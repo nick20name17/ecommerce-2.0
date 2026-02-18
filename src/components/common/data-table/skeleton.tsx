@@ -14,19 +14,16 @@ export const DataTableSkeleton = <T,>({
   rowsCount = DEFAULT_LIMIT
 }: DataTableSkeletonProps<T>) => {
   return Array.from({ length: rowsCount }).map((_, index) => (
-    <TableRow
-      key={`skeleton_${index}`}
-      className='h-(--table-row-height)'
-    >
+    <TableRow key={`skeleton_${index}`}>
       {headers.map((header, headerIndex) => (
         <TableCell
-          className='skeleton py-1'
+          className='py-1'
           key={`skeleton_${index}_${header.id || headerIndex}`}
           style={{
             width: header.getSize()
           }}
         >
-          <Skeleton className='h-(--table-row-height) w-full' />
+          <Skeleton className='size-full' />
         </TableCell>
       ))}
     </TableRow>

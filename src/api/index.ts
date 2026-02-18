@@ -11,13 +11,6 @@ export const api = axios.create({
   }
 })
 
-export const publicApi = axios.create({
-  baseURL: API_BASE_URL,
-  headers: {
-    'Content-Type': 'application/json'
-  }
-})
-
 api.interceptors.request.use(
   (config) => {
     const session = getSession()
@@ -35,6 +28,8 @@ api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const session = getSession()
+
+    console.log(session)
 
     if (!session?.refresh) return Promise.reject(new Error('No refresh token available'))
 

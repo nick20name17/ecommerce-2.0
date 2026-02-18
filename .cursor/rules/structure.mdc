@@ -1,0 +1,37 @@
+---
+description: Project structure and file organization conventions
+alwaysApply: true
+---
+
+# Structure Rules
+
+- Follow the existing folder structure. Do not introduce new top-level directories without explicit approval.
+- Use **kebab-case** for all file and folder names (e.g. `password-input.tsx`, `data-table/`).
+- Use the `@/` path alias for all imports from `src/`.
+- Keep components small and focused. Avoid god components — extract logic into hooks, child components, or utilities when a component exceeds ~150 lines.
+
+## Component Organization
+
+- **`src/components/ui/`** — Base UI primitives (shadcn/ui).
+- **`src/components/common/`** — Shared reusable components (e.g. `data-table/`, `inputs/`).
+- **`src/components/common/filters/`** — Reusable list page controls: `SearchFilter`, `Pagination`. Use these in every CRUD list page rather than building one-off filter UI.
+
+## Route Structure
+
+- Route-specific components must be colocated with their route inside a `-components/` folder (e.g. `src/routes/_authenticated/users/-components/`).
+- TanStack Router file-based routing conventions:
+  - `_` prefix for layout routes (`_auth`, `_authenticated`)
+  - `-` prefix for private component folders (`-components/`)
+  - `index.tsx` for route pages
+- CRUD route `-components/` typically contain: column definitions (`*-columns.tsx`), a combined create/edit modal (`*-modal.tsx`), and a delete confirmation dialog (`*-delete-dialog.tsx`).
+
+## Hooks
+
+- Shared custom hooks go in `src/hooks/`.
+- **`use-query-params.ts`** — Reusable `nuqs` URL param hooks (`useSearchParam`, `useOffsetParam`, `useLimitParam`). Add new shared params here.
+- **`use-ordering.ts`** — TanStack Table sorting state + API ordering string conversion.
+
+## Other Directories
+
+- Global providers go in `src/providers/`. Shared helpers in `src/helpers/`. Constants in `src/constants/`.
+- Import order is enforced by Prettier (`@trivago/prettier-plugin-sort-imports`). Do not manually reorder imports.

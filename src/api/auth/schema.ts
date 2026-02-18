@@ -19,7 +19,7 @@ export interface RefreshPayload {
   refresh: string
 }
 
-export type RefreshResponse = Tokens
+export type RefreshResponse = Pick<Tokens, 'access'>
 
 export interface SignInResponse extends Tokens {
   user: User

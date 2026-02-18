@@ -1,3 +1,3 @@
 export const STORAGE_KEYS = {
-  session: 'apexflora:session'
+  session: 'ecommerce:session'
 } as const

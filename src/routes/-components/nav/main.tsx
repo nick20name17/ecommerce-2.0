@@ -1,7 +1,7 @@
 'use client'
 
 import { Link } from '@tanstack/react-router'
-import { FolderKanban, Home } from 'lucide-react'
+import { FolderKanban, Home, User } from 'lucide-react'
 
 import {
   SidebarGroup,
@@ -20,6 +20,11 @@ const NAV_ITEMS = [
     title: 'Projects',
     url: '/projects',
     icon: FolderKanban
+  },
+  {
+    title: 'Users',
+    url: '/users',
+    icon: User
   }
 ] as const
 

@@ -1,6 +1,12 @@
+import { z } from 'zod'
+
+import { USER_ROLES } from '@/constants/user'
+import type { UserRole } from '@/constants/user'
+
+import { EmailSchema, NameSchema, PasswordSchema } from '../schema'
 import type { ApiResponse, PaginationParams } from '../schema'
 
-export type UserRole = 'admin' | 'manager' | 'superadmin' | 'sale'
+export type { UserRole } from '@/constants/user'
 
 export interface User {
   id: number
@@ -15,11 +21,34 @@ export interface User {
   updated_at: string
 }
 
-export type CreateUserPayload = Omit<User, 'id' | 'updated_at' | 'date_joined'>
+export interface UserSummary {
+  id: number
+  email: string
+  first_name: string
+  last_name: string
+  full_name: string
+  role: string
+}
+
+export interface CreateUserPayload {
+  email: string
+  password: string
+  password_confirm: string
+  first_name: string
+  last_name: string
+  role: string
+  project?: number
+}
 
 export interface UpdateUserPayload {
   id: number
-  payload: Partial<CreateUserPayload>
+  payload: {
+    is_active?: boolean
+    first_name?: string
+    last_name?: string
+    email?: string
+    role?: string
+  }
 }
 
 export type UserResponse = ApiResponse<User>
@@ -28,3 +57,31 @@ export interface UserParams extends PaginationParams {
   search?: string
   ordering?: string
 }
+
+const roleValues = Object.values(USER_ROLES) as [string, ...string[]]
+
+export const CreateUserSchema = z
+  .object({
+    first_name: NameSchema,
+    last_name: NameSchema,
+    email: EmailSchema,
+    role: z.enum(roleValues),
+    password: PasswordSchema,
+    password_confirm: PasswordSchema
+  })
+  .refine((data) => data.password === data.password_confirm, {
+    message: 'passwords do not match',
+    path: ['password_confirm']
+  })
+
+export type CreateUserFormValues = z.infer<typeof CreateUserSchema>
+
+export const UpdateUserSchema = z.object({
+  first_name: NameSchema,
+  last_name: NameSchema,
+  email: EmailSchema,
+  role: z.enum(roleValues),
+  is_active: z.boolean()
+})
+
+export type UpdateUserFormValues = z.infer<typeof UpdateUserSchema>

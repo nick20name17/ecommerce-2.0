@@ -1,15 +1,29 @@
-import { isAxiosError } from "axios";
+import { isAxiosError } from 'axios'
 
-const FALLBACK_ERROR_MESSAGE = "Щось пішло не так";
+const FALLBACK_ERROR_MESSAGE = 'Something went wrong'
 
-export const getErrorMessage = (error: unknown) => {
-    if (error instanceof Error) {
-        return error.message;
+export function getErrorMessage(error: unknown): string {
+  if (isAxiosError(error)) {
+    const data = error.response?.data
+
+    if (typeof data?.detail === 'string') return data.detail
+
+    if (typeof data?.message === 'string') return data.message
+
+    if (Array.isArray(data?.non_field_errors)) {
+      return data.non_field_errors.join(', ')
     }
 
-    if (isAxiosError(error)) {
-        return error.response?.data?.detail;
-    }
+    if (error.message) return error.message
+  }
 
-    return FALLBACK_ERROR_MESSAGE;
-};
+  if (error instanceof Error) {
+    return error.message
+  }
+
+  if (typeof error === 'string') {
+    return error
+  }
+
+  return FALLBACK_ERROR_MESSAGE
+}

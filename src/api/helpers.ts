@@ -12,7 +12,7 @@ const refreshToken = async () => {
   }
 
   try {
-    const { access, refresh } = await authService.refresh({
+    const { access } = await authService.refresh({
       refresh: session.refresh
     })
 
@@ -21,9 +21,9 @@ const refreshToken = async () => {
       throw new Error('No access token received')
     }
 
-    updateTokens({ access, refresh })
+    updateTokens({ access })
 
-    return { access, refresh }
+    return { access }
   } catch (error) {
     clearSession()
     throw error

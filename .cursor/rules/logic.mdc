@@ -1,0 +1,65 @@
+---
+description: Business logic, API layer, and library conventions
+alwaysApply: true
+---
+
+# Logic Rules
+
+## API Layer
+
+Every API module must follow the `src/api/user/` pattern with three files:
+
+- **`schema.ts`** — TypeScript types/interfaces. Extend shared types from `src/api/schema.ts` (e.g. `ApiResponse<T>`, `PaginationParams`).
+- **`service.ts`** — Axios calls as a plain object of async functions using the `api` instance from `src/api/index.ts`.
+- **`query.ts`** — TanStack Query `queryOptions` with hierarchical query keys following this pattern:
+
+```typescript
+export const EXAMPLE_QUERY_KEYS = {
+  all: () => ['example'] as const,
+  lists: () => [...EXAMPLE_QUERY_KEYS.all(), 'list'] as const,
+  list: (params = {}) => [...EXAMPLE_QUERY_KEYS.lists(), params] as const,
+  details: () => [...EXAMPLE_QUERY_KEYS.all(), 'detail'] as const,
+  detail: (id: string) => [...EXAMPLE_QUERY_KEYS.details(), id] as const,
+}
+```
+
+## Libraries & Dependencies
+
+- Use existing project libraries before considering new ones. Key libs: TanStack Query (server state), TanStack Router (routing), TanStack Table (tables), `nuqs` (URL state), `zod` (validation), `axios` (HTTP), `sonner` (toasts).
+- **Ask for approval** before installing any new npm package. New **shadcn components** may be installed without permission.
+
+## State & Data Flow
+
+- Use **TanStack Query** for all server state. Never store API data in local state or context.
+- Use mutation `meta` for toast messages (`successMessage`, `errorMessage`) and auto-invalidation (`invalidatesQuery`) — these are handled globally in `src/providers/react-query.tsx`.
+- Use `nuqs` for URL-driven state (filters, search, pagination). Use the shared hooks from `src/hooks/use-query-params.ts` (`useSearchParam`, `useOffsetParam`, `useLimitParam`) — never call `useQueryState` directly for these common params.
+- Use `useOrdering` from `src/hooks/use-ordering.ts` for TanStack Table sorting state. It returns `{ sorting, setSorting, ordering }` where `ordering` is the API-ready string (e.g. `-date_joined`).
+- Use React context only for truly global client state (auth, theme).
+
+## CRUD List Pages
+
+Follow the `src/routes/_authenticated/users/index.tsx` pattern:
+
+- Use `keepPreviousData` with `useQuery` for seamless pagination transitions.
+- Use reusable `<SearchFilter>` and `<Pagination>` from `src/components/common/filters/`.
+- Configure `useReactTable` with `manualSorting: true` and `useOrdering()` — do **not** import `getSortedRowModel` since sorting is server-side.
+- Memoize column definitions with `useMemo`.
+- Prevent self-actions: users must not be able to deactivate or delete their own account. Guard in both the table (disabled toggle + tooltip) and the delete dialog.
+
+## Forms & Modals
+
+- Use `zod` for form validation schemas. Reuse base schemas from `src/api/schema.ts` (`RequiredStringSchema`, `EmailSchema`, `PasswordSchema`).
+- Combine create/edit into a single modal component. Pass an optional entity prop — its presence determines create vs. edit mode. Use a React `key` prop on the modal to reset form state when switching between entities.
+- Use `FormProvider` + `useFormContext` for shared fields across create/edit forms.
+- Set `defaultValues` directly from the entity prop — no `useEffect` to sync.
+- Disable the submit button when `!formState.isDirty` (edit mode) or `mutation.isPending`.
+
+## Validation & Error Handling
+
+- Use `getErrorMessage()` from `src/helpers/error.ts` for extracting user-friendly error messages.
+
+## General
+
+- TypeScript strict mode is enabled. Never use `any` — prefer `unknown` and narrow with type guards.
+- Use `use-debounce` for debounced inputs (search, filters).
+- Auth tokens are managed via localStorage and axios interceptors. Do not manually attach tokens to requests.

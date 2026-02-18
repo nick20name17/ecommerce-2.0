@@ -14,8 +14,21 @@ export const EmailSchema = z
   .email({ error: VALIDATION_MESSAGES.invalidEmail })
   .check(z.minLength(1, { error: VALIDATION_MESSAGES.required }), z.trim())
 
+export const NameSchema = RequiredStringSchema.check(
+  z.maxLength(100, { error: 'max 100 characters' })
+)
+
+export const OptionalStringSchema = z.optional(z.string().check(z.trim()))
+
 export interface ApiResponse<T> {
   count: number
+  results: T[]
+}
+
+export interface PaginatedResponse<T> {
+  count: number
+  next: string | null
+  previous: string | null
   results: T[]
 }
 

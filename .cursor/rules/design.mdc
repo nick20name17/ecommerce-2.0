@@ -1,0 +1,23 @@
+---
+description: UI and design conventions for the project
+alwaysApply: true
+---
+
+# Design Rules
+
+- Use **shadcn/ui** components from `src/components/ui/` as the primary component library. If no suitable shadcn component exists for a given task, **stop and ask** the user for the preferred solution before proceeding.
+- New shadcn components can be installed without asking for permission.
+- Keep visual styles consistent across the entire project. Treat existing components as the **source of truth** for spacing, colors, typography, and layout patterns.
+- When asked to change a design element (e.g. border radius, color scheme, font size), apply the change **project-wide** — not just in a single file.
+- Use the `cn()` utility from `@/lib/utils` (clsx + tailwind-merge) for all conditional or merged class names.
+- Use `class-variance-authority` (`cva`) for defining component variants, following the pattern in existing `src/components/ui/` components.
+- Use CSS custom properties (oklch tokens defined in `src/index.css`) for theming colors — never use hardcoded color values.
+- Support dark mode via the `.dark` class. Always verify both themes when adding or changing styles.
+- Use Tailwind CSS v4 utility classes. Avoid inline styles or custom CSS unless absolutely necessary.
+- Use `lucide-react` for icons.
+
+## Layout
+
+- The authenticated layout (`_authenticated/route.tsx`) constrains the app to `h-svh overflow-hidden`. The inner `<main>` is a flex column with `p-4`.
+- Page content must fill available height without triggering page-level scrollbars. Use `flex h-full flex-col` on the page root, and `flex-1` with `min-h-0` on the data table or scrollable region.
+- Only the table body should scroll — the page header, search bar, and pagination remain fixed.
