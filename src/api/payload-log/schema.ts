@@ -29,6 +29,8 @@ export interface PayloadLogListResponse {
 }
 
 export interface PayloadLogParams extends PaginationParams {
+  search?: string
+  ordering?: string
   created_after?: string
   created_before?: string
   entity?: string

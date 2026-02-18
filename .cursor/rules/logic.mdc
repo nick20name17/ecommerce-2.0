@@ -19,7 +19,7 @@ export const EXAMPLE_QUERY_KEYS = {
   lists: () => [...EXAMPLE_QUERY_KEYS.all(), 'list'] as const,
   list: (params = {}) => [...EXAMPLE_QUERY_KEYS.lists(), params] as const,
   details: () => [...EXAMPLE_QUERY_KEYS.all(), 'detail'] as const,
-  detail: (id: string) => [...EXAMPLE_QUERY_KEYS.details(), id] as const,
+  detail: (id: string) => [...EXAMPLE_QUERY_KEYS.details(), id] as const
 }
 ```
 
@@ -27,6 +27,7 @@ export const EXAMPLE_QUERY_KEYS = {
 
 - Use existing project libraries before considering new ones. Key libs: TanStack Query (server state), TanStack Router (routing), TanStack Table (tables), `nuqs` (URL state), `zod` (validation), `axios` (HTTP), `sonner` (toasts).
 - **Ask for approval** before installing any new npm package. New **shadcn components** may be installed without permission.
+- use 'use no memo' only for components that have something related to @tanstack/react-table.
 
 ## State & Data Flow
 

@@ -22,6 +22,13 @@ export const updateTokens = (tokens: Partial<Pick<Session, 'access' | 'refresh'>
   }
 }
 
+export const updateSessionUser = (user: Partial<Session['user']>) => {
+  const session = getSession()
+  if (session?.user) {
+    setSession({ ...session, user: { ...session.user, ...user } })
+  }
+}
+
 export const clearSession = () => localStorage.removeItem(STORAGE_KEYS.session)
 
 export const isLoggedIn = () => !!getSession()
