@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { AlertCircle, ChevronLeft, ChevronRight, Image, Minus, Plus } from 'lucide-react'
 
 import type { AddToCartPayload, UpdateCartItemPayload } from '@/api/cart/schema'
@@ -111,12 +111,12 @@ export function ProductEditSheet({
     Array<{ autoid: string; unit: string; multiplier: string; price: string; old_price: string }> | undefined
   const hasMultipleUnits = (units?.length ?? 0) > 1
 
-  const maxCount = useMemo(() => {
+  const maxCount = (() => {
     const v = product?.max_count
     if (typeof v === 'number') return v
     if (typeof v === 'string') return parseInt(v) || 9999
     return 9999
-  }, [product])
+  })()
 
   const ignoreCount = product
     ? isCartItem(product) ? product.ignore_count : product.ignoreCount
@@ -124,7 +124,7 @@ export function ProductEditSheet({
 
   const hasConfigs = configs.length > 0
 
-  const activeConfigurations = useMemo(() => {
+  const activeConfigurations = (() => {
     const result: { name: string; id: string | number }[] = []
     configs.forEach((c) => {
       c.items.forEach((i) => {
@@ -132,25 +132,25 @@ export function ProductEditSheet({
       })
     })
     return result
-  }, [configs])
+  })()
 
-  const hasUncheckedRequired = useMemo(() => {
-    return configs.some((c) => !c.allownone && !c.items.some((i) => i.active))
-  }, [configs])
+  const hasUncheckedRequired = configs.some(
+    (c) => !c.allownone && !c.items.some((i) => i.active)
+  )
 
-  const totalPrice = useMemo(() => {
+  const totalPrice = (() => {
     let total = Number(configData?.base_price) || 0
     configs.forEach((c) => c.items.forEach((i) => { if (i.active) total += Number(i.price) || 0 }))
     return total
-  }, [configs, configData])
+  })()
 
-  const totalOldPrice = useMemo(() => {
+  const totalOldPrice = (() => {
     let total = Number(configData?.base_old_price) || 0
     configs.forEach((c) => c.items.forEach((i) => { if (i.active) total += Number(i.old_price) || 0 }))
     return total
-  }, [configs, configData])
+  })()
 
-  const hasChanges = useMemo(() => {
+  const hasChanges = (() => {
     if (quantity !== initialQuantityRef.current) return true
     const currentIds = new Set(activeConfigurations.map((c) => c.id))
     if (currentIds.size !== initialConfigIdsRef.current.size) return true
@@ -158,9 +158,9 @@ export function ProductEditSheet({
       if (!initialConfigIdsRef.current.has(id)) return true
     }
     return false
-  }, [quantity, activeConfigurations])
+  })()
 
-  const handleSelectConfigItem = useCallback((configName: string, itemId: string) => {
+  const handleSelectConfigItem = (configName: string, itemId: string) => {
     setConfigs((prev) =>
       prev.map((c) => {
         if (c.name !== configName) return c
@@ -173,7 +173,7 @@ export function ProductEditSheet({
         }
       })
     )
-  }, [])
+  }
 
   const handleClose = () => {
     if (hasChanges) {

@@ -1,16 +1,12 @@
-'use no memo'
-
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
-import { getCoreRowModel, useReactTable } from '@tanstack/react-table'
 import { endOfDay, startOfDay } from 'date-fns'
 import { Filter, FilterX, X } from 'lucide-react'
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 
-import { getPayloadLogColumns } from './payload-log-columns'
 import { PayloadLogDetailDialog } from './payload-log-detail-dialog'
+import { PayloadLogsDataTable } from './payload-logs-data-table'
 import { getPayloadLogsQuery } from '@/api/payload-log/query'
 import type { PayloadLog, PayloadLogParams } from '@/api/payload-log/schema'
-import { DataTable } from '@/components/common/data-table'
 import { Pagination } from '@/components/common/filters/pagination'
 import { Button } from '@/components/ui/button'
 import { DatePicker } from '@/components/ui/date-picker'
@@ -94,17 +90,6 @@ export const PayloadLogsCard = () => {
   const { data, isLoading, isPlaceholderData } = useQuery({
     ...getPayloadLogsQuery(params),
     placeholderData: keepPreviousData
-  })
-
-  const columns = useMemo(() => getPayloadLogColumns({ onView: setSelectedLog }), [])
-
-  const table = useReactTable({
-    columns,
-    data: data?.results ?? [],
-    getCoreRowModel: getCoreRowModel(),
-    onSortingChange: setSorting,
-    state: { sorting },
-    manualSorting: true
   })
 
   return (
@@ -255,10 +240,12 @@ export const PayloadLogsCard = () => {
         ) : null}
 
         <div className='ring-foreground/10 flex h-full flex-col overflow-hidden rounded-xl ring-1'>
-          <DataTable
-            table={table}
+          <PayloadLogsDataTable
+            data={data?.results ?? []}
             isLoading={isLoading || isPlaceholderData}
-            className='flex-1'
+            sorting={sorting}
+            setSorting={setSorting}
+            onView={setSelectedLog}
           />
 
           <div className='border-t p-3'>

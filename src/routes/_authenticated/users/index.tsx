@@ -1,31 +1,24 @@
-'use no memo'
-
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
-import { getCoreRowModel, useReactTable } from '@tanstack/react-table'
 import { Plus } from 'lucide-react'
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 
-import { getUserColumns } from './-components/user-columns'
 import { UserDeleteDialog } from './-components/user-delete-dialog'
 import { UserModal } from './-components/user-modal'
+import { UsersDataTable } from './-components/users-data-table'
 import { getUsersQuery } from '@/api/user/query'
 import type { User, UserParams } from '@/api/user/schema'
-import { DataTable } from '@/components/common/data-table'
 import { Pagination } from '@/components/common/filters/pagination'
 import { SearchFilter } from '@/components/common/filters/search'
 import { Button } from '@/components/ui/button'
 import { useOrdering } from '@/hooks/use-ordering'
 import { useLimitParam, useOffsetParam, useSearchParam } from '@/hooks/use-query-params'
-import { useAuth } from '@/providers/auth'
 
 export const Route = createFileRoute('/_authenticated/users/')({
   component: UsersPage
 })
 
 function UsersPage() {
-  const { user: currentUser } = useAuth()
-
   const [search] = useSearchParam()
   const [offset] = useOffsetParam()
   const [limit] = useLimitParam()
@@ -46,25 +39,6 @@ function UsersPage() {
     placeholderData: keepPreviousData
   })
 
-  const columns = useMemo(
-    () =>
-      getUserColumns({
-        currentUserId: currentUser?.id,
-        onEdit: setModalUser,
-        onDelete: setDeleteUser
-      }),
-    [currentUser?.id]
-  )
-
-  const table = useReactTable({
-    columns,
-    data: data?.results ?? [],
-    getCoreRowModel: getCoreRowModel(),
-    onSortingChange: setSorting,
-    state: { sorting },
-    manualSorting: true
-  })
-
   const editingUser = typeof modalUser === 'object' ? modalUser : null
 
   return (
@@ -79,10 +53,13 @@ function UsersPage() {
 
       <SearchFilter placeholder='Search users...' />
 
-      <DataTable
-        table={table}
+      <UsersDataTable
+        data={data?.results ?? []}
         isLoading={isLoading || isPlaceholderData}
-        className='flex-1'
+        sorting={sorting}
+        setSorting={setSorting}
+        onEdit={setModalUser}
+        onDelete={setDeleteUser}
       />
 
       <Pagination totalCount={data?.count ?? 0} />

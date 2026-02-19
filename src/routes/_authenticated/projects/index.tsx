@@ -1,17 +1,13 @@
-'use no memo'
-
 import { keepPreviousData, useQueries, useQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
-import { getCoreRowModel, useReactTable } from '@tanstack/react-table'
 import { Plus } from 'lucide-react'
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 
-import { getProjectColumns } from './-components/project-columns'
 import { ProjectDeleteDialog } from './-components/project-delete-dialog'
 import { ProjectModal } from './-components/project-modal'
+import { ProjectsDataTable } from './-components/projects-data-table'
 import { getProjectHealthQuery, getProjectsQuery } from '@/api/project/query'
 import type { Project, ProjectParams } from '@/api/project/schema'
-import { DataTable } from '@/components/common/data-table'
 import { Pagination } from '@/components/common/filters/pagination'
 import { SearchFilter } from '@/components/common/filters/search'
 import { Button } from '@/components/ui/button'
@@ -19,10 +15,13 @@ import { useOrdering } from '@/hooks/use-ordering'
 import { useLimitParam, useOffsetParam, useSearchParam } from '@/hooks/use-query-params'
 
 export const Route = createFileRoute('/_authenticated/projects/')({
-  component: ProjectsPage,
+  component: ProjectsPage
 })
 
-function mergeHealthIntoProjects(projects: Project[], healthResults: Array<{ data?: unknown }>): Project[] {
+function mergeHealthIntoProjects(
+  projects: Project[],
+  healthResults: Array<{ data?: unknown }>
+): Project[] {
   return projects.map((project, index) => {
     const health = healthResults[index]?.data as
       | {
@@ -62,7 +61,7 @@ function mergeHealthIntoProjects(projects: Project[], healthResults: Array<{ dat
       db_status: health.db_status,
       overall_status: health.overall_status,
       has_ebms_config: health.has_ebms_config,
-      has_sync_config: health.has_sync_config,
+      has_sync_config: health.has_sync_config
     }
   })
 }
@@ -80,65 +79,49 @@ function ProjectsPage() {
     search: search || undefined,
     offset,
     limit,
-    ordering,
+    ordering
   }
 
   const { data, isLoading, isPlaceholderData } = useQuery({
     ...getProjectsQuery(params),
-    placeholderData: keepPreviousData,
+    placeholderData: keepPreviousData
   })
 
   const projects = data?.results ?? []
+
   const healthQueries = useQueries({
-    queries: projects.map((p) => getProjectHealthQuery(p.id)),
-    enabled: projects.length > 0,
+    queries: projects?.map((p) => getProjectHealthQuery(p.id)),
+    enabled: projects.length > 0
   })
-  const projectsWithHealth = useMemo(
-    () =>
-      mergeHealthIntoProjects(
-        projects,
-        healthQueries.map((q) => ({ data: q.data }))
-      ),
-    [projects, healthQueries]
+
+  const projectsWithHealth = mergeHealthIntoProjects(
+    projects,
+    healthQueries?.map((q) => ({ data: q.data }))
   )
+
   const healthLoading = healthQueries.some((q) => q.isLoading)
-
-  const columns = useMemo(
-    () =>
-      getProjectColumns({
-        onEdit: setModalProject,
-        onDelete: setDeleteProject,
-      }),
-    []
-  )
-
-  const table = useReactTable({
-    columns,
-    data: projectsWithHealth,
-    getCoreRowModel: getCoreRowModel(),
-    onSortingChange: setSorting,
-    state: { sorting },
-    manualSorting: true,
-  })
 
   const editingProject = typeof modalProject === 'object' ? modalProject : null
 
   return (
-    <div className="flex h-full flex-col gap-4">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Projects</h1>
+    <div className='flex h-full flex-col gap-4'>
+      <div className='flex items-center justify-between'>
+        <h1 className='text-2xl font-bold'>Projects</h1>
         <Button onClick={() => setModalProject('create')}>
           <Plus />
           Add Project
         </Button>
       </div>
 
-      <SearchFilter placeholder="Search projects..." />
+      <SearchFilter placeholder='Search projects...' />
 
-      <DataTable
-        table={table}
+      <ProjectsDataTable
+        data={projectsWithHealth}
         isLoading={isLoading || isPlaceholderData || healthLoading}
-        className="flex-1"
+        sorting={sorting}
+        setSorting={setSorting}
+        onEdit={setModalProject}
+        onDelete={setDeleteProject}
       />
 
       <Pagination totalCount={data?.count ?? 0} />

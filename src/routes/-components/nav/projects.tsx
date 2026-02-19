@@ -1,8 +1,6 @@
-'use client'
-
 import { useQuery } from '@tanstack/react-query'
-import { useEffect, useMemo } from 'react'
 import { ChevronsUpDown, FolderKanban } from 'lucide-react'
+import { useEffect } from 'react'
 
 import { getProjectsPickerQuery } from '@/api/project/query'
 import {
@@ -35,15 +33,16 @@ export function NavProjects() {
     enabled: isSuperAdminUser
   })
 
-  const projects = useMemo(() => data?.results ?? [], [data?.results])
+  const projects = data?.results ?? []
   const selectedProjectId = projectId ?? projects[0]?.id ?? null
   const selectedProject = projects.find((p) => p.id === selectedProjectId) ?? null
 
   useEffect(() => {
-    if (!projectId && projects.length > 0) {
-      setProjectId(projects[0].id)
+    const results = data?.results
+    if (!projectId && results?.length && results.length > 0) {
+      setProjectId(results[0].id)
     }
-  }, [projectId, projects, setProjectId])
+  }, [projectId, data?.results, setProjectId])
 
   if (!isSuperAdminUser) {
     return (
@@ -104,7 +103,7 @@ export function NavProjects() {
                 No projects found
               </div>
             ) : (
-              projects.map((project) => (
+              projects?.map((project) => (
                 <DropdownMenuItem
                   key={project.id}
                   onClick={() => setProjectId(project.id)}

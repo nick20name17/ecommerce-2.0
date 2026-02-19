@@ -27,7 +27,14 @@ export const EXAMPLE_QUERY_KEYS = {
 
 - Use existing project libraries before considering new ones. Key libs: TanStack Query (server state), TanStack Router (routing), TanStack Table (tables), `nuqs` (URL state), `zod` (validation), `axios` (HTTP), `sonner` (toasts).
 - **Ask for approval** before installing any new npm package. New **shadcn components** may be installed without permission.
-- use 'use no memo' only for components that have something related to @tanstack/react-table.
+- Use `'use no memo'` only in components that use TanStack Table (`useReactTable`) or other APIs that require stable refs. To minimize its scope, extract the table into a dedicated `*-data-table` component (e.g. `users-data-table.tsx`, `projects-data-table.tsx`) that owns `useReactTable`, column `useMemo`, and `<DataTable>`. The parent list page or card stays without `'use no memo'` and passes data, loading state, `sorting`/`setSorting` (from `useOrdering()` in the parent), and action callbacks as props.
+
+## Memoization (React Compiler)
+
+- Do **not** use `useCallback` or `useMemo` by default — the project uses React Compiler, which handles memoization.
+- Use `useMemo` or `useCallback` only when:
+  - The component has **`'use no memo'`** (e.g. components that use TanStack Table), or
+  - The component uses **external APIs** that return unstable references (e.g. `useOrdering()`, `useReactTable()`).
 
 ## State & Data Flow
 
@@ -44,7 +51,7 @@ Follow the `src/routes/_authenticated/users/index.tsx` pattern:
 - Use `keepPreviousData` with `useQuery` for seamless pagination transitions.
 - Use reusable `<SearchFilter>` and `<Pagination>` from `src/components/common/filters/`.
 - Configure `useReactTable` with `manualSorting: true` and `useOrdering()` — do **not** import `getSortedRowModel` since sorting is server-side.
-- Memoize column definitions with `useMemo`.
+- In `*-data-table` components (which use `'use no memo'` and receive `sorting`/`setSorting` from the parent), memoize column definitions with `useMemo` so the table does not see new column refs every render.
 - Table cells: truncate content (no line wrap); add tooltips for truncated values (see Design rules).
 - Prevent self-actions: users must not be able to deactivate or delete their own account. Guard in both the table (disabled toggle + tooltip) and the delete dialog.
 
