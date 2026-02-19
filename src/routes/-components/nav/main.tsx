@@ -1,7 +1,16 @@
 'use client'
 
 import { Link } from '@tanstack/react-router'
-import { FolderKanban, Home, User } from 'lucide-react'
+import {
+  ClipboardList,
+  FolderKanban,
+  Home,
+  Plus,
+  Settings,
+  Ship,
+  StickyNote,
+  User,
+} from 'lucide-react'
 
 import {
   SidebarGroup,
@@ -17,6 +26,11 @@ const NAV_ITEMS = [
     icon: Home
   },
   {
+    title: 'Create',
+    url: '/create',
+    icon: Plus
+  },
+  {
     title: 'Projects',
     url: '/projects',
     icon: FolderKanban
@@ -25,7 +39,27 @@ const NAV_ITEMS = [
     title: 'Users',
     url: '/users',
     icon: User
-  }
+  },
+  {
+    title: 'Order Desk',
+    url: '/order-desk',
+    icon: ClipboardList
+  },
+  {
+    title: 'Shipping',
+    url: '/shipping',
+    icon: Ship
+  },
+  {
+    title: 'Notes',
+    url: '/notes',
+    icon: StickyNote
+  },
+  {
+    title: 'Settings',
+    url: '/settings',
+    icon: Settings
+  },
 ] as const
 
 export const NavMain = () => {
