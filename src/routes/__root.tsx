@@ -6,7 +6,9 @@ import { AuthProvider } from '@/providers/auth'
 
 const RootSearchParamsSchema = z.object({
   project_id: z.coerce.number().optional(),
-  status: z.string().optional()
+  status: z.string().optional(),
+  offset: z.coerce.number().optional(),
+  limit: z.coerce.number().optional()
 })
 
 export type RootSearchParams = z.infer<typeof RootSearchParamsSchema>

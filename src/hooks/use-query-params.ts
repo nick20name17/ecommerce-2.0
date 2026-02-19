@@ -1,3 +1,4 @@
+import { useNavigate, useSearch } from '@tanstack/react-router'
 import {
   createParser,
   parseAsInteger,
@@ -26,12 +27,44 @@ export const useSearchParam = () => {
   return useQueryState('search', parseAsString.withDefault(''))
 }
 
-export const useOffsetParam = () => {
-  return useQueryState('offset', parseAsInteger.withDefault(0))
+export function useOffsetParam() {
+  const navigate = useNavigate()
+  const search = useSearch({ from: '__root__' }) as { offset?: number } & Record<string, unknown>
+  const raw = search?.offset
+  const offset =
+    raw !== undefined && raw !== null && raw !== ''
+      ? Math.max(0, Math.floor(Number(raw)))
+      : 0
+
+  const setOffset = (value: number | null) => {
+    const next = value === null || value === 0 ? undefined : value
+    navigate({
+      to: '.',
+      search: (prev: Record<string, unknown>) => ({ ...prev, offset: next }),
+      replace: true
+    })
+  }
+  return [offset, setOffset] as const
 }
 
-export const useLimitParam = () => {
-  return useQueryState('limit', parseAsInteger.withDefault(DEFAULT_LIMIT))
+export function useLimitParam() {
+  const navigate = useNavigate()
+  const search = useSearch({ from: '__root__' }) as { limit?: number } & Record<string, unknown>
+  const raw = search?.limit
+  const limit =
+    raw !== undefined && raw !== null && raw !== ''
+      ? Math.max(1, Math.floor(Number(raw)))
+      : DEFAULT_LIMIT
+
+  const setLimit = (value: number) => {
+    const next = value === DEFAULT_LIMIT ? undefined : value
+    navigate({
+      to: '.',
+      search: (prev: Record<string, unknown>) => ({ ...prev, limit: next }),
+      replace: true
+    })
+  }
+  return [limit, setLimit] as const
 }
 
 export { useProjectIdParam } from './use-project-id-param'

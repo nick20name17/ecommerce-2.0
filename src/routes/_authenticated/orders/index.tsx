@@ -25,10 +25,10 @@ export const Route = createFileRoute('/_authenticated/orders/')({
 })
 
 const STATUS_TABS = [
-  { label: 'All Orders', value: 'all' },
   { label: 'Unprocessed', value: ORDER_STATUS.unprocessed },
   { label: 'Open', value: ORDER_STATUS.open },
-  { label: 'Closed', value: ORDER_STATUS.closed }
+  { label: 'Closed', value: ORDER_STATUS.closed },
+  { label: 'All Orders', value: 'all' }
 ] as const
 
 const VALID_STATUS_VALUES = new Set<string>(Object.values(ORDER_STATUS))
@@ -45,7 +45,7 @@ function OrdersPage() {
   const rawStatus = rootSearch.status ?? null
   const isCorruptStatus = typeof rawStatus === 'string' && rawStatus.includes('?')
   const status = isCorruptStatus ? null : rawStatus
-  const activeStatus = status ?? 'all'
+  const activeStatus = status ?? ORDER_STATUS.unprocessed
 
   useEffect(() => {
     if (!isCorruptStatus) return
