@@ -72,7 +72,7 @@ export const DangerZoneCard = ({ user }: DangerZoneCardProps) => {
 
   return (
     <>
-      <Card className='border-destructive/30'>
+      <Card className='ring-destructive/30'>
         <CardHeader>
           <CardTitle className='text-destructive'>Danger Zone</CardTitle>
         </CardHeader>
@@ -83,7 +83,11 @@ export const DangerZoneCard = ({ user }: DangerZoneCardProps) => {
               Temporarily disable your account. You can reactivate it later.
             </p>
             <div className='mt-2'>
-              <Button variant='outline' size='sm' onClick={() => setDeactivateOpen(true)}>
+              <Button
+                variant='outline'
+                size='sm'
+                onClick={() => setDeactivateOpen(true)}
+              >
                 Deactivate Account
               </Button>
             </div>
@@ -95,7 +99,11 @@ export const DangerZoneCard = ({ user }: DangerZoneCardProps) => {
               Permanently delete your account. This cannot be undone.
             </p>
             <div className='mt-2'>
-              <Button variant='outline' size='sm' onClick={() => setDeleteOpen(true)}>
+              <Button
+                variant='outline'
+                size='sm'
+                onClick={() => setDeleteOpen(true)}
+              >
                 Delete Account
               </Button>
             </div>
@@ -104,7 +112,10 @@ export const DangerZoneCard = ({ user }: DangerZoneCardProps) => {
       </Card>
 
       {/* Deactivate confirmation */}
-      <AlertDialog open={deactivateOpen} onOpenChange={setDeactivateOpen}>
+      <AlertDialog
+        open={deactivateOpen}
+        onOpenChange={setDeactivateOpen}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogMedia className='bg-destructive/10 text-destructive'>
@@ -130,7 +141,10 @@ export const DangerZoneCard = ({ user }: DangerZoneCardProps) => {
       </AlertDialog>
 
       {/* Delete confirmation */}
-      <Dialog open={deleteOpen} onOpenChange={handleDeleteClose}>
+      <Dialog
+        open={deleteOpen}
+        onOpenChange={handleDeleteClose}
+      >
         <DialogContent className='sm:max-w-md'>
           <DialogHeader>
             <DialogTitle>Delete Account</DialogTitle>
@@ -141,7 +155,10 @@ export const DangerZoneCard = ({ user }: DangerZoneCardProps) => {
           </DialogHeader>
 
           <div className='flex flex-col gap-2'>
-            <label htmlFor='delete-confirm' className='text-sm font-medium'>
+            <label
+              htmlFor='delete-confirm'
+              className='text-sm font-medium'
+            >
               Type <strong>{DELETE_CONFIRMATION_TEXT}</strong> to confirm
             </label>
             <Input

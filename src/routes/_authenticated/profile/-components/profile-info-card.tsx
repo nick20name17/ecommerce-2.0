@@ -1,5 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { format } from 'date-fns'
 import { Controller, useForm } from 'react-hook-form'
 
 import { type UpdateProfileFormValues, UpdateProfileSchema } from '@/api/profile/schema'
@@ -14,7 +15,6 @@ import { Input } from '@/components/ui/input'
 import { DATE_FORMATS } from '@/constants/app'
 import { getUserRoleLabel } from '@/constants/user'
 import { updateSessionUser } from '@/helpers/auth'
-import { format } from 'date-fns'
 
 interface ProfileInfoCardProps {
   user: User
@@ -62,12 +62,25 @@ export const ProfileInfoCard = ({ user }: ProfileInfoCardProps) => {
         <CardTitle>Profile Information</CardTitle>
       </CardHeader>
       <CardContent>
-        <form id='profile-form' onSubmit={handleSubmit}>
+        <form
+          id='profile-form'
+          onSubmit={handleSubmit}
+        >
           <FieldGroup>
-            <Field>
-              <FieldLabel className='text-muted-foreground text-xs'>Email</FieldLabel>
-              <p className='text-sm'>{user.email}</p>
-            </Field>
+            <div className='grid grid-cols-2 gap-4'>
+              <Field>
+                <FieldLabel className='text-muted-foreground text-xs'>Email</FieldLabel>
+                <p className='text-sm'>{user.email}</p>
+              </Field>
+              <Field>
+                <FieldLabel className='text-muted-foreground text-xs'>Member Since</FieldLabel>
+                <p className='text-sm'>
+                  {user.date_joined
+                    ? format(new Date(user.date_joined), DATE_FORMATS.display)
+                    : '—'}
+                </p>
+              </Field>
+            </div>
 
             <Controller
               name='first_name'
@@ -116,15 +129,6 @@ export const ProfileInfoCard = ({ user }: ProfileInfoCardProps) => {
                 <p className='text-sm'>{user.project_name || `Project #${user.project}`}</p>
               </Field>
             ) : null}
-
-            <Field>
-              <FieldLabel className='text-muted-foreground text-xs'>Member Since</FieldLabel>
-              <p className='text-sm'>
-                {user.date_joined
-                  ? format(new Date(user.date_joined), DATE_FORMATS.display)
-                  : '—'}
-              </p>
-            </Field>
           </FieldGroup>
         </form>
       </CardContent>

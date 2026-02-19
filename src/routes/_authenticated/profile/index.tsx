@@ -23,10 +23,10 @@ function ProfilePage() {
 
   if (showLogs) {
     return (
-      <div className='flex h-full flex-col gap-4'>
+      <div className='flex h-full flex-col gap-4 overflow-y-auto p-1'>
         <h1 className='text-2xl font-bold'>My Profile</h1>
 
-        <div className='grid items-start gap-6 lg:grid-cols-[380px_1fr]'>
+        <div className='grid h-220 items-start gap-4 lg:grid-cols-[380px_1fr]'>
           <div className='flex flex-col gap-4'>
             <ProfileInfoCard user={user} />
             <SecurityCard />
@@ -40,7 +40,7 @@ function ProfilePage() {
   }
 
   return (
-    <div className='flex h-full flex-col gap-4 overflow-y-auto'>
+    <div className='flex h-full flex-col gap-4 overflow-y-auto p-1'>
       <h1 className='text-2xl font-bold'>My Profile</h1>
 
       <div className='grid items-start gap-6 md:grid-cols-2'>

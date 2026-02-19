@@ -22,6 +22,7 @@ import {
   SelectTrigger,
   SelectValue
 } from '@/components/ui/select'
+import { useOrdering } from '@/hooks/use-ordering'
 import {
   useLimitParam,
   useOffsetParam,
@@ -32,7 +33,6 @@ import {
   usePayloadLogMethod,
   usePayloadLogStatusCode
 } from '@/hooks/use-query-params'
-import { useOrdering } from '@/hooks/use-ordering'
 
 const METHOD_OPTIONS = ['GET', 'POST', 'PATCH', 'PUT', 'DELETE'] as const
 const ERROR_OPTIONS = [
@@ -81,17 +81,12 @@ export const PayloadLogsCard = () => {
     offset,
     limit,
     ordering,
-    created_after: created_after
-      ? startOfDay(created_after).toISOString()
-      : undefined,
-    created_before: created_before
-      ? endOfDay(created_before).toISOString()
-      : undefined,
+    created_after: created_after ? startOfDay(created_after).toISOString() : undefined,
+    created_before: created_before ? endOfDay(created_before).toISOString() : undefined,
     entity: entity ?? undefined,
     method: method ?? undefined,
     status_code: status_code ?? undefined,
-    is_error:
-      is_error === 'true' ? true : is_error === 'false' ? false : undefined
+    is_error: is_error === 'true' ? true : is_error === 'false' ? false : undefined
   }
 
   const filtersOpen = showFilters || (hasFilters && !filtersManuallyClosed)
@@ -114,7 +109,7 @@ export const PayloadLogsCard = () => {
 
   return (
     <>
-      <div className='flex flex-col gap-3'>
+      <div className='flex h-full min-h-0 flex-col gap-3'>
         <div className='flex items-center justify-between'>
           <h3 className='text-lg font-semibold'>API Payload Logs</h3>
         </div>
@@ -189,7 +184,10 @@ export const PayloadLogsCard = () => {
                   <SelectContent>
                     <SelectItem value={ALL_VALUE}>All Methods</SelectItem>
                     {METHOD_OPTIONS.map((m) => (
-                      <SelectItem key={m} value={m}>
+                      <SelectItem
+                        key={m}
+                        value={m}
+                      >
                         {m}
                       </SelectItem>
                     ))}
@@ -229,7 +227,10 @@ export const PayloadLogsCard = () => {
                   <SelectContent>
                     <SelectItem value={ALL_VALUE}>All</SelectItem>
                     {ERROR_OPTIONS.map((o) => (
-                      <SelectItem key={o.value} value={o.value}>
+                      <SelectItem
+                        key={o.value}
+                        value={o.value}
+                      >
                         {o.label}
                       </SelectItem>
                     ))}
@@ -253,7 +254,7 @@ export const PayloadLogsCard = () => {
           </div>
         ) : null}
 
-        <div className='ring-foreground/10 flex flex-col overflow-hidden rounded-xl ring-1'>
+        <div className='ring-foreground/10 flex h-full flex-col overflow-hidden rounded-xl ring-1'>
           <DataTable
             table={table}
             isLoading={isLoading || isPlaceholderData}
