@@ -21,6 +21,7 @@ export const PasswordInput = (props: React.ComponentProps<'input'>) => {
         onClick={toggleVisibility}
       >
         <Button
+          type='button'
           variant='ghost'
           size='icon-sm'
         >

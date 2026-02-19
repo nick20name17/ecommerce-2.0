@@ -24,18 +24,24 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 )
 
+const isRefreshRequest = (config: InternalAxiosRequestConfig) =>
+  String(config?.url ?? '').includes('/auth/refresh')
+
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
-    const session = getSession()
-
-    console.log(session)
-
-    if (!session?.refresh) return Promise.reject(new Error('No refresh token available'))
-
     const config = error?.config as InternalAxiosRequestConfig & {
       _retry?: boolean
     }
+
+    if (error?.response?.status === 401 && isRefreshRequest(config)) {
+      clearSession()
+      window.location.href = AUTH_REDIRECTS.logout
+      return Promise.reject(error)
+    }
+
+    const session = getSession()
+    if (!session?.refresh) return Promise.reject(error)
 
     if (error?.response?.status !== 401 || config?._retry) {
       return Promise.reject(error)
@@ -50,9 +56,7 @@ api.interceptors.response.use(
       return api(config)
     } catch (refreshError) {
       clearSession()
-
       window.location.href = AUTH_REDIRECTS.logout
-
       return Promise.reject(refreshError)
     }
   }
