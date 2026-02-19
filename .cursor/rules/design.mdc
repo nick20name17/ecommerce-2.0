@@ -16,6 +16,11 @@ alwaysApply: true
 - Use Tailwind CSS v4 utility classes. Avoid inline styles or custom CSS unless absolutely necessary.
 - Use `lucide-react` for icons.
 
+## Truncation & Tooltips
+
+- Whenever content uses `truncate` (or equivalent text truncation), add a **tooltip** (e.g. `title` attribute or shadcn `Tooltip`) showing the full value so users can see it on hover.
+- In **data tables**, table cell content must **truncate and not wrap** to another line. Use `truncate` (and optionally `min-w-0` / `max-w-*` where needed) on cell content; pair with a tooltip for truncated text.
+
 ## Layout
 
 - The authenticated layout (`_authenticated/route.tsx`) constrains the app to `h-svh overflow-hidden`. The inner `<main>` is a flex column with `p-4`.

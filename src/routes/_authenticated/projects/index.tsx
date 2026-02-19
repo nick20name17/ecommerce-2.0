@@ -1,70 +1,159 @@
 'use no memo'
 
+import { keepPreviousData, useQueries, useQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
-import { getCoreRowModel, getExpandedRowModel, useReactTable } from '@tanstack/react-table'
+import { getCoreRowModel, useReactTable } from '@tanstack/react-table'
+import { Plus } from 'lucide-react'
+import { useMemo, useState } from 'react'
 
+import { getProjectColumns } from './-components/project-columns'
+import { ProjectDeleteDialog } from './-components/project-delete-dialog'
+import { ProjectModal } from './-components/project-modal'
+import { getProjectHealthQuery, getProjectsQuery } from '@/api/project/query'
+import type { Project, ProjectParams } from '@/api/project/schema'
 import { DataTable } from '@/components/common/data-table'
-import { createExpanderColumn } from '@/components/common/data-table/columns'
+import { Pagination } from '@/components/common/filters/pagination'
+import { SearchFilter } from '@/components/common/filters/search'
+import { Button } from '@/components/ui/button'
+import { useOrdering } from '@/hooks/use-ordering'
+import { useLimitParam, useOffsetParam, useSearchParam } from '@/hooks/use-query-params'
 
 export const Route = createFileRoute('/_authenticated/projects/')({
-  component: RouteComponent
+  component: ProjectsPage,
 })
 
-const columns = [
-  createExpanderColumn(),
-  {
-    id: 'name',
-    header: 'Name',
-    cell: ({ row }) => row.original.name
-  },
-  {
-    id: 'description',
-    header: 'Description',
-    cell: ({ row }) => row.original.description
-  },
-  {
-    id: 'createdAt',
-    header: 'Created At',
-    cell: ({ row }) => row.original.createdAt
-  }
-]
+function mergeHealthIntoProjects(projects: Project[], healthResults: Array<{ data?: unknown }>): Project[] {
+  return projects.map((project, index) => {
+    const health = healthResults[index]?.data as
+      | {
+          website_status?: 'healthy' | 'unhealthy'
+          website_response_ms?: number
+          website_last_checked?: string
+          backend_status?: 'healthy' | 'unhealthy'
+          backend_response_ms?: number
+          backend_last_checked?: string
+          ebms_status?: 'healthy' | 'unhealthy'
+          ebms_response_ms?: number
+          ebms_last_checked?: string
+          sync_status?: 'healthy' | 'unhealthy'
+          sync_response_ms?: number
+          sync_last_checked?: string
+          db_status?: 'healthy' | 'unhealthy'
+          overall_status?: 'healthy' | 'unhealthy'
+          has_ebms_config?: boolean
+          has_sync_config?: boolean
+        }
+      | undefined
+    if (!health) return project
+    return {
+      ...project,
+      website_status: health.website_status,
+      website_response_ms: health.website_response_ms,
+      website_last_checked: health.website_last_checked,
+      backend_status: health.backend_status,
+      backend_response_ms: health.backend_response_ms,
+      backend_last_checked: health.backend_last_checked,
+      ebms_status: health.ebms_status,
+      ebms_response_ms: health.ebms_response_ms,
+      ebms_last_checked: health.ebms_last_checked,
+      sync_status: health.sync_status,
+      sync_response_ms: health.sync_response_ms,
+      sync_last_checked: health.sync_last_checked,
+      db_status: health.db_status,
+      overall_status: health.overall_status,
+      has_ebms_config: health.has_ebms_config,
+      has_sync_config: health.has_sync_config,
+    }
+  })
+}
 
-const data = [
-  {
-    id: 1,
-    name: 'Project 1',
-    description: 'Description 1',
-    createdAt: new Date().toISOString()
-  },
-  {
-    id: 2,
-    name: 'Project 2',
-    description: 'Description 2',
-    createdAt: new Date().toISOString()
-  },
-  {
-    id: 3,
-    name: 'Project 3',
-    description: 'Description 3',
-    createdAt: new Date().toISOString()
-  }
-]
+function ProjectsPage() {
+  const [search] = useSearchParam()
+  const [offset] = useOffsetParam()
+  const [limit] = useLimitParam()
+  const { sorting, setSorting, ordering } = useOrdering()
 
-function RouteComponent() {
-  const table = useReactTable({
-    columns,
-    data,
-    getRowCanExpand: () => true,
-    getExpandedRowModel: getExpandedRowModel(),
-    getCoreRowModel: getCoreRowModel()
+  const [modalProject, setModalProject] = useState<Project | 'create' | null>(null)
+  const [deleteProject, setDeleteProject] = useState<Project | null>(null)
+
+  const params: ProjectParams = {
+    search: search || undefined,
+    offset,
+    limit,
+    ordering,
+  }
+
+  const { data, isLoading, isPlaceholderData } = useQuery({
+    ...getProjectsQuery(params),
+    placeholderData: keepPreviousData,
   })
 
+  const projects = data?.results ?? []
+  const healthQueries = useQueries({
+    queries: projects.map((p) => getProjectHealthQuery(p.id)),
+    enabled: projects.length > 0,
+  })
+  const projectsWithHealth = useMemo(
+    () =>
+      mergeHealthIntoProjects(
+        projects,
+        healthQueries.map((q) => ({ data: q.data }))
+      ),
+    [projects, healthQueries]
+  )
+  const healthLoading = healthQueries.some((q) => q.isLoading)
+
+  const columns = useMemo(
+    () =>
+      getProjectColumns({
+        onEdit: setModalProject,
+        onDelete: setDeleteProject,
+      }),
+    []
+  )
+
+  const table = useReactTable({
+    columns,
+    data: projectsWithHealth,
+    getCoreRowModel: getCoreRowModel(),
+    onSortingChange: setSorting,
+    state: { sorting },
+    manualSorting: true,
+  })
+
+  const editingProject = typeof modalProject === 'object' ? modalProject : null
+
   return (
-    <DataTable
-      table={table}
-      renderSubComponent={() => {
-        return <DataTable table={table} />
-      }}
-    />
+    <div className="flex h-full flex-col gap-4">
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-bold">Projects</h1>
+        <Button onClick={() => setModalProject('create')}>
+          <Plus />
+          Add Project
+        </Button>
+      </div>
+
+      <SearchFilter placeholder="Search projects..." />
+
+      <DataTable
+        table={table}
+        isLoading={isLoading || isPlaceholderData || healthLoading}
+        className="flex-1"
+      />
+
+      <Pagination totalCount={data?.count ?? 0} />
+
+      <ProjectModal
+        key={editingProject?.id ?? 'create'}
+        open={modalProject !== null}
+        onOpenChange={(open) => !open && setModalProject(null)}
+        project={editingProject}
+      />
+      <ProjectDeleteDialog
+        project={deleteProject}
+        open={!!deleteProject}
+        onOpenChange={(open) => !open && setDeleteProject(null)}
+      />
+    </div>
   )
 }

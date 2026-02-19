@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query'
 import { useEffect, useMemo } from 'react'
 import { ChevronsUpDown, FolderKanban } from 'lucide-react'
 
-import { getProjectsQuery } from '@/api/project/query'
+import { getProjectsPickerQuery } from '@/api/project/query'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -31,7 +31,7 @@ export function NavProjects() {
   const [projectId, setProjectId] = useProjectIdParam()
 
   const { data, isLoading } = useQuery({
-    ...getProjectsQuery({ limit: 100 }),
+    ...getProjectsPickerQuery(),
     enabled: isSuperAdminUser
   })
 

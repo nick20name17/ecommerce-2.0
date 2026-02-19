@@ -45,6 +45,7 @@ Follow the `src/routes/_authenticated/users/index.tsx` pattern:
 - Use reusable `<SearchFilter>` and `<Pagination>` from `src/components/common/filters/`.
 - Configure `useReactTable` with `manualSorting: true` and `useOrdering()` — do **not** import `getSortedRowModel` since sorting is server-side.
 - Memoize column definitions with `useMemo`.
+- Table cells: truncate content (no line wrap); add tooltips for truncated values (see Design rules).
 - Prevent self-actions: users must not be able to deactivate or delete their own account. Guard in both the table (disabled toggle + tooltip) and the delete dialog.
 
 ## Forms & Modals

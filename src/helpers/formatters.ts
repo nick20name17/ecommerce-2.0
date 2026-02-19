@@ -1,6 +1,11 @@
 import { format } from 'date-fns'
 
-import { CURRENCY_DEFAULT, DATE_FORMATS, LOCALE_DEFAULT, TEXT_TRUNCATE_LENGTH } from '@/constants/app'
+import {
+  CURRENCY_DEFAULT,
+  DATE_FORMATS,
+  LOCALE_DEFAULT,
+  TEXT_TRUNCATE_LENGTH
+} from '@/constants/app'
 
 const currencyFormat = new Intl.NumberFormat(LOCALE_DEFAULT, {
   style: 'currency',
