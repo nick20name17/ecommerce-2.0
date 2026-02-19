@@ -1,5 +1,5 @@
 import { ChevronsUpDown, Search, Users, X } from 'lucide-react'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useDebouncedCallback } from 'use-debounce'
 
@@ -26,17 +26,13 @@ export function TaskCustomerCombobox({ value, onChange, projectId }: TaskCustome
   const updateDebouncedSearch = useDebouncedCallback((q: string) => setDebouncedSearch(q), 300)
 
   const handleOpenChange = (newOpen: boolean) => {
+    setOpen(newOpen)
     if (newOpen) {
       setSearch('')
       setDebouncedSearch('')
-      setTimeout(() => inputRef.current?.focus(), 0)
+      queueMicrotask(() => inputRef.current?.focus())
     }
-    setOpen(newOpen)
   }
-
-  useEffect(() => {
-    if (open) updateDebouncedSearch(search)
-  }, [open, search, updateDebouncedSearch])
 
   const params = {
     limit: 50,

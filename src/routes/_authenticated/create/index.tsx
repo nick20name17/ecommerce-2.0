@@ -103,8 +103,10 @@ function CreatePage() {
   useEffect(() => {
     if (configQuery.isError && editSheetOpen) {
       toast.error(getErrorMessage(configQuery.error))
-      setEditSheetOpen(false)
-      setEditProduct(null)
+      queueMicrotask(() => {
+        setEditSheetOpen(false)
+        setEditProduct(null)
+      })
     }
   }, [configQuery.isError, configQuery.error, editSheetOpen])
 
@@ -115,7 +117,7 @@ function CreatePage() {
     if (customer?.id != null) {
       queryClient.invalidateQueries({ queryKey: CART_QUERY_KEYS.detail(customer.id, projectId) })
     }
-  }, [customer?.id, projectId, queryClient])
+  }, [customer, projectId, queryClient])
 
   const handleCustomerChange = useCallback((c: Customer | null) => {
     setCustomer(c)
@@ -134,23 +136,20 @@ function CreatePage() {
         setEditSheetOpen(true)
       } else {
         setCartUpdating(true)
+        const customerId = customer.id
+        const payload = {
+          product_autoid: product.autoid,
+          quantity: 1,
+          unit: product.unit || product.def_unit || '',
+        }
         try {
-          await cartService.addItem(
-            {
-              product_autoid: product.autoid,
-              quantity: 1,
-              unit: product.unit || product.def_unit || '',
-            },
-            customer.id,
-            projectId
-          )
+          await cartService.addItem(payload, customerId, projectId)
           invalidateCart()
           toast.success(`${product.id} added to cart`)
         } catch (error) {
           toast.error(getErrorMessage(error))
-        } finally {
-          setCartUpdating(false)
         }
+        setCartUpdating(false)
       }
     },
     [customer, invalidateCart, projectId]
@@ -177,9 +176,8 @@ function CreatePage() {
         if (item) toast.success(`${item.product_id} removed`)
       } catch (error) {
         toast.error(getErrorMessage(error))
-      } finally {
-        setCartUpdating(false)
       }
+      setCartUpdating(false)
     },
     [customer, cartItems, invalidateCart, projectId]
   )
@@ -193,9 +191,8 @@ function CreatePage() {
         invalidateCart()
       } catch (error) {
         toast.error(getErrorMessage(error))
-      } finally {
-        setCartUpdating(false)
       }
+      setCartUpdating(false)
     },
     [customer, invalidateCart, projectId]
   )
@@ -210,10 +207,9 @@ function CreatePage() {
       toast.success('All items cleared')
     } catch (error) {
       toast.error(getErrorMessage(error))
-    } finally {
-      setClearingCart(false)
-      setCartUpdating(false)
     }
+    setClearingCart(false)
+    setCartUpdating(false)
   }, [customer, cartItems.length, invalidateCart, projectId])
 
   const handleCreateProposal = useCallback(async () => {
@@ -226,9 +222,8 @@ function CreatePage() {
       navigate({ to: '/' })
     } catch (error) {
       toast.error(getErrorMessage(error))
-    } finally {
-      setCreatingProposal(false)
     }
+    setCreatingProposal(false)
   }, [customer, cartItems.length, invalidateCart, navigate, projectId])
 
   const handleCreateOrder = useCallback(async () => {
@@ -241,9 +236,8 @@ function CreatePage() {
       navigate({ to: '/' })
     } catch (error) {
       toast.error(getErrorMessage(error))
-    } finally {
-      setCreatingOrder(false)
     }
+    setCreatingOrder(false)
   }, [customer, cartItems.length, invalidateCart, navigate, projectId])
 
   return (

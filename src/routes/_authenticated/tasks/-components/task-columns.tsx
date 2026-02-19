@@ -69,7 +69,11 @@ export const getTaskColumns = ({
     cell: ({ row }) => {
       const t = row.original
       return (
-        <div onClick={(e) => e.stopPropagation()}>
+        <div
+          role='group'
+          onClick={(e) => e.stopPropagation()}
+          onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && e.stopPropagation()}
+        >
           <Select
             value={String(t.status)}
             onValueChange={(v) => onStatusChange(t, Number(v))}
@@ -176,7 +180,11 @@ export const getTaskColumns = ({
     cell: ({ row }) => {
       const task = row.original
       return (
-        <div onClick={(e) => e.stopPropagation()}>
+        <div
+          role='group'
+          onClick={(e) => e.stopPropagation()}
+          onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && e.stopPropagation()}
+        >
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button

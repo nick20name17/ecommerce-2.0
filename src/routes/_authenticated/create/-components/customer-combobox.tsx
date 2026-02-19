@@ -1,5 +1,5 @@
 import { ChevronsUpDown, Search, Users, X } from 'lucide-react'
-import { useEffect, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useDebouncedCallback } from 'use-debounce'
 
@@ -25,17 +25,14 @@ export function CustomerCombobox({ value, onChange, projectId }: CustomerCombobo
 
   const updateDebouncedSearch = useDebouncedCallback((q: string) => setDebouncedSearch(q), 300)
 
-  useEffect(() => {
-    if (open) {
+  const handleOpenChange = (next: boolean) => {
+    setOpen(next)
+    if (next) {
       setSearch('')
       setDebouncedSearch('')
-      setTimeout(() => inputRef.current?.focus(), 0)
+      queueMicrotask(() => inputRef.current?.focus())
     }
-  }, [open])
-
-  useEffect(() => {
-    if (open) updateDebouncedSearch(search)
-  }, [open, search, updateDebouncedSearch])
+  }
 
   const params = {
     limit: 50,
@@ -60,7 +57,7 @@ export function CustomerCombobox({ value, onChange, projectId }: CustomerCombobo
   }
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
+    <Popover open={open} onOpenChange={handleOpenChange}>
       <div className='flex gap-2'>
         <PopoverTrigger asChild>
           <Button variant='outline' className='w-full justify-between font-normal'>

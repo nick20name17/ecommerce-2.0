@@ -85,6 +85,7 @@ function TasksPage() {
       <div className='flex flex-wrap items-center gap-3'>
         <SearchFilter placeholder='Search tasks...' />
         <TaskStatusManager
+          key={statuses.map((s) => s.id).sort().join(',')}
           projectId={projectId}
           statuses={statuses}
           value={taskStatusId}

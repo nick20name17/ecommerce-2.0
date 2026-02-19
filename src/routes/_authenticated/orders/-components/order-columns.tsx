@@ -84,7 +84,11 @@ export const getOrderColumns = (): ColumnDef<Order>[] => [
     id: 'actions',
     header: 'Actions',
     cell: ({ row }) => (
-      <div onClick={(e) => e.stopPropagation()}>
+      <div
+        role='group'
+        onClick={(e) => e.stopPropagation()}
+        onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && e.stopPropagation()}
+      >
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant='ghost' size='icon-sm'>

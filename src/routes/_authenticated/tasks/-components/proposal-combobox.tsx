@@ -1,5 +1,5 @@
 import { ChevronsUpDown, FileText, Search, X } from 'lucide-react'
-import { useEffect, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useDebouncedCallback } from 'use-debounce'
 
@@ -21,22 +21,18 @@ export function ProposalCombobox({ value, onChange, projectId }: ProposalCombobo
   const [open, setOpen] = useState(false)
   const [search, setSearch] = useState('')
   const [debouncedSearch, setDebouncedSearch] = useState('')
-  const [selectedProposal, setSelectedProposal] = useState<Proposal | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
 
   const updateDebouncedSearch = useDebouncedCallback((q: string) => setDebouncedSearch(q), 300)
 
-  useEffect(() => {
-    if (open) {
+  const handleOpenChange = (next: boolean) => {
+    setOpen(next)
+    if (next) {
       setSearch('')
       setDebouncedSearch('')
-      setTimeout(() => inputRef.current?.focus(), 0)
+      queueMicrotask(() => inputRef.current?.focus())
     }
-  }, [open])
-
-  useEffect(() => {
-    if (open) updateDebouncedSearch(search)
-  }, [open, search, updateDebouncedSearch])
+  }
 
   const params = {
     limit: 50,
@@ -49,15 +45,10 @@ export function ProposalCombobox({ value, onChange, projectId }: ProposalCombobo
   })
   const proposals = data?.results ?? []
   const loading = isLoading || (search !== debouncedSearch && isFetching)
-
-  useEffect(() => {
-    if (value != null && proposals.length > 0) {
-      const p = proposals.find((x) => x.autoid === value)
-      if (p) setSelectedProposal(p)
-    } else if (value == null) {
-      setSelectedProposal(null)
-    }
-  }, [value, proposals])
+  const selectedProposal =
+    value != null && proposals.length > 0
+      ? proposals.find((x) => x.autoid === value) ?? null
+      : null
 
   const handleSearchChange = (q: string) => {
     setSearch(q)
@@ -65,7 +56,6 @@ export function ProposalCombobox({ value, onChange, projectId }: ProposalCombobo
   }
 
   const handleSelect = (proposal: Proposal) => {
-    setSelectedProposal(proposal)
     onChange(proposal.autoid)
     setOpen(false)
   }
@@ -77,7 +67,7 @@ export function ProposalCombobox({ value, onChange, projectId }: ProposalCombobo
       : null
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
+    <Popover open={open} onOpenChange={handleOpenChange}>
       <div className='flex gap-2'>
         <PopoverTrigger asChild>
           <Button variant='outline' className='w-full justify-between font-normal'>
@@ -94,10 +84,7 @@ export function ProposalCombobox({ value, onChange, projectId }: ProposalCombobo
             variant='ghost'
             size='icon'
             className='shrink-0'
-            onClick={() => {
-              setSelectedProposal(null)
-              onChange(null)
-            }}
+            onClick={() => onChange(null)}
           >
             <X className='size-4' />
           </Button>

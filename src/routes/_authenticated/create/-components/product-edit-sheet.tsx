@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { AlertCircle, ChevronLeft, ChevronRight, Image, Minus, Plus } from 'lucide-react'
 
 import type { AddToCartPayload, UpdateCartItemPayload } from '@/api/cart/schema'
@@ -57,32 +57,34 @@ export function ProductEditSheet({
   const [selectedUnit, setSelectedUnit] = useState('')
   const [configs, setConfigs] = useState<Configuration[]>([])
   const [activeTab, setActiveTab] = useState('')
-
-  const initialQuantityRef = useRef(1)
-  const initialConfigIdsRef = useRef<Set<string | number>>(new Set())
+  const [initialQuantity, setInitialQuantity] = useState(1)
+  const [initialConfigIds, setInitialConfigIds] = useState<Set<string | number>>(new Set())
 
   useEffect(() => {
     if (!product || !open) return
     const qty = mode === 'edit' && isCartItem(product) ? product.quantity : 1
-    setQuantity(qty)
-    initialQuantityRef.current = qty
-    setPhotoIndex(0)
-    setSelectedUnit(product.unit || (isCartItem(product) ? '' : product.def_unit) || '')
-    setConfirmClose(false)
-    initialConfigIdsRef.current = new Set()
+    queueMicrotask(() => {
+      setQuantity(qty)
+      setInitialQuantity(qty)
+      setPhotoIndex(0)
+      setSelectedUnit(product.unit || (isCartItem(product) ? '' : product.def_unit) || '')
+      setConfirmClose(false)
+      setInitialConfigIds(new Set())
+    })
   }, [product, mode, open])
 
   useEffect(() => {
     if (!configData?.configurations?.length) {
-      setConfigs([])
-      setActiveTab('')
+      queueMicrotask(() => {
+        setConfigs([])
+        setActiveTab('')
+      })
       return
     }
     const cloned = configData.configurations.map((c) => ({
       ...c,
       items: c.items.map((item) => ({ ...item })),
     }))
-    // Apply defaults only for groups with no saved active selection
     cloned.forEach((config) => {
       const hasActive = config.items.some((i) => i.active)
       if (!hasActive && config.default) {
@@ -90,12 +92,13 @@ export function ProductEditSheet({
         if (def) def.active = true
       }
     })
-    setConfigs(cloned)
-    setActiveTab(cloned[0]?.name ?? '')
-    // Capture initial config state
     const ids = new Set<string | number>()
     cloned.forEach((c) => c.items.forEach((i) => { if (i.active) ids.add(i.id) }))
-    initialConfigIdsRef.current = ids
+    queueMicrotask(() => {
+      setConfigs(cloned)
+      setActiveTab(cloned[0]?.name ?? '')
+      setInitialConfigIds(ids)
+    })
   }, [configData])
 
   const displayName = product
@@ -151,11 +154,11 @@ export function ProductEditSheet({
   })()
 
   const hasChanges = (() => {
-    if (quantity !== initialQuantityRef.current) return true
+    if (quantity !== initialQuantity) return true
     const currentIds = new Set(activeConfigurations.map((c) => c.id))
-    if (currentIds.size !== initialConfigIdsRef.current.size) return true
+    if (currentIds.size !== initialConfigIds.size) return true
     for (const id of currentIds) {
-      if (!initialConfigIdsRef.current.has(id)) return true
+      if (!initialConfigIds.has(id)) return true
     }
     return false
   })()
@@ -186,30 +189,39 @@ export function ProductEditSheet({
   const handleSave = async () => {
     if (!product || !customerId) return
     setSaving(true)
-    try {
-      if (mode === 'add') {
-        const payload: AddToCartPayload = {
+    const isAdd = mode === 'add'
+    const addPayload: AddToCartPayload | null = isAdd
+      ? {
           product_autoid: isCartItem(product) ? product.product_autoid : product.autoid,
           quantity,
           unit: selectedUnit || (isCartItem(product) ? '' : product.def_unit) || '',
-          configurations: activeConfigurations.length > 0 ? activeConfigurations as AddToCartPayload['configurations'] : undefined,
+          configurations:
+            activeConfigurations.length > 0
+              ? (activeConfigurations as AddToCartPayload['configurations'])
+              : undefined,
         }
-        await cartService.addItem(payload, customerId, projectId)
-      } else {
-        const cartItem = product as CartItem
-        const payload: UpdateCartItemPayload = {
+      : null
+    const editPayload: UpdateCartItemPayload | null = !isAdd
+      ? {
           quantity,
           configurations: activeConfigurations as UpdateCartItemPayload['configurations'],
         }
-        await cartService.updateItem(cartItem.id, payload, customerId, projectId)
-      }
+      : null
+    const itemId = !isAdd && isCartItem(product) ? product.id : 0
+    const savePromise =
+      isAdd && addPayload
+        ? cartService.addItem(addPayload, customerId, projectId)
+        : !isAdd && editPayload
+          ? cartService.updateItem(itemId, editPayload, customerId, projectId)
+          : Promise.resolve()
+    try {
+      await savePromise
       onOpenChange(false)
       onSaved()
     } catch (error) {
       console.error('Failed to save:', getErrorMessage(error))
-    } finally {
-      setSaving(false)
     }
+    setSaving(false)
   }
 
   const priceDisplay = hasConfigs

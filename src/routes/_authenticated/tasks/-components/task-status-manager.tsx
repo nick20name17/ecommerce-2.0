@@ -59,9 +59,6 @@ export function TaskStatusManager({
   const orderedStatusesRef = useRef(orderedStatuses)
 
   useEffect(() => {
-    setOrderedStatuses(sorted)
-  }, [sorted])
-  useEffect(() => {
     orderedStatusesRef.current = orderedStatuses
   }, [orderedStatuses])
 

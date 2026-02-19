@@ -140,7 +140,11 @@ export const getCustomerColumns = ({
       const customer = row.original
 
       return (
-        <div onClick={(e) => e.stopPropagation()}>
+        <div
+          role='group'
+          onClick={(e) => e.stopPropagation()}
+          onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && e.stopPropagation()}
+        >
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button

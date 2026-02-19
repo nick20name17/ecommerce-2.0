@@ -1,5 +1,5 @@
 import { ChevronsUpDown, Search, ShoppingCart, X } from 'lucide-react'
-import { useEffect, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useDebouncedCallback } from 'use-debounce'
 
@@ -21,22 +21,18 @@ export function OrderCombobox({ value, onChange, projectId }: OrderComboboxProps
   const [open, setOpen] = useState(false)
   const [search, setSearch] = useState('')
   const [debouncedSearch, setDebouncedSearch] = useState('')
-  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
 
   const updateDebouncedSearch = useDebouncedCallback((q: string) => setDebouncedSearch(q), 300)
 
-  useEffect(() => {
-    if (open) {
+  const handleOpenChange = (next: boolean) => {
+    setOpen(next)
+    if (next) {
       setSearch('')
       setDebouncedSearch('')
-      setTimeout(() => inputRef.current?.focus(), 0)
+      queueMicrotask(() => inputRef.current?.focus())
     }
-  }, [open])
-
-  useEffect(() => {
-    if (open) updateDebouncedSearch(search)
-  }, [open, search, updateDebouncedSearch])
+  }
 
   const params: OrderParams = {
     limit: 50,
@@ -49,15 +45,8 @@ export function OrderCombobox({ value, onChange, projectId }: OrderComboboxProps
   })
   const orders = data?.results ?? []
   const loading = isLoading || (search !== debouncedSearch && isFetching)
-
-  useEffect(() => {
-    if (value != null && orders.length > 0) {
-      const o = orders.find((x) => x.autoid === value)
-      if (o) setSelectedOrder(o)
-    } else if (value == null) {
-      setSelectedOrder(null)
-    }
-  }, [value, orders])
+  const selectedOrder =
+    value != null && orders.length > 0 ? orders.find((x) => x.autoid === value) ?? null : null
 
   const handleSearchChange = (q: string) => {
     setSearch(q)
@@ -65,7 +54,6 @@ export function OrderCombobox({ value, onChange, projectId }: OrderComboboxProps
   }
 
   const handleSelect = (order: Order) => {
-    setSelectedOrder(order)
     onChange(order.autoid)
     setOpen(false)
   }
@@ -77,7 +65,7 @@ export function OrderCombobox({ value, onChange, projectId }: OrderComboboxProps
       : null
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
+    <Popover open={open} onOpenChange={handleOpenChange}>
       <div className='flex gap-2'>
         <PopoverTrigger asChild>
           <Button variant='outline' className='w-full justify-between font-normal'>
@@ -94,10 +82,7 @@ export function OrderCombobox({ value, onChange, projectId }: OrderComboboxProps
             variant='ghost'
             size='icon'
             className='shrink-0'
-            onClick={() => {
-              setSelectedOrder(null)
-              onChange(null)
-            }}
+            onClick={() => onChange(null)}
           >
             <X className='size-4' />
           </Button>

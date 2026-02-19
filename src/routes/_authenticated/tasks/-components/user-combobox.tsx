@@ -1,5 +1,5 @@
 import { ChevronsUpDown, Search, User, X } from 'lucide-react'
-import { useEffect, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useDebouncedCallback } from 'use-debounce'
 
@@ -20,22 +20,18 @@ export function UserCombobox({ value, onChange }: UserComboboxProps) {
   const [open, setOpen] = useState(false)
   const [search, setSearch] = useState('')
   const [debouncedSearch, setDebouncedSearch] = useState('')
-  const [selectedUser, setSelectedUser] = useState<UserType | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
 
   const updateDebouncedSearch = useDebouncedCallback((q: string) => setDebouncedSearch(q), 300)
 
-  useEffect(() => {
-    if (open) {
+  const handleOpenChange = (next: boolean) => {
+    setOpen(next)
+    if (next) {
       setSearch('')
       setDebouncedSearch('')
-      setTimeout(() => inputRef.current?.focus(), 0)
+      queueMicrotask(() => inputRef.current?.focus())
     }
-  }, [open])
-
-  useEffect(() => {
-    if (open) updateDebouncedSearch(search)
-  }, [open, search, updateDebouncedSearch])
+  }
 
   const params = { limit: 50, offset: 0, search: debouncedSearch || undefined }
   const { data, isLoading, isFetching } = useQuery({
@@ -44,15 +40,8 @@ export function UserCombobox({ value, onChange }: UserComboboxProps) {
   })
   const users = data?.results ?? []
   const loading = isLoading || (search !== debouncedSearch && isFetching)
-
-  useEffect(() => {
-    if (value != null && users.length > 0) {
-      const u = users.find((x) => x.id === value)
-      if (u) setSelectedUser(u)
-    } else if (value == null) {
-      setSelectedUser(null)
-    }
-  }, [value, users])
+  const selectedUser =
+    value != null && users.length > 0 ? users.find((x) => x.id === value) ?? null : null
 
   const handleSearchChange = (q: string) => {
     setSearch(q)
@@ -60,7 +49,6 @@ export function UserCombobox({ value, onChange }: UserComboboxProps) {
   }
 
   const handleSelect = (user: UserType) => {
-    setSelectedUser(user)
     onChange(user.id)
     setOpen(false)
   }
@@ -72,7 +60,7 @@ export function UserCombobox({ value, onChange }: UserComboboxProps) {
       : null
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
+    <Popover open={open} onOpenChange={handleOpenChange}>
       <div className='flex gap-2'>
         <PopoverTrigger asChild>
           <Button variant='outline' className='w-full justify-between font-normal'>
@@ -135,11 +123,10 @@ export function UserCombobox({ value, onChange }: UserComboboxProps) {
               <button
                 type='button'
                 className='group hover:bg-accent hover:text-accent-foreground flex w-full items-center gap-2 rounded-md px-2 py-2 text-left text-sm'
-                onClick={() => {
-                  onChange(null)
-                  setSelectedUser(null)
-                  setOpen(false)
-                }}
+            onClick={() => {
+              onChange(null)
+              setOpen(false)
+            }}
               >
                 <span className='text-muted-foreground group-hover:text-accent-foreground'>
                   Unassigned
