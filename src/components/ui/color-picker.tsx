@@ -1,16 +1,10 @@
-'use client'
-
 import { forwardRef, useMemo, useState } from 'react'
 import { HexColorPicker } from 'react-colorful'
 
 import type { ButtonProps } from '@/components/ui/button'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger
-} from '@/components/ui/popover'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { useForwardedRef } from '@/lib/use-forwarded-ref'
 import { cn } from '@/lib/utils'
 
@@ -37,7 +31,10 @@ const ColorPicker = forwardRef<
     if (inline) {
       return (
         <div className='flex flex-col gap-2'>
-          <HexColorPicker color={parsedValue} onChange={onChange} />
+          <HexColorPicker
+            color={parsedValue}
+            onChange={onChange}
+          />
           <Input
             maxLength={7}
             onChange={(e) => onChange(e.currentTarget.value)}
@@ -53,8 +50,15 @@ const ColorPicker = forwardRef<
     }
 
     return (
-      <Popover onOpenChange={setOpen} open={open}>
-        <PopoverTrigger asChild disabled={disabled} onBlur={onBlur}>
+      <Popover
+        onOpenChange={setOpen}
+        open={open}
+      >
+        <PopoverTrigger
+          asChild
+          disabled={disabled}
+          onBlur={onBlur}
+        >
           <Button
             {...props}
             className={cn('block', className)}
@@ -68,7 +72,10 @@ const ColorPicker = forwardRef<
           </Button>
         </PopoverTrigger>
         <PopoverContent className='w-full'>
-          <HexColorPicker color={parsedValue} onChange={onChange} />
+          <HexColorPicker
+            color={parsedValue}
+            onChange={onChange}
+          />
           <Input
             maxLength={7}
             onChange={(e) => onChange(e.currentTarget.value)}
@@ -84,3 +91,4 @@ const ColorPicker = forwardRef<
 ColorPicker.displayName = 'ColorPicker'
 
 export { ColorPicker }
+

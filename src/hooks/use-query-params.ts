@@ -29,12 +29,15 @@ export const useSearchParam = () => {
 
 export function useOffsetParam() {
   const navigate = useNavigate()
-  const search = useSearch({ from: '__root__' }) as { offset?: number } & Record<string, unknown>
+  const search = useSearch({
+    from: '__root__',
+    structuralSharing: false
+  }) as { offset?: number } & Record<string, unknown>
   const raw = search?.offset
   const offset =
-    raw !== undefined && raw !== null && raw !== ''
-      ? Math.max(0, Math.floor(Number(raw)))
-      : 0
+    raw === undefined || raw === null || (typeof raw === 'string' && raw === '')
+      ? 0
+      : Math.max(0, Math.floor(Number(raw)))
 
   const setOffset = (value: number | null) => {
     const next = value === null || value === 0 ? undefined : value
@@ -49,12 +52,15 @@ export function useOffsetParam() {
 
 export function useLimitParam() {
   const navigate = useNavigate()
-  const search = useSearch({ from: '__root__' }) as { limit?: number } & Record<string, unknown>
+  const search = useSearch({
+    from: '__root__',
+    structuralSharing: false
+  }) as { limit?: number } & Record<string, unknown>
   const raw = search?.limit
   const limit =
-    raw !== undefined && raw !== null && raw !== ''
-      ? Math.max(1, Math.floor(Number(raw)))
-      : DEFAULT_LIMIT
+    raw === undefined || raw === null || (typeof raw === 'string' && raw === '')
+      ? DEFAULT_LIMIT
+      : Math.max(1, Math.floor(Number(raw)))
 
   const setLimit = (value: number) => {
     const next = value === DEFAULT_LIMIT ? undefined : value

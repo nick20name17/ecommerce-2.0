@@ -60,7 +60,10 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
 
       queryClient.setQueryData(USERS_QUERY_KEYS.detail('me'), response.user)
 
-      await navigate({ to: redirect || AUTH_REDIRECTS.signInSuccess, replace: true })
+      await navigate({
+        to: (typeof redirect === 'string' ? redirect : null) ?? AUTH_REDIRECTS.signInSuccess,
+        replace: true
+      })
       router.invalidate()
     }
   })

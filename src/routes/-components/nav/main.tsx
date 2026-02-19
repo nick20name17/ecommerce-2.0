@@ -1,5 +1,3 @@
-'use client'
-
 import { Link } from '@tanstack/react-router'
 import {
   CheckSquare,
@@ -12,7 +10,7 @@ import {
   ShoppingCart,
   StickyNote,
   User,
-  Users,
+  Users
 } from 'lucide-react'
 
 import {
@@ -77,7 +75,7 @@ const NAV_ITEMS = [
     title: 'Settings',
     url: '/settings',
     icon: Settings
-  },
+  }
 ] as const
 
 export const NavMain = () => {

@@ -1,5 +1,3 @@
-'use client'
-
 import * as React from 'react'
 
 import { NavMain } from './nav/main'
@@ -10,12 +8,15 @@ import {
   SidebarContent,
   SidebarFooter,
   SidebarHeader,
-  SidebarRail,
+  SidebarRail
 } from '@/components/ui/sidebar'
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
-    <Sidebar collapsible='icon' {...props}>
+    <Sidebar
+      collapsible='icon'
+      {...props}
+    >
       <SidebarHeader>
         <NavProjects />
       </SidebarHeader>

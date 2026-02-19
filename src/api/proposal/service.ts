@@ -1,6 +1,6 @@
 import { api } from '..'
 
-import type { Proposal, ProposalParams, ProposalResponse } from './schema'
+import type { ProposalParams, ProposalResponse } from './schema'
 
 export const proposalService = {
   get: async (params: ProposalParams = {}) => {

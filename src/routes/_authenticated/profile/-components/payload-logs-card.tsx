@@ -202,7 +202,7 @@ export const PayloadLogsCard = () => {
                 <Select
                   value={is_error ?? ALL_VALUE}
                   onValueChange={(v) => {
-                    setIsError(v === ALL_VALUE ? null : v)
+                    setIsError(v === ALL_VALUE ? null : (v as 'true' | 'false'))
                     setOffset(null)
                   }}
                 >

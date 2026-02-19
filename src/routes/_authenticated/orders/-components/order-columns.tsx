@@ -3,7 +3,7 @@
 import type { ColumnDef } from '@tanstack/react-table'
 import { MoreHorizontal, Pencil, Trash2 } from 'lucide-react'
 
-import type { Order, OrderStatus } from '@/api/order/schema'
+import type { Order } from '@/api/order/schema'
 import { ColumnHeader } from '@/components/common/data-table/column-header'
 import { createCheckboxColumn } from '@/components/common/data-table/columns'
 import { createExpanderColumn } from '@/components/common/data-table/columns'
@@ -83,7 +83,7 @@ export const getOrderColumns = (): ColumnDef<Order>[] => [
   {
     id: 'actions',
     header: 'Actions',
-    cell: ({ row }) => (
+    cell: () => (
       <div
         role='group'
         onClick={(e) => e.stopPropagation()}

@@ -1,5 +1,3 @@
-'use client'
-
 import { useLocation, useNavigate } from '@tanstack/react-router'
 import { unstable_createAdapterProvider } from 'nuqs/adapters/custom'
 import { startTransition, useCallback, useMemo } from 'react'
@@ -12,18 +10,17 @@ function urlSearchParamsToRecord(params: URLSearchParams): Record<string, string
   return record
 }
 
-function useNuqsTanstackRouterAdapterMerge(watchKeys: string[]) {
-  const pathname = useLocation({ select: (s) => s.pathname })
-  const search = useLocation({ select: (s) => s.search ?? {} })
+function useNuqsTanstackRouterAdapterMerge(_watchKeys: string[]) {
+  const { pathname, search: searchState } = useLocation()
+  const search = (searchState ?? {}) as Record<string, unknown>
   const navigate = useNavigate()
 
   const searchParams = useMemo(
     () =>
       new URLSearchParams(
         Object.entries(search).flatMap(([key, value]) => {
-          if (Array.isArray(value)) return value.map((v) => [key, String(v)])
-          if (typeof value === 'object' && value !== null)
-            return [[key, JSON.stringify(value)]]
+          if (Array.isArray(value)) return value.map((v: unknown) => [key, String(v)])
+          if (typeof value === 'object' && value !== null) return [[key, JSON.stringify(value)]]
           return [[key, String(value)]]
         })
       ),
@@ -56,3 +53,4 @@ function useNuqsTanstackRouterAdapterMerge(watchKeys: string[]) {
 }
 
 export const NuqsAdapter = unstable_createAdapterProvider(useNuqsTanstackRouterAdapterMerge)
+

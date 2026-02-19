@@ -77,10 +77,7 @@ export function UserCombobox({ value, onChange }: UserComboboxProps) {
             variant='ghost'
             size='icon'
             className='shrink-0'
-            onClick={() => {
-              setSelectedUser(null)
-              onChange(null)
-            }}
+            onClick={() => onChange(null)}
           >
             <X className='size-4' />
           </Button>

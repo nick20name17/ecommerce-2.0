@@ -1,5 +1,3 @@
-'use client'
-
 import { format, parse } from 'date-fns'
 import { Calendar as CalendarIcon, ChevronDownIcon } from 'lucide-react'
 import * as React from 'react'
@@ -51,9 +49,9 @@ export function DatePicker({
   const handleTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const timeStr = e.target.value
     if (!timeStr) return
+    const base = value ?? new Date()
     try {
       const parsed = parse(timeStr, 'HH:mm', new Date(0))
-      const base = value ?? new Date()
       const next = new Date(base)
       next.setHours(parsed.getHours(), parsed.getMinutes(), 0, 0)
       onChange(next)

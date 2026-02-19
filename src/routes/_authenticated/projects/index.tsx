@@ -90,8 +90,10 @@ function ProjectsPage() {
   const projects = data?.results ?? []
 
   const healthQueries = useQueries({
-    queries: projects?.map((p) => getProjectHealthQuery(p.id)),
-    enabled: projects.length > 0
+    queries:
+      projects.length > 0
+        ? projects.map((p) => getProjectHealthQuery(p.id))
+        : []
   })
 
   const projectsWithHealth = mergeHealthIntoProjects(

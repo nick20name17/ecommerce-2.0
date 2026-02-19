@@ -178,7 +178,7 @@ function SharedFields({
         render={({ field, fieldState }) => (
           <Field data-invalid={fieldState.invalid}>
             <FieldLabel>Responsible user</FieldLabel>
-            <UserCombobox value={field.value} onChange={field.onChange} />
+            <UserCombobox value={field.value ?? null} onChange={field.onChange} />
             {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
           </Field>
         )}
@@ -196,7 +196,7 @@ function SharedFields({
               <Field>
                 <FieldLabel>Order</FieldLabel>
                 <OrderCombobox
-                  value={field.value}
+                  value={field.value ?? null}
                   onChange={field.onChange}
                   projectId={projectId}
                 />
@@ -209,7 +209,7 @@ function SharedFields({
             render={({ field }) => (
               <Field>
                 <FieldLabel>Proposal</FieldLabel>
-                <ProposalCombobox value={field.value} onChange={field.onChange} projectId={projectId} />
+                <ProposalCombobox value={field.value ?? null} onChange={field.onChange} projectId={projectId} />
               </Field>
             )}
           />
@@ -220,7 +220,7 @@ function SharedFields({
               <Field className='sm:col-span-2'>
                 <FieldLabel>Customer</FieldLabel>
                 <TaskCustomerCombobox
-                  value={field.value}
+                  value={field.value ?? null}
                   onChange={field.onChange}
                   projectId={projectId}
                 />

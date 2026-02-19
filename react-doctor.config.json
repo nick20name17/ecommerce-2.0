@@ -1,0 +1,14 @@
+{
+  "ignore": {
+    "files": [
+      "src/routes/_authenticated/orders/-components/orders-data-table.tsx",
+      "src/routes/_authenticated/users/-components/users-data-table.tsx",
+      "src/routes/_authenticated/customers/-components/customers-data-table.tsx",
+      "src/routes/_authenticated/proposals/-components/proposals-data-table.tsx",
+      "src/routes/_authenticated/projects/-components/projects-data-table.tsx",
+      "src/routes/_authenticated/tasks/-components/tasks-data-table.tsx",
+      "src/routes/_authenticated/profile/-components/payload-logs-data-table.tsx",
+      "src/routes/_authenticated/customers/$customerId/-components/customer-orders-tab.tsx"
+    ]
+  }
+}

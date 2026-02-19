@@ -6,7 +6,7 @@ import { getCoreRowModel, getExpandedRowModel, useReactTable } from '@tanstack/r
 import { useMemo, useState } from 'react'
 
 import { getOrdersQuery } from '@/api/order/query'
-import type { Order, OrderItem, OrderParams } from '@/api/order/schema'
+import type { Order, OrderParams } from '@/api/order/schema'
 import { DataTable } from '@/components/common/data-table'
 import { ColumnHeader } from '@/components/common/data-table/column-header'
 import { createExpanderColumn } from '@/components/common/data-table/columns'
