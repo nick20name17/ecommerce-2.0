@@ -11,9 +11,10 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Field, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
+import { DATE_FORMATS } from '@/constants/app'
 import { getUserRoleLabel } from '@/constants/user'
 import { updateSessionUser } from '@/helpers/auth'
-import { formatDate } from '@/helpers/formatters'
+import { format } from 'date-fns'
 
 interface ProfileInfoCardProps {
   user: User
@@ -118,7 +119,11 @@ export const ProfileInfoCard = ({ user }: ProfileInfoCardProps) => {
 
             <Field>
               <FieldLabel className='text-muted-foreground text-xs'>Member Since</FieldLabel>
-              <p className='text-sm'>{formatDate(user.date_joined)}</p>
+              <p className='text-sm'>
+                {user.date_joined
+                  ? format(new Date(user.date_joined), DATE_FORMATS.display)
+                  : '—'}
+              </p>
             </Field>
           </FieldGroup>
         </form>

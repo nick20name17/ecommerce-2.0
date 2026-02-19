@@ -18,8 +18,9 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Switch } from '@/components/ui/switch'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
+import { DATE_FORMATS } from '@/constants/app'
 import { getUserRoleLabel } from '@/constants/user'
-import { formatDate } from '@/helpers/formatters'
+import { format } from 'date-fns'
 
 interface UserColumnsOptions {
   currentUserId: number | undefined
@@ -101,7 +102,10 @@ export const getUserColumns = ({
   {
     accessorKey: 'date_joined',
     header: ({ column }) => <ColumnHeader column={column} title="Joined" />,
-    cell: ({ row }) => formatDate(row.original.date_joined),
+    cell: ({ row }) =>
+      row.original.date_joined
+        ? format(new Date(row.original.date_joined), DATE_FORMATS.display)
+        : '—',
     size: 130
   },
   {

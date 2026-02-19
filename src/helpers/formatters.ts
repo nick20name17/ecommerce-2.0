@@ -1,26 +1,8 @@
 import {
   CURRENCY_DEFAULT,
-  DATE_FORMAT_OPTIONS,
   LOCALE_DEFAULT,
   TEXT_TRUNCATE_LENGTH,
 } from '@/constants/app'
-
-export function formatDate(
-  date: string | null | undefined,
-  locale: string = LOCALE_DEFAULT,
-  options: Intl.DateTimeFormatOptions = DATE_FORMAT_OPTIONS.display,
-  fallback: string = '—'
-): string {
-  if (!date) return fallback
-
-  try {
-    const d = new Date(date)
-    if (isNaN(d.getTime())) return fallback
-    return d.toLocaleDateString(locale, options)
-  } catch {
-    return fallback
-  }
-}
 
 export function formatCurrency(
   amount: string | number | null | undefined,
@@ -87,29 +69,6 @@ export function formatPercentage(
       maximumFractionDigits: decimals,
     }) + '%'
   )
-}
-
-export function formatDateTime(
-  date: string | null | undefined,
-  fallback: string = '—'
-): string {
-  if (!date) return fallback
-
-  try {
-    const d = new Date(date)
-    if (isNaN(d.getTime())) return fallback
-
-    const day = String(d.getDate()).padStart(2, '0')
-    const month = String(d.getMonth() + 1).padStart(2, '0')
-    const year = d.getFullYear()
-    const hours = String(d.getHours()).padStart(2, '0')
-    const minutes = String(d.getMinutes()).padStart(2, '0')
-    const seconds = String(d.getSeconds()).padStart(2, '0')
-
-    return `${day}.${month}.${year}, ${hours}:${minutes}:${seconds}`
-  } catch {
-    return fallback
-  }
 }
 
 export function formatResponseTime(ms: number | null | undefined): string {

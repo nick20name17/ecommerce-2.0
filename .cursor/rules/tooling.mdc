@@ -1,0 +1,11 @@
+---
+description: Script runner and package manager
+alwaysApply: true
+---
+
+# Tooling Rules
+
+- **Always use Bun** as the script runner and package manager.
+- Run installs with `bun install` (not `npm install`, `yarn`, or `pnpm`).
+- Run scripts with `bun run <script>` or `bun <script>` (e.g. `bun run dev`, `bun test`).
+- In documentation, terminal examples, and CI, use `bun` commands.
