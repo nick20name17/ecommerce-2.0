@@ -10,6 +10,7 @@ import {
   Ship,
   StickyNote,
   User,
+  Users,
 } from 'lucide-react'
 
 import {
@@ -34,6 +35,11 @@ const NAV_ITEMS = [
     title: 'Projects',
     url: '/projects',
     icon: FolderKanban
+  },
+  {
+    title: 'Customers',
+    url: '/customers',
+    icon: Users
   },
   {
     title: 'Users',

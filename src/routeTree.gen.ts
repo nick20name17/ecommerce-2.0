@@ -20,8 +20,10 @@ import { Route as AuthenticatedProfileIndexRouteImport } from './routes/_authent
 import { Route as AuthenticatedOrderDeskIndexRouteImport } from './routes/_authenticated/order-desk/index'
 import { Route as AuthenticatedNotesIndexRouteImport } from './routes/_authenticated/notes/index'
 import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authenticated/dashboard/index'
+import { Route as AuthenticatedCustomersIndexRouteImport } from './routes/_authenticated/customers/index'
 import { Route as AuthenticatedCreateIndexRouteImport } from './routes/_authenticated/create/index'
 import { Route as AuthSignInIndexRouteImport } from './routes/_auth/sign-in/index'
+import { Route as AuthenticatedCustomersCustomerIdIndexRouteImport } from './routes/_authenticated/customers/$customerId/index'
 
 const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
   id: '/_authenticated',
@@ -82,6 +84,12 @@ const AuthenticatedDashboardIndexRoute =
     path: '/dashboard/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedCustomersIndexRoute =
+  AuthenticatedCustomersIndexRouteImport.update({
+    id: '/customers/',
+    path: '/customers/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedCreateIndexRoute =
   AuthenticatedCreateIndexRouteImport.update({
     id: '/create/',
@@ -93,11 +101,18 @@ const AuthSignInIndexRoute = AuthSignInIndexRouteImport.update({
   path: '/sign-in/',
   getParentRoute: () => AuthRouteRoute,
 } as any)
+const AuthenticatedCustomersCustomerIdIndexRoute =
+  AuthenticatedCustomersCustomerIdIndexRouteImport.update({
+    id: '/customers/$customerId/',
+    path: '/customers/$customerId/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof AuthenticatedIndexRoute
   '/sign-in/': typeof AuthSignInIndexRoute
   '/create/': typeof AuthenticatedCreateIndexRoute
+  '/customers/': typeof AuthenticatedCustomersIndexRoute
   '/dashboard/': typeof AuthenticatedDashboardIndexRoute
   '/notes/': typeof AuthenticatedNotesIndexRoute
   '/order-desk/': typeof AuthenticatedOrderDeskIndexRoute
@@ -106,11 +121,13 @@ export interface FileRoutesByFullPath {
   '/settings/': typeof AuthenticatedSettingsIndexRoute
   '/shipping/': typeof AuthenticatedShippingIndexRoute
   '/users/': typeof AuthenticatedUsersIndexRoute
+  '/customers/$customerId/': typeof AuthenticatedCustomersCustomerIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof AuthenticatedIndexRoute
   '/sign-in': typeof AuthSignInIndexRoute
   '/create': typeof AuthenticatedCreateIndexRoute
+  '/customers': typeof AuthenticatedCustomersIndexRoute
   '/dashboard': typeof AuthenticatedDashboardIndexRoute
   '/notes': typeof AuthenticatedNotesIndexRoute
   '/order-desk': typeof AuthenticatedOrderDeskIndexRoute
@@ -119,6 +136,7 @@ export interface FileRoutesByTo {
   '/settings': typeof AuthenticatedSettingsIndexRoute
   '/shipping': typeof AuthenticatedShippingIndexRoute
   '/users': typeof AuthenticatedUsersIndexRoute
+  '/customers/$customerId': typeof AuthenticatedCustomersCustomerIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -127,6 +145,7 @@ export interface FileRoutesById {
   '/_authenticated/': typeof AuthenticatedIndexRoute
   '/_auth/sign-in/': typeof AuthSignInIndexRoute
   '/_authenticated/create/': typeof AuthenticatedCreateIndexRoute
+  '/_authenticated/customers/': typeof AuthenticatedCustomersIndexRoute
   '/_authenticated/dashboard/': typeof AuthenticatedDashboardIndexRoute
   '/_authenticated/notes/': typeof AuthenticatedNotesIndexRoute
   '/_authenticated/order-desk/': typeof AuthenticatedOrderDeskIndexRoute
@@ -135,6 +154,7 @@ export interface FileRoutesById {
   '/_authenticated/settings/': typeof AuthenticatedSettingsIndexRoute
   '/_authenticated/shipping/': typeof AuthenticatedShippingIndexRoute
   '/_authenticated/users/': typeof AuthenticatedUsersIndexRoute
+  '/_authenticated/customers/$customerId/': typeof AuthenticatedCustomersCustomerIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -142,6 +162,7 @@ export interface FileRouteTypes {
     | '/'
     | '/sign-in/'
     | '/create/'
+    | '/customers/'
     | '/dashboard/'
     | '/notes/'
     | '/order-desk/'
@@ -150,11 +171,13 @@ export interface FileRouteTypes {
     | '/settings/'
     | '/shipping/'
     | '/users/'
+    | '/customers/$customerId/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/sign-in'
     | '/create'
+    | '/customers'
     | '/dashboard'
     | '/notes'
     | '/order-desk'
@@ -163,6 +186,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/shipping'
     | '/users'
+    | '/customers/$customerId'
   id:
     | '__root__'
     | '/_auth'
@@ -170,6 +194,7 @@ export interface FileRouteTypes {
     | '/_authenticated/'
     | '/_auth/sign-in/'
     | '/_authenticated/create/'
+    | '/_authenticated/customers/'
     | '/_authenticated/dashboard/'
     | '/_authenticated/notes/'
     | '/_authenticated/order-desk/'
@@ -178,6 +203,7 @@ export interface FileRouteTypes {
     | '/_authenticated/settings/'
     | '/_authenticated/shipping/'
     | '/_authenticated/users/'
+    | '/_authenticated/customers/$customerId/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -264,6 +290,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/customers/': {
+      id: '/_authenticated/customers/'
+      path: '/customers'
+      fullPath: '/customers/'
+      preLoaderRoute: typeof AuthenticatedCustomersIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/create/': {
       id: '/_authenticated/create/'
       path: '/create'
@@ -277,6 +310,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/sign-in/'
       preLoaderRoute: typeof AuthSignInIndexRouteImport
       parentRoute: typeof AuthRouteRoute
+    }
+    '/_authenticated/customers/$customerId/': {
+      id: '/_authenticated/customers/$customerId/'
+      path: '/customers/$customerId'
+      fullPath: '/customers/$customerId/'
+      preLoaderRoute: typeof AuthenticatedCustomersCustomerIdIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
   }
 }
@@ -296,6 +336,7 @@ const AuthRouteRouteWithChildren = AuthRouteRoute._addFileChildren(
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
   AuthenticatedCreateIndexRoute: typeof AuthenticatedCreateIndexRoute
+  AuthenticatedCustomersIndexRoute: typeof AuthenticatedCustomersIndexRoute
   AuthenticatedDashboardIndexRoute: typeof AuthenticatedDashboardIndexRoute
   AuthenticatedNotesIndexRoute: typeof AuthenticatedNotesIndexRoute
   AuthenticatedOrderDeskIndexRoute: typeof AuthenticatedOrderDeskIndexRoute
@@ -304,11 +345,13 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedSettingsIndexRoute: typeof AuthenticatedSettingsIndexRoute
   AuthenticatedShippingIndexRoute: typeof AuthenticatedShippingIndexRoute
   AuthenticatedUsersIndexRoute: typeof AuthenticatedUsersIndexRoute
+  AuthenticatedCustomersCustomerIdIndexRoute: typeof AuthenticatedCustomersCustomerIdIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
   AuthenticatedCreateIndexRoute: AuthenticatedCreateIndexRoute,
+  AuthenticatedCustomersIndexRoute: AuthenticatedCustomersIndexRoute,
   AuthenticatedDashboardIndexRoute: AuthenticatedDashboardIndexRoute,
   AuthenticatedNotesIndexRoute: AuthenticatedNotesIndexRoute,
   AuthenticatedOrderDeskIndexRoute: AuthenticatedOrderDeskIndexRoute,
@@ -317,6 +360,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedSettingsIndexRoute: AuthenticatedSettingsIndexRoute,
   AuthenticatedShippingIndexRoute: AuthenticatedShippingIndexRoute,
   AuthenticatedUsersIndexRoute: AuthenticatedUsersIndexRoute,
+  AuthenticatedCustomersCustomerIdIndexRoute:
+    AuthenticatedCustomersCustomerIdIndexRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =

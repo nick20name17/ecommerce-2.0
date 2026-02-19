@@ -1,0 +1,249 @@
+'use no memo'
+
+import { keepPreviousData, useQuery } from '@tanstack/react-query'
+import type { ColumnDef, Row, SortingState } from '@tanstack/react-table'
+import { getCoreRowModel, getExpandedRowModel, useReactTable } from '@tanstack/react-table'
+import { useMemo, useState } from 'react'
+
+import { getOrdersQuery } from '@/api/order/query'
+import type { Order, OrderItem, OrderParams } from '@/api/order/schema'
+import { DataTable } from '@/components/common/data-table'
+import { ColumnHeader } from '@/components/common/data-table/column-header'
+import { createExpanderColumn } from '@/components/common/data-table/columns'
+import { Pagination } from '@/components/common/filters/pagination'
+import { SearchFilter } from '@/components/common/filters/search'
+import { Badge } from '@/components/ui/badge'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
+import { getOrderStatusLabel } from '@/constants/order'
+import { formatCurrency, formatDate, formatQuantity } from '@/helpers/formatters'
+import { useLimitParam, useOffsetParam, useProjectIdParam, useSearchParam } from '@/hooks/use-query-params'
+
+const ORDER_STATUS_VARIANT: Record<string, 'default' | 'secondary' | 'outline' | 'destructive' | 'success'> = {
+  U: 'outline',
+  O: 'default',
+  X: 'success',
+  P: 'success',
+  V: 'destructive',
+  H: 'outline',
+  A: 'secondary',
+}
+
+function getOrderColumns(): ColumnDef<Order>[] {
+  return [
+    createExpanderColumn<Order>(),
+    {
+      accessorKey: 'id',
+      header: ({ column }) => <ColumnHeader column={column} title='Order #' />,
+      cell: ({ row }) => <span className='font-medium'>{row.original.id}</span>,
+      size: 110,
+    },
+    {
+      accessorKey: 'invoice',
+      header: ({ column }) => <ColumnHeader column={column} title='Invoice' />,
+      cell: ({ row }) => {
+        const invoice = row.original.invoice
+        if (!invoice) return <span className='text-muted-foreground'>—</span>
+        return (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <span className='block max-w-full truncate'>{invoice}</span>
+            </TooltipTrigger>
+            <TooltipContent>{invoice}</TooltipContent>
+          </Tooltip>
+        )
+      },
+      size: 110,
+    },
+    {
+      accessorKey: 'status',
+      header: 'Status',
+      cell: ({ row }) => (
+        <Badge variant={ORDER_STATUS_VARIANT[row.original.status] ?? 'secondary'}>
+          {getOrderStatusLabel(row.original.status)}
+        </Badge>
+      ),
+      size: 110,
+      enableSorting: false,
+    },
+    {
+      accessorKey: 'inv_date',
+      header: ({ column }) => <ColumnHeader column={column} title='Date' />,
+      cell: ({ row }) => formatDate(row.original.inv_date),
+      size: 120,
+    },
+    {
+      accessorKey: 'subtotal',
+      header: ({ column }) => <ColumnHeader column={column} title='Subtotal' />,
+      cell: ({ row }) => formatCurrency(row.original.subtotal),
+      size: 100,
+    },
+    {
+      accessorKey: 'tax',
+      header: 'Tax',
+      cell: ({ row }) => formatCurrency(row.original.tax),
+      size: 90,
+      enableSorting: false,
+    },
+    {
+      accessorKey: 'total',
+      header: ({ column }) => <ColumnHeader column={column} title='Total' />,
+      cell: ({ row }) => <span className='font-medium'>{formatCurrency(row.original.total)}</span>,
+      size: 100,
+    },
+    {
+      accessorKey: 'balance',
+      header: ({ column }) => <ColumnHeader column={column} title='Balance' />,
+      cell: ({ row }) => formatCurrency(row.original.balance),
+      size: 100,
+    },
+  ]
+}
+
+function OrderExpandedRow({ row }: { row: Row<Order> }) {
+  const order = row.original
+  const items = order.items ?? []
+
+  return (
+    <div className='space-y-3'>
+      <div className='flex items-center justify-between'>
+        <h3 className='text-base font-semibold'>Order Items</h3>
+        <div className='text-muted-foreground flex items-center gap-4 text-sm'>
+          <span>
+            Customer ID: <span className='text-foreground font-semibold'>{order.name}</span>
+          </span>
+          <span>
+            Subtotal: <span className='text-foreground font-medium'>{formatCurrency(order.subtotal)}</span>
+          </span>
+          <span>
+            Tax: <span className='text-foreground font-medium'>{formatCurrency(order.tax)}</span>
+          </span>
+          <span>
+            Balance: <span className='text-foreground font-medium'>{formatCurrency(order.balance)}</span>
+          </span>
+        </div>
+      </div>
+
+      {!items.length ? (
+        <p className='text-muted-foreground text-sm'>No line items.</p>
+      ) : (
+        <div className='overflow-hidden rounded-md border'>
+          <Table>
+            <TableHeader className='bg-muted'>
+              <TableRow className='border-none'>
+                <TableHead className='shadow-[inset_0_-1px_0] shadow-gray-300' style={{ width: 130, minWidth: 130 }}>
+                  Item Code
+                </TableHead>
+                <TableHead className='shadow-[inset_0_-1px_0] shadow-gray-300'>
+                  Description
+                </TableHead>
+                <TableHead className='shadow-[inset_0_-1px_0] shadow-gray-300' style={{ width: 100, minWidth: 100 }}>
+                  Quantity
+                </TableHead>
+                <TableHead className='shadow-[inset_0_-1px_0] shadow-gray-300' style={{ width: 100, minWidth: 100 }}>
+                  Price
+                </TableHead>
+                <TableHead className='shadow-[inset_0_-1px_0] shadow-gray-300' style={{ width: 110, minWidth: 110 }}>
+                  Amount
+                </TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {items.map((item) => (
+                <TableRow key={item.autoid}>
+                  <TableCell className='border-b' style={{ width: 130, minWidth: 130 }}>
+                    {item.inven}
+                  </TableCell>
+                  <TableCell className='border-b font-semibold'>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <span className='block max-w-full truncate'>{item.descr || '—'}</span>
+                      </TooltipTrigger>
+                      <TooltipContent>{item.descr}</TooltipContent>
+                    </Tooltip>
+                  </TableCell>
+                  <TableCell className='border-b' style={{ width: 100, minWidth: 100 }}>
+                    {formatQuantity(item.quan, 0)}
+                  </TableCell>
+                  <TableCell className='border-b' style={{ width: 100, minWidth: 100 }}>
+                    {formatCurrency(item.price)}
+                  </TableCell>
+                  <TableCell className='border-b font-bold' style={{ width: 110, minWidth: 110 }}>
+                    {formatCurrency(item.so_amount)}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      )}
+    </div>
+  )
+}
+
+interface CustomerOrdersTabProps {
+  customerId: string
+}
+
+export function CustomerOrdersTab({ customerId }: CustomerOrdersTabProps) {
+  const [search] = useSearchParam()
+  const [offset] = useOffsetParam()
+  const [limit] = useLimitParam()
+  const [projectId] = useProjectIdParam()
+  const [sorting, setSorting] = useState<SortingState>([])
+
+  const orderingStr = useMemo(() => {
+    if (!sorting.length) return undefined
+    const s = sorting[0]
+    return s.desc ? `-${s.id}` : s.id
+  }, [sorting])
+
+  const params: OrderParams = {
+    customer: customerId,
+    search: search || undefined,
+    offset,
+    limit,
+    ordering: orderingStr,
+    project_id: projectId ?? undefined,
+  }
+
+  const { data, isLoading, isPlaceholderData } = useQuery({
+    ...getOrdersQuery(params),
+    placeholderData: keepPreviousData,
+  })
+
+  const columns = useMemo(() => getOrderColumns(), [])
+
+  const table = useReactTable({
+    columns,
+    data: data?.results ?? [],
+    getCoreRowModel: getCoreRowModel(),
+    getExpandedRowModel: getExpandedRowModel(),
+    getRowCanExpand: (row) => !!row.original.items?.length,
+    onSortingChange: setSorting,
+    state: { sorting },
+    manualSorting: true,
+  })
+
+  return (
+    <div className='flex h-full flex-col gap-4'>
+      <SearchFilter placeholder='Search orders...' />
+
+      <DataTable
+        table={table}
+        isLoading={isLoading || isPlaceholderData}
+        className='flex-1'
+        renderSubComponent={(row) => <OrderExpandedRow row={row} />}
+      />
+
+      <Pagination totalCount={data?.count ?? 0} />
+    </div>
+  )
+}

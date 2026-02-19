@@ -73,7 +73,8 @@ const TableBodyExpandedRow = <TData,>({
 export const DataTableBody = <TData,>({
   table,
   isLoading = false,
-  renderSubComponent
+  renderSubComponent,
+  onRowClick,
 }: DataTableProps<TData>) => {
   if (isLoading) {
     return <DataTableSkeleton headers={table.getHeaderGroups()[0].headers} />
@@ -90,7 +91,7 @@ export const DataTableBody = <TData,>({
       {table.getRowModel().rows.map((row) => {
         return (
           <Fragment key={row.id}>
-            <TableBodyRow row={row} />
+            <TableBodyRow row={row} onRowClick={onRowClick} />
             {row.getIsExpanded() && renderSubComponent ? (
               <TableBodyExpandedRow
                 row={row}

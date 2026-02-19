@@ -11,7 +11,8 @@ export const DataTable = <TData,>({
   table,
   isLoading,
   className,
-  renderSubComponent
+  renderSubComponent,
+  onRowClick,
 }: DataTableProps<TData>) => {
   return (
     <ScrollArea className={cn('h-full min-h-0 rounded-md', className)}>
@@ -21,6 +22,7 @@ export const DataTable = <TData,>({
           table={table}
           isLoading={isLoading}
           renderSubComponent={renderSubComponent}
+          onRowClick={onRowClick}
         />
       </Table>
       <ScrollBar orientation='horizontal' />

@@ -16,3 +16,9 @@ export const getCustomersQuery = (params: CustomerParams = {}) =>
     queryKey: CUSTOMER_QUERY_KEYS.list(params),
     queryFn: () => customerService.get(params),
   })
+
+export const getCustomerDetailQuery = (id: string, projectId?: number | null) =>
+  queryOptions({
+    queryKey: [...CUSTOMER_QUERY_KEYS.detail(id), projectId] as const,
+    queryFn: () => customerService.getById(id, projectId != null ? { project_id: projectId } : undefined),
+  })

@@ -6,4 +6,5 @@ export interface DataTableProps<TData> {
   isLoading?: boolean
   className?: string
   renderSubComponent?: (row: Row<TData>) => ReactElement
+  onRowClick?: (row: Row<TData>) => void
 }

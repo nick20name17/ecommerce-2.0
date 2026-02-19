@@ -35,4 +35,6 @@ export interface OrderParams extends PaginationParams {
   search?: string
   ordering?: string
   status?: OrderStatus
+  customer?: string
+  project_id?: number
 }
