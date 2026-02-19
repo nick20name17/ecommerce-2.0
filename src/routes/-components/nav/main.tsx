@@ -5,9 +5,9 @@ import {
   ClipboardList,
   FolderKanban,
   Home,
-  Plus,
   Settings,
   Ship,
+  ShoppingCart,
   StickyNote,
   User,
   Users,
@@ -27,11 +27,6 @@ const NAV_ITEMS = [
     icon: Home
   },
   {
-    title: 'Create',
-    url: '/create',
-    icon: Plus
-  },
-  {
     title: 'Projects',
     url: '/projects',
     icon: FolderKanban
@@ -45,6 +40,11 @@ const NAV_ITEMS = [
     title: 'Users',
     url: '/users',
     icon: User
+  },
+  {
+    title: 'Orders',
+    url: '/orders',
+    icon: ShoppingCart
   },
   {
     title: 'Order Desk',

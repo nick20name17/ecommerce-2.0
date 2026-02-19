@@ -16,7 +16,7 @@ const TableBodyCell = <TData,>({ cell }: { cell: Cell<TData, unknown> }) => {
     <TableCell
       key={cell.id}
       style={{ width: size, minWidth: size, maxWidth: size }}
-      className={cn('has-[#checkbox]:bg-muted has-[#expander]:bg-muted border-b')}
+      className={cn('border-b')}
     >
       {flexRender(cell.column.columnDef.cell, cell.getContext())}
     </TableCell>
@@ -74,7 +74,7 @@ export const DataTableBody = <TData,>({
   table,
   isLoading = false,
   renderSubComponent,
-  onRowClick,
+  onRowClick
 }: DataTableProps<TData>) => {
   if (isLoading) {
     return <DataTableSkeleton headers={table.getHeaderGroups()[0].headers} />
@@ -91,7 +91,10 @@ export const DataTableBody = <TData,>({
       {table.getRowModel().rows.map((row) => {
         return (
           <Fragment key={row.id}>
-            <TableBodyRow row={row} onRowClick={onRowClick} />
+            <TableBodyRow
+              row={row}
+              onRowClick={onRowClick}
+            />
             {row.getIsExpanded() && renderSubComponent ? (
               <TableBodyExpandedRow
                 row={row}

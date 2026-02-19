@@ -7,6 +7,10 @@ import {
 } from 'nuqs'
 
 import { DEFAULT_LIMIT } from '@/api/constants'
+import { ORDER_STATUS } from '@/constants/order'
+
+const ORDER_STATUS_VALUES = ['all', ...Object.values(ORDER_STATUS)] as [string, ...string[]]
+const orderStatusParser = parseAsStringLiteral(ORDER_STATUS_VALUES)
 
 const parseAsIsoDate = createParser<Date | null>({
   parse: (v) => {
@@ -31,6 +35,8 @@ export const useLimitParam = () => {
 }
 
 export { useProjectIdParam } from './use-project-id-param'
+
+export const useOrderStatusParam = () => useQueryState('status', orderStatusParser)
 
 export const usePayloadLogCreatedAfter = () => useQueryState('created_after', parseAsIsoDate)
 export const usePayloadLogCreatedBefore = () => useQueryState('created_before', parseAsIsoDate)

@@ -22,19 +22,10 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
-import { getOrderStatusLabel } from '@/constants/order'
+import { getOrderStatusLabel, ORDER_STATUS_CLASS } from '@/constants/order'
 import { formatCurrency, formatDate, formatQuantity } from '@/helpers/formatters'
 import { useLimitParam, useOffsetParam, useProjectIdParam, useSearchParam } from '@/hooks/use-query-params'
-
-const ORDER_STATUS_VARIANT: Record<string, 'default' | 'secondary' | 'outline' | 'destructive' | 'success'> = {
-  U: 'outline',
-  O: 'default',
-  X: 'success',
-  P: 'success',
-  V: 'destructive',
-  H: 'outline',
-  A: 'secondary',
-}
+import { cn } from '@/lib/utils'
 
 function getOrderColumns(): ColumnDef<Order>[] {
   return [
@@ -65,11 +56,14 @@ function getOrderColumns(): ColumnDef<Order>[] {
     {
       accessorKey: 'status',
       header: 'Status',
-      cell: ({ row }) => (
-        <Badge variant={ORDER_STATUS_VARIANT[row.original.status] ?? 'secondary'}>
-          {getOrderStatusLabel(row.original.status)}
-        </Badge>
-      ),
+      cell: ({ row }) => {
+        const status = row.original.status
+        return (
+          <Badge variant='outline' className={cn('font-medium', ORDER_STATUS_CLASS[status] ?? '')}>
+            {getOrderStatusLabel(status)}
+          </Badge>
+        )
+      },
       size: 110,
       enableSorting: false,
     },
