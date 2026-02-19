@@ -5,9 +5,7 @@ import type { PayloadLog } from '@/api/payload-log/schema'
 import { ColumnHeader } from '@/components/common/data-table/column-header'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { DATE_FORMATS } from '@/constants/app'
-import { formatResponseTime } from '@/helpers/formatters'
-import { format } from 'date-fns'
+import { formatDate, formatResponseTime } from '@/helpers/formatters'
 
 const METHOD_VARIANT: Record<string, 'default' | 'secondary' | 'destructive' | 'outline'> = {
   GET: 'secondary',
@@ -101,9 +99,7 @@ export const getPayloadLogColumns = ({
     ),
     cell: ({ row }) => (
       <span className='text-muted-foreground text-xs'>
-        {row.original.created_at
-        ? format(new Date(row.original.created_at), DATE_FORMATS.dateTime)
-        : '—'}
+        {formatDate(row.original.created_at, 'dateTime')}
       </span>
     ),
     size: 130

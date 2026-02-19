@@ -8,9 +8,7 @@ import {
   DialogHeader,
   DialogTitle
 } from '@/components/ui/dialog'
-import { DATE_FORMATS } from '@/constants/app'
-import { formatResponseTime } from '@/helpers/formatters'
-import { format } from 'date-fns'
+import { formatDate, formatResponseTime } from '@/helpers/formatters'
 
 interface PayloadLogDetailDialogProps {
   log: PayloadLog | null
@@ -97,9 +95,7 @@ export const PayloadLogDetailDialog = ({
               </Badge>
             </DetailItem>
             <DetailItem label='Created At'>
-              {log.created_at
-                ? format(new Date(log.created_at), DATE_FORMATS.dateTime)
-                : '—'}
+              {formatDate(log.created_at, 'dateTime')}
             </DetailItem>
           </div>
 

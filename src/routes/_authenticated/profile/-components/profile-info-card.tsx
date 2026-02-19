@@ -1,6 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { format } from 'date-fns'
 import { Controller, useForm } from 'react-hook-form'
 
 import { type UpdateProfileFormValues, UpdateProfileSchema } from '@/api/profile/schema'
@@ -12,8 +11,8 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Field, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
-import { DATE_FORMATS } from '@/constants/app'
 import { getUserRoleLabel } from '@/constants/user'
+import { formatDate } from '@/helpers/formatters'
 import { updateSessionUser } from '@/helpers/auth'
 
 interface ProfileInfoCardProps {
@@ -75,9 +74,7 @@ export const ProfileInfoCard = ({ user }: ProfileInfoCardProps) => {
               <Field>
                 <FieldLabel className='text-muted-foreground text-xs'>Member Since</FieldLabel>
                 <p className='text-sm'>
-                  {user.date_joined
-                    ? format(new Date(user.date_joined), DATE_FORMATS.display)
-                    : '—'}
+                  {formatDate(user.date_joined)}
                 </p>
               </Field>
             </div>
