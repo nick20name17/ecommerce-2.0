@@ -1,3 +1,5 @@
+import { z } from 'zod'
+
 import type { TaskPriority } from '@/constants/task'
 
 import type { ApiResponse, PaginationParams } from '../schema'
@@ -87,7 +89,7 @@ export interface Task extends TaskListItem {
 export interface CreateTaskPayload {
   project?: number
   title: string
-  description?: string
+  description?: string | null
   status: number
   priority: TaskPriority
   due_date?: string | null
@@ -106,7 +108,9 @@ export interface CreateTaskStatusPayload {
   order?: number
 }
 
-export type UpdateTaskStatusPayload = Partial<CreateTaskStatusPayload>
+export type UpdateTaskStatusPayload = Partial<CreateTaskStatusPayload> & {
+  is_default?: boolean
+}
 
 export type TaskListResponse = ApiResponse<TaskListItem>
 export type TaskStatusResponse = ApiResponse<TaskStatus>
@@ -117,4 +121,39 @@ export interface TaskParams extends PaginationParams {
   status?: number
   priority?: TaskPriority
   responsible_user?: number
+  project_id?: number
 }
+
+export interface TaskStatusListResponse {
+  results: TaskStatus[]
+}
+
+const TASK_PRIORITY_VALUES = ['low', 'medium', 'high', 'urgent'] as const
+
+export const CreateTaskSchema = z.object({
+  title: z.string().min(1, 'Title is required').max(200),
+  description: z.string().max(2000).optional().nullable(),
+  status: z.number({ message: 'Status is required' }),
+  priority: z.enum(TASK_PRIORITY_VALUES),
+  due_date: z.string().optional().nullable(),
+  responsible_user: z.number().optional().nullable(),
+  linked_order_autoid: z.string().optional().nullable(),
+  linked_proposal_autoid: z.string().optional().nullable(),
+  linked_customer_autoid: z.string().optional().nullable()
+})
+
+export type CreateTaskFormValues = z.infer<typeof CreateTaskSchema>
+
+export const UpdateTaskSchema = CreateTaskSchema.partial().extend({
+  title: z.string().min(1).max(200).optional(),
+  description: z.string().max(2000).optional().nullable(),
+  status: z.number().optional(),
+  priority: z.enum(TASK_PRIORITY_VALUES).optional(),
+  due_date: z.string().optional().nullable(),
+  responsible_user: z.number().optional().nullable(),
+  linked_order_autoid: z.string().optional().nullable(),
+  linked_proposal_autoid: z.string().optional().nullable(),
+  linked_customer_autoid: z.string().optional().nullable()
+})
+
+export type UpdateTaskFormValues = z.infer<typeof UpdateTaskSchema>

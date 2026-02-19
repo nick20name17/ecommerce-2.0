@@ -1,9 +1,10 @@
 import { useDebouncedCallback } from 'use-debounce'
 import { useEffect, useRef, useState } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { Image, Loader2, Package, Search, X } from 'lucide-react'
 
 import type { Product } from '@/api/product/schema'
-import { productService } from '@/api/product/service'
+import { getProductsQuery } from '@/api/product/query'
 import { Badge } from '@/components/ui/badge'
 import { formatCurrency } from '@/helpers/formatters'
 
@@ -16,12 +17,12 @@ interface ProductSearchProps {
 
 export function ProductSearch({ customerId, projectId, onSelect, disabled }: ProductSearchProps) {
   const [query, setQuery] = useState('')
-  const [results, setResults] = useState<Product[]>([])
-  const [loading, setLoading] = useState(false)
+  const [debouncedSearch, setDebouncedSearch] = useState('')
   const [showResults, setShowResults] = useState(false)
   const [highlighted, setHighlighted] = useState(-1)
   const wrapperRef = useRef<HTMLDivElement>(null)
-  const requestIdRef = useRef(0)
+
+  const updateDebouncedSearch = useDebouncedCallback((q: string) => setDebouncedSearch(q), 300)
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {
@@ -34,39 +35,35 @@ export function ProductSearch({ customerId, projectId, onSelect, disabled }: Pro
     return () => document.removeEventListener('mousedown', handler)
   }, [])
 
-  const debouncedSearch = useDebouncedCallback(async (q: string) => {
-    const id = ++requestIdRef.current
-    try {
-      const params: Record<string, unknown> = { limit: 50, search: q }
-      if (customerId) params.customer_id = customerId
-      if (projectId != null) params.project_id = projectId
-      const res = await productService.get(params)
-      if (id === requestIdRef.current) setResults(res.results)
-    } catch {
-      if (id === requestIdRef.current) setResults([])
-    } finally {
-      if (id === requestIdRef.current) setLoading(false)
-    }
-  }, 300)
+  const params = {
+    limit: 50,
+    search: debouncedSearch,
+    customer_id: customerId ?? undefined,
+    project_id: projectId ?? undefined,
+  }
+  const { data, isLoading, isFetching } = useQuery({
+    ...getProductsQuery(params),
+    enabled: !!customerId && debouncedSearch.length > 0,
+  })
+  const results = data?.results ?? []
+  const loading = isLoading || (query.trim() !== debouncedSearch && isFetching)
 
   const handleInput = (value: string) => {
     setQuery(value)
     setHighlighted(-1)
     if (!value.trim()) {
       setShowResults(false)
-      setResults([])
-      setLoading(false)
+      setDebouncedSearch('')
       return
     }
-    setLoading(true)
     setShowResults(true)
-    debouncedSearch(value.trim())
+    updateDebouncedSearch(value.trim())
   }
 
   const handleSelect = (product: Product) => {
     onSelect(product)
     setQuery('')
-    setResults([])
+    setDebouncedSearch('')
     setShowResults(false)
     setHighlighted(-1)
   }
@@ -136,22 +133,26 @@ export function ProductSearch({ customerId, projectId, onSelect, disabled }: Pro
                 <button
                   key={product.autoid}
                   type='button'
-                  className={`flex w-full gap-3 border-b px-3 py-2.5 text-left text-sm last:border-b-0 ${
-                    highlighted === index ? 'bg-accent' : 'hover:bg-accent/50'
+                  className={`group flex w-full gap-3 border-b px-3 py-2.5 text-left text-sm last:border-b-0 ${
+                    highlighted === index ? 'bg-accent text-accent-foreground' : 'hover:bg-accent hover:text-accent-foreground'
                   }`}
                   onClick={() => handleSelect(product)}
                   onMouseEnter={() => setHighlighted(index)}
                 >
                   <div className='bg-muted flex size-10 shrink-0 items-center justify-center overflow-hidden rounded'>
                     {product.photo ? (
-                      <img src={product.photo} alt={product.descr_1} className='size-full object-cover' />
+                      <img
+                        src={product.photo}
+                        alt={product.descr_1}
+                        className='size-full object-cover'
+                      />
                     ) : (
-                      <Image className='text-muted-foreground size-4' />
+                      <Image className='text-muted-foreground size-4 group-hover:text-accent-foreground' />
                     )}
                   </div>
                   <div className='min-w-0 flex-1'>
                     <div className='flex items-center justify-between gap-2'>
-                      <div className='flex items-center gap-2 truncate'>
+                      <div className='flex items-center gap-2 truncate group-hover:text-accent-foreground'>
                         <Badge variant='secondary' className='shrink-0 text-xs'>
                           {product.id}
                         </Badge>
@@ -160,23 +161,30 @@ export function ProductSearch({ customerId, projectId, onSelect, disabled }: Pro
                       <div className='flex shrink-0 items-center gap-2'>
                         <PriceDisplay price={product.price} oldPrice={product.old_price} />
                         {product.inactive && (
-                          <Badge variant='secondary' className='text-[10px]'>Inactive</Badge>
+                          <Badge variant='secondary' className='text-[10px]'>
+                            Inactive
+                          </Badge>
                         )}
                       </div>
                     </div>
                     {Array.isArray(product.product_specs) && product.product_specs.length > 0 && (
-                      <div className='text-muted-foreground mt-0.5 flex flex-wrap gap-1 text-xs'>
-                        {(product.product_specs as Array<{ descr: string; info: string }>).slice(0, 3).map((spec, i) => (
-                          <span key={spec.descr}>
-                            <span className='text-muted-foreground/70'>{spec.descr}:</span>{' '}
-                            <span>{spec.info}</span>
-                            {i < Math.min((product.product_specs as unknown[]).length, 3) - 1 && (
-                              <span className='text-muted-foreground/40 ml-1'>·</span>
-                            )}
-                          </span>
-                        ))}
+                      <div className='text-muted-foreground mt-0.5 flex flex-wrap gap-1 text-xs group-hover:text-accent-foreground'>
+                        {(product.product_specs as Array<{ descr: string; info: string }>)
+                          .slice(0, 3)
+                          .map((spec, i) => (
+                            <span key={spec.descr}>
+                              <span className='text-muted-foreground/70'>{spec.descr}:</span>{' '}
+                              <span>{spec.info}</span>
+                              {i <
+                                Math.min((product.product_specs as unknown[]).length, 3) - 1 && (
+                                <span className='text-muted-foreground/40 ml-1'>·</span>
+                              )}
+                            </span>
+                          ))}
                         {(product.product_specs as unknown[]).length > 3 && (
-                          <span className='italic'>+{(product.product_specs as unknown[]).length - 3} more</span>
+                          <span className='italic'>
+                            +{(product.product_specs as unknown[]).length - 3} more
+                          </span>
                         )}
                       </div>
                     )}
@@ -191,7 +199,13 @@ export function ProductSearch({ customerId, projectId, onSelect, disabled }: Pro
   )
 }
 
-function PriceDisplay({ price, oldPrice }: { price: string | number; oldPrice?: string | number }) {
+function PriceDisplay({
+  price,
+  oldPrice,
+}: {
+  price: string | number
+  oldPrice?: string | number
+}) {
   const currentNum = Math.round((parseFloat(String(price)) || 0) * 100) / 100
   const oldNum = Math.round((parseFloat(String(oldPrice)) || 0) * 100) / 100
   const hasDiscount = oldPrice && oldNum > currentNum
@@ -199,7 +213,9 @@ function PriceDisplay({ price, oldPrice }: { price: string | number; oldPrice?: 
   return (
     <span className='flex items-center gap-1.5 text-sm'>
       {hasDiscount && (
-        <span className='text-muted-foreground text-xs line-through'>{formatCurrency(oldNum)}</span>
+        <span className='text-muted-foreground text-xs line-through'>
+          {formatCurrency(oldNum)}
+        </span>
       )}
       <span className={hasDiscount ? 'font-semibold text-green-600' : ''}>
         {formatCurrency(currentNum)}

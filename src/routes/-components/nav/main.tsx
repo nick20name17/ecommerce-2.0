@@ -2,6 +2,7 @@
 
 import { Link } from '@tanstack/react-router'
 import {
+  CheckSquare,
   ClipboardList,
   FolderKanban,
   Home,
@@ -45,6 +46,11 @@ const NAV_ITEMS = [
     title: 'Orders',
     url: '/orders',
     icon: ShoppingCart
+  },
+  {
+    title: 'Tasks',
+    url: '/tasks',
+    icon: CheckSquare
   },
   {
     title: 'Order Desk',

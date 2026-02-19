@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Eraser, FileCheck, ShoppingCart } from 'lucide-react'
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
 import { CartSummary } from './-components/cart-summary'
@@ -8,9 +9,13 @@ import { CartTable } from './-components/cart-table'
 import { CustomerCombobox } from './-components/customer-combobox'
 import { ProductEditSheet } from './-components/product-edit-sheet'
 import { ProductSearch } from './-components/product-search'
+import { CART_QUERY_KEYS, getCartQuery } from '@/api/cart/query'
 import { cartService } from '@/api/cart/service'
-import type { Cart, CartItem, ConfigurationProduct, Product } from '@/api/product/schema'
-import { productService } from '@/api/product/service'
+import {
+  getProductByAutoidQuery,
+  getProductConfigurationsQuery,
+} from '@/api/product/query'
+import type { CartItem, ConfigurationProduct, Product } from '@/api/product/schema'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Spinner } from '@/components/ui/spinner'
@@ -24,11 +29,13 @@ export const Route = createFileRoute('/_authenticated/create/')({
 
 function CreatePage() {
   const navigate = useNavigate()
+  const queryClient = useQueryClient()
   const [projectId] = useProjectIdParam()
 
   const [customer, setCustomer] = useState<Customer | null>(null)
-  const [cart, setCart] = useState<Cart | null>(null)
-  const [cartLoading, setCartLoading] = useState(false)
+  const { data: cart, isLoading: cartLoading } = useQuery({
+    ...getCartQuery(customer?.id ?? '', projectId),
+  })
   const [cartUpdating, setCartUpdating] = useState(false)
   const [clearingCart, setClearingCart] = useState(false)
   const [creatingProposal, setCreatingProposal] = useState(false)
@@ -37,49 +44,82 @@ function CreatePage() {
   const [editProduct, setEditProduct] = useState<Product | CartItem | null>(null)
   const [editMode, setEditMode] = useState<'add' | 'edit'>('add')
   const [editSheetOpen, setEditSheetOpen] = useState(false)
-  const [configData, setConfigData] = useState<ConfigurationProduct | null>(null)
-  const [configLoading, setConfigLoading] = useState(false)
 
-  const cartItems = cart?.items ?? []
+  const autoidForConfig =
+    editProduct && 'product_autoid' in editProduct
+      ? editProduct.product_autoid
+      : (editProduct as Product)?.autoid
+  const needConfig =
+    editSheetOpen &&
+    !!editProduct &&
+    !!customer?.id &&
+    (isCartItem(editProduct)
+      ? (editProduct.configurations?.length ?? 0) > 0
+      : Number((editProduct as Product).configurations) > 0)
+  const configQuery = useQuery({
+    ...getProductConfigurationsQuery(autoidForConfig ?? '', {
+      customer_id: customer?.id ?? '',
+      project_id: projectId ?? undefined,
+    }),
+    enabled: needConfig,
+  })
+  const productQuery = useQuery({
+    ...getProductByAutoidQuery(autoidForConfig ?? '', {
+      customer_id: customer?.id,
+      project_id: projectId ?? undefined,
+    }),
+    enabled:
+      editSheetOpen &&
+      !!editProduct &&
+      isCartItem(editProduct) &&
+      !(editProduct.photos?.length) &&
+      !!customer?.id,
+  })
+  const configData = useMemo((): ConfigurationProduct | null => {
+    const data = configQuery.data
+    if (!data?.configurations || !editProduct || !isCartItem(editProduct)) return data ?? null
+    const savedByGroup = new Map<string, string>()
+    for (const c of editProduct.configurations) savedByGroup.set(c.name, c.id)
+    const next = JSON.parse(JSON.stringify(data)) as ConfigurationProduct
+    for (const group of next.configurations ?? []) {
+      for (const gi of group.items) {
+        gi.active = gi.id === savedByGroup.get(group.name)
+      }
+    }
+    return next
+  }, [configQuery.data, editProduct])
+  const configLoading = configQuery.isLoading
+  const editProductWithPhotos = useMemo(() => {
+    if (
+      !editProduct ||
+      !isCartItem(editProduct) ||
+      (editProduct.photos?.length ?? 0) > 0
+    )
+      return editProduct
+    const photos = productQuery.data?.photos
+    return photos?.length ? { ...editProduct, photos: photos as string[] } : editProduct
+  }, [editProduct, productQuery.data?.photos])
+
+  useEffect(() => {
+    if (configQuery.isError && editSheetOpen) {
+      toast.error(getErrorMessage(configQuery.error))
+      setEditSheetOpen(false)
+      setEditProduct(null)
+    }
+  }, [configQuery.isError, configQuery.error, editSheetOpen])
+
+  const cartItems = useMemo(() => cart?.items ?? [], [cart?.items])
   const isBusy = cartUpdating || cartLoading || creatingProposal || creatingOrder
 
-  const loadCart = useCallback(async (customerId: string) => {
-    setCartLoading(true)
-    try {
-      const data = await cartService.get(customerId, projectId)
-      setCart(data)
-    } catch (error) {
-      setCart(null)
-      toast.error(getErrorMessage(error))
-    } finally {
-      setCartLoading(false)
+  const invalidateCart = useCallback(() => {
+    if (customer?.id != null) {
+      queryClient.invalidateQueries({ queryKey: CART_QUERY_KEYS.detail(customer.id, projectId) })
     }
-  }, [projectId])
+  }, [customer?.id, projectId, queryClient])
 
-  const refreshCart = useCallback(async () => {
-    if (!customer) return
-    setCartUpdating(true)
-    try {
-      const data = await cartService.get(customer.id, projectId)
-      setCart(data)
-    } catch (error) {
-      toast.error(getErrorMessage(error))
-    } finally {
-      setCartUpdating(false)
-    }
-  }, [customer, projectId])
-
-  const handleCustomerChange = useCallback(
-    async (c: Customer | null) => {
-      setCustomer(c)
-      if (c) {
-        await loadCart(c.id)
-      } else {
-        setCart(null)
-      }
-    },
-    [loadCart]
-  )
+  const handleCustomerChange = useCallback((c: Customer | null) => {
+    setCustomer(c)
+  }, [])
 
   const handleProductSelect = useCallback(
     async (product: Product) => {
@@ -92,26 +132,8 @@ function CreatePage() {
         setEditProduct({ ...product, unit: product.unit || product.def_unit })
         setEditMode('add')
         setEditSheetOpen(true)
-
-        if (hasConfigurations) {
-          setConfigLoading(true)
-          try {
-            const data = await productService.getConfigurations(product.autoid, {
-              customer_id: customer.id,
-              project_id: projectId ?? undefined,
-            })
-            setConfigData(data)
-          } catch (error) {
-            toast.error(getErrorMessage(error))
-            setEditSheetOpen(false)
-            setEditProduct(null)
-          } finally {
-            setConfigLoading(false)
-          }
-        }
       } else {
         setCartUpdating(true)
-        setConfigLoading(true)
         try {
           await cartService.addItem(
             {
@@ -122,68 +144,26 @@ function CreatePage() {
             customer.id,
             projectId
           )
-          await refreshCart()
+          invalidateCart()
           toast.success(`${product.id} added to cart`)
         } catch (error) {
           toast.error(getErrorMessage(error))
         } finally {
-          setConfigLoading(false)
           setCartUpdating(false)
         }
       }
     },
-    [customer, refreshCart, projectId]
+    [customer, invalidateCart, projectId]
   )
 
   const handleEditItem = useCallback(
-    async (item: CartItem) => {
+    (item: CartItem) => {
       if (!customer) return
       setEditProduct({ ...item })
       setEditMode('edit')
       setEditSheetOpen(true)
-      setConfigData(null)
-
-      const needsConfigurations = item.configurations?.length > 0
-      if (needsConfigurations) {
-        setConfigLoading(true)
-        try {
-          const [data, productData] = await Promise.all([
-            productService.getConfigurations(item.product_autoid, {
-              customer_id: customer.id,
-              project_id: projectId ?? undefined,
-            }),
-            !item.photos?.length
-              ? productService.getByAutoid(item.product_autoid, {
-                  customer_id: customer.id,
-                  project_id: projectId ?? undefined,
-                })
-              : null,
-          ])
-          if (data?.configurations) {
-            const savedByGroup = new Map<string, string>()
-            for (const c of item.configurations) savedByGroup.set(c.name, c.id)
-            for (const group of data.configurations) {
-              for (const gi of group.items) {
-                gi.active = gi.id === savedByGroup.get(group.name)
-              }
-            }
-          }
-          if (productData?.photos?.length) {
-            setEditProduct((prev) =>
-              prev ? { ...prev, photos: productData.photos as string[] } : prev
-            )
-          }
-          setConfigData(data)
-        } catch (error) {
-          toast.error(getErrorMessage(error))
-          setEditSheetOpen(false)
-          setEditProduct(null)
-        } finally {
-          setConfigLoading(false)
-        }
-      }
     },
-    [customer, projectId]
+    [customer]
   )
 
   const handleRemoveItem = useCallback(
@@ -192,8 +172,8 @@ function CreatePage() {
       const item = cartItems.find((i) => i.id === itemId)
       setCartUpdating(true)
       try {
-        const data = await cartService.deleteItem(itemId, customer.id, projectId)
-        setCart(data)
+        await cartService.deleteItem(itemId, customer.id, projectId)
+        invalidateCart()
         if (item) toast.success(`${item.product_id} removed`)
       } catch (error) {
         toast.error(getErrorMessage(error))
@@ -201,7 +181,7 @@ function CreatePage() {
         setCartUpdating(false)
       }
     },
-    [customer, cartItems, projectId]
+    [customer, cartItems, invalidateCart, projectId]
   )
 
   const handleQuantityChange = useCallback(
@@ -209,15 +189,15 @@ function CreatePage() {
       if (!customer) return
       setCartUpdating(true)
       try {
-        const data = await cartService.updateItem(itemId, { quantity }, customer.id, projectId)
-        setCart(data)
+        await cartService.updateItem(itemId, { quantity }, customer.id, projectId)
+        invalidateCart()
       } catch (error) {
         toast.error(getErrorMessage(error))
       } finally {
         setCartUpdating(false)
       }
     },
-    [customer, projectId]
+    [customer, invalidateCart, projectId]
   )
 
   const handleClearAll = useCallback(async () => {
@@ -226,7 +206,7 @@ function CreatePage() {
     setCartUpdating(true)
     try {
       await cartService.flush(customer.id, projectId)
-      setCart((prev) => (prev ? { ...prev, items: [], total: 0, old_total: 0 } : prev))
+      invalidateCart()
       toast.success('All items cleared')
     } catch (error) {
       toast.error(getErrorMessage(error))
@@ -234,14 +214,14 @@ function CreatePage() {
       setClearingCart(false)
       setCartUpdating(false)
     }
-  }, [customer, cartItems.length, projectId])
+  }, [customer, cartItems.length, invalidateCart, projectId])
 
   const handleCreateProposal = useCallback(async () => {
     if (!customer || cartItems.length === 0) return
     setCreatingProposal(true)
     try {
       await cartService.submitProposal(customer.id, projectId)
-      setCart((prev) => (prev ? { ...prev, items: [], total: 0, old_total: 0 } : prev))
+      invalidateCart()
       toast.success('Proposal created successfully')
       navigate({ to: '/' })
     } catch (error) {
@@ -249,14 +229,14 @@ function CreatePage() {
     } finally {
       setCreatingProposal(false)
     }
-  }, [customer, cartItems.length, navigate, projectId])
+  }, [customer, cartItems.length, invalidateCart, navigate, projectId])
 
   const handleCreateOrder = useCallback(async () => {
     if (!customer || cartItems.length === 0) return
     setCreatingOrder(true)
     try {
       await cartService.submitOrder(customer.id, projectId)
-      setCart((prev) => (prev ? { ...prev, items: [], total: 0, old_total: 0 } : prev))
+      invalidateCart()
       toast.success('Order created successfully')
       navigate({ to: '/' })
     } catch (error) {
@@ -264,7 +244,7 @@ function CreatePage() {
     } finally {
       setCreatingOrder(false)
     }
-  }, [customer, cartItems.length, navigate, projectId])
+  }, [customer, cartItems.length, invalidateCart, navigate, projectId])
 
   return (
     <div className='flex h-full flex-col gap-4'>
@@ -311,7 +291,7 @@ function CreatePage() {
           {/* Summary */}
           {(cart || cartLoading) && (
             <div className='border-b p-4'>
-              <CartSummary cart={cart} loading={cartLoading} updating={cartUpdating} />
+              <CartSummary cart={cart ?? null} loading={cartLoading} updating={cartUpdating} />
             </div>
           )}
 
@@ -352,13 +332,13 @@ function CreatePage() {
         key={editProduct ? (isCartItemType(editProduct) ? editProduct.id : editProduct.autoid) : 'none'}
         open={editSheetOpen}
         onOpenChange={setEditSheetOpen}
-        product={editProduct}
+        product={editProductWithPhotos}
         mode={editMode}
         configData={configData}
         configLoading={configLoading}
         customerId={customer?.id ?? ''}
         projectId={projectId}
-        onSaved={refreshCart}
+        onSaved={invalidateCart}
       />
     </div>
   )
@@ -366,6 +346,10 @@ function CreatePage() {
 
 function isCartItemType(p: Product | CartItem): p is CartItem {
   return 'product_autoid' in p
+}
+
+function isCartItem(p: Product | CartItem | null): p is CartItem {
+  return p != null && 'product_autoid' in p
 }
 
 function Section({

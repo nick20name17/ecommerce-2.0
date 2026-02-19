@@ -1,26 +1,27 @@
-import { ChevronsUpDown, Search, Users, X } from 'lucide-react'
+import { ChevronsUpDown, Search, ShoppingCart, X } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useDebouncedCallback } from 'use-debounce'
 
-import type { Customer } from '@/api/customer/schema'
-import { getCustomersQuery } from '@/api/customer/query'
+import type { Order, OrderParams } from '@/api/order/schema'
+import { getOrdersQuery } from '@/api/order/query'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Spinner } from '@/components/ui/spinner'
 
-interface CustomerComboboxProps {
-  value: Customer | null
-  onChange: (customer: Customer | null) => void
+interface OrderComboboxProps {
+  value: string | null
+  onChange: (autoid: string | null) => void
   projectId?: number | null
 }
 
-export function CustomerCombobox({ value, onChange, projectId }: CustomerComboboxProps) {
+export function OrderCombobox({ value, onChange, projectId }: OrderComboboxProps) {
   const [open, setOpen] = useState(false)
   const [search, setSearch] = useState('')
   const [debouncedSearch, setDebouncedSearch] = useState('')
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
 
   const updateDebouncedSearch = useDebouncedCallback((q: string) => setDebouncedSearch(q), 300)
@@ -37,49 +38,67 @@ export function CustomerCombobox({ value, onChange, projectId }: CustomerCombobo
     if (open) updateDebouncedSearch(search)
   }, [open, search, updateDebouncedSearch])
 
-  const params = {
+  const params: OrderParams = {
     limit: 50,
     search: debouncedSearch || undefined,
     project_id: projectId ?? undefined,
   }
   const { data, isLoading, isFetching } = useQuery({
-    ...getCustomersQuery(params),
+    ...getOrdersQuery(params),
     enabled: open,
   })
-  const customers = data?.results ?? []
+  const orders = data?.results ?? []
   const loading = isLoading || (search !== debouncedSearch && isFetching)
+
+  useEffect(() => {
+    if (value != null && orders.length > 0) {
+      const o = orders.find((x) => x.autoid === value)
+      if (o) setSelectedOrder(o)
+    } else if (value == null) {
+      setSelectedOrder(null)
+    }
+  }, [value, orders])
 
   const handleSearchChange = (q: string) => {
     setSearch(q)
     updateDebouncedSearch(q)
   }
 
-  const handleSelect = (customer: Customer) => {
-    onChange(customer)
+  const handleSelect = (order: Order) => {
+    setSelectedOrder(order)
+    onChange(order.autoid)
     setOpen(false)
   }
+
+  const displayLabel = selectedOrder
+    ? `${selectedOrder.invoice}${selectedOrder.name ? ` — ${selectedOrder.name}` : ''}`
+    : value
+      ? `Order ${value}`
+      : null
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <div className='flex gap-2'>
         <PopoverTrigger asChild>
           <Button variant='outline' className='w-full justify-between font-normal'>
-            {value ? (
-              <span className='flex items-center gap-2 truncate'>
-                <span className='font-semibold'>{value.id}</span>
-                <span className='truncate'>{value.l_name}</span>
-                {value.contact_1 && (
-                  <span className='text-muted-foreground text-xs'>{value.contact_1}</span>
-                )}
-              </span>
+            {displayLabel ? (
+              <span className='truncate'>{displayLabel}</span>
             ) : (
-              <span className='text-muted-foreground'>Select customer...</span>
+              <span className='text-muted-foreground'>Select order...</span>
             )}
             <ChevronsUpDown className='ml-auto size-4 shrink-0 opacity-50' />
           </Button>
         </PopoverTrigger>
-        {value && (
-          <Button variant='ghost' size='icon' className='shrink-0' onClick={() => onChange(null)}>
+        {(value != null || selectedOrder) && (
+          <Button
+            variant='ghost'
+            size='icon'
+            className='shrink-0'
+            onClick={() => {
+              setSelectedOrder(null)
+              onChange(null)
+            }}
+          >
             <X className='size-4' />
           </Button>
         )}
@@ -93,7 +112,7 @@ export function CustomerCombobox({ value, onChange, projectId }: CustomerCombobo
           )}
           <Input
             ref={inputRef}
-            placeholder='Search by name or ID...'
+            placeholder='Search by invoice or name...'
             value={search}
             onChange={(e) => handleSearchChange(e.target.value)}
             className='h-8 border-0 p-0 shadow-none focus-visible:ring-0'
@@ -103,43 +122,34 @@ export function CustomerCombobox({ value, onChange, projectId }: CustomerCombobo
           className='max-h-64 overflow-y-auto overscroll-contain'
           onWheel={(e) => e.stopPropagation()}
         >
-          {loading && customers.length === 0 ? (
+          {loading && orders.length === 0 ? (
             <div className='space-y-2 p-2'>
               {Array.from({ length: 5 }).map((_, i) => (
                 <Skeleton key={i} className='h-10 w-full' />
               ))}
             </div>
-          ) : customers.length === 0 ? (
+          ) : orders.length === 0 ? (
             <div className='text-muted-foreground flex flex-col items-center gap-2 py-8'>
-              <Users className='size-6 opacity-50' />
+              <ShoppingCart className='size-6 opacity-50' />
               <span className='text-sm'>
-                {search ? 'No customers found' : 'Start typing to search'}
+                {search ? 'No orders found' : 'Start typing to search'}
               </span>
             </div>
           ) : (
             <div className='p-1'>
-              {customers.map((c) => (
+              {orders.map((o) => (
                 <button
-                  key={c.id}
+                  key={o.autoid}
                   type='button'
-                  className='group hover:bg-accent hover:text-accent-foreground flex w-full items-center justify-between gap-2 rounded-md px-2 py-2 text-left text-sm'
-                  onClick={() => handleSelect(c)}
+                  className='group hover:bg-accent hover:text-accent-foreground flex w-full flex-col gap-0.5 rounded-md px-2 py-2 text-left text-sm'
+                  onClick={() => handleSelect(o)}
                 >
-                  <div className='flex min-w-0 gap-2 group-hover:text-accent-foreground'>
-                    <span className='font-semibold'>{c.id}</span>
-                    <span className='truncate'>{c.l_name}</span>
-                  </div>
-                  <div className='text-muted-foreground flex shrink-0 items-center gap-2 text-xs group-hover:text-accent-foreground'>
-                    {c.contact_1 && <span>{c.contact_1}</span>}
-                    {c.city && c.state && (
-                      <span>
-                        {c.city}, {c.state}
-                      </span>
-                    )}
-                    {c.inactive && (
-                      <span className='bg-muted rounded px-1.5 py-0.5 text-[10px]'>Inactive</span>
-                    )}
-                  </div>
+                  <span className='font-medium group-hover:text-accent-foreground'>{o.invoice}</span>
+                  {o.name && (
+                    <span className='text-muted-foreground truncate text-xs group-hover:text-accent-foreground'>
+                      {o.name}
+                    </span>
+                  )}
                 </button>
               ))}
             </div>

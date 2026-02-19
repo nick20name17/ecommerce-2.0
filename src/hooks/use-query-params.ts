@@ -79,3 +79,6 @@ export const usePayloadLogStatusCode = () => useQueryState('status_code', parseA
 export const usePayloadLogIsError = () =>
   useQueryState('is_error', parseAsStringLiteral(['true', 'false']))
 
+const parseAsTaskStatusId = parseAsInteger
+export const useTaskStatusParam = () => useQueryState('task_status', parseAsTaskStatusId)
+
