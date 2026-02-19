@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Eraser, FileCheck, ShoppingCart } from 'lucide-react'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
 import { CartSummary } from './-components/cart-summary'
@@ -75,7 +75,7 @@ function CreatePage() {
       !(editProduct.photos?.length) &&
       !!customer?.id,
   })
-  const configData = useMemo((): ConfigurationProduct | null => {
+  const configData = ((): ConfigurationProduct | null => {
     const data = configQuery.data
     if (!data?.configurations || !editProduct || !isCartItem(editProduct)) return data ?? null
     const savedByGroup = new Map<string, string>()
@@ -87,18 +87,17 @@ function CreatePage() {
       }
     }
     return next
-  }, [configQuery.data, editProduct])
+  })()
   const configLoading = configQuery.isLoading
-  const editProductWithPhotos = useMemo(() => {
-    if (
-      !editProduct ||
-      !isCartItem(editProduct) ||
-      (editProduct.photos?.length ?? 0) > 0
-    )
-      return editProduct
-    const photos = productQuery.data?.photos
-    return photos?.length ? { ...editProduct, photos: photos as string[] } : editProduct
-  }, [editProduct, productQuery.data?.photos])
+  const editProductWithPhotos =
+    !editProduct ||
+    !isCartItem(editProduct) ||
+    (editProduct.photos?.length ?? 0) > 0
+      ? editProduct
+      : (() => {
+          const photos = productQuery.data?.photos
+          return photos?.length ? { ...editProduct, photos: photos as string[] } : editProduct
+        })()
 
   useEffect(() => {
     if (configQuery.isError && editSheetOpen) {
@@ -110,94 +109,82 @@ function CreatePage() {
     }
   }, [configQuery.isError, configQuery.error, editSheetOpen])
 
-  const cartItems = useMemo(() => cart?.items ?? [], [cart?.items])
+  const cartItems = cart?.items ?? []
   const isBusy = cartUpdating || cartLoading || creatingProposal || creatingOrder
 
-  const invalidateCart = useCallback(() => {
+  const invalidateCart = () => {
     if (customer?.id != null) {
       queryClient.invalidateQueries({ queryKey: CART_QUERY_KEYS.detail(customer.id, projectId) })
     }
-  }, [customer, projectId, queryClient])
+  }
 
-  const handleCustomerChange = useCallback((c: Customer | null) => {
+  const handleCustomerChange = (c: Customer | null) => {
     setCustomer(c)
-  }, [])
+  }
 
-  const handleProductSelect = useCallback(
-    async (product: Product) => {
-      if (!customer) return
+  const handleProductSelect = async (product: Product) => {
+    if (!customer) return
 
-      const hasConfigurations = Number(product.configurations) > 0
-      const hasMultipleUnits = (product.units?.length ?? 0) > 1
+    const hasConfigurations = Number(product.configurations) > 0
+    const hasMultipleUnits = (product.units?.length ?? 0) > 1
 
-      if (hasConfigurations || hasMultipleUnits) {
-        setEditProduct({ ...product, unit: product.unit || product.def_unit })
-        setEditMode('add')
-        setEditSheetOpen(true)
-      } else {
-        setCartUpdating(true)
-        const customerId = customer.id
-        const payload = {
-          product_autoid: product.autoid,
-          quantity: 1,
-          unit: product.unit || product.def_unit || '',
-        }
-        try {
-          await cartService.addItem(payload, customerId, projectId)
-          invalidateCart()
-          toast.success(`${product.id} added to cart`)
-        } catch (error) {
-          toast.error(getErrorMessage(error))
-        }
-        setCartUpdating(false)
-      }
-    },
-    [customer, invalidateCart, projectId]
-  )
-
-  const handleEditItem = useCallback(
-    (item: CartItem) => {
-      if (!customer) return
-      setEditProduct({ ...item })
-      setEditMode('edit')
+    if (hasConfigurations || hasMultipleUnits) {
+      setEditProduct({ ...product, unit: product.unit || product.def_unit })
+      setEditMode('add')
       setEditSheetOpen(true)
-    },
-    [customer]
-  )
-
-  const handleRemoveItem = useCallback(
-    async (itemId: number) => {
-      if (!customer) return
-      const item = cartItems.find((i) => i.id === itemId)
+    } else {
       setCartUpdating(true)
+      const customerId = customer.id
+      const payload = {
+        product_autoid: product.autoid,
+        quantity: 1,
+        unit: product.unit || product.def_unit || '',
+      }
       try {
-        await cartService.deleteItem(itemId, customer.id, projectId)
+        await cartService.addItem(payload, customerId, projectId)
         invalidateCart()
-        if (item) toast.success(`${item.product_id} removed`)
+        toast.success(`${product.id} added to cart`)
       } catch (error) {
         toast.error(getErrorMessage(error))
       }
       setCartUpdating(false)
-    },
-    [customer, cartItems, invalidateCart, projectId]
-  )
+    }
+  }
 
-  const handleQuantityChange = useCallback(
-    async (itemId: number, quantity: number) => {
-      if (!customer) return
-      setCartUpdating(true)
-      try {
-        await cartService.updateItem(itemId, { quantity }, customer.id, projectId)
-        invalidateCart()
-      } catch (error) {
-        toast.error(getErrorMessage(error))
-      }
-      setCartUpdating(false)
-    },
-    [customer, invalidateCart, projectId]
-  )
+  const handleEditItem = (item: CartItem) => {
+    if (!customer) return
+    setEditProduct({ ...item })
+    setEditMode('edit')
+    setEditSheetOpen(true)
+  }
 
-  const handleClearAll = useCallback(async () => {
+  const handleRemoveItem = async (itemId: number) => {
+    if (!customer) return
+    const item = cartItems.find((i) => i.id === itemId)
+    setCartUpdating(true)
+    try {
+      await cartService.deleteItem(itemId, customer.id, projectId)
+      invalidateCart()
+      if (item) toast.success(`${item.product_id} removed`)
+    } catch (error) {
+      toast.error(getErrorMessage(error))
+    }
+    setCartUpdating(false)
+  }
+
+  const handleQuantityChange = async (itemId: number, quantity: number) => {
+    if (!customer) return
+    setCartUpdating(true)
+    try {
+      await cartService.updateItem(itemId, { quantity }, customer.id, projectId)
+      invalidateCart()
+    } catch (error) {
+      toast.error(getErrorMessage(error))
+    }
+    setCartUpdating(false)
+  }
+
+  const handleClearAll = async () => {
     if (!customer || cartItems.length === 0) return
     setClearingCart(true)
     setCartUpdating(true)
@@ -210,9 +197,9 @@ function CreatePage() {
     }
     setClearingCart(false)
     setCartUpdating(false)
-  }, [customer, cartItems.length, invalidateCart, projectId])
+  }
 
-  const handleCreateProposal = useCallback(async () => {
+  const handleCreateProposal = async () => {
     if (!customer || cartItems.length === 0) return
     setCreatingProposal(true)
     try {
@@ -224,9 +211,9 @@ function CreatePage() {
       toast.error(getErrorMessage(error))
     }
     setCreatingProposal(false)
-  }, [customer, cartItems.length, invalidateCart, navigate, projectId])
+  }
 
-  const handleCreateOrder = useCallback(async () => {
+  const handleCreateOrder = async () => {
     if (!customer || cartItems.length === 0) return
     setCreatingOrder(true)
     try {
@@ -238,7 +225,7 @@ function CreatePage() {
       toast.error(getErrorMessage(error))
     }
     setCreatingOrder(false)
-  }, [customer, cartItems.length, invalidateCart, navigate, projectId])
+  }
 
   return (
     <div className='flex h-full flex-col gap-4'>

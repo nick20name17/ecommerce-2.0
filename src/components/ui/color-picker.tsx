@@ -1,4 +1,4 @@
-import { forwardRef, useMemo, useState } from 'react'
+import { forwardRef, useState } from 'react'
 import { HexColorPicker } from 'react-colorful'
 
 import type { ButtonProps } from '@/components/ui/button'
@@ -25,8 +25,7 @@ const ColorPicker = forwardRef<
   ) => {
     const ref = useForwardedRef(forwardedRef)
     const [open, setOpen] = useState(false)
-
-    const parsedValue = useMemo(() => value || '#FFFFFF', [value])
+    const parsedValue = value || '#FFFFFF'
 
     if (inline) {
       return (

@@ -1,5 +1,5 @@
 import { ChevronsUpDown, Search, Users, X } from 'lucide-react'
-import { useMemo, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useDebouncedCallback } from 'use-debounce'
 
@@ -43,7 +43,7 @@ export function TaskCustomerCombobox({ value, onChange, projectId }: TaskCustome
     ...getCustomersQuery(params),
     enabled: open,
   })
-  const customers = useMemo(() => data?.results ?? [], [data?.results])
+  const customers = data?.results ?? []
   const loading = isLoading || (search !== debouncedSearch && isFetching)
 
   const displayCustomer =

@@ -4,7 +4,7 @@ import { DragDropProvider } from '@dnd-kit/react'
 import { useSortable } from '@dnd-kit/react/sortable'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { ChevronDown, ChevronUp, GripVertical, Pencil, Plus, Trash2 } from 'lucide-react'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
 import { TASK_QUERY_KEYS } from '@/api/task/query'
@@ -54,7 +54,7 @@ export function TaskStatusManager({
   onValueChange
 }: TaskStatusManagerProps) {
   const [expanded, setExpanded] = useState(false)
-  const sorted = useMemo(() => [...statuses].sort((a, b) => a.order - b.order), [statuses])
+  const sorted = [...statuses].sort((a, b) => a.order - b.order)
   const [orderedStatuses, setOrderedStatuses] = useState<TaskStatus[]>(sorted)
   const orderedStatusesRef = useRef(orderedStatuses)
 
@@ -68,41 +68,38 @@ export function TaskStatusManager({
       taskService.updateStatus(id, { order })
   })
 
-  const handleDragEnd = useCallback(
-    (event: unknown, manager: unknown) => {
-      const e = event as {
-        operation?: { source: { id: unknown }; target: { id: unknown } }
-      }
-      const m = manager as {
-        dragOperation?: { source: { id: unknown }; target: { id: unknown } }
-      }
-      const op = e?.operation ?? m?.dragOperation
-      if (!op?.source || !op?.target) return
-      const sourceId = op.source.id
-      const targetId = op.target.id
-      if (sourceId === targetId) return
-      const current = orderedStatusesRef.current
-      const fromIndex = current.findIndex((s) => s.id === sourceId)
-      const toIndex = current.findIndex((s) => s.id === targetId)
-      if (fromIndex === -1 || toIndex === -1) return
-      const next = arrayMove(current, fromIndex, toIndex)
-      setOrderedStatuses(next)
-      const start = Math.min(fromIndex, toIndex)
-      const end = Math.max(fromIndex, toIndex)
-      Promise.all(
-        Array.from({ length: end - start + 1 }, (_, i) => {
-          const status = next[start + i]!
-          return reorderMutation.mutateAsync({ id: status.id, order: start + i })
-        })
-      )
-        .then(() => {
-          queryClient.invalidateQueries({ queryKey: TASK_QUERY_KEYS.statuses(projectId) })
-          toast.success('Status order saved')
-        })
-        .catch(() => {})
-    },
-    [reorderMutation, queryClient, projectId]
-  )
+  const handleDragEnd = (event: unknown, manager: unknown) => {
+    const e = event as {
+      operation?: { source: { id: unknown }; target: { id: unknown } }
+    }
+    const m = manager as {
+      dragOperation?: { source: { id: unknown }; target: { id: unknown } }
+    }
+    const op = e?.operation ?? m?.dragOperation
+    if (!op?.source || !op?.target) return
+    const sourceId = op.source.id
+    const targetId = op.target.id
+    if (sourceId === targetId) return
+    const current = orderedStatusesRef.current
+    const fromIndex = current.findIndex((s) => s.id === sourceId)
+    const toIndex = current.findIndex((s) => s.id === targetId)
+    if (fromIndex === -1 || toIndex === -1) return
+    const next = arrayMove(current, fromIndex, toIndex)
+    setOrderedStatuses(next)
+    const start = Math.min(fromIndex, toIndex)
+    const end = Math.max(fromIndex, toIndex)
+    Promise.all(
+      Array.from({ length: end - start + 1 }, (_, i) => {
+        const status = next[start + i]!
+        return reorderMutation.mutateAsync({ id: status.id, order: start + i })
+      })
+    )
+      .then(() => {
+        queryClient.invalidateQueries({ queryKey: TASK_QUERY_KEYS.statuses(projectId) })
+        toast.success('Status order saved')
+      })
+      .catch(() => {})
+  }
 
   return (
     <div className='space-y-2'>

@@ -1,14 +1,14 @@
 import type { SortingState } from '@tanstack/react-table'
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 
 export function useOrdering() {
   const [sorting, setSorting] = useState<SortingState>([])
 
-  const ordering = useMemo(() => {
-    if (!sorting.length) return undefined
-    const sort = sorting[0]
-    return sort.desc ? `-${sort.id}` : sort.id
-  }, [sorting])
+  const ordering = !sorting.length
+    ? undefined
+    : sorting[0]!.desc
+      ? `-${sorting[0].id}`
+      : sorting[0].id
 
   return { sorting, setSorting, ordering } as const
 }
