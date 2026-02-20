@@ -34,7 +34,7 @@ function arrayMove<T>(array: T[], from: number, to: number): T[] {
 }
 
 interface TaskStatusManagerProps {
-  projectId: number | null
+  projectId: number | null | undefined
   statuses: TaskStatus[]
 }
 
@@ -49,10 +49,16 @@ export function TaskStatusManager({ projectId, statuses }: TaskStatusManagerProp
     mutationFn: ({ id, order }: { id: number; order: number }) =>
       taskService.updateStatus(id, { order })
   })
-  const handleDragEnd = (event: DragEndEvent) => {
-    if (event.canceled) return
+  const handleDragEnd = (event: unknown) => {
+    const e = event as {
+      canceled?: boolean
+      operation?: { source: { id: string | number } | null; target: { id: string | number } | null }
+    }
+    if (e.canceled) return
+    const op = e.operation
+    if (!op?.source) return
 
-    const { source, target } = event.operation
+    const { source, target } = op
     const sortableSource = source as { initialIndex?: number; index?: number }
     const useSortableIndices =
       typeof sortableSource.initialIndex === 'number' && typeof sortableSource.index === 'number'
@@ -66,7 +72,14 @@ export function TaskStatusManager({ projectId, statuses }: TaskStatusManagerProp
         ? orderedStatuses.findIndex((s) => s.id === Number(target.id))
         : -1
 
-    if (fromIndex === -1 || toIndex === -1 || fromIndex === toIndex) return
+    if (
+      typeof fromIndex !== 'number' ||
+      typeof toIndex !== 'number' ||
+      fromIndex === -1 ||
+      toIndex === -1 ||
+      fromIndex === toIndex
+    )
+      return
 
     const next = arrayMove(orderedStatuses, fromIndex, toIndex)
 
@@ -74,11 +87,15 @@ export function TaskStatusManager({ projectId, statuses }: TaskStatusManagerProp
 
     Promise.all(
       next
-        .filter((s) => !s.is_default)
-        .map((status, i) => reorderMutation.mutateAsync({ id: status.id, order: i }))
+        .filter((s) => !s.is_default && s.id != null)
+        .map((status, i) =>
+          reorderMutation.mutateAsync({ id: status.id as number, order: i })
+        )
     )
       .then(() => {
-        queryClient.invalidateQueries({ queryKey: TASK_QUERY_KEYS.statuses(projectId) })
+        queryClient.invalidateQueries({
+          queryKey: TASK_QUERY_KEYS.statuses(projectId ?? null)
+        })
         toast.success('Status order saved')
       })
       .catch(() => {})
@@ -106,7 +123,7 @@ export function TaskStatusManager({ projectId, statuses }: TaskStatusManagerProp
           onDragEnd={handleDragEnd}
         >
           <StatusList
-            projectId={projectId}
+            projectId={projectId ?? null}
             statuses={orderedStatuses}
             onStatusesChange={setOrderedStatuses}
           />

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { AlertCircle, ChevronLeft, ChevronRight, Image, Minus, Plus } from 'lucide-react'
+import { AlertCircle, ChevronLeft, ChevronRight, Image } from 'lucide-react'
 
 import type { AddToCartPayload, UpdateCartItemPayload } from '@/api/cart/schema'
 import { cartService } from '@/api/cart/service'
@@ -15,6 +15,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
+import { NumberInput } from '@/components/ui/number-input'
 import {
   Dialog,
   DialogContent,
@@ -379,46 +380,14 @@ export function ProductEditSheet({
                   {/* Quantity */}
                   <div className='space-y-1.5'>
                     <h3 className='text-muted-foreground text-sm'>Quantity</h3>
-                    <div className={cn(
-                      'inline-flex items-center rounded-md border p-0.5',
-                      !ignoreCount && (quantity > maxCount || maxCount <= 0) ? 'border-destructive' : 'border-input',
-                      !ignoreCount && maxCount <= 0 && 'pointer-events-none opacity-60'
-                    )}>
-                      <button
-                        type='button'
-                        className='hover:bg-muted flex size-8 items-center justify-center rounded disabled:opacity-40'
-                        disabled={quantity <= 1 || (!ignoreCount && maxCount <= 0)}
-                        onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                      >
-                        <Minus className='size-3.5' />
-                      </button>
-                      <input
-                        type='number'
-                        className='w-14 border-0 bg-transparent text-center outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none'
-                        value={quantity}
-                        min={1}
-                        max={ignoreCount ? undefined : maxCount}
-                        disabled={!ignoreCount && maxCount <= 0}
-                        onChange={(e) => {
-                          const n = parseInt(e.target.value, 10)
-                          if (!isNaN(n) && n >= 1) setQuantity(n)
-                        }}
-                      />
-                      <button
-                        type='button'
-                        className='hover:bg-muted flex size-8 items-center justify-center rounded disabled:opacity-40'
-                        disabled={(!ignoreCount && quantity >= maxCount) || (!ignoreCount && maxCount <= 0)}
-                        onClick={() => setQuantity((q) => q + 1)}
-                      >
-                        <Plus className='size-3.5' />
-                      </button>
-                    </div>
-                    {!ignoreCount && (maxCount <= 0 || quantity > maxCount) && (
-                      <span className='text-destructive flex items-center gap-1.5 text-xs'>
-                        <AlertCircle className='size-3.5 shrink-0' />
-                        Only {maxCount} available
-                      </span>
-                    )}
+                    <NumberInput
+                      value={quantity}
+                      onChange={setQuantity}
+                      min={1}
+                      max={ignoreCount ? undefined : maxCount}
+                      disabled={!ignoreCount && maxCount <= 0}
+                      showMaxMessage
+                    />
                   </div>
 
                   {/* Configurations */}

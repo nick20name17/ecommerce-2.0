@@ -71,6 +71,7 @@ export const usePayloadLogIsError = () =>
   useQueryState('is_error', parseAsStringLiteral(['true', 'false']))
 
 export const useTaskStatusParam = () => useQueryState('task_status', parseAsInteger)
+
 const TASK_PRIORITY_VALUES = ['low', 'medium', 'high', 'urgent'] as [string, ...string[]]
 export const useTaskPriorityParam = () =>
   useQueryState(

@@ -9,6 +9,7 @@ import { TaskModal } from './-components/task-modal'
 import { TasksDataTable } from './-components/tasks-data-table'
 import { TASK_QUERY_KEYS, getTasksQuery, getTaskStatusesQuery } from '@/api/task/query'
 import type { TaskListItem, Task } from '@/api/task/schema'
+import type { TaskPriority } from '@/constants/task'
 import { taskService } from '@/api/task/service'
 import { Pagination } from '@/components/common/filters/pagination'
 import { SearchFilter } from '@/components/common/filters/search'
@@ -69,7 +70,7 @@ function TasksPage() {
     ordering,
     project_id: projectId ?? undefined,
     status: taskStatusId ?? undefined,
-    priority: priority || undefined,
+    priority: (priority === '' ? undefined : priority) as TaskPriority | undefined,
     responsible_user: responsibleUserId ?? undefined,
     due_date_from:
       dueFrom instanceof Date ? dueFrom.toISOString().slice(0, 10) : undefined,
@@ -142,9 +143,9 @@ function TasksPage() {
               setTaskStatusId(id)
               resetOffset()
             }}
-            priority={priority}
+            priority={priority as TaskPriority | ''}
             onPriorityChange={(v) => {
-              setPriority(v)
+              setPriority((v === '' ? '' : v) as TaskPriority | '')
               resetOffset()
             }}
             responsibleUserId={responsibleUserId}

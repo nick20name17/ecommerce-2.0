@@ -30,7 +30,7 @@ export function TaskPrioritySelect({
   placeholder = 'Select priority',
   includeAll = false,
   disabled,
-  className,
+  className: _className,
   triggerClassName
 }: TaskPrioritySelectProps) {
   return (

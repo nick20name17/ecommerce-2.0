@@ -26,7 +26,7 @@ export function TaskStatusSelect({
   placeholder = 'Select status',
   includeAll = false,
   disabled,
-  className,
+  className: _className,
   triggerClassName
 }: TaskStatusSelectProps) {
   const sorted = [...statuses].sort((a, b) => a.order - b.order)

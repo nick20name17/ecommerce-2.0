@@ -13,6 +13,7 @@ import {
   CreateTaskSchema,
   type Task,
   type TaskListItem,
+  type TaskStatus,
   type UpdateTaskFormValues,
   UpdateTaskSchema
 } from '@/api/task/schema'
@@ -123,7 +124,7 @@ function SharedFields({ statuses, projectId }: { statuses: TaskStatus[]; project
             <div className='flex items-center gap-2'>
               <TaskStatusSelect
                 statuses={statuses}
-                value={field.value ?? null}
+                value={field.value !== undefined && field.value !== null ? field.value : null}
                 onValueChange={(id) => field.onChange(id ?? undefined)}
                 placeholder='Select status'
               />
@@ -247,7 +248,7 @@ function CreateForm({
     getTaskStatusesQuery(projectId)
   )
   const statuses = statusesData?.results ?? []
-  const defaultStatus = statuses.find((s) => s.is_default) ?? statuses[0]
+  const defaultStatus = statuses.find((s) => s.is_default) ?? statuses[0]!
 
   if (statusesLoading && statuses.length === 0) {
     return (
@@ -298,8 +299,8 @@ function CreateFormInner({
   onOpenChange,
   projectId
 }: {
-  defaultStatus: { id: number; name: string }
-  statuses: { id: number; name: string; is_default?: boolean; color?: string }[]
+  defaultStatus: TaskStatus
+  statuses: TaskStatus[]
   onOpenChange: (open: boolean) => void
   projectId?: number
 }) {

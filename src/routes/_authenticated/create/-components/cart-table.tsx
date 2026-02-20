@@ -1,10 +1,11 @@
-import { Image, Minus, Pencil, Plus, Trash2 } from 'lucide-react'
+import { Image, Pencil, Trash2 } from 'lucide-react'
 
 import type { CartItem } from '@/api/product/schema'
 import { Button } from '@/components/ui/button'
+import { NumberInput } from '@/components/ui/number-input'
 import { Skeleton } from '@/components/ui/skeleton'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Spinner } from '@/components/ui/spinner'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { formatCurrency } from '@/helpers/formatters'
 
 interface CartTableProps {
@@ -73,11 +74,13 @@ export function CartTable({ items, loading, updating, fetching = false, onEdit, 
               <TableCell className='font-mono text-sm font-medium'>{item.product_id}</TableCell>
               <TableCell className='max-w-[200px] truncate'>{item.name}</TableCell>
               <TableCell>
-                <QuantityInput
+                <NumberInput
                   value={item.quantity}
-                  maxCount={item.max_count}
-                  ignoreCount={item.ignore_count}
+                  min={1}
+                  max={item.ignore_count ? undefined : item.max_count}
                   disabled={updating}
+                  size='sm'
+                  showMaxMessage
                   onChange={(qty) => onQuantityChange(item.id, qty)}
                 />
               </TableCell>
@@ -116,66 +119,3 @@ export function CartTable({ items, loading, updating, fetching = false, onEdit, 
   )
 }
 
-function QuantityInput({
-  value,
-  maxCount = 9999,
-  ignoreCount = false,
-  disabled = false,
-  onChange,
-}: {
-  value: number
-  maxCount?: number
-  ignoreCount?: boolean
-  disabled?: boolean
-  onChange: (value: number) => void
-}) {
-  const maxAllowed = ignoreCount ? 9999 : maxCount
-  const hasError = !ignoreCount && value > maxCount
-  const isDisabled = disabled || (!ignoreCount && maxCount <= 0)
-
-  return (
-    <div className='flex flex-col gap-1'>
-      <div
-        className={`inline-flex items-center rounded-md border p-0.5 ${
-          hasError ? 'border-destructive' : 'border-input'
-        } ${isDisabled ? 'pointer-events-none opacity-50' : ''}`}
-      >
-        <button
-          type='button'
-          className='hover:bg-muted flex size-7 items-center justify-center rounded transition-colors disabled:opacity-40'
-          disabled={isDisabled || value <= 1}
-          onClick={() => onChange(Math.max(1, value - 1))}
-        >
-          <Minus className='size-3' />
-        </button>
-        <input
-          type='number'
-          className='w-10 border-0 bg-transparent text-center text-sm outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none'
-          value={value}
-          min={1}
-          max={maxAllowed}
-          disabled={isDisabled}
-          onChange={(e) => {
-            const num = parseInt(e.target.value, 10)
-            if (!isNaN(num) && num >= 1) onChange(num)
-          }}
-          onBlur={(e) => {
-            const num = parseInt(e.target.value, 10)
-            if (isNaN(num) || num < 1) onChange(1)
-          }}
-        />
-        <button
-          type='button'
-          className='hover:bg-muted flex size-7 items-center justify-center rounded transition-colors disabled:opacity-40'
-          disabled={isDisabled || (!ignoreCount && value >= maxCount)}
-          onClick={() => onChange(value + 1)}
-        >
-          <Plus className='size-3' />
-        </button>
-      </div>
-      {hasError && (
-        <span className='text-destructive text-xs'>Only {maxCount} available</span>
-      )}
-    </div>
-  )
-}
