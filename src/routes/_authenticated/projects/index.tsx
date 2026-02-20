@@ -15,7 +15,10 @@ import { useOrdering } from '@/hooks/use-ordering'
 import { useLimitParam, useOffsetParam, useSearchParam } from '@/hooks/use-query-params'
 
 export const Route = createFileRoute('/_authenticated/projects/')({
-  component: ProjectsPage
+  component: ProjectsPage,
+  head: () => ({
+    meta: [{ title: 'Projects' }]
+  })
 })
 
 function mergeHealthIntoProjects(

@@ -3,6 +3,9 @@ import { StickyNote } from 'lucide-react'
 
 export const Route = createFileRoute('/_authenticated/notes/')({
   component: NotesPage,
+  head: () => ({
+    meta: [{ title: 'Notes' }]
+  })
 })
 
 function NotesPage() {

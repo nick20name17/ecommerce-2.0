@@ -3,6 +3,9 @@ import { Settings } from 'lucide-react'
 
 export const Route = createFileRoute('/_authenticated/settings/')({
   component: SettingsPage,
+  head: () => ({
+    meta: [{ title: 'Settings' }]
+  })
 })
 
 function SettingsPage() {

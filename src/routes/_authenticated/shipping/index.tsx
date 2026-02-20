@@ -3,6 +3,9 @@ import { Truck } from 'lucide-react'
 
 export const Route = createFileRoute('/_authenticated/shipping/')({
   component: ShippingPage,
+  head: () => ({
+    meta: [{ title: 'Shipping' }]
+  })
 })
 
 function ShippingPage() {

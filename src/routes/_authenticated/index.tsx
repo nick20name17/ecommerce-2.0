@@ -12,5 +12,8 @@ const DashboardPage = () => {
 }
 
 export const Route = createFileRoute('/_authenticated/')({
-  component: DashboardPage
+  component: DashboardPage,
+  head: () => ({
+    meta: [{ title: 'Dashboard' }]
+  })
 })

@@ -1,7 +1,6 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { Plus } from 'lucide-react'
-import { useEffect } from 'react'
 
 import { OrdersDataTable } from './-components/orders-data-table'
 import { getOrdersQuery } from '@/api/order/query'
@@ -19,12 +18,15 @@ import {
   useOffsetParam,
   useOrderAutoidParam,
   useOrderProjectIdParam,
-  useSearchParam,
-  useStatusParam
+  useOrderStatusParam,
+  useSearchParam
 } from '@/hooks/use-query-params'
 
 export const Route = createFileRoute('/_authenticated/orders/')({
-  component: OrdersPage
+  component: OrdersPage,
+  head: () => ({
+    meta: [{ title: 'Orders' }]
+  })
 })
 
 const STATUS_TABS = [
@@ -44,17 +46,11 @@ function OrdersPage() {
   const [projectIdFromStorage] = useProjectId()
   const [autoidFromUrl] = useOrderAutoidParam()
   const [projectIdFromUrl] = useOrderProjectIdParam()
-  const [rawStatus, setStatus] = useStatusParam()
+  const [status, setStatus] = useOrderStatusParam()
   const projectId = projectIdFromUrl ?? projectIdFromStorage
   const { sorting, setSorting, ordering } = useOrdering()
 
-  const isCorruptStatus = typeof rawStatus === 'string' && rawStatus.includes('?')
-  const status = isCorruptStatus ? null : rawStatus
   const activeStatus = status ?? ORDER_STATUS.unprocessed
-
-  useEffect(() => {
-    if (isCorruptStatus) setStatus(null)
-  }, [isCorruptStatus, setStatus])
 
   const apiStatus: OrderStatus | undefined =
     activeStatus !== 'all' && VALID_STATUS_VALUES.has(activeStatus)

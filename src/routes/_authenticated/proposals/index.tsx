@@ -23,7 +23,10 @@ import {
 } from '@/hooks/use-query-params'
 
 export const Route = createFileRoute('/_authenticated/proposals/')({
-  component: ProposalsPage
+  component: ProposalsPage,
+  head: () => ({
+    meta: [{ title: 'Proposals' }]
+  })
 })
 
 const STATUS_TABS = [

@@ -3,6 +3,9 @@ import { ClipboardList } from 'lucide-react'
 
 export const Route = createFileRoute('/_authenticated/order-desk/')({
   component: OrderDeskPage,
+  head: () => ({
+    meta: [{ title: 'Order Desk' }]
+  })
 })
 
 function OrderDeskPage() {

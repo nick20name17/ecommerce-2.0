@@ -15,7 +15,10 @@ import { useOrdering } from '@/hooks/use-ordering'
 import { useLimitParam, useOffsetParam, useSearchParam } from '@/hooks/use-query-params'
 
 export const Route = createFileRoute('/_authenticated/users/')({
-  component: UsersPage
+  component: UsersPage,
+  head: () => ({
+    meta: [{ title: 'Users' }]
+  })
 })
 
 function UsersPage() {

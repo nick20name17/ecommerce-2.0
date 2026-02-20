@@ -9,7 +9,10 @@ import { isSuperAdmin } from '@/constants/user'
 import { useAuth } from '@/providers/auth'
 
 export const Route = createFileRoute('/_authenticated/profile/')({
-  component: ProfilePage
+  component: ProfilePage,
+  head: () => ({
+    meta: [{ title: 'Profile' }]
+  })
 })
 
 function ProfilePage() {

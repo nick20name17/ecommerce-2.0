@@ -9,7 +9,10 @@ import { getTaskDetailQuery } from '@/api/task/query'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 export const Route = createFileRoute('/_authenticated/tasks/$taskId/')({
-  component: TaskDetailPage
+  component: TaskDetailPage,
+  head: () => ({
+    meta: [{ title: 'Task' }]
+  })
 })
 
 function TaskDetailPage() {

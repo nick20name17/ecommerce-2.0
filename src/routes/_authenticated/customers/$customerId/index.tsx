@@ -11,6 +11,9 @@ import { useProjectId } from '@/hooks/use-project-id'
 
 export const Route = createFileRoute('/_authenticated/customers/$customerId/')({
   component: CustomerDetailPage,
+  head: () => ({
+    meta: [{ title: 'Customer' }]
+  })
 })
 
 function CustomerDetailPage() {

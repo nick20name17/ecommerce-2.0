@@ -33,7 +33,10 @@ import {
 import { useProjectId } from '@/hooks/use-project-id'
 
 export const Route = createFileRoute('/_authenticated/tasks/')({
-  component: TasksPage
+  component: TasksPage,
+  head: () => ({
+    meta: [{ title: 'Tasks' }]
+  })
 })
 
 function TasksPage() {
