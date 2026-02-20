@@ -1,12 +1,15 @@
 import { useMutation, useQuery } from '@tanstack/react-query'
+import { Link } from '@tanstack/react-router'
 import { format } from 'date-fns'
-import { ShoppingCart, Trash2 } from 'lucide-react'
+import { FileText, ShoppingCart, Trash2, User } from 'lucide-react'
 import { useState } from 'react'
+
+import { UserCombobox } from '../../-components/user-combobox'
 
 import { TASK_QUERY_KEYS, getTaskStatusesQuery } from '@/api/task/query'
 import type { Task } from '@/api/task/schema'
 import { taskService } from '@/api/task/service'
-import { getUsersQuery } from '@/api/user/query'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { DatePicker } from '@/components/ui/date-picker'
@@ -19,7 +22,7 @@ import {
   SelectValue
 } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
-import { TASK_PRIORITY_LABELS } from '@/constants/task'
+import { TASK_PRIORITY_LABELS, getTaskPriorityColor } from '@/constants/task'
 import type { TaskPriority } from '@/constants/task'
 import { useProjectId } from '@/hooks/use-project-id'
 
@@ -36,9 +39,7 @@ export const TaskInfoCard = ({ task, onDelete }: TaskInfoCardProps) => {
   const [description, setDescription] = useState(task.description ?? '')
 
   const { data: statusesData } = useQuery(getTaskStatusesQuery(projectId ?? task.project))
-  const { data: usersData } = useQuery({ ...getUsersQuery({ limit: 200, offset: 0 }) })
   const statuses = statusesData?.results ?? []
-  const users = usersData?.results ?? []
 
   const updateMutation = useMutation({
     mutationFn: (payload: Parameters<typeof taskService.update>[1]) =>
@@ -58,10 +59,8 @@ export const TaskInfoCard = ({ task, onDelete }: TaskInfoCardProps) => {
   const handleDueDateChange = (date: Date | undefined) => {
     updateMutation.mutate({ due_date: date ? date.toISOString().slice(0, 10) : null })
   }
-  const handleResponsibleChange = (value: string) => {
-    updateMutation.mutate({
-      responsible_user: value === '_none' ? null : Number(value)
-    })
+  const handleResponsibleChange = (userId: number | null) => {
+    updateMutation.mutate({ responsible_user: userId })
   }
 
   const handleTitleBlur = () => {
@@ -177,7 +176,13 @@ export const TaskInfoCard = ({ task, onDelete }: TaskInfoCardProps) => {
                     key={value}
                     value={value}
                   >
-                    {label}
+                    <span className='flex items-center gap-1.5'>
+                      <span
+                        className='size-2 shrink-0 rounded-full'
+                        style={{ backgroundColor: getTaskPriorityColor(value as TaskPriority) }}
+                      />
+                      {label}
+                    </span>
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -200,26 +205,36 @@ export const TaskInfoCard = ({ task, onDelete }: TaskInfoCardProps) => {
             <label className='text-muted-foreground text-xs font-medium tracking-wide uppercase'>
               Responsible
             </label>
-            <Select
-              value={task.responsible_user != null ? String(task.responsible_user) : '_none'}
-              onValueChange={handleResponsibleChange}
-              disabled={updateMutation.isPending}
-            >
-              <SelectTrigger className='h-9 w-full'>
-                <SelectValue placeholder='Unassigned' />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value='_none'>Unassigned</SelectItem>
-                {users.map((u) => (
-                  <SelectItem
-                    key={u.id}
-                    value={String(u.id)}
-                  >
-                    {u.first_name} {u.last_name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <UserCombobox
+              value={task.responsible_user ?? null}
+              onChange={handleResponsibleChange}
+            />
+          </div>
+
+          <div className='space-y-1'>
+            <div className='text-muted-foreground text-xs font-medium tracking-wide uppercase'>
+              Related order
+            </div>
+            {task.linked_order_autoid ? (
+              <Button
+                variant='secondary'
+                asChild
+              >
+                <Link
+                  to='/orders'
+                  search={{
+                    autoid: task.linked_order_autoid,
+                    status: 'all'
+                  }}
+                  className='hover:bg-secondary/80 inline-flex w-fit cursor-pointer items-center gap-1.5 border border-transparent px-2.5 py-1 text-sm font-medium transition-colors'
+                >
+                  <ShoppingCart className='size-4 shrink-0' />
+                  Order {task.linked_order_autoid}
+                </Link>
+              </Button>
+            ) : (
+              <p className='text-sm'>—</p>
+            )}
           </div>
 
           <div className='space-y-1'>
@@ -244,27 +259,54 @@ export const TaskInfoCard = ({ task, onDelete }: TaskInfoCardProps) => {
             <label className='text-muted-foreground text-xs font-medium tracking-wide uppercase'>
               Linked to
             </label>
-            <div className='flex flex-wrap items-center gap-2 text-sm'>
+            <div className='flex flex-wrap items-center gap-2'>
               {task.linked_order_details && (
-                <a
-                  href={`/orders?search=${encodeURIComponent(task.linked_order_details.invoice)}`}
-                  className='text-primary inline-flex items-center gap-1.5 hover:underline'
+                <Badge
+                  variant='secondary'
+                  asChild
                 >
-                  <ShoppingCart className='size-4' />
-                  Order {task.linked_order_details.invoice}
-                </a>
+                  <Link
+                    to='/orders'
+                    search={{
+                      autoid: task.linked_order_details.autoid,
+                      project_id: task.project
+                    }}
+                    className='hover:bg-secondary/80 inline-flex cursor-pointer items-center gap-1.5 border border-transparent px-2.5 py-1 text-sm font-medium transition-colors'
+                  >
+                    <ShoppingCart className='size-4 shrink-0' />
+                    Order {task.linked_order_details.invoice}
+                  </Link>
+                </Badge>
               )}
               {task.linked_proposal_details && (
-                <span className='inline-flex items-center gap-1.5'>
-                  <ShoppingCart className='size-4' />
-                  Proposal {task.linked_proposal_details.quote}
-                </span>
+                <Badge
+                  variant='secondary'
+                  asChild
+                >
+                  <Link
+                    to='/proposals'
+                    search={{ search: task.linked_proposal_details.quote }}
+                    className='hover:bg-secondary/80 inline-flex cursor-pointer items-center gap-1.5 border border-transparent px-2.5 py-1 text-sm font-medium transition-colors'
+                  >
+                    <FileText className='size-4 shrink-0' />
+                    Proposal {task.linked_proposal_details.quote}
+                  </Link>
+                </Badge>
               )}
               {task.linked_customer_details && (
-                <span className='inline-flex items-center gap-1.5'>
-                  <ShoppingCart className='size-4' />
-                  {task.linked_customer_details.l_name}
-                </span>
+                <Badge
+                  variant='secondary'
+                  asChild
+                >
+                  <Link
+                    to='/customers/$customerId'
+                    params={{ customerId: task.linked_customer_details.id }}
+                    className='hover:bg-secondary/80 inline-flex cursor-pointer items-center gap-1.5 border border-transparent px-2.5 py-1 text-sm font-medium transition-colors'
+                  >
+                    <User className='size-4 shrink-0' />
+                    {task.linked_customer_details.l_name}
+                  </Link>
+                </Badge>
               )}
             </div>
           </div>

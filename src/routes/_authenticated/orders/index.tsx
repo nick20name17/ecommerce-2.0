@@ -13,13 +13,15 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { ORDER_STATUS } from '@/constants/order'
 import type { OrderStatus } from '@/constants/order'
 import { useOrdering } from '@/hooks/use-ordering'
+import { useProjectId } from '@/hooks/use-project-id'
 import {
   useLimitParam,
   useOffsetParam,
+  useOrderAutoidParam,
+  useOrderProjectIdParam,
   useSearchParam,
   useStatusParam
 } from '@/hooks/use-query-params'
-import { useProjectId } from '@/hooks/use-project-id'
 
 export const Route = createFileRoute('/_authenticated/orders/')({
   component: OrdersPage
@@ -39,8 +41,11 @@ function OrdersPage() {
   const [search] = useSearchParam()
   const [offset, setOffset] = useOffsetParam()
   const [limit] = useLimitParam()
-  const [projectId] = useProjectId()
+  const [projectIdFromStorage] = useProjectId()
+  const [autoidFromUrl] = useOrderAutoidParam()
+  const [projectIdFromUrl] = useOrderProjectIdParam()
   const [rawStatus, setStatus] = useStatusParam()
+  const projectId = projectIdFromUrl ?? projectIdFromStorage
   const { sorting, setSorting, ordering } = useOrdering()
 
   const isCorruptStatus = typeof rawStatus === 'string' && rawStatus.includes('?')
@@ -58,6 +63,7 @@ function OrdersPage() {
 
   const params: OrderParams = {
     search: search || undefined,
+    autoid: autoidFromUrl ?? undefined,
     offset,
     limit,
     ordering,

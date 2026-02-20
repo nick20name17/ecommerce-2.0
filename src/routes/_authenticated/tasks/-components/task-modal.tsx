@@ -35,7 +35,11 @@ import {
   SelectValue
 } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
-import { TASK_PRIORITY, TASK_PRIORITY_LABELS } from '@/constants/task'
+import {
+  getTaskPriorityColor,
+  TASK_PRIORITY,
+  TASK_PRIORITY_LABELS
+} from '@/constants/task'
 import { DatePicker } from '@/components/ui/date-picker'
 
 interface TaskModalProps {
@@ -65,7 +69,7 @@ function SharedFields({
   statuses,
   projectId
 }: {
-  statuses: { id: number; name: string }[]
+  statuses: { id: number; name: string; color?: string }[]
   projectId?: number
 }) {
   const { control } = useFormContext<CreateTaskFormValues>()
@@ -124,7 +128,15 @@ function SharedFields({
               <SelectContent>
                 {statuses.map((s) => (
                   <SelectItem key={s.id} value={String(s.id)}>
-                    {s.name}
+                    <span className='flex items-center gap-1.5'>
+                      {s.color != null && (
+                        <span
+                          className='size-2 shrink-0 rounded-full'
+                          style={{ backgroundColor: s.color }}
+                        />
+                      )}
+                      {s.name}
+                    </span>
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -147,7 +159,13 @@ function SharedFields({
               <SelectContent>
                 {Object.entries(TASK_PRIORITY_LABELS).map(([value, label]) => (
                   <SelectItem key={value} value={value}>
-                    {label}
+                    <span className='flex items-center gap-1.5'>
+                      <span
+                        className='size-2 shrink-0 rounded-full'
+                        style={{ backgroundColor: getTaskPriorityColor(value as keyof typeof TASK_PRIORITY_LABELS) }}
+                      />
+                      {label}
+                    </span>
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -293,7 +311,7 @@ function CreateFormInner({
   projectId
 }: {
   defaultStatus: { id: number; name: string }
-  statuses: { id: number; name: string; is_default?: boolean }[]
+  statuses: { id: number; name: string; is_default?: boolean; color?: string }[]
   onOpenChange: (open: boolean) => void
   projectId?: number
 }) {
@@ -348,7 +366,7 @@ function CreateFormInner({
       <form id='task-form' onSubmit={handleSubmit}>
         <FieldGroup>
           <SharedFields
-            statuses={statuses.map((s) => ({ id: s.id, name: s.name }))}
+            statuses={statuses.map((s) => ({ id: s.id, name: s.name, color: s.color }))}
             projectId={projectId}
           />
         </FieldGroup>
@@ -436,7 +454,7 @@ function EditForm({
       <form id='task-form' onSubmit={handleSubmit}>
         <FieldGroup>
           <SharedFields
-            statuses={statuses.map((s) => ({ id: s.id, name: s.name }))}
+            statuses={statuses.map((s) => ({ id: s.id, name: s.name, color: s.color }))}
             projectId={projectId}
           />
         </FieldGroup>

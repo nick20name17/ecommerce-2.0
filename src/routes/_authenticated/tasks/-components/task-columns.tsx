@@ -22,7 +22,7 @@ import {
   SelectValue
 } from '@/components/ui/select'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
-import { getTaskPriorityLabel } from '@/constants/task'
+import { getTaskPriorityColor, getTaskPriorityLabel } from '@/constants/task'
 import { formatDate } from '@/helpers/formatters'
 import { cn } from '@/lib/utils'
 
@@ -111,14 +111,21 @@ export const getTaskColumns = ({
         title='Priority'
       />
     ),
-    cell: ({ row }) => (
-      <Badge
-        variant='secondary'
-        className={cn('font-medium')}
-      >
-        {getTaskPriorityLabel(row.original.priority)}
-      </Badge>
-    ),
+    cell: ({ row }) => {
+      const priority = row.original.priority
+      return (
+        <Badge
+          variant='secondary'
+          className={cn('flex w-fit items-center gap-1.5 font-medium')}
+        >
+          <span
+            className='size-2 shrink-0 rounded-full'
+            style={{ backgroundColor: getTaskPriorityColor(priority) }}
+          />
+          {getTaskPriorityLabel(priority)}
+        </Badge>
+      )
+    },
     size: 100
   },
   {

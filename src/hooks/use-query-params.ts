@@ -60,3 +60,7 @@ export const usePayloadLogIsError = () =>
   useQueryState('is_error', parseAsStringLiteral(['true', 'false']))
 
 export const useTaskStatusParam = () => useQueryState('task_status', parseAsInteger)
+
+export const useOrderAutoidParam = () => useQueryState('autoid', parseAsString)
+export const useOrderProjectIdParam = () =>
+  useQueryState('project_id', parseAsInteger.withOptions({ shallow: false }))
