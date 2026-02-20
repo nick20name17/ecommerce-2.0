@@ -1,8 +1,13 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useQuery, useMutation } from '@tanstack/react-query'
+import { useMutation, useQuery } from '@tanstack/react-query'
 import { Controller, FormProvider, useForm, useFormContext } from 'react-hook-form'
 
-import { getTaskStatusesQuery, TASK_QUERY_KEYS } from '@/api/task/query'
+import { TaskCustomerCombobox } from './customer-combobox'
+import { OrderCombobox } from './order-combobox'
+import { ProposalCombobox } from './proposal-combobox'
+import { TaskStatusManager } from './task-status-manager'
+import { UserCombobox } from './user-combobox'
+import { TASK_QUERY_KEYS, getTaskStatusesQuery } from '@/api/task/query'
 import {
   type CreateTaskFormValues,
   CreateTaskSchema,
@@ -12,11 +17,10 @@ import {
   UpdateTaskSchema
 } from '@/api/task/schema'
 import { taskService } from '@/api/task/service'
+import { TaskPrioritySelect } from '@/components/common/task-priority-select'
+import { TaskStatusSelect } from '@/components/common/task-status-select'
 import { Button } from '@/components/ui/button'
-import { TaskCustomerCombobox } from './customer-combobox'
-import { OrderCombobox } from './order-combobox'
-import { ProposalCombobox } from './proposal-combobox'
-import { UserCombobox } from './user-combobox'
+import { DatePicker } from '@/components/ui/date-picker'
 import {
   Dialog,
   DialogContent,
@@ -27,20 +31,8 @@ import {
 } from '@/components/ui/dialog'
 import { Field, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue
-} from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
-import {
-  getTaskPriorityColor,
-  TASK_PRIORITY,
-  TASK_PRIORITY_LABELS
-} from '@/constants/task'
-import { DatePicker } from '@/components/ui/date-picker'
+import { TASK_PRIORITY } from '@/constants/task'
 
 interface TaskModalProps {
   task?: Task | TaskListItem | null
@@ -53,12 +45,22 @@ export const TaskModal = ({ task, open, onOpenChange, projectId }: TaskModalProp
   const isEdit = !!task
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog
+      open={open}
+      onOpenChange={onOpenChange}
+    >
       <DialogContent className='sm:max-w-2xl'>
         {isEdit ? (
-          <EditForm task={task} onOpenChange={onOpenChange} projectId={projectId} />
+          <EditForm
+            task={task}
+            onOpenChange={onOpenChange}
+            projectId={projectId}
+          />
         ) : (
-          <CreateForm onOpenChange={onOpenChange} projectId={projectId} />
+          <CreateForm
+            onOpenChange={onOpenChange}
+            projectId={projectId}
+          />
         )}
       </DialogContent>
     </Dialog>
@@ -80,7 +82,10 @@ function SharedFields({
         name='title'
         control={control}
         render={({ field, fieldState }) => (
-          <Field data-invalid={fieldState.invalid} className='sm:col-span-2'>
+          <Field
+            data-invalid={fieldState.invalid}
+            className='sm:col-span-2'
+          >
             <FieldLabel htmlFor='task-title'>Title</FieldLabel>
             <Input
               {...field}
@@ -97,7 +102,10 @@ function SharedFields({
         name='description'
         control={control}
         render={({ field, fieldState }) => (
-          <Field data-invalid={fieldState.invalid} className='sm:col-span-2'>
+          <Field
+            data-invalid={fieldState.invalid}
+            className='sm:col-span-2'
+          >
             <FieldLabel htmlFor='task-description'>Description</FieldLabel>
             <Textarea
               {...field}
@@ -118,29 +126,18 @@ function SharedFields({
         render={({ field, fieldState }) => (
           <Field data-invalid={fieldState.invalid}>
             <FieldLabel>Status</FieldLabel>
-            <Select
-              value={field.value != null ? String(field.value) : ''}
-              onValueChange={(v) => field.onChange(v ? Number(v) : undefined)}
-            >
-              <SelectTrigger className='w-full' aria-invalid={fieldState.invalid}>
-                <SelectValue placeholder='Select status' />
-              </SelectTrigger>
-              <SelectContent>
-                {statuses.map((s) => (
-                  <SelectItem key={s.id} value={String(s.id)}>
-                    <span className='flex items-center gap-1.5'>
-                      {s.color != null && (
-                        <span
-                          className='size-2 shrink-0 rounded-full'
-                          style={{ backgroundColor: s.color }}
-                        />
-                      )}
-                      {s.name}
-                    </span>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <div className='flex items-center gap-2'>
+              <TaskStatusSelect
+                statuses={statuses}
+                value={field.value ?? null}
+                onValueChange={(id) => field.onChange(id ?? undefined)}
+                placeholder='Select status'
+              />
+              <TaskStatusManager
+                projectId={projectId}
+                statuses={statuses}
+              />
+            </div>
             {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
           </Field>
         )}
@@ -152,24 +149,11 @@ function SharedFields({
         render={({ field, fieldState }) => (
           <Field data-invalid={fieldState.invalid}>
             <FieldLabel>Priority</FieldLabel>
-            <Select value={field.value} onValueChange={field.onChange}>
-              <SelectTrigger className='w-full' aria-invalid={fieldState.invalid}>
-                <SelectValue placeholder='Select priority' />
-              </SelectTrigger>
-              <SelectContent>
-                {Object.entries(TASK_PRIORITY_LABELS).map(([value, label]) => (
-                  <SelectItem key={value} value={value}>
-                    <span className='flex items-center gap-1.5'>
-                      <span
-                        className='size-2 shrink-0 rounded-full'
-                        style={{ backgroundColor: getTaskPriorityColor(value as keyof typeof TASK_PRIORITY_LABELS) }}
-                      />
-                      {label}
-                    </span>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <TaskPrioritySelect
+              value={field.value ?? ''}
+              onValueChange={(v) => field.onChange(v || undefined)}
+              placeholder='Select priority'
+            />
             {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
           </Field>
         )}
@@ -196,14 +180,17 @@ function SharedFields({
         render={({ field, fieldState }) => (
           <Field data-invalid={fieldState.invalid}>
             <FieldLabel>Responsible user</FieldLabel>
-            <UserCombobox value={field.value ?? null} onChange={field.onChange} />
+            <UserCombobox
+              value={field.value ?? null}
+              onChange={field.onChange}
+            />
             {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
           </Field>
         )}
       />
 
-      <div className='space-y-3 sm:col-span-2 pt-2'>
-        <p className='text-muted-foreground text-xs font-medium uppercase tracking-wide'>
+      <div className='space-y-3 pt-2 sm:col-span-2'>
+        <p className='text-muted-foreground text-xs font-medium tracking-wide uppercase'>
           Linked items (optional)
         </p>
         <div className='grid gap-3 sm:grid-cols-2'>
@@ -227,7 +214,11 @@ function SharedFields({
             render={({ field }) => (
               <Field>
                 <FieldLabel>Proposal</FieldLabel>
-                <ProposalCombobox value={field.value ?? null} onChange={field.onChange} projectId={projectId} />
+                <ProposalCombobox
+                  value={field.value ?? null}
+                  onChange={field.onChange}
+                  projectId={projectId}
+                />
               </Field>
             )}
           />
@@ -271,7 +262,7 @@ function CreateForm({
           <DialogTitle>Create Task</DialogTitle>
           <DialogDescription>Loading statuses…</DialogDescription>
         </DialogHeader>
-        <div className='py-6 text-center text-muted-foreground'>Loading…</div>
+        <div className='text-muted-foreground py-6 text-center'>Loading…</div>
       </>
     )
   }
@@ -286,7 +277,10 @@ function CreateForm({
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
-          <Button variant='outline' onClick={() => onOpenChange(false)}>
+          <Button
+            variant='outline'
+            onClick={() => onOpenChange(false)}
+          >
             Close
           </Button>
         </DialogFooter>
@@ -363,7 +357,10 @@ function CreateFormInner({
         <DialogDescription>Add a new task.</DialogDescription>
       </DialogHeader>
 
-      <form id='task-form' onSubmit={handleSubmit}>
+      <form
+        id='task-form'
+        onSubmit={handleSubmit}
+      >
         <FieldGroup>
           <SharedFields
             statuses={statuses.map((s) => ({ id: s.id, name: s.name, color: s.color }))}
@@ -373,7 +370,10 @@ function CreateFormInner({
       </form>
 
       <DialogFooter>
-        <Button variant='outline' onClick={() => onOpenChange(false)}>
+        <Button
+          variant='outline'
+          onClick={() => onOpenChange(false)}
+        >
           Cancel
         </Button>
         <Button
@@ -401,11 +401,14 @@ function EditForm({
   const { data: statusesData } = useQuery(getTaskStatusesQuery(projectId ?? task.project))
   const statuses = statusesData?.results ?? []
 
-  const taskDescription = 'description' in task ? (task as Task).description ?? null : null
+  const taskDescription = 'description' in task ? ((task as Task).description ?? null) : null
   const fullTask = task as Task
-  const linkedOrder = 'linked_order_autoid' in fullTask ? fullTask.linked_order_autoid ?? null : null
-  const linkedProposal = 'linked_proposal_autoid' in fullTask ? fullTask.linked_proposal_autoid ?? null : null
-  const linkedCustomer = 'linked_customer_autoid' in fullTask ? fullTask.linked_customer_autoid ?? null : null
+  const linkedOrder =
+    'linked_order_autoid' in fullTask ? (fullTask.linked_order_autoid ?? null) : null
+  const linkedProposal =
+    'linked_proposal_autoid' in fullTask ? (fullTask.linked_proposal_autoid ?? null) : null
+  const linkedCustomer =
+    'linked_customer_autoid' in fullTask ? (fullTask.linked_customer_autoid ?? null) : null
 
   const form = useForm<UpdateTaskFormValues>({
     resolver: zodResolver(UpdateTaskSchema),
@@ -451,7 +454,10 @@ function EditForm({
         <DialogDescription>Update task details.</DialogDescription>
       </DialogHeader>
 
-      <form id='task-form' onSubmit={handleSubmit}>
+      <form
+        id='task-form'
+        onSubmit={handleSubmit}
+      >
         <FieldGroup>
           <SharedFields
             statuses={statuses.map((s) => ({ id: s.id, name: s.name, color: s.color }))}
@@ -461,7 +467,10 @@ function EditForm({
       </form>
 
       <DialogFooter>
-        <Button variant='outline' onClick={() => onOpenChange(false)}>
+        <Button
+          variant='outline'
+          onClick={() => onOpenChange(false)}
+        >
           Cancel
         </Button>
         <Button

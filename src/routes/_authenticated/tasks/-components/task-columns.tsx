@@ -6,6 +6,7 @@ import { MoreHorizontal, Pencil, Trash2 } from 'lucide-react'
 import type { TaskListItem } from '@/api/task/schema'
 import type { TaskStatus } from '@/api/task/schema'
 import { ColumnHeader } from '@/components/common/data-table/column-header'
+import { TaskStatusSelect } from '@/components/common/task-status-select'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
@@ -15,13 +16,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue
-} from '@/components/ui/select'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { getTaskPriorityColor, getTaskPriorityLabel } from '@/constants/task'
 import { formatDate } from '@/helpers/formatters'
@@ -77,30 +71,12 @@ export const getTaskColumns = ({
           onClick={(e) => e.stopPropagation()}
           onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && e.stopPropagation()}
         >
-          <Select
-            value={String(t.status)}
-            onValueChange={(v) => onStatusChange(t, Number(v))}
-          >
-            <SelectTrigger className='w-full'>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {statuses.map((s) => (
-                <SelectItem
-                  key={s.id}
-                  value={String(s.id)}
-                >
-                  <span className='flex items-center gap-1.5'>
-                    <span
-                      className='size-2 shrink-0 rounded-full'
-                      style={{ backgroundColor: s.color }}
-                    />
-                    {s.name}
-                  </span>
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <TaskStatusSelect
+            statuses={statuses}
+            value={t.status}
+            onValueChange={(id) => id != null && onStatusChange(t, id)}
+            placeholder='Status'
+          />
         </div>
       )
     },

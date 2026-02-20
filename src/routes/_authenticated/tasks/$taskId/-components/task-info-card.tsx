@@ -9,20 +9,14 @@ import { UserCombobox } from '../../-components/user-combobox'
 import { TASK_QUERY_KEYS, getTaskStatusesQuery } from '@/api/task/query'
 import type { Task } from '@/api/task/schema'
 import { taskService } from '@/api/task/service'
+import { TaskPrioritySelect } from '@/components/common/task-priority-select'
+import { TaskStatusSelect } from '@/components/common/task-status-select'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { DatePicker } from '@/components/ui/date-picker'
 import { Input } from '@/components/ui/input'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue
-} from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
-import { TASK_PRIORITY_LABELS, getTaskPriorityColor } from '@/constants/task'
 import type { TaskPriority } from '@/constants/task'
 import { useProjectId } from '@/hooks/use-project-id'
 
@@ -131,62 +125,27 @@ export const TaskInfoCard = ({ task, onDelete }: TaskInfoCardProps) => {
             <label className='text-muted-foreground text-xs font-medium tracking-wide uppercase'>
               Status
             </label>
-            <Select
-              value={String(task.status)}
-              onValueChange={handleStatusChange}
+            <TaskStatusSelect
+              statuses={statuses}
+              value={task.status}
+              onValueChange={(id) => id != null && handleStatusChange(String(id))}
+              placeholder='Select status'
               disabled={updateMutation.isPending}
-            >
-              <SelectTrigger className='h-9 w-full'>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {statuses.map((s) => (
-                  <SelectItem
-                    key={s.id}
-                    value={String(s.id)}
-                  >
-                    <span className='flex items-center gap-1.5'>
-                      <span
-                        className='size-2 shrink-0 rounded-full'
-                        style={{ backgroundColor: s.color }}
-                      />
-                      {s.name}
-                    </span>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+              triggerClassName='h-9 w-full'
+            />
           </div>
 
           <div className='space-y-1'>
             <label className='text-muted-foreground text-xs font-medium tracking-wide uppercase'>
               Priority
             </label>
-            <Select
+            <TaskPrioritySelect
               value={task.priority}
-              onValueChange={handlePriorityChange}
+              onValueChange={(v) => v && handlePriorityChange(v)}
+              placeholder='Select priority'
               disabled={updateMutation.isPending}
-            >
-              <SelectTrigger className='h-9 w-full'>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {Object.entries(TASK_PRIORITY_LABELS).map(([value, label]) => (
-                  <SelectItem
-                    key={value}
-                    value={value}
-                  >
-                    <span className='flex items-center gap-1.5'>
-                      <span
-                        className='size-2 shrink-0 rounded-full'
-                        style={{ backgroundColor: getTaskPriorityColor(value as TaskPriority) }}
-                      />
-                      {label}
-                    </span>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+              triggerClassName='h-9 w-full'
+            />
           </div>
 
           <div className='space-y-1'>

@@ -14,9 +14,10 @@ import { Spinner } from '@/components/ui/spinner'
 interface UserComboboxProps {
   value: number | null
   onChange: (userId: number | null) => void
+  placeholder?: string
 }
 
-export function UserCombobox({ value, onChange }: UserComboboxProps) {
+export function UserCombobox({ value, onChange, placeholder = 'Select user...' }: UserComboboxProps) {
   const [open, setOpen] = useState(false)
   const [search, setSearch] = useState('')
   const [debouncedSearch, setDebouncedSearch] = useState('')
@@ -73,7 +74,7 @@ export function UserCombobox({ value, onChange }: UserComboboxProps) {
             {displayLabel ? (
               <span className='truncate'>{displayLabel}</span>
             ) : (
-              <span className='text-muted-foreground'>Select user...</span>
+              <span className='text-muted-foreground'>{placeholder}</span>
             )}
             <ChevronsUpDown className='ml-auto size-4 shrink-0 opacity-50' />
           </Button>

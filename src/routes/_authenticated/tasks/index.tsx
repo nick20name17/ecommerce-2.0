@@ -1,11 +1,11 @@
 import { keepPreviousData, useMutation, useQuery } from '@tanstack/react-query'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
-import { Plus } from 'lucide-react'
+import { Filter, Plus } from 'lucide-react'
 import { useState } from 'react'
 
 import { TaskDeleteDialog } from './$taskId/-components/task-delete-dialog'
+import { TaskFiltersPanel } from './-components/task-filters-panel'
 import { TaskModal } from './-components/task-modal'
-import { TaskStatusManager } from './-components/task-status-manager'
 import { TasksDataTable } from './-components/tasks-data-table'
 import { TASK_QUERY_KEYS, getTasksQuery, getTaskStatusesQuery } from '@/api/task/query'
 import type { TaskListItem, Task } from '@/api/task/schema'
@@ -13,11 +13,20 @@ import { taskService } from '@/api/task/service'
 import { Pagination } from '@/components/common/filters/pagination'
 import { SearchFilter } from '@/components/common/filters/search'
 import { Button } from '@/components/ui/button'
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger
+} from '@/components/ui/collapsible'
 import { useOrdering } from '@/hooks/use-ordering'
 import {
   useLimitParam,
   useOffsetParam,
   useSearchParam,
+  useTaskDueFromParam,
+  useTaskDueToParam,
+  useTaskPriorityParam,
+  useTaskResponsibleParam,
   useTaskStatusParam
 } from '@/hooks/use-query-params'
 import { useProjectId } from '@/hooks/use-project-id'
@@ -30,16 +39,28 @@ function TasksPage() {
   const navigate = useNavigate()
   const [search] = useSearchParam()
   const [taskStatusId, setTaskStatusId] = useTaskStatusParam()
+  const [priority, setPriority] = useTaskPriorityParam()
+  const [responsibleUserId, setResponsibleUserId] = useTaskResponsibleParam()
+  const [dueFrom, setDueFrom] = useTaskDueFromParam()
+  const [dueTo, setDueTo] = useTaskDueToParam()
   const [offset, setOffset] = useOffsetParam()
   const [limit] = useLimitParam()
   const [projectId] = useProjectId()
   const { sorting, setSorting, ordering } = useOrdering()
 
+  const [filtersOpen, setFiltersOpen] = useState(true)
   const [modalTask, setModalTask] = useState<Task | TaskListItem | 'create' | null>(null)
   const [taskToDelete, setTaskToDelete] = useState<TaskListItem | null>(null)
 
   const { data: statusesData } = useQuery(getTaskStatusesQuery(projectId ?? null))
   const statuses = statusesData?.results ?? []
+
+  const hasAnyFilter =
+    taskStatusId != null ||
+    !!priority ||
+    responsibleUserId != null ||
+    dueFrom != null ||
+    dueTo != null
 
   const params = {
     search: search || undefined,
@@ -47,7 +68,13 @@ function TasksPage() {
     limit,
     ordering,
     project_id: projectId ?? undefined,
-    status: taskStatusId ?? undefined
+    status: taskStatusId ?? undefined,
+    priority: priority || undefined,
+    responsible_user: responsibleUserId ?? undefined,
+    due_date_from:
+      dueFrom instanceof Date ? dueFrom.toISOString().slice(0, 10) : undefined,
+    due_date_to:
+      dueTo instanceof Date ? dueTo.toISOString().slice(0, 10) : undefined
   }
 
   const { data, isLoading, isPlaceholderData } = useQuery({
@@ -74,29 +101,72 @@ function TasksPage() {
     navigate({ to: '/tasks/$taskId', params: { taskId: String(task.id) } })
   }
 
+  const resetOffset = () => setOffset(null)
+  const clearFilters = () => {
+    setTaskStatusId(null)
+    setPriority('')
+    setResponsibleUserId(null)
+    setDueFrom(null)
+    setDueTo(null)
+    setOffset(null)
+  }
+
   return (
     <div className='flex h-full flex-col gap-4'>
       <div className='flex items-center justify-between'>
         <h1 className='text-2xl font-bold'>Tasks</h1>
         <Button onClick={() => setModalTask('create')}>
           <Plus />
-          Add Task
+          Create Task
         </Button>
       </div>
 
-      <div className='flex flex-wrap items-center gap-3'>
-        <SearchFilter placeholder='Search tasks...' />
-        <TaskStatusManager
-          key={statuses.map((s) => s.id).sort().join(',')}
-          projectId={projectId}
-          statuses={statuses}
-          value={taskStatusId}
-          onValueChange={(id) => {
-            setTaskStatusId(id)
-            setOffset(null)
-          }}
-        />
-      </div>
+      <Collapsible open={filtersOpen} onOpenChange={setFiltersOpen}>
+        <div className='flex flex-wrap items-center gap-2'>
+          <div className='min-w-0 flex-1 sm:max-w-[400px]'>
+            <SearchFilter placeholder='Search tasks...' />
+          </div>
+          <CollapsibleTrigger asChild>
+            <Button variant='outline' size='default'>
+              <Filter className='size-4' />
+              {filtersOpen ? 'Hide Filters' : 'Show Filters'}
+            </Button>
+          </CollapsibleTrigger>
+        </div>
+        <CollapsibleContent>
+          <TaskFiltersPanel
+            className='mt-3'
+            statuses={statuses}
+            taskStatusId={taskStatusId}
+            onTaskStatusChange={(id) => {
+              setTaskStatusId(id)
+              resetOffset()
+            }}
+            priority={priority}
+            onPriorityChange={(v) => {
+              setPriority(v)
+              resetOffset()
+            }}
+            responsibleUserId={responsibleUserId}
+            onResponsibleChange={(id) => {
+              setResponsibleUserId(id)
+              resetOffset()
+            }}
+            dueFrom={dueFrom ?? undefined}
+            onDueFromChange={(d) => {
+              setDueFrom(d ?? null)
+              resetOffset()
+            }}
+            dueTo={dueTo ?? undefined}
+            onDueToChange={(d) => {
+              setDueTo(d ?? null)
+              resetOffset()
+            }}
+            hasAnyFilter={hasAnyFilter}
+            onClearFilters={clearFilters}
+          />
+        </CollapsibleContent>
+      </Collapsible>
 
       <TasksDataTable
         data={data?.results ?? []}

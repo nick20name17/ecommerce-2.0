@@ -122,6 +122,8 @@ export interface TaskParams extends PaginationParams {
   priority?: TaskPriority
   responsible_user?: number
   project_id?: number
+  due_date_from?: string
+  due_date_to?: string
 }
 
 export interface TaskStatusListResponse {

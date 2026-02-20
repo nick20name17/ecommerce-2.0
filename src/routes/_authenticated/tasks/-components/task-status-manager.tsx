@@ -3,7 +3,7 @@ import { OptimisticSortingPlugin, SortableKeyboardPlugin } from '@dnd-kit/dom/so
 import { DragDropProvider } from '@dnd-kit/react'
 import { useSortable } from '@dnd-kit/react/sortable'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { GripVertical, Pencil, Plus, Trash2 } from 'lucide-react'
+import { GripVertical, Pencil, Plus, Settings, Trash2 } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
@@ -22,13 +22,6 @@ import {
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue
-} from '@/components/ui/select'
 import { cn } from '@/lib/utils'
 
 const SORTABLE_PLUGINS = [...defaultPreset.plugins, OptimisticSortingPlugin, SortableKeyboardPlugin]
@@ -42,16 +35,9 @@ function arrayMove<T>(array: T[], from: number, to: number): T[] {
 interface TaskStatusManagerProps {
   projectId: number | null
   statuses: TaskStatus[]
-  value: number | null
-  onValueChange: (statusId: number | null) => void
 }
 
-export function TaskStatusManager({
-  projectId,
-  statuses,
-  value,
-  onValueChange
-}: TaskStatusManagerProps) {
+export function TaskStatusManager({ projectId, statuses }: TaskStatusManagerProps) {
   const [orderedStatuses, setOrderedStatuses] = useState(() =>
     [...statuses].sort((a, b) => a.order - b.order)
   )
@@ -97,51 +83,34 @@ export function TaskStatusManager({
   }
 
   return (
-    <div className='flex items-center gap-2'>
-      <Select
-        value={value == null ? 'all' : String(value)}
-        onValueChange={(v) => onValueChange(v === 'all' ? null : parseInt(v, 10))}
-      >
-        <SelectTrigger>
-          <SelectValue placeholder='Status' />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value='all'>All statuses</SelectItem>
-          {orderedStatuses.map((s) => (
-            <SelectItem
-              key={s.id}
-              value={String(s.id)}
-            >
-              {s.name}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-
-      <Popover>
-        <PopoverTrigger asChild>
-          <Button variant='outline'>Manage</Button>
-        </PopoverTrigger>
-        <PopoverContent
-          className='w-80'
-          onOpenAutoFocus={(e) => e.preventDefault()}
+    <Popover>
+      <PopoverTrigger asChild>
+        <Button
+          variant='outline'
+          size='icon'
         >
-          <p className='text-muted-foreground mb-2 text-xs'>
-            Drag rows to reorder. Default status is fixed.
-          </p>
-          <DragDropProvider
-            plugins={SORTABLE_PLUGINS}
-            onDragEnd={handleDragEnd}
-          >
-            <StatusList
-              projectId={projectId}
-              statuses={orderedStatuses}
-              onStatusesChange={setOrderedStatuses}
-            />
-          </DragDropProvider>
-        </PopoverContent>
-      </Popover>
-    </div>
+          <Settings />
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent
+        className='w-80'
+        onOpenAutoFocus={(e) => e.preventDefault()}
+      >
+        <p className='text-muted-foreground mb-2 text-xs'>
+          Drag rows to reorder. Default status is fixed.
+        </p>
+        <DragDropProvider
+          plugins={SORTABLE_PLUGINS}
+          onDragEnd={handleDragEnd}
+        >
+          <StatusList
+            projectId={projectId}
+            statuses={orderedStatuses}
+            onStatusesChange={setOrderedStatuses}
+          />
+        </DragDropProvider>
+      </PopoverContent>
+    </Popover>
   )
 }
 
