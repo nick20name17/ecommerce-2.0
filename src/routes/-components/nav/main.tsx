@@ -4,7 +4,7 @@ import {
   ClipboardList,
   FileText,
   FolderKanban,
-  Home,
+  LayoutDashboard,
   Settings,
   Ship,
   ShoppingCart,
@@ -21,7 +21,7 @@ import {
 } from '@/components/ui/sidebar'
 
 const NAV_ITEMS = [
-  { title: 'Dashboard', url: '/dashboard', icon: Home },
+  { title: 'Dashboard', url: '/', icon: LayoutDashboard },
   { title: 'Projects', url: '/projects', icon: FolderKanban },
   { title: 'Customers', url: '/customers', icon: Users },
   { title: 'Users', url: '/users', icon: User },

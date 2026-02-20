@@ -14,16 +14,16 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { PROPOSAL_STATUS } from '@/constants/proposal'
 import type { ProposalStatus } from '@/constants/proposal'
 import { useOrdering } from '@/hooks/use-ordering'
+import { useProjectId } from '@/hooks/use-project-id'
 import {
   useLimitParam,
   useOffsetParam,
   useSearchParam,
   useStatusParam
 } from '@/hooks/use-query-params'
-import { useProjectId } from '@/hooks/use-project-id'
 
 export const Route = createFileRoute('/_authenticated/proposals/')({
-  component: ProposalsPage,
+  component: ProposalsPage
 })
 
 const STATUS_TABS = [
@@ -31,7 +31,7 @@ const STATUS_TABS = [
   { label: 'Accepted', value: PROPOSAL_STATUS.accepted },
   { label: 'Lost', value: PROPOSAL_STATUS.lost },
   { label: 'Expired', value: PROPOSAL_STATUS.expired },
-  { label: 'All Proposals', value: 'all' },
+  { label: 'All Proposals', value: 'all' }
 ] as const
 
 const VALID_STATUS_VALUES = new Set<string>(Object.values(PROPOSAL_STATUS))
@@ -59,40 +59,46 @@ function ProposalsPage() {
     limit,
     ordering,
     status: apiStatus,
-    project_id: projectId ?? undefined,
+    project_id: projectId ?? undefined
   }
 
   const { data, isLoading, isPlaceholderData } = useQuery({
     ...getProposalsQuery(params),
-    placeholderData: keepPreviousData,
+    placeholderData: keepPreviousData
   })
 
   const handleStatusChange = (value: string) => {
-    setStatus(value === 'all' ? null : value)
+    setStatus(value)
     setOffset(null)
   }
 
   return (
-    <div className="flex h-full flex-col gap-4">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Proposals</h1>
+    <div className='flex h-full flex-col gap-4'>
+      <div className='flex items-center justify-between'>
+        <h1 className='text-2xl font-bold'>Proposals</h1>
         <Button onClick={() => navigate({ to: '/create' })}>
           <Plus />
           Create Proposal
         </Button>
       </div>
 
-      <Tabs value={activeStatus} onValueChange={handleStatusChange}>
-        <TabsList variant="line">
+      <Tabs
+        value={activeStatus}
+        onValueChange={handleStatusChange}
+      >
+        <TabsList variant='line'>
           {STATUS_TABS.map((tab) => (
-            <TabsTrigger key={tab.value} value={tab.value}>
+            <TabsTrigger
+              key={tab.value}
+              value={tab.value}
+            >
               {tab.label}
             </TabsTrigger>
           ))}
         </TabsList>
       </Tabs>
 
-      <SearchFilter placeholder="Search by quote number..." />
+      <SearchFilter placeholder='Search by quote number...' />
 
       <ProposalsDataTable
         data={data?.results ?? []}

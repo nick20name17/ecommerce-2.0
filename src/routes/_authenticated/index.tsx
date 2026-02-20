@@ -3,7 +3,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import { Spinner } from '@/components/ui/spinner'
 import { useAuth } from '@/providers/auth'
 
-const HomePage = () => {
+const DashboardPage = () => {
   const { user, isUserLoading } = useAuth()
 
   if (isUserLoading) return <Spinner />
@@ -12,5 +12,5 @@ const HomePage = () => {
 }
 
 export const Route = createFileRoute('/_authenticated/')({
-  component: HomePage
+  component: DashboardPage
 })

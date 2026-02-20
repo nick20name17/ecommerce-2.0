@@ -71,7 +71,7 @@ function OrdersPage() {
   })
 
   const handleStatusChange = (value: string) => {
-    setStatus(value === 'all' ? null : value)
+    setStatus(value)
     setOffset(null)
   }
 
