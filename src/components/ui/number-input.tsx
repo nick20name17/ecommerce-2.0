@@ -101,12 +101,12 @@ export function NumberInput({
           <Plus className='size-3.5' />
         </button>
       </div>
-      {showMaxMessage && max !== undefined && (max <= 0 || value > max) && (
+      {showMaxMessage && max !== undefined && (max <= 0 || value > max) ? (
         <span className='text-destructive flex items-center gap-1.5 text-xs'>
           <AlertCircle className='size-3.5 shrink-0' />
           Only {max} available
         </span>
-      )}
+      ) : null}
     </div>
   )
 }
