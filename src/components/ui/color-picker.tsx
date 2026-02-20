@@ -20,7 +20,7 @@ const ColorPicker = forwardRef<
   Omit<ButtonProps, 'value' | 'onChange' | 'onBlur'> & ColorPickerProps
 >(
   (
-    { disabled, value, onChange, onBlur, name, className, size, inline, ...props },
+    { disabled, value, onChange, onBlur, name, className, size = 'icon-sm', inline, ...props },
     forwardedRef
   ) => {
     const ref = useForwardedRef(forwardedRef)
@@ -29,7 +29,7 @@ const ColorPicker = forwardRef<
 
     if (inline) {
       return (
-        <div className='flex flex-col gap-2'>
+        <div className='flex shrink-0 flex-col gap-2'>
           <HexColorPicker
             color={parsedValue}
             onChange={onChange}
@@ -60,7 +60,7 @@ const ColorPicker = forwardRef<
         >
           <Button
             {...props}
-            className={cn('block', className)}
+            className={cn('block shrink-0', className)}
             name={name}
             onClick={() => setOpen(true)}
             size={size}
@@ -90,4 +90,3 @@ const ColorPicker = forwardRef<
 ColorPicker.displayName = 'ColorPicker'
 
 export { ColorPicker }
-
