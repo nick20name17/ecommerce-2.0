@@ -1,6 +1,6 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
-import { Plus } from 'lucide-react'
+import { Plus, X } from 'lucide-react'
 import { useState } from 'react'
 
 import { ProposalModal } from './-components/proposal-modal'
@@ -9,6 +9,7 @@ import { getProposalsQuery } from '@/api/proposal/query'
 import type { Proposal, ProposalParams } from '@/api/proposal/schema'
 import { Pagination } from '@/components/common/filters/pagination'
 import { SearchFilter } from '@/components/common/filters/search'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { PROPOSAL_STATUS } from '@/constants/proposal'
@@ -18,6 +19,7 @@ import { useProjectId } from '@/hooks/use-project-id'
 import {
   useLimitParam,
   useOffsetParam,
+  useProposalAutoidParam,
   useSearchParam,
   useStatusParam
 } from '@/hooks/use-query-params'
@@ -45,6 +47,7 @@ function ProposalsPage() {
   const [offset, setOffset] = useOffsetParam()
   const [limit] = useLimitParam()
   const [projectId] = useProjectId()
+  const [autoidFromUrl, setAutoidFromUrl] = useProposalAutoidParam()
   const [status, setStatus] = useStatusParam()
   const { sorting, setSorting, ordering } = useOrdering()
   const [viewProposal, setViewProposal] = useState<Proposal | null>(null)
@@ -57,7 +60,8 @@ function ProposalsPage() {
       : undefined
 
   const params: ProposalParams = {
-    search: search || undefined,
+    quote: search || undefined,
+    autoid: autoidFromUrl ?? undefined,
     offset,
     limit,
     ordering,
@@ -101,7 +105,29 @@ function ProposalsPage() {
         </TabsList>
       </Tabs>
 
-      <SearchFilter placeholder='Search by quote number...' />
+      <div className='flex flex-wrap items-center gap-2'>
+        <SearchFilter placeholder='Search by quote number...' />
+        {autoidFromUrl && (
+          <Badge
+            variant='secondary'
+            className='cursor-pointer gap-1 pr-1 transition-opacity hover:opacity-80'
+            onClick={() => setAutoidFromUrl(null)}
+          >
+            Proposal: {autoidFromUrl}
+            <button
+              type='button'
+              className='rounded-sm p-0.5 hover:bg-muted'
+              onClick={(e) => {
+                e.stopPropagation()
+                setAutoidFromUrl(null)
+              }}
+              aria-label='Clear proposal filter'
+            >
+              <X className='size-3' />
+            </button>
+          </Badge>
+        )}
+      </div>
 
       <ProposalsDataTable
         data={data?.results ?? []}

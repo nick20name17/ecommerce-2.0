@@ -197,7 +197,7 @@ export function CustomerOrdersTab({ customerId }: CustomerOrdersTabProps) {
 
   const params: OrderParams = {
     customer: customerId,
-    search: search || undefined,
+    invoice: search || undefined,
     offset,
     limit,
     ordering,

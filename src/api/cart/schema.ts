@@ -11,3 +11,11 @@ export interface UpdateCartItemPayload {
   quantity?: number
   configurations?: CartConfiguration[]
 }
+
+export interface SubmitOrderResponse {
+  AUTOID: string
+}
+
+export interface SubmitProposalResponse {
+  AUTOID: string
+}

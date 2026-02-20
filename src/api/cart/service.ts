@@ -1,7 +1,12 @@
 import { api } from '..'
 import type { Cart } from '../product/schema'
 
-import type { AddToCartPayload, UpdateCartItemPayload } from './schema'
+import type {
+  AddToCartPayload,
+  SubmitOrderResponse,
+  SubmitProposalResponse,
+  UpdateCartItemPayload
+} from './schema'
 
 function buildParams(customerId: string, projectId?: number | null) {
   const params: Record<string, string> = { customer_id: customerId }
@@ -52,17 +57,23 @@ export const cartService = {
     })
   },
 
-  submitProposal: async (customerId: string, projectId?: number | null) => {
-    const { data } = await api.post('/cart/proposal/', null, {
+  submitProposal: async (
+    customerId: string,
+    projectId?: number | null
+  ): Promise<SubmitProposalResponse> => {
+    const { data } = await api.post<SubmitProposalResponse>('/cart/proposal/', null, {
       params: buildParams(customerId, projectId),
     })
     return data
   },
 
-  submitOrder: async (customerId: string, projectId?: number | null) => {
-    const { data } = await api.post('/cart/order/', null, {
+  submitOrder: async (
+    customerId: string,
+    projectId?: number | null
+  ): Promise<SubmitOrderResponse> => {
+    const { data } = await api.post<SubmitOrderResponse>('/cart/order/', null, {
       params: buildParams(customerId, projectId),
     })
     return data
-  },
+  }
 }

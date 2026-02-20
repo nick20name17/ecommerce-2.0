@@ -1,15 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
-
-import { Spinner } from '@/components/ui/spinner'
-import { useAuth } from '@/providers/auth'
-
-const DashboardPage = () => {
-  const { user, isUserLoading } = useAuth()
-
-  if (isUserLoading) return <Spinner />
-
-  return <pre>{JSON.stringify(user, null, 2)}</pre>
-}
+import { LayoutDashboard } from 'lucide-react'
 
 export const Route = createFileRoute('/_authenticated/')({
   component: DashboardPage,
@@ -17,3 +7,13 @@ export const Route = createFileRoute('/_authenticated/')({
     meta: [{ title: 'Dashboard' }]
   })
 })
+
+function DashboardPage() {
+  return (
+    <div className='flex h-full flex-col items-center justify-center gap-3 text-muted-foreground'>
+      <LayoutDashboard className='size-12 opacity-50' />
+      <h1 className='text-2xl font-bold text-foreground'>Dashboard</h1>
+      <p className='text-sm'>Dashboard content will be implemented here.</p>
+    </div>
+  )
+}

@@ -29,7 +29,8 @@ export interface ProposalItem {
 export type ProposalResponse = PaginatedResponse<Proposal>
 
 export interface ProposalParams extends PaginationParams {
-  search?: string
+  quote?: string
+  autoid?: string
   ordering?: string
   status?: ProposalStatus
   project_id?: number

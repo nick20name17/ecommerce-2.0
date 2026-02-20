@@ -32,14 +32,7 @@ export const getProposalColumns = ({
     header: ({ column }) => <ColumnHeader column={column} title="Quote" />,
     cell: ({ row }) => {
       const v = row.original.quote
-      return (
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <span className="block max-w-[120px] truncate">{v ?? '—'}</span>
-          </TooltipTrigger>
-          <TooltipContent>{v ?? '—'}</TooltipContent>
-        </Tooltip>
-      )
+      return <span className="block max-w-[120px] truncate">{v ?? '—'}</span>
     },
     size: 130,
   },

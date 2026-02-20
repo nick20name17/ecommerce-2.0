@@ -1,12 +1,13 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
-import { Plus } from 'lucide-react'
+import { Plus, X } from 'lucide-react'
 
 import { OrdersDataTable } from './-components/orders-data-table'
 import { getOrdersQuery } from '@/api/order/query'
 import type { OrderParams } from '@/api/order/schema'
 import { Pagination } from '@/components/common/filters/pagination'
 import { SearchFilter } from '@/components/common/filters/search'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { ORDER_STATUS } from '@/constants/order'
@@ -44,7 +45,7 @@ function OrdersPage() {
   const [offset, setOffset] = useOffsetParam()
   const [limit] = useLimitParam()
   const [projectIdFromStorage] = useProjectId()
-  const [autoidFromUrl] = useOrderAutoidParam()
+  const [autoidFromUrl, setAutoidFromUrl] = useOrderAutoidParam()
   const [projectIdFromUrl] = useOrderProjectIdParam()
   const [status, setStatus] = useOrderStatusParam()
   const projectId = projectIdFromUrl ?? projectIdFromStorage
@@ -58,7 +59,7 @@ function OrdersPage() {
       : undefined
 
   const params: OrderParams = {
-    search: search || undefined,
+    invoice: search || undefined,
     autoid: autoidFromUrl ?? undefined,
     offset,
     limit,
@@ -103,7 +104,29 @@ function OrdersPage() {
         </TabsList>
       </Tabs>
 
-      <SearchFilter placeholder='Search by invoice number...' />
+      <div className='flex flex-wrap items-center gap-2'>
+        <SearchFilter placeholder='Search by invoice number...' />
+        {autoidFromUrl && (
+          <Badge
+            variant='secondary'
+            className='cursor-pointer gap-1 pr-1 transition-opacity hover:opacity-80'
+            onClick={() => setAutoidFromUrl(null)}
+          >
+            Order: {autoidFromUrl}
+            <button
+              type='button'
+              className='rounded-sm p-0.5 hover:bg-muted'
+              onClick={(e) => {
+                e.stopPropagation()
+                setAutoidFromUrl(null)
+              }}
+              aria-label='Clear order filter'
+            >
+              <X className='size-3' />
+            </button>
+          </Badge>
+        )}
+      </div>
 
       <OrdersDataTable
         data={data?.results ?? []}

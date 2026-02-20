@@ -36,7 +36,7 @@ export function ProposalCombobox({ value, onChange, projectId }: ProposalCombobo
 
   const params = {
     limit: 50,
-    search: debouncedSearch || undefined,
+    quote: debouncedSearch || undefined,
     project_id: projectId ?? undefined,
   }
   const { data, isLoading, isFetching } = useQuery({

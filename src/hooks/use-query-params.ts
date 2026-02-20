@@ -84,5 +84,6 @@ export const useTaskDueFromParam = () => useQueryState('due_from', parseAsDateOn
 export const useTaskDueToParam = () => useQueryState('due_to', parseAsDateOnly)
 
 export const useOrderAutoidParam = () => useQueryState('autoid', parseAsString)
+export const useProposalAutoidParam = () => useQueryState('autoid', parseAsString)
 export const useOrderProjectIdParam = () =>
   useQueryState('project_id', parseAsInteger.withOptions({ shallow: false }))

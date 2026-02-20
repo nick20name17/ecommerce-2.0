@@ -204,10 +204,10 @@ function CreatePage() {
     }
     busyDispatch({ type: 'CREATING_PROPOSAL', value: true })
     try {
-      await cartService.submitProposal(customer.id, projectId)
+      const result = await cartService.submitProposal(customer.id, projectId)
       invalidateCart()
       toast.success('Proposal created successfully')
-      navigate({ to: '/proposals' })
+      navigate({ to: '/proposals', search: { autoid: result.AUTOID, status: 'all' } })
     } catch (error) {
       toast.error(getErrorMessage(error))
     }
@@ -225,10 +225,10 @@ function CreatePage() {
     }
     busyDispatch({ type: 'CREATING_ORDER', value: true })
     try {
-      await cartService.submitOrder(customer.id, projectId)
+      const result = await cartService.submitOrder(customer.id, projectId)
       invalidateCart()
       toast.success('Order created successfully')
-      navigate({ to: '/orders' })
+      navigate({ to: '/orders', search: { autoid: result.AUTOID, status: 'all' } })
     } catch (error) {
       toast.error(getErrorMessage(error))
     }
