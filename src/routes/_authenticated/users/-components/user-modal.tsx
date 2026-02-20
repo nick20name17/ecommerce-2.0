@@ -149,7 +149,7 @@ function CreateForm({ onOpenChange }: { onOpenChange: (open: boolean) => void })
       first_name: '',
       last_name: '',
       email: '',
-      role: 'user',
+      role: 'sale',
       password: '',
       password_confirm: ''
     }
