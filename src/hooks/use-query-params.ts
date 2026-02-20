@@ -1,4 +1,3 @@
-import { useNavigate, useSearch } from '@tanstack/react-router'
 import {
   createParser,
   parseAsInteger,
@@ -23,59 +22,34 @@ const parseAsIsoDate = createParser<Date | null>({
   eq: (a, b) => (a?.getTime() ?? null) === (b?.getTime() ?? null)
 })
 
+const offsetParser = parseAsInteger.withDefault(0)
+const limitParser = parseAsInteger.withDefault(DEFAULT_LIMIT)
+
 export const useSearchParam = () => {
   return useQueryState('search', parseAsString.withDefault(''))
 }
 
 export function useOffsetParam() {
-  const navigate = useNavigate()
-  const search = useSearch({
-    from: '__root__',
-    structuralSharing: false
-  }) as { offset?: number } & Record<string, unknown>
-  const raw = search?.offset
-  const offset =
-    raw === undefined || raw === null || (typeof raw === 'string' && raw === '')
-      ? 0
-      : Math.max(0, Math.floor(Number(raw)))
-
+  const [offset, setOffsetRaw] = useQueryState('offset', offsetParser)
+  const normalized = Math.max(0, offset)
   const setOffset = (value: number | null) => {
-    const next = value === null || value === 0 ? undefined : value
-    navigate({
-      to: '.',
-      search: (prev: Record<string, unknown>) => ({ ...prev, offset: next }),
-      replace: true
-    })
+    setOffsetRaw(value === null || value === 0 ? null : value)
   }
-  return [offset, setOffset] as const
+  return [normalized, setOffset] as const
 }
 
 export function useLimitParam() {
-  const navigate = useNavigate()
-  const search = useSearch({
-    from: '__root__',
-    structuralSharing: false
-  }) as { limit?: number } & Record<string, unknown>
-  const raw = search?.limit
-  const limit =
-    raw === undefined || raw === null || (typeof raw === 'string' && raw === '')
-      ? DEFAULT_LIMIT
-      : Math.max(1, Math.floor(Number(raw)))
-
+  const [limit, setLimitRaw] = useQueryState('limit', limitParser)
+  const normalized = Math.max(1, limit)
   const setLimit = (value: number) => {
-    const next = value === DEFAULT_LIMIT ? undefined : value
-    navigate({
-      to: '.',
-      search: (prev: Record<string, unknown>) => ({ ...prev, limit: next }),
-      replace: true
-    })
+    setLimitRaw(value === DEFAULT_LIMIT ? null : value)
   }
-  return [limit, setLimit] as const
+  return [normalized, setLimit] as const
 }
 
-export { useProjectIdParam } from './use-project-id-param'
-
 export const useOrderStatusParam = () => useQueryState('status', orderStatusParser)
+
+export const useStatusParam = () => useQueryState('status', parseAsString)
 
 export const usePayloadLogCreatedAfter = () => useQueryState('created_after', parseAsIsoDate)
 export const usePayloadLogCreatedBefore = () => useQueryState('created_before', parseAsIsoDate)
@@ -85,6 +59,4 @@ export const usePayloadLogStatusCode = () => useQueryState('status_code', parseA
 export const usePayloadLogIsError = () =>
   useQueryState('is_error', parseAsStringLiteral(['true', 'false']))
 
-const parseAsTaskStatusId = parseAsInteger
-export const useTaskStatusParam = () => useQueryState('task_status', parseAsTaskStatusId)
-
+export const useTaskStatusParam = () => useQueryState('task_status', parseAsInteger)

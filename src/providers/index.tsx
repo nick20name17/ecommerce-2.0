@@ -1,4 +1,4 @@
-import { NuqsAdapter } from '@/adapters/nuqs-tanstack-router'
+import { NuqsAdapter } from 'nuqs/adapters/tanstack-router'
 import type { PropsWithChildren } from 'react'
 
 import { ReactQueryProvider } from './react-query'

@@ -16,10 +16,10 @@ import { useOrdering } from '@/hooks/use-ordering'
 import {
   useLimitParam,
   useOffsetParam,
-  useProjectIdParam,
   useSearchParam,
   useTaskStatusParam
 } from '@/hooks/use-query-params'
+import { useProjectId } from '@/hooks/use-project-id'
 
 export const Route = createFileRoute('/_authenticated/tasks/')({
   component: TasksPage
@@ -31,7 +31,7 @@ function TasksPage() {
   const [taskStatusId, setTaskStatusId] = useTaskStatusParam()
   const [offset, setOffset] = useOffsetParam()
   const [limit] = useLimitParam()
-  const [projectId] = useProjectIdParam()
+  const [projectId] = useProjectId()
   const { sorting, setSorting, ordering } = useOrdering()
 
   const [modalTask, setModalTask] = useState<Task | TaskListItem | 'create' | null>(null)

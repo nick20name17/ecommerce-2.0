@@ -12,7 +12,8 @@ import { Pagination } from '@/components/common/filters/pagination'
 import { SearchFilter } from '@/components/common/filters/search'
 import { Button } from '@/components/ui/button'
 import { useOrdering } from '@/hooks/use-ordering'
-import { useLimitParam, useOffsetParam, useProjectIdParam, useSearchParam } from '@/hooks/use-query-params'
+import { useLimitParam, useOffsetParam, useSearchParam } from '@/hooks/use-query-params'
+import { useProjectId } from '@/hooks/use-project-id'
 
 export const Route = createFileRoute('/_authenticated/customers/')({
   component: CustomersPage,
@@ -23,7 +24,7 @@ function CustomersPage() {
   const [search] = useSearchParam()
   const [offset] = useOffsetParam()
   const [limit] = useLimitParam()
-  const [projectId] = useProjectIdParam()
+  const [projectId] = useProjectId()
   const { sorting, setSorting, ordering } = useOrdering()
 
   const [modalCustomer, setModalCustomer] = useState<Customer | 'create' | null>(null)
@@ -66,7 +67,6 @@ function CustomersPage() {
           navigate({
             to: '/customers/$customerId',
             params: { customerId: customer.id },
-            search: (prev) => (projectId != null ? { ...prev, project_id: projectId } : prev),
           })
         }
         onEdit={setModalCustomer}

@@ -8,8 +8,6 @@ import { TaskInfoCard } from './-components/task-info-card'
 import { getTaskDetailQuery } from '@/api/task/query'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
-import { useProjectIdParam } from '@/hooks/use-query-params'
-
 export const Route = createFileRoute('/_authenticated/tasks/$taskId/')({
   component: TaskDetailPage
 })
@@ -17,7 +15,6 @@ export const Route = createFileRoute('/_authenticated/tasks/$taskId/')({
 function TaskDetailPage() {
   const { taskId } = Route.useParams()
   const navigate = useNavigate()
-  const [projectId] = useProjectIdParam()
   const [deleteOpen, setDeleteOpen] = useState(false)
   const id = Number(taskId)
 
@@ -31,7 +28,7 @@ function TaskDetailPage() {
       <div className='flex h-full flex-col gap-4'>
         <p className='text-muted-foreground'>Invalid task ID.</p>
         <Button variant='outline' asChild>
-          <Link to='/tasks' search={projectId != null ? { project_id: projectId } : undefined}>
+          <Link to='/tasks'>
             Back to Tasks
           </Link>
         </Button>
@@ -58,7 +55,6 @@ function TaskDetailPage() {
         <Button variant='outline' asChild>
           <Link
             to='/tasks'
-            search={projectId != null ? { project_id: projectId } : undefined}
           >
             Back to Tasks
           </Link>
@@ -73,7 +69,6 @@ function TaskDetailPage() {
         <Button variant='ghost' size='icon' asChild>
           <Link
             to='/tasks'
-            search={projectId != null ? { project_id: projectId } : undefined}
           >
             <ArrowLeft />
           </Link>
@@ -87,7 +82,7 @@ function TaskDetailPage() {
         open={deleteOpen}
         onOpenChange={setDeleteOpen}
         onDeleted={() =>
-          navigate({ to: '/tasks', search: projectId != null ? { project_id: projectId } : undefined })
+          navigate({ to: '/tasks' })
         }
       />
     </div>

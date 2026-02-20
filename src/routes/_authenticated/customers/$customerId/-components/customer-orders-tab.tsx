@@ -24,7 +24,8 @@ import {
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { getOrderStatusLabel, ORDER_STATUS_CLASS } from '@/constants/order'
 import { formatCurrency, formatDate, formatQuantity } from '@/helpers/formatters'
-import { useLimitParam, useOffsetParam, useProjectIdParam, useSearchParam } from '@/hooks/use-query-params'
+import { useLimitParam, useOffsetParam, useSearchParam } from '@/hooks/use-query-params'
+import { useProjectId } from '@/hooks/use-project-id'
 import { cn } from '@/lib/utils'
 
 function getOrderColumns(): ColumnDef<Order>[] {
@@ -190,7 +191,7 @@ export function CustomerOrdersTab({ customerId }: CustomerOrdersTabProps) {
   const [search] = useSearchParam()
   const [offset] = useOffsetParam()
   const [limit] = useLimitParam()
-  const [projectId] = useProjectIdParam()
+  const [projectId] = useProjectId()
   const [sorting, setSorting] = useState<SortingState>([])
 
   const orderingStr = useMemo(() => {

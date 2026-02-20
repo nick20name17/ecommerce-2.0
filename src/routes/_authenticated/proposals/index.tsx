@@ -1,5 +1,5 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
-import { createFileRoute, useNavigate, useSearch } from '@tanstack/react-router'
+import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { Plus } from 'lucide-react'
 import { useState } from 'react'
 
@@ -17,9 +17,10 @@ import { useOrdering } from '@/hooks/use-ordering'
 import {
   useLimitParam,
   useOffsetParam,
-  useProjectIdParam,
   useSearchParam,
+  useStatusParam
 } from '@/hooks/use-query-params'
+import { useProjectId } from '@/hooks/use-project-id'
 
 export const Route = createFileRoute('/_authenticated/proposals/')({
   component: ProposalsPage,
@@ -37,15 +38,14 @@ const VALID_STATUS_VALUES = new Set<string>(Object.values(PROPOSAL_STATUS))
 
 function ProposalsPage() {
   const navigate = useNavigate()
-  const rootSearch = useSearch({ from: '__root__' }) as { status?: string }
   const [search] = useSearchParam()
   const [offset, setOffset] = useOffsetParam()
   const [limit] = useLimitParam()
-  const [projectId] = useProjectIdParam()
+  const [projectId] = useProjectId()
+  const [status, setStatus] = useStatusParam()
   const { sorting, setSorting, ordering } = useOrdering()
   const [viewProposal, setViewProposal] = useState<Proposal | null>(null)
 
-  const status = rootSearch.status ?? null
   const activeStatus = status ?? PROPOSAL_STATUS.open
 
   const apiStatus: ProposalStatus | undefined =
@@ -68,14 +68,7 @@ function ProposalsPage() {
   })
 
   const handleStatusChange = (value: string) => {
-    navigate({
-      to: '.',
-      search: (prev: Record<string, unknown>) => ({
-        ...prev,
-        status: value === 'all' ? undefined : value,
-      }),
-      replace: true,
-    })
+    setStatus(value === 'all' ? null : value)
     setOffset(null)
   }
 

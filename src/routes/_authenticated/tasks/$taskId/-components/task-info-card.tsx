@@ -21,7 +21,7 @@ import {
 import { Textarea } from '@/components/ui/textarea'
 import { TASK_PRIORITY_LABELS } from '@/constants/task'
 import type { TaskPriority } from '@/constants/task'
-import { useProjectIdParam } from '@/hooks/use-query-params'
+import { useProjectId } from '@/hooks/use-project-id'
 
 const DATE_TIME_LONG = 'MMM d, yyyy, h:mm a'
 
@@ -31,7 +31,7 @@ interface TaskInfoCardProps {
 }
 
 export const TaskInfoCard = ({ task, onDelete }: TaskInfoCardProps) => {
-  const [projectId] = useProjectIdParam()
+  const [projectId] = useProjectId()
   const [title, setTitle] = useState(task.title)
   const [description, setDescription] = useState(task.description ?? '')
 

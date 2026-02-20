@@ -21,7 +21,7 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import { Spinner } from '@/components/ui/spinner'
 import type { Customer } from '@/api/customer/schema'
 import { getErrorMessage } from '@/helpers/error'
-import { useProjectIdParam } from '@/hooks/use-query-params'
+import { useProjectId } from '@/hooks/use-project-id'
 
 export const Route = createFileRoute('/_authenticated/create/')({
   component: CreatePage,
@@ -30,7 +30,7 @@ export const Route = createFileRoute('/_authenticated/create/')({
 function CreatePage() {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
-  const [projectId] = useProjectIdParam()
+  const [projectId] = useProjectId()
 
   const [customer, setCustomer] = useState<Customer | null>(null)
   const { data: cart, isLoading: cartLoading } = useQuery({
@@ -279,8 +279,8 @@ function CreatePage() {
           {/* Actions */}
           <div className='flex flex-wrap justify-end gap-2 p-4'>
             <Button variant='ghost' onClick={() => navigate({ to: '/' })}>
-              Cancel
-            </Button>
+            Cancel
+          </Button>
             <Button
               variant='outline'
               disabled={cartItems.length === 0 || isBusy}

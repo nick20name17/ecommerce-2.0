@@ -9,22 +9,18 @@ export const PROJECT_QUERY_KEYS = {
   list: (params: ProjectParams = {}) => [...PROJECT_QUERY_KEYS.lists(), params] as const,
   details: () => [...PROJECT_QUERY_KEYS.all(), 'detail'] as const,
   detail: (id: number) => [...PROJECT_QUERY_KEYS.details(), id] as const,
-  health: (id: number) => [...PROJECT_QUERY_KEYS.detail(id), 'health'] as const,
+  health: (id: number) => [...PROJECT_QUERY_KEYS.detail(id), 'health'] as const
 }
 
 export const getProjectsQuery = (params: ProjectParams = {}) =>
   queryOptions({
     queryKey: PROJECT_QUERY_KEYS.list(params),
-    queryFn: () => projectService.get(params),
+    queryFn: () => projectService.get(params)
   })
-
-export const PROJECTS_PICKER_PARAMS: ProjectParams = { limit: 100, offset: 0 }
-
-export const getProjectsPickerQuery = () =>
-  getProjectsQuery(PROJECTS_PICKER_PARAMS)
 
 export const getProjectHealthQuery = (id: number) =>
   queryOptions({
     queryKey: PROJECT_QUERY_KEYS.health(id),
-    queryFn: () => projectService.getHealth(id),
+    queryFn: () => projectService.getHealth(id)
   })
+

@@ -7,7 +7,7 @@ import { CustomerOrdersTab } from './-components/customer-orders-tab'
 import { getCustomerDetailQuery } from '@/api/customer/query'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
-import { useProjectIdParam } from '@/hooks/use-query-params'
+import { useProjectId } from '@/hooks/use-project-id'
 
 export const Route = createFileRoute('/_authenticated/customers/$customerId/')({
   component: CustomerDetailPage,
@@ -15,7 +15,7 @@ export const Route = createFileRoute('/_authenticated/customers/$customerId/')({
 
 function CustomerDetailPage() {
   const { customerId } = Route.useParams()
-  const [projectId] = useProjectIdParam()
+  const [projectId] = useProjectId()
 
   const { data: customer, isLoading } = useQuery(getCustomerDetailQuery(customerId, projectId))
 
@@ -36,12 +36,7 @@ function CustomerDetailPage() {
       <div className='flex h-full flex-col items-center justify-center gap-4'>
         <p className='text-muted-foreground'>Customer not found.</p>
         <Button variant='outline' asChild>
-          <Link
-            to='/customers'
-            search={projectId != null ? { project_id: projectId } : undefined}
-          >
-            Back to Customers
-          </Link>
+          <Link to='/customers'>Back to Customers</Link>
         </Button>
       </div>
     )
@@ -51,10 +46,7 @@ function CustomerDetailPage() {
     <div className='flex h-full flex-col gap-4 overflow-y-auto p-1'>
       <div className='flex items-center gap-3'>
         <Button variant='ghost' size='icon' asChild>
-          <Link
-            to='/customers'
-            search={projectId != null ? { project_id: projectId } : undefined}
-          >
+          <Link to='/customers'>
             <ArrowLeft />
           </Link>
         </Button>

@@ -21,67 +21,22 @@ import {
 } from '@/components/ui/sidebar'
 
 const NAV_ITEMS = [
-  {
-    title: 'Dashboard',
-    url: '/dashboard',
-    icon: Home
-  },
-  {
-    title: 'Projects',
-    url: '/projects',
-    icon: FolderKanban
-  },
-  {
-    title: 'Customers',
-    url: '/customers',
-    icon: Users
-  },
-  {
-    title: 'Users',
-    url: '/users',
-    icon: User
-  },
-  {
-    title: 'Orders',
-    url: '/orders',
-    icon: ShoppingCart
-  },
-  {
-    title: 'Proposals',
-    url: '/proposals',
-    icon: FileText
-  },
-  {
-    title: 'Tasks',
-    url: '/tasks',
-    icon: CheckSquare
-  },
-  {
-    title: 'Order Desk',
-    url: '/order-desk',
-    icon: ClipboardList
-  },
-  {
-    title: 'Shipping',
-    url: '/shipping',
-    icon: Ship
-  },
-  {
-    title: 'Notes',
-    url: '/notes',
-    icon: StickyNote
-  },
-  {
-    title: 'Settings',
-    url: '/settings',
-    icon: Settings
-  }
+  { title: 'Dashboard', url: '/dashboard', icon: Home },
+  { title: 'Projects', url: '/projects', icon: FolderKanban },
+  { title: 'Customers', url: '/customers', icon: Users },
+  { title: 'Users', url: '/users', icon: User },
+  { title: 'Orders', url: '/orders', icon: ShoppingCart },
+  { title: 'Proposals', url: '/proposals', icon: FileText },
+  { title: 'Tasks', url: '/tasks', icon: CheckSquare },
+  { title: 'Order Desk', url: '/order-desk', icon: ClipboardList },
+  { title: 'Shipping', url: '/shipping', icon: Ship },
+  { title: 'Notes', url: '/notes', icon: StickyNote },
+  { title: 'Settings', url: '/settings', icon: Settings }
 ] as const
 
 export const NavMain = () => {
   return (
     <SidebarGroup>
-      {/* <SidebarGroupLabel>Platform</SidebarGroupLabel> */}
       <SidebarMenu>
         {NAV_ITEMS.map((item) => (
           <SidebarMenuItem key={item.title}>

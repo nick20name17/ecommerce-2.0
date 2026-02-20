@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query'
 import { getProjectHealthQuery } from '@/api/project/query'
 import { HealthCell } from '@/components/common/project-health-cell'
 import { type ProjectHealthService, getServiceHealthDetails } from '@/helpers/project-health'
-import { useProjectIdParam } from '@/hooks/use-query-params'
+import { useProjectId } from '@/hooks/use-project-id'
 
 const HEALTH_SERVICES: { label: string; service: ProjectHealthService }[] = [
   { label: 'Frontend', service: 'website' },
@@ -13,7 +13,7 @@ const HEALTH_SERVICES: { label: string; service: ProjectHealthService }[] = [
 ]
 
 export function HeaderProjectHealth() {
-  const [projectId] = useProjectIdParam()
+  const [projectId] = useProjectId()
   const { data: health, isLoading } = useQuery({
     ...getProjectHealthQuery(projectId!),
     enabled: projectId != null

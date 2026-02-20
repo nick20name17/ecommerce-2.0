@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { ChevronsUpDown, FolderKanban } from 'lucide-react'
 import { useEffect } from 'react'
 
-import { getProjectsPickerQuery } from '@/api/project/query'
+import { getProjectsQuery } from '@/api/project/query'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,7 +18,7 @@ import {
 } from '@/components/ui/sidebar'
 import { Spinner } from '@/components/ui/spinner'
 import { isSuperAdmin } from '@/constants/user'
-import { useProjectIdParam } from '@/hooks/use-project-id-param'
+import { useProjectId } from '@/hooks/use-project-id'
 import { useAuth } from '@/providers/auth'
 
 export function NavProjects() {
@@ -26,23 +26,24 @@ export function NavProjects() {
   const { user } = useAuth()
   const isSuperAdminUser = !!user?.role && isSuperAdmin(user.role)
 
-  const [projectId, setProjectId] = useProjectIdParam()
+  const [projectId, setProjectId] = useProjectId()
 
   const { data, isLoading } = useQuery({
-    ...getProjectsPickerQuery(),
+    ...getProjectsQuery({ limit: 20, offset: 0 }),
     enabled: isSuperAdminUser
   })
 
   const projects = data?.results ?? []
-  const selectedProjectId = projectId ?? projects[0]?.id ?? null
-  const selectedProject = projects.find((p) => p.id === selectedProjectId) ?? null
+  const firstProjectId = projects[0]?.id ?? null
+  const effectiveProjectId = projectId ?? firstProjectId
 
   useEffect(() => {
-    const results = data?.results
-    if (!projectId && results?.length && results.length > 0) {
-      setProjectId(results[0].id)
+    if (projectId == null && firstProjectId != null) {
+      setProjectId(firstProjectId)
     }
-  }, [projectId, data?.results, setProjectId])
+  }, [projectId, firstProjectId, setProjectId])
+
+  const selectedProject = projects.find((p) => p.id === effectiveProjectId) ?? null
 
   if (!isSuperAdminUser) {
     return (
@@ -78,9 +79,6 @@ export function NavProjects() {
                 <span className='truncate font-medium'>
                   {selectedProject?.name ?? 'Select Project'}
                 </span>
-                {/* <span className='truncate text-xs'>
-                  {selectedProject ? `ID: ${selectedProject.id}` : 'No project selected'}
-                </span> */}
               </div>
               <ChevronsUpDown className='ml-auto' />
             </SidebarMenuButton>
@@ -103,7 +101,7 @@ export function NavProjects() {
                 No projects found
               </div>
             ) : (
-              projects?.map((project) => (
+              projects.map((project) => (
                 <DropdownMenuItem
                   key={project.id}
                   onClick={() => setProjectId(project.id)}
@@ -113,7 +111,7 @@ export function NavProjects() {
                     <FolderKanban className='size-3.5 shrink-0' />
                   </div>
                   <span className='truncate'>{project.name}</span>
-                  {project.id === selectedProjectId && (
+                  {project.id === effectiveProjectId && (
                     <span className='bg-primary ml-auto size-2 rounded-full' />
                   )}
                 </DropdownMenuItem>

@@ -1,5 +1,5 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
-import { createFileRoute, useNavigate, useSearch } from '@tanstack/react-router'
+import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { Plus } from 'lucide-react'
 import { useEffect } from 'react'
 
@@ -16,9 +16,10 @@ import { useOrdering } from '@/hooks/use-ordering'
 import {
   useLimitParam,
   useOffsetParam,
-  useProjectIdParam,
-  useSearchParam
+  useSearchParam,
+  useStatusParam
 } from '@/hooks/use-query-params'
+import { useProjectId } from '@/hooks/use-project-id'
 
 export const Route = createFileRoute('/_authenticated/orders/')({
   component: OrdersPage
@@ -35,26 +36,20 @@ const VALID_STATUS_VALUES = new Set<string>(Object.values(ORDER_STATUS))
 
 function OrdersPage() {
   const navigate = useNavigate()
-  const rootSearch = useSearch({ from: '__root__' })
   const [search] = useSearchParam()
   const [offset, setOffset] = useOffsetParam()
   const [limit] = useLimitParam()
-  const [projectId] = useProjectIdParam()
+  const [projectId] = useProjectId()
+  const [rawStatus, setStatus] = useStatusParam()
   const { sorting, setSorting, ordering } = useOrdering()
 
-  const rawStatus = rootSearch.status ?? null
   const isCorruptStatus = typeof rawStatus === 'string' && rawStatus.includes('?')
   const status = isCorruptStatus ? null : rawStatus
   const activeStatus = status ?? ORDER_STATUS.unprocessed
 
   useEffect(() => {
-    if (!isCorruptStatus) return
-    navigate({
-      to: '.',
-      search: (prev) => ({ ...prev, status: undefined }),
-      replace: true
-    })
-  }, [isCorruptStatus, navigate])
+    if (isCorruptStatus) setStatus(null)
+  }, [isCorruptStatus, setStatus])
 
   const apiStatus: OrderStatus | undefined =
     activeStatus !== 'all' && VALID_STATUS_VALUES.has(activeStatus)
@@ -76,14 +71,7 @@ function OrdersPage() {
   })
 
   const handleStatusChange = (value: string) => {
-    navigate({
-      to: '.',
-      search: (prev) => ({
-        ...prev,
-        status: value === 'all' ? undefined : value
-      }),
-      replace: true
-    })
+    setStatus(value === 'all' ? null : value)
     setOffset(null)
   }
 
