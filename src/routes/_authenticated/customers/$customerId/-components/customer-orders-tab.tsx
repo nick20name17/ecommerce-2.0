@@ -1,9 +1,9 @@
 'use no memo'
 
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
-import type { ColumnDef, Row, SortingState } from '@tanstack/react-table'
+import type { ColumnDef, Row } from '@tanstack/react-table'
 import { getCoreRowModel, getExpandedRowModel, useReactTable } from '@tanstack/react-table'
-import { useMemo, useState } from 'react'
+import { useMemo } from 'react'
 
 import { getOrdersQuery } from '@/api/order/query'
 import type { Order, OrderParams } from '@/api/order/schema'
@@ -24,6 +24,7 @@ import {
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { getOrderStatusLabel, ORDER_STATUS_CLASS } from '@/constants/order'
 import { formatCurrency, formatDate, formatQuantity } from '@/helpers/formatters'
+import { useOrdering } from '@/hooks/use-ordering'
 import { useLimitParam, useOffsetParam, useSearchParam } from '@/hooks/use-query-params'
 import { useProjectId } from '@/hooks/use-project-id'
 import { cn } from '@/lib/utils'
@@ -192,20 +193,14 @@ export function CustomerOrdersTab({ customerId }: CustomerOrdersTabProps) {
   const [offset] = useOffsetParam()
   const [limit] = useLimitParam()
   const [projectId] = useProjectId()
-  const [sorting, setSorting] = useState<SortingState>([])
-
-  const orderingStr = useMemo(() => {
-    if (!sorting.length) return undefined
-    const s = sorting[0]
-    return s.desc ? `-${s.id}` : s.id
-  }, [sorting])
+  const { sorting, setSorting, ordering } = useOrdering()
 
   const params: OrderParams = {
     customer: customerId,
     search: search || undefined,
     offset,
     limit,
-    ordering: orderingStr,
+    ordering,
     project_id: projectId ?? undefined,
   }
 
