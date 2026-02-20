@@ -67,13 +67,7 @@ export const TaskModal = ({ task, open, onOpenChange, projectId }: TaskModalProp
   )
 }
 
-function SharedFields({
-  statuses,
-  projectId
-}: {
-  statuses: { id: number; name: string; color?: string }[]
-  projectId?: number
-}) {
+function SharedFields({ statuses, projectId }: { statuses: TaskStatus[]; projectId?: number }) {
   const { control } = useFormContext<CreateTaskFormValues>()
 
   return (
@@ -363,7 +357,7 @@ function CreateFormInner({
       >
         <FieldGroup>
           <SharedFields
-            statuses={statuses.map((s) => ({ id: s.id, name: s.name, color: s.color }))}
+            statuses={statuses}
             projectId={projectId}
           />
         </FieldGroup>
@@ -460,7 +454,7 @@ function EditForm({
       >
         <FieldGroup>
           <SharedFields
-            statuses={statuses.map((s) => ({ id: s.id, name: s.name, color: s.color }))}
+            statuses={statuses}
             projectId={projectId}
           />
         </FieldGroup>

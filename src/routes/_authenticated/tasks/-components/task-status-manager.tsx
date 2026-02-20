@@ -10,6 +10,7 @@ import { toast } from 'sonner'
 import { TASK_QUERY_KEYS } from '@/api/task/query'
 import type { TaskStatus } from '@/api/task/schema'
 import { taskService } from '@/api/task/service'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { ColorPicker } from '@/components/ui/color-picker'
 import {
@@ -41,6 +42,7 @@ export function TaskStatusManager({ projectId, statuses }: TaskStatusManagerProp
   const [orderedStatuses, setOrderedStatuses] = useState(() =>
     [...statuses].sort((a, b) => a.order - b.order)
   )
+
   const queryClient = useQueryClient()
 
   const reorderMutation = useMutation({
@@ -97,7 +99,7 @@ export function TaskStatusManager({ projectId, statuses }: TaskStatusManagerProp
         onOpenAutoFocus={(e) => e.preventDefault()}
       >
         <p className='text-muted-foreground mb-2 text-xs'>
-          Drag rows to reorder. Default status is fixed.
+          Drag rows to reorder. Default status is fixed and cannot be edited or deleted.
         </p>
         <DragDropProvider
           plugins={SORTABLE_PLUGINS}
@@ -186,19 +188,24 @@ function SortableStatusRow({
   canEdit: boolean
   canDelete: boolean
 }) {
-  const { handleRef, ref, isDragging } = useSortable({ id: status.id, index, disabled: isDefault })
+  const { handleRef, ref, isDragging } = useSortable({
+    id: status.id,
+    index,
+    disabled: isDefault
+  })
 
   return (
     <div
       ref={ref}
       className={cn(
-        'bg-background flex items-center gap-2 rounded-md border px-3 py-2',
-        isDragging && 'opacity-60 shadow-md',
-        isDefault && 'cursor-default'
+        'flex items-center gap-2 rounded-md border px-3 py-2',
+        isDefault && 'bg-muted/30',
+        !isDefault && 'bg-background',
+        isDragging && 'opacity-60 shadow-md'
       )}
     >
       {isDefault ? (
-        <div className='w-4' />
+        <div className='w-4 shrink-0' aria-hidden />
       ) : (
         <button
           ref={handleRef}
@@ -214,22 +221,32 @@ function SortableStatusRow({
       />
       <span className='flex-1 text-sm'>{status.name}</span>
 
-      {isDefault && <span className='text-muted-foreground text-xs'>Default</span>}
-      {canEdit && (
-        <StatusEditDialog
-          status={status}
-          onSave={onEdit}
-        />
-      )}
-      {canDelete && (
-        <Button
-          variant='ghost'
-          size='icon'
-          className='h-6 w-6'
-          onClick={onDelete}
+      {isDefault ? (
+        <Badge
+          variant='secondary'
+          className='text-xs font-normal'
         >
-          <Trash2 className='h-3 w-3' />
-        </Button>
+          Default
+        </Badge>
+      ) : (
+        <>
+          {canEdit && (
+            <StatusEditDialog
+              status={status}
+              onSave={onEdit}
+            />
+          )}
+          {canDelete && (
+            <Button
+              variant='ghost'
+              size='icon'
+              className='h-6 w-6'
+              onClick={onDelete}
+            >
+              <Trash2 className='h-3 w-3' />
+            </Button>
+          )}
+        </>
       )}
     </div>
   )
