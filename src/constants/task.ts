@@ -15,10 +15,10 @@ export const TASK_PRIORITY_LABELS: Record<TaskPriority, string> = {
 }
 
 export const TASK_PRIORITY_COLORS: Record<TaskPriority, string> = {
-  [TASK_PRIORITY.low]: '#6B7280',
-  [TASK_PRIORITY.medium]: '#3B82F6',
-  [TASK_PRIORITY.high]: '#F59E0B',
-  [TASK_PRIORITY.urgent]: '#EF4444',
+  [TASK_PRIORITY.low]: 'var(--priority-low)',
+  [TASK_PRIORITY.medium]: 'var(--priority-medium)',
+  [TASK_PRIORITY.high]: 'var(--priority-high)',
+  [TASK_PRIORITY.urgent]: 'var(--priority-urgent)',
 }
 
 export function getTaskPriorityLabel(priority: TaskPriority): string {
@@ -26,5 +26,5 @@ export function getTaskPriorityLabel(priority: TaskPriority): string {
 }
 
 export function getTaskPriorityColor(priority: TaskPriority): string {
-  return TASK_PRIORITY_COLORS[priority] ?? '#6B7280'
+  return TASK_PRIORITY_COLORS[priority] ?? 'var(--priority-low)'
 }

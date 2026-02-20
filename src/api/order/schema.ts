@@ -1,6 +1,6 @@
 import type { OrderStatus } from '@/constants/order'
 
-import type { PaginatedResponse, PaginationParams } from '../schema'
+import type { PaginatedResponse, PaginationParams } from '@/api/schema'
 
 export type { OrderStatus } from '@/constants/order'
 

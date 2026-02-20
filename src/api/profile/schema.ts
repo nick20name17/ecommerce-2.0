@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import { NameSchema, PasswordSchema } from '../schema'
+import { NameSchema, PasswordSchema } from '@/api/schema'
 
 export interface UpdateProfilePayload {
   first_name?: string

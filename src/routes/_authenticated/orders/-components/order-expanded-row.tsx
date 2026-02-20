@@ -43,19 +43,19 @@ export function OrderExpandedRow({ row }: { row: Row<Order> }) {
           <Table>
             <TableHeader className='bg-muted'>
               <TableRow className='border-none'>
-                <TableHead className='shadow-[inset_0_-1px_0] shadow-gray-300' style={{ width: 130, minWidth: 130 }}>
+                <TableHead className='w-[130px] min-w-[130px] shadow-[inset_0_-1px_0_var(--border)]'>
                   Item Code
                 </TableHead>
-                <TableHead className='shadow-[inset_0_-1px_0] shadow-gray-300'>
+                <TableHead className='shadow-[inset_0_-1px_0_var(--border)]'>
                   Description
                 </TableHead>
-                <TableHead className='shadow-[inset_0_-1px_0] shadow-gray-300' style={{ width: 100, minWidth: 100 }}>
+                <TableHead className='w-[100px] min-w-[100px] shadow-[inset_0_-1px_0_var(--border)]'>
                   Quantity
                 </TableHead>
-                <TableHead className='shadow-[inset_0_-1px_0] shadow-gray-300' style={{ width: 100, minWidth: 100 }}>
+                <TableHead className='w-[100px] min-w-[100px] shadow-[inset_0_-1px_0_var(--border)]'>
                   Price
                 </TableHead>
-                <TableHead className='shadow-[inset_0_-1px_0] shadow-gray-300' style={{ width: 110, minWidth: 110 }}>
+                <TableHead className='w-[110px] min-w-[110px] shadow-[inset_0_-1px_0_var(--border)]'>
                   Amount
                 </TableHead>
               </TableRow>
@@ -63,7 +63,7 @@ export function OrderExpandedRow({ row }: { row: Row<Order> }) {
             <TableBody>
               {items.map((item) => (
                 <TableRow key={item.autoid}>
-                  <TableCell className='border-b' style={{ width: 130, minWidth: 130 }}>
+                  <TableCell className='border-b w-[130px] min-w-[130px]'>
                     {item.inven}
                   </TableCell>
                   <TableCell className='border-b font-semibold'>
@@ -74,13 +74,13 @@ export function OrderExpandedRow({ row }: { row: Row<Order> }) {
                       <TooltipContent>{item.descr}</TooltipContent>
                     </Tooltip>
                   </TableCell>
-                  <TableCell className='border-b' style={{ width: 100, minWidth: 100 }}>
+                  <TableCell className='border-b w-[100px] min-w-[100px]'>
                     {formatQuantity(item.quan, 0)}
                   </TableCell>
-                  <TableCell className='border-b' style={{ width: 100, minWidth: 100 }}>
+                  <TableCell className='border-b w-[100px] min-w-[100px]'>
                     {formatCurrency(item.price)}
                   </TableCell>
-                  <TableCell className='border-b font-bold' style={{ width: 110, minWidth: 110 }}>
+                  <TableCell className='border-b font-bold w-[110px] min-w-[110px]'>
                     {formatCurrency(item.so_amount)}
                   </TableCell>
                 </TableRow>

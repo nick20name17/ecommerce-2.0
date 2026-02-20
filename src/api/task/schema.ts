@@ -2,7 +2,7 @@ import { z } from 'zod'
 
 import type { TaskPriority } from '@/constants/task'
 
-import type { ApiResponse, PaginationParams } from '../schema'
+import type { ApiResponse, PaginationParams } from '@/api/schema'
 import type { UserSummary } from '../user/schema'
 
 export type { TaskPriority } from '@/constants/task'

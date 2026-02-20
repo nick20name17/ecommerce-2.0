@@ -1,4 +1,4 @@
-import type { PaginationParams } from '../schema'
+import type { PaginationParams } from '@/api/schema'
 
 export interface PayloadLog {
   id: number

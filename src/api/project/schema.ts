@@ -2,8 +2,8 @@ import { z } from 'zod'
 
 import { VALIDATION_MESSAGES } from '@/constants/validation-messages'
 
-import { OptionalStringSchema, RequiredStringSchema } from '../schema'
-import type { ApiResponse, PaginationParams } from '../schema'
+import { OptionalStringSchema, RequiredStringSchema } from '@/api/schema'
+import type { ApiResponse, PaginationParams } from '@/api/schema'
 
 export interface Project {
   id: number

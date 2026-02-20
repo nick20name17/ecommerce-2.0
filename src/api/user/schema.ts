@@ -3,8 +3,8 @@ import { z } from 'zod'
 import { USER_ROLES } from '@/constants/user'
 import type { UserRole } from '@/constants/user'
 
-import { EmailSchema, NameSchema, PasswordSchema } from '../schema'
-import type { ApiResponse, PaginationParams } from '../schema'
+import { EmailSchema, NameSchema, PasswordSchema } from '@/api/schema'
+import type { ApiResponse, PaginationParams } from '@/api/schema'
 
 export type { UserRole } from '@/constants/user'
 

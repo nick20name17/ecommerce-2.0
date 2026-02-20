@@ -27,6 +27,8 @@ import { cn } from '@/lib/utils'
 
 const SORTABLE_PLUGINS = [...defaultPreset.plugins, OptimisticSortingPlugin, SortableKeyboardPlugin]
 
+const defaultStatusColorHex = '#6B7280'
+
 function arrayMove<T>(array: T[], from: number, to: number): T[] {
   const next = array.slice()
   next.splice(to, 0, next.splice(from, 1)[0]!)
@@ -234,7 +236,7 @@ function SortableStatusRow({
 
       <div
         className='h-3 w-3 shrink-0 rounded-full'
-        style={{ backgroundColor: status.color ?? '#94a3b8' }}
+        style={{ backgroundColor: status.color ?? 'var(--status-default)' }}
       />
       <span className='flex-1 text-sm'>{status.name}</span>
 
@@ -278,12 +280,12 @@ function StatusEditDialog({
 }) {
   const [open, setOpen] = useState(false)
   const [name, setName] = useState(status.name)
-  const [color, setColor] = useState(status.color ?? '#94a3b8')
+  const [color, setColor] = useState(status.color ?? defaultStatusColorHex)
 
   const handleOpenChange = (next: boolean) => {
     if (next) {
       setName(status.name)
-      setColor(status.color ?? '#94a3b8')
+      setColor(status.color ?? defaultStatusColorHex)
     }
     setOpen(next)
   }
@@ -350,14 +352,14 @@ function AddStatusRow({
   disabled: boolean
 }) {
   const [name, setName] = useState('')
-  const [color, setColor] = useState('#94a3b8')
+  const [color, setColor] = useState(defaultStatusColorHex)
 
   const handleAdd = () => {
     const trimmed = name.trim()
     if (!trimmed) return
     onAdd(trimmed, color)
     setName('')
-    setColor('#94a3b8')
+    setColor(defaultStatusColorHex)
   }
 
   return (

@@ -2,6 +2,7 @@ import { Image, Pencil, Trash2 } from 'lucide-react'
 
 import type { CartItem } from '@/api/product/schema'
 import { Button } from '@/components/ui/button'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { NumberInput } from '@/components/ui/number-input'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Spinner } from '@/components/ui/spinner'
@@ -72,7 +73,14 @@ export function CartTable({ items, loading, updating, fetching = false, onEdit, 
                 </div>
               </TableCell>
               <TableCell className='font-mono text-sm font-medium'>{item.product_id}</TableCell>
-              <TableCell className='max-w-[200px] truncate'>{item.name}</TableCell>
+              <TableCell className='max-w-[200px] min-w-0'>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <span className='block truncate'>{item.name}</span>
+                  </TooltipTrigger>
+                  <TooltipContent>{item.name}</TooltipContent>
+                </Tooltip>
+              </TableCell>
               <TableCell>
                 <NumberInput
                   value={item.quantity}

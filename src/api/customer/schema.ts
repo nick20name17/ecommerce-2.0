@@ -1,7 +1,7 @@
 import * as z from 'zod/mini'
 
-import { OptionalStringSchema, RequiredStringSchema } from '../schema'
-import type { PaginatedResponse, PaginationParams } from '../schema'
+import { OptionalStringSchema, RequiredStringSchema } from '@/api/schema'
+import type { PaginatedResponse, PaginationParams } from '@/api/schema'
 
 export interface Customer {
   id: string

@@ -1,4 +1,4 @@
-import type { PaginatedResponse, PaginationParams } from '../schema'
+import type { PaginatedResponse, PaginationParams } from '@/api/schema'
 
 export interface Product {
   autoid: string
