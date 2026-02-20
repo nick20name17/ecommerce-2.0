@@ -15,8 +15,14 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { Sheet, SheetContent, SheetFooter, SheetHeader, SheetTitle } from '@/components/ui/sheet'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Spinner } from '@/components/ui/spinner'
 import { formatCurrency } from '@/helpers/formatters'
@@ -234,71 +240,74 @@ export function ProductEditSheet({
 
   return (
     <>
-      <Sheet open={open} onOpenChange={(v) => !v ? handleClose() : onOpenChange(v)}>
-        <SheetContent side='right' className='flex w-full flex-col sm:max-w-xl'>
-          <SheetHeader>
-            <SheetTitle>Product configuration</SheetTitle>
-          </SheetHeader>
+      <Dialog open={open} onOpenChange={(v) => !v ? handleClose() : onOpenChange(v)}>
+        <DialogContent className='flex max-h-[90vh] max-w-4xl flex-col gap-0 overflow-hidden p-0 sm:max-w-4xl'>
+          <DialogHeader className='bg-background sticky top-0 z-10 shrink-0 border-b px-6 py-4'>
+            <DialogTitle>Product configuration</DialogTitle>
+          </DialogHeader>
 
-          <ScrollArea className='flex-1'>
-            <div className='flex flex-col gap-5 px-4 pb-4'>
-              {/* Photo Gallery */}
-              {photos?.length ? (
-                <div className='flex flex-col gap-2'>
-                  <div className='bg-muted relative aspect-square overflow-hidden rounded-lg'>
-                    <img src={photos[photoIndex]} alt={displayName} className='size-full object-contain' />
-                    {photos.length > 1 && (
-                      <>
-                        <button
-                          type='button'
-                          className='absolute left-2 top-1/2 flex size-8 -translate-y-1/2 items-center justify-center rounded-full bg-white/80 shadow-sm transition-opacity hover:bg-white disabled:opacity-0'
-                          disabled={photoIndex === 0}
-                          onClick={() => setPhotoIndex((i) => i - 1)}
-                        >
-                          <ChevronLeft className='size-4' />
-                        </button>
-                        <button
-                          type='button'
-                          className='absolute right-2 top-1/2 flex size-8 -translate-y-1/2 items-center justify-center rounded-full bg-white/80 shadow-sm transition-opacity hover:bg-white disabled:opacity-0'
-                          disabled={photoIndex === photos.length - 1}
-                          onClick={() => setPhotoIndex((i) => i + 1)}
-                        >
-                          <ChevronRight className='size-4' />
-                        </button>
-                      </>
-                    )}
-                  </div>
-                  {photos.length > 1 && (
-                    <div className='flex flex-wrap gap-1'>
-                      {photos.map((photo, i) => (
-                        <button
-                          key={i}
-                          type='button'
-                          className={cn(
-                            'size-14 overflow-hidden rounded border-2 transition-colors',
-                            i === photoIndex ? 'border-primary' : 'border-transparent hover:border-primary/30'
-                          )}
-                          onClick={() => setPhotoIndex(i)}
-                        >
-                          <img src={photo} alt={`${displayName} - ${i + 1}`} className='size-full object-cover' />
-                        </button>
-                      ))}
+          <ScrollArea className='min-h-0 flex-1'>
+            <div className='grid grid-cols-1 gap-6 px-6 py-4 md:grid-cols-[200px,1fr]'>
+              {/* Left: Photo Gallery (smaller, left-aligned) */}
+              <div className='flex w-full max-w-[200px] flex-col gap-2 md:max-w-none'>
+                {photos?.length ? (
+                  <>
+                    <div className='bg-muted relative aspect-square w-full max-w-[200px] overflow-hidden rounded-lg'>
+                      <img src={photos[photoIndex]} alt={displayName} className='size-full object-contain' />
+                      {photos.length > 1 && (
+                        <>
+                          <button
+                            type='button'
+                            className='absolute left-2 top-1/2 flex size-8 -translate-y-1/2 items-center justify-center rounded-full bg-white/80 shadow-sm transition-opacity hover:bg-white disabled:opacity-0'
+                            disabled={photoIndex === 0}
+                            onClick={() => setPhotoIndex((i) => i - 1)}
+                          >
+                            <ChevronLeft className='size-4' />
+                          </button>
+                          <button
+                            type='button'
+                            className='absolute right-2 top-1/2 flex size-8 -translate-y-1/2 items-center justify-center rounded-full bg-white/80 shadow-sm transition-opacity hover:bg-white disabled:opacity-0'
+                            disabled={photoIndex === photos.length - 1}
+                            onClick={() => setPhotoIndex((i) => i + 1)}
+                          >
+                            <ChevronRight className='size-4' />
+                          </button>
+                        </>
+                      )}
                     </div>
-                  )}
-                </div>
-              ) : (
-                <div className='bg-muted text-muted-foreground flex aspect-video items-center justify-center rounded-lg'>
-                  <div className='flex flex-col items-center gap-2'>
-                    <Image className='size-10 opacity-40' />
-                    <span className='text-sm'>No photos available</span>
+                    {photos.length > 1 && (
+                      <div className='flex flex-wrap gap-1'>
+                        {photos.map((photo, i) => (
+                          <button
+                            key={i}
+                            type='button'
+                            className={cn(
+                              'size-12 overflow-hidden rounded border-2 transition-colors',
+                              i === photoIndex ? 'border-primary' : 'border-transparent hover:border-primary/30'
+                            )}
+                            onClick={() => setPhotoIndex(i)}
+                          >
+                            <img src={photo} alt={`${displayName} - ${i + 1}`} className='size-full object-cover' />
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <div className='bg-muted text-muted-foreground flex aspect-square w-full max-w-[200px] items-center justify-center rounded-lg'>
+                    <div className='flex flex-col items-center gap-2'>
+                      <Image className='size-10 opacity-40' />
+                      <span className='text-sm'>No photos available</span>
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
+              </div>
 
-              {/* Product Name */}
-              <h2 className='text-lg font-semibold'>{displayName}</h2>
+              {/* Right: Name, price, quantity, configs */}
+              <div className='flex flex-col gap-5'>
+                <h2 className='text-xl font-semibold'>{displayName}</h2>
 
-              {configLoading ? (
+                {configLoading ? (
                 <div className='space-y-4'>
                   <Skeleton className='h-7 w-32' />
                   <Skeleton className='h-5 w-20' />
@@ -372,12 +381,13 @@ export function ProductEditSheet({
                     <h3 className='text-muted-foreground text-sm'>Quantity</h3>
                     <div className={cn(
                       'inline-flex items-center rounded-md border p-0.5',
-                      !ignoreCount && quantity > maxCount ? 'border-destructive' : 'border-input'
+                      !ignoreCount && (quantity > maxCount || maxCount <= 0) ? 'border-destructive' : 'border-input',
+                      !ignoreCount && maxCount <= 0 && 'pointer-events-none opacity-60'
                     )}>
                       <button
                         type='button'
                         className='hover:bg-muted flex size-8 items-center justify-center rounded disabled:opacity-40'
-                        disabled={quantity <= 1}
+                        disabled={quantity <= 1 || (!ignoreCount && maxCount <= 0)}
                         onClick={() => setQuantity((q) => Math.max(1, q - 1))}
                       >
                         <Minus className='size-3.5' />
@@ -387,6 +397,8 @@ export function ProductEditSheet({
                         className='w-14 border-0 bg-transparent text-center outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none'
                         value={quantity}
                         min={1}
+                        max={ignoreCount ? undefined : maxCount}
+                        disabled={!ignoreCount && maxCount <= 0}
                         onChange={(e) => {
                           const n = parseInt(e.target.value, 10)
                           if (!isNaN(n) && n >= 1) setQuantity(n)
@@ -395,12 +407,18 @@ export function ProductEditSheet({
                       <button
                         type='button'
                         className='hover:bg-muted flex size-8 items-center justify-center rounded disabled:opacity-40'
-                        disabled={!ignoreCount && quantity >= maxCount}
+                        disabled={(!ignoreCount && quantity >= maxCount) || (!ignoreCount && maxCount <= 0)}
                         onClick={() => setQuantity((q) => q + 1)}
                       >
                         <Plus className='size-3.5' />
                       </button>
                     </div>
+                    {!ignoreCount && (maxCount <= 0 || quantity > maxCount) && (
+                      <span className='text-destructive flex items-center gap-1.5 text-xs'>
+                        <AlertCircle className='size-3.5 shrink-0' />
+                        Only {maxCount} available
+                      </span>
+                    )}
                   </div>
 
                   {/* Configurations */}
@@ -469,10 +487,11 @@ export function ProductEditSheet({
                   )}
                 </>
               )}
+              </div>
             </div>
           </ScrollArea>
 
-          <SheetFooter className='flex-row items-center border-t'>
+          <DialogFooter className='bg-background sticky bottom-0 z-10 flex shrink-0 flex-row items-center border-t px-6 py-4'>
             {hasUncheckedRequired && !configLoading && (
               <span className='text-destructive mr-auto flex items-center gap-1.5 text-sm'>
                 <AlertCircle className='size-4' />
@@ -481,15 +500,15 @@ export function ProductEditSheet({
             )}
             <Button variant='outline' onClick={handleClose}>Cancel</Button>
             <Button
-              disabled={hasUncheckedRequired || configLoading || saving}
+              disabled={hasUncheckedRequired || configLoading || saving || (!ignoreCount && maxCount <= 0)}
               onClick={handleSave}
             >
               {saving && <Spinner className='mr-2 size-4' />}
               Save
             </Button>
-          </SheetFooter>
-        </SheetContent>
-      </Sheet>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <AlertDialog open={confirmClose} onOpenChange={setConfirmClose}>
         <AlertDialogContent>

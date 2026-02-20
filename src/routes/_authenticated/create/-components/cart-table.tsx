@@ -11,13 +11,15 @@ interface CartTableProps {
   items: CartItem[]
   loading: boolean
   updating: boolean
+  fetching?: boolean
   onEdit: (item: CartItem) => void
   onRemove: (itemId: number) => void
   onQuantityChange: (itemId: number, quantity: number) => void
 }
 
-export function CartTable({ items, loading, updating, onEdit, onRemove, onQuantityChange }: CartTableProps) {
-  if (loading) {
+export function CartTable({ items, loading, updating, fetching = false, onEdit, onRemove, onQuantityChange }: CartTableProps) {
+  const showSkeleton = loading || updating || (fetching && items.length === 0)
+  if (showSkeleton) {
     return (
       <div className='space-y-3'>
         {Array.from({ length: 3 }).map((_, i) => (

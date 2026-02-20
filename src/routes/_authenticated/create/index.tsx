@@ -33,7 +33,7 @@ function CreatePage() {
   const [projectId] = useProjectId()
 
   const [customer, setCustomer] = useState<Customer | null>(null)
-  const { data: cart, isLoading: cartLoading } = useQuery({
+  const { data: cart, isLoading: cartLoading, isFetching: cartFetching } = useQuery({
     ...getCartQuery(customer?.id ?? '', projectId),
   })
   const [cartUpdating, setCartUpdating] = useState(false)
@@ -200,13 +200,20 @@ function CreatePage() {
   }
 
   const handleCreateProposal = async () => {
-    if (!customer || cartItems.length === 0) return
+    if (!customer) {
+      toast.warning('Please select a customer for this proposal')
+      return
+    }
+    if (cartItems.length === 0) {
+      toast.warning('Please add at least one product to the proposal')
+      return
+    }
     setCreatingProposal(true)
     try {
       await cartService.submitProposal(customer.id, projectId)
       invalidateCart()
       toast.success('Proposal created successfully')
-      navigate({ to: '/' })
+      navigate({ to: '/proposals' })
     } catch (error) {
       toast.error(getErrorMessage(error))
     }
@@ -214,13 +221,20 @@ function CreatePage() {
   }
 
   const handleCreateOrder = async () => {
-    if (!customer || cartItems.length === 0) return
+    if (!customer) {
+      toast.warning('Please select a customer for this order')
+      return
+    }
+    if (cartItems.length === 0) {
+      toast.warning('Please add at least one product to the order')
+      return
+    }
     setCreatingOrder(true)
     try {
       await cartService.submitOrder(customer.id, projectId)
       invalidateCart()
       toast.success('Order created successfully')
-      navigate({ to: '/' })
+      navigate({ to: '/orders' })
     } catch (error) {
       toast.error(getErrorMessage(error))
     }
@@ -263,6 +277,7 @@ function CreatePage() {
               items={cartItems}
               loading={cartLoading}
               updating={cartUpdating}
+              fetching={cartFetching}
               onEdit={handleEditItem}
               onRemove={handleRemoveItem}
               onQuantityChange={handleQuantityChange}

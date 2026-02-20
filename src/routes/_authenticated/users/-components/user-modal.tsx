@@ -31,7 +31,8 @@ import {
   SelectTrigger,
   SelectValue
 } from '@/components/ui/select'
-import { USER_ROLE_LABELS } from '@/constants/user'
+import { USER_ROLE_LABELS, USER_ROLES, isSuperAdmin } from '@/constants/user'
+import type { UserRole } from '@/constants/user'
 import { useAuth } from '@/providers/auth'
 
 interface UserModalProps {
@@ -56,8 +57,19 @@ export const UserModal = ({ user, open, onOpenChange }: UserModalProps) => {
   )
 }
 
-function SharedFields() {
+function SharedFields({ editingUser }: { editingUser?: User | null }) {
   const { control } = useFormContext()
+  const { user: currentUser } = useAuth()
+
+  const roleOptions = (Object.entries(USER_ROLE_LABELS) as [UserRole, string][]).filter(
+    ([value]) => {
+      if (isSuperAdmin(currentUser?.role as UserRole)) return true
+      if (value === USER_ROLES.superadmin) {
+        return editingUser?.role === USER_ROLES.superadmin
+      }
+      return true
+    }
+  )
 
   return (
     <>
@@ -115,7 +127,7 @@ function SharedFields() {
                 <SelectValue placeholder='Select role' />
               </SelectTrigger>
               <SelectContent>
-                {Object.entries(USER_ROLE_LABELS).map(([value, label]) => (
+                {roleOptions.map(([value, label]) => (
                   <SelectItem key={value} value={value}>
                     {label}
                   </SelectItem>
@@ -166,7 +178,7 @@ function CreateForm({ onOpenChange }: { onOpenChange: (open: boolean) => void })
 
       <form id='user-form' onSubmit={handleSubmit}>
         <FieldGroup>
-          <SharedFields />
+          <SharedFields editingUser={null} />
 
           <Controller
             name='password'
@@ -256,7 +268,7 @@ function EditForm({
 
       <form id='user-form' onSubmit={handleSubmit}>
         <FieldGroup>
-          <SharedFields />
+          <SharedFields editingUser={user} />
 
           <Controller
             name='is_active'
