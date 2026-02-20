@@ -11,6 +11,7 @@ const RootComponent = () => {
       <HeadContent />
       <Outlet />
       <Toaster
+        position='top-right'
         duration={7000}
         richColors
       />
