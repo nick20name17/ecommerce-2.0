@@ -1,7 +1,7 @@
 'use no memo'
 
 import type { ColumnDef } from '@tanstack/react-table'
-import { MoreHorizontal, Pencil } from 'lucide-react'
+import { MoreHorizontal, Pencil, Trash2 } from 'lucide-react'
 
 import type { TaskListItem } from '@/api/task/schema'
 import type { TaskStatus } from '@/api/task/schema'
@@ -12,6 +12,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
 import {
@@ -28,12 +29,14 @@ import { cn } from '@/lib/utils'
 
 interface TaskColumnsOptions {
   onEdit: (task: TaskListItem) => void
+  onDelete: (task: TaskListItem) => void
   statuses: TaskStatus[]
   onStatusChange: (task: TaskListItem, statusId: number) => void
 }
 
 export const getTaskColumns = ({
   onEdit,
+  onDelete,
   statuses,
   onStatusChange
 }: TaskColumnsOptions): ColumnDef<TaskListItem>[] => [
@@ -206,6 +209,14 @@ export const getTaskColumns = ({
               <DropdownMenuItem onClick={() => onEdit(task)}>
                 <Pencil />
                 Edit
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                onClick={() => onDelete(task)}
+                className='text-destructive focus:text-destructive'
+              >
+                <Trash2 />
+                Delete
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

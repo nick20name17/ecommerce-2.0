@@ -14,6 +14,7 @@ interface TasksDataTableProps {
   sorting: SortingState
   setSorting: (updater: React.SetStateAction<SortingState>) => void
   onEdit: (task: TaskListItem) => void
+  onDelete: (task: TaskListItem) => void
   onView: (task: TaskListItem) => void
   statuses: TaskStatus[]
   onStatusChange: (task: TaskListItem, statusId: number) => void
@@ -25,13 +26,14 @@ export function TasksDataTable({
   sorting,
   setSorting,
   onEdit,
+  onDelete,
   onView,
   statuses,
   onStatusChange
 }: TasksDataTableProps) {
   const columns = useMemo(
-    () => getTaskColumns({ onEdit, statuses, onStatusChange }),
-    [onEdit, statuses, onStatusChange]
+    () => getTaskColumns({ onEdit, onDelete, statuses, onStatusChange }),
+    [onEdit, onDelete, statuses, onStatusChange]
   )
 
   const table = useReactTable({

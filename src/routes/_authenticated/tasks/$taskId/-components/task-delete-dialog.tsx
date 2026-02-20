@@ -2,7 +2,7 @@ import { useMutation } from '@tanstack/react-query'
 import { TriangleAlert } from 'lucide-react'
 
 import { TASK_QUERY_KEYS } from '@/api/task/query'
-import type { Task } from '@/api/task/schema'
+import type { Task, TaskListItem } from '@/api/task/schema'
 import { taskService } from '@/api/task/service'
 import {
   AlertDialog,
@@ -17,7 +17,7 @@ import {
 } from '@/components/ui/alert-dialog'
 
 interface TaskDeleteDialogProps {
-  task: Task | null
+  task: Task | TaskListItem | null
   open: boolean
   onOpenChange: (open: boolean) => void
   onDeleted: () => void

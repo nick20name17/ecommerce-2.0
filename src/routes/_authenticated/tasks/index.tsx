@@ -3,6 +3,7 @@ import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { Plus } from 'lucide-react'
 import { useState } from 'react'
 
+import { TaskDeleteDialog } from './$taskId/-components/task-delete-dialog'
 import { TaskModal } from './-components/task-modal'
 import { TaskStatusManager } from './-components/task-status-manager'
 import { TasksDataTable } from './-components/tasks-data-table'
@@ -35,6 +36,7 @@ function TasksPage() {
   const { sorting, setSorting, ordering } = useOrdering()
 
   const [modalTask, setModalTask] = useState<Task | TaskListItem | 'create' | null>(null)
+  const [taskToDelete, setTaskToDelete] = useState<TaskListItem | null>(null)
 
   const { data: statusesData } = useQuery(getTaskStatusesQuery(projectId ?? null))
   const statuses = statusesData?.results ?? []
@@ -102,6 +104,7 @@ function TasksPage() {
         sorting={sorting}
         setSorting={setSorting}
         onEdit={setModalTask}
+        onDelete={(task) => setTaskToDelete(task)}
         onView={handleView}
         statuses={statuses}
         onStatusChange={handleStatusChange}
@@ -115,6 +118,13 @@ function TasksPage() {
         onOpenChange={(open) => !open && setModalTask(null)}
         task={editingTask ?? undefined}
         projectId={projectId ?? undefined}
+      />
+
+      <TaskDeleteDialog
+        task={taskToDelete}
+        open={taskToDelete !== null}
+        onOpenChange={(open) => !open && setTaskToDelete(null)}
+        onDeleted={() => setTaskToDelete(null)}
       />
     </div>
   )
