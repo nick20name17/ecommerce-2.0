@@ -53,17 +53,17 @@ export const TaskDeleteDialog = ({
           <AlertDialogMedia className='bg-destructive/10 text-destructive'>
             <TriangleAlert />
           </AlertDialogMedia>
-          <AlertDialogTitle>Delete task</AlertDialogTitle>
+          <AlertDialogTitle>Delete Task</AlertDialogTitle>
           <AlertDialogDescription>
-            Are you sure you want to delete "{task?.title}"? This action cannot be undone.
+            Are you sure you want to delete &quot;{task?.title}&quot;? This action cannot be undone.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
           <AlertDialogAction
+            variant='destructive'
             onClick={handleDelete}
             disabled={deleteMutation.isPending}
-            className='bg-destructive text-destructive-foreground hover:bg-destructive/90'
           >
             {deleteMutation.isPending ? 'Deleting...' : 'Delete'}
           </AlertDialogAction>

@@ -1,6 +1,7 @@
-import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useReducer, useState } from 'react'
+import { ArrowLeft } from 'lucide-react'
 import { toast } from 'sonner'
 
 import { CartSummary } from './-components/cart-summary'
@@ -14,6 +15,7 @@ import { CART_QUERY_KEYS, getCartQuery } from '@/api/cart/query'
 import { cartService } from '@/api/cart/service'
 import type { Customer } from '@/api/customer/schema'
 import type { CartItem, Product } from '@/api/product/schema'
+import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { getErrorMessage } from '@/helpers/error'
 import { useProjectId } from '@/hooks/use-project-id'
@@ -235,7 +237,14 @@ function CreatePage() {
 
   return (
     <div className='flex h-full flex-col gap-4'>
-      <h1 className='text-2xl font-bold'>Create New</h1>
+      <div className='flex items-center gap-3 min-w-0'>
+        <Button variant='ghost' size='icon' asChild>
+          <Link to='/'>
+            <ArrowLeft className='size-4' />
+          </Link>
+        </Button>
+        <h1 className='text-2xl font-bold'>Create New</h1>
+      </div>
 
       <ScrollArea className='min-h-0 flex-1'>
         <div className='bg-card overflow-hidden rounded-lg border'>

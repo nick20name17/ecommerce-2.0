@@ -183,7 +183,7 @@ export const getTaskColumns = ({
             </DropdownMenuTrigger>
             <DropdownMenuContent align='end'>
               <DropdownMenuItem onClick={() => onEdit(task)}>
-                <Pencil />
+                <Pencil className='size-4' />
                 Edit
               </DropdownMenuItem>
               <DropdownMenuSeparator />
@@ -191,7 +191,7 @@ export const getTaskColumns = ({
                 onClick={() => onDelete(task)}
                 className='text-destructive focus:text-destructive'
               >
-                <Trash2 />
+                <Trash2 className='size-4' />
                 Delete
               </DropdownMenuItem>
             </DropdownMenuContent>

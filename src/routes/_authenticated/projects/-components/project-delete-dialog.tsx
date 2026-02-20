@@ -47,20 +47,19 @@ export const ProjectDeleteDialog = ({
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogMedia className="bg-destructive/10 text-destructive">
+          <AlertDialogMedia className='bg-destructive/10 text-destructive'>
             <TriangleAlert />
           </AlertDialogMedia>
           <AlertDialogTitle>Delete Project</AlertDialogTitle>
           <AlertDialogDescription>
             Are you sure you want to delete{' '}
-            <span className="font-medium">{project?.name}</span>? This action
-            cannot be undone.
+            <span className='font-medium'>{project?.name}</span>? This action cannot be undone.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
           <AlertDialogAction
-            variant="destructive"
+            variant='destructive'
             onClick={handleDelete}
             disabled={deleteMutation.isPending}
           >

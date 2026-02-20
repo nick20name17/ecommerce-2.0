@@ -119,11 +119,11 @@ export const getUserColumns = ({
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuItem onClick={() => onEdit(user)}>
-              <Pencil />
+              <Pencil className='size-4' />
               Edit
             </DropdownMenuItem>
             <DropdownMenuItem variant="destructive" onClick={() => onDelete(user)}>
-              <Trash2 />
+              <Trash2 className='size-4' />
               Delete
             </DropdownMenuItem>
           </DropdownMenuContent>

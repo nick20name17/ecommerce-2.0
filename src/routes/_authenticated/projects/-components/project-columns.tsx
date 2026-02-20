@@ -172,14 +172,14 @@ export const getProjectColumns = ({
           </DropdownMenuTrigger>
           <DropdownMenuContent align='end'>
             <DropdownMenuItem onClick={() => onEdit(project)}>
-              <Pencil />
+              <Pencil className='size-4' />
               Edit
             </DropdownMenuItem>
             <DropdownMenuItem
               variant='destructive'
               onClick={() => onDelete(project)}
             >
-              <Trash2 />
+              <Trash2 className='size-4' />
               Delete
             </DropdownMenuItem>
           </DropdownMenuContent>

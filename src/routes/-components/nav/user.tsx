@@ -1,5 +1,5 @@
 import { Link } from '@tanstack/react-router'
-import { Bell, ChevronsUpDown, LogOut, User } from 'lucide-react'
+import { ChevronsUpDown, LogOut, User } from 'lucide-react'
 
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import {
@@ -75,13 +75,7 @@ export function NavUser() {
                 </Link>
               </DropdownMenuItem>
             </DropdownMenuGroup>
-            <DropdownMenuSeparator />
-            <DropdownMenuGroup>
-              <DropdownMenuItem>
-                <Bell />
-                Notifications
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
+
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={logout}>
               <LogOut />

@@ -1,5 +1,7 @@
 import { HeadContent, Outlet, createRootRoute } from '@tanstack/react-router'
 
+import { Error } from '@/components/common/error'
+import { NotFound } from '@/components/common/not-found'
 import { Toaster } from '@/components/ui/sonner'
 import { AuthProvider } from '@/providers/auth'
 
@@ -17,5 +19,7 @@ const RootComponent = () => {
 }
 
 export const Route = createRootRoute({
-  component: RootComponent
+  component: RootComponent,
+  errorComponent: Error,
+  notFoundComponent: NotFound
 })

@@ -98,11 +98,11 @@ export const getOrderColumns = (): ColumnDef<Order>[] => [
           </DropdownMenuTrigger>
           <DropdownMenuContent align='end'>
             <DropdownMenuItem disabled title='Coming soon'>
-              <Pencil />
+              <Pencil className='size-4' />
               Edit
             </DropdownMenuItem>
             <DropdownMenuItem disabled variant='destructive' title='Coming soon'>
-              <Trash2 />
+              <Trash2 className='size-4' />
               Remove
             </DropdownMenuItem>
           </DropdownMenuContent>

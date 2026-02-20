@@ -116,7 +116,7 @@ export const TaskInfoCard = ({ task, onDelete }: TaskInfoCardProps) => {
             onClick={onDelete}
             aria-label='Delete task'
           >
-            <Trash2 />
+            <Trash2 className='size-4' />
           </Button>
         </div>
 
