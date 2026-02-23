@@ -13,7 +13,6 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
@@ -186,10 +185,9 @@ export const getTaskColumns = ({
                 <Pencil className='size-4' />
                 Edit
               </DropdownMenuItem>
-              <DropdownMenuSeparator />
               <DropdownMenuItem
+                variant='destructive'
                 onClick={() => onDelete(task)}
-                className='text-destructive focus:text-destructive'
               >
                 <Trash2 className='size-4' />
                 Delete

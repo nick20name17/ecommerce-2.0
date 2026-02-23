@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation } from '@tanstack/react-query'
-import { UserPlus, UserPen } from 'lucide-react'
+import { UserPlus } from 'lucide-react'
 import { Controller, FormProvider, useForm, useFormContext } from 'react-hook-form'
 
 import { USERS_QUERY_KEYS } from '@/api/user/query'
@@ -34,7 +34,7 @@ import {
   SelectTrigger,
   SelectValue
 } from '@/components/ui/select'
-import { USER_ROLE_LABELS, USER_ROLES, isSuperAdmin } from '@/constants/user'
+import { USER_ROLES, USER_ROLE_LABELS, isSuperAdmin } from '@/constants/user'
 import type { UserRole } from '@/constants/user'
 import { useAuth } from '@/providers/auth'
 
@@ -52,10 +52,16 @@ export const UserModal = ({ user, open, onOpenChange }: UserModalProps) => {
   const isEdit = !!user
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog
+      open={open}
+      onOpenChange={onOpenChange}
+    >
       <DialogContent className='sm:max-w-md'>
         {isEdit ? (
-          <EditForm user={user} onOpenChange={onOpenChange} />
+          <EditForm
+            user={user}
+            onOpenChange={onOpenChange}
+          />
         ) : (
           <CreateForm onOpenChange={onOpenChange} />
         )}
@@ -87,7 +93,12 @@ function SharedFields({ editingUser }: { editingUser?: User | null }) {
           render={({ field, fieldState }) => (
             <Field data-invalid={fieldState.invalid}>
               <FieldLabel htmlFor='first-name'>First Name</FieldLabel>
-              <Input {...field} id='first-name' placeholder='John' aria-invalid={fieldState.invalid} />
+              <Input
+                {...field}
+                id='first-name'
+                placeholder='John'
+                aria-invalid={fieldState.invalid}
+              />
               {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
             </Field>
           )}
@@ -98,7 +109,12 @@ function SharedFields({ editingUser }: { editingUser?: User | null }) {
           render={({ field, fieldState }) => (
             <Field data-invalid={fieldState.invalid}>
               <FieldLabel htmlFor='last-name'>Last Name</FieldLabel>
-              <Input {...field} id='last-name' placeholder='Doe' aria-invalid={fieldState.invalid} />
+              <Input
+                {...field}
+                id='last-name'
+                placeholder='Doe'
+                aria-invalid={fieldState.invalid}
+              />
               {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
             </Field>
           )}
@@ -129,13 +145,22 @@ function SharedFields({ editingUser }: { editingUser?: User | null }) {
         render={({ field, fieldState }) => (
           <Field data-invalid={fieldState.invalid}>
             <FieldLabel>Role</FieldLabel>
-            <Select value={field.value} onValueChange={field.onChange}>
-              <SelectTrigger className='w-full' aria-invalid={fieldState.invalid}>
+            <Select
+              value={field.value}
+              onValueChange={field.onChange}
+            >
+              <SelectTrigger
+                className='w-full'
+                aria-invalid={fieldState.invalid}
+              >
                 <SelectValue placeholder='Select role' />
               </SelectTrigger>
               <SelectContent>
                 {roleOptions.map(([value, label]) => (
-                  <SelectItem key={value} value={value}>
+                  <SelectItem
+                    key={value}
+                    value={value}
+                  >
                     {label}
                   </SelectItem>
                 ))}
@@ -186,7 +211,10 @@ function CreateForm({ onOpenChange }: { onOpenChange: (open: boolean) => void })
         <DialogDescription>Add a new team member with access to the system.</DialogDescription>
       </DialogHeader>
 
-      <form id='user-form' onSubmit={handleSubmit}>
+      <form
+        id='user-form'
+        onSubmit={handleSubmit}
+      >
         <FieldGroup>
           <SharedFields editingUser={null} />
 
@@ -197,7 +225,10 @@ function CreateForm({ onOpenChange }: { onOpenChange: (open: boolean) => void })
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor='password'>Password</FieldLabel>
-                  <PasswordInput {...field} id='password' />
+                  <PasswordInput
+                    {...field}
+                    id='password'
+                  />
                   {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                 </Field>
               )}
@@ -209,7 +240,10 @@ function CreateForm({ onOpenChange }: { onOpenChange: (open: boolean) => void })
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor='password-confirm'>Confirm</FieldLabel>
-                  <PasswordInput {...field} id='password-confirm' />
+                  <PasswordInput
+                    {...field}
+                    id='password-confirm'
+                  />
                   {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                 </Field>
               )}
@@ -219,7 +253,10 @@ function CreateForm({ onOpenChange }: { onOpenChange: (open: boolean) => void })
       </form>
 
       <DialogFooter>
-        <Button variant='outline' onClick={() => onOpenChange(false)}>
+        <Button
+          variant='outline'
+          onClick={() => onOpenChange(false)}
+        >
           Cancel
         </Button>
         <Button
@@ -235,13 +272,7 @@ function CreateForm({ onOpenChange }: { onOpenChange: (open: boolean) => void })
   )
 }
 
-function EditForm({
-  user,
-  onOpenChange
-}: {
-  user: User
-  onOpenChange: (open: boolean) => void
-}) {
+function EditForm({ user, onOpenChange }: { user: User; onOpenChange: (open: boolean) => void }) {
   const { user: currentUser } = useAuth()
   const isSelf = user.id === currentUser?.id
 
@@ -285,7 +316,10 @@ function EditForm({
         </DialogDescription>
       </DialogHeader>
 
-      <form id='user-form' onSubmit={handleSubmit}>
+      <form
+        id='user-form'
+        onSubmit={handleSubmit}
+      >
         <FieldGroup>
           <SharedFields editingUser={user} />
 
@@ -293,7 +327,10 @@ function EditForm({
             name='is_active'
             control={form.control}
             render={({ field }) => (
-              <Field orientation='horizontal' data-disabled={isSelf}>
+              <Field
+                orientation='horizontal'
+                data-disabled={isSelf}
+              >
                 <Checkbox
                   id='is-active'
                   checked={field.value}
@@ -308,7 +345,10 @@ function EditForm({
       </form>
 
       <DialogFooter>
-        <Button variant='outline' onClick={() => onOpenChange(false)}>
+        <Button
+          variant='outline'
+          onClick={() => onOpenChange(false)}
+        >
           Cancel
         </Button>
         <Button

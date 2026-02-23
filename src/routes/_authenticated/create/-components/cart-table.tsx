@@ -4,7 +4,6 @@ import type { CartItem } from '@/api/product/schema'
 import { Button } from '@/components/ui/button'
 import { NumberInput } from '@/components/ui/number-input'
 import { Skeleton } from '@/components/ui/skeleton'
-import { Spinner } from '@/components/ui/spinner'
 import {
   Table,
   TableBody,
@@ -19,7 +18,6 @@ import { formatCurrency } from '@/helpers/formatters'
 interface CartTableProps {
   items: CartItem[]
   loading: boolean
-  updating: boolean
   onEdit: (item: CartItem) => void
   onRemove: (itemId: number) => void
   onQuantityChange: (itemId: number, quantity: number) => void
@@ -28,7 +26,6 @@ interface CartTableProps {
 export function CartTable({
   items,
   loading,
-  updating,
   onEdit,
   onRemove,
   onQuantityChange
@@ -54,12 +51,7 @@ export function CartTable({
   }
 
   return (
-    <div className={`relative overflow-x-auto ${updating ? 'pointer-events-none opacity-60' : ''}`}>
-      {updating && (
-        <div className='absolute inset-0 z-10 flex items-center justify-center bg-white/50 dark:bg-black/20'>
-          <Spinner className='size-5' />
-        </div>
-      )}
+    <div className='overflow-x-auto'>
       <Table>
         <TableHeader>
           <TableRow className='bg-muted/50 hover:bg-muted/50'>
@@ -102,7 +94,6 @@ export function CartTable({
                   value={item.quantity}
                   min={1}
                   max={item.ignore_count ? undefined : item.max_count}
-                  disabled={updating}
                   size='sm'
                   showMaxMessage
                   onChange={(qty) => onQuantityChange(item.id, qty)}
@@ -119,7 +110,6 @@ export function CartTable({
                   <Button
                     variant='ghost'
                     size='icon-sm'
-                    disabled={updating}
                     onClick={() => onEdit(item)}
                   >
                     <Pencil className='size-3.5' />
@@ -127,7 +117,6 @@ export function CartTable({
                   <Button
                     variant='ghost'
                     size='icon-sm'
-                    disabled={updating}
                     className='text-destructive hover:text-destructive'
                     onClick={() => onRemove(item.id)}
                   >

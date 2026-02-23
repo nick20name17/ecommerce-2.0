@@ -63,6 +63,11 @@ Follow the `src/routes/_authenticated/users/index.tsx` pattern:
 - Set `defaultValues` directly from the entity prop — no `useEffect` to sync.
 - Disable the submit button when `!formState.isDirty` (edit mode) or `mutation.isPending`.
 
+## Popups & Mutations
+
+- **Loading state**: Always pass `isPending={mutation.isPending}` to submit/action buttons. This shows a loading indicator and prevents double-clicks.
+- **Close on success only**: Never close dialogs/modals/sheets on button click. Instead, close them in the mutation's `onSuccess` callback via `onOpenChange(false)`. This ensures users see errors if the mutation fails and can retry without reopening the popup.
+
 ## Validation & Error Handling
 
 - Use `getErrorMessage()` from `src/helpers/error.ts` for extracting user-friendly error messages.
