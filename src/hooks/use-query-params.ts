@@ -22,16 +22,6 @@ const parseAsIsoDate = createParser<Date | null>({
   eq: (a, b) => (a?.getTime() ?? null) === (b?.getTime() ?? null)
 })
 
-const parseAsDateOnly = createParser<Date | null>({
-  parse: (v) => {
-    if (!v) return null
-    const d = new Date(v + 'T00:00:00')
-    return isNaN(d.getTime()) ? null : d
-  },
-  serialize: (v) =>
-    v instanceof Date ? v.toISOString().slice(0, 10) : '',
-  eq: (a, b) => (a?.getTime() ?? null) === (b?.getTime() ?? null)
-})
 
 const offsetParser = parseAsInteger.withDefault(0)
 const limitParser = parseAsInteger.withDefault(DEFAULT_LIMIT)
@@ -80,8 +70,8 @@ export const useTaskPriorityParam = () =>
   )
 export const useTaskResponsibleParam = () =>
   useQueryState('task_responsible', parseAsInteger)
-export const useTaskDueFromParam = () => useQueryState('due_from', parseAsDateOnly)
-export const useTaskDueToParam = () => useQueryState('due_to', parseAsDateOnly)
+export const useTaskDueFromParam = () => useQueryState('due_from', parseAsIsoDate)
+export const useTaskDueToParam = () => useQueryState('due_to', parseAsIsoDate)
 
 export const useOrderAutoidParam = () => useQueryState('autoid', parseAsString)
 export const useProposalAutoidParam = () => useQueryState('autoid', parseAsString)

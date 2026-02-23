@@ -90,6 +90,7 @@ export function TaskFiltersPanel({
             Due Date From
           </FieldLabel>
           <DatePicker
+            showTime
             value={dueFrom}
             onChange={onDueFromChange}
             placeholder='Select date'
@@ -101,6 +102,7 @@ export function TaskFiltersPanel({
             Due Date To
           </FieldLabel>
           <DatePicker
+            showTime
             value={dueTo}
             onChange={onDueToChange}
             placeholder='Select date'

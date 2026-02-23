@@ -1,7 +1,7 @@
 import { keepPreviousData, useMutation, useQuery } from '@tanstack/react-query'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { Filter, Plus } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import { TaskDeleteDialog } from './$taskId/-components/task-delete-dialog'
 import { TaskFiltersPanel } from './-components/task-filters-panel'
@@ -52,7 +52,7 @@ function TasksPage() {
   const [projectId] = useProjectId()
   const { sorting, setSorting, ordering } = useOrdering()
 
-  const [filtersOpen, setFiltersOpen] = useState(true)
+  const [filtersOpen, setFiltersOpen] = useState(false)
   const [modalTask, setModalTask] = useState<Task | TaskListItem | 'create' | null>(null)
   const [taskToDelete, setTaskToDelete] = useState<TaskListItem | null>(null)
 
@@ -66,6 +66,12 @@ function TasksPage() {
     dueFrom != null ||
     dueTo != null
 
+  useEffect(() => {
+    if (hasAnyFilter) {
+      setFiltersOpen(true)
+    }
+  }, [hasAnyFilter])
+
   const params = {
     search: search || undefined,
     offset,
@@ -75,10 +81,8 @@ function TasksPage() {
     status: taskStatusId ?? undefined,
     priority: (priority === '' ? undefined : priority) as TaskPriority | undefined,
     responsible_user: responsibleUserId ?? undefined,
-    due_date_from:
-      dueFrom instanceof Date ? dueFrom.toISOString().slice(0, 10) : undefined,
-    due_date_to:
-      dueTo instanceof Date ? dueTo.toISOString().slice(0, 10) : undefined
+    due_date_from: dueFrom instanceof Date ? dueFrom.toISOString() : undefined,
+    due_date_to: dueTo instanceof Date ? dueTo.toISOString() : undefined
   }
 
   const { data, isLoading, isPlaceholderData } = useQuery({
