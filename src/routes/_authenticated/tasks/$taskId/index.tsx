@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { Link, createFileRoute, useNavigate } from '@tanstack/react-router'
+import { createFileRoute, useRouter } from '@tanstack/react-router'
 import { ArrowLeft } from 'lucide-react'
 import { useState } from 'react'
 
@@ -17,7 +17,7 @@ export const Route = createFileRoute('/_authenticated/tasks/$taskId/')({
 
 function TaskDetailPage() {
   const { taskId } = Route.useParams()
-  const navigate = useNavigate()
+  const router = useRouter()
   const [deleteOpen, setDeleteOpen] = useState(false)
   const id = Number(taskId)
 
@@ -30,10 +30,8 @@ function TaskDetailPage() {
     return (
       <div className='flex h-full flex-col gap-4'>
         <p className='text-muted-foreground'>Invalid task ID.</p>
-        <Button variant='outline' asChild>
-          <Link to='/tasks'>
-            Back to Tasks
-          </Link>
+        <Button variant='outline' onClick={() => router.history.back()}>
+          Back to Tasks
         </Button>
       </div>
     )
@@ -55,12 +53,8 @@ function TaskDetailPage() {
     return (
       <div className='flex h-full flex-col items-center justify-center gap-4'>
         <p className='text-muted-foreground'>Task not found.</p>
-        <Button variant='outline' asChild>
-          <Link
-            to='/tasks'
-          >
-            Back to Tasks
-          </Link>
+        <Button variant='outline' onClick={() => router.history.back()}>
+          Back to Tasks
         </Button>
       </div>
     )
@@ -69,12 +63,8 @@ function TaskDetailPage() {
   return (
     <div className='flex h-full flex-col gap-4 overflow-y-auto p-1'>
       <div className='flex items-center gap-3 min-w-0'>
-        <Button variant='ghost' size='icon' asChild>
-          <Link
-            to='/tasks'
-          >
-            <ArrowLeft />
-          </Link>
+        <Button variant='ghost' size='icon' onClick={() => router.history.back()}>
+          <ArrowLeft />
         </Button>
       </div>
 
@@ -84,9 +74,7 @@ function TaskDetailPage() {
         task={task}
         open={deleteOpen}
         onOpenChange={setDeleteOpen}
-        onDeleted={() =>
-          navigate({ to: '/tasks' })
-        }
+        onDeleted={() => router.history.back()}
       />
     </div>
   )

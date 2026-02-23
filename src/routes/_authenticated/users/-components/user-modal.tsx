@@ -63,7 +63,7 @@ function SharedFields({ editingUser }: { editingUser?: User | null }) {
 
   const roleOptions = (Object.entries(USER_ROLE_LABELS) as [UserRole, string][]).filter(
     ([value]) => {
-      if (isSuperAdmin(currentUser?.role as UserRole)) return true
+      if (currentUser?.role && isSuperAdmin(currentUser.role)) return true
       if (value === USER_ROLES.superadmin) {
         return editingUser?.role === USER_ROLES.superadmin
       }

@@ -1,6 +1,8 @@
 import { api } from '..'
 
 import type {
+  ConfigurationPhotoItem,
+  ConfigurationPhotosParams,
   ConfigurationProduct,
   Product,
   ProductParams,
@@ -27,6 +29,14 @@ export const productService = {
   ) => {
     const { data } = await api.get<ConfigurationProduct>(
       `/data/products-with-price/${autoid}/configurations/`,
+      { params }
+    )
+    return data
+  },
+
+  getConfigurationPhotos: async (params: ConfigurationPhotosParams) => {
+    const { data } = await api.get<ConfigurationPhotoItem[]>(
+      '/data/configurations-photos/',
       { params }
     )
     return data

@@ -7,6 +7,7 @@ export const RequiredStringSchema = z
   .check(z.minLength(1, { error: VALIDATION_MESSAGES.required }), z.trim())
 
 export const PasswordSchema = RequiredStringSchema.check(
+  z.minLength(8, { error: 'min 8 characters' }),
   z.maxLength(64, { error: 'max 64 characters' })
 )
 

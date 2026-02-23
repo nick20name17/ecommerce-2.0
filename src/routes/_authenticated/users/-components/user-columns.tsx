@@ -8,7 +8,7 @@ import { USERS_QUERY_KEYS } from '@/api/user/query'
 import type { User } from '@/api/user/schema'
 import { userService } from '@/api/user/service'
 import { ColumnHeader } from '@/components/common/data-table/column-header'
-import { Badge } from '@/components/ui/badge'
+import { RoleBadge } from '@/components/common/role-badge'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -18,7 +18,6 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Switch } from '@/components/ui/switch'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
-import { getUserRoleLabel } from '@/constants/user'
 import { formatDate } from '@/helpers/formatters'
 
 interface UserColumnsOptions {
@@ -64,7 +63,10 @@ export const getUserColumns = ({
   currentUserId,
   onEdit,
   onDelete
-}: UserColumnsOptions): ColumnDef<User>[] => [
+}: UserColumnsOptions): ColumnDef<User>[] => {
+  const isSelf = (user: User) => user.id === currentUserId
+
+  return [
   {
     accessorKey: 'first_name',
     header: ({ column }) => <ColumnHeader column={column} title="First Name" />,
@@ -86,9 +88,7 @@ export const getUserColumns = ({
   {
     accessorKey: 'role',
     header: ({ column }) => <ColumnHeader column={column} title="Role" />,
-    cell: ({ row }) => (
-      <Badge variant="secondary">{getUserRoleLabel(row.original.role)}</Badge>
-    ),
+    cell: ({ row }) => <RoleBadge role={row.original.role} />,
     size: 120
   },
   {
@@ -122,10 +122,12 @@ export const getUserColumns = ({
               <Pencil className='size-4' />
               Edit
             </DropdownMenuItem>
-            <DropdownMenuItem variant="destructive" onClick={() => onDelete(user)}>
-              <Trash2 className='size-4' />
-              Delete
-            </DropdownMenuItem>
+            {!isSelf(user) && (
+              <DropdownMenuItem variant="destructive" onClick={() => onDelete(user)}>
+                <Trash2 className='size-4' />
+                Delete
+              </DropdownMenuItem>
+            )}
           </DropdownMenuContent>
         </DropdownMenu>
       )
@@ -133,4 +135,4 @@ export const getUserColumns = ({
     size: 50,
     enableSorting: false
   }
-]
+]}

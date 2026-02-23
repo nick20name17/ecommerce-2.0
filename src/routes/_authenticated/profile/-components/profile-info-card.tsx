@@ -6,12 +6,11 @@ import { type UpdateProfileFormValues, UpdateProfileSchema } from '@/api/profile
 import { profileService } from '@/api/profile/service'
 import { USERS_QUERY_KEYS } from '@/api/user/query'
 import type { User } from '@/api/user/schema'
-import { Badge } from '@/components/ui/badge'
+import { RoleBadge } from '@/components/common/role-badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Field, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
-import { getUserRoleLabel } from '@/constants/user'
 import { formatDate } from '@/helpers/formatters'
 import { updateSessionUser } from '@/helpers/auth'
 
@@ -33,11 +32,11 @@ export const ProfileInfoCard = ({ user }: ProfileInfoCardProps) => {
   const mutation = useMutation({
     mutationFn: profileService.updateProfile,
     meta: {
-      successMessage: 'Profile updated successfully',
-      invalidatesQuery: USERS_QUERY_KEYS.detail('me')
+      successMessage: 'Profile updated successfully'
     },
     onSuccess: (updatedUser) => {
       queryClient.setQueryData(USERS_QUERY_KEYS.detail('me'), updatedUser)
+      queryClient.invalidateQueries({ queryKey: USERS_QUERY_KEYS.lists() })
       updateSessionUser(updatedUser)
       form.reset({
         first_name: updatedUser.first_name,
@@ -116,7 +115,7 @@ export const ProfileInfoCard = ({ user }: ProfileInfoCardProps) => {
             <Field>
               <FieldLabel className='text-muted-foreground text-xs'>Role</FieldLabel>
               <div>
-                <Badge variant='secondary'>{getUserRoleLabel(user.role)}</Badge>
+                <RoleBadge role={user.role} />
               </div>
             </Field>
 

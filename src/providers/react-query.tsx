@@ -31,8 +31,6 @@ declare module '@tanstack/react-query' {
 export const queryClient = new QueryClient({
   queryCache: new QueryCache({
     onError(error, query) {
-      console.log(query)
-
       const resource = getQueryResourceLabel(query)
       const message = getErrorMessage(error)
       toast.error(`Failed to fetch ${resource}`, {

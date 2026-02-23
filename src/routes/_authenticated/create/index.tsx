@@ -1,6 +1,6 @@
-import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
+import { createFileRoute, useNavigate, useRouter } from '@tanstack/react-router'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { useReducer, useState } from 'react'
+import { useEffect, useReducer, useState } from 'react'
 import { ArrowLeft } from 'lucide-react'
 import { toast } from 'sonner'
 
@@ -13,12 +13,14 @@ import { ProductSearch } from './-components/product-search'
 import { useEditSheetData } from './-components/use-edit-sheet-data'
 import { CART_QUERY_KEYS, getCartQuery } from '@/api/cart/query'
 import { cartService } from '@/api/cart/service'
+import { getCustomerDetailQuery } from '@/api/customer/query'
 import type { Customer } from '@/api/customer/schema'
 import type { CartItem, Product } from '@/api/product/schema'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { getErrorMessage } from '@/helpers/error'
 import { useProjectId } from '@/hooks/use-project-id'
+import { useSelectedCustomerId } from '@/hooks/use-selected-customer'
 
 type EditState = { product: Product | CartItem | null; mode: 'add' | 'edit'; open: boolean }
 type EditAction =
@@ -82,8 +84,10 @@ export const Route = createFileRoute('/_authenticated/create/')({
 
 function CreatePage() {
   const navigate = useNavigate()
+  const router = useRouter()
   const queryClient = useQueryClient()
   const [projectId] = useProjectId()
+  const [savedCustomerId, setSavedCustomerId] = useSelectedCustomerId()
 
   const [customer, setCustomer] = useState<Customer | null>(null)
   const [busy, busyDispatch] = useReducer(busyReducer, initialBusy)
@@ -92,6 +96,17 @@ function CreatePage() {
     mode: 'add',
     open: false,
   })
+
+  const { data: savedCustomer } = useQuery({
+    ...getCustomerDetailQuery(savedCustomerId ?? '', projectId),
+    enabled: !!savedCustomerId && !customer,
+  })
+
+  useEffect(() => {
+    if (savedCustomer && !customer) {
+      setCustomer(savedCustomer)
+    }
+  }, [savedCustomer, customer])
 
   const { data: cart, isLoading: cartLoading, isFetching: cartFetching } = useQuery({
     ...getCartQuery(customer?.id ?? '', projectId),
@@ -118,6 +133,7 @@ function CreatePage() {
 
   const handleCustomerChange = (c: Customer | null) => {
     setCustomer(c)
+    setSavedCustomerId(c?.id ?? null)
   }
 
   const handleProductSelect = async (product: Product) => {
@@ -238,10 +254,8 @@ function CreatePage() {
   return (
     <div className='flex h-full flex-col gap-4'>
       <div className='flex items-center gap-3 min-w-0'>
-        <Button variant='ghost' size='icon' asChild>
-          <Link to='/'>
-            <ArrowLeft className='size-4' />
-          </Link>
+        <Button variant='ghost' size='icon' onClick={() => router.history.back()}>
+          <ArrowLeft className='size-4' />
         </Button>
         <h1 className='text-2xl font-bold'>Create New</h1>
       </div>

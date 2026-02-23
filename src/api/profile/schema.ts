@@ -26,6 +26,10 @@ export const ChangePasswordSchema = z
     new_password: PasswordSchema,
     new_password_confirm: PasswordSchema
   })
+  .refine((data) => data.new_password !== data.old_password, {
+    message: 'new password must be different from current password',
+    path: ['new_password']
+  })
   .refine((data) => data.new_password === data.new_password_confirm, {
     message: 'passwords do not match',
     path: ['new_password_confirm']

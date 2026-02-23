@@ -52,7 +52,19 @@ export interface ConfigurationItem {
   photos?: string[]
 }
 
+export interface ConfigurationPhotosParams {
+  configuration_id: string
+  category_name: string
+  project_id?: number
+}
+
+export interface ConfigurationPhotoItem {
+  id: string
+  photos: string[]
+}
+
 export interface Configuration {
+  id: string
   name: string
   allownone: boolean
   default: string
