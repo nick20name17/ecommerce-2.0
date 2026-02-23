@@ -39,7 +39,7 @@ export function NavUser() {
               size='lg'
               className='data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground'
             >
-              <Avatar className='size-9'>
+              <Avatar className='size-8'>
                 <AvatarFallback className=''>{userInitials}</AvatarFallback>
               </Avatar>
               <div className='grid flex-1 text-left text-sm leading-tight'>
