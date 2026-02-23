@@ -2,28 +2,40 @@ import { Image, Pencil, Trash2 } from 'lucide-react'
 
 import type { CartItem } from '@/api/product/schema'
 import { Button } from '@/components/ui/button'
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { NumberInput } from '@/components/ui/number-input'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Spinner } from '@/components/ui/spinner'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow
+} from '@/components/ui/table'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { formatCurrency } from '@/helpers/formatters'
 
 interface CartTableProps {
   items: CartItem[]
   loading: boolean
   updating: boolean
-  fetching?: boolean
   onEdit: (item: CartItem) => void
   onRemove: (itemId: number) => void
   onQuantityChange: (itemId: number, quantity: number) => void
 }
 
-export function CartTable({ items, loading, updating, fetching = false, onEdit, onRemove, onQuantityChange }: CartTableProps) {
-  const showSkeleton = loading || updating || (fetching && items.length === 0)
-  if (showSkeleton) {
+export function CartTable({
+  items,
+  loading,
+  updating,
+  onEdit,
+  onRemove,
+  onQuantityChange
+}: CartTableProps) {
+  if (loading) {
     return (
-      <div className='space-y-3'>
+      <div className='space-y-3 p-4'>
         {Array.from({ length: 3 }).map((_, i) => (
           <Skeleton key={i} className='h-14 w-full' />
         ))}
@@ -33,16 +45,16 @@ export function CartTable({ items, loading, updating, fetching = false, onEdit, 
 
   if (items.length === 0) {
     return (
-      <div className='text-muted-foreground flex flex-col items-center gap-2 rounded-lg border border-dashed py-10'>
+      <div className='text-muted-foreground flex flex-col items-center gap-2 py-10'>
         <Image className='size-8 opacity-40' />
         <span className='text-sm'>No products added yet</span>
-        <span className='text-xs opacity-60'>Use the search above to add products</span>
+        <span className='text-xs opacity-60'>Search for products to add them here</span>
       </div>
     )
   }
 
   return (
-    <div className={`relative overflow-x-auto rounded-lg border ${updating ? 'pointer-events-none opacity-60' : ''}`}>
+    <div className={`relative overflow-x-auto ${updating ? 'pointer-events-none opacity-60' : ''}`}>
       {updating && (
         <div className='absolute inset-0 z-10 flex items-center justify-center bg-white/50 dark:bg-black/20'>
           <Spinner className='size-5' />
@@ -66,7 +78,11 @@ export function CartTable({ items, loading, updating, fetching = false, onEdit, 
               <TableCell>
                 <div className='bg-muted flex size-10 items-center justify-center overflow-hidden rounded'>
                   {item.photo ? (
-                    <img src={item.photo} alt={item.name} className='size-full object-cover' />
+                    <img
+                      src={item.photo}
+                      alt={item.name}
+                      className='size-full object-cover'
+                    />
                   ) : (
                     <Image className='text-muted-foreground size-4' />
                   )}

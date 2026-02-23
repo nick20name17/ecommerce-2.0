@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate, useRouter } from '@tanstack/react-router'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useEffect, useReducer, useState } from 'react'
-import { ArrowLeft, FilePlus2 } from 'lucide-react'
+import { ArrowLeft, FilePlus2, Package, ShoppingCart, User } from 'lucide-react'
 import { toast } from 'sonner'
 
 import { CartSummary } from './-components/cart-summary'
@@ -21,6 +21,7 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import { getErrorMessage } from '@/helpers/error'
 import { useProjectId } from '@/hooks/use-project-id'
 import { useSelectedCustomerId } from '@/hooks/use-selected-customer'
+import { cn } from '@/lib/utils'
 
 type EditState = { product: Product | CartItem | null; mode: 'add' | 'edit'; open: boolean }
 type EditAction =
@@ -97,7 +98,7 @@ function CreatePage() {
     open: false,
   })
 
-  const { data: savedCustomer } = useQuery({
+  const { data: savedCustomer, isLoading: customerLoading } = useQuery({
     ...getCustomerDetailQuery(savedCustomerId ?? '', projectId),
     enabled: !!savedCustomerId && !customer,
   })
@@ -108,7 +109,7 @@ function CreatePage() {
     }
   }, [savedCustomer, customer])
 
-  const { data: cart, isLoading: cartLoading, isFetching: cartFetching } = useQuery({
+  const { data: cart, isLoading: cartLoading } = useQuery({
     ...getCartQuery(customer?.id ?? '', projectId),
   })
   const { product: editProduct, mode: editMode, open: editSheetOpen } = editState
@@ -252,81 +253,101 @@ function CreatePage() {
   }
 
   return (
-    <div className='flex h-full flex-col gap-5'>
-      <header className='flex min-w-0 items-center gap-3'>
-        <Button variant='ghost' size='icon' onClick={() => router.history.back()}>
-          <ArrowLeft className='size-4' />
-        </Button>
-        <div className='flex size-10 items-center justify-center rounded-lg bg-primary/10 text-primary'>
-          <FilePlus2 className='size-5' />
+    <div className='flex h-full flex-col'>
+      {/* Sticky Header */}
+      <header className='flex min-w-0 items-center justify-between gap-4 pb-4'>
+        <div className='flex items-center gap-3'>
+          <Button variant='ghost' size='icon' className='shrink-0' onClick={() => router.history.back()}>
+            <ArrowLeft className='size-4' />
+          </Button>
+          <div className='flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-sm'>
+            <FilePlus2 className='size-5' />
+          </div>
+          <div className='min-w-0'>
+            <h1 className='text-xl font-semibold tracking-tight'>Create New</h1>
+            <p className='text-sm text-muted-foreground'>Build a proposal or order</p>
+          </div>
         </div>
-        <div>
-          <h1 className='text-2xl font-semibold tracking-tight'>Create New</h1>
-          <p className='text-sm text-muted-foreground'>Build a proposal or order</p>
-        </div>
+        <CreatePageActions
+          customerSelected={!!customer}
+          hasItems={cartItems.length > 0}
+          isBusy={isBusy}
+          clearingCart={busy.clearingCart}
+          creatingProposal={busy.creatingProposal}
+          creatingOrder={busy.creatingOrder}
+          onClearAll={handleClearAll}
+          onCreateProposal={handleCreateProposal}
+          onCreateOrder={handleCreateOrder}
+        />
       </header>
 
-      <ScrollArea className='min-h-0 flex-1'>
-        <div className='bg-card overflow-hidden rounded-lg border'>
-          {/* Customer Selection */}
-          <Section title='Select Customer' description='Choose a customer for this proposal.'>
-            <CustomerCombobox value={customer} onChange={handleCustomerChange} projectId={projectId} />
-          </Section>
+      <ScrollArea className='min-h-0 flex-1 -mx-4 px-4'>
+        <div className='grid gap-4 pb-4 lg:grid-cols-[1fr,380px]'>
+          {/* Left Column - Form */}
+          <div className='flex flex-col gap-4'>
+            {/* Customer Selection Card */}
+            <Section
+              icon={<User className='size-4' />}
+              title='Customer'
+              description='Select a customer for this proposal'
+              step={1}
+              isComplete={!!customer}
+            >
+              <CustomerCombobox value={customer} onChange={handleCustomerChange} projectId={projectId} />
+            </Section>
 
-          {/* Product Search */}
-          <Section title='Add Products' description='Search for products by ID or description.'>
-            <ProductSearch
-              customerId={customer?.id ?? null}
-              projectId={projectId}
-              onSelect={handleProductSelect}
-              disabled={!customer || isBusy}
-            />
-          </Section>
-
-          {/* Cart Items */}
-          <Section
-            title='Proposal Items'
-            trailing={
-              cartItems.length > 0 && !cartLoading ? (
-                <span className='bg-muted rounded px-2 py-0.5 text-xs'>
-                  {cartItems.length} item{cartItems.length !== 1 ? 's' : ''}
-                </span>
-              ) : null
-            }
-          >
-            <CartTable
-              items={cartItems}
-              loading={cartLoading}
-              updating={busy.cartUpdating}
-              fetching={cartFetching}
-              onEdit={handleEditItem}
-              onRemove={handleRemoveItem}
-              onQuantityChange={handleQuantityChange}
-            />
-          </Section>
-
-          {/* Summary */}
-          {(cart || cartLoading) && (
-            <div className='border-b p-4'>
-              <CartSummary
-                cart={cart ?? null}
-                loading={cartLoading}
-                updating={busy.cartUpdating}
+            {/* Product Search Card */}
+            <Section
+              icon={<Package className='size-4' />}
+              title='Products'
+              description='Search and add products by ID or description'
+              step={2}
+              isComplete={cartItems.length > 0}
+              isDisabled={!customer}
+              allowOverflow
+            >
+              <ProductSearch
+                customerId={customer?.id ?? null}
+                projectId={projectId}
+                onSelect={handleProductSelect}
+                disabled={!customer || isBusy}
               />
-            </div>
-          )}
+            </Section>
+          </div>
 
-          <CreatePageActions
-            customerSelected={!!customer}
-            hasItems={cartItems.length > 0}
-            isBusy={isBusy}
-            clearingCart={busy.clearingCart}
-            creatingProposal={busy.creatingProposal}
-            creatingOrder={busy.creatingOrder}
-            onClearAll={handleClearAll}
-            onCreateProposal={handleCreateProposal}
-            onCreateOrder={handleCreateOrder}
-          />
+          {/* Right Column - Cart */}
+          <div className='flex flex-col gap-4'>
+            <Section
+              icon={<ShoppingCart className='size-4' />}
+              title='Cart'
+              trailing={
+                cartItems.length > 0 && !cartLoading ? (
+                  <span className='rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary'>
+                    {cartItems.length} item{cartItems.length !== 1 ? 's' : ''}
+                  </span>
+                ) : null
+              }
+              noPadding
+            >
+              <CartTable
+                items={cartItems}
+                loading={cartLoading || customerLoading}
+                updating={busy.cartUpdating}
+                onEdit={handleEditItem}
+                onRemove={handleRemoveItem}
+                onQuantityChange={handleQuantityChange}
+              />
+              {(cart || cartLoading || customerLoading) && (
+                <div className='border-t p-4'>
+                  <CartSummary
+                    cart={cart ?? null}
+                    loading={cartLoading || customerLoading}
+                    updating={busy.cartUpdating}
+                  />
+                </div>
+              )}
+            </Section>
+          </div>
         </div>
       </ScrollArea>
 
@@ -353,26 +374,61 @@ function isCartItemType(p: Product | CartItem): p is CartItem {
 }
 
 function Section({
+  icon,
   title,
   description,
   trailing,
+  step,
+  isComplete,
+  isDisabled,
+  noPadding,
+  allowOverflow,
   children,
 }: {
+  icon?: React.ReactNode
   title: string
   description?: string
   trailing?: React.ReactNode
+  step?: number
+  isComplete?: boolean
+  isDisabled?: boolean
+  noPadding?: boolean
+  allowOverflow?: boolean
   children: React.ReactNode
 }) {
   return (
-    <div className='border-b p-4'>
-      <div className='mb-3 flex items-center justify-between'>
-        <div>
-          <h3 className='font-semibold'>{title}</h3>
-          {description && <p className='text-muted-foreground text-sm'>{description}</p>}
+    <div
+      className={cn(
+        'rounded-xl border bg-card transition-all',
+        !allowOverflow && 'overflow-hidden',
+        isDisabled && 'opacity-60'
+      )}
+    >
+      <div className='flex items-center gap-3 border-b bg-muted/30 px-4 py-3'>
+        {step !== undefined && (
+          <div
+            className={cn(
+              'flex size-6 shrink-0 items-center justify-center rounded-full text-xs font-semibold transition-colors',
+              isComplete
+                ? 'bg-primary text-primary-foreground'
+                : 'bg-muted text-muted-foreground'
+            )}
+          >
+            {step}
+          </div>
+        )}
+        {icon && !step && (
+          <div className='flex size-8 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground'>
+            {icon}
+          </div>
+        )}
+        <div className='min-w-0 flex-1'>
+          <h3 className='text-sm font-semibold'>{title}</h3>
+          {description && <p className='text-xs text-muted-foreground'>{description}</p>}
         </div>
         {trailing}
       </div>
-      {children}
+      <div className={cn(!noPadding && 'p-4')}>{children}</div>
     </div>
   )
 }
