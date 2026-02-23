@@ -62,7 +62,8 @@ export const UserDeleteDialog = ({ user, open, onOpenChange }: UserDeleteDialogP
           <AlertDialogAction
             variant='destructive'
             onClick={handleDelete}
-            disabled={isSelf || deleteMutation.isPending}
+            disabled={isSelf}
+            isPending={deleteMutation.isPending}
           >
             Delete
           </AlertDialogAction>

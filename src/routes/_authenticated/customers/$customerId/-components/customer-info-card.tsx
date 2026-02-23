@@ -1,6 +1,7 @@
 import type { Customer } from '@/api/customer/schema'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { getCustomerTypeLabel } from '@/constants/customer'
 import { formatDate, formatPhone } from '@/helpers/formatters'
 
@@ -41,9 +42,12 @@ export const CustomerInfoCard = ({ customer }: CustomerInfoCardProps) => {
           <span>{customer.contact_1 ? formatPhone(customer.contact_1) : '—'}</span>
 
           <span className='text-muted-foreground'>Email</span>
-          <span className='truncate' title={customer.contact_3 ?? ''}>
-            {customer.contact_3 ?? '—'}
-          </span>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <span className='block truncate'>{customer.contact_3 ?? '—'}</span>
+            </TooltipTrigger>
+            <TooltipContent>{customer.contact_3 ?? '—'}</TooltipContent>
+          </Tooltip>
 
           <span className='text-muted-foreground'>Customer Type</span>
           <span>{getCustomerTypeLabel(customer.in_level)}</span>

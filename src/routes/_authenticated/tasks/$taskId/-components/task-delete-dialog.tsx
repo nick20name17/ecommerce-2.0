@@ -63,9 +63,9 @@ export const TaskDeleteDialog = ({
           <AlertDialogAction
             variant='destructive'
             onClick={handleDelete}
-            disabled={deleteMutation.isPending}
+            isPending={deleteMutation.isPending}
           >
-            {deleteMutation.isPending ? 'Deleting...' : 'Delete'}
+            Delete
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

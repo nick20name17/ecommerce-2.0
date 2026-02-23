@@ -1,5 +1,5 @@
 import { useMutation } from '@tanstack/react-query'
-import { TriangleAlert } from 'lucide-react'
+import { Check, Copy, TriangleAlert } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
 import { ORDER_QUERY_KEYS } from '@/api/order/query'
@@ -30,12 +30,22 @@ interface OrderDeleteDialogProps {
 
 export const OrderDeleteDialog = ({ order, projectId, open, onOpenChange }: OrderDeleteDialogProps) => {
   const [confirmText, setConfirmText] = useState('')
+  const [copied, setCopied] = useState(false)
 
   const isConfirmed = confirmText === CONFIRMATION_TEXT
 
   useEffect(() => {
-    if (!open) setConfirmText('')
+    if (!open) {
+      setConfirmText('')
+      setCopied(false)
+    }
   }, [open])
+
+  const handleCopy = async () => {
+    await navigator.clipboard.writeText(CONFIRMATION_TEXT)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
 
   const deleteMutation = useMutation({
     mutationFn: ({ autoid, projectId }: { autoid: string; projectId: number }) =>
@@ -68,7 +78,16 @@ export const OrderDeleteDialog = ({ order, projectId, open, onOpenChange }: Orde
         </AlertDialogHeader>
         <div className='space-y-2'>
           <Label htmlFor='confirm-delete'>
-            Type <span className='font-semibold'>{CONFIRMATION_TEXT}</span> to confirm
+            Type{' '}
+            <button
+              type='button'
+              onClick={handleCopy}
+              className='hover:bg-muted inline-flex cursor-pointer items-center gap-1 rounded px-1 font-semibold transition-colors'
+            >
+              {CONFIRMATION_TEXT}
+              {copied ? <Check className='size-3' /> : <Copy className='size-3' />}
+            </button>{' '}
+            to confirm
           </Label>
           <Input
             id='confirm-delete'
@@ -82,7 +101,8 @@ export const OrderDeleteDialog = ({ order, projectId, open, onOpenChange }: Orde
           <AlertDialogAction
             variant='destructive'
             onClick={handleDelete}
-            disabled={!isConfirmed || deleteMutation.isPending}
+            disabled={!isConfirmed}
+            isPending={deleteMutation.isPending}
           >
             Delete
           </AlertDialogAction>

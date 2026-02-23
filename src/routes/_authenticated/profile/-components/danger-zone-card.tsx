@@ -1,5 +1,5 @@
 import { useMutation } from '@tanstack/react-query'
-import { TriangleAlert } from 'lucide-react'
+import { Check, Copy, TriangleAlert } from 'lucide-react'
 import { useState } from 'react'
 
 import { profileService } from '@/api/profile/service'
@@ -40,8 +40,15 @@ export const DangerZoneCard = ({ user }: DangerZoneCardProps) => {
   const [deactivateOpen, setDeactivateOpen] = useState(false)
   const [deleteOpen, setDeleteOpen] = useState(false)
   const [deleteConfirmation, setDeleteConfirmation] = useState('')
+  const [copied, setCopied] = useState(false)
 
   const isDeleteValid = deleteConfirmation === DELETE_CONFIRMATION_TEXT
+
+  const handleCopy = async () => {
+    await navigator.clipboard.writeText(DELETE_CONFIRMATION_TEXT)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
 
   const deactivateMutation = useMutation({
     mutationFn: () => profileService.deactivateAccount(user.id),
@@ -66,7 +73,10 @@ export const DangerZoneCard = ({ user }: DangerZoneCardProps) => {
   })
 
   const handleDeleteClose = (open: boolean) => {
-    if (!open) setDeleteConfirmation('')
+    if (!open) {
+      setDeleteConfirmation('')
+      setCopied(false)
+    }
     setDeleteOpen(open)
   }
 
@@ -132,9 +142,9 @@ export const DangerZoneCard = ({ user }: DangerZoneCardProps) => {
             <AlertDialogAction
               variant='destructive'
               onClick={() => deactivateMutation.mutate()}
-              disabled={deactivateMutation.isPending}
+              isPending={deactivateMutation.isPending}
             >
-              {deactivateMutation.isPending ? 'Deactivating...' : 'Deactivate'}
+              Deactivate
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -159,7 +169,16 @@ export const DangerZoneCard = ({ user }: DangerZoneCardProps) => {
               htmlFor='delete-confirm'
               className='text-sm font-medium'
             >
-              Type <strong>{DELETE_CONFIRMATION_TEXT}</strong> to confirm
+              Type{' '}
+              <button
+                type='button'
+                onClick={handleCopy}
+                className='hover:bg-muted inline-flex cursor-pointer items-center gap-1 rounded px-1 font-bold transition-colors'
+              >
+                {DELETE_CONFIRMATION_TEXT}
+                {copied ? <Check className='size-3' /> : <Copy className='size-3' />}
+              </button>{' '}
+              to confirm
             </label>
             <Input
               id='delete-confirm'

@@ -15,5 +15,8 @@ export const orderService = {
     await api.delete(`/data/orders/${autoid}/`, {
       params: { project_id: projectId }
     })
+  },
+  deleteLinkedProposal: async (autoid: string) => {
+    await api.delete(`/data/orders/${autoid}/linked-proposal/`)
   }
 }

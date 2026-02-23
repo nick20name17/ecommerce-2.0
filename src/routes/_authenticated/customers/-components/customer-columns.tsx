@@ -142,6 +142,7 @@ export const getCustomerColumns = ({
       return (
         <div
           role='group'
+          className='flex justify-center'
           onClick={(e) => e.stopPropagation()}
           onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && e.stopPropagation()}
         >

@@ -61,7 +61,7 @@ export const ProjectDeleteDialog = ({
           <AlertDialogAction
             variant='destructive'
             onClick={handleDelete}
-            disabled={deleteMutation.isPending}
+            isPending={deleteMutation.isPending}
           >
             Delete
           </AlertDialogAction>

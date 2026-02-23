@@ -134,16 +134,30 @@ function AlertDialogAction({
   className,
   variant = "default",
   size = "default",
+  isPending,
+  onClick,
+  disabled,
+  children,
   ...props
 }: React.ComponentProps<typeof AlertDialogPrimitive.Action> &
-  Pick<React.ComponentProps<typeof Button>, "variant" | "size">) {
+  Pick<React.ComponentProps<typeof Button>, "variant" | "size" | "isPending">) {
+  const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    if (onClick) {
+      e.preventDefault()
+      onClick(e)
+    }
+  }
+
   return (
-    <Button variant={variant} size={size} asChild>
+    <Button variant={variant} size={size} isPending={isPending} disabled={disabled || isPending} asChild>
       <AlertDialogPrimitive.Action
         data-slot="alert-dialog-action"
         className={cn(className)}
+        onClick={handleClick}
         {...props}
-      />
+      >
+        {children}
+      </AlertDialogPrimitive.Action>
     </Button>
   )
 }

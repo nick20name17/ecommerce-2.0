@@ -156,12 +156,6 @@ function StatusList({
     ...mutationMeta
   })
 
-  const updateMutation = useMutation({
-    mutationFn: ({ id, name, color }: { id: number; name: string; color: string }) =>
-      taskService.updateStatus(id, { name, color }),
-    ...{ meta: { ...mutationMeta.meta, successMessage: 'Status updated' } }
-  })
-
   const deleteMutation = useMutation({
     mutationFn: (id: number) => taskService.deleteStatus(id),
     onSuccess: (_, id) => onStatusesChange(statuses.filter((s) => s.id !== id)),
@@ -178,8 +172,9 @@ function StatusList({
           isDefault={status.is_default}
           canEdit={!status.is_default}
           canDelete={!status.is_default && statuses.length > 1}
-          onEdit={(name, color) => updateMutation.mutate({ id: status.id, name, color })}
+          projectId={projectId}
           onDelete={() => deleteMutation.mutate(status.id)}
+          isDeleting={deleteMutation.isPending && deleteMutation.variables === status.id}
         />
       ))}
       <AddStatusRow
@@ -193,19 +188,21 @@ function StatusList({
 function SortableStatusRow({
   status,
   index,
-  onEdit,
   onDelete,
   isDefault,
   canEdit,
-  canDelete
+  canDelete,
+  projectId,
+  isDeleting
 }: {
   status: TaskStatus
   index: number
-  onEdit: (name: string, color: string) => void
   onDelete: () => void
   isDefault: boolean
   canEdit: boolean
   canDelete: boolean
+  projectId: number | null
+  isDeleting: boolean
 }) {
   const { handleRef, ref, isDragging } = useSortable({
     id: status.id,
@@ -252,7 +249,7 @@ function SortableStatusRow({
           {canEdit && (
             <StatusEditDialog
               status={status}
-              onSave={onEdit}
+              projectId={projectId}
             />
           )}
           {canDelete && (
@@ -261,6 +258,7 @@ function SortableStatusRow({
               size='icon'
               className='h-6 w-6'
               onClick={onDelete}
+              disabled={isDeleting}
             >
               <Trash2 className='h-3 w-3' />
             </Button>
@@ -273,14 +271,26 @@ function SortableStatusRow({
 
 function StatusEditDialog({
   status,
-  onSave
+  projectId
 }: {
   status: TaskStatus
-  onSave: (name: string, color: string) => void
+  projectId: number | null
 }) {
   const [open, setOpen] = useState(false)
   const [name, setName] = useState(status.name)
   const [color, setColor] = useState(status.color ?? defaultStatusColorHex)
+
+  const updateMutation = useMutation({
+    mutationFn: ({ name, color }: { name: string; color: string }) =>
+      taskService.updateStatus(status.id, { name, color }),
+    meta: {
+      successMessage: 'Status updated',
+      invalidatesQuery: TASK_QUERY_KEYS.statuses(projectId)
+    },
+    onSuccess: () => {
+      setOpen(false)
+    }
+  })
 
   const handleOpenChange = (next: boolean) => {
     if (next) {
@@ -294,8 +304,7 @@ function StatusEditDialog({
     e.preventDefault()
     const trimmed = name.trim()
     if (!trimmed) return
-    onSave(trimmed, color)
-    setOpen(false)
+    updateMutation.mutate({ name: trimmed, color })
   }
 
   return (
@@ -334,10 +343,17 @@ function StatusEditDialog({
           <Button
             variant='outline'
             onClick={() => setOpen(false)}
+            disabled={updateMutation.isPending}
           >
             Cancel
           </Button>
-          <Button onClick={handleSubmit}>Save</Button>
+          <Button
+            onClick={handleSubmit}
+            isPending={updateMutation.isPending}
+            disabled={updateMutation.isPending}
+          >
+            Save
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

@@ -63,10 +63,10 @@ export function ProposalExpandedRow({ row }: { row: Row<Proposal> }) {
                   <TableCell className='border-b w-[130px] min-w-[130px]'>
                     {item.inven || '—'}
                   </TableCell>
-                  <TableCell className='border-b font-semibold'>
+                  <TableCell className='border-b font-semibold max-w-[300px]'>
                     <Tooltip>
                       <TooltipTrigger asChild>
-                        <span className='block max-w-full truncate'>{item.descr || '—'}</span>
+                        <span className='block truncate'>{item.descr || '—'}</span>
                       </TooltipTrigger>
                       <TooltipContent>{item.descr}</TooltipContent>
                     </Tooltip>

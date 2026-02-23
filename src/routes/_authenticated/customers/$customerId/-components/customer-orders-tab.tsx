@@ -110,20 +110,22 @@ function getOrderColumns({ onDelete }: OrderColumnsOptions): ColumnDef<Order>[] 
     {
       id: 'actions',
       cell: ({ row }) => (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant='ghost' size='icon-sm'>
-              <MoreHorizontal />
-              <span className='sr-only'>Open menu</span>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align='end'>
-            <DropdownMenuItem variant='destructive' onClick={() => onDelete(row.original)}>
-              <Trash2 className='size-4' />
-              Delete
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <div className='flex justify-center'>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant='ghost' size='icon-sm'>
+                <MoreHorizontal />
+                <span className='sr-only'>Open menu</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align='end'>
+              <DropdownMenuItem variant='destructive' onClick={() => onDelete(row.original)}>
+                <Trash2 className='size-4' />
+                Delete
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       ),
       size: 50,
       enableSorting: false,

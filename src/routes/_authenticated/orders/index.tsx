@@ -1,11 +1,12 @@
-import { keepPreviousData, useQuery } from '@tanstack/react-query'
+import { keepPreviousData, useMutation, useQuery } from '@tanstack/react-query'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { Plus, ShoppingCart, X } from 'lucide-react'
 import { useState } from 'react'
 
 import { OrderDeleteDialog } from './-components/order-delete-dialog'
 import { OrdersDataTable } from './-components/orders-data-table'
-import { getOrdersQuery } from '@/api/order/query'
+import { getOrdersQuery, ORDER_QUERY_KEYS } from '@/api/order/query'
+import { orderService } from '@/api/order/service'
 import type { Order, OrderParams } from '@/api/order/schema'
 import { Pagination } from '@/components/common/filters/pagination'
 import { SearchFilter } from '@/components/common/filters/search'
@@ -54,6 +55,15 @@ function OrdersPage() {
   const { sorting, setSorting, ordering } = useOrdering()
 
   const [orderToDelete, setOrderToDelete] = useState<Order | null>(null)
+
+  const deleteLinkedProposalMutation = useMutation({
+    mutationFn: (autoid: string) => orderService.deleteLinkedProposal(autoid),
+    meta: {
+      successMessage: 'Linked proposal deleted',
+      errorMessage: 'Failed to delete linked proposal',
+      invalidatesQuery: ORDER_QUERY_KEYS.lists(),
+    },
+  })
 
   const activeStatus = status ?? ORDER_STATUS.unprocessed
 
@@ -146,6 +156,7 @@ function OrdersPage() {
         sorting={sorting}
         setSorting={setSorting}
         onDelete={setOrderToDelete}
+        onDeleteLinkedProposal={(order) => deleteLinkedProposalMutation.mutate(order.autoid)}
       />
 
       <Pagination totalCount={data?.count ?? 0} />

@@ -155,35 +155,34 @@ export const getProjectColumns = ({
   },
   {
     id: 'actions',
-    header: 'Actions',
+    header: '',
     cell: ({ row }) => {
       const project = row.original
 
       return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant='ghost'
-              size='icon-sm'
-            >
-              <MoreHorizontal />
-              <span className='sr-only'>Open menu</span>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align='end'>
-            <DropdownMenuItem onClick={() => onEdit(project)}>
-              <Pencil className='size-4' />
-              Edit
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              variant='destructive'
-              onClick={() => onDelete(project)}
-            >
-              <Trash2 className='size-4' />
-              Delete
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <div className='flex justify-center'>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant='ghost' size='icon-sm'>
+                <MoreHorizontal />
+                <span className='sr-only'>Open menu</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align='end'>
+              <DropdownMenuItem onClick={() => onEdit(project)}>
+                <Pencil className='size-4' />
+                Edit
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                variant='destructive'
+                onClick={() => onDelete(project)}
+              >
+                <Trash2 className='size-4' />
+                Delete
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       )
     },
     size: 50,

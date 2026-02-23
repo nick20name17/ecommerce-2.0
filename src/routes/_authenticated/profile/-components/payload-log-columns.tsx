@@ -107,14 +107,16 @@ export const getPayloadLogColumns = ({
   {
     id: 'actions',
     cell: ({ row }) => (
-      <Button
-        variant='ghost'
-        size='icon-sm'
-        onClick={() => onView(row.original)}
-      >
-        <Eye />
-        <span className='sr-only'>View details</span>
-      </Button>
+      <div className='flex justify-center'>
+        <Button
+          variant='ghost'
+          size='icon-sm'
+          onClick={() => onView(row.original)}
+        >
+          <Eye />
+          <span className='sr-only'>View details</span>
+        </Button>
+      </div>
     ),
     size: 50,
     enableSorting: false

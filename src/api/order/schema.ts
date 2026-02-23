@@ -16,6 +16,9 @@ export interface Order {
   subtotal: string
   total: string
   balance: string
+  external_id: string | null
+  total_quan: string
+  total_ship: string
   items?: OrderItem[]
 }
 

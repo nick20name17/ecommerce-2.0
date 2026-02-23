@@ -133,26 +133,28 @@ export const getUserColumns = ({
         const user = row.original
 
         return (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant='ghost' size='icon-sm'>
-                <MoreHorizontal />
-                <span className='sr-only'>Open menu</span>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align='end'>
-              <DropdownMenuItem onClick={() => onEdit(user)}>
-                <Pencil className='size-4' />
-                Edit
-              </DropdownMenuItem>
-              {!isSelf(user) && (
-                <DropdownMenuItem variant='destructive' onClick={() => onDelete(user)}>
-                  <Trash2 className='size-4' />
-                  Delete
+          <div className='flex justify-center'>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant='ghost' size='icon-sm'>
+                  <MoreHorizontal />
+                  <span className='sr-only'>Open menu</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align='end'>
+                <DropdownMenuItem onClick={() => onEdit(user)}>
+                  <Pencil className='size-4' />
+                  Edit
                 </DropdownMenuItem>
-              )}
-            </DropdownMenuContent>
-          </DropdownMenu>
+                {!isSelf(user) && (
+                  <DropdownMenuItem variant='destructive' onClick={() => onDelete(user)}>
+                    <Trash2 className='size-4' />
+                    Delete
+                  </DropdownMenuItem>
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         )
       },
       size: 50,
