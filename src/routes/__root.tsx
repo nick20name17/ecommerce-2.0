@@ -12,6 +12,7 @@ const RootComponent = () => {
       <Outlet />
       <Toaster
         position='top-right'
+        closeButton
         duration={7000}
         richColors
       />

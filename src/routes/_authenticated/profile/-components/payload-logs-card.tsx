@@ -1,5 +1,4 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
-import { endOfDay, startOfDay } from 'date-fns'
 import { Filter, FilterX, X } from 'lucide-react'
 import { useState } from 'react'
 
@@ -77,8 +76,8 @@ export const PayloadLogsCard = () => {
     offset,
     limit,
     ordering,
-    created_after: created_after ? startOfDay(created_after).toISOString() : undefined,
-    created_before: created_before ? endOfDay(created_before).toISOString() : undefined,
+    created_after: created_after ? created_after.toISOString() : undefined,
+    created_before: created_before ? created_before.toISOString() : undefined,
     entity: entity ?? undefined,
     method: method ?? undefined,
     status_code: status_code ?? undefined,
