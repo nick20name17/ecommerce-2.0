@@ -1,8 +1,10 @@
 'use no memo'
 
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import type { ColumnDef } from '@tanstack/react-table'
+import { useNavigate } from '@tanstack/react-router'
 import { MoreHorizontal, ShoppingCart, Trash2 } from 'lucide-react'
+import { toast } from 'sonner'
 
 import { PROPOSAL_QUERY_KEYS } from '@/api/proposal/query'
 import type { Proposal } from '@/api/proposal/schema'
@@ -37,18 +39,28 @@ const ToOrderAction = ({
   proposal: Proposal
   projectId: number | null
 }) => {
+  const queryClient = useQueryClient()
+  const navigate = useNavigate()
   const mutation = useMutation({
-    mutationFn: () => proposalService.toOrder(proposal.autoid, projectId!),
-    meta: {
-      successMessage: 'Proposal converted to order successfully',
-      invalidatesQuery: PROPOSAL_QUERY_KEYS.lists()
-    }
+    mutationFn: () => proposalService.toOrder(proposal.autoid, projectId!)
   })
+
+  const handleToOrder = async () => {
+    await toast.promise(mutation.mutateAsync(), {
+      loading: 'Converting proposal to order...',
+      success: (result) => {
+        queryClient.invalidateQueries({ queryKey: PROPOSAL_QUERY_KEYS.lists() })
+        navigate({ to: '/orders', search: { autoid: result.AUTOID, status: 'all' } })
+        return 'Proposal converted to order successfully'
+      },
+      error: 'Failed to convert proposal to order'
+    })
+  }
 
   return (
     <DropdownMenuItem
       disabled={!projectId || mutation.isPending}
-      onClick={() => mutation.mutate()}
+      onClick={handleToOrder}
     >
       <ShoppingCart className='size-4' />
       To Order

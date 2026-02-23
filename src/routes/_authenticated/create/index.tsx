@@ -218,14 +218,15 @@ function CreatePage() {
       return
     }
     busyDispatch({ type: 'CREATING_PROPOSAL', value: true })
-    try {
-      const result = await cartService.submitProposal(customer.id, projectId)
-      invalidateCart()
-      toast.success('Proposal created successfully')
-      navigate({ to: '/proposals', search: { autoid: result.AUTOID, status: 'all' } })
-    } catch (error) {
-      toast.error(getErrorMessage(error))
-    }
+    await toast.promise(cartService.submitProposal(customer.id, projectId), {
+      loading: 'Creating proposal...',
+      success: (result) => {
+        invalidateCart()
+        navigate({ to: '/proposals', search: { autoid: result.AUTOID, status: 'all' } })
+        return 'Proposal created successfully'
+      },
+      error: (error) => getErrorMessage(error)
+    })
     busyDispatch({ type: 'CREATING_PROPOSAL', value: false })
   }
 
@@ -239,14 +240,15 @@ function CreatePage() {
       return
     }
     busyDispatch({ type: 'CREATING_ORDER', value: true })
-    try {
-      const result = await cartService.submitOrder(customer.id, projectId)
-      invalidateCart()
-      toast.success('Order created successfully')
-      navigate({ to: '/orders', search: { autoid: result.AUTOID, status: 'all' } })
-    } catch (error) {
-      toast.error(getErrorMessage(error))
-    }
+    await toast.promise(cartService.submitOrder(customer.id, projectId), {
+      loading: 'Creating order...',
+      success: (result) => {
+        invalidateCart()
+        navigate({ to: '/orders', search: { autoid: result.AUTOID, status: 'all' } })
+        return 'Order created successfully'
+      },
+      error: (error) => getErrorMessage(error)
+    })
     busyDispatch({ type: 'CREATING_ORDER', value: false })
   }
 

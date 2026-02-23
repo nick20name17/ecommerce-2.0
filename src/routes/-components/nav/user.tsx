@@ -2,7 +2,6 @@ import { Link } from '@tanstack/react-router'
 import { ChevronsUpDown, LogOut, User } from 'lucide-react'
 
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -44,18 +43,8 @@ export function NavUser() {
                 <AvatarFallback className=''>{userInitials}</AvatarFallback>
               </Avatar>
               <div className='grid flex-1 text-left text-sm leading-tight'>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <span className='truncate font-medium'>{userName}</span>
-                  </TooltipTrigger>
-                  <TooltipContent>{userName}</TooltipContent>
-                </Tooltip>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <span className='truncate text-xs'>{user?.email}</span>
-                  </TooltipTrigger>
-                  <TooltipContent>{user?.email}</TooltipContent>
-                </Tooltip>
+                <span className='truncate font-medium'>{userName}</span>
+                <span className='truncate text-xs'>{user?.email}</span>
               </div>
               <ChevronsUpDown className='ml-auto size-4' />
             </SidebarMenuButton>
@@ -72,18 +61,8 @@ export function NavUser() {
                   <AvatarFallback className=''>{userInitials}</AvatarFallback>
                 </Avatar>
                 <div className='grid flex-1 text-left text-sm leading-tight'>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <span className='truncate font-medium'>{userName}</span>
-                    </TooltipTrigger>
-                    <TooltipContent>{userName}</TooltipContent>
-                  </Tooltip>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <span className='truncate text-xs'>{user?.email}</span>
-                    </TooltipTrigger>
-                    <TooltipContent>{user?.email}</TooltipContent>
-                  </Tooltip>
+                  <span className='truncate font-medium'>{userName}</span>
+                  <span className='truncate text-xs'>{user?.email}</span>
                 </div>
               </div>
             </DropdownMenuLabel>

@@ -7,7 +7,6 @@ import {
   LayoutDashboard,
   Settings,
   ShoppingCart,
-  StickyNote,
   Truck,
   Users,
   UsersRound
@@ -28,9 +27,9 @@ const NAV_ITEMS = [
   { title: 'Orders', url: '/orders', icon: ShoppingCart },
   { title: 'Proposals', url: '/proposals', icon: FileText },
   { title: 'Tasks', url: '/tasks', icon: CheckSquare },
-  { title: 'Order Desk', url: '/order-desk', icon: ClipboardList },
+  { title: 'Order Desk', url: '/create', icon: ClipboardList },
   { title: 'Shipping', url: '/shipping', icon: Truck },
-  { title: 'Notes', url: '/notes', icon: StickyNote },
+  // { title: 'Notes', url: '/notes', icon: StickyNote },
   { title: 'Settings', url: '/settings', icon: Settings }
 ] as const
 
