@@ -153,6 +153,7 @@ function StatusList({
         project: projectId ?? undefined,
         order: statuses.length
       }),
+    onSuccess: (newStatus) => onStatusesChange([...statuses, newStatus]),
     ...mutationMeta
   })
 
@@ -164,19 +165,26 @@ function StatusList({
 
   return (
     <div className='flex flex-col gap-1'>
-      {statuses.map((status, index) => (
-        <SortableStatusRow
-          key={status.id}
-          status={status}
-          index={index}
-          isDefault={status.is_default}
-          canEdit={!status.is_default}
-          canDelete={!status.is_default && statuses.length > 1}
-          projectId={projectId}
-          onDelete={() => deleteMutation.mutate(status.id)}
-          isDeleting={deleteMutation.isPending && deleteMutation.variables === status.id}
-        />
-      ))}
+      <div
+        className='max-h-48 overflow-y-auto overscroll-contain'
+        onWheel={(e) => e.stopPropagation()}
+      >
+        <div className='flex flex-col gap-1'>
+          {statuses.map((status, index) => (
+            <SortableStatusRow
+              key={status.id}
+              status={status}
+              index={index}
+              isDefault={status.is_default}
+              canEdit={!status.is_default}
+              canDelete={!status.is_default && statuses.length > 1}
+              projectId={projectId}
+              onDelete={() => deleteMutation.mutate(status.id)}
+              isDeleting={deleteMutation.isPending && deleteMutation.variables === status.id}
+            />
+          ))}
+        </div>
+      </div>
       <AddStatusRow
         onAdd={(name, color) => createMutation.mutate({ name, color })}
         disabled={createMutation.isPending}

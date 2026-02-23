@@ -68,9 +68,9 @@ export function ProposalCombobox({ value, onChange, projectId }: ProposalCombobo
 
   return (
     <Popover open={open} onOpenChange={handleOpenChange}>
-      <div className='flex gap-2'>
+      <div className='flex min-w-0 gap-2'>
         <PopoverTrigger asChild>
-          <Button variant='outline' className='w-full justify-between font-normal'>
+          <Button variant='outline' className='min-w-0 flex-1 justify-between font-normal'>
             {displayLabel ? (
               <span className='truncate'>{displayLabel}</span>
             ) : (
