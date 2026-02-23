@@ -3,8 +3,10 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import type { ColumnDef, Row } from '@tanstack/react-table'
 import { getCoreRowModel, getExpandedRowModel, useReactTable } from '@tanstack/react-table'
-import { useMemo } from 'react'
+import { MoreHorizontal, Trash2 } from 'lucide-react'
+import { useMemo, useState } from 'react'
 
+import { OrderDeleteDialog } from '@/routes/_authenticated/orders/-components/order-delete-dialog'
 import { getOrdersQuery } from '@/api/order/query'
 import type { Order, OrderParams } from '@/api/order/schema'
 import { DataTable } from '@/components/common/data-table'
@@ -13,6 +15,13 @@ import { createExpanderColumn } from '@/components/common/data-table/columns'
 import { Pagination } from '@/components/common/filters/pagination'
 import { SearchFilter } from '@/components/common/filters/search'
 import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger
+} from '@/components/ui/dropdown-menu'
 import {
   Table,
   TableBody,
@@ -29,15 +38,13 @@ import { useLimitParam, useOffsetParam, useSearchParam } from '@/hooks/use-query
 import { useProjectId } from '@/hooks/use-project-id'
 import { cn } from '@/lib/utils'
 
-function getOrderColumns(): ColumnDef<Order>[] {
+interface OrderColumnsOptions {
+  onDelete: (order: Order) => void
+}
+
+function getOrderColumns({ onDelete }: OrderColumnsOptions): ColumnDef<Order>[] {
   return [
     createExpanderColumn<Order>(),
-    {
-      accessorKey: 'id',
-      header: ({ column }) => <ColumnHeader column={column} title='Order #' />,
-      cell: ({ row }) => <span className='font-medium'>{row.original.id}</span>,
-      size: 110,
-    },
     {
       accessorKey: 'invoice',
       header: ({ column }) => <ColumnHeader column={column} title='Invoice' />,
@@ -99,6 +106,27 @@ function getOrderColumns(): ColumnDef<Order>[] {
       header: ({ column }) => <ColumnHeader column={column} title='Balance' />,
       cell: ({ row }) => formatCurrency(row.original.balance),
       size: 100,
+    },
+    {
+      id: 'actions',
+      cell: ({ row }) => (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant='ghost' size='icon-sm'>
+              <MoreHorizontal />
+              <span className='sr-only'>Open menu</span>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align='end'>
+            <DropdownMenuItem variant='destructive' onClick={() => onDelete(row.original)}>
+              <Trash2 className='size-4' />
+              Delete
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      ),
+      size: 50,
+      enableSorting: false,
     },
   ]
 }
@@ -195,8 +223,10 @@ export function CustomerOrdersTab({ customerId }: CustomerOrdersTabProps) {
   const [projectId] = useProjectId()
   const { sorting, setSorting, ordering } = useOrdering()
 
+  const [orderToDelete, setOrderToDelete] = useState<Order | null>(null)
+
   const params: OrderParams = {
-    customer: customerId,
+    customer_id: customerId,
     invoice: search || undefined,
     offset,
     limit,
@@ -209,7 +239,7 @@ export function CustomerOrdersTab({ customerId }: CustomerOrdersTabProps) {
     placeholderData: keepPreviousData,
   })
 
-  const columns = useMemo(() => getOrderColumns(), [])
+  const columns = useMemo(() => getOrderColumns({ onDelete: setOrderToDelete }), [])
 
   const table = useReactTable({
     columns,
@@ -234,6 +264,13 @@ export function CustomerOrdersTab({ customerId }: CustomerOrdersTabProps) {
       />
 
       <Pagination totalCount={data?.count ?? 0} />
+
+      <OrderDeleteDialog
+        order={orderToDelete}
+        projectId={projectId}
+        open={!!orderToDelete}
+        onOpenChange={(open) => !open && setOrderToDelete(null)}
+      />
     </div>
   )
 }

@@ -1,10 +1,12 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { Plus, ShoppingCart, X } from 'lucide-react'
+import { useState } from 'react'
 
+import { OrderDeleteDialog } from './-components/order-delete-dialog'
 import { OrdersDataTable } from './-components/orders-data-table'
 import { getOrdersQuery } from '@/api/order/query'
-import type { OrderParams } from '@/api/order/schema'
+import type { Order, OrderParams } from '@/api/order/schema'
 import { Pagination } from '@/components/common/filters/pagination'
 import { SearchFilter } from '@/components/common/filters/search'
 import { Badge } from '@/components/ui/badge'
@@ -50,6 +52,8 @@ function OrdersPage() {
   const [status, setStatus] = useOrderStatusParam()
   const projectId = projectIdFromUrl ?? projectIdFromStorage
   const { sorting, setSorting, ordering } = useOrdering()
+
+  const [orderToDelete, setOrderToDelete] = useState<Order | null>(null)
 
   const activeStatus = status ?? ORDER_STATUS.unprocessed
 
@@ -141,9 +145,17 @@ function OrdersPage() {
         isLoading={isLoading || isPlaceholderData}
         sorting={sorting}
         setSorting={setSorting}
+        onDelete={setOrderToDelete}
       />
 
       <Pagination totalCount={data?.count ?? 0} />
+
+      <OrderDeleteDialog
+        order={orderToDelete}
+        projectId={projectId}
+        open={!!orderToDelete}
+        onOpenChange={(open) => !open && setOrderToDelete(null)}
+      />
     </div>
   )
 }

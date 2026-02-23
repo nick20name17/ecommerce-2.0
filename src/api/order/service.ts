@@ -11,4 +11,9 @@ export const orderService = {
     const { data } = await api.get<Order>(`/data/orders/${id}/`)
     return data
   },
+  delete: async (autoid: string, projectId: number) => {
+    await api.delete(`/data/orders/${autoid}/`, {
+      params: { project_id: projectId }
+    })
+  }
 }

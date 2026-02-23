@@ -3,7 +3,7 @@ import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { FileText, Plus, X } from 'lucide-react'
 import { useState } from 'react'
 
-import { ProposalModal } from './-components/proposal-modal'
+import { ProposalDeleteDialog } from './-components/proposal-delete-dialog'
 import { ProposalsDataTable } from './-components/proposals-data-table'
 import { getProposalsQuery } from '@/api/proposal/query'
 import type { Proposal, ProposalParams } from '@/api/proposal/schema'
@@ -14,6 +14,7 @@ import { Button } from '@/components/ui/button'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { PROPOSAL_STATUS } from '@/constants/proposal'
 import type { ProposalStatus } from '@/constants/proposal'
+import { isSuperAdmin } from '@/constants/user'
 import { useOrdering } from '@/hooks/use-ordering'
 import { useProjectId } from '@/hooks/use-project-id'
 import {
@@ -23,6 +24,7 @@ import {
   useSearchParam,
   useStatusParam
 } from '@/hooks/use-query-params'
+import { useAuth } from '@/providers/auth'
 
 export const Route = createFileRoute('/_authenticated/proposals/')({
   component: ProposalsPage,
@@ -43,6 +45,7 @@ const VALID_STATUS_VALUES = new Set<string>(Object.values(PROPOSAL_STATUS))
 
 function ProposalsPage() {
   const navigate = useNavigate()
+  const { user } = useAuth()
   const [search] = useSearchParam()
   const [offset, setOffset] = useOffsetParam()
   const [limit] = useLimitParam()
@@ -50,7 +53,10 @@ function ProposalsPage() {
   const [autoidFromUrl, setAutoidFromUrl] = useProposalAutoidParam()
   const [status, setStatus] = useStatusParam()
   const { sorting, setSorting, ordering } = useOrdering()
-  const [viewProposal, setViewProposal] = useState<Proposal | null>(null)
+
+  const userIsSuperAdmin = user?.role ? isSuperAdmin(user.role) : false
+
+  const [proposalToDelete, setProposalToDelete] = useState<Proposal | null>(null)
 
   const activeStatus = status ?? PROPOSAL_STATUS.open
 
@@ -142,15 +148,18 @@ function ProposalsPage() {
         isLoading={isLoading || isPlaceholderData}
         sorting={sorting}
         setSorting={setSorting}
-        onView={setViewProposal}
+        isSuperAdmin={userIsSuperAdmin}
+        projectId={projectId}
+        onDelete={setProposalToDelete}
       />
 
       <Pagination totalCount={data?.count ?? 0} />
 
-      <ProposalModal
-        proposal={viewProposal}
-        open={!!viewProposal}
-        onOpenChange={(open) => !open && setViewProposal(null)}
+      <ProposalDeleteDialog
+        proposal={proposalToDelete}
+        projectId={projectId}
+        open={!!proposalToDelete}
+        onOpenChange={(open) => !open && setProposalToDelete(null)}
       />
     </div>
   )

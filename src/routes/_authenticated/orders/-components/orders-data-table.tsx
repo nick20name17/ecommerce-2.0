@@ -14,6 +14,7 @@ interface OrdersDataTableProps {
   isLoading: boolean
   sorting: SortingState
   setSorting: (updater: React.SetStateAction<SortingState>) => void
+  onDelete: (order: Order) => void
 }
 
 export function OrdersDataTable({
@@ -21,8 +22,9 @@ export function OrdersDataTable({
   isLoading,
   sorting,
   setSorting,
+  onDelete
 }: OrdersDataTableProps) {
-  const columns = useMemo(() => getOrderColumns(), [])
+  const columns = useMemo(() => getOrderColumns({ onDelete }), [onDelete])
 
   const table = useReactTable({
     columns,

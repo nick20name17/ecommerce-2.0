@@ -20,7 +20,11 @@ import { getOrderStatusLabel, ORDER_STATUS_CLASS } from '@/constants/order'
 import { formatCurrency, formatDate } from '@/helpers/formatters'
 import { cn } from '@/lib/utils'
 
-export const getOrderColumns = (): ColumnDef<Order>[] => [
+interface OrderColumnsOptions {
+  onDelete: (order: Order) => void
+}
+
+export const getOrderColumns = ({ onDelete }: OrderColumnsOptions): ColumnDef<Order>[] => [
   createExpanderColumn<Order>(),
   createCheckboxColumn<Order>(),
   {
@@ -83,7 +87,7 @@ export const getOrderColumns = (): ColumnDef<Order>[] => [
   {
     id: 'actions',
     header: 'Actions',
-    cell: () => (
+    cell: ({ row }) => (
       <div
         role='group'
         onClick={(e) => e.stopPropagation()}
@@ -101,9 +105,9 @@ export const getOrderColumns = (): ColumnDef<Order>[] => [
               <Pencil className='size-4' />
               Edit
             </DropdownMenuItem>
-            <DropdownMenuItem disabled variant='destructive' title='Coming soon'>
+            <DropdownMenuItem variant='destructive' onClick={() => onDelete(row.original)}>
               <Trash2 className='size-4' />
-              Remove
+              Delete
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

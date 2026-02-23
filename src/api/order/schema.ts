@@ -36,6 +36,6 @@ export interface OrderParams extends PaginationParams {
   autoid?: string
   ordering?: string
   status?: OrderStatus
-  customer?: string
+  customer_id?: string
   project_id?: number
 }
