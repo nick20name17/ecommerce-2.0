@@ -1,6 +1,6 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
-import { Plus } from 'lucide-react'
+import { Plus, UsersRound } from 'lucide-react'
 import { useState } from 'react'
 
 import { CustomerDeleteDialog } from './-components/customer-delete-dialog'
@@ -50,16 +50,26 @@ function CustomersPage() {
   const editingCustomer = typeof modalCustomer === 'object' ? modalCustomer : null
 
   return (
-    <div className='flex h-full flex-col gap-4'>
-      <div className='flex items-center justify-between'>
-        <h1 className='text-2xl font-bold'>Customers</h1>
-        <Button onClick={() => setModalCustomer('create')}>
-          <Plus />
+    <div className='flex h-full flex-col gap-5'>
+      <header className='flex items-start justify-between'>
+        <div className='flex items-center gap-3'>
+          <div className='flex size-10 items-center justify-center rounded-lg bg-primary/10 text-primary'>
+            <UsersRound className='size-5' />
+          </div>
+          <div>
+            <h1 className='text-2xl font-semibold tracking-tight'>Customers</h1>
+            <p className='text-sm text-muted-foreground'>{data?.count ?? 0} total</p>
+          </div>
+        </div>
+        <Button onClick={() => setModalCustomer('create')} className='gap-2'>
+          <Plus className='size-4' />
           Add Customer
         </Button>
-      </div>
+      </header>
 
-      <SearchFilter placeholder='Search customers...' />
+      <div className='flex items-center gap-3'>
+        <SearchFilter placeholder='Search by name, email, or phone...' className='max-w-xs' />
+      </div>
 
       <CustomersDataTable
         data={data?.results ?? []}

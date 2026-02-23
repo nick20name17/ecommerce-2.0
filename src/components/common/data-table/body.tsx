@@ -16,7 +16,7 @@ const TableBodyCell = <TData,>({ cell }: { cell: Cell<TData, unknown> }) => {
     <TableCell
       key={cell.id}
       style={{ width: size, minWidth: size, maxWidth: size }}
-      className={cn('border-b')}
+      className={cn('border-b border-border/40')}
     >
       {flexRender(cell.column.columnDef.cell, cell.getContext())}
     </TableCell>
@@ -34,7 +34,10 @@ const TableBodyRow = <TData,>({
     <TableRow
       key={row.id}
       id={`row-${row.id}`}
-      className={cn('last:[&>td]:border-b-0', onRowClick ? 'hover:bg-muted cursor-pointer' : '')}
+      className={cn(
+        'last:[&>td]:border-b-0 transition-colors duration-150',
+        onRowClick ? 'hover:bg-muted/50 cursor-pointer' : 'hover:bg-muted/30'
+      )}
       data-state={row.getIsSelected() && 'selected'}
       onClick={() => onRowClick?.(row)}
     >

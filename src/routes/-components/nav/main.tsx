@@ -6,11 +6,11 @@ import {
   FolderKanban,
   LayoutDashboard,
   Settings,
-  Ship,
   ShoppingCart,
   StickyNote,
-  User,
-  Users
+  Truck,
+  Users,
+  UsersRound
 } from 'lucide-react'
 
 import {
@@ -23,13 +23,13 @@ import {
 const NAV_ITEMS = [
   { title: 'Dashboard', url: '/', icon: LayoutDashboard },
   { title: 'Projects', url: '/projects', icon: FolderKanban },
-  { title: 'Customers', url: '/customers', icon: Users },
-  { title: 'Users', url: '/users', icon: User },
+  { title: 'Customers', url: '/customers', icon: UsersRound },
+  { title: 'Users', url: '/users', icon: Users },
   { title: 'Orders', url: '/orders', icon: ShoppingCart },
   { title: 'Proposals', url: '/proposals', icon: FileText },
   { title: 'Tasks', url: '/tasks', icon: CheckSquare },
   { title: 'Order Desk', url: '/order-desk', icon: ClipboardList },
-  { title: 'Shipping', url: '/shipping', icon: Ship },
+  { title: 'Shipping', url: '/shipping', icon: Truck },
   { title: 'Notes', url: '/notes', icon: StickyNote },
   { title: 'Settings', url: '/settings', icon: Settings }
 ] as const

@@ -1,6 +1,6 @@
 import { keepPreviousData, useMutation, useQuery } from '@tanstack/react-query'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
-import { Filter, Plus } from 'lucide-react'
+import { CheckSquare, Filter, Plus } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
 import { TaskDeleteDialog } from './$taskId/-components/task-delete-dialog'
@@ -120,18 +120,26 @@ function TasksPage() {
   }
 
   return (
-    <div className='flex h-full flex-col gap-4'>
-      <div className='flex items-center justify-between'>
-        <h1 className='text-2xl font-bold'>Tasks</h1>
-        <Button onClick={() => setModalTask('create')}>
-          <Plus />
+    <div className='flex h-full flex-col gap-5'>
+      <header className='flex items-start justify-between'>
+        <div className='flex items-center gap-3'>
+          <div className='flex size-10 items-center justify-center rounded-lg bg-primary/10 text-primary'>
+            <CheckSquare className='size-5' />
+          </div>
+          <div>
+            <h1 className='text-2xl font-semibold tracking-tight'>Tasks</h1>
+            <p className='text-sm text-muted-foreground'>{data?.count ?? 0} total</p>
+          </div>
+        </div>
+        <Button onClick={() => setModalTask('create')} className='gap-2'>
+          <Plus className='size-4' />
           Create Task
         </Button>
-      </div>
+      </header>
 
       <Collapsible open={filtersOpen} onOpenChange={setFiltersOpen}>
         <div className='flex flex-wrap items-center gap-2'>
-          <div className='min-w-0 flex-1 sm:max-w-[400px]'>
+          <div className='min-w-0 flex-1 sm:max-w-xs'>
             <SearchFilter placeholder='Search tasks...' />
           </div>
           <CollapsibleTrigger asChild>

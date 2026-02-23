@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate, useRouter } from '@tanstack/react-router'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useEffect, useReducer, useState } from 'react'
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeft, FilePlus2 } from 'lucide-react'
 import { toast } from 'sonner'
 
 import { CartSummary } from './-components/cart-summary'
@@ -252,13 +252,19 @@ function CreatePage() {
   }
 
   return (
-    <div className='flex h-full flex-col gap-4'>
-      <div className='flex items-center gap-3 min-w-0'>
+    <div className='flex h-full flex-col gap-5'>
+      <header className='flex min-w-0 items-center gap-3'>
         <Button variant='ghost' size='icon' onClick={() => router.history.back()}>
           <ArrowLeft className='size-4' />
         </Button>
-        <h1 className='text-2xl font-bold'>Create New</h1>
-      </div>
+        <div className='flex size-10 items-center justify-center rounded-lg bg-primary/10 text-primary'>
+          <FilePlus2 className='size-5' />
+        </div>
+        <div>
+          <h1 className='text-2xl font-semibold tracking-tight'>Create New</h1>
+          <p className='text-sm text-muted-foreground'>Build a proposal or order</p>
+        </div>
+      </header>
 
       <ScrollArea className='min-h-0 flex-1'>
         <div className='bg-card overflow-hidden rounded-lg border'>

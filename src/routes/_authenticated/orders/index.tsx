@@ -1,6 +1,6 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
-import { Plus, X } from 'lucide-react'
+import { Plus, ShoppingCart, X } from 'lucide-react'
 
 import { OrdersDataTable } from './-components/orders-data-table'
 import { getOrdersQuery } from '@/api/order/query'
@@ -79,14 +79,22 @@ function OrdersPage() {
   }
 
   return (
-    <div className='flex h-full flex-col gap-4'>
-      <div className='flex items-center justify-between'>
-        <h1 className='text-2xl font-bold'>Orders</h1>
-        <Button onClick={() => navigate({ to: '/create' })}>
-          <Plus />
+    <div className='flex h-full flex-col gap-5'>
+      <header className='flex items-start justify-between'>
+        <div className='flex items-center gap-3'>
+          <div className='flex size-10 items-center justify-center rounded-lg bg-primary/10 text-primary'>
+            <ShoppingCart className='size-5' />
+          </div>
+          <div>
+            <h1 className='text-2xl font-semibold tracking-tight'>Orders</h1>
+            <p className='text-sm text-muted-foreground'>{data?.count ?? 0} total</p>
+          </div>
+        </div>
+        <Button onClick={() => navigate({ to: '/create' })} className='gap-2'>
+          <Plus className='size-4' />
           Create Order
         </Button>
-      </div>
+      </header>
 
       <Tabs
         value={activeStatus}

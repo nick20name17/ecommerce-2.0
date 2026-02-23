@@ -101,7 +101,23 @@ function DialogHeader({ className, ...props }: React.ComponentProps<'div'>) {
   return (
     <div
       data-slot='dialog-header'
-      className={cn('flex flex-col gap-2', className)}
+      className={cn(
+        'flex flex-col gap-2 has-data-[slot=dialog-media]:items-center has-data-[slot=dialog-media]:text-center',
+        className
+      )}
+      {...props}
+    />
+  )
+}
+
+function DialogMedia({ className, ...props }: React.ComponentProps<'div'>) {
+  return (
+    <div
+      data-slot='dialog-media'
+      className={cn(
+        'mb-1 inline-flex size-12 items-center justify-center rounded-xl *:[svg:not([class*="size-"])]:size-6',
+        className
+      )}
       {...props}
     />
   )
@@ -167,6 +183,7 @@ export {
   DialogDescription,
   DialogFooter,
   DialogHeader,
+  DialogMedia,
   DialogOverlay,
   DialogPortal,
   DialogTitle,

@@ -27,7 +27,7 @@ export const DataTableHeader = <TData,>({ table }: DataTableHeaderProps<TData>) 
                   minWidth: size,
                   maxWidth: size
                 }}
-                className='shadow-[inset_0_-1px_0] shadow-gray-300'
+                className='border-b border-border text-xs font-medium uppercase tracking-wider text-muted-foreground'
                 key={header.id}
               >
                 {header.isPlaceholder
