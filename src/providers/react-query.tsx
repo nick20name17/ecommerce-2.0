@@ -20,6 +20,9 @@ function getQueryResourceLabel(query: { queryKey: readonly unknown[] }): string 
 
 declare module '@tanstack/react-query' {
   interface Register {
+    queryMeta: {
+      suppressErrorToast?: boolean
+    }
     mutationMeta: {
       invalidatesQuery?: QueryKey
       successMessage?: string
@@ -31,6 +34,7 @@ declare module '@tanstack/react-query' {
 export const queryClient = new QueryClient({
   queryCache: new QueryCache({
     onError(error, query) {
+      if (query.meta?.suppressErrorToast) return
       const resource = getQueryResourceLabel(query)
       const message = getErrorMessage(error)
       toast.error(`Failed to fetch ${resource}`, {

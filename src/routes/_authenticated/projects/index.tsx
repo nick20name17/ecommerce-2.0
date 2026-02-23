@@ -21,12 +21,15 @@ export const Route = createFileRoute('/_authenticated/projects/')({
   })
 })
 
+export type ProjectWithHealthLoading = Project & { _healthLoading?: boolean }
+
 function mergeHealthIntoProjects(
   projects: Project[],
-  healthResults: Array<{ data?: unknown }>
-): Project[] {
+  healthResults: Array<{ data?: unknown; isLoading?: boolean }>
+): ProjectWithHealthLoading[] {
   return projects.map((project, index) => {
-    const health = healthResults[index]?.data as
+    const result = healthResults[index]
+    const health = result?.data as
       | {
           website_status?: 'healthy' | 'unhealthy'
           website_response_ms?: number
@@ -46,25 +49,26 @@ function mergeHealthIntoProjects(
           has_sync_config?: boolean
         }
       | undefined
-    if (!health) return project
+
     return {
       ...project,
-      website_status: health.website_status,
-      website_response_ms: health.website_response_ms,
-      website_last_checked: health.website_last_checked,
-      backend_status: health.backend_status,
-      backend_response_ms: health.backend_response_ms,
-      backend_last_checked: health.backend_last_checked,
-      ebms_status: health.ebms_status,
-      ebms_response_ms: health.ebms_response_ms,
-      ebms_last_checked: health.ebms_last_checked,
-      sync_status: health.sync_status,
-      sync_response_ms: health.sync_response_ms,
-      sync_last_checked: health.sync_last_checked,
-      db_status: health.db_status,
-      overall_status: health.overall_status,
-      has_ebms_config: health.has_ebms_config,
-      has_sync_config: health.has_sync_config
+      _healthLoading: result?.isLoading ?? false,
+      website_status: health?.website_status,
+      website_response_ms: health?.website_response_ms,
+      website_last_checked: health?.website_last_checked,
+      backend_status: health?.backend_status,
+      backend_response_ms: health?.backend_response_ms,
+      backend_last_checked: health?.backend_last_checked,
+      ebms_status: health?.ebms_status,
+      ebms_response_ms: health?.ebms_response_ms,
+      ebms_last_checked: health?.ebms_last_checked,
+      sync_status: health?.sync_status,
+      sync_response_ms: health?.sync_response_ms,
+      sync_last_checked: health?.sync_last_checked,
+      db_status: health?.db_status,
+      overall_status: health?.overall_status,
+      has_ebms_config: health?.has_ebms_config,
+      has_sync_config: health?.has_sync_config
     }
   })
 }
@@ -95,16 +99,17 @@ function ProjectsPage() {
   const healthQueries = useQueries({
     queries:
       projects.length > 0
-        ? projects.map((p) => getProjectHealthQuery(p.id))
+        ? projects.map((p) => ({
+            ...getProjectHealthQuery(p.id),
+            meta: { suppressErrorToast: true }
+          }))
         : []
   })
 
   const projectsWithHealth = mergeHealthIntoProjects(
     projects,
-    healthQueries?.map((q) => ({ data: q.data }))
+    healthQueries?.map((q) => ({ data: q.data, isLoading: q.isLoading }))
   )
-
-  const healthLoading = healthQueries.some((q) => q.isLoading)
 
   const editingProject = typeof modalProject === 'object' ? modalProject : null
 
@@ -132,7 +137,7 @@ function ProjectsPage() {
 
       <ProjectsDataTable
         data={projectsWithHealth}
-        isLoading={isLoading || isPlaceholderData || healthLoading}
+        isLoading={isLoading || isPlaceholderData}
         sorting={sorting}
         setSorting={setSorting}
         onEdit={setModalProject}

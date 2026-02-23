@@ -15,13 +15,17 @@ import {
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { formatDate } from '@/helpers/formatters'
 import { type ProjectHealthService, getServiceHealthDetails } from '@/helpers/project-health'
+import type { ProjectWithHealthLoading } from '../index'
 
 interface ProjectColumnsOptions {
   onEdit: (project: Project) => void
   onDelete: (project: Project) => void
 }
 
-function renderServiceHealthCell(project: Project, service: ProjectHealthService) {
+function renderServiceHealthCell(project: ProjectWithHealthLoading, service: ProjectHealthService) {
+  if (project._healthLoading) {
+    return <HealthCell status={null} isLoading />
+  }
   const { status, responseMs, lastChecked } = getServiceHealthDetails(project, service)
   return (
     <HealthCell
@@ -32,14 +36,17 @@ function renderServiceHealthCell(project: Project, service: ProjectHealthService
   )
 }
 
-function renderStatusOnlyCell(status: 'healthy' | 'unhealthy' | null) {
-  return <HealthCell status={status} />
+function renderStatusOnlyCell(
+  status: 'healthy' | 'unhealthy' | null,
+  isLoading?: boolean
+) {
+  return <HealthCell status={status} isLoading={isLoading} />
 }
 
 export const getProjectColumns = ({
   onEdit,
   onDelete
-}: ProjectColumnsOptions): ColumnDef<Project>[] => [
+}: ProjectColumnsOptions): ColumnDef<ProjectWithHealthLoading>[] => [
   {
     accessorKey: 'name',
     header: ({ column }) => (
@@ -127,7 +134,8 @@ export const getProjectColumns = ({
   {
     accessorKey: 'overall_status',
     header: 'Status',
-    cell: ({ row }) => renderStatusOnlyCell(row.original.overall_status ?? null),
+    cell: ({ row }) =>
+      renderStatusOnlyCell(row.original.overall_status ?? null, row.original._healthLoading),
     size: 100,
     enableSorting: false
   },

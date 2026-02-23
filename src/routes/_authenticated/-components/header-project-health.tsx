@@ -16,7 +16,8 @@ export function HeaderProjectHealth() {
   const [projectId] = useProjectId()
   const { data: health, isLoading } = useQuery({
     ...getProjectHealthQuery(projectId!),
-    enabled: projectId != null
+    enabled: projectId != null,
+    meta: { suppressErrorToast: true }
   })
 
   if (projectId == null) return null
@@ -24,25 +25,26 @@ export function HeaderProjectHealth() {
   return (
     <div className='border-border bg-muted/30 flex items-center gap-4 rounded-md border px-3 py-1.5'>
       <span className='text-muted-foreground text-xs font-medium'>Project health</span>
-      {isLoading || !health ? (
-        <span className='text-muted-foreground text-xs'>Loading…</span>
-      ) : (
-        <div className='flex items-center gap-3'>
-          {HEALTH_SERVICES.map(({ label, service }) => {
-            const { status, responseMs, lastChecked } = getServiceHealthDetails(health, service)
-            return (
-              <div key={service} className='flex items-center gap-1.5'>
-                <HealthCell status={status} responseMs={responseMs} lastChecked={lastChecked} />
-                <span className='text-muted-foreground text-xs'>{label}</span>
-              </div>
-            )
-          })}
-          <div className='flex items-center gap-1.5'>
-            <HealthCell status={health.overall_status ?? null} />
-            <span className='text-muted-foreground text-xs'>Status</span>
-          </div>
+      <div className='flex items-center gap-3'>
+        {HEALTH_SERVICES.map(({ label, service }) => {
+          const details = health ? getServiceHealthDetails(health, service) : null
+          return (
+            <div key={service} className='flex items-center gap-1.5'>
+              <HealthCell
+                status={details?.status ?? null}
+                responseMs={details?.responseMs}
+                lastChecked={details?.lastChecked}
+                isLoading={isLoading}
+              />
+              <span className='text-muted-foreground text-xs'>{label}</span>
+            </div>
+          )
+        })}
+        <div className='flex items-center gap-1.5'>
+          <HealthCell status={health?.overall_status ?? null} isLoading={isLoading} />
+          <span className='text-muted-foreground text-xs'>Status</span>
         </div>
-      )}
+      </div>
     </div>
   )
 }

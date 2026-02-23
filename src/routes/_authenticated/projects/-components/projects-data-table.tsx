@@ -7,9 +7,10 @@ import { useMemo } from 'react'
 import { getProjectColumns } from './project-columns'
 import type { Project } from '@/api/project/schema'
 import { DataTable } from '@/components/common/data-table'
+import type { ProjectWithHealthLoading } from '../index'
 
 interface ProjectsDataTableProps {
-  data: Project[]
+  data: ProjectWithHealthLoading[]
   isLoading: boolean
   sorting: SortingState
   setSorting: (updater: React.SetStateAction<SortingState>) => void
