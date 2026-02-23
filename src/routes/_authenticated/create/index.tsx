@@ -105,11 +105,11 @@ function CreatePage() {
 
   useEffect(() => {
     if (savedCustomer && !customer) {
-      setCustomer(savedCustomer)
+      queueMicrotask(() => setCustomer(savedCustomer))
     }
   }, [savedCustomer, customer])
 
-  const { data: cart, isLoading: cartLoading } = useQuery({
+  const { data: cart, isLoading: cartLoading, isFetching: cartFetching } = useQuery({
     ...getCartQuery(customer?.id ?? '', projectId),
   })
   const { product: editProduct, mode: editMode, open: editSheetOpen } = editState
@@ -146,7 +146,6 @@ function CreatePage() {
     if (hasConfigurations || hasMultipleUnits) {
       editDispatch({ type: 'OPEN_ADD', product })
     } else {
-      busyDispatch({ type: 'CART_UPDATING', value: true })
       const customerId = customer.id
       const payload = {
         product_autoid: product.autoid,
@@ -160,7 +159,6 @@ function CreatePage() {
       } catch (error) {
         toast.error(getErrorMessage(error))
       }
-      busyDispatch({ type: 'CART_UPDATING', value: false })
     }
   }
 
@@ -331,8 +329,7 @@ function CreatePage() {
             >
               <CartTable
                 items={cartItems}
-                loading={cartLoading || customerLoading}
-                updating={busy.cartUpdating}
+                loading={cartLoading || customerLoading || cartFetching}
                 onEdit={handleEditItem}
                 onRemove={handleRemoveItem}
                 onQuantityChange={handleQuantityChange}
