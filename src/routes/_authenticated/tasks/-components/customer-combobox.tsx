@@ -1,10 +1,10 @@
+import { useQuery } from '@tanstack/react-query'
 import { ChevronsUpDown, Search, Users, X } from 'lucide-react'
 import { useRef, useState } from 'react'
-import { useQuery } from '@tanstack/react-query'
 import { useDebouncedCallback } from 'use-debounce'
 
-import type { Customer } from '@/api/customer/schema'
 import { getCustomersQuery } from '@/api/customer/query'
+import type { Customer } from '@/api/customer/schema'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
@@ -37,22 +37,20 @@ export function TaskCustomerCombobox({ value, onChange, projectId }: TaskCustome
   const params = {
     limit: 50,
     search: debouncedSearch || undefined,
-    project_id: projectId ?? undefined,
+    project_id: projectId ?? undefined
   }
   const { data, isLoading, isFetching } = useQuery({
     ...getCustomersQuery(params),
-    enabled: open,
+    enabled: open
   })
   const customers = data?.results ?? []
   const loading = isLoading || (search !== debouncedSearch && isFetching)
 
   const displayCustomer =
     value != null
-      ? customers.find((x) => x.id === value) ?? { id: value, l_name: `Customer ${value}` }
+      ? (customers.find((x) => x.id === value) ?? { id: value, l_name: `Customer ${value}` })
       : null
-  const displayLabel = displayCustomer
-    ? `${displayCustomer.id} — ${displayCustomer.l_name}`
-    : null
+  const displayLabel = displayCustomer ? `${displayCustomer.id} — ${displayCustomer.l_name}` : null
 
   const handleSearchChange = (q: string) => {
     setSearch(q)
@@ -67,10 +65,16 @@ export function TaskCustomerCombobox({ value, onChange, projectId }: TaskCustome
   const handleClear = () => onChange(null)
 
   return (
-    <Popover open={open} onOpenChange={handleOpenChange}>
+    <Popover
+      open={open}
+      onOpenChange={handleOpenChange}
+    >
       <div className='flex min-w-0 gap-2'>
         <PopoverTrigger asChild>
-          <Button variant='outline' className='min-w-0 flex-1 justify-between font-normal'>
+          <Button
+            variant='outline'
+            className='min-w-0 flex-1 justify-between font-normal'
+          >
             {displayLabel ? (
               <span className='truncate'>{displayLabel}</span>
             ) : (
@@ -80,12 +84,20 @@ export function TaskCustomerCombobox({ value, onChange, projectId }: TaskCustome
           </Button>
         </PopoverTrigger>
         {value != null && (
-          <Button variant='ghost' size='icon' className='shrink-0' onClick={handleClear}>
+          <Button
+            variant='ghost'
+            size='icon'
+            className='shrink-0'
+            onClick={handleClear}
+          >
             <X className='size-4' />
           </Button>
         )}
       </div>
-      <PopoverContent className='w-(--radix-popover-trigger-width) p-0' align='start'>
+      <PopoverContent
+        className='w-(--radix-popover-trigger-width) p-0'
+        align='start'
+      >
         <div className='flex items-center gap-2 border-b px-3 py-2'>
           {loading ? (
             <Spinner className='size-4 shrink-0' />
@@ -107,7 +119,10 @@ export function TaskCustomerCombobox({ value, onChange, projectId }: TaskCustome
           {loading && customers.length === 0 ? (
             <div className='space-y-2 p-2'>
               {Array.from({ length: 5 }).map((_, i) => (
-                <Skeleton key={i} className='h-10 w-full' />
+                <Skeleton
+                  key={i}
+                  className='h-10 w-full'
+                />
               ))}
             </div>
           ) : customers.length === 0 ? (
@@ -126,12 +141,12 @@ export function TaskCustomerCombobox({ value, onChange, projectId }: TaskCustome
                   className='group hover:bg-accent hover:text-accent-foreground flex w-full items-center justify-between gap-2 rounded-md px-2 py-2 text-left text-sm'
                   onClick={() => handleSelect(c)}
                 >
-                  <div className='flex min-w-0 gap-2 group-hover:text-accent-foreground'>
+                  <div className='group-hover:text-accent-foreground flex min-w-0 gap-2'>
                     <span className='font-semibold'>{c.id}</span>
                     <span className='truncate'>{c.l_name}</span>
                   </div>
                   {c.contact_1 && (
-                    <span className='text-muted-foreground shrink-0 text-xs group-hover:text-accent-foreground'>
+                    <span className='text-muted-foreground group-hover:text-accent-foreground shrink-0 text-xs'>
                       {c.contact_1}
                     </span>
                   )}
@@ -144,3 +159,4 @@ export function TaskCustomerCombobox({ value, onChange, projectId }: TaskCustome
     </Popover>
   )
 }
+

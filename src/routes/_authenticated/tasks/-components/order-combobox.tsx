@@ -1,10 +1,10 @@
+import { useQuery } from '@tanstack/react-query'
 import { ChevronsUpDown, Search, ShoppingCart, X } from 'lucide-react'
 import { useRef, useState } from 'react'
-import { useQuery } from '@tanstack/react-query'
 import { useDebouncedCallback } from 'use-debounce'
 
-import type { Order, OrderParams } from '@/api/order/schema'
 import { getOrdersQuery } from '@/api/order/query'
+import type { Order, OrderParams } from '@/api/order/schema'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
@@ -37,16 +37,16 @@ export function OrderCombobox({ value, onChange, projectId }: OrderComboboxProps
   const params: OrderParams = {
     limit: 50,
     invoice: debouncedSearch || undefined,
-    project_id: projectId ?? undefined,
+    project_id: projectId ?? undefined
   }
   const { data, isLoading, isFetching } = useQuery({
     ...getOrdersQuery(params),
-    enabled: open,
+    enabled: open
   })
   const orders = data?.results ?? []
   const loading = isLoading || (search !== debouncedSearch && isFetching)
   const selectedOrder =
-    value != null && orders.length > 0 ? orders.find((x) => x.autoid === value) ?? null : null
+    value != null && orders.length > 0 ? (orders.find((x) => x.autoid === value) ?? null) : null
 
   const handleSearchChange = (q: string) => {
     setSearch(q)
@@ -65,10 +65,16 @@ export function OrderCombobox({ value, onChange, projectId }: OrderComboboxProps
       : null
 
   return (
-    <Popover open={open} onOpenChange={handleOpenChange}>
+    <Popover
+      open={open}
+      onOpenChange={handleOpenChange}
+    >
       <div className='flex min-w-0 gap-2'>
         <PopoverTrigger asChild>
-          <Button variant='outline' className='min-w-0 flex-1 justify-between font-normal'>
+          <Button
+            variant='outline'
+            className='min-w-0 flex-1 justify-between font-normal'
+          >
             {displayLabel ? (
               <span className='truncate'>{displayLabel}</span>
             ) : (
@@ -88,7 +94,10 @@ export function OrderCombobox({ value, onChange, projectId }: OrderComboboxProps
           </Button>
         )}
       </div>
-      <PopoverContent className='w-(--radix-popover-trigger-width) p-0' align='start'>
+      <PopoverContent
+        className='w-(--radix-popover-trigger-width) p-0'
+        align='start'
+      >
         <div className='flex items-center gap-2 border-b px-3 py-2'>
           {loading ? (
             <Spinner className='size-4 shrink-0' />
@@ -110,7 +119,10 @@ export function OrderCombobox({ value, onChange, projectId }: OrderComboboxProps
           {loading && orders.length === 0 ? (
             <div className='space-y-2 p-2'>
               {Array.from({ length: 5 }).map((_, i) => (
-                <Skeleton key={i} className='h-10 w-full' />
+                <Skeleton
+                  key={i}
+                  className='h-10 w-full'
+                />
               ))}
             </div>
           ) : orders.length === 0 ? (
@@ -129,9 +141,11 @@ export function OrderCombobox({ value, onChange, projectId }: OrderComboboxProps
                   className='group hover:bg-accent hover:text-accent-foreground flex w-full flex-col gap-0.5 rounded-md px-2 py-2 text-left text-sm'
                   onClick={() => handleSelect(o)}
                 >
-                  <span className='font-medium group-hover:text-accent-foreground'>{o.invoice}</span>
+                  <span className='group-hover:text-accent-foreground font-medium'>
+                    {o.invoice}
+                  </span>
                   {o.name && (
-                    <span className='text-muted-foreground truncate text-xs group-hover:text-accent-foreground'>
+                    <span className='text-muted-foreground group-hover:text-accent-foreground truncate text-xs'>
                       {o.name}
                     </span>
                   )}
@@ -144,3 +158,4 @@ export function OrderCombobox({ value, onChange, projectId }: OrderComboboxProps
     </Popover>
   )
 }
+

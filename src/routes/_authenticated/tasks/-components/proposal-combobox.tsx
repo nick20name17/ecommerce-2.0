@@ -1,10 +1,10 @@
+import { useQuery } from '@tanstack/react-query'
 import { ChevronsUpDown, FileText, Search, X } from 'lucide-react'
 import { useRef, useState } from 'react'
-import { useQuery } from '@tanstack/react-query'
 import { useDebouncedCallback } from 'use-debounce'
 
-import type { Proposal } from '@/api/proposal/schema'
 import { getProposalsQuery } from '@/api/proposal/query'
+import type { Proposal } from '@/api/proposal/schema'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
@@ -37,17 +37,17 @@ export function ProposalCombobox({ value, onChange, projectId }: ProposalCombobo
   const params = {
     limit: 50,
     quote: debouncedSearch || undefined,
-    project_id: projectId ?? undefined,
+    project_id: projectId ?? undefined
   }
   const { data, isLoading, isFetching } = useQuery({
     ...getProposalsQuery(params),
-    enabled: open,
+    enabled: open
   })
   const proposals = data?.results ?? []
   const loading = isLoading || (search !== debouncedSearch && isFetching)
   const selectedProposal =
     value != null && proposals.length > 0
-      ? proposals.find((x) => x.autoid === value) ?? null
+      ? (proposals.find((x) => x.autoid === value) ?? null)
       : null
 
   const handleSearchChange = (q: string) => {
@@ -67,10 +67,16 @@ export function ProposalCombobox({ value, onChange, projectId }: ProposalCombobo
       : null
 
   return (
-    <Popover open={open} onOpenChange={handleOpenChange}>
+    <Popover
+      open={open}
+      onOpenChange={handleOpenChange}
+    >
       <div className='flex min-w-0 gap-2'>
         <PopoverTrigger asChild>
-          <Button variant='outline' className='min-w-0 flex-1 justify-between font-normal'>
+          <Button
+            variant='outline'
+            className='min-w-0 flex-1 justify-between font-normal'
+          >
             {displayLabel ? (
               <span className='truncate'>{displayLabel}</span>
             ) : (
@@ -90,7 +96,10 @@ export function ProposalCombobox({ value, onChange, projectId }: ProposalCombobo
           </Button>
         )}
       </div>
-      <PopoverContent className='w-(--radix-popover-trigger-width) p-0' align='start'>
+      <PopoverContent
+        className='w-(--radix-popover-trigger-width) p-0'
+        align='start'
+      >
         <div className='flex items-center gap-2 border-b px-3 py-2'>
           {loading ? (
             <Spinner className='size-4 shrink-0' />
@@ -112,7 +121,10 @@ export function ProposalCombobox({ value, onChange, projectId }: ProposalCombobo
           {loading && proposals.length === 0 ? (
             <div className='space-y-2 p-2'>
               {Array.from({ length: 5 }).map((_, i) => (
-                <Skeleton key={i} className='h-10 w-full' />
+                <Skeleton
+                  key={i}
+                  className='h-10 w-full'
+                />
               ))}
             </div>
           ) : proposals.length === 0 ? (
@@ -131,9 +143,9 @@ export function ProposalCombobox({ value, onChange, projectId }: ProposalCombobo
                   className='group hover:bg-accent hover:text-accent-foreground flex w-full flex-col gap-0.5 rounded-md px-2 py-2 text-left text-sm'
                   onClick={() => handleSelect(p)}
                 >
-                  <span className='font-medium group-hover:text-accent-foreground'>{p.quote}</span>
+                  <span className='group-hover:text-accent-foreground font-medium'>{p.quote}</span>
                   {p.b_name && (
-                    <span className='text-muted-foreground truncate text-xs group-hover:text-accent-foreground'>
+                    <span className='text-muted-foreground group-hover:text-accent-foreground truncate text-xs'>
                       {p.b_name}
                     </span>
                   )}
@@ -146,3 +158,4 @@ export function ProposalCombobox({ value, onChange, projectId }: ProposalCombobo
     </Popover>
   )
 }
+

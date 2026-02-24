@@ -17,7 +17,11 @@ interface UserComboboxProps {
   placeholder?: string
 }
 
-export function UserCombobox({ value, onChange, placeholder = 'Select user...' }: UserComboboxProps) {
+export function UserCombobox({
+  value,
+  onChange,
+  placeholder = 'Select user...'
+}: UserComboboxProps) {
   const [open, setOpen] = useState(false)
   const [search, setSearch] = useState('')
   const [debouncedSearch, setDebouncedSearch] = useState('')
