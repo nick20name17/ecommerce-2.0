@@ -18,9 +18,9 @@ import { isSuperAdmin } from '@/constants/user'
 import { useOrdering } from '@/hooks/use-ordering'
 import { useProjectId } from '@/hooks/use-project-id'
 import {
+  useAutoidParam,
   useLimitParam,
   useOffsetParam,
-  useProposalAutoidParam,
   useSearchParam,
   useStatusParam
 } from '@/hooks/use-query-params'
@@ -50,7 +50,7 @@ function ProposalsPage() {
   const [offset, setOffset] = useOffsetParam()
   const [limit] = useLimitParam()
   const [projectId] = useProjectId()
-  const [autoidFromUrl, setAutoidFromUrl] = useProposalAutoidParam()
+  const [autoidFromUrl, setAutoidFromUrl] = useAutoidParam()
   const [status, setStatus] = useStatusParam()
   const { sorting, setSorting, ordering } = useOrdering()
 

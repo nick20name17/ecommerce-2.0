@@ -18,9 +18,9 @@ import type { OrderStatus } from '@/constants/order'
 import { useOrdering } from '@/hooks/use-ordering'
 import { useProjectId } from '@/hooks/use-project-id'
 import {
+  useAutoidParam,
   useLimitParam,
   useOffsetParam,
-  useOrderAutoidParam,
   useOrderProjectIdParam,
   useOrderStatusParam,
   useSearchParam
@@ -48,7 +48,7 @@ function OrdersPage() {
   const [offset, setOffset] = useOffsetParam()
   const [limit] = useLimitParam()
   const [projectIdFromStorage] = useProjectId()
-  const [autoidFromUrl, setAutoidFromUrl] = useOrderAutoidParam()
+  const [autoidFromUrl, setAutoidFromUrl] = useAutoidParam()
   const [projectIdFromUrl] = useOrderProjectIdParam()
   const [status, setStatus] = useOrderStatusParam()
   const projectId = projectIdFromUrl ?? projectIdFromStorage
