@@ -1,13 +1,15 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQuery } from '@tanstack/react-query'
+import { useRef, useState } from 'react'
 import { Controller, FormProvider, useForm, useFormContext } from 'react-hook-form'
 
 import { TaskCustomerCombobox } from './customer-combobox'
 import { OrderCombobox } from './order-combobox'
 import { ProposalCombobox } from './proposal-combobox'
+import { TaskAttachments, type TaskAttachmentsRef } from './task-attachments'
 import { TaskStatusManager } from './task-status-manager'
 import { UserCombobox } from './user-combobox'
-import { TASK_QUERY_KEYS, getTaskStatusesQuery } from '@/api/task/query'
+import { TASK_QUERY_KEYS, getTaskDetailQuery, getTaskStatusesQuery } from '@/api/task/query'
 import {
   type CreateTaskFormValues,
   CreateTaskSchema,
@@ -304,6 +306,8 @@ function CreateFormInner({
   onOpenChange: (open: boolean) => void
   projectId?: number
 }) {
+  const attachmentsRef = useRef<TaskAttachmentsRef>(null)
+
   const form = useForm<CreateTaskFormValues>({
     resolver: zodResolver(CreateTaskSchema),
     defaultValues: {
@@ -320,8 +324,8 @@ function CreateFormInner({
   })
 
   const mutation = useMutation({
-    mutationFn: (payload: CreateTaskFormValues) =>
-      taskService.create({
+    mutationFn: async (payload: CreateTaskFormValues) => {
+      const task = await taskService.create({
         title: payload.title,
         description: payload.description ?? undefined,
         status: payload.status,
@@ -332,7 +336,14 @@ function CreateFormInner({
         linked_proposal_autoid: payload.linked_proposal_autoid ?? null,
         linked_customer_autoid: payload.linked_customer_autoid ?? null,
         project: projectId
-      }),
+      })
+
+      if (attachmentsRef.current?.hasPendingFiles()) {
+        await attachmentsRef.current.uploadPendingFiles(task.id)
+      }
+
+      return task
+    },
     meta: {
       successMessage: 'Task created successfully',
       invalidatesQuery: TASK_QUERY_KEYS.lists()
@@ -360,6 +371,11 @@ function CreateFormInner({
           <SharedFields
             statuses={statuses}
             projectId={projectId}
+          />
+
+          <TaskAttachments
+            ref={attachmentsRef}
+            mode='deferred'
           />
         </FieldGroup>
       </form>
@@ -394,16 +410,16 @@ function EditForm({
   projectId?: number
 }) {
   const { data: statusesData } = useQuery(getTaskStatusesQuery(projectId ?? task.project))
+  const { data: taskDetails, isLoading: isLoadingTask } = useQuery(getTaskDetailQuery(task.id))
   const statuses = statusesData?.results ?? []
+  const attachmentsRef = useRef<TaskAttachmentsRef>(null)
+  const [hasPendingFiles, setHasPendingFiles] = useState(false)
 
-  const taskDescription = 'description' in task ? ((task as Task).description ?? null) : null
-  const fullTask = task as Task
-  const linkedOrder =
-    'linked_order_autoid' in fullTask ? (fullTask.linked_order_autoid ?? null) : null
-  const linkedProposal =
-    'linked_proposal_autoid' in fullTask ? (fullTask.linked_proposal_autoid ?? null) : null
-  const linkedCustomer =
-    'linked_customer_autoid' in fullTask ? (fullTask.linked_customer_autoid ?? null) : null
+  const fullTask = taskDetails ?? (task as Task)
+  const taskDescription = fullTask.description ?? null
+  const linkedOrder = fullTask.linked_order_autoid ?? null
+  const linkedProposal = fullTask.linked_proposal_autoid ?? null
+  const linkedCustomer = fullTask.linked_customer_autoid ?? null
 
   const form = useForm<UpdateTaskFormValues>({
     resolver: zodResolver(UpdateTaskSchema),
@@ -421,8 +437,8 @@ function EditForm({
   })
 
   const mutation = useMutation({
-    mutationFn: (payload: UpdateTaskFormValues) =>
-      taskService.update(task.id, {
+    mutationFn: async (payload: UpdateTaskFormValues) => {
+      await taskService.update(task.id, {
         title: payload.title,
         description: payload.description ?? undefined,
         status: payload.status,
@@ -432,7 +448,12 @@ function EditForm({
         linked_order_autoid: payload.linked_order_autoid ?? null,
         linked_proposal_autoid: payload.linked_proposal_autoid ?? null,
         linked_customer_autoid: payload.linked_customer_autoid ?? null
-      }),
+      })
+
+      if (attachmentsRef.current?.hasPendingFiles()) {
+        await attachmentsRef.current.uploadPendingFiles()
+      }
+    },
     meta: {
       successMessage: 'Task updated successfully',
       invalidatesQuery: TASK_QUERY_KEYS.lists()
@@ -441,6 +462,8 @@ function EditForm({
   })
 
   const handleSubmit = form.handleSubmit((data) => mutation.mutate(data))
+
+  const canSubmit = form.formState.isDirty || hasPendingFiles
 
   return (
     <FormProvider {...form}>
@@ -458,6 +481,15 @@ function EditForm({
             statuses={statuses}
             projectId={projectId}
           />
+
+          <TaskAttachments
+            ref={attachmentsRef}
+            taskId={task.id}
+            attachments={fullTask.attachments ?? []}
+            mode='deferred'
+            isLoading={isLoadingTask}
+            onPendingFilesChange={setHasPendingFiles}
+          />
         </FieldGroup>
       </form>
 
@@ -472,7 +504,7 @@ function EditForm({
           type='submit'
           form='task-form'
           isPending={mutation.isPending}
-          disabled={!form.formState.isDirty || mutation.isPending}
+          disabled={!canSubmit || mutation.isPending}
         >
           Save Changes
         </Button>
@@ -480,3 +512,4 @@ function EditForm({
     </FormProvider>
   )
 }
+

@@ -4,6 +4,7 @@ import { format } from 'date-fns'
 import { FileText, ShoppingCart, Trash2, User } from 'lucide-react'
 import { useState } from 'react'
 
+import { TaskAttachments } from '../../-components/task-attachments'
 import { UserCombobox } from '../../-components/user-combobox'
 
 import { TASK_QUERY_KEYS, getTaskStatusesQuery } from '@/api/task/query'
@@ -271,28 +272,11 @@ export const TaskInfoCard = ({ task, onDelete }: TaskInfoCardProps) => {
           </div>
         )}
 
-        <div className='mt-6 space-y-2'>
-          <label className='text-muted-foreground text-xs font-medium tracking-wide uppercase'>
-            Attachments
-          </label>
-          {task.attachments?.length ? (
-            <ul className='space-y-1'>
-              {task.attachments.map((a) => (
-                <li key={a.id}>
-                  <a
-                    href={a.download_url}
-                    target='_blank'
-                    rel='noopener noreferrer'
-                    className='text-primary text-sm hover:underline'
-                  >
-                    {a.file_name}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p className='text-muted-foreground text-sm'>No attachments</p>
-          )}
+        <div className='mt-6'>
+          <TaskAttachments
+            taskId={task.id}
+            attachments={task.attachments ?? []}
+          />
         </div>
 
         {updatedDate && (
