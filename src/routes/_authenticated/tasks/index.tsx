@@ -1,7 +1,7 @@
 import { keepPreviousData, useMutation, useQuery } from '@tanstack/react-query'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { CheckSquare, Filter, Plus } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
 import { TaskDeleteDialog } from './$taskId/-components/task-delete-dialog'
 import { TaskFiltersPanel } from './-components/task-filters-panel'
@@ -52,7 +52,14 @@ function TasksPage() {
   const [projectId] = useProjectId()
   const { sorting, setSorting, ordering } = useOrdering()
 
-  const [filtersOpen, setFiltersOpen] = useState(false)
+  const [filtersOpen, setFiltersOpen] = useState(
+    () =>
+      taskStatusId != null ||
+      !!priority ||
+      responsibleUserId != null ||
+      dueFrom != null ||
+      dueTo != null
+  )
   const [modalTask, setModalTask] = useState<Task | TaskListItem | 'create' | null>(null)
   const [taskToDelete, setTaskToDelete] = useState<TaskListItem | null>(null)
 
@@ -65,12 +72,6 @@ function TasksPage() {
     responsibleUserId != null ||
     dueFrom != null ||
     dueTo != null
-
-  useEffect(() => {
-    if (hasAnyFilter) {
-      setFiltersOpen(true)
-    }
-  }, [hasAnyFilter])
 
   const params = {
     search: search || undefined,

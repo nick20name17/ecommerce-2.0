@@ -109,13 +109,13 @@ export const Pagination = ({ totalCount }: PaginationProps) => {
               />
             </PaginationItem>
 
-            {pages.map((page, i) =>
+            {pages.map((page, pageIndex) =>
               page === 'ellipsis' ? (
-                <PaginationItem key={`ellipsis-${i}`}>
+                <PaginationItem key={`ellipsis-${pageIndex === 1 ? 'start' : 'end'}`}>
                   <PaginationEllipsis />
                 </PaginationItem>
               ) : (
-                <PaginationItem key={page}>
+                <PaginationItem key={`page-${page}`}>
                   <PaginationButton
                     isActive={page === currentPage}
                     onClick={() => goToPage(page)}

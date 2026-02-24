@@ -108,12 +108,6 @@ export const TaskAttachments = forwardRef<TaskAttachmentsRef, TaskAttachmentsPro
     const optimisticAttachments = recentlyUploaded.filter((a) => !existingIds.has(a.id))
     const allAttachments = [...attachments, ...optimisticAttachments]
 
-    useEffect(() => {
-      if (optimisticAttachments.length === 0 && recentlyUploaded.length > 0) {
-        setRecentlyUploaded([])
-      }
-    }, [optimisticAttachments.length, recentlyUploaded.length])
-
     const uploadMutation = useMutation({
       mutationFn: async ({ file, tempId }: { file: File; tempId: string }) => {
         if (!taskId) throw new Error('Task ID is required for immediate upload')
@@ -145,17 +139,18 @@ export const TaskAttachments = forwardRef<TaskAttachmentsRef, TaskAttachmentsPro
     const deleteMutation = useMutation({
       mutationFn: async (attachmentId: number) => {
         if (!taskId) throw new Error('Task ID is required for delete')
+        await taskService.deleteAttachment(taskId, attachmentId)
+        return attachmentId
+      },
+      onMutate: (attachmentId) => {
         setDeletingIds((prev) => new Set(prev).add(attachmentId))
-        try {
-          await taskService.deleteAttachment(taskId, attachmentId)
-          return attachmentId
-        } finally {
-          setDeletingIds((prev) => {
-            const next = new Set(prev)
-            next.delete(attachmentId)
-            return next
-          })
-        }
+      },
+      onSettled: (_, __, attachmentId) => {
+        setDeletingIds((prev) => {
+          const next = new Set(prev)
+          next.delete(attachmentId)
+          return next
+        })
       },
       onSuccess: () => {
         if (taskId) {
@@ -307,8 +302,8 @@ export const TaskAttachments = forwardRef<TaskAttachmentsRef, TaskAttachmentsPro
           <div className='bg-destructive/10 text-destructive flex items-start gap-2 rounded-lg p-3 text-sm'>
             <CircleAlertIcon className='mt-0.5 size-4 shrink-0' />
             <div className='space-y-1'>
-              {errors.map((error, index) => (
-                <p key={index}>{error}</p>
+              {errors.map((error) => (
+                <p key={error}>{error}</p>
               ))}
               <button
                 type='button'
@@ -420,8 +415,8 @@ export const TaskAttachments = forwardRef<TaskAttachmentsRef, TaskAttachmentsPro
               <TableBody>
                 {isLoading && (
                   <>
-                    {[1, 2].map((i) => (
-                      <TableRow key={`skeleton-${i}`}>
+                    {['skeleton-row-1', 'skeleton-row-2'].map((skeletonId) => (
+                      <TableRow key={skeletonId}>
                         <TableCell className='py-1.5 ps-3'>
                           <div className='flex items-center gap-2'>
                             <Skeleton className='size-4 shrink-0' />

@@ -7,7 +7,7 @@ import { ProjectDeleteDialog } from './-components/project-delete-dialog'
 import { ProjectModal } from './-components/project-modal'
 import { ProjectsDataTable } from './-components/projects-data-table'
 import { getProjectHealthQuery, getProjectsQuery } from '@/api/project/query'
-import type { Project, ProjectParams } from '@/api/project/schema'
+import type { Project, ProjectParams, ProjectWithHealthLoading } from '@/api/project/schema'
 import { Pagination } from '@/components/common/filters/pagination'
 import { SearchFilter } from '@/components/common/filters/search'
 import { Button } from '@/components/ui/button'
@@ -20,8 +20,6 @@ export const Route = createFileRoute('/_authenticated/projects/')({
     meta: [{ title: 'Projects' }]
   })
 })
-
-export type ProjectWithHealthLoading = Project & { _healthLoading?: boolean }
 
 function mergeHealthIntoProjects(
   projects: Project[],

@@ -123,9 +123,9 @@ export const TaskInfoCard = ({ task, onDelete }: TaskInfoCardProps) => {
 
         <div className='mt-6 grid grid-cols-2 gap-x-8 gap-y-4'>
           <div className='space-y-1'>
-            <label className='text-muted-foreground text-xs font-medium tracking-wide uppercase'>
+            <span className='text-muted-foreground text-xs font-medium tracking-wide uppercase'>
               Status
-            </label>
+            </span>
             <TaskStatusSelect
               statuses={statuses}
               value={task.status}
@@ -137,9 +137,9 @@ export const TaskInfoCard = ({ task, onDelete }: TaskInfoCardProps) => {
           </div>
 
           <div className='space-y-1'>
-            <label className='text-muted-foreground text-xs font-medium tracking-wide uppercase'>
+            <span className='text-muted-foreground text-xs font-medium tracking-wide uppercase'>
               Priority
-            </label>
+            </span>
             <TaskPrioritySelect
               value={task.priority}
               onValueChange={(v) => v && handlePriorityChange(v)}
@@ -150,9 +150,9 @@ export const TaskInfoCard = ({ task, onDelete }: TaskInfoCardProps) => {
           </div>
 
           <div className='space-y-1'>
-            <label className='text-muted-foreground text-xs font-medium tracking-wide uppercase'>
+            <span className='text-muted-foreground text-xs font-medium tracking-wide uppercase'>
               Due date
-            </label>
+            </span>
             <DatePicker
               value={task.due_date ? new Date(task.due_date) : undefined}
               onChange={handleDueDateChange}
@@ -162,9 +162,9 @@ export const TaskInfoCard = ({ task, onDelete }: TaskInfoCardProps) => {
           </div>
 
           <div className='space-y-1'>
-            <label className='text-muted-foreground text-xs font-medium tracking-wide uppercase'>
+            <span className='text-muted-foreground text-xs font-medium tracking-wide uppercase'>
               Responsible
-            </label>
+            </span>
             <UserCombobox
               value={task.responsible_user ?? null}
               onChange={handleResponsibleChange}
@@ -198,16 +198,16 @@ export const TaskInfoCard = ({ task, onDelete }: TaskInfoCardProps) => {
           </div>
 
           <div className='space-y-1'>
-            <label className='text-muted-foreground text-xs font-medium tracking-wide uppercase'>
+            <span className='text-muted-foreground text-xs font-medium tracking-wide uppercase'>
               Author
-            </label>
+            </span>
             <p className='text-sm'>{task.author_details?.full_name ?? task.author_name}</p>
           </div>
 
           <div className='space-y-1'>
-            <label className='text-muted-foreground text-xs font-medium tracking-wide uppercase'>
+            <span className='text-muted-foreground text-xs font-medium tracking-wide uppercase'>
               Created
-            </label>
+            </span>
             <p className='text-sm'>{createdDate ? format(createdDate, DATE_TIME_LONG) : '—'}</p>
           </div>
         </div>
@@ -216,9 +216,9 @@ export const TaskInfoCard = ({ task, onDelete }: TaskInfoCardProps) => {
           task.linked_proposal_details ??
           task.linked_customer_details) && (
           <div className='mt-6 space-y-2'>
-            <label className='text-muted-foreground text-xs font-medium tracking-wide uppercase'>
+            <span className='text-muted-foreground text-xs font-medium tracking-wide uppercase'>
               Linked to
-            </label>
+            </span>
             <div className='flex flex-wrap items-center gap-2'>
               {task.linked_order_details && (
                 <Badge

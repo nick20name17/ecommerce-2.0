@@ -1,6 +1,6 @@
 import { useMutation } from '@tanstack/react-query'
 import { Check, Copy, TriangleAlert } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
 import { PROPOSAL_QUERY_KEYS } from '@/api/proposal/query'
 import type { Proposal } from '@/api/proposal/schema'
@@ -39,12 +39,13 @@ export const ProposalDeleteDialog = ({
 
   const isConfirmed = confirmText === CONFIRMATION_TEXT
 
-  useEffect(() => {
-    if (!open) {
+  const handleOpenChange = (newOpen: boolean) => {
+    if (!newOpen) {
       setConfirmText('')
       setCopied(false)
     }
-  }, [open])
+    onOpenChange(newOpen)
+  }
 
   const handleCopy = async () => {
     await navigator.clipboard.writeText(CONFIRMATION_TEXT)
@@ -70,7 +71,7 @@ export const ProposalDeleteDialog = ({
   }
 
   return (
-    <AlertDialog open={open} onOpenChange={onOpenChange}>
+    <AlertDialog open={open} onOpenChange={handleOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogMedia className='bg-destructive/10 text-destructive'>

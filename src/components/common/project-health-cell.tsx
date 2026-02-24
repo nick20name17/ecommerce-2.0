@@ -63,8 +63,8 @@ export function HealthCell({
       </TooltipTrigger>
       <TooltipContent>
         <div className='flex flex-col gap-0.5'>
-          {tooltipLines.map((line, i) => (
-            <span key={i}>{line}</span>
+          {tooltipLines.map((line) => (
+            <span key={line}>{line}</span>
           ))}
         </div>
       </TooltipContent>

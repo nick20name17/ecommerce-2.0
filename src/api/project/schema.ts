@@ -111,6 +111,8 @@ export interface UpdateProjectPayload {
 
 export type ProjectResponse = ApiResponse<Project>
 
+export type ProjectWithHealthLoading = Project & { _healthLoading?: boolean }
+
 export interface ProjectParams extends PaginationParams {
   search?: string
   ordering?: string

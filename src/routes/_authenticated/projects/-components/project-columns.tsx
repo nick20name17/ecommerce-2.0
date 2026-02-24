@@ -1,7 +1,7 @@
 import type { ColumnDef } from '@tanstack/react-table'
 import { MoreHorizontal, Pencil, Trash2 } from 'lucide-react'
 
-import type { Project } from '@/api/project/schema'
+import type { Project, ProjectWithHealthLoading } from '@/api/project/schema'
 import { ColumnHeader } from '@/components/common/data-table/column-header'
 import { HealthCell } from '@/components/common/project-health-cell'
 import { Badge } from '@/components/ui/badge'
@@ -15,7 +15,6 @@ import {
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { formatDate } from '@/helpers/formatters'
 import { type ProjectHealthService, getServiceHealthDetails } from '@/helpers/project-health'
-import type { ProjectWithHealthLoading } from '../index'
 
 interface ProjectColumnsOptions {
   onEdit: (project: Project) => void

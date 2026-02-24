@@ -1,6 +1,6 @@
 import { useMutation } from '@tanstack/react-query'
 import { Check, Copy, TriangleAlert } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
 import { ORDER_QUERY_KEYS } from '@/api/order/query'
 import type { Order } from '@/api/order/schema'
@@ -34,12 +34,13 @@ export const OrderDeleteDialog = ({ order, projectId, open, onOpenChange }: Orde
 
   const isConfirmed = confirmText === CONFIRMATION_TEXT
 
-  useEffect(() => {
-    if (!open) {
+  const handleOpenChange = (newOpen: boolean) => {
+    if (!newOpen) {
       setConfirmText('')
       setCopied(false)
     }
-  }, [open])
+    onOpenChange(newOpen)
+  }
 
   const handleCopy = async () => {
     await navigator.clipboard.writeText(CONFIRMATION_TEXT)
@@ -65,7 +66,7 @@ export const OrderDeleteDialog = ({ order, projectId, open, onOpenChange }: Orde
   }
 
   return (
-    <AlertDialog open={open} onOpenChange={onOpenChange}>
+    <AlertDialog open={open} onOpenChange={handleOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogMedia className='bg-destructive/10 text-destructive'>
