@@ -1,7 +1,7 @@
 import { useMutation } from '@tanstack/react-query'
 import { TriangleAlert } from 'lucide-react'
 
-import { USERS_QUERY_KEYS } from '@/api/user/query'
+import { USER_QUERY_KEYS } from '@/api/user/query'
 import type { User } from '@/api/user/schema'
 import { userService } from '@/api/user/service'
 import {
@@ -31,7 +31,7 @@ export const UserDeleteDialog = ({ user, open, onOpenChange }: UserDeleteDialogP
     mutationFn: userService.delete,
     meta: {
       successMessage: 'User deleted successfully',
-      invalidatesQuery: USERS_QUERY_KEYS.lists()
+      invalidatesQuery: USER_QUERY_KEYS.lists()
     },
     onSuccess: () => {
       onOpenChange(false)

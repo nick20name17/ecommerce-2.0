@@ -4,7 +4,7 @@ import { useMutation } from '@tanstack/react-query'
 import type { ColumnDef } from '@tanstack/react-table'
 import { MoreHorizontal, Pencil, Trash2 } from 'lucide-react'
 
-import { USERS_QUERY_KEYS } from '@/api/user/query'
+import { USER_QUERY_KEYS } from '@/api/user/query'
 import type { User } from '@/api/user/schema'
 import { userService } from '@/api/user/service'
 import { ColumnHeader } from '@/components/common/data-table/column-header'
@@ -39,7 +39,7 @@ const StatusToggle = ({ user, currentUserId }: { user: User; currentUserId: numb
       userService.update({ id: user.id, payload: { is_active: !user.is_active } }),
     meta: {
       successMessage: `User ${user.is_active ? 'deactivated' : 'activated'} successfully`,
-      invalidatesQuery: USERS_QUERY_KEYS.lists()
+      invalidatesQuery: USER_QUERY_KEYS.lists()
     }
   })
 

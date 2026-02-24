@@ -11,7 +11,7 @@ import { parseAsString, useQueryState } from 'nuqs'
 import type { SignInPayload, SignInResponse } from '@/api/auth/schema'
 import { authService } from '@/api/auth/service'
 import { AUTH_REDIRECTS } from '@/api/constants'
-import { USERS_QUERY_KEYS } from '@/api/user/query'
+import { USER_QUERY_KEYS } from '@/api/user/query'
 import type { User } from '@/api/user/schema'
 import { userService } from '@/api/user/service'
 import { clearSession, getSession, setSession } from '@/helpers/auth'
@@ -36,7 +36,7 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
   const userId = session?.user?.id ?? null
 
   const { data: user, isLoading: isUserLoading } = useQuery({
-    queryKey: USERS_QUERY_KEYS.detail('me'),
+    queryKey: USER_QUERY_KEYS.detail('me'),
     queryFn: userService.getMe,
     placeholderData: session?.user,
     staleTime: 1000 * 60 * 10,
@@ -47,7 +47,7 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
   const logout = async () => {
     clearSession()
 
-    queryClient.removeQueries({ queryKey: USERS_QUERY_KEYS.detail('me') })
+    queryClient.removeQueries({ queryKey: USER_QUERY_KEYS.detail('me') })
     queryClient.clear()
 
     await navigate({ to: AUTH_REDIRECTS.logout, replace: true })
@@ -59,7 +59,7 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
     onSuccess: async (response) => {
       setSession(response)
 
-      queryClient.setQueryData(USERS_QUERY_KEYS.detail('me'), response.user)
+      queryClient.setQueryData(USER_QUERY_KEYS.detail('me'), response.user)
 
       await navigate({
         to: (typeof redirect === 'string' ? redirect : null) ?? AUTH_REDIRECTS.signInSuccess,

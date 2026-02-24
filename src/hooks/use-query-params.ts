@@ -26,7 +26,7 @@ const parseAsIsoDate = createParser<Date | null>({
 const offsetParser = parseAsInteger.withDefault(0)
 const limitParser = parseAsInteger.withDefault(DEFAULT_LIMIT)
 
-export const useSearchParam = () => {
+export function useSearchParam() {
   return useQueryState('search', parseAsString.withDefault(''))
 }
 
@@ -48,32 +48,67 @@ export function useLimitParam() {
   return [normalized, setLimit] as const
 }
 
-export const useOrderStatusParam = () => useQueryState('status', orderStatusParser)
+export function useOrderStatusParam() {
+  return useQueryState('status', orderStatusParser)
+}
 
-export const useStatusParam = () => useQueryState('status', parseAsString)
+export function useStatusParam() {
+  return useQueryState('status', parseAsString)
+}
 
-export const usePayloadLogCreatedAfter = () => useQueryState('created_after', parseAsIsoDate)
-export const usePayloadLogCreatedBefore = () => useQueryState('created_before', parseAsIsoDate)
-export const usePayloadLogEntity = () => useQueryState('entity', parseAsString)
-export const usePayloadLogMethod = () => useQueryState('method', parseAsString)
-export const usePayloadLogStatusCode = () => useQueryState('status_code', parseAsInteger)
-export const usePayloadLogIsError = () =>
-  useQueryState('is_error', parseAsStringLiteral(['true', 'false']))
+export function usePayloadLogCreatedAfter() {
+  return useQueryState('created_after', parseAsIsoDate)
+}
 
-export const useTaskStatusParam = () => useQueryState('task_status', parseAsInteger)
+export function usePayloadLogCreatedBefore() {
+  return useQueryState('created_before', parseAsIsoDate)
+}
+
+export function usePayloadLogEntity() {
+  return useQueryState('entity', parseAsString)
+}
+
+export function usePayloadLogMethod() {
+  return useQueryState('method', parseAsString)
+}
+
+export function usePayloadLogStatusCode() {
+  return useQueryState('status_code', parseAsInteger)
+}
+
+export function usePayloadLogIsError() {
+  return useQueryState('is_error', parseAsStringLiteral(['true', 'false']))
+}
+
+export function useTaskStatusParam() {
+  return useQueryState('task_status', parseAsInteger)
+}
 
 const TASK_PRIORITY_VALUES = ['low', 'medium', 'high', 'urgent'] as [string, ...string[]]
-export const useTaskPriorityParam = () =>
-  useQueryState(
+
+export function useTaskPriorityParam() {
+  return useQueryState(
     'task_priority',
     parseAsStringLiteral(TASK_PRIORITY_VALUES).withDefault('')
   )
-export const useTaskResponsibleParam = () =>
-  useQueryState('task_responsible', parseAsInteger)
-export const useTaskDueFromParam = () => useQueryState('due_from', parseAsIsoDate)
-export const useTaskDueToParam = () => useQueryState('due_to', parseAsIsoDate)
+}
 
-export const useOrderAutoidParam = () => useQueryState('autoid', parseAsString)
-export const useProposalAutoidParam = () => useQueryState('autoid', parseAsString)
-export const useOrderProjectIdParam = () =>
-  useQueryState('project_id', parseAsInteger.withOptions({ shallow: false }))
+export function useTaskResponsibleParam() {
+  return useQueryState('task_responsible', parseAsInteger)
+}
+
+export function useTaskDueFromParam() {
+  return useQueryState('due_from', parseAsIsoDate)
+}
+
+export function useTaskDueToParam() {
+  return useQueryState('due_to', parseAsIsoDate)
+}
+
+export function useAutoidParam() {
+  return useQueryState('autoid', parseAsString)
+}
+
+export function useOrderProjectIdParam() {
+  return useQueryState('project_id', parseAsInteger.withOptions({ shallow: false }))
+}

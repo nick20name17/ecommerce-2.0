@@ -4,7 +4,7 @@ import { Controller, useForm } from 'react-hook-form'
 
 import { type UpdateProfileFormValues, UpdateProfileSchema } from '@/api/profile/schema'
 import { profileService } from '@/api/profile/service'
-import { USERS_QUERY_KEYS } from '@/api/user/query'
+import { USER_QUERY_KEYS } from '@/api/user/query'
 import type { User } from '@/api/user/schema'
 import { RoleBadge } from '@/components/common/role-badge'
 import { Button } from '@/components/ui/button'
@@ -35,8 +35,8 @@ export const ProfileInfoCard = ({ user }: ProfileInfoCardProps) => {
       successMessage: 'Profile updated successfully'
     },
     onSuccess: (updatedUser) => {
-      queryClient.setQueryData(USERS_QUERY_KEYS.detail('me'), updatedUser)
-      queryClient.invalidateQueries({ queryKey: USERS_QUERY_KEYS.lists() })
+      queryClient.setQueryData(USER_QUERY_KEYS.detail('me'), updatedUser)
+      queryClient.invalidateQueries({ queryKey: USER_QUERY_KEYS.lists() })
       updateSessionUser(updatedUser)
       form.reset({
         first_name: updatedUser.first_name,

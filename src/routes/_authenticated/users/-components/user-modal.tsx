@@ -3,7 +3,7 @@ import { useMutation } from '@tanstack/react-query'
 import { UserPlus } from 'lucide-react'
 import { Controller, FormProvider, useForm, useFormContext } from 'react-hook-form'
 
-import { USERS_QUERY_KEYS } from '@/api/user/query'
+import { USER_QUERY_KEYS } from '@/api/user/query'
 import {
   type CreateUserFormValues,
   CreateUserSchema,
@@ -191,7 +191,7 @@ function CreateForm({ onOpenChange }: { onOpenChange: (open: boolean) => void })
     mutationFn: userService.create,
     meta: {
       successMessage: 'User created successfully',
-      invalidatesQuery: USERS_QUERY_KEYS.lists()
+      invalidatesQuery: USER_QUERY_KEYS.lists()
     },
     onSuccess: () => {
       onOpenChange(false)
@@ -291,7 +291,7 @@ function EditForm({ user, onOpenChange }: { user: User; onOpenChange: (open: boo
     mutationFn: userService.update,
     meta: {
       successMessage: 'User updated successfully',
-      invalidatesQuery: USERS_QUERY_KEYS.lists()
+      invalidatesQuery: USER_QUERY_KEYS.lists()
     },
     onSuccess: () => onOpenChange(false)
   })

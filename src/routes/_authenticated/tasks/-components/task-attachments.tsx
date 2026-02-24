@@ -34,7 +34,8 @@ import {
   TooltipProvider,
   TooltipTrigger
 } from '@/components/ui/tooltip'
-import { formatBytes, useFileUpload, type FileWithPreview } from '@/hooks/use-file-upload'
+import { formatBytes } from '@/helpers/formatters'
+import { useFileUpload, type FileWithPreview } from '@/hooks/use-file-upload'
 import { cn } from '@/lib/utils'
 
 interface TaskAttachmentsProps {
