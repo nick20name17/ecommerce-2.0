@@ -4,6 +4,7 @@ import type {
   CreateTaskPayload,
   CreateTaskStatusPayload,
   Task,
+  TaskAttachment,
   TaskListItem,
   TaskParams,
   TaskListResponse,
@@ -60,5 +61,34 @@ export const taskService = {
 
   deleteStatus: async (id: number) => {
     await api.delete(`/tasks/statuses/${id}/`)
+  },
+
+  getAttachments: async (taskId: number) => {
+    const { data } = await api.get<TaskAttachment[]>(
+      `/tasks/${taskId}/attachments/`
+    )
+    return data
+  },
+
+  getAttachment: async (taskId: number, attachmentId: number) => {
+    const { data } = await api.get<TaskAttachment>(
+      `/tasks/${taskId}/attachments/${attachmentId}/`
+    )
+    return data
+  },
+
+  uploadAttachment: async (taskId: number, file: File) => {
+    const formData = new FormData()
+    formData.append('file', file)
+    const { data } = await api.post<TaskAttachment>(
+      `/tasks/${taskId}/attachments/`,
+      formData,
+      { headers: { 'Content-Type': 'multipart/form-data' } }
+    )
+    return data
+  },
+
+  deleteAttachment: async (taskId: number, attachmentId: number) => {
+    await api.delete(`/tasks/${taskId}/attachments/${attachmentId}/`)
   }
 }
