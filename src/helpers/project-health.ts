@@ -51,25 +51,26 @@ export function getServiceHealthDetails(
       return {
         status,
         responseMs: project.website_response_ms,
-        lastChecked: project.website_last_checked,
+        lastChecked: project.website_last_checked
       }
     case 'backend':
       return {
         status,
         responseMs: project.backend_response_ms,
-        lastChecked: project.backend_last_checked,
+        lastChecked: project.backend_last_checked
       }
     case 'ebms':
       return {
         status,
         responseMs: project.ebms_response_ms,
-        lastChecked: project.ebms_last_checked,
+        lastChecked: project.ebms_last_checked
       }
     case 'sync':
       return {
         status,
         responseMs: project.sync_response_ms,
-        lastChecked: project.sync_last_checked,
+        lastChecked: project.sync_last_checked
       }
   }
 }
+
