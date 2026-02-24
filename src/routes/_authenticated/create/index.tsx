@@ -8,8 +8,8 @@ import { CartSummary } from './-components/cart-summary'
 import { CartTable } from './-components/cart-table'
 import { CreatePageActions } from './-components/create-page-actions'
 import { CustomerCombobox } from './-components/customer-combobox'
+import { ProductCatalogDialog } from './-components/product-catalog-dialog'
 import { ProductEditSheet } from './-components/product-edit-sheet'
-import { ProductSearch } from './-components/product-search'
 import { useEditSheetData } from './-components/use-edit-sheet-data'
 import { CART_QUERY_KEYS, getCartQuery } from '@/api/cart/query'
 import { cartService } from '@/api/cart/service'
@@ -91,6 +91,7 @@ function CreatePage() {
   const [savedCustomerId, setSavedCustomerId] = useSelectedCustomerId()
 
   const [customer, setCustomer] = useState<Customer | null>(null)
+  const [catalogOpen, setCatalogOpen] = useState(false)
   const [busy, busyDispatch] = useReducer(busyReducer, initialBusy)
   const [editState, editDispatch] = useReducer(editReducer, {
     product: null,
@@ -306,12 +307,22 @@ function CreatePage() {
               isDisabled={!customer}
               allowOverflow
             >
-              <ProductSearch
-                customerId={customer?.id ?? null}
-                projectId={projectId}
-                onSelect={handleProductSelect}
-                disabled={!customer || isBusy}
-              />
+              <div className='flex flex-col gap-3'>
+                <Button
+                  type='button'
+                  className='w-full justify-between'
+                  disabled={!customer || isBusy}
+                  onClick={() => setCatalogOpen(true)}
+                >
+                  <span>Browse catalog</span>
+                  <span className='text-primary-foreground/80 text-xs font-normal'>
+                    Categories · Search · Prices
+                  </span>
+                </Button>
+                <p className='text-xs text-muted-foreground'>
+                  Use the catalog to filter by category and search across products. Configurable products will prompt for options.
+                </p>
+              </div>
             </Section>
           </div>
 
@@ -363,6 +374,15 @@ function CreatePage() {
         customerId={customer?.id ?? ''}
         projectId={projectId}
         onSaved={invalidateCart}
+      />
+
+      <ProductCatalogDialog
+        open={catalogOpen}
+        onOpenChange={setCatalogOpen}
+        customerId={customer?.id ?? null}
+        projectId={projectId}
+        onSelect={handleProductSelect}
+        disabled={isBusy}
       />
     </div>
   )
