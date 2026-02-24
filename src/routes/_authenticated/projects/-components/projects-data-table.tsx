@@ -5,9 +5,8 @@ import { getCoreRowModel, useReactTable } from '@tanstack/react-table'
 import { useMemo } from 'react'
 
 import { getProjectColumns } from './project-columns'
-import type { Project } from '@/api/project/schema'
+import type { Project, ProjectWithHealthLoading } from '@/api/project/schema'
 import { DataTable } from '@/components/common/data-table'
-import type { ProjectWithHealthLoading } from '../index'
 
 interface ProjectsDataTableProps {
   data: ProjectWithHealthLoading[]
