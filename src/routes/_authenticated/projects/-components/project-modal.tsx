@@ -256,6 +256,25 @@ function SharedFields() {
           )}
         />
       </div>
+
+      <Controller
+        name="parent_category"
+        control={control}
+        render={({ field, fieldState }) => (
+          <Field data-invalid={fieldState.invalid}>
+            <FieldLabel htmlFor="parent-category">Parent Category</FieldLabel>
+            <Input
+              {...field}
+              value={field.value ?? ''}
+              id="parent-category"
+              placeholder="Root TREE_ID"
+              maxLength={5}
+              aria-invalid={fieldState.invalid}
+            />
+            {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+          </Field>
+        )}
+      />
     </>
   )
 }
@@ -277,6 +296,7 @@ function CreateForm({ onOpenChange }: { onOpenChange: (open: boolean) => void })
       extra_columns: '',
       price_field: '',
       markup_id_trigger: '',
+      parent_category: '',
       s3_bucket_name: '',
       s3_region: '',
       s3_access_key_id: '',
@@ -389,6 +409,7 @@ function EditForm({
       extra_columns: project.extra_columns ?? '',
       price_field: project.price_field ?? '',
       markup_id_trigger: project.markup_id_trigger ?? '',
+      parent_category: project.parent_category ?? '',
       s3_bucket_name: project.s3_bucket_name ?? '',
       s3_region: project.s3_region ?? '',
       s3_access_key_id: project.s3_access_key_id ?? '',
