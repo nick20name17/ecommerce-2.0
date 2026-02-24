@@ -71,7 +71,7 @@ function DialogContent({
       <DialogPrimitive.Content
         data-slot='dialog-content'
         className={cn(
-          'bg-background data-open:animate-in data-closed:animate-out data-closed:fade-out-0 data-open:fade-in-0 data-closed:zoom-out-95 data-open:zoom-in-95 ring-foreground/10 fixed top-1/2 left-1/2 z-50 grid w-full max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 gap-4 rounded-xl p-4 text-sm ring-1 duration-100 outline-none sm:max-w-sm',
+          'bg-background data-open:animate-in data-closed:animate-out data-closed:fade-out-0 data-open:fade-in-0 data-closed:zoom-out-95 data-open:zoom-in-95 ring-foreground/10 fixed top-1/2 left-1/2 z-50 flex w-full max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 flex-col rounded-xl text-sm ring-1 duration-100 outline-none sm:max-w-sm',
           className
         )}
         {...props}
@@ -84,7 +84,7 @@ function DialogContent({
           >
             <Button
               variant='ghost'
-              className='absolute top-2 right-2'
+              className='absolute top-3 right-3.5 z-10'
               size='icon-sm'
             >
               <XIcon />
@@ -102,7 +102,7 @@ function DialogHeader({ className, ...props }: React.ComponentProps<'div'>) {
     <div
       data-slot='dialog-header'
       className={cn(
-        'flex flex-col gap-2 has-data-[slot=dialog-media]:items-center has-data-[slot=dialog-media]:text-center',
+        'flex shrink-0 flex-col gap-1 p-4 pb-0 has-data-[slot=dialog-media]:items-center has-data-[slot=dialog-media]:text-center',
         className
       )}
       {...props}
@@ -135,7 +135,7 @@ function DialogFooter({
     <div
       data-slot='dialog-footer'
       className={cn(
-        'bg-muted/50 -mx-4 -mb-4 flex flex-col-reverse gap-2 rounded-b-xl border-t p-4 sm:flex-row sm:justify-end',
+        'bg-muted/50 flex shrink-0 flex-col-reverse gap-2 rounded-b-xl border-t p-4 sm:flex-row sm:justify-end',
         className
       )}
       {...props}
@@ -147,6 +147,19 @@ function DialogFooter({
         </DialogPrimitive.Close>
       )}
     </div>
+  )
+}
+
+function DialogBody({ className, ...props }: React.ComponentProps<'div'>) {
+  return (
+    <div
+      data-slot='dialog-body'
+      className={cn(
+        'min-h-0 flex-1 overflow-y-auto p-4 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden',
+        className
+      )}
+      {...props}
+    />
   )
 }
 
@@ -178,6 +191,7 @@ function DialogDescription({
 
 export {
   Dialog,
+  DialogBody,
   DialogClose,
   DialogContent,
   DialogDescription,

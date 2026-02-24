@@ -26,6 +26,7 @@ import { Button } from '@/components/ui/button'
 import { DatePicker } from '@/components/ui/date-picker'
 import {
   Dialog,
+  DialogBody,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -52,7 +53,7 @@ export const TaskModal = ({ task, open, onOpenChange, projectId }: TaskModalProp
       open={open}
       onOpenChange={onOpenChange}
     >
-      <DialogContent className='sm:max-w-2xl'>
+      <DialogContent className='max-h-[95vh] sm:max-w-2xl'>
         {isEdit ? (
           <EditForm
             task={task}
@@ -74,7 +75,7 @@ function SharedFields({ statuses, projectId }: { statuses: TaskStatus[]; project
   const { control } = useFormContext<CreateTaskFormValues>()
 
   return (
-    <div className='grid grid-cols-1 gap-3 sm:grid-cols-2'>
+    <div className='grid grid-cols-1 gap-2.5 sm:grid-cols-2'>
       <Controller
         name='title'
         control={control}
@@ -186,11 +187,11 @@ function SharedFields({ statuses, projectId }: { statuses: TaskStatus[]; project
         )}
       />
 
-      <div className='space-y-3 pt-2 sm:col-span-2'>
+      <div className='space-y-2.5 pt-1.5 sm:col-span-2'>
         <p className='text-muted-foreground text-xs font-medium tracking-wide uppercase'>
           Linked items (optional)
         </p>
-        <div className='grid gap-3 sm:grid-cols-2'>
+        <div className='grid gap-2.5 sm:grid-cols-2'>
           <Controller
             name='linked_order_autoid'
             control={control}
@@ -358,27 +359,28 @@ function CreateFormInner({
 
   return (
     <FormProvider {...form}>
-      <DialogHeader>
+      <DialogHeader className='border-b pb-4'>
         <DialogTitle>Create Task</DialogTitle>
-        <DialogDescription>Add a new task.</DialogDescription>
       </DialogHeader>
 
-      <form
-        id='task-form'
-        onSubmit={handleSubmit}
-      >
-        <FieldGroup>
-          <SharedFields
-            statuses={statuses}
-            projectId={projectId}
-          />
+      <DialogBody>
+        <form
+          id='task-form'
+          onSubmit={handleSubmit}
+        >
+          <FieldGroup className='gap-3 ring-offset-4'>
+            <SharedFields
+              statuses={statuses}
+              projectId={projectId}
+            />
 
-          <TaskAttachments
-            ref={attachmentsRef}
-            mode='deferred'
-          />
-        </FieldGroup>
-      </form>
+            <TaskAttachments
+              ref={attachmentsRef}
+              mode='deferred'
+            />
+          </FieldGroup>
+        </form>
+      </DialogBody>
 
       <DialogFooter>
         <Button
@@ -467,31 +469,32 @@ function EditForm({
 
   return (
     <FormProvider {...form}>
-      <DialogHeader>
+      <DialogHeader className='border-b pb-4'>
         <DialogTitle>Edit Task</DialogTitle>
-        <DialogDescription>Update task details.</DialogDescription>
       </DialogHeader>
 
-      <form
-        id='task-form'
-        onSubmit={handleSubmit}
-      >
-        <FieldGroup>
-          <SharedFields
-            statuses={statuses}
-            projectId={projectId}
-          />
+      <DialogBody>
+        <form
+          id='task-form'
+          onSubmit={handleSubmit}
+        >
+          <FieldGroup className='gap-3 ring-offset-4'>
+            <SharedFields
+              statuses={statuses}
+              projectId={projectId}
+            />
 
-          <TaskAttachments
-            ref={attachmentsRef}
-            taskId={task.id}
-            attachments={fullTask.attachments ?? []}
-            mode='deferred'
-            isLoading={isLoadingTask}
-            onPendingFilesChange={setHasPendingFiles}
-          />
-        </FieldGroup>
-      </form>
+            <TaskAttachments
+              ref={attachmentsRef}
+              taskId={task.id}
+              attachments={fullTask.attachments ?? []}
+              mode='deferred'
+              isLoading={isLoadingTask}
+              onPendingFilesChange={setHasPendingFiles}
+            />
+          </FieldGroup>
+        </form>
+      </DialogBody>
 
       <DialogFooter>
         <Button
@@ -512,4 +515,3 @@ function EditForm({
     </FormProvider>
   )
 }
-
