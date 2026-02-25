@@ -61,14 +61,16 @@ function TaskDetailPage() {
   }
 
   return (
-    <div className='flex h-full flex-col gap-4 overflow-y-auto p-1'>
-      <div className='flex items-center gap-3 min-w-0'>
+    <div className='flex h-full min-h-0 flex-col gap-4'>
+      <div className='flex shrink-0 items-center gap-3 min-w-0'>
         <Button variant='ghost' size='icon' onClick={() => router.history.back()}>
           <ArrowLeft />
         </Button>
       </div>
 
-      <TaskInfoCard task={task} onDelete={() => setDeleteOpen(true)} />
+      <div className='min-h-0 flex-1 overflow-y-auto'>
+        <TaskInfoCard task={task} onDelete={() => setDeleteOpen(true)} />
+      </div>
 
       <TaskDeleteDialog
         task={task}
