@@ -35,7 +35,7 @@ import { useProjectId } from '@/hooks/use-project-id'
 export const Route = createFileRoute('/_authenticated/tasks/')({
   component: TasksPage,
   head: () => ({
-    meta: [{ title: 'Tasks' }]
+    meta: [{ title: "To-Do's" }]
   })
 })
 
@@ -128,7 +128,7 @@ function TasksPage() {
             <CheckSquare className='size-5' />
           </div>
           <div>
-            <h1 className='text-2xl font-semibold tracking-tight'>Tasks</h1>
+            <h1 className='text-2xl font-semibold tracking-tight'>To-Do's</h1>
             <p className='text-sm text-muted-foreground'>{data?.count ?? 0} total</p>
           </div>
         </div>
@@ -141,7 +141,7 @@ function TasksPage() {
       <Collapsible open={filtersOpen} onOpenChange={setFiltersOpen}>
         <div className='flex flex-wrap items-center gap-2'>
           <div className='min-w-0 flex-1 sm:max-w-xs'>
-            <SearchFilter placeholder='Search tasks...' />
+            <SearchFilter placeholder="Search to-do's..." />
           </div>
           <CollapsibleTrigger asChild>
             <Button variant='outline' size='default'>

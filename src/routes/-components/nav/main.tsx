@@ -26,7 +26,7 @@ const NAV_ITEMS = [
   { title: 'Users', url: '/users', icon: Users },
   { title: 'Orders', url: '/orders', icon: ShoppingCart },
   { title: 'Proposals', url: '/proposals', icon: FileText },
-  { title: 'Tasks', url: '/tasks', icon: CheckSquare },
+  { title: "To-Do's", url: '/tasks', icon: CheckSquare },
   { title: 'Order Desk', url: '/create', icon: ClipboardList },
   { title: 'Shipping', url: '/shipping', icon: Truck },
   // { title: 'Notes', url: '/notes', icon: StickyNote },

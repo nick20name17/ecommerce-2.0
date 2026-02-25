@@ -31,7 +31,7 @@ function TaskDetailPage() {
       <div className='flex h-full flex-col gap-4'>
         <p className='text-muted-foreground'>Invalid task ID.</p>
         <Button variant='outline' onClick={() => router.history.back()}>
-          Back to Tasks
+          Back to To-Do's
         </Button>
       </div>
     )
@@ -54,7 +54,7 @@ function TaskDetailPage() {
       <div className='flex h-full flex-col items-center justify-center gap-4'>
         <p className='text-muted-foreground'>Task not found.</p>
         <Button variant='outline' onClick={() => router.history.back()}>
-          Back to Tasks
+          Back to To-Do's
         </Button>
       </div>
     )
