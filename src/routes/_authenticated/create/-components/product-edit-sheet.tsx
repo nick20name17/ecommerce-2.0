@@ -74,17 +74,19 @@ export function ProductEditSheet({
   const hasMultipleUnits = (units?.length ?? 0) > 1
 
   const maxCount = (() => {
-    const v = product?.max_count
+    const v = configData?.max_count ?? product?.max_count
     if (typeof v === 'number') return v
-    if (typeof v === 'string') return parseInt(v) || 9999
+    if (typeof v === 'string') return parseInt(String(v), 10) || 9999
     return 9999
   })()
 
-  const ignoreCount = product
-    ? isCartItem(product)
-      ? product.ignore_count
-      : product.ignoreCount
-    : false
+  const ignoreCount = configData
+    ? configData.ignore_count
+    : product
+      ? isCartItem(product)
+        ? product.ignore_count
+        : Boolean((product as Product & { ignore_count?: boolean }).ignore_count ?? (product as Product).ignoreCount)
+      : false
 
   const hasConfigs = configs.length > 0
 

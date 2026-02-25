@@ -136,4 +136,5 @@ export interface ProductParams extends PaginationParams {
   ordering?: string
   inactive?: boolean
   type?: string
+  category?: string
 }

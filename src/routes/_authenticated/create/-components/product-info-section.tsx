@@ -89,7 +89,7 @@ export function ProductInfoSection({
                 min={0}
                 max={ignoreCount ? undefined : maxCount}
                 disabled={!ignoreCount && maxCount < 0}
-                showMaxMessage
+                showMaxMessage={!ignoreCount}
               />
             </div>
           </div>

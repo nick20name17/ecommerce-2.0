@@ -1,9 +1,9 @@
-import { useQuery } from '@tanstack/react-query'
-
-import { getProjectHealthQuery } from '@/api/project/query'
 import { HealthCell } from '@/components/common/project-health-cell'
+import { isSuperAdmin } from '@/constants/user'
 import { type ProjectHealthService, getServiceHealthDetails } from '@/helpers/project-health'
 import { useProjectId } from '@/hooks/use-project-id'
+import { useProjectHealthWebSocket } from '@/hooks/use-project-health-ws'
+import { useAuth } from '@/providers/auth'
 
 const HEALTH_SERVICES: { label: string; service: ProjectHealthService }[] = [
   { label: 'Frontend', service: 'website' },
@@ -13,14 +13,14 @@ const HEALTH_SERVICES: { label: string; service: ProjectHealthService }[] = [
 ]
 
 export function HeaderProjectHealth() {
+  const { user } = useAuth()
   const [projectId] = useProjectId()
-  const { data: health, isLoading } = useQuery({
-    ...getProjectHealthQuery(projectId!),
-    enabled: projectId != null,
-    meta: { suppressErrorToast: true }
-  })
 
-  if (projectId == null) return null
+  const userIsSuperAdmin = !!user?.role && isSuperAdmin(user.role)
+
+  const { health, isConnected } = useProjectHealthWebSocket({ projectId })
+
+  if (userIsSuperAdmin && projectId == null) return null
 
   return (
     <div className='border-border bg-muted/30 flex items-center gap-4 rounded-md border px-3 py-1.5'>
@@ -34,14 +34,14 @@ export function HeaderProjectHealth() {
                 status={details?.status ?? null}
                 responseMs={details?.responseMs}
                 lastChecked={details?.lastChecked}
-                isLoading={isLoading}
+                isLoading={!isConnected}
               />
               <span className='text-muted-foreground text-xs'>{label}</span>
             </div>
           )
         })}
         <div className='flex items-center gap-1.5'>
-          <HealthCell status={health?.overall_status ?? null} isLoading={isLoading} />
+          <HealthCell status={health?.overall_status ?? null} isLoading={!isConnected} />
           <span className='text-muted-foreground text-xs'>Status</span>
         </div>
       </div>
