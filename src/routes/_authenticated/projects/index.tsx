@@ -77,7 +77,7 @@ function ProjectsPage() {
   const [limit] = useLimitParam()
   const { sorting, setSorting, ordering } = useOrdering()
 
-  const [modalProject, setModalProject] = useState<Project | 'create' | null>(null)
+  const [modalProject, setModalProject] = useState<number | 'create' | null>(null)
   const [deleteProject, setDeleteProject] = useState<Project | null>(null)
 
   const params: ProjectParams = {
@@ -109,7 +109,7 @@ function ProjectsPage() {
     healthQueries?.map((q) => ({ data: q.data, isLoading: q.isLoading }))
   )
 
-  const editingProject = typeof modalProject === 'object' ? modalProject : null
+  const editingProjectId = typeof modalProject === 'number' ? modalProject : null
 
   return (
     <div className='flex h-full flex-col gap-5'>
@@ -138,17 +138,17 @@ function ProjectsPage() {
         isLoading={isLoading || isPlaceholderData}
         sorting={sorting}
         setSorting={setSorting}
-        onEdit={setModalProject}
+        onEdit={(project) => setModalProject(project.id)}
         onDelete={setDeleteProject}
       />
 
       <Pagination totalCount={data?.count ?? 0} />
 
       <ProjectModal
-        key={editingProject?.id ?? 'create'}
+        key={editingProjectId ?? 'create'}
         open={modalProject !== null}
         onOpenChange={(open) => !open && setModalProject(null)}
-        project={editingProject}
+        projectId={editingProjectId}
       />
       <ProjectDeleteDialog
         project={deleteProject}

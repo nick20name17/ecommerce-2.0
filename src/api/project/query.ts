@@ -18,6 +18,12 @@ export const getProjectsQuery = (params: ProjectParams = {}) =>
     queryFn: () => projectService.get(params)
   })
 
+export const getProjectByIdQuery = (id: number) =>
+  queryOptions({
+    queryKey: PROJECT_QUERY_KEYS.detail(id),
+    queryFn: () => projectService.getById(id)
+  })
+
 export const getProjectHealthQuery = (id: number) =>
   queryOptions({
     queryKey: PROJECT_QUERY_KEYS.health(id),

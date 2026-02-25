@@ -135,7 +135,6 @@ const sharedFields = {
   db_username: RequiredStringSchema,
   api_endpoint: OptionalStringSchema,
   api_login: OptionalStringSchema,
-  extra_columns: OptionalStringSchema,
   price_field: OptionalStringSchema,
   markup_id_trigger: OptionalStringSchema,
   parent_category: OptionalStringSchema,

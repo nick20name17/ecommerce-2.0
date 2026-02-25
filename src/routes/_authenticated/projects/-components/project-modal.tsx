@@ -1,8 +1,8 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQuery } from '@tanstack/react-query'
 import { Controller, FormProvider, useForm, useFormContext } from 'react-hook-form'
 
-import { PROJECT_QUERY_KEYS } from '@/api/project/query'
+import { getProjectByIdQuery, PROJECT_QUERY_KEYS } from '@/api/project/query'
 import {
   type CreateProjectFormValues,
   CreateProjectSchema,
@@ -23,26 +23,105 @@ import {
 } from '@/components/ui/dialog'
 import { Field, FieldError, FieldGroup, FieldLabel, FieldSeparator } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
+import { Skeleton } from '@/components/ui/skeleton'
 
 interface ProjectModalProps {
-  project?: Project | null
+  projectId?: number | null
   open: boolean
   onOpenChange: (open: boolean) => void
 }
 
-export const ProjectModal = ({ project, open, onOpenChange }: ProjectModalProps) => {
-  const isEdit = !!project
+export const ProjectModal = ({ projectId, open, onOpenChange }: ProjectModalProps) => {
+  const isEdit = projectId != null
+
+  const { data: project, isLoading, isError, error } = useQuery({
+    ...getProjectByIdQuery(projectId ?? 0),
+    enabled: isEdit && open && projectId != null
+  })
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="flex max-h-[85vh] flex-col overflow-hidden p-0 sm:max-w-2xl">
-        {isEdit ? (
-          <EditForm project={project} onOpenChange={onOpenChange} />
-        ) : (
+        {!isEdit ? (
           <CreateForm onOpenChange={onOpenChange} />
+        ) : isLoading ? (
+          <EditFormSkeleton />
+        ) : isError || !project ? (
+          <EditFormError error={error} onOpenChange={onOpenChange} />
+        ) : (
+          <EditForm project={project} onOpenChange={onOpenChange} />
         )}
       </DialogContent>
     </Dialog>
+  )
+}
+
+function EditFormSkeleton() {
+  return (
+    <>
+      <DialogHeader className="sticky top-0 z-10 border-b bg-background px-6 py-4">
+        <Skeleton className="h-6 w-32" />
+        <Skeleton className="mt-2 h-4 w-48" />
+      </DialogHeader>
+      <div className="min-h-0 flex-1 space-y-4 overflow-y-auto px-6 py-4">
+        <div className="space-y-2">
+          <Skeleton className="h-4 w-16" />
+          <Skeleton className="h-9 w-full" />
+        </div>
+        <Skeleton className="h-4 w-24" />
+        <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Skeleton className="h-4 w-14" />
+            <Skeleton className="h-9 w-full" />
+          </div>
+          <div className="space-y-2">
+            <Skeleton className="h-4 w-12" />
+            <Skeleton className="h-9 w-full" />
+          </div>
+        </div>
+        <div className="space-y-2">
+          <Skeleton className="h-4 w-20" />
+          <Skeleton className="h-9 w-full" />
+        </div>
+        <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Skeleton className="h-4 w-16" />
+            <Skeleton className="h-9 w-full" />
+          </div>
+          <div className="space-y-2">
+            <Skeleton className="h-4 w-20" />
+            <Skeleton className="h-9 w-full" />
+          </div>
+        </div>
+      </div>
+      <DialogFooter className="sticky bottom-0 z-10 border-t bg-background px-6 py-4">
+        <Skeleton className="h-9 w-20" />
+        <Skeleton className="h-9 w-24" />
+      </DialogFooter>
+    </>
+  )
+}
+
+function EditFormError({
+  error,
+  onOpenChange
+}: {
+  error: Error | null
+  onOpenChange: (open: boolean) => void
+}) {
+  const message = error?.message ?? 'Failed to load project'
+  return (
+    <>
+      <DialogHeader className="border-b bg-background px-6 py-4">
+        <DialogTitle>Edit Project</DialogTitle>
+        <DialogDescription>{message}</DialogDescription>
+      </DialogHeader>
+      <DialogFooter className="border-t bg-background px-6 py-4">
+        <Button variant="outline" onClick={() => onOpenChange(false)}>
+          Close
+        </Button>
+      </DialogFooter>
+    </>
   )
 }
 
@@ -202,24 +281,6 @@ function SharedFields() {
 
       <FieldSeparator>Advanced</FieldSeparator>
 
-      <Controller
-        name="extra_columns"
-        control={control}
-        render={({ field, fieldState }) => (
-          <Field data-invalid={fieldState.invalid}>
-            <FieldLabel htmlFor="extra-columns">Extra Columns</FieldLabel>
-            <Input
-              {...field}
-              value={field.value ?? ''}
-              id="extra-columns"
-              placeholder="column1,column2"
-              aria-invalid={fieldState.invalid}
-            />
-            {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-          </Field>
-        )}
-      />
-
       <div className="grid grid-cols-2 gap-4">
         <Controller
           name="price_field"
@@ -293,7 +354,6 @@ function CreateForm({ onOpenChange }: { onOpenChange: (open: boolean) => void })
       api_endpoint: '',
       api_login: '',
       api_password: '',
-      extra_columns: '',
       price_field: '',
       markup_id_trigger: '',
       parent_category: '',
@@ -406,7 +466,6 @@ function EditForm({
       db_username: project.db_username ?? '',
       api_endpoint: project.api_endpoint ?? '',
       api_login: project.api_login ?? '',
-      extra_columns: project.extra_columns ?? '',
       price_field: project.price_field ?? '',
       markup_id_trigger: project.markup_id_trigger ?? '',
       parent_category: project.parent_category ?? '',
@@ -420,7 +479,7 @@ function EditForm({
     mutationFn: projectService.update,
     meta: {
       successMessage: 'Project updated successfully',
-      invalidatesQuery: PROJECT_QUERY_KEYS.lists(),
+      invalidatesQuery: PROJECT_QUERY_KEYS.all(),
     },
     onSuccess: () => onOpenChange(false),
   })
