@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import ReconnectingWebSocket from 'reconnecting-websocket'
 
-import type { ProjectHealth } from '@/api/project/schema'
 import { API_ORIGIN } from '@/api/constants'
+import type { ProjectHealth } from '@/api/project/schema'
 import { isSuperAdmin } from '@/constants/user'
 import { getSession } from '@/helpers/auth'
 
@@ -106,3 +106,4 @@ export function useProjectHealthWebSocket({
 
   return { health, isConnected }
 }
+
