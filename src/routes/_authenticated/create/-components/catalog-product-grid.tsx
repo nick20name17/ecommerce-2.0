@@ -1,6 +1,6 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import { useDebouncedCallback } from 'use-debounce'
-import { Image, Loader2, Package, Search, ShoppingCart, X } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Image, Loader2, Package, Search, ShoppingCart, X } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 
 import { getProductsQuery } from '@/api/product/query'
@@ -21,6 +21,72 @@ interface CatalogProductGridProps {
 }
 
 const DEFAULT_LIMIT = 24
+
+function CatalogProductCardImage({
+  photo,
+  photos,
+  alt,
+}: {
+  photo: string | undefined
+  photos: string[] | undefined
+  alt: string
+}) {
+  const urls = (photos?.length ? (photos as string[]) : null) ?? (photo ? [photo] : [])
+  const [index, setIndex] = useState(0)
+  useEffect(() => {
+    setIndex((i) => (i >= urls.length ? 0 : i))
+  }, [urls.length])
+  const current = urls[index]
+  const hasMultiple = urls.length > 1
+
+  if (!current) {
+    return (
+      <div className='flex size-20 shrink-0 items-center justify-center rounded-xl bg-muted'>
+        <Image className='size-6 text-muted-foreground' />
+      </div>
+    )
+  }
+
+  return (
+    <div className='group/img relative flex size-20 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-muted'>
+      <img
+        src={current}
+        alt={alt}
+        className='size-full object-cover'
+        loading='lazy'
+      />
+      {hasMultiple && (
+        <>
+          <button
+            type='button'
+            className='absolute left-0 top-1/2 flex size-5 -translate-y-1/2 items-center justify-center rounded-r bg-background/80 text-muted-foreground opacity-0 transition-opacity hover:opacity-100 group-hover/img:opacity-100'
+            onClick={(e) => {
+              e.stopPropagation()
+              setIndex((i) => (i === 0 ? urls.length - 1 : i - 1))
+            }}
+            aria-label='Previous image'
+          >
+            <ChevronLeft className='size-2.5' />
+          </button>
+          <button
+            type='button'
+            className='absolute right-0 top-1/2 flex size-5 -translate-y-1/2 items-center justify-center rounded-l bg-background/80 text-muted-foreground opacity-0 transition-opacity hover:opacity-100 group-hover/img:opacity-100'
+            onClick={(e) => {
+              e.stopPropagation()
+              setIndex((i) => (i === urls.length - 1 ? 0 : i + 1))
+            }}
+            aria-label='Next image'
+          >
+            <ChevronRight className='size-2.5' />
+          </button>
+          <span className='absolute bottom-0.5 right-0.5 rounded bg-foreground/70 px-1 py-0.5 text-[10px] font-medium text-background'>
+            {index + 1}/{urls.length}
+          </span>
+        </>
+      )}
+    </div>
+  )
+}
 
 export function CatalogProductGrid({
   customerId,
@@ -196,18 +262,11 @@ export function CatalogProductGrid({
                     className='group rounded-2xl border bg-card p-3 shadow-sm transition-colors hover:bg-muted/10'
                   >
                     <div className='flex gap-3'>
-                      <div className='bg-muted relative flex size-14 shrink-0 items-center justify-center overflow-hidden rounded-xl'>
-                        {product.photo ? (
-                          <img
-                            src={product.photo}
-                            alt={product.descr_1}
-                            className='size-full object-cover'
-                            loading='lazy'
-                          />
-                        ) : (
-                          <Image className='size-5 text-muted-foreground' />
-                        )}
-                      </div>
+                      <CatalogProductCardImage
+                        photo={product.photo}
+                        photos={product.photos as string[] | undefined}
+                        alt={product.descr_1}
+                      />
 
                       <div className='min-w-0 flex-1'>
                         <div className='flex items-start justify-between gap-2'>
