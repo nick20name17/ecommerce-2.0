@@ -236,6 +236,8 @@ function CreatePage() {
         loading: 'Creating proposal...',
         success: (result) => {
           invalidateCart()
+          setCustomer(null)
+          setSavedCustomerId(null)
           navigate({ to: '/proposals', search: { autoid: result.AUTOID, status: 'all' } })
           return 'Proposal created successfully'
         },
@@ -267,6 +269,8 @@ function CreatePage() {
         loading: 'Creating order...',
         success: (result) => {
           invalidateCart()
+          setCustomer(null)
+          setSavedCustomerId(null)
           navigate({ to: '/orders', search: { autoid: result.AUTOID, status: 'all' } })
           return 'Order created successfully'
         },
