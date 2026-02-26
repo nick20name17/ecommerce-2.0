@@ -91,9 +91,7 @@ export function TaskStatusManager({ projectId, statuses }: TaskStatusManagerProp
     Promise.all(
       next
         .filter((s) => !s.is_default && s.id != null)
-        .map((status, i) =>
-          reorderMutation.mutateAsync({ id: status.id as number, order: i })
-        )
+        .map((status, i) => reorderMutation.mutateAsync({ id: status.id as number, order: i }))
     )
       .then(() => {
         queryClient.invalidateQueries({
@@ -230,7 +228,10 @@ function SortableStatusRow({
       )}
     >
       {isDefault ? (
-        <div className='w-4 shrink-0' aria-hidden />
+        <div
+          className='w-4 shrink-0'
+          aria-hidden
+        />
       ) : (
         <button
           ref={handleRef}
@@ -278,13 +279,7 @@ function SortableStatusRow({
   )
 }
 
-function StatusEditDialog({
-  status,
-  projectId
-}: {
-  status: TaskStatus
-  projectId: number | null
-}) {
+function StatusEditDialog({ status, projectId }: { status: TaskStatus; projectId: number | null }) {
   const [open, setOpen] = useState(false)
   const [name, setName] = useState(status.name)
   const [color, setColor] = useState(status.color ?? defaultStatusColorHex)
@@ -330,7 +325,7 @@ function StatusEditDialog({
         </Button>
       </DialogTrigger>
       <DialogContent>
-        <DialogHeader>
+        <DialogHeader className='bg-background border-b px-6 py-4'>
           <DialogTitle>Edit status</DialogTitle>
         </DialogHeader>
         <DialogBody>
@@ -414,3 +409,4 @@ function AddStatusRow({
     </div>
   )
 }
+

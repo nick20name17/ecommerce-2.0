@@ -157,7 +157,7 @@ export const DangerZoneCard = ({ user }: DangerZoneCardProps) => {
         onOpenChange={handleDeleteClose}
       >
         <DialogContent className='sm:max-w-md'>
-          <DialogHeader>
+          <DialogHeader className='bg-background border-b px-6 py-4'>
             <DialogTitle>Delete Account</DialogTitle>
             <DialogDescription className='text-destructive'>
               <strong>Warning:</strong> This action is permanent and cannot be undone. All your data

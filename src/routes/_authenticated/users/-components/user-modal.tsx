@@ -1,12 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQuery } from '@tanstack/react-query'
-import {
-  Controller,
-  FormProvider,
-  useForm,
-  useFormContext,
-  useWatch
-} from 'react-hook-form'
+import { Controller, FormProvider, useForm, useFormContext, useWatch } from 'react-hook-form'
 
 import { getProjectsQuery } from '@/api/project/query'
 import { USER_QUERY_KEYS } from '@/api/user/query'
@@ -56,7 +50,7 @@ export const UserModal = ({ user, open, onOpenChange }: UserModalProps) => {
       open={open}
       onOpenChange={onOpenChange}
     >
-      <DialogContent className='flex max-h-[90vh] flex-col sm:max-w-md'>
+      <DialogContent className='flex max-h-[90vh] flex-col overflow-hidden p-0 sm:max-w-md'>
         {isEdit ? (
           <EditForm
             user={user}
@@ -246,11 +240,11 @@ function CreateForm({ onOpenChange }: { onOpenChange: (open: boolean) => void })
 
   return (
     <FormProvider {...form}>
-      <DialogHeader>
+      <DialogHeader className='bg-background sticky top-0 z-10 border-b px-6 py-4'>
         <DialogTitle>Create User</DialogTitle>
       </DialogHeader>
 
-      <DialogBody>
+      <DialogBody className='px-6 py-4'>
         <form
           id='user-form'
           onSubmit={handleSubmit}
@@ -293,7 +287,7 @@ function CreateForm({ onOpenChange }: { onOpenChange: (open: boolean) => void })
         </form>
       </DialogBody>
 
-      <DialogFooter>
+      <DialogFooter className='bg-background sticky bottom-0 z-10 border-t px-6 py-4'>
         <Button
           variant='outline'
           onClick={() => onOpenChange(false)}
@@ -344,11 +338,11 @@ function EditForm({ user, onOpenChange }: { user: User; onOpenChange: (open: boo
 
   return (
     <FormProvider {...form}>
-      <DialogHeader>
+      <DialogHeader className='bg-background sticky top-0 z-10 border-b px-6 py-4'>
         <DialogTitle>Edit User</DialogTitle>
       </DialogHeader>
 
-      <DialogBody>
+      <DialogBody className='px-6 py-4'>
         <form
           id='user-form'
           onSubmit={handleSubmit}
@@ -378,7 +372,7 @@ function EditForm({ user, onOpenChange }: { user: User; onOpenChange: (open: boo
         </form>
       </DialogBody>
 
-      <DialogFooter>
+      <DialogFooter className='bg-background sticky bottom-0 z-10 border-t px-6 py-4'>
         <Button
           variant='outline'
           onClick={() => onOpenChange(false)}
@@ -397,3 +391,4 @@ function EditForm({ user, onOpenChange }: { user: User; onOpenChange: (open: boo
     </FormProvider>
   )
 }
+

@@ -61,12 +61,12 @@ export const PayloadLogDetailDialog = ({
       open={open}
       onOpenChange={onOpenChange}
     >
-      <DialogContent className='flex h-[90vh] flex-col sm:max-w-4xl!'>
-        <DialogHeader>
+      <DialogContent className='flex h-[90vh] flex-col overflow-hidden p-0 sm:max-w-4xl!'>
+        <DialogHeader className='bg-background sticky top-0 z-10 border-b px-6 py-4'>
           <DialogTitle>Payload Log #{log.id}</DialogTitle>
         </DialogHeader>
 
-        <DialogBody className='min-h-0 space-y-4'>
+        <DialogBody className='min-h-0 space-y-4 px-6 py-4'>
           <div className='grid grid-cols-2 gap-4'>
             <DetailItem label='Project'>
               {log.project_name} (#{log.project_id})
@@ -95,9 +95,7 @@ export const PayloadLogDetailDialog = ({
                 {log.is_error ? 'Yes' : 'No'}
               </Badge>
             </DetailItem>
-            <DetailItem label='Created At'>
-              {formatDate(log.created_at, 'dateTime')}
-            </DetailItem>
+            <DetailItem label='Created At'>{formatDate(log.created_at, 'dateTime')}</DetailItem>
           </div>
 
           <div className='flex flex-col gap-1.5 overflow-hidden'>
@@ -143,7 +141,7 @@ export const PayloadLogDetailDialog = ({
           </div>
         </DialogBody>
 
-        <DialogFooter>
+        <DialogFooter className='bg-background sticky bottom-0 z-10 border-t px-6 py-4'>
           <Button
             variant='outline'
             onClick={() => onOpenChange(false)}
@@ -166,3 +164,4 @@ function DetailItem({ label, children }: { label: string; children: React.ReactN
     </div>
   )
 }
+

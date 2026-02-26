@@ -60,7 +60,7 @@ export const TaskModal = ({
       open={open}
       onOpenChange={onOpenChange}
     >
-      <DialogContent className='max-h-[95vh] sm:max-w-2xl'>
+      <DialogContent className='flex max-h-[95vh] flex-col overflow-hidden p-0 sm:max-w-2xl'>
         {isEdit ? (
           <EditForm
             task={task}
@@ -266,7 +266,7 @@ function CreateForm({
   if (statusesLoading && statuses.length === 0) {
     return (
       <>
-        <DialogHeader>
+        <DialogHeader className='bg-background sticky top-0 z-10 border-b px-6 py-4'>
           <DialogTitle>Create Todo</DialogTitle>
           <DialogDescription>Loading statuses…</DialogDescription>
         </DialogHeader>
@@ -278,13 +278,13 @@ function CreateForm({
   if (!statusesLoading && statuses.length === 0) {
     return (
       <>
-        <DialogHeader>
+        <DialogHeader className='bg-background sticky top-0 z-10 border-b px-6 py-4'>
           <DialogTitle>Create Todo</DialogTitle>
           <DialogDescription>
             No todo statuses available. Create statuses in project settings first.
           </DialogDescription>
         </DialogHeader>
-        <DialogFooter>
+        <DialogFooter className='bg-background sticky bottom-0 z-10 border-t px-6 py-4'>
           <Button
             variant='outline'
             onClick={() => onOpenChange(false)}
@@ -382,11 +382,11 @@ function CreateFormInner({
 
   return (
     <FormProvider {...form}>
-      <DialogHeader className='border-b pb-4'>
+      <DialogHeader className='bg-background sticky top-0 z-10 border-b px-6 py-4'>
         <DialogTitle>Create Todo</DialogTitle>
       </DialogHeader>
 
-      <DialogBody>
+      <DialogBody className='px-6 py-4'>
         <form
           id='task-form'
           onSubmit={handleSubmit}
@@ -405,7 +405,7 @@ function CreateFormInner({
         </form>
       </DialogBody>
 
-      <DialogFooter>
+      <DialogFooter className='bg-background sticky bottom-0 z-10 border-t px-6 py-4'>
         <Button
           variant='outline'
           onClick={() => onOpenChange(false)}
@@ -492,11 +492,11 @@ function EditForm({
 
   return (
     <FormProvider {...form}>
-      <DialogHeader className='border-b pb-4'>
+      <DialogHeader className='bg-background sticky top-0 z-10 border-b px-6 py-4'>
         <DialogTitle>Edit Todo</DialogTitle>
       </DialogHeader>
 
-      <DialogBody>
+      <DialogBody className='px-6 py-4'>
         <form
           id='task-form'
           onSubmit={handleSubmit}
@@ -519,7 +519,7 @@ function EditForm({
         </form>
       </DialogBody>
 
-      <DialogFooter>
+      <DialogFooter className='bg-background sticky bottom-0 z-10 border-t px-6 py-4'>
         <Button
           variant='outline'
           onClick={() => onOpenChange(false)}
@@ -538,3 +538,4 @@ function EditForm({
     </FormProvider>
   )
 }
+

@@ -30,14 +30,20 @@ export const SecurityCard = () => {
           <CardDescription>Keep your account secure by using a strong password.</CardDescription>
         </CardHeader>
         <CardContent>
-          <Button variant='outline' onClick={() => setOpen(true)}>
+          <Button
+            variant='outline'
+            onClick={() => setOpen(true)}
+          >
             <Lock />
             Change Password
           </Button>
         </CardContent>
       </Card>
 
-      <ChangePasswordDialog open={open} onOpenChange={setOpen} />
+      <ChangePasswordDialog
+        open={open}
+        onOpenChange={setOpen}
+      />
     </>
   )
 }
@@ -79,54 +85,73 @@ function ChangePasswordDialog({
   }
 
   return (
-    <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className='flex max-h-[90vh] flex-col sm:max-w-md'>
-        <DialogHeader>
+    <Dialog
+      open={open}
+      onOpenChange={handleClose}
+    >
+      <DialogContent className='flex max-h-[90vh] flex-col overflow-hidden p-0 sm:max-w-md'>
+        <DialogHeader className='bg-background sticky top-0 z-10 border-b px-6 py-4'>
           <DialogTitle>Change Password</DialogTitle>
         </DialogHeader>
 
-        <DialogBody>
-          <form id='password-form' onSubmit={handleSubmit}>
+        <DialogBody className='px-6 py-4'>
+          <form
+            id='password-form'
+            onSubmit={handleSubmit}
+          >
             <FieldGroup>
-            <Controller
-              name='old_password'
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor='old-password'>Current Password</FieldLabel>
-                  <PasswordInput {...field} id='old-password' />
-                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                </Field>
-              )}
-            />
-            <Controller
-              name='new_password'
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor='new-password'>New Password</FieldLabel>
-                  <PasswordInput {...field} id='new-password' />
-                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                </Field>
-              )}
-            />
-            <Controller
-              name='new_password_confirm'
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor='new-password-confirm'>Confirm New Password</FieldLabel>
-                  <PasswordInput {...field} id='new-password-confirm' />
-                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                </Field>
-              )}
-            />
+              <Controller
+                name='old_password'
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldLabel htmlFor='old-password'>Current Password</FieldLabel>
+                    <PasswordInput
+                      {...field}
+                      id='old-password'
+                    />
+                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                  </Field>
+                )}
+              />
+              <Controller
+                name='new_password'
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldLabel htmlFor='new-password'>New Password</FieldLabel>
+                    <PasswordInput
+                      {...field}
+                      id='new-password'
+                    />
+                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                  </Field>
+                )}
+              />
+              <Controller
+                name='new_password_confirm'
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldLabel htmlFor='new-password-confirm'>Confirm New Password</FieldLabel>
+                    <PasswordInput
+                      {...field}
+                      id='new-password-confirm'
+                    />
+                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                  </Field>
+                )}
+              />
             </FieldGroup>
           </form>
         </DialogBody>
 
-        <DialogFooter>
-          <Button variant='outline' onClick={() => handleClose(false)} disabled={mutation.isPending}>
+        <DialogFooter className='bg-background sticky bottom-0 z-10 border-t px-6 py-4'>
+          <Button
+            variant='outline'
+            onClick={() => handleClose(false)}
+            disabled={mutation.isPending}
+          >
             Cancel
           </Button>
           <Button
@@ -142,3 +167,4 @@ function ChangePasswordDialog({
     </Dialog>
   )
 }
+

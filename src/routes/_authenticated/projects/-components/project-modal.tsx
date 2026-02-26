@@ -2,13 +2,13 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { Controller, FormProvider, useForm, useFormContext } from 'react-hook-form'
 
-import { getProjectByIdQuery, PROJECT_QUERY_KEYS } from '@/api/project/query'
+import { PROJECT_QUERY_KEYS, getProjectByIdQuery } from '@/api/project/query'
 import {
   type CreateProjectFormValues,
   CreateProjectSchema,
   type Project,
   type UpdateProjectFormValues,
-  UpdateProjectSchema,
+  UpdateProjectSchema
 } from '@/api/project/schema'
 import { projectService } from '@/api/project/service'
 import { PasswordInput } from '@/components/common/inputs/password-input'
@@ -20,7 +20,7 @@ import {
   DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogTitle,
+  DialogTitle
 } from '@/components/ui/dialog'
 import { Field, FieldError, FieldGroup, FieldLabel, FieldSeparator } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
@@ -35,22 +35,36 @@ interface ProjectModalProps {
 export const ProjectModal = ({ projectId, open, onOpenChange }: ProjectModalProps) => {
   const isEdit = projectId != null
 
-  const { data: project, isLoading, isError, error } = useQuery({
+  const {
+    data: project,
+    isLoading,
+    isError,
+    error
+  } = useQuery({
     ...getProjectByIdQuery(projectId ?? 0),
     enabled: isEdit && open && projectId != null
   })
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="flex max-h-[85vh] flex-col overflow-hidden p-0 sm:max-w-2xl">
+    <Dialog
+      open={open}
+      onOpenChange={onOpenChange}
+    >
+      <DialogContent className='flex max-h-[85vh] flex-col overflow-hidden p-0 sm:max-w-2xl'>
         {!isEdit ? (
           <CreateForm onOpenChange={onOpenChange} />
         ) : isLoading ? (
           <EditFormSkeleton />
         ) : isError || !project ? (
-          <EditFormError error={error} onOpenChange={onOpenChange} />
+          <EditFormError
+            error={error}
+            onOpenChange={onOpenChange}
+          />
         ) : (
-          <EditForm project={project} onOpenChange={onOpenChange} />
+          <EditForm
+            project={project}
+            onOpenChange={onOpenChange}
+          />
         )}
       </DialogContent>
     </Dialog>
@@ -60,44 +74,44 @@ export const ProjectModal = ({ projectId, open, onOpenChange }: ProjectModalProp
 function EditFormSkeleton() {
   return (
     <>
-      <DialogHeader className="sticky top-0 z-10 border-b bg-background px-6 py-4">
-        <Skeleton className="h-6 w-32" />
-        <Skeleton className="mt-2 h-4 w-48" />
+      <DialogHeader className='bg-background sticky top-0 z-10 border-b px-6 py-4'>
+        <Skeleton className='h-6 w-32' />
+        <Skeleton className='mt-2 h-4 w-48' />
       </DialogHeader>
-      <div className="min-h-0 flex-1 space-y-4 overflow-y-auto px-6 py-4">
-        <div className="space-y-2">
-          <Skeleton className="h-4 w-16" />
-          <Skeleton className="h-9 w-full" />
+      <div className='min-h-0 flex-1 space-y-4 overflow-y-auto px-6 py-4'>
+        <div className='space-y-2'>
+          <Skeleton className='h-4 w-16' />
+          <Skeleton className='h-9 w-full' />
         </div>
-        <Skeleton className="h-4 w-24" />
-        <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Skeleton className="h-4 w-14" />
-            <Skeleton className="h-9 w-full" />
+        <Skeleton className='h-4 w-24' />
+        <div className='grid grid-cols-2 gap-4'>
+          <div className='space-y-2'>
+            <Skeleton className='h-4 w-14' />
+            <Skeleton className='h-9 w-full' />
           </div>
-          <div className="space-y-2">
-            <Skeleton className="h-4 w-12" />
-            <Skeleton className="h-9 w-full" />
+          <div className='space-y-2'>
+            <Skeleton className='h-4 w-12' />
+            <Skeleton className='h-9 w-full' />
           </div>
         </div>
-        <div className="space-y-2">
-          <Skeleton className="h-4 w-20" />
-          <Skeleton className="h-9 w-full" />
+        <div className='space-y-2'>
+          <Skeleton className='h-4 w-20' />
+          <Skeleton className='h-9 w-full' />
         </div>
-        <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Skeleton className="h-4 w-16" />
-            <Skeleton className="h-9 w-full" />
+        <div className='grid grid-cols-2 gap-4'>
+          <div className='space-y-2'>
+            <Skeleton className='h-4 w-16' />
+            <Skeleton className='h-9 w-full' />
           </div>
-          <div className="space-y-2">
-            <Skeleton className="h-4 w-20" />
-            <Skeleton className="h-9 w-full" />
+          <div className='space-y-2'>
+            <Skeleton className='h-4 w-20' />
+            <Skeleton className='h-9 w-full' />
           </div>
         </div>
       </div>
-      <DialogFooter className="sticky bottom-0 z-10 border-t bg-background px-6 py-4">
-        <Skeleton className="h-9 w-20" />
-        <Skeleton className="h-9 w-24" />
+      <DialogFooter className='bg-background sticky bottom-0 z-10 border-t px-6 py-4'>
+        <Skeleton className='h-9 w-20' />
+        <Skeleton className='h-9 w-24' />
       </DialogFooter>
     </>
   )
@@ -113,12 +127,15 @@ function EditFormError({
   const message = error?.message ?? 'Failed to load project'
   return (
     <>
-      <DialogHeader className="border-b bg-background px-6 py-4">
+      <DialogHeader className='bg-background border-b px-6 py-4'>
         <DialogTitle>Edit Project</DialogTitle>
         <DialogDescription>{message}</DialogDescription>
       </DialogHeader>
-      <DialogFooter className="border-t bg-background px-6 py-4">
-        <Button variant="outline" onClick={() => onOpenChange(false)}>
+      <DialogFooter className='bg-background border-t px-6 py-4'>
+        <Button
+          variant='outline'
+          onClick={() => onOpenChange(false)}
+        >
           Close
         </Button>
       </DialogFooter>
@@ -132,12 +149,17 @@ function SharedFields() {
   return (
     <>
       <Controller
-        name="name"
+        name='name'
         control={control}
         render={({ field, fieldState }) => (
           <Field data-invalid={fieldState.invalid}>
-            <FieldLabel htmlFor="name">Name</FieldLabel>
-            <Input {...field} id="name" placeholder="My Project" aria-invalid={fieldState.invalid} />
+            <FieldLabel htmlFor='name'>Name</FieldLabel>
+            <Input
+              {...field}
+              id='name'
+              placeholder='My Project'
+              aria-invalid={fieldState.invalid}
+            />
             {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
           </Field>
         )}
@@ -145,30 +167,37 @@ function SharedFields() {
 
       <FieldSeparator>Database</FieldSeparator>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className='grid grid-cols-2 gap-4'>
         <Controller
-          name="db_type"
+          name='db_type'
           control={control}
           render={({ field, fieldState }) => (
             <Field data-invalid={fieldState.invalid}>
-              <FieldLabel htmlFor="db-type">DB Type</FieldLabel>
-              <Input {...field} id="db-type" placeholder="postgresql" aria-invalid={fieldState.invalid} />
+              <FieldLabel htmlFor='db-type'>DB Type</FieldLabel>
+              <Input
+                {...field}
+                id='db-type'
+                placeholder='postgresql'
+                aria-invalid={fieldState.invalid}
+              />
               {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
             </Field>
           )}
         />
         <Controller
-          name="db_port"
+          name='db_port'
           control={control}
           render={({ field, fieldState }) => (
             <Field data-invalid={fieldState.invalid}>
-              <FieldLabel htmlFor="db-port">DB Port</FieldLabel>
+              <FieldLabel htmlFor='db-port'>DB Port</FieldLabel>
               <Input
                 {...field}
-                onChange={(e) => field.onChange(e.target.value === '' ? undefined : Number(e.target.value))}
-                id="db-port"
-                type="number"
-                placeholder="5432"
+                onChange={(e) =>
+                  field.onChange(e.target.value === '' ? undefined : Number(e.target.value))
+                }
+                id='db-port'
+                type='number'
+                placeholder='5432'
                 aria-invalid={fieldState.invalid}
               />
               {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
@@ -178,36 +207,51 @@ function SharedFields() {
       </div>
 
       <Controller
-        name="db_host"
+        name='db_host'
         control={control}
         render={({ field, fieldState }) => (
           <Field data-invalid={fieldState.invalid}>
-            <FieldLabel htmlFor="db-host">DB Host</FieldLabel>
-            <Input {...field} id="db-host" placeholder="localhost" aria-invalid={fieldState.invalid} />
+            <FieldLabel htmlFor='db-host'>DB Host</FieldLabel>
+            <Input
+              {...field}
+              id='db-host'
+              placeholder='localhost'
+              aria-invalid={fieldState.invalid}
+            />
             {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
           </Field>
         )}
       />
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className='grid grid-cols-2 gap-4'>
         <Controller
-          name="db_name"
+          name='db_name'
           control={control}
           render={({ field, fieldState }) => (
             <Field data-invalid={fieldState.invalid}>
-              <FieldLabel htmlFor="db-name">DB Name</FieldLabel>
-              <Input {...field} id="db-name" placeholder="mydb" aria-invalid={fieldState.invalid} />
+              <FieldLabel htmlFor='db-name'>DB Name</FieldLabel>
+              <Input
+                {...field}
+                id='db-name'
+                placeholder='mydb'
+                aria-invalid={fieldState.invalid}
+              />
               {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
             </Field>
           )}
         />
         <Controller
-          name="db_username"
+          name='db_username'
           control={control}
           render={({ field, fieldState }) => (
             <Field data-invalid={fieldState.invalid}>
-              <FieldLabel htmlFor="db-username">DB Username</FieldLabel>
-              <Input {...field} id="db-username" placeholder="postgres" aria-invalid={fieldState.invalid} />
+              <FieldLabel htmlFor='db-username'>DB Username</FieldLabel>
+              <Input
+                {...field}
+                id='db-username'
+                placeholder='postgres'
+                aria-invalid={fieldState.invalid}
+              />
               {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
             </Field>
           )}
@@ -216,25 +260,37 @@ function SharedFields() {
 
       <FieldSeparator>API</FieldSeparator>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className='grid grid-cols-2 gap-4'>
         <Controller
-          name="api_endpoint"
+          name='api_endpoint'
           control={control}
           render={({ field, fieldState }) => (
             <Field data-invalid={fieldState.invalid}>
-              <FieldLabel htmlFor="api-endpoint">API Endpoint</FieldLabel>
-              <Input {...field} value={field.value ?? ''} id="api-endpoint" placeholder="https://..." aria-invalid={fieldState.invalid} />
+              <FieldLabel htmlFor='api-endpoint'>API Endpoint</FieldLabel>
+              <Input
+                {...field}
+                value={field.value ?? ''}
+                id='api-endpoint'
+                placeholder='https://...'
+                aria-invalid={fieldState.invalid}
+              />
               {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
             </Field>
           )}
         />
         <Controller
-          name="api_login"
+          name='api_login'
           control={control}
           render={({ field, fieldState }) => (
             <Field data-invalid={fieldState.invalid}>
-              <FieldLabel htmlFor="api-login">API Login</FieldLabel>
-              <Input {...field} value={field.value ?? ''} id="api-login" placeholder="admin" aria-invalid={fieldState.invalid} />
+              <FieldLabel htmlFor='api-login'>API Login</FieldLabel>
+              <Input
+                {...field}
+                value={field.value ?? ''}
+                id='api-login'
+                placeholder='admin'
+                aria-invalid={fieldState.invalid}
+              />
               {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
             </Field>
           )}
@@ -243,25 +299,37 @@ function SharedFields() {
 
       <FieldSeparator>S3 Storage</FieldSeparator>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className='grid grid-cols-2 gap-4'>
         <Controller
-          name="s3_bucket_name"
+          name='s3_bucket_name'
           control={control}
           render={({ field, fieldState }) => (
             <Field data-invalid={fieldState.invalid}>
-              <FieldLabel htmlFor="s3-bucket">Bucket Name</FieldLabel>
-              <Input {...field} value={field.value ?? ''} id="s3-bucket" placeholder="my-bucket" aria-invalid={fieldState.invalid} />
+              <FieldLabel htmlFor='s3-bucket'>Bucket Name</FieldLabel>
+              <Input
+                {...field}
+                value={field.value ?? ''}
+                id='s3-bucket'
+                placeholder='my-bucket'
+                aria-invalid={fieldState.invalid}
+              />
               {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
             </Field>
           )}
         />
         <Controller
-          name="s3_region"
+          name='s3_region'
           control={control}
           render={({ field, fieldState }) => (
             <Field data-invalid={fieldState.invalid}>
-              <FieldLabel htmlFor="s3-region">Region</FieldLabel>
-              <Input {...field} value={field.value ?? ''} id="s3-region" placeholder="us-east-1" aria-invalid={fieldState.invalid} />
+              <FieldLabel htmlFor='s3-region'>Region</FieldLabel>
+              <Input
+                {...field}
+                value={field.value ?? ''}
+                id='s3-region'
+                placeholder='us-east-1'
+                aria-invalid={fieldState.invalid}
+              />
               {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
             </Field>
           )}
@@ -269,12 +337,18 @@ function SharedFields() {
       </div>
 
       <Controller
-        name="s3_access_key_id"
+        name='s3_access_key_id'
         control={control}
         render={({ field, fieldState }) => (
           <Field data-invalid={fieldState.invalid}>
-            <FieldLabel htmlFor="s3-access-key">Access Key ID</FieldLabel>
-            <Input {...field} value={field.value ?? ''} id="s3-access-key" placeholder="AKIA..." aria-invalid={fieldState.invalid} />
+            <FieldLabel htmlFor='s3-access-key'>Access Key ID</FieldLabel>
+            <Input
+              {...field}
+              value={field.value ?? ''}
+              id='s3-access-key'
+              placeholder='AKIA...'
+              aria-invalid={fieldState.invalid}
+            />
             {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
           </Field>
         )}
@@ -282,18 +356,18 @@ function SharedFields() {
 
       <FieldSeparator>Advanced</FieldSeparator>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className='grid grid-cols-2 gap-4'>
         <Controller
-          name="price_field"
+          name='price_field'
           control={control}
           render={({ field, fieldState }) => (
             <Field data-invalid={fieldState.invalid}>
-              <FieldLabel htmlFor="price-field">Price Field</FieldLabel>
+              <FieldLabel htmlFor='price-field'>Price Field</FieldLabel>
               <Input
                 {...field}
                 value={field.value ?? ''}
-                id="price-field"
-                placeholder="price"
+                id='price-field'
+                placeholder='price'
                 aria-invalid={fieldState.invalid}
               />
               {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
@@ -301,16 +375,16 @@ function SharedFields() {
           )}
         />
         <Controller
-          name="markup_id_trigger"
+          name='markup_id_trigger'
           control={control}
           render={({ field, fieldState }) => (
             <Field data-invalid={fieldState.invalid}>
-              <FieldLabel htmlFor="markup-trigger">Markup ID Trigger</FieldLabel>
+              <FieldLabel htmlFor='markup-trigger'>Markup ID Trigger</FieldLabel>
               <Input
                 {...field}
                 value={field.value ?? ''}
-                id="markup-trigger"
-                placeholder="markup_id"
+                id='markup-trigger'
+                placeholder='markup_id'
                 aria-invalid={fieldState.invalid}
               />
               {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
@@ -320,16 +394,16 @@ function SharedFields() {
       </div>
 
       <Controller
-        name="parent_category"
+        name='parent_category'
         control={control}
         render={({ field, fieldState }) => (
           <Field data-invalid={fieldState.invalid}>
-            <FieldLabel htmlFor="parent-category">Parent Category</FieldLabel>
+            <FieldLabel htmlFor='parent-category'>Parent Category</FieldLabel>
             <Input
               {...field}
               value={field.value ?? ''}
-              id="parent-category"
-              placeholder="Root TREE_ID"
+              id='parent-category'
+              placeholder='Root TREE_ID'
               maxLength={5}
               aria-invalid={fieldState.invalid}
             />
@@ -361,84 +435,101 @@ function CreateForm({ onOpenChange }: { onOpenChange: (open: boolean) => void })
       s3_bucket_name: '',
       s3_region: '',
       s3_access_key_id: '',
-      s3_secret_key: '',
-    },
+      s3_secret_key: ''
+    }
   })
 
   const mutation = useMutation({
     mutationFn: projectService.create,
     meta: {
       successMessage: 'Project created successfully',
-      invalidatesQuery: PROJECT_QUERY_KEYS.lists(),
+      invalidatesQuery: PROJECT_QUERY_KEYS.lists()
     },
     onSuccess: () => {
       onOpenChange(false)
       form.reset()
-    },
+    }
   })
 
   const handleSubmit = form.handleSubmit((data) => mutation.mutate(data))
 
   return (
     <FormProvider {...form}>
-      <DialogHeader className="sticky top-0 z-10 border-b bg-background px-6 py-4">
+      <DialogHeader className='bg-background sticky top-0 z-10 border-b px-6 py-4'>
         <DialogTitle>Create Project</DialogTitle>
       </DialogHeader>
 
-      <DialogBody className="px-6 py-4">
+      <DialogBody className='px-6 py-4'>
         <form
-          id="project-form"
+          id='project-form'
           onSubmit={handleSubmit}
         >
           <FieldGroup>
             <SharedFields />
 
-          <Controller
-            name="db_password"
-            control={form.control}
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor="db-password">DB Password</FieldLabel>
-                <PasswordInput {...field} id="db-password" placeholder="••••••••" />
-                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-              </Field>
-            )}
-          />
+            <Controller
+              name='db_password'
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor='db-password'>DB Password</FieldLabel>
+                  <PasswordInput
+                    {...field}
+                    id='db-password'
+                    placeholder='••••••••'
+                  />
+                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                </Field>
+              )}
+            />
 
-          <Controller
-            name="api_password"
-            control={form.control}
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor="api-password">API Password</FieldLabel>
-                <PasswordInput {...field} value={field.value ?? ''} id="api-password" placeholder="••••••••" />
-                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-              </Field>
-            )}
-          />
+            <Controller
+              name='api_password'
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor='api-password'>API Password</FieldLabel>
+                  <PasswordInput
+                    {...field}
+                    value={field.value ?? ''}
+                    id='api-password'
+                    placeholder='••••••••'
+                  />
+                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                </Field>
+              )}
+            />
 
-          <Controller
-            name="s3_secret_key"
-            control={form.control}
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor="s3-secret-key">S3 Secret Key</FieldLabel>
-                <PasswordInput {...field} value={field.value ?? ''} id="s3-secret-key" placeholder="••••••••" />
-                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-              </Field>
-            )}
-          />
-        </FieldGroup>
+            <Controller
+              name='s3_secret_key'
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor='s3-secret-key'>S3 Secret Key</FieldLabel>
+                  <PasswordInput
+                    {...field}
+                    value={field.value ?? ''}
+                    id='s3-secret-key'
+                    placeholder='••••••••'
+                  />
+                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                </Field>
+              )}
+            />
+          </FieldGroup>
         </form>
       </DialogBody>
 
-      <DialogFooter className="sticky bottom-0 z-10 border-t bg-background px-6 py-4">
-        <Button variant="outline" onClick={() => onOpenChange(false)}>
+      <DialogFooter className='bg-background sticky bottom-0 z-10 border-t px-6 py-4'>
+        <Button
+          variant='outline'
+          onClick={() => onOpenChange(false)}
+        >
           Cancel
         </Button>
         <Button
-          type="submit"
-          form="project-form"
+          type='submit'
+          form='project-form'
           isPending={mutation.isPending}
           disabled={mutation.isPending}
         >
@@ -451,7 +542,7 @@ function CreateForm({ onOpenChange }: { onOpenChange: (open: boolean) => void })
 
 function EditForm({
   project,
-  onOpenChange,
+  onOpenChange
 }: {
   project: Project
   onOpenChange: (open: boolean) => void
@@ -472,17 +563,17 @@ function EditForm({
       parent_category: project.parent_category ?? '',
       s3_bucket_name: project.s3_bucket_name ?? '',
       s3_region: project.s3_region ?? '',
-      s3_access_key_id: project.s3_access_key_id ?? '',
-    },
+      s3_access_key_id: project.s3_access_key_id ?? ''
+    }
   })
 
   const mutation = useMutation({
     mutationFn: projectService.update,
     meta: {
       successMessage: 'Project updated successfully',
-      invalidatesQuery: PROJECT_QUERY_KEYS.all(),
+      invalidatesQuery: PROJECT_QUERY_KEYS.all()
     },
-    onSuccess: () => onOpenChange(false),
+    onSuccess: () => onOpenChange(false)
   })
 
   const handleSubmit = form.handleSubmit((data) => {
@@ -491,13 +582,13 @@ function EditForm({
 
   return (
     <FormProvider {...form}>
-      <DialogHeader className="sticky top-0 z-10 border-b bg-background px-6 py-4">
+      <DialogHeader className='bg-background sticky top-0 z-10 border-b px-6 py-4'>
         <DialogTitle>Edit Project</DialogTitle>
       </DialogHeader>
 
-      <DialogBody className="px-6 py-4">
+      <DialogBody className='px-6 py-4'>
         <form
-          id="project-form"
+          id='project-form'
           onSubmit={handleSubmit}
         >
           <FieldGroup>
@@ -506,13 +597,16 @@ function EditForm({
         </form>
       </DialogBody>
 
-      <DialogFooter className="sticky bottom-0 z-10 border-t bg-background px-6 py-4">
-        <Button variant="outline" onClick={() => onOpenChange(false)}>
+      <DialogFooter className='bg-background sticky bottom-0 z-10 border-t px-6 py-4'>
+        <Button
+          variant='outline'
+          onClick={() => onOpenChange(false)}
+        >
           Cancel
         </Button>
         <Button
-          type="submit"
-          form="project-form"
+          type='submit'
+          form='project-form'
           isPending={mutation.isPending}
           disabled={!form.formState.isDirty || mutation.isPending}
         >
@@ -522,3 +616,4 @@ function EditForm({
     </FormProvider>
   )
 }
+

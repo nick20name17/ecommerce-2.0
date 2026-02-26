@@ -12,13 +12,13 @@ interface DataTableHeaderProps<TData> {
 
 export const DataTableHeader = <TData,>({
   table,
-  fitWidth = false,
+  fitWidth = false
 }: DataTableHeaderProps<TData>) => {
   const colCount = table.getHeaderGroups()[0]?.headers.length ?? 1
   const widthPercent = fitWidth ? `${100 / colCount}%` : undefined
 
   return (
-    <TableHeader className={cn('bg-muted sticky top-0 z-10')}>
+    <TableHeader className={cn('bg-muted sticky top-0 z-10 border-b border-border')}>
       {table?.getHeaderGroups()?.map((headerGroup) => (
         <TableRow
           className='border-none'
@@ -37,7 +37,7 @@ export const DataTableHeader = <TData,>({
             return (
               <TableHead
                 style={style}
-                className='border-b border-border text-xs font-medium uppercase tracking-wider text-muted-foreground'
+                className='border-border text-muted-foreground border-b text-xs font-medium tracking-wider uppercase'
                 key={header.id}
               >
                 {header.isPlaceholder
@@ -51,3 +51,4 @@ export const DataTableHeader = <TData,>({
     </TableHeader>
   )
 }
+

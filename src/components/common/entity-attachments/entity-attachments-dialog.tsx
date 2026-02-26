@@ -39,8 +39,7 @@ export function EntityAttachmentsDialog({
     enabled: open && entityType === 'proposal' && !!autoid
   })
 
-  const { data: attachments = [], isLoading } =
-    entityType === 'order' ? orderQuery : proposalQuery
+  const { data: attachments = [], isLoading } = entityType === 'order' ? orderQuery : proposalQuery
 
   return (
     <Dialog
@@ -48,7 +47,7 @@ export function EntityAttachmentsDialog({
       onOpenChange={onOpenChange}
     >
       <DialogContent className='flex max-h-[85vh] flex-col gap-0 p-0 sm:max-w-lg'>
-        <DialogHeader className='shrink-0 space-y-1 px-6 pt-6 pb-4'>
+        <DialogHeader className='bg-background sticky top-0 z-10 shrink-0 space-y-1 border-b px-6 py-4'>
           <DialogTitle className='text-lg font-semibold'>Attachments</DialogTitle>
           <DialogDescription className='text-sm'>{entityLabel}</DialogDescription>
         </DialogHeader>
@@ -66,3 +65,4 @@ export function EntityAttachmentsDialog({
     </Dialog>
   )
 }
+
