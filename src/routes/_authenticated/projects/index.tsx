@@ -130,7 +130,7 @@ function ProjectsPage() {
       </header>
 
       <div className='flex items-center gap-3'>
-        <SearchFilter placeholder='Search projects...' className='max-w-xs' />
+        <SearchFilter placeholder='Search projects...' />
       </div>
 
       <ProjectsDataTable

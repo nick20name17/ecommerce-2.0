@@ -48,17 +48,15 @@ function UsersPage() {
   return (
     <div className='flex h-full flex-col gap-5'>
       <header className='flex items-start justify-between'>
-        <div className='space-y-1'>
-          <div className='flex items-center gap-3'>
-            <div className='flex size-10 items-center justify-center rounded-lg bg-primary/10 text-primary'>
-              <Users className='size-5' />
-            </div>
-            <div>
-              <h1 className='text-2xl font-semibold tracking-tight'>Users</h1>
-              <p className='text-sm text-muted-foreground'>
-                {data?.count ?? 0} total · {activeCount} active
-              </p>
-            </div>
+        <div className='flex items-center gap-3'>
+          <div className='flex size-10 items-center justify-center rounded-lg bg-primary/10 text-primary'>
+            <Users className='size-5' />
+          </div>
+          <div>
+            <h1 className='text-2xl font-semibold tracking-tight'>Users</h1>
+            <p className='text-sm text-muted-foreground'>
+              {data?.count ?? 0} total · {activeCount} active
+            </p>
           </div>
         </div>
         <Button onClick={() => setModalUser('create')} className='gap-2'>
@@ -68,7 +66,7 @@ function UsersPage() {
       </header>
 
       <div className='flex items-center gap-3'>
-        <SearchFilter placeholder='Search by name or email...' className='max-w-xs' />
+        <SearchFilter placeholder='Search by name or email...' />
       </div>
 
       <UsersDataTable

@@ -68,7 +68,7 @@ function CustomersPage() {
       </header>
 
       <div className='flex items-center gap-3'>
-        <SearchFilter placeholder='Search by name, email, or phone...' className='max-w-xs' />
+        <SearchFilter placeholder='Search by name, email, or phone...' />
       </div>
 
       <CustomersDataTable

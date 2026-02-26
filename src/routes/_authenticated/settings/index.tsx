@@ -1,7 +1,7 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
 import { parseAsString, useQueryState } from 'nuqs'
-import { Database } from 'lucide-react'
+import { Database, Settings } from 'lucide-react'
 import { useMemo } from 'react'
 
 import { FieldsDataTable } from './-components/fields-data-table'
@@ -71,13 +71,19 @@ function SettingsPage() {
   }
 
   return (
-    <div className='flex h-full flex-col gap-4'>
-      <header>
-        <h1 className='text-lg font-semibold tracking-tight'>Settings</h1>
+    <div className='flex h-full flex-col gap-5'>
+      <header className='flex items-center gap-3'>
+        <div className='flex size-10 items-center justify-center rounded-lg bg-primary/10 text-primary'>
+          <Settings className='size-5' />
+        </div>
+        <div>
+          <h1 className='text-2xl font-semibold tracking-tight'>Settings</h1>
+          <p className='text-sm text-muted-foreground'>Data schema and field configuration</p>
+        </div>
       </header>
 
       <Tabs value={currentTab} onValueChange={setActiveTab} className='flex h-full min-h-0 flex-col'>
-        <TabsList variant='outline' className='flex-wrap'>
+        <TabsList variant='line' className='flex-wrap'>
           {tables.map((table) => (
             <TabsTrigger key={table.name} value={table.name}>
               {getTableLabel(table.name)}

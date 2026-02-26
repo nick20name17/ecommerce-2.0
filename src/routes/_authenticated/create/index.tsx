@@ -284,11 +284,11 @@ function CreatePage() {
           <Button variant='ghost' size='icon' className='shrink-0' onClick={() => router.history.back()}>
             <ArrowLeft className='size-4' />
           </Button>
-          <div className='flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-sm'>
+          <div className='flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary'>
             <FilePlus2 className='size-5' />
           </div>
           <div className='min-w-0'>
-            <h1 className='text-xl font-semibold tracking-tight'>Create New</h1>
+            <h1 className='text-2xl font-semibold tracking-tight'>Create New</h1>
             <p className='text-sm text-muted-foreground'>Build a proposal or order</p>
           </div>
         </div>

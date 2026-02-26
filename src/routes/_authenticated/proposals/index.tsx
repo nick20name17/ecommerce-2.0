@@ -3,11 +3,11 @@ import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { FileText, Plus, X } from 'lucide-react'
 import { useState } from 'react'
 
-import { EntityAttachmentsDialog } from '@/components/common/entity-attachments/entity-attachments-dialog'
 import { ProposalDeleteDialog } from './-components/proposal-delete-dialog'
 import { ProposalsDataTable } from './-components/proposals-data-table'
 import { getProposalsQuery } from '@/api/proposal/query'
 import type { Proposal, ProposalParams } from '@/api/proposal/schema'
+import { EntityAttachmentsDialog } from '@/components/common/entity-attachments/entity-attachments-dialog'
 import { Pagination } from '@/components/common/filters/pagination'
 import { SearchFilter } from '@/components/common/filters/search'
 import { Badge } from '@/components/ui/badge'
@@ -91,59 +91,63 @@ function ProposalsPage() {
     <div className='flex h-full flex-col gap-5'>
       <header className='flex items-start justify-between'>
         <div className='flex items-center gap-3'>
-          <div className='flex size-10 items-center justify-center rounded-lg bg-primary/10 text-primary'>
+          <div className='bg-primary/10 text-primary flex size-10 items-center justify-center rounded-lg'>
             <FileText className='size-5' />
           </div>
           <div>
             <h1 className='text-2xl font-semibold tracking-tight'>Proposals</h1>
-            <p className='text-sm text-muted-foreground'>{data?.count ?? 0} total</p>
+            <p className='text-muted-foreground text-sm'>{data?.count ?? 0} total</p>
           </div>
         </div>
-        <Button onClick={() => navigate({ to: '/create' })} className='gap-2'>
+        <Button
+          onClick={() => navigate({ to: '/create' })}
+          className='gap-2'
+        >
           <Plus className='size-4' />
           Create Proposal
         </Button>
       </header>
 
-      <Tabs
-        value={activeStatus}
-        onValueChange={handleStatusChange}
-      >
-        <TabsList variant='line'>
-          {STATUS_TABS.map((tab) => (
-            <TabsTrigger
-              key={tab.value}
-              value={tab.value}
-            >
-              {tab.label}
-            </TabsTrigger>
-          ))}
-        </TabsList>
-      </Tabs>
+      <div className='flex flex-wrap items-center justify-between gap-2'>
+        <Tabs
+          value={activeStatus}
+          onValueChange={handleStatusChange}
+        >
+          <TabsList variant='line'>
+            {STATUS_TABS.map((tab) => (
+              <TabsTrigger
+                key={tab.value}
+                value={tab.value}
+              >
+                {tab.label}
+              </TabsTrigger>
+            ))}
+          </TabsList>
+        </Tabs>
 
-      <div className='flex flex-wrap items-center gap-2'>
         <SearchFilter placeholder='Search by quote number...' />
-        {autoidFromUrl && (
-          <Badge
-            variant='secondary'
-            className='cursor-pointer gap-1 pr-1 transition-opacity hover:opacity-80'
-            onClick={() => setAutoidFromUrl(null)}
-          >
-            Proposal: {autoidFromUrl}
-            <button
-              type='button'
-              className='rounded-sm p-0.5 hover:bg-muted'
-              onClick={(e) => {
-                e.stopPropagation()
-                setAutoidFromUrl(null)
-              }}
-              aria-label='Clear proposal filter'
-            >
-              <X className='size-3' />
-            </button>
-          </Badge>
-        )}
       </div>
+
+      {autoidFromUrl && (
+        <Badge
+          variant='secondary'
+          className='cursor-pointer w-fit gap-1 pr-1 transition-opacity hover:opacity-80'
+          onClick={() => setAutoidFromUrl(null)}
+        >
+          Proposal: {autoidFromUrl}
+          <button
+            type='button'
+            className='rounded-sm p-0.5 hover:bg-muted'
+            onClick={(e) => {
+              e.stopPropagation()
+              setAutoidFromUrl(null)
+            }}
+            aria-label='Clear proposal filter'
+          >
+            <X className='size-3' />
+          </button>
+        </Badge>
+      )}
 
       <ProposalsDataTable
         data={data?.results ?? []}
@@ -180,3 +184,4 @@ function ProposalsPage() {
     </div>
   )
 }
+

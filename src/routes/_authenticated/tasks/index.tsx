@@ -140,7 +140,7 @@ function TasksPage() {
 
       <Collapsible open={filtersOpen} onOpenChange={setFiltersOpen}>
         <div className='flex flex-wrap items-center gap-2'>
-          <div className='min-w-0 flex-1 sm:max-w-xs'>
+          <div className='min-w-0 flex-1'>
             <SearchFilter placeholder="Search to-do's..." />
           </div>
           <CollapsibleTrigger asChild>

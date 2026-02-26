@@ -3,12 +3,12 @@ import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { Plus, ShoppingCart, X } from 'lucide-react'
 import { useState } from 'react'
 
-import { EntityAttachmentsDialog } from '@/components/common/entity-attachments/entity-attachments-dialog'
 import { OrderDeleteDialog } from './-components/order-delete-dialog'
 import { OrdersDataTable } from './-components/orders-data-table'
-import { getOrdersQuery, ORDER_QUERY_KEYS } from '@/api/order/query'
-import { orderService } from '@/api/order/service'
+import { ORDER_QUERY_KEYS, getOrdersQuery } from '@/api/order/query'
 import type { Order, OrderParams } from '@/api/order/schema'
+import { orderService } from '@/api/order/service'
+import { EntityAttachmentsDialog } from '@/components/common/entity-attachments/entity-attachments-dialog'
 import { Pagination } from '@/components/common/filters/pagination'
 import { SearchFilter } from '@/components/common/filters/search'
 import { Badge } from '@/components/ui/badge'
@@ -63,8 +63,8 @@ function OrdersPage() {
     meta: {
       successMessage: 'Linked proposal deleted',
       errorMessage: 'Failed to delete linked proposal',
-      invalidatesQuery: ORDER_QUERY_KEYS.lists(),
-    },
+      invalidatesQuery: ORDER_QUERY_KEYS.lists()
+    }
   })
 
   const activeStatus = status ?? ORDER_STATUS.unprocessed
@@ -98,59 +98,63 @@ function OrdersPage() {
     <div className='flex h-full flex-col gap-5'>
       <header className='flex items-start justify-between'>
         <div className='flex items-center gap-3'>
-          <div className='flex size-10 items-center justify-center rounded-lg bg-primary/10 text-primary'>
+          <div className='bg-primary/10 text-primary flex size-10 items-center justify-center rounded-lg'>
             <ShoppingCart className='size-5' />
           </div>
           <div>
             <h1 className='text-2xl font-semibold tracking-tight'>Orders</h1>
-            <p className='text-sm text-muted-foreground'>{data?.count ?? 0} total</p>
+            <p className='text-muted-foreground text-sm'>{data?.count ?? 0} total</p>
           </div>
         </div>
-        <Button onClick={() => navigate({ to: '/create' })} className='gap-2'>
+        <Button
+          onClick={() => navigate({ to: '/create' })}
+          className='gap-2'
+        >
           <Plus className='size-4' />
           Create Order
         </Button>
       </header>
 
-      <Tabs
-        value={activeStatus}
-        onValueChange={handleStatusChange}
-      >
-        <TabsList variant='line'>
-          {STATUS_TABS.map((tab) => (
-            <TabsTrigger
-              key={tab.value}
-              value={tab.value}
-            >
-              {tab.label}
-            </TabsTrigger>
-          ))}
-        </TabsList>
-      </Tabs>
+      <div className='flex flex-wrap items-center justify-between gap-2'>
+        <Tabs
+          value={activeStatus}
+          onValueChange={handleStatusChange}
+        >
+          <TabsList variant='line'>
+            {STATUS_TABS.map((tab) => (
+              <TabsTrigger
+                key={tab.value}
+                value={tab.value}
+              >
+                {tab.label}
+              </TabsTrigger>
+            ))}
+          </TabsList>
+        </Tabs>
 
-      <div className='flex flex-wrap items-center gap-2'>
         <SearchFilter placeholder='Search by invoice number...' />
-        {autoidFromUrl && (
-          <Badge
-            variant='secondary'
-            className='cursor-pointer gap-1 pr-1 transition-opacity hover:opacity-80'
-            onClick={() => setAutoidFromUrl(null)}
-          >
-            Order: {autoidFromUrl}
-            <button
-              type='button'
-              className='rounded-sm p-0.5 hover:bg-muted'
-              onClick={(e) => {
-                e.stopPropagation()
-                setAutoidFromUrl(null)
-              }}
-              aria-label='Clear order filter'
-            >
-              <X className='size-3' />
-            </button>
-          </Badge>
-        )}
       </div>
+
+      {autoidFromUrl && (
+        <Badge
+          variant='secondary'
+          className='cursor-pointer w-fit gap-1 pr-1 transition-opacity hover:opacity-80'
+          onClick={() => setAutoidFromUrl(null)}
+        >
+          Order: {autoidFromUrl}
+          <button
+            type='button'
+            className='rounded-sm p-0.5 hover:bg-muted'
+            onClick={(e) => {
+              e.stopPropagation()
+              setAutoidFromUrl(null)
+            }}
+            aria-label='Clear order filter'
+          >
+            <X className='size-3' />
+          </button>
+        </Badge>
+      )}
 
       <OrdersDataTable
         data={data?.results ?? []}
@@ -173,7 +177,11 @@ function OrdersPage() {
 
       <EntityAttachmentsDialog
         entityType='order'
-        entityLabel={orderForAttachments ? `Order ${orderForAttachments.invoice ?? orderForAttachments.autoid}` : ''}
+        entityLabel={
+          orderForAttachments
+            ? `Order ${orderForAttachments.invoice ?? orderForAttachments.autoid}`
+            : ''
+        }
         autoid={orderForAttachments?.autoid ?? ''}
         projectId={projectId}
         open={!!orderForAttachments}
@@ -182,3 +190,4 @@ function OrdersPage() {
     </div>
   )
 }
+
