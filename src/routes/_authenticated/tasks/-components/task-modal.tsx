@@ -96,7 +96,7 @@ function SharedFields({ statuses, projectId }: { statuses: TaskStatus[]; project
             <Input
               {...field}
               id='task-title'
-              placeholder='Task title'
+              placeholder='Todo title'
               aria-invalid={fieldState.invalid}
             />
             {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
@@ -267,7 +267,7 @@ function CreateForm({
     return (
       <>
         <DialogHeader>
-          <DialogTitle>Create Task</DialogTitle>
+          <DialogTitle>Create Todo</DialogTitle>
           <DialogDescription>Loading statuses…</DialogDescription>
         </DialogHeader>
         <div className='text-muted-foreground py-6 text-center'>Loading…</div>
@@ -279,9 +279,9 @@ function CreateForm({
     return (
       <>
         <DialogHeader>
-          <DialogTitle>Create Task</DialogTitle>
+          <DialogTitle>Create Todo</DialogTitle>
           <DialogDescription>
-            No task statuses available. Create statuses in project settings first.
+            No todo statuses available. Create statuses in project settings first.
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
@@ -359,7 +359,7 @@ function CreateFormInner({
       return task
     },
     meta: {
-      successMessage: 'Task created successfully',
+      successMessage: 'Todo created successfully',
       invalidatesQuery: TASK_QUERY_KEYS.lists()
     },
     onSuccess: () => {
@@ -383,7 +383,7 @@ function CreateFormInner({
   return (
     <FormProvider {...form}>
       <DialogHeader className='border-b pb-4'>
-        <DialogTitle>Create Task</DialogTitle>
+        <DialogTitle>Create Todo</DialogTitle>
       </DialogHeader>
 
       <DialogBody>
@@ -480,7 +480,7 @@ function EditForm({
       }
     },
     meta: {
-      successMessage: 'Task updated successfully',
+      successMessage: 'Todo updated successfully',
       invalidatesQuery: TASK_QUERY_KEYS.lists()
     },
     onSuccess: () => onOpenChange(false)
@@ -493,7 +493,7 @@ function EditForm({
   return (
     <FormProvider {...form}>
       <DialogHeader className='border-b pb-4'>
-        <DialogTitle>Edit Task</DialogTitle>
+        <DialogTitle>Edit Todo</DialogTitle>
       </DialogHeader>
 
       <DialogBody>

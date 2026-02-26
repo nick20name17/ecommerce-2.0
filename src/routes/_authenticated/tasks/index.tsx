@@ -134,7 +134,7 @@ function TasksPage() {
         </div>
         <Button onClick={() => setModalTask('create')} className='gap-2'>
           <Plus className='size-4' />
-          Create Task
+          Create Todo
         </Button>
       </header>
 

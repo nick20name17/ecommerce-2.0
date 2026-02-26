@@ -40,7 +40,7 @@ export const TaskInfoCard = ({ task, onDelete }: TaskInfoCardProps) => {
     mutationFn: (payload: Parameters<typeof taskService.update>[1]) =>
       taskService.update(task.id, payload),
     meta: {
-      successMessage: 'Task updated',
+      successMessage: 'Todo updated',
       invalidatesQuery: TASK_QUERY_KEYS.all()
     }
   })
@@ -93,7 +93,7 @@ export const TaskInfoCard = ({ task, onDelete }: TaskInfoCardProps) => {
                 }
               }}
               className='focus-visible:border-input focus-visible:ring-ring h-auto rounded-md border-transparent px-3 py-2 text-2xl font-bold focus-visible:ring-2'
-              placeholder='Task title'
+              placeholder='Todo title'
             />
             <Textarea
               value={description}
@@ -115,7 +115,7 @@ export const TaskInfoCard = ({ task, onDelete }: TaskInfoCardProps) => {
             size='icon'
             className='text-muted-foreground hover:text-destructive shrink-0'
             onClick={onDelete}
-            aria-label='Delete task'
+            aria-label='Delete todo'
           >
             <Trash2 className='size-4' />
           </Button>

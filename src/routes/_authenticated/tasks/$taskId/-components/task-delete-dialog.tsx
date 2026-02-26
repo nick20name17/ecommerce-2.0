@@ -32,7 +32,7 @@ export const TaskDeleteDialog = ({
   const deleteMutation = useMutation({
     mutationFn: (id: number) => taskService.delete(id),
     meta: {
-      successMessage: 'Task deleted',
+      successMessage: 'Todo deleted',
       invalidatesQuery: TASK_QUERY_KEYS.lists()
     },
     onSuccess: () => {
@@ -53,7 +53,7 @@ export const TaskDeleteDialog = ({
           <AlertDialogMedia className='bg-destructive/10 text-destructive'>
             <TriangleAlert />
           </AlertDialogMedia>
-          <AlertDialogTitle>Delete Task</AlertDialogTitle>
+          <AlertDialogTitle>Delete Todo</AlertDialogTitle>
           <AlertDialogDescription>
             Are you sure you want to delete &quot;{task?.title}&quot;? This action cannot be undone.
           </AlertDialogDescription>

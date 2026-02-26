@@ -90,7 +90,7 @@ export function CustomerTasksTab({ customerId }: CustomerTasksTabProps) {
           className='h-9 gap-2 shrink-0'
         >
           <Plus className='size-4' />
-          Add task
+          Add todo
         </Button>
       </div>
 

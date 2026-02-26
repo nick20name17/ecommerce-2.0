@@ -11,7 +11,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 export const Route = createFileRoute('/_authenticated/tasks/$taskId/')({
   component: TaskDetailPage,
   head: () => ({
-    meta: [{ title: 'Task' }]
+    meta: [{ title: 'Todo' }]
   })
 })
 
@@ -29,7 +29,7 @@ function TaskDetailPage() {
   if (Number.isNaN(id)) {
     return (
       <div className='flex h-full flex-col gap-4'>
-        <p className='text-muted-foreground'>Invalid task ID.</p>
+        <p className='text-muted-foreground'>Invalid todo ID.</p>
         <Button variant='outline' onClick={() => router.history.back()}>
           Back to To-Do's
         </Button>
@@ -52,7 +52,7 @@ function TaskDetailPage() {
   if (!task) {
     return (
       <div className='flex h-full flex-col items-center justify-center gap-4'>
-        <p className='text-muted-foreground'>Task not found.</p>
+        <p className='text-muted-foreground'>Todo not found.</p>
         <Button variant='outline' onClick={() => router.history.back()}>
           Back to To-Do's
         </Button>

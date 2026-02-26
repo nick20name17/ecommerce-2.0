@@ -111,7 +111,7 @@ export const TaskAttachments = forwardRef<TaskAttachmentsRef, TaskAttachmentsPro
 
     const uploadMutation = useMutation({
       mutationFn: async ({ file, tempId }: { file: File; tempId: string }) => {
-        if (!taskId) throw new Error('Task ID is required for immediate upload')
+        if (!taskId) throw new Error('Todo ID is required for immediate upload')
         const result = await taskService.uploadAttachment(taskId, file)
         return { result, tempId }
       },
@@ -139,7 +139,7 @@ export const TaskAttachments = forwardRef<TaskAttachmentsRef, TaskAttachmentsPro
 
     const deleteMutation = useMutation({
       mutationFn: async (attachmentId: number) => {
-        if (!taskId) throw new Error('Task ID is required for delete')
+        if (!taskId) throw new Error('Todo ID is required for delete')
         await taskService.deleteAttachment(taskId, attachmentId)
         return attachmentId
       },
@@ -222,7 +222,7 @@ export const TaskAttachments = forwardRef<TaskAttachmentsRef, TaskAttachmentsPro
       uploadPendingFiles: async (overrideTaskId?: number) => {
         const targetTaskId = overrideTaskId ?? taskId
         if (!targetTaskId) {
-          throw new Error('Task ID is required to upload files')
+          throw new Error('Todo ID is required to upload files')
         }
 
         const filesToUpload = pendingFiles.filter(
