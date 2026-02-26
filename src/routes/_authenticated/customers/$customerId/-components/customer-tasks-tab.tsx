@@ -110,7 +110,11 @@ export function CustomerTasksTab({ customerId }: CustomerTasksTabProps) {
       <Pagination totalCount={data?.count ?? 0} />
 
       <TaskModal
-        key={editingTask && 'id' in editingTask ? editingTask.id : 'create'}
+        key={
+          editingTask && 'id' in editingTask
+            ? editingTask.id
+            : `create-${modalTask === 'create' ? customerId : ''}`
+        }
         open={modalTask !== null}
         onOpenChange={(open) => !open && setModalTask(null)}
         task={editingTask ?? undefined}

@@ -364,7 +364,17 @@ function CreateFormInner({
     },
     onSuccess: () => {
       onOpenChange(false)
-      form.reset()
+      form.reset({
+        title: '',
+        description: null,
+        status: defaultStatus.id,
+        priority: TASK_PRIORITY.medium,
+        due_date: null,
+        responsible_user: null,
+        linked_order_autoid: null,
+        linked_proposal_autoid: null,
+        linked_customer_autoid: defaultLinkedCustomerAutoid ?? null
+      })
     }
   })
 
