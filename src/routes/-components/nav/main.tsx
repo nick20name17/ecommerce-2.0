@@ -18,10 +18,12 @@ import {
   SidebarMenuButton,
   SidebarMenuItem
 } from '@/components/ui/sidebar'
+import { isSuperAdmin } from '@/constants/user'
+import { useAuth } from '@/providers/auth'
 
 const NAV_ITEMS = [
   { title: 'Dashboard', url: '/', icon: LayoutDashboard },
-  { title: 'Projects', url: '/projects', icon: FolderKanban },
+  { title: 'Projects', url: '/projects', icon: FolderKanban, superAdminOnly: true },
   { title: 'Customers', url: '/customers', icon: UsersRound },
   { title: 'Users', url: '/users', icon: Users },
   { title: 'Orders', url: '/orders', icon: ShoppingCart },
@@ -34,10 +36,14 @@ const NAV_ITEMS = [
 ] as const
 
 export const NavMain = () => {
+  const { user } = useAuth()
+  const userIsSuperAdmin = !!user?.role && isSuperAdmin(user.role)
+  const items = NAV_ITEMS.filter((item) => !('superAdminOnly' in item && item.superAdminOnly) || userIsSuperAdmin)
+
   return (
     <SidebarGroup>
       <SidebarMenu>
-        {NAV_ITEMS.map((item) => (
+        {items.map((item) => (
           <SidebarMenuItem key={item.title}>
             <SidebarMenuButton
               tooltip={item.title}

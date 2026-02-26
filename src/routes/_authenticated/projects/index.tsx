@@ -1,5 +1,5 @@
 import { keepPreviousData, useQueries, useQuery } from '@tanstack/react-query'
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, redirect } from '@tanstack/react-router'
 import { FolderKanban, Plus } from 'lucide-react'
 import { useState } from 'react'
 
@@ -11,10 +11,20 @@ import type { Project, ProjectParams, ProjectWithHealthLoading } from '@/api/pro
 import { Pagination } from '@/components/common/filters/pagination'
 import { SearchFilter } from '@/components/common/filters/search'
 import { Button } from '@/components/ui/button'
+import { isSuperAdmin } from '@/constants/user'
+import type { UserRole } from '@/constants/user'
+import { getSession } from '@/helpers/auth'
 import { useOrdering } from '@/hooks/use-ordering'
 import { useLimitParam, useOffsetParam, useSearchParam } from '@/hooks/use-query-params'
 
 export const Route = createFileRoute('/_authenticated/projects/')({
+  beforeLoad: () => {
+    const session = getSession()
+    const role = session?.user?.role as UserRole | undefined
+    if (!role || !isSuperAdmin(role)) {
+      throw redirect({ to: '/', replace: true })
+    }
+  },
   component: ProjectsPage,
   head: () => ({
     meta: [{ title: 'Projects' }]
