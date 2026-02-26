@@ -35,10 +35,12 @@ function getFinancial(metrics: DashboardMetrics): DashboardFinancialTotal {
   return metrics.sales_total_field === 'total' ? metrics.total : metrics.sub_total
 }
 
+const defaultTrendFormat = (n: number) => String(n)
+
 function TrendIndicator({
   current,
   previous,
-  format = (n: number) => String(n),
+  format = defaultTrendFormat,
   invert = false
 }: {
   current: number

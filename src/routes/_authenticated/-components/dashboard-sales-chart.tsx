@@ -6,6 +6,7 @@ import {
   ChartTooltipContent,
   type ChartConfig
 } from '@/components/ui/chart'
+import { formatCurrency } from '@/helpers/formatters'
 import { Bar, BarChart, CartesianGrid, Legend, XAxis, YAxis } from 'recharts'
 
 const chartConfig = {
@@ -56,12 +57,10 @@ export function DashboardSalesChart({ metrics }: DashboardSalesChartProps) {
             <ChartTooltipContent
               formatter={(value) => (
                 <span className='font-mono font-medium tabular-nums'>
-                  {new Intl.NumberFormat(undefined, {
-                    style: 'currency',
-                    currency: 'USD',
+                  {formatCurrency(Number(value), '$0', {
                     minimumFractionDigits: 0,
                     maximumFractionDigits: 0
-                  }).format(Number(value))}
+                  })}
                 </span>
               )}
             />
