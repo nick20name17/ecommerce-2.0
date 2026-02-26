@@ -5,7 +5,6 @@ import { Link2Off, Loader2, MoreHorizontal, Paperclip, Trash2 } from 'lucide-rea
 
 import type { Order } from '@/api/order/schema'
 import { ColumnHeader } from '@/components/common/data-table/column-header'
-import { createCheckboxColumn } from '@/components/common/data-table/columns'
 import { createExpanderColumn } from '@/components/common/data-table/columns'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -34,7 +33,6 @@ export const getOrderColumns = ({
   onAttachments,
 }: OrderColumnsOptions): ColumnDef<OrderRow>[] => [
   createExpanderColumn<OrderRow>(),
-  createCheckboxColumn<OrderRow>(),
   {
     accessorKey: 'invoice',
     header: ({ column }) => <ColumnHeader column={column} title='Invoice' />,
