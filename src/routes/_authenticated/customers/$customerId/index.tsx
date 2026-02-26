@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { createFileRoute, useRouter } from '@tanstack/react-router'
 import { ArrowLeft } from 'lucide-react'
 
+import { CustomerDashboardTab } from './-components/customer-dashboard-tab'
 import { CustomerInfoCard } from './-components/customer-info-card'
 import { CustomerOrdersTab } from './-components/customer-orders-tab'
 import { CustomerTasksTab } from './-components/customer-tasks-tab'
@@ -66,8 +67,10 @@ function CustomerDetailPage() {
         <h1 className='text-2xl font-bold'>{customer.l_name}</h1>
       </div>
 
-      <div className='grid min-h-0 min-w-0 flex-1 items-start gap-4 lg:grid-cols-[380px_1fr]'>
-        <CustomerInfoCard customer={customer} />
+      <div className='grid min-h-0 min-w-0 flex-1 items-stretch gap-4 lg:grid-cols-[380px_1fr]'>
+        <div className='min-w-0 self-start'>
+          <CustomerInfoCard customer={customer} />
+        </div>
         <div className='flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden'>
           <Tabs
             value={activeTab}
@@ -76,20 +79,30 @@ function CustomerDetailPage() {
           >
             <TabsList
               variant='line'
-              className='mb-2'
+              className='mb-2 shrink-0'
             >
               <TabsTrigger value='orders'>Orders</TabsTrigger>
               <TabsTrigger value='todos'>To-Do's</TabsTrigger>
+              <TabsTrigger value='dashboard'>Dashboard</TabsTrigger>
             </TabsList>
             <TabsContent
+              value='dashboard'
+              className='mt-0 min-h-0 min-w-0 flex-1 overflow-x-hidden overflow-y-auto p-1'
+            >
+              <CustomerDashboardTab
+                customerId={customerId}
+                projectId={projectId ?? null}
+              />
+            </TabsContent>
+            <TabsContent
               value='orders'
-              className='mt-0 min-h-0 min-w-0 flex-1 overflow-hidden'
+              className='mt-0 flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden'
             >
               <CustomerOrdersTab customerId={customerId} />
             </TabsContent>
             <TabsContent
               value='todos'
-              className='mt-0 min-h-0 min-w-0 flex-1 overflow-hidden'
+              className='mt-0 flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden'
             >
               <CustomerTasksTab customerId={customerId} />
             </TabsContent>

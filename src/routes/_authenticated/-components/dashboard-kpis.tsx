@@ -72,7 +72,7 @@ const KPI_CONFIG = [
   {
     key: 'orders',
     title: 'Total orders',
-    description: 'All time',
+    description: 'Current month',
     icon: ShoppingCart,
     value: (m: DashboardMetrics) => m.total_order_count,
     secondary: (m: DashboardMetrics) => `Last month: ${m.last_month_order_count}`,
@@ -83,7 +83,7 @@ const KPI_CONFIG = [
   {
     key: 'sales',
     title: 'Total sales',
-    description: 'All time',
+    description: 'Current month',
     icon: DollarSign,
     value: (m: DashboardMetrics) => getFinancial(m).total_sales,
     secondary: (m: DashboardMetrics) =>

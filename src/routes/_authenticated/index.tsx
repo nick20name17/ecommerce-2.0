@@ -2,20 +2,20 @@ import { useQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
 import { DollarSign, LayoutDashboard, Loader2, ShoppingCart } from 'lucide-react'
 
-import { CustomerCombobox } from './create/-components/customer-combobox'
 import { DashboardKpis } from './-components/dashboard-kpis'
 import { DashboardOrdersChart } from './-components/dashboard-orders-chart'
 import { DashboardSalesChart } from './-components/dashboard-sales-chart'
-import type { Customer } from '@/api/customer/schema'
+import { CustomerCombobox } from './create/-components/customer-combobox'
 import { getCustomerDetailQuery } from '@/api/customer/query'
+import type { Customer } from '@/api/customer/schema'
 import { getDashboardQuery } from '@/api/dashboard/query'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { isSuperAdmin } from '@/constants/user'
 import { getErrorMessage } from '@/helpers/error'
-import { useDashboardCustomerIdParam } from '@/hooks/use-query-params'
 import { useProjectId } from '@/hooks/use-project-id'
-import { useAuth } from '@/providers/auth'
+import { useDashboardCustomerIdParam } from '@/hooks/use-query-params'
 import { cn } from '@/lib/utils'
+import { useAuth } from '@/providers/auth'
 
 export const Route = createFileRoute('/_authenticated/')({
   component: DashboardPage,
@@ -51,15 +51,13 @@ function DashboardPage() {
   if (userIsSuperAdmin && projectId == null) {
     return (
       <div className='flex h-full flex-col items-center justify-center gap-6 px-4'>
-        <div className='flex flex-col items-center gap-4 rounded-2xl border border-border bg-card/50 px-8 py-10 text-center shadow-sm'>
-          <div className='flex size-14 items-center justify-center rounded-2xl bg-primary/10 ring-2 ring-primary/20'>
-            <LayoutDashboard className='size-7 text-primary' />
+        <div className='border-border bg-card/50 flex flex-col items-center gap-4 rounded-2xl border px-8 py-10 text-center shadow-sm'>
+          <div className='bg-primary/10 ring-primary/20 flex size-14 items-center justify-center rounded-2xl ring-2'>
+            <LayoutDashboard className='text-primary size-7' />
           </div>
           <div className='space-y-1'>
-            <h1 className='text-xl font-semibold tracking-tight text-foreground'>
-              Dashboard
-            </h1>
-            <p className='max-w-sm text-sm text-muted-foreground'>
+            <h1 className='text-foreground text-xl font-semibold tracking-tight'>Dashboard</h1>
+            <p className='text-muted-foreground max-w-sm text-sm'>
               Select a project in the sidebar to view sales metrics and KPIs.
             </p>
           </div>
@@ -71,12 +69,12 @@ function DashboardPage() {
   if (error) {
     return (
       <div className='flex h-full flex-col items-center justify-center gap-6 px-4'>
-        <Card className='max-w-md border-destructive/30 bg-card'>
+        <Card className='border-destructive/30 bg-card max-w-md'>
           <CardHeader>
             <CardTitle className='text-destructive'>Unable to load dashboard</CardTitle>
           </CardHeader>
           <CardContent className='space-y-2'>
-            <p className='text-sm text-muted-foreground'>{getErrorMessage(error)}</p>
+            <p className='text-muted-foreground text-sm'>{getErrorMessage(error)}</p>
           </CardContent>
         </Card>
       </div>
@@ -89,18 +87,16 @@ function DashboardPage() {
         <header className='flex shrink-0 items-start justify-between'>
           <div className='space-y-1'>
             <div className='flex items-center gap-3'>
-              <div className='flex size-10 items-center justify-center rounded-lg bg-primary/10 text-primary'>
+              <div className='bg-primary/10 text-primary flex size-10 items-center justify-center rounded-lg'>
                 <LayoutDashboard className='size-5' />
               </div>
               <div>
                 <h1 className='text-2xl font-semibold tracking-tight'>Dashboard</h1>
-                <p className='text-sm text-muted-foreground'>
-                  Loading sales metrics…
-                </p>
+                <p className='text-muted-foreground text-sm'>Loading sales metrics…</p>
               </div>
             </div>
           </div>
-          <div className='w-full min-w-0 sm:min-w-[20rem] sm:max-w-md'>
+          <div className='w-full min-w-0 sm:max-w-md sm:min-w-[20rem]'>
             <CustomerCombobox
               value={customerFilterValue}
               onChange={(customer) => setCustomerId(customer?.id ?? null)}
@@ -110,37 +106,43 @@ function DashboardPage() {
             />
           </div>
         </header>
-        <div className='min-h-0 flex-1 overflow-y-auto overflow-x-hidden px-1 pt-4 pb-6 pr-4'>
+        <div className='min-h-0 flex-1 overflow-x-hidden overflow-y-auto px-1 pt-4 pr-4 pb-6'>
           <div className='flex flex-col gap-5'>
             <div className='grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3'>
               {Array.from({ length: 6 }).map((_, i) => (
-                <Card key={i} className='min-w-0 overflow-hidden'>
+                <Card
+                  key={i}
+                  className='min-w-0 overflow-hidden'
+                >
                   <CardHeader className='flex flex-row items-start justify-between gap-3 pb-2'>
                     <div className='space-y-1'>
                       <div className='flex items-center gap-2'>
-                        <div className='size-8 shrink-0 animate-pulse rounded-lg bg-muted' />
-                        <div className='h-4 w-24 animate-pulse rounded bg-muted' />
+                        <div className='bg-muted size-8 shrink-0 animate-pulse rounded-lg' />
+                        <div className='bg-muted h-4 w-24 animate-pulse rounded' />
                       </div>
-                      <div className='h-3 w-20 animate-pulse rounded bg-muted' />
+                      <div className='bg-muted h-3 w-20 animate-pulse rounded' />
                     </div>
                   </CardHeader>
                   <CardContent className='pt-0'>
-                    <div className='h-8 w-28 animate-pulse rounded bg-muted' />
-                    <div className='mt-1.5 h-3 w-32 animate-pulse rounded bg-muted' />
+                    <div className='bg-muted h-8 w-28 animate-pulse rounded' />
+                    <div className='bg-muted mt-1.5 h-3 w-32 animate-pulse rounded' />
                   </CardContent>
                 </Card>
               ))}
             </div>
             <div className='grid min-w-0 gap-5 lg:grid-cols-2'>
               {[1, 2].map((i) => (
-                <Card key={i} className='min-w-0 shrink-0 overflow-hidden'>
-                  <CardHeader className='flex flex-row items-center gap-3 border-b border-border/50 bg-muted/20 pb-4'>
-                    <div className='size-9 shrink-0 animate-pulse rounded-lg bg-muted' />
-                    <div className='h-5 w-48 animate-pulse rounded bg-muted' />
+                <Card
+                  key={i}
+                  className='min-w-0 shrink-0 overflow-hidden'
+                >
+                  <CardHeader className='border-border/50 bg-muted/20 flex flex-row items-center gap-3 border-b pb-4'>
+                    <div className='bg-muted size-9 shrink-0 animate-pulse rounded-lg' />
+                    <div className='bg-muted h-5 w-48 animate-pulse rounded' />
                   </CardHeader>
                   <CardContent className='pt-4'>
-                    <div className='flex h-[280px] items-center justify-center rounded-lg border border-dashed border-border bg-muted/20'>
-                      <Loader2 className='size-8 animate-spin text-muted-foreground' />
+                    <div className='border-border bg-muted/20 flex h-[280px] items-center justify-center rounded-lg border border-dashed'>
+                      <Loader2 className='text-muted-foreground size-8 animate-spin' />
                     </div>
                   </CardContent>
                 </Card>
@@ -157,18 +159,16 @@ function DashboardPage() {
       <header className='flex shrink-0 items-start justify-between'>
         <div className='space-y-1'>
           <div className='flex items-center gap-3'>
-            <div className='flex size-10 items-center justify-center rounded-lg bg-primary/10 text-primary'>
+            <div className='bg-primary/10 text-primary flex size-10 items-center justify-center rounded-lg'>
               <LayoutDashboard className='size-5' />
             </div>
             <div>
               <h1 className='text-2xl font-semibold tracking-tight'>Dashboard</h1>
-              <p className='text-sm text-muted-foreground'>
-                Sales KPIs and order metrics
-              </p>
+              <p className='text-muted-foreground text-sm'>Sales KPIs and order metrics</p>
             </div>
           </div>
         </div>
-        <div className='w-full min-w-0 sm:min-w-[20rem] sm:max-w-md'>
+        <div className='w-full min-w-0 sm:max-w-md sm:min-w-[20rem]'>
           <CustomerCombobox
             value={customerFilterValue}
             onChange={(customer) => setCustomerId(customer?.id ?? null)}
@@ -178,19 +178,19 @@ function DashboardPage() {
           />
         </div>
       </header>
-      <div className='min-h-0 flex-1 overflow-y-auto overflow-x-hidden px-1 pt-4 pb-6 pr-4'>
+      <div className='min-h-0 flex-1 overflow-x-hidden overflow-y-auto px-1 pt-4 pr-4 pb-6'>
         <div className='flex flex-col gap-5'>
           <DashboardKpis metrics={data} />
           <div className='grid min-w-0 gap-5 lg:grid-cols-2'>
             <Card
               aria-label='Orders this month vs last month'
               className={cn(
-                'min-w-0 shrink-0 overflow-hidden border-border/80 shadow-sm',
-                'dark:bg-card/50 dark:ring-1 dark:ring-border/50'
+                'border-border/80 min-w-0 shrink-0 overflow-hidden shadow-sm',
+                'dark:bg-card/50 dark:ring-border/50 dark:ring-1'
               )}
             >
-              <CardHeader className='flex flex-row items-center gap-3 border-b border-border/50 bg-muted/20 pb-4'>
-                <div className='flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary'>
+              <CardHeader className='border-border/50 bg-muted/20 flex flex-row items-center gap-3 border-b pb-4'>
+                <div className='bg-primary/10 text-primary flex size-9 shrink-0 items-center justify-center rounded-lg'>
                   <ShoppingCart className='size-4' />
                 </div>
                 <CardTitle className='text-base'>Orders — this month vs last month</CardTitle>
@@ -202,12 +202,12 @@ function DashboardPage() {
             <Card
               aria-label='Sales this month vs last month'
               className={cn(
-                'min-w-0 shrink-0 overflow-hidden border-border/80 shadow-sm',
-                'dark:bg-card/50 dark:ring-1 dark:ring-border/50'
+                'border-border/80 min-w-0 shrink-0 overflow-hidden shadow-sm',
+                'dark:bg-card/50 dark:ring-border/50 dark:ring-1'
               )}
             >
-              <CardHeader className='flex flex-row items-center gap-3 border-b border-border/50 bg-muted/20 pb-4'>
-                <div className='flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary'>
+              <CardHeader className='border-border/50 bg-muted/20 flex flex-row items-center gap-3 border-b pb-4'>
+                <div className='bg-primary/10 text-primary flex size-9 shrink-0 items-center justify-center rounded-lg'>
                   <DollarSign className='size-4' />
                 </div>
                 <CardTitle className='text-base'>Sales — this month vs last month</CardTitle>
@@ -222,3 +222,4 @@ function DashboardPage() {
     </div>
   )
 }
+

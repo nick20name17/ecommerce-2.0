@@ -109,7 +109,7 @@ export function useAutoidParam() {
   return useQueryState('autoid', parseAsString)
 }
 
-const CUSTOMER_TAB_VALUES = ['orders', 'todos'] as [string, ...string[]]
+const CUSTOMER_TAB_VALUES = ['orders', 'todos', 'dashboard'] as [string, ...string[]]
 
 export function useCustomerTabParam() {
   return useQueryState(
