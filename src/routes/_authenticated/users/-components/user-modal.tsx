@@ -6,9 +6,9 @@ import { getProjectsQuery } from '@/api/project/query'
 import { USER_QUERY_KEYS } from '@/api/user/query'
 import {
   type CreateUserFormValues,
-  CreateUserSchema,
+  getCreateUserSchema,
   type UpdateUserFormValues,
-  UpdateUserSchema,
+  getUpdateUserSchema,
   type User
 } from '@/api/user/schema'
 import { userService } from '@/api/user/service'
@@ -67,10 +67,15 @@ export const UserModal = ({ user, open, onOpenChange }: UserModalProps) => {
 function SharedFields({ editingUser }: { editingUser?: User | null }) {
   const { control, setValue } = useFormContext()
   const role = useWatch({ control, name: 'role', defaultValue: undefined })
-  const showProject = role !== undefined && !isSuperAdmin(role as UserRole)
-
   const { user: currentUser } = useAuth()
-  const { data: projectsData } = useQuery(getProjectsQuery({ limit: 500 }))
+  const isCurrentUserSuperAdmin = !!currentUser?.role && isSuperAdmin(currentUser.role)
+  const showProject =
+    isCurrentUserSuperAdmin && role !== undefined && !isSuperAdmin(role as UserRole)
+
+  const { data: projectsData } = useQuery({
+    ...getProjectsQuery({ limit: 500 }),
+    enabled: showProject
+  })
   const projects = projectsData?.results ?? []
 
   const roleOptions = (Object.entries(USER_ROLE_LABELS) as [UserRole, string][]).filter(
@@ -211,14 +216,16 @@ function SharedFields({ editingUser }: { editingUser?: User | null }) {
 }
 
 function CreateForm({ onOpenChange }: { onOpenChange: (open: boolean) => void }) {
+  const { user: currentUser } = useAuth()
+  const isCurrentUserSuperAdmin = !!currentUser?.role && isSuperAdmin(currentUser.role)
   const form = useForm<CreateUserFormValues>({
-    resolver: zodResolver(CreateUserSchema),
+    resolver: zodResolver(getCreateUserSchema(isCurrentUserSuperAdmin)),
     defaultValues: {
       first_name: '',
       last_name: '',
       email: '',
       role: 'sale',
-      project: 0,
+      project: currentUser?.project ?? 0,
       password: '',
       password_confirm: ''
     }
@@ -236,7 +243,12 @@ function CreateForm({ onOpenChange }: { onOpenChange: (open: boolean) => void })
     }
   })
 
-  const handleSubmit = form.handleSubmit((data) => mutation.mutate(data))
+  const handleSubmit = form.handleSubmit((data) =>
+    mutation.mutate({
+      ...data,
+      project: data.project ?? currentUser?.project ?? 0
+    })
+  )
 
   return (
     <FormProvider {...form}>
@@ -310,9 +322,10 @@ function CreateForm({ onOpenChange }: { onOpenChange: (open: boolean) => void })
 function EditForm({ user, onOpenChange }: { user: User; onOpenChange: (open: boolean) => void }) {
   const { user: currentUser } = useAuth()
   const isSelf = user.id === currentUser?.id
+  const isCurrentUserSuperAdmin = !!currentUser?.role && isSuperAdmin(currentUser.role)
 
   const form = useForm<UpdateUserFormValues>({
-    resolver: zodResolver(UpdateUserSchema),
+    resolver: zodResolver(getUpdateUserSchema(isCurrentUserSuperAdmin)),
     defaultValues: {
       first_name: user.first_name,
       last_name: user.last_name,
@@ -333,7 +346,8 @@ function EditForm({ user, onOpenChange }: { user: User; onOpenChange: (open: boo
   })
 
   const handleSubmit = form.handleSubmit((data) => {
-    mutation.mutate({ id: user.id, payload: data })
+    const payload = { ...data, project: data.project ?? currentUser?.project ?? user.project }
+    mutation.mutate({ id: user.id, payload })
   })
 
   return (
