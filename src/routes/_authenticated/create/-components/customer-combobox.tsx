@@ -1,10 +1,10 @@
+import { useQuery } from '@tanstack/react-query'
 import { ChevronsUpDown, Search, Users, X } from 'lucide-react'
 import { useRef, useState } from 'react'
-import { useQuery } from '@tanstack/react-query'
 import { useDebouncedCallback } from 'use-debounce'
 
-import type { Customer } from '@/api/customer/schema'
 import { getCustomersQuery } from '@/api/customer/query'
+import type { Customer } from '@/api/customer/schema'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
@@ -45,11 +45,11 @@ export function CustomerCombobox({
   const params = {
     limit: 50,
     search: debouncedSearch || undefined,
-    project_id: projectId ?? undefined,
+    project_id: projectId ?? undefined
   }
   const { data, isLoading, isFetching } = useQuery({
     ...getCustomersQuery(params),
-    enabled: open,
+    enabled: open
   })
   const customers = data?.results ?? []
   const loading = isLoading || (search !== debouncedSearch && isFetching)
@@ -70,10 +70,16 @@ export function CustomerCombobox({
   }
 
   return (
-    <Popover open={open} onOpenChange={handleOpenChange}>
+    <Popover
+      open={open}
+      onOpenChange={handleOpenChange}
+    >
       <div className='flex gap-2'>
         <PopoverTrigger asChild>
-          <Button variant='outline' className='w-full justify-between font-normal'>
+          <Button
+            variant='outline'
+            className='w-full justify-between font-normal'
+          >
             {value ? (
               <span className='flex items-center gap-2 truncate'>
                 <span className='font-semibold'>{value.id}</span>
@@ -89,12 +95,20 @@ export function CustomerCombobox({
           </Button>
         </PopoverTrigger>
         {value && (
-          <Button variant='ghost' size='icon' className='shrink-0' onClick={() => onChange(null)}>
+          <Button
+            variant='ghost'
+            size='icon'
+            className='shrink-0'
+            onClick={() => onChange(null)}
+          >
             <X className='size-4' />
           </Button>
         )}
       </div>
-      <PopoverContent className='w-(--radix-popover-trigger-width) p-0' align='start'>
+      <PopoverContent
+        className='w-(--radix-popover-trigger-width) p-0'
+        align='start'
+      >
         <div className='flex items-center gap-2 border-b px-3 py-2'>
           {loading ? (
             <Spinner className='size-4 shrink-0' />
@@ -116,7 +130,10 @@ export function CustomerCombobox({
           {loading && customers.length === 0 ? (
             <div className='space-y-2 p-2'>
               {Array.from({ length: 5 }).map((_, i) => (
-                <Skeleton key={i} className='h-10 w-full' />
+                <Skeleton
+                  key={i}
+                  className='h-10 w-full'
+                />
               ))}
             </div>
           ) : customers.length === 0 ? (
@@ -155,11 +172,11 @@ export function CustomerCombobox({
                   className='group hover:bg-accent hover:text-accent-foreground flex w-full items-center justify-between gap-2 rounded-md px-2 py-2 text-left text-sm'
                   onClick={() => handleSelect(c)}
                 >
-                  <div className='flex min-w-0 gap-2 group-hover:text-accent-foreground'>
+                  <div className='group-hover:text-accent-foreground flex min-w-0 gap-2'>
                     <span className='font-semibold'>{c.id}</span>
                     <span className='truncate'>{c.l_name}</span>
                   </div>
-                  <div className='text-muted-foreground flex shrink-0 items-center gap-2 text-xs group-hover:text-accent-foreground'>
+                  <div className='text-muted-foreground group-hover:text-accent-foreground flex shrink-0 items-center gap-2 text-xs'>
                     {c.contact_1 && <span>{c.contact_1}</span>}
                     {c.city && c.state && (
                       <span>
@@ -179,3 +196,4 @@ export function CustomerCombobox({
     </Popover>
   )
 }
+

@@ -1,13 +1,9 @@
-import { createFileRoute, useNavigate, useRouter } from '@tanstack/react-router'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { createFileRoute, useNavigate, useRouter } from '@tanstack/react-router'
+import { ArrowLeft, FilePlus2, Package, Paperclip, ShoppingCart, User } from 'lucide-react'
 import { useEffect, useReducer, useRef, useState } from 'react'
-import { ArrowLeft, FilePlus2, Paperclip, Package, ShoppingCart, User } from 'lucide-react'
 import { toast } from 'sonner'
 
-import {
-  EntityAttachments,
-  type EntityAttachmentsRef
-} from '@/components/common/entity-attachments/entity-attachments'
 import { CartSummary } from './-components/cart-summary'
 import { CartTable } from './-components/cart-table'
 import { CreatePageActions } from './-components/create-page-actions'
@@ -20,13 +16,14 @@ import { cartService } from '@/api/cart/service'
 import { getCustomerDetailQuery } from '@/api/customer/query'
 import type { Customer } from '@/api/customer/schema'
 import type { CartItem, Product } from '@/api/product/schema'
+import {
+  EntityAttachments,
+  type EntityAttachmentsRef
+} from '@/components/common/entity-attachments/entity-attachments'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { getErrorMessage } from '@/helpers/error'
-import {
-  cancelPendingCreatedAutoid,
-  waitForCreatedAutoid
-} from '@/helpers/pending-created-autoid'
+import { cancelPendingCreatedAutoid, waitForCreatedAutoid } from '@/helpers/pending-created-autoid'
 import { useProjectId } from '@/hooks/use-project-id'
 import { useSelectedCustomerId } from '@/hooks/use-selected-customer'
 import { cn } from '@/lib/utils'
@@ -40,7 +37,11 @@ type EditAction =
 function editReducer(state: EditState, action: EditAction): EditState {
   switch (action.type) {
     case 'OPEN_ADD':
-      return { product: { ...action.product, unit: action.product.unit || action.product.def_unit }, mode: 'add', open: true }
+      return {
+        product: { ...action.product, unit: action.product.unit || action.product.def_unit },
+        mode: 'add',
+        open: true
+      }
     case 'OPEN_EDIT':
       return { product: { ...action.item }, mode: 'edit', open: true }
     case 'CLOSE':
@@ -81,7 +82,7 @@ const initialBusy: BusyState = {
   cartUpdating: false,
   clearingCart: false,
   creatingProposal: false,
-  creatingOrder: false,
+  creatingOrder: false
 }
 
 export const Route = createFileRoute('/_authenticated/create/')({
@@ -105,12 +106,12 @@ function CreatePage() {
   const [editState, editDispatch] = useReducer(editReducer, {
     product: null,
     mode: 'add',
-    open: false,
+    open: false
   })
 
   const { data: savedCustomer, isLoading: customerLoading } = useQuery({
     ...getCustomerDetailQuery(savedCustomerId ?? '', projectId),
-    enabled: !!savedCustomerId && !customer,
+    enabled: !!savedCustomerId && !customer
   })
 
   useEffect(() => {
@@ -119,8 +120,12 @@ function CreatePage() {
     }
   }, [savedCustomer, customer])
 
-  const { data: cart, isLoading: cartLoading, isFetching: cartFetching } = useQuery({
-    ...getCartQuery(customer?.id ?? '', projectId),
+  const {
+    data: cart,
+    isLoading: cartLoading,
+    isFetching: cartFetching
+  } = useQuery({
+    ...getCartQuery(customer?.id ?? '', projectId)
   })
   const { product: editProduct, mode: editMode, open: editSheetOpen } = editState
 
@@ -133,8 +138,7 @@ function CreatePage() {
   )
 
   const cartItems = cart?.items ?? []
-  const isBusy =
-    busy.cartUpdating || cartLoading || busy.creatingProposal || busy.creatingOrder
+  const isBusy = busy.cartUpdating || cartLoading || busy.creatingProposal || busy.creatingOrder
 
   const invalidateCart = () => {
     if (customer?.id != null) {
@@ -160,7 +164,7 @@ function CreatePage() {
       const payload = {
         product_autoid: product.autoid,
         quantity: 1,
-        unit: product.unit || product.def_unit || '',
+        unit: product.unit || product.def_unit || ''
       }
       try {
         await cartService.addItem(payload, customerId, projectId)
@@ -303,15 +307,20 @@ function CreatePage() {
       {/* Sticky Header */}
       <header className='flex min-w-0 items-center justify-between gap-4 pb-4'>
         <div className='flex items-center gap-3'>
-          <Button variant='ghost' size='icon' className='shrink-0' onClick={() => router.history.back()}>
+          <Button
+            variant='ghost'
+            size='icon'
+            className='shrink-0'
+            onClick={() => router.history.back()}
+          >
             <ArrowLeft className='size-4' />
           </Button>
-          <div className='flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary'>
+          <div className='bg-primary/10 text-primary flex size-10 shrink-0 items-center justify-center rounded-lg'>
             <FilePlus2 className='size-5' />
           </div>
           <div className='min-w-0'>
             <h1 className='text-2xl font-semibold tracking-tight'>Create New</h1>
-            <p className='text-sm text-muted-foreground'>Build a proposal or order</p>
+            <p className='text-muted-foreground text-sm'>Build a proposal or order</p>
           </div>
         </div>
         <CreatePageActions
@@ -327,7 +336,7 @@ function CreatePage() {
         />
       </header>
 
-      <ScrollArea className='min-h-0 flex-1 -mx-4 px-4'>
+      <ScrollArea className='-mx-4 min-h-0 flex-1 px-4'>
         <div className='grid gap-4 pb-4 lg:grid-cols-[1fr,380px]'>
           {/* Left Column - Form */}
           <div className='flex flex-col gap-4'>
@@ -339,7 +348,11 @@ function CreatePage() {
               step={1}
               isComplete={!!customer}
             >
-              <CustomerCombobox value={customer} onChange={handleCustomerChange} projectId={projectId} />
+              <CustomerCombobox
+                value={customer}
+                onChange={handleCustomerChange}
+                projectId={projectId}
+              />
             </Section>
 
             {/* Product Search Card */}
@@ -364,8 +377,9 @@ function CreatePage() {
                     Categories · Search · Prices
                   </span>
                 </Button>
-                <p className='text-xs text-muted-foreground'>
-                  Use the catalog to filter by category and search across products. Configurable products will prompt for options.
+                <p className='text-muted-foreground text-xs'>
+                  Use the catalog to filter by category and search across products. Configurable
+                  products will prompt for options.
                 </p>
               </div>
             </Section>
@@ -393,7 +407,7 @@ function CreatePage() {
               title='Cart'
               trailing={
                 cartItems.length > 0 && !cartLoading ? (
-                  <span className='rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary'>
+                  <span className='bg-primary/10 text-primary rounded-full px-2.5 py-0.5 text-xs font-medium'>
                     {cartItems.length} item{cartItems.length !== 1 ? 's' : ''}
                   </span>
                 ) : null
@@ -422,7 +436,9 @@ function CreatePage() {
       </ScrollArea>
 
       <ProductEditSheet
-        key={editProduct ? (isCartItemType(editProduct) ? editProduct.id : editProduct.autoid) : 'none'}
+        key={
+          editProduct ? (isCartItemType(editProduct) ? editProduct.id : editProduct.autoid) : 'none'
+        }
         open={editSheetOpen}
         onOpenChange={(open) => {
           if (!open) editDispatch({ type: 'CLOSE' })
@@ -462,7 +478,7 @@ function Section({
   isDisabled,
   noPadding,
   allowOverflow,
-  children,
+  children
 }: {
   icon?: React.ReactNode
   title: string
@@ -478,32 +494,30 @@ function Section({
   return (
     <div
       className={cn(
-        'rounded-xl border bg-card transition-all',
+        'bg-card rounded-xl border transition-all',
         !allowOverflow && 'overflow-hidden',
         isDisabled && 'opacity-60'
       )}
     >
-      <div className='flex items-center gap-3 border-b bg-muted/30 px-4 py-3'>
+      <div className='bg-muted/30 flex items-center gap-3 border-b px-4 py-3'>
         {step !== undefined && (
           <div
             className={cn(
               'flex size-6 shrink-0 items-center justify-center rounded-full text-xs font-semibold transition-colors',
-              isComplete
-                ? 'bg-primary text-primary-foreground'
-                : 'bg-muted text-muted-foreground'
+              isComplete ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'
             )}
           >
             {step}
           </div>
         )}
         {icon && !step && (
-          <div className='flex size-8 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground'>
+          <div className='bg-muted text-muted-foreground flex size-8 shrink-0 items-center justify-center rounded-lg'>
             {icon}
           </div>
         )}
         <div className='min-w-0 flex-1'>
           <h3 className='text-sm font-semibold'>{title}</h3>
-          {description && <p className='text-xs text-muted-foreground'>{description}</p>}
+          {description && <p className='text-muted-foreground text-xs'>{description}</p>}
         </div>
         {trailing}
       </div>
@@ -511,3 +525,4 @@ function Section({
     </div>
   )
 }
+
