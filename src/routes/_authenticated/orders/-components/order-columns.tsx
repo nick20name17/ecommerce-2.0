@@ -32,9 +32,20 @@ export const getOrderColumns = ({
   createExpanderColumn<Order>(),
   createCheckboxColumn<Order>(),
   {
-    accessorKey: 'id',
+    accessorKey: 'invoice',
     header: ({ column }) => <ColumnHeader column={column} title='Invoice' />,
-    cell: ({ row }) => <span className='font-medium'>{row.original.id}</span>,
+    cell: ({ row }) => {
+      const invoice = (row.original.invoice ?? '').trim()
+      if (!invoice) return <span className='text-muted-foreground'>—</span>
+      return (
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <span className='block max-w-full truncate font-medium'>{invoice}</span>
+          </TooltipTrigger>
+          <TooltipContent>{invoice}</TooltipContent>
+        </Tooltip>
+      )
+    },
     size: 120,
   },
   {

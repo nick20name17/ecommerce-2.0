@@ -74,7 +74,7 @@ export const OrderDeleteDialog = ({ order, projectId, open, onOpenChange }: Orde
           </AlertDialogMedia>
           <AlertDialogTitle>Delete Order</AlertDialogTitle>
           <AlertDialogDescription>
-            Are you sure you want to delete order {order?.id}? This action cannot be undone.
+            Are you sure you want to delete order {(order?.invoice ?? '').trim() || '—'}? This action cannot be undone.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <div className='space-y-2'>
