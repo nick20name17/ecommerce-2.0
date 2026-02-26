@@ -2,7 +2,7 @@ export const USER_ROLES = {
   superadmin: 'superadmin',
   admin: 'admin',
   sale: 'sale',
-  manager: 'manager',
+  manager: 'manager'
 } as const
 
 export type UserRole = (typeof USER_ROLES)[keyof typeof USER_ROLES]
@@ -11,7 +11,7 @@ export const USER_ROLE_LABELS: Record<UserRole, string> = {
   [USER_ROLES.superadmin]: 'Super Admin',
   [USER_ROLES.admin]: 'Admin',
   [USER_ROLES.sale]: 'Sale',
-  [USER_ROLES.manager]: 'Manager',
+  [USER_ROLES.manager]: 'Manager'
 }
 
 export function getUserRoleLabel(role: UserRole): string {
@@ -25,3 +25,4 @@ export function isSuperAdmin(role: UserRole): boolean {
 export function isAdmin(role: UserRole): boolean {
   return role === USER_ROLES.admin || role === USER_ROLES.superadmin
 }
+

@@ -2,7 +2,7 @@ import { z } from 'zod'
 
 import { EmailSchema, NameSchema, PasswordSchema } from '@/api/schema'
 import type { ApiResponse, PaginationParams } from '@/api/schema'
-import { USER_ROLES } from '@/constants/user'
+import { USER_ROLES, isSuperAdmin } from '@/constants/user'
 import type { UserRole } from '@/constants/user'
 
 export type { UserRole } from '@/constants/user'
@@ -66,7 +66,7 @@ export const CreateUserSchema = z
     last_name: NameSchema,
     email: EmailSchema,
     role: z.enum(roleValues),
-    project: z.number().min(1, 'Project is required'),
+    project: z.number(),
     password: PasswordSchema,
     password_confirm: PasswordSchema
   })
@@ -74,17 +74,28 @@ export const CreateUserSchema = z
     message: 'passwords do not match',
     path: ['password_confirm']
   })
+  .superRefine((data, ctx) => {
+    if (!isSuperAdmin(data.role as UserRole) && (!data.project || data.project < 1)) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'Project is required', path: ['project'] })
+    }
+  })
 
 export type CreateUserFormValues = z.infer<typeof CreateUserSchema>
 
-export const UpdateUserSchema = z.object({
-  first_name: NameSchema,
-  last_name: NameSchema,
-  email: EmailSchema,
-  role: z.enum(roleValues),
-  project: z.number().min(1, 'Project is required'),
-  is_active: z.boolean()
-})
+export const UpdateUserSchema = z
+  .object({
+    first_name: NameSchema,
+    last_name: NameSchema,
+    email: EmailSchema,
+    role: z.enum(roleValues),
+    project: z.number(),
+    is_active: z.boolean()
+  })
+  .superRefine((data, ctx) => {
+    if (!isSuperAdmin(data.role as UserRole) && (!data.project || data.project < 1)) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'Project is required', path: ['project'] })
+    }
+  })
 
 export type UpdateUserFormValues = z.infer<typeof UpdateUserSchema>
 

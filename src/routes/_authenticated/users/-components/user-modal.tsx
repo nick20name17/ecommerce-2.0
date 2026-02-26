@@ -1,6 +1,12 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQuery } from '@tanstack/react-query'
-import { Controller, FormProvider, useForm, useFormContext } from 'react-hook-form'
+import {
+  Controller,
+  FormProvider,
+  useForm,
+  useFormContext,
+  useWatch
+} from 'react-hook-form'
 
 import { getProjectsQuery } from '@/api/project/query'
 import { USER_QUERY_KEYS } from '@/api/user/query'
@@ -65,7 +71,10 @@ export const UserModal = ({ user, open, onOpenChange }: UserModalProps) => {
 }
 
 function SharedFields({ editingUser }: { editingUser?: User | null }) {
-  const { control } = useFormContext()
+  const { control, setValue } = useFormContext()
+  const role = useWatch({ control, name: 'role', defaultValue: undefined })
+  const showProject = role !== undefined && !isSuperAdmin(role as UserRole)
+
   const { user: currentUser } = useAuth()
   const { data: projectsData } = useQuery(getProjectsQuery({ limit: 500 }))
   const projects = projectsData?.results ?? []
@@ -143,7 +152,10 @@ function SharedFields({ editingUser }: { editingUser?: User | null }) {
             <FieldLabel>Role</FieldLabel>
             <Select
               value={field.value}
-              onValueChange={field.onChange}
+              onValueChange={(value) => {
+                field.onChange(value)
+                if (value === USER_ROLES.superadmin) setValue('project', 0)
+              }}
             >
               <SelectTrigger
                 className='w-full'
@@ -167,37 +179,39 @@ function SharedFields({ editingUser }: { editingUser?: User | null }) {
         )}
       />
 
-      <Controller
-        name='project'
-        control={control}
-        render={({ field, fieldState }) => (
-          <Field data-invalid={fieldState.invalid}>
-            <FieldLabel>Project</FieldLabel>
-            <Select
-              value={field.value === 0 || field.value === undefined ? '' : String(field.value)}
-              onValueChange={(v) => field.onChange(v ? Number(v) : 0)}
-            >
-              <SelectTrigger
-                className='w-full'
-                aria-invalid={fieldState.invalid}
+      {showProject && (
+        <Controller
+          name='project'
+          control={control}
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel>Project</FieldLabel>
+              <Select
+                value={field.value === 0 || field.value === undefined ? '' : String(field.value)}
+                onValueChange={(v) => field.onChange(v ? Number(v) : 0)}
               >
-                <SelectValue placeholder='Select project' />
-              </SelectTrigger>
-              <SelectContent>
-                {projects.map((p) => (
-                  <SelectItem
-                    key={p.id}
-                    value={String(p.id)}
-                  >
-                    {p.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-          </Field>
-        )}
-      />
+                <SelectTrigger
+                  className='w-full'
+                  aria-invalid={fieldState.invalid}
+                >
+                  <SelectValue placeholder='Select project' />
+                </SelectTrigger>
+                <SelectContent>
+                  {projects.map((p) => (
+                    <SelectItem
+                      key={p.id}
+                      value={String(p.id)}
+                    >
+                      {p.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
+          )}
+        />
+      )}
     </>
   )
 }
@@ -383,4 +397,3 @@ function EditForm({ user, onOpenChange }: { user: User; onOpenChange: (open: boo
     </FormProvider>
   )
 }
-
