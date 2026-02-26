@@ -1,10 +1,11 @@
 import { useQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
-import { DollarSign, LayoutDashboard, Loader2, ShoppingCart } from 'lucide-react'
+import { LayoutDashboard, Loader2, ShoppingCart } from 'lucide-react'
 
 import { DashboardKpis } from './-components/dashboard-kpis'
 import { DashboardOrdersChart } from './-components/dashboard-orders-chart'
-import { DashboardSalesChart } from './-components/dashboard-sales-chart'
+// TEMPORARY: financial chart hidden
+// import { DashboardSalesChart } from './-components/dashboard-sales-chart'
 import { CustomerCombobox } from './create/-components/customer-combobox'
 import { getCustomerDetailQuery } from '@/api/customer/query'
 import type { Customer } from '@/api/customer/schema'
@@ -110,7 +111,7 @@ function DashboardPage() {
         <div className='min-h-0 flex-1 overflow-x-hidden overflow-y-auto px-1 pt-4 pr-4 pb-6'>
           <div className='flex flex-col gap-5'>
             <div className='grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3'>
-              {Array.from({ length: 6 }).map((_, i) => (
+              {Array.from({ length: 3 }).map((_, i) => (
                 <Card
                   key={`skeleton-${i}`}
                   className='min-w-0 overflow-hidden'
@@ -131,23 +132,18 @@ function DashboardPage() {
                 </Card>
               ))}
             </div>
-            <div className='grid min-w-0 gap-5 lg:grid-cols-2'>
-              {[1, 2].map((i) => (
-                <Card
-                  key={i}
-                  className='min-w-0 shrink-0 overflow-hidden'
-                >
-                  <CardHeader className='border-border/50 bg-muted/20 flex flex-row items-center gap-3 border-b pb-4'>
-                    <Skeleton className='size-9 shrink-0 rounded-lg' />
-                    <Skeleton className='h-5 w-48' />
-                  </CardHeader>
-                  <CardContent className='pt-4'>
-                    <div className='border-border bg-muted/20 flex h-[280px] items-center justify-center rounded-lg border border-dashed'>
-                      <Loader2 className='text-muted-foreground size-8 animate-spin' />
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+            <div className='grid min-w-0 grid-cols-1 gap-5'>
+              <Card className='min-w-0 shrink-0 overflow-hidden'>
+                <CardHeader className='border-border/50 bg-muted/20 flex flex-row items-center gap-3 border-b pb-4'>
+                  <Skeleton className='size-9 shrink-0 rounded-lg' />
+                  <Skeleton className='h-5 w-48' />
+                </CardHeader>
+                <CardContent className='pt-4'>
+                  <div className='border-border bg-muted/20 flex h-[280px] items-center justify-center rounded-lg border border-dashed'>
+                    <Loader2 className='text-muted-foreground size-8 animate-spin' />
+                  </div>
+                </CardContent>
+              </Card>
             </div>
           </div>
         </div>
@@ -182,7 +178,7 @@ function DashboardPage() {
       <div className='min-h-0 flex-1 overflow-x-hidden overflow-y-auto px-1 pt-4 pr-4 pb-6'>
         <div className='flex flex-col gap-5'>
           <DashboardKpis metrics={data} />
-          <div className='grid min-w-0 gap-5 lg:grid-cols-2'>
+          <div className='grid min-w-0 grid-cols-1 gap-5'>
             <Card
               aria-label='Orders this month vs last month'
               className={cn(
@@ -200,7 +196,8 @@ function DashboardPage() {
                 <DashboardOrdersChart metrics={data} />
               </CardContent>
             </Card>
-            <Card
+            {/* TEMPORARY: financial chart hidden */}
+            {/* <Card
               aria-label='Sales this month vs last month'
               className={cn(
                 'border-border/80 min-w-0 shrink-0 overflow-hidden shadow-sm',
@@ -216,7 +213,7 @@ function DashboardPage() {
               <CardContent className='pt-4'>
                 <DashboardSalesChart metrics={data} />
               </CardContent>
-            </Card>
+            </Card> */}
           </div>
         </div>
       </div>

@@ -1,4 +1,4 @@
-import type { DashboardFinancialTotal, DashboardMetrics } from '@/api/dashboard/schema'
+import type { DashboardMetrics } from '@/api/dashboard/schema'
 import {
   Card,
   CardContent,
@@ -9,30 +9,25 @@ import {
 import {
   ArrowDownRight,
   ArrowUpRight,
-  DollarSign,
   FileText,
   Minus,
   Package,
-  Receipt,
-  ShoppingCart,
-  TrendingUp
+  ShoppingCart
 } from 'lucide-react'
 
-import { formatCurrency } from '@/helpers/formatters'
 import { cn } from '@/lib/utils'
 
-const formatCurrencyInteger = (value: number) =>
-  formatCurrency(value, '$0', {
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0
-  })
+// TEMPORARY: used by commented financial KPIs
+// import type { DashboardFinancialTotal } from '@/api/dashboard/schema'
+// import { formatCurrency } from '@/helpers/formatters'
+// const formatCurrencyInteger = (value: number) =>
+//   formatCurrency(value, '$0', { minimumFractionDigits: 0, maximumFractionDigits: 0 })
+// function getFinancial(metrics: DashboardMetrics): DashboardFinancialTotal {
+//   return metrics.sales_total_field === 'total' ? metrics.total : metrics.sub_total
+// }
 
 interface DashboardKpisProps {
   metrics: DashboardMetrics
-}
-
-function getFinancial(metrics: DashboardMetrics): DashboardFinancialTotal {
-  return metrics.sales_total_field === 'total' ? metrics.total : metrics.sub_total
 }
 
 const defaultTrendFormat = (n: number) => String(n)
@@ -81,32 +76,33 @@ const KPI_CONFIG = [
     showTrend: false,
     colSpan: 'sm:col-span-1'
   },
-  {
-    key: 'sales',
-    title: 'Total sales',
-    description: 'Current month',
-    icon: DollarSign,
-    value: (m: DashboardMetrics) => getFinancial(m).total_sales,
-    secondary: (m: DashboardMetrics) =>
-      `Last month: ${formatCurrencyInteger(getFinancial(m).last_month_total_sales)}`,
-    format: formatCurrencyInteger,
-    showTrend: false,
-    colSpan: 'sm:col-span-1'
-  },
-  {
-    key: 'aov',
-    title: 'Average order value',
-    description: 'Current vs last month',
-    icon: TrendingUp,
-    value: (m: DashboardMetrics) => getFinancial(m).average_order_value,
-    format: formatCurrencyInteger,
-    showTrend: true,
-    trend: (m: DashboardMetrics) => ({
-      current: getFinancial(m).average_order_value,
-      previous: getFinancial(m).last_month_average_order_value
-    }),
-    colSpan: 'sm:col-span-1'
-  },
+  // TEMPORARY: financial KPIs hidden
+  // {
+  //   key: 'sales',
+  //   title: 'Total sales',
+  //   description: 'Current month',
+  //   icon: DollarSign,
+  //   value: (m: DashboardMetrics) => getFinancial(m).total_sales,
+  //   secondary: (m: DashboardMetrics) =>
+  //     `Last month: ${formatCurrencyInteger(getFinancial(m).last_month_total_sales)}`,
+  //   format: formatCurrencyInteger,
+  //   showTrend: false,
+  //   colSpan: 'sm:col-span-1'
+  // },
+  // {
+  //   key: 'aov',
+  //   title: 'Average order value',
+  //   description: 'Current vs last month',
+  //   icon: TrendingUp,
+  //   value: (m: DashboardMetrics) => getFinancial(m).average_order_value,
+  //   format: formatCurrencyInteger,
+  //   showTrend: true,
+  //   trend: (m: DashboardMetrics) => ({
+  //     current: getFinancial(m).average_order_value,
+  //     previous: getFinancial(m).last_month_average_order_value
+  //   }),
+  //   colSpan: 'sm:col-span-1'
+  // },
   {
     key: 'unprocessed',
     title: 'Unprocessed orders',
@@ -126,17 +122,18 @@ const KPI_CONFIG = [
     format: (n: number) => String(n),
     showTrend: false,
     colSpan: 'sm:col-span-1'
-  },
-  {
-    key: 'outstanding',
-    title: 'Outstanding',
-    description: 'Invoice balance',
-    icon: Receipt,
-    value: (m: DashboardMetrics) => getFinancial(m).outstanding_invoices,
-    format: formatCurrencyInteger,
-    showTrend: false,
-    colSpan: 'sm:col-span-1'
   }
+  // TEMPORARY: financial KPIs hidden
+  // {
+  //   key: 'outstanding',
+  //   title: 'Outstanding',
+  //   description: 'Invoice balance',
+  //   icon: Receipt,
+  //   value: (m: DashboardMetrics) => getFinancial(m).outstanding_invoices,
+  //   format: formatCurrencyInteger,
+  //   showTrend: false,
+  //   colSpan: 'sm:col-span-1'
+  // }
 ] as const
 
 export function DashboardKpis({ metrics }: DashboardKpisProps) {
@@ -146,7 +143,12 @@ export function DashboardKpis({ metrics }: DashboardKpisProps) {
         const Icon = config.icon
         const value = config.value(metrics)
         const format = config.format
-        const trendConfig = config.showTrend && 'trend' in config ? config.trend(metrics) : null
+        const trendConfig =
+          config.showTrend && 'trend' in config
+            ? (config.trend as (m: DashboardMetrics) => { current: number; previous: number })(
+                metrics
+              )
+            : null
         const secondary =
           'secondary' in config && typeof config.secondary === 'function'
             ? config.secondary(metrics)

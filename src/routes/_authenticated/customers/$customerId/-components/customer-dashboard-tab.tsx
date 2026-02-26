@@ -1,9 +1,10 @@
 import { useQuery } from '@tanstack/react-query'
-import { DollarSign, ShoppingCart } from 'lucide-react'
+import { ShoppingCart } from 'lucide-react'
 
 import { DashboardKpis } from '@/routes/_authenticated/-components/dashboard-kpis'
 import { DashboardOrdersChart } from '@/routes/_authenticated/-components/dashboard-orders-chart'
-import { DashboardSalesChart } from '@/routes/_authenticated/-components/dashboard-sales-chart'
+// TEMPORARY: financial chart hidden
+// import { DashboardSalesChart } from '@/routes/_authenticated/-components/dashboard-sales-chart'
 import { getDashboardQuery } from '@/api/dashboard/query'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -14,7 +15,7 @@ function DashboardTabSkeleton() {
   return (
     <div className='flex flex-col gap-5'>
       <div className='grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3'>
-        {Array.from({ length: 6 }).map((_, i) => (
+        {Array.from({ length: 3 }).map((_, i) => (
           <Card key={i} className='min-w-0 overflow-hidden'>
             <CardHeader className='pb-2'>
               <div className='space-y-1'>
@@ -32,18 +33,7 @@ function DashboardTabSkeleton() {
           </Card>
         ))}
       </div>
-      <div className='grid min-w-0 grid-cols-1 gap-5 2xl:grid-cols-2'>
-        <Card className='min-w-0 shrink-0 overflow-hidden'>
-          <CardHeader className='border-b border-border/50 bg-muted/20 pb-4'>
-            <div className='flex items-center gap-3'>
-              <Skeleton className='size-9 rounded-lg' />
-              <Skeleton className='h-4 w-56' />
-            </div>
-          </CardHeader>
-          <CardContent className='pt-4'>
-            <Skeleton className='h-[280px] w-full' />
-          </CardContent>
-        </Card>
+      <div className='grid min-w-0 grid-cols-1 gap-5'>
         <Card className='min-w-0 shrink-0 overflow-hidden'>
           <CardHeader className='border-b border-border/50 bg-muted/20 pb-4'>
             <div className='flex items-center gap-3'>
@@ -97,7 +87,7 @@ export function CustomerDashboardTab({ customerId, projectId }: CustomerDashboar
   return (
     <div className='flex min-w-0 flex-col gap-5'>
       <DashboardKpis metrics={data} />
-      <div className='grid min-w-0 grid-cols-1 gap-5 2xl:grid-cols-2'>
+      <div className='grid min-w-0 grid-cols-1 gap-5'>
         <Card
           aria-label='Orders this month vs last month'
           className={cn(
@@ -115,7 +105,8 @@ export function CustomerDashboardTab({ customerId, projectId }: CustomerDashboar
             <DashboardOrdersChart metrics={data} />
           </CardContent>
         </Card>
-        <Card
+        {/* TEMPORARY: financial chart hidden */}
+        {/* <Card
           aria-label='Sales this month vs last month'
           className={cn(
             'min-w-0 shrink-0 overflow-hidden border-border/80 shadow-sm',
@@ -131,7 +122,7 @@ export function CustomerDashboardTab({ customerId, projectId }: CustomerDashboar
           <CardContent className='pt-4'>
             <DashboardSalesChart metrics={data} />
           </CardContent>
-        </Card>
+        </Card> */}
       </div>
     </div>
   )
