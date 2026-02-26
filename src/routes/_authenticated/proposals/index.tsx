@@ -1,7 +1,7 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { FileText, Plus, X } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 import { ProposalDeleteDialog } from './-components/proposal-delete-dialog'
 import { ProposalsDataTable } from './-components/proposals-data-table'
@@ -77,10 +77,54 @@ function ProposalsPage() {
     project_id: projectId ?? undefined
   }
 
-  const { data, isLoading, isPlaceholderData } = useQuery({
+  const { data, refetch, isLoading, isPlaceholderData } = useQuery({
     ...getProposalsQuery(params),
     placeholderData: keepPreviousData
   })
+
+  const results = data?.results ?? []
+  const proposalInResults =
+    autoidFromUrl != null &&
+    autoidFromUrl !== '' &&
+    results.some((p) => p.autoid === autoidFromUrl)
+
+  const refetchTimersRef = useRef<ReturnType<typeof setTimeout>[]>([])
+  useEffect(() => {
+    if (!autoidFromUrl) return
+    if (proposalInResults) {
+      refetchTimersRef.current.forEach(clearTimeout)
+      refetchTimersRef.current = []
+      return
+    }
+    refetchTimersRef.current = [
+      setTimeout(() => refetch(), 3000),
+      setTimeout(() => refetch(), 6000)
+    ]
+    return () => {
+      refetchTimersRef.current.forEach(clearTimeout)
+      refetchTimersRef.current = []
+    }
+  }, [autoidFromUrl, proposalInResults, refetch])
+
+  const hasPendingAutoid =
+    autoidFromUrl != null && autoidFromUrl !== '' && !proposalInResults
+  const pendingProposalPlaceholder: Proposal & { _pending?: true } = hasPendingAutoid
+    ? {
+        autoid: autoidFromUrl,
+        b_id: '',
+        quote: '',
+        b_name: '',
+        qt_date: null,
+        status: 'N',
+        tax: '0',
+        subtotal: '0',
+        total: '0',
+        _pending: true
+      }
+    : (null as unknown as Proposal & { _pending?: true })
+  const tableData: (Proposal & { _pending?: true })[] = hasPendingAutoid
+    ? [pendingProposalPlaceholder, ...results]
+    : results
 
   const handleStatusChange = (value: string) => {
     setStatus(value)
@@ -131,13 +175,13 @@ function ProposalsPage() {
       {autoidFromUrl && (
         <Badge
           variant='secondary'
-          className='cursor-pointer w-fit gap-1 pr-1 transition-opacity hover:opacity-80'
+          className='w-fit cursor-pointer gap-1 pr-1 transition-opacity hover:opacity-80'
           onClick={() => setAutoidFromUrl(null)}
         >
           Proposal: {autoidFromUrl}
           <button
             type='button'
-            className='rounded-sm p-0.5 hover:bg-muted'
+            className='hover:bg-muted rounded-sm p-0.5'
             onClick={(e) => {
               e.stopPropagation()
               setAutoidFromUrl(null)
@@ -150,7 +194,7 @@ function ProposalsPage() {
       )}
 
       <ProposalsDataTable
-        data={data?.results ?? []}
+        data={tableData}
         isLoading={isLoading || isPlaceholderData}
         sorting={sorting}
         setSorting={setSorting}
@@ -184,4 +228,3 @@ function ProposalsPage() {
     </div>
   )
 }
-

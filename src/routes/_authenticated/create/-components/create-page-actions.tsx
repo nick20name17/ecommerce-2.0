@@ -7,6 +7,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from '@/components/ui/tooltip'
+import { cn } from '@/lib/utils'
 
 interface CreatePageActionsProps {
   customerSelected: boolean
@@ -31,21 +32,27 @@ export function CreatePageActions({
   onCreateProposal,
   onCreateOrder,
 }: CreatePageActionsProps) {
-  const canSubmit = customerSelected && hasItems && !isBusy
+  const isCreating = creatingProposal || creatingOrder
+  const canSubmit = customerSelected && hasItems && !isBusy && !isCreating
   const submitTooltip = !customerSelected
     ? 'Select a customer first'
     : !hasItems
       ? 'Add at least one product'
-      : undefined
+      : isCreating
+        ? 'Please wait…'
+        : undefined
 
   return (
-    <div className='flex items-center gap-2'>
+    <div
+      className={cn('flex items-center gap-2', isCreating && 'pointer-events-none')}
+      aria-busy={isCreating}
+    >
       <Tooltip>
         <TooltipTrigger asChild>
           <Button
             variant='ghost'
             size='sm'
-            disabled={!hasItems || isBusy}
+            disabled={!hasItems || isBusy || isCreating}
             onClick={onClearAll}
             className='text-muted-foreground hover:text-destructive'
           >
@@ -63,7 +70,7 @@ export function CreatePageActions({
           <Button
             variant='outline'
             size='sm'
-            disabled={!canSubmit}
+            disabled={!canSubmit || isCreating}
             onClick={onCreateOrder}
           >
             {creatingOrder ? (
@@ -81,7 +88,7 @@ export function CreatePageActions({
         <TooltipTrigger asChild>
           <Button
             size='sm'
-            disabled={!canSubmit}
+            disabled={!canSubmit || isCreating}
             onClick={onCreateProposal}
           >
             {creatingProposal ? (

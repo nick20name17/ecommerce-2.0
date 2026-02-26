@@ -3,7 +3,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import type { ColumnDef } from '@tanstack/react-table'
 import { useNavigate } from '@tanstack/react-router'
-import { MoreHorizontal, Paperclip, ShoppingCart, Trash2 } from 'lucide-react'
+import { Loader2, MoreHorizontal, Paperclip, ShoppingCart, Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
 
 import { PROPOSAL_QUERY_KEYS } from '@/api/proposal/query'
@@ -25,6 +25,8 @@ import {
   getProposalStatusLabel,
 } from '@/constants/proposal'
 import { formatCurrency, formatDate } from '@/helpers/formatters'
+
+export type ProposalRow = Proposal & { _pending?: true }
 
 interface ProposalColumnsOptions {
   isSuperAdmin: boolean
@@ -74,12 +76,19 @@ export const getProposalColumns = ({
   projectId,
   onDelete,
   onAttachments
-}: ProposalColumnsOptions): ColumnDef<Proposal>[] => [
-  createExpanderColumn<Proposal>(),
+}: ProposalColumnsOptions): ColumnDef<ProposalRow>[] => [
+  createExpanderColumn<ProposalRow>(),
   {
     accessorKey: 'quote',
     header: ({ column }) => <ColumnHeader column={column} title="Quote" />,
     cell: ({ row }) => {
+      if (row.original._pending)
+        return (
+          <span className='text-muted-foreground flex items-center gap-2'>
+            <Loader2 className='size-4 animate-spin' />
+            Pending…
+          </span>
+        )
       const v = row.original.quote
       return (
         <Tooltip>
@@ -95,17 +104,26 @@ export const getProposalColumns = ({
   {
     accessorKey: 'status',
     header: ({ column }) => <ColumnHeader column={column} title="Status" />,
-    cell: ({ row }) => (
-      <Badge variant={getProposalStatusBadgeVariant(row.original.status)}>
-        {getProposalStatusLabel(row.original.status)}
-      </Badge>
-    ),
+    cell: ({ row }) => {
+      if (row.original._pending)
+        return (
+          <Badge variant='outline' className='text-muted-foreground font-medium'>
+            Creating…
+          </Badge>
+        )
+      return (
+        <Badge variant={getProposalStatusBadgeVariant(row.original.status)}>
+          {getProposalStatusLabel(row.original.status)}
+        </Badge>
+      )
+    },
     size: 110,
   },
   {
     accessorKey: 'b_name',
     header: ({ column }) => <ColumnHeader column={column} title="Customer" />,
     cell: ({ row }) => {
+      if (row.original._pending) return <span className='text-muted-foreground'>—</span>
       const v = row.original.b_name
       return (
         <Tooltip>
@@ -121,42 +139,46 @@ export const getProposalColumns = ({
   {
     accessorKey: 'qt_date',
     header: ({ column }) => <ColumnHeader column={column} title="Quote Date" />,
-    cell: ({ row }) => formatDate(row.original.qt_date),
+    cell: ({ row }) => (row.original._pending ? '—' : formatDate(row.original.qt_date)),
     size: 120,
   },
   {
     accessorKey: 'total',
     header: ({ column }) => <ColumnHeader column={column} title="Total" />,
-    cell: ({ row }) => formatCurrency(row.original.total),
+    cell: ({ row }) =>
+      row.original._pending ? '—' : formatCurrency(row.original.total),
     size: 110,
   },
   {
     id: 'actions',
-    cell: ({ row }: { row: { original: Proposal } }) => (
-      <div className='flex justify-center'>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant='ghost' size='icon-sm'>
-              <MoreHorizontal />
-              <span className='sr-only'>Open menu</span>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align='end'>
-            <DropdownMenuItem onClick={() => onAttachments(row.original)}>
-              <Paperclip className='size-4' />
-              Attachments
-            </DropdownMenuItem>
-            {isSuperAdmin && (
-              <ToOrderAction proposal={row.original} projectId={projectId} />
-            )}
-            <DropdownMenuItem variant='destructive' onClick={() => onDelete(row.original)}>
-              <Trash2 className='size-4' />
-              Delete
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
-    ),
+    cell: ({ row }: { row: { original: ProposalRow } }) => {
+      if (row.original._pending) return null
+      return (
+        <div className='flex justify-center'>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant='ghost' size='icon-sm'>
+                <MoreHorizontal />
+                <span className='sr-only'>Open menu</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align='end'>
+              <DropdownMenuItem onClick={() => onAttachments(row.original)}>
+                <Paperclip className='size-4' />
+                Attachments
+              </DropdownMenuItem>
+              {isSuperAdmin && (
+                <ToOrderAction proposal={row.original} projectId={projectId} />
+              )}
+              <DropdownMenuItem variant='destructive' onClick={() => onDelete(row.original)}>
+                <Trash2 className='size-4' />
+                Delete
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      )
+    },
     size: 50,
     enableSorting: false
   }

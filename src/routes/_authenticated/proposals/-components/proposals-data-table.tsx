@@ -4,20 +4,19 @@ import type { SortingState } from '@tanstack/react-table'
 import { getCoreRowModel, getExpandedRowModel, useReactTable } from '@tanstack/react-table'
 import { useMemo } from 'react'
 
-import { getProposalColumns } from './proposal-columns'
+import { getProposalColumns, type ProposalRow } from './proposal-columns'
 import { ProposalExpandedRow } from './proposal-expanded-row'
-import type { Proposal } from '@/api/proposal/schema'
 import { DataTable } from '@/components/common/data-table'
 
 interface ProposalsDataTableProps {
-  data: Proposal[]
+  data: ProposalRow[]
   isLoading: boolean
   sorting: SortingState
   setSorting: (updater: React.SetStateAction<SortingState>) => void
   isSuperAdmin: boolean
   projectId: number | null
-  onDelete: (proposal: Proposal) => void
-  onAttachments: (proposal: Proposal) => void
+  onDelete: (proposal: ProposalRow) => void
+  onAttachments: (proposal: ProposalRow) => void
 }
 
 export function ProposalsDataTable({
@@ -40,7 +39,7 @@ export function ProposalsDataTable({
     data,
     getCoreRowModel: getCoreRowModel(),
     getExpandedRowModel: getExpandedRowModel(),
-    getRowCanExpand: (row) => !!row.original.items?.length,
+    getRowCanExpand: (row) => !row.original._pending && !!row.original.items?.length,
     onSortingChange: setSorting,
     state: { sorting },
     manualSorting: true,
