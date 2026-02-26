@@ -1,8 +1,8 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useMutation } from '@tanstack/react-query'
-import { UserPlus } from 'lucide-react'
+import { useMutation, useQuery } from '@tanstack/react-query'
 import { Controller, FormProvider, useForm, useFormContext } from 'react-hook-form'
 
+import { getProjectsQuery } from '@/api/project/query'
 import { USER_QUERY_KEYS } from '@/api/user/query'
 import {
   type CreateUserFormValues,
@@ -13,16 +13,14 @@ import {
 } from '@/api/user/schema'
 import { userService } from '@/api/user/service'
 import { PasswordInput } from '@/components/common/inputs/password-input'
-import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import {
   Dialog,
+  DialogBody,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogMedia,
   DialogTitle
 } from '@/components/ui/dialog'
 import { Field, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field'
@@ -38,10 +36,6 @@ import { USER_ROLES, USER_ROLE_LABELS, isSuperAdmin } from '@/constants/user'
 import type { UserRole } from '@/constants/user'
 import { useAuth } from '@/providers/auth'
 
-function getInitials(firstName: string, lastName: string): string {
-  return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase()
-}
-
 interface UserModalProps {
   user?: User | null
   open: boolean
@@ -56,7 +50,7 @@ export const UserModal = ({ user, open, onOpenChange }: UserModalProps) => {
       open={open}
       onOpenChange={onOpenChange}
     >
-      <DialogContent className='sm:max-w-md'>
+      <DialogContent className='flex max-h-[90vh] flex-col sm:max-w-md'>
         {isEdit ? (
           <EditForm
             user={user}
@@ -73,6 +67,8 @@ export const UserModal = ({ user, open, onOpenChange }: UserModalProps) => {
 function SharedFields({ editingUser }: { editingUser?: User | null }) {
   const { control } = useFormContext()
   const { user: currentUser } = useAuth()
+  const { data: projectsData } = useQuery(getProjectsQuery({ limit: 500 }))
+  const projects = projectsData?.results ?? []
 
   const roleOptions = (Object.entries(USER_ROLE_LABELS) as [UserRole, string][]).filter(
     ([value]) => {
@@ -170,6 +166,38 @@ function SharedFields({ editingUser }: { editingUser?: User | null }) {
           </Field>
         )}
       />
+
+      <Controller
+        name='project'
+        control={control}
+        render={({ field, fieldState }) => (
+          <Field data-invalid={fieldState.invalid}>
+            <FieldLabel>Project</FieldLabel>
+            <Select
+              value={field.value === 0 || field.value === undefined ? '' : String(field.value)}
+              onValueChange={(v) => field.onChange(v ? Number(v) : 0)}
+            >
+              <SelectTrigger
+                className='w-full'
+                aria-invalid={fieldState.invalid}
+              >
+                <SelectValue placeholder='Select project' />
+              </SelectTrigger>
+              <SelectContent>
+                {projects.map((p) => (
+                  <SelectItem
+                    key={p.id}
+                    value={String(p.id)}
+                  >
+                    {p.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+          </Field>
+        )}
+      />
     </>
   )
 }
@@ -182,6 +210,7 @@ function CreateForm({ onOpenChange }: { onOpenChange: (open: boolean) => void })
       last_name: '',
       email: '',
       role: 'sale',
+      project: 0,
       password: '',
       password_confirm: ''
     }
@@ -204,53 +233,51 @@ function CreateForm({ onOpenChange }: { onOpenChange: (open: boolean) => void })
   return (
     <FormProvider {...form}>
       <DialogHeader>
-        <DialogMedia className='bg-primary/10 text-primary'>
-          <UserPlus className='size-5' />
-        </DialogMedia>
         <DialogTitle>Create User</DialogTitle>
-        <DialogDescription>Add a new team member with access to the system.</DialogDescription>
       </DialogHeader>
 
-      <form
-        id='user-form'
-        onSubmit={handleSubmit}
-      >
-        <FieldGroup>
-          <SharedFields editingUser={null} />
+      <DialogBody>
+        <form
+          id='user-form'
+          onSubmit={handleSubmit}
+        >
+          <FieldGroup>
+            <SharedFields editingUser={null} />
 
-          <div className='grid grid-cols-2 gap-4'>
-            <Controller
-              name='password'
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor='password'>Password</FieldLabel>
-                  <PasswordInput
-                    {...field}
-                    id='password'
-                  />
-                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                </Field>
-              )}
-            />
+            <div className='grid grid-cols-2 gap-4'>
+              <Controller
+                name='password'
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldLabel htmlFor='password'>Password</FieldLabel>
+                    <PasswordInput
+                      {...field}
+                      id='password'
+                    />
+                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                  </Field>
+                )}
+              />
 
-            <Controller
-              name='password_confirm'
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor='password-confirm'>Confirm</FieldLabel>
-                  <PasswordInput
-                    {...field}
-                    id='password-confirm'
-                  />
-                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                </Field>
-              )}
-            />
-          </div>
-        </FieldGroup>
-      </form>
+              <Controller
+                name='password_confirm'
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldLabel htmlFor='password-confirm'>Confirm</FieldLabel>
+                    <PasswordInput
+                      {...field}
+                      id='password-confirm'
+                    />
+                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                  </Field>
+                )}
+              />
+            </div>
+          </FieldGroup>
+        </form>
+      </DialogBody>
 
       <DialogFooter>
         <Button
@@ -283,6 +310,7 @@ function EditForm({ user, onOpenChange }: { user: User; onOpenChange: (open: boo
       last_name: user.last_name,
       email: user.email,
       role: user.role,
+      project: user.project,
       is_active: user.is_active
     }
   })
@@ -303,46 +331,38 @@ function EditForm({ user, onOpenChange }: { user: User; onOpenChange: (open: boo
   return (
     <FormProvider {...form}>
       <DialogHeader>
-        <DialogMedia className='bg-primary/10 text-primary'>
-          <Avatar className='size-10'>
-            <AvatarFallback className='bg-transparent text-sm font-medium'>
-              {getInitials(user.first_name, user.last_name)}
-            </AvatarFallback>
-          </Avatar>
-        </DialogMedia>
         <DialogTitle>Edit User</DialogTitle>
-        <DialogDescription>
-          Update profile and permissions for {user.first_name} {user.last_name}.
-        </DialogDescription>
       </DialogHeader>
 
-      <form
-        id='user-form'
-        onSubmit={handleSubmit}
-      >
-        <FieldGroup>
-          <SharedFields editingUser={user} />
+      <DialogBody>
+        <form
+          id='user-form'
+          onSubmit={handleSubmit}
+        >
+          <FieldGroup>
+            <SharedFields editingUser={user} />
 
-          <Controller
-            name='is_active'
-            control={form.control}
-            render={({ field }) => (
-              <Field
-                orientation='horizontal'
-                data-disabled={isSelf}
-              >
-                <Checkbox
-                  id='is-active'
-                  checked={field.value}
-                  onCheckedChange={field.onChange}
-                  disabled={isSelf}
-                />
-                <FieldLabel htmlFor='is-active'>Active account</FieldLabel>
-              </Field>
-            )}
-          />
-        </FieldGroup>
-      </form>
+            <Controller
+              name='is_active'
+              control={form.control}
+              render={({ field }) => (
+                <Field
+                  orientation='horizontal'
+                  data-disabled={isSelf}
+                >
+                  <Checkbox
+                    id='is-active'
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                    disabled={isSelf}
+                  />
+                  <FieldLabel htmlFor='is-active'>Active account</FieldLabel>
+                </Field>
+              )}
+            />
+          </FieldGroup>
+        </form>
+      </DialogBody>
 
       <DialogFooter>
         <Button
@@ -363,3 +383,4 @@ function EditForm({ user, onOpenChange }: { user: User; onOpenChange: (open: boo
     </FormProvider>
   )
 }
+

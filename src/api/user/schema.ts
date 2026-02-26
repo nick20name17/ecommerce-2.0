@@ -1,10 +1,9 @@
 import { z } from 'zod'
 
-import { USER_ROLES } from '@/constants/user'
-import type { UserRole } from '@/constants/user'
-
 import { EmailSchema, NameSchema, PasswordSchema } from '@/api/schema'
 import type { ApiResponse, PaginationParams } from '@/api/schema'
+import { USER_ROLES } from '@/constants/user'
+import type { UserRole } from '@/constants/user'
 
 export type { UserRole } from '@/constants/user'
 
@@ -37,7 +36,7 @@ export interface CreateUserPayload {
   first_name: string
   last_name: string
   role: string
-  project?: number
+  project: number
 }
 
 export interface UpdateUserPayload {
@@ -48,6 +47,7 @@ export interface UpdateUserPayload {
     last_name?: string
     email?: string
     role?: string
+    project?: number
   }
 }
 
@@ -66,6 +66,7 @@ export const CreateUserSchema = z
     last_name: NameSchema,
     email: EmailSchema,
     role: z.enum(roleValues),
+    project: z.number().min(1, 'Project is required'),
     password: PasswordSchema,
     password_confirm: PasswordSchema
   })
@@ -81,7 +82,9 @@ export const UpdateUserSchema = z.object({
   last_name: NameSchema,
   email: EmailSchema,
   role: z.enum(roleValues),
+  project: z.number().min(1, 'Project is required'),
   is_active: z.boolean()
 })
 
 export type UpdateUserFormValues = z.infer<typeof UpdateUserSchema>
+
