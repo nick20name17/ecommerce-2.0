@@ -1,9 +1,7 @@
+import { useMutation } from '@tanstack/react-query'
 import { Package, X } from 'lucide-react'
 
-import { ProductConfigurations } from './product-configurations'
-import { ProductImageGallery } from './product-image-gallery'
-import { ProductInfoSection } from './product-info-section'
-import { useProductEditSheet } from './use-product-edit-sheet'
+import { CART_QUERY_KEYS } from '@/api/cart/query'
 import type { AddToCartPayload, UpdateCartItemPayload } from '@/api/cart/schema'
 import { cartService } from '@/api/cart/service'
 import type { CartItem, ConfigurationProduct, Product } from '@/api/product/schema'
@@ -21,8 +19,11 @@ import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent } from '@/components/ui/dialog'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Spinner } from '@/components/ui/spinner'
-import { getErrorMessage } from '@/helpers/error'
 import { formatCurrency } from '@/helpers/formatters'
+import { ProductConfigurations } from './product-configurations'
+import { ProductImageGallery } from './product-image-gallery'
+import { ProductInfoSection } from './product-info-section'
+import { useProductEditSheet } from './use-product-edit-sheet'
 
 interface ProductEditSheetProps {
   open: boolean
@@ -58,7 +59,47 @@ export function ProductEditSheet({
     isCartItem
   } = useProductEditSheet(product, mode, open, configData, projectId)
 
-  const { quantity, saving, confirmClose, photoIndex, selectedUnit, configs, activeTab } = state
+  const { quantity, confirmClose, photoIndex, selectedUnit, configs, activeTab } = state
+
+  const saveMutation = useMutation({
+    mutationFn: async () => {
+      if (!product || !customerId) return
+      const isAdd = mode === 'add'
+      const addPayload: AddToCartPayload | null = isAdd
+        ? {
+            product_autoid: isCartItem(product) ? product.product_autoid : product.autoid,
+            quantity,
+            unit: selectedUnit || (isCartItem(product) ? '' : product.def_unit) || '',
+            configurations:
+              activeConfigurations.length > 0
+                ? (activeConfigurations as AddToCartPayload['configurations'])
+                : undefined
+          }
+        : null
+      const editPayload: UpdateCartItemPayload | null = !isAdd
+        ? {
+            quantity,
+            configurations: activeConfigurations as UpdateCartItemPayload['configurations']
+          }
+        : null
+      const itemId = !isAdd && isCartItem(product) ? product.id : 0
+      if (isAdd && addPayload) {
+        return cartService.addItem(addPayload, customerId, projectId)
+      }
+      if (!isAdd && editPayload) {
+        return cartService.updateItem(itemId, editPayload, customerId, projectId)
+      }
+    },
+    meta: {
+      successMessage: mode === 'add' ? 'Added to cart' : 'Cart updated',
+      errorMessage: 'Failed to save',
+      invalidatesQuery: CART_QUERY_KEYS.detail(customerId, projectId)
+    },
+    onSuccess: () => {
+      onOpenChange(false)
+      onSaved()
+    }
+  })
 
   const displayName = product ? (isCartItem(product) ? product.name : product.descr_1) : ''
 
@@ -102,42 +143,9 @@ export function ProductEditSheet({
     }
   }
 
-  const handleSave = async () => {
+  const handleSave = () => {
     if (!product || !customerId) return
-    dispatch({ type: 'SET_SAVING', value: true })
-    const isAdd = mode === 'add'
-    const addPayload: AddToCartPayload | null = isAdd
-      ? {
-          product_autoid: isCartItem(product) ? product.product_autoid : product.autoid,
-          quantity,
-          unit: selectedUnit || (isCartItem(product) ? '' : product.def_unit) || '',
-          configurations:
-            activeConfigurations.length > 0
-              ? (activeConfigurations as AddToCartPayload['configurations'])
-              : undefined
-        }
-      : null
-    const editPayload: UpdateCartItemPayload | null = !isAdd
-      ? {
-          quantity,
-          configurations: activeConfigurations as UpdateCartItemPayload['configurations']
-        }
-      : null
-    const itemId = !isAdd && isCartItem(product) ? product.id : 0
-    const savePromise =
-      isAdd && addPayload
-        ? cartService.addItem(addPayload, customerId, projectId)
-        : !isAdd && editPayload
-          ? cartService.updateItem(itemId, editPayload, customerId, projectId)
-          : Promise.resolve()
-    try {
-      await savePromise
-      onOpenChange(false)
-      onSaved()
-    } catch (error) {
-      console.error('Failed to save:', getErrorMessage(error))
-    }
-    dispatch({ type: 'SET_SAVING', value: false })
+    saveMutation.mutate()
   }
 
   const priceDisplay = hasConfigs
@@ -255,10 +263,15 @@ export function ProductEditSheet({
                 </Button>
                 <Button
                   size='sm'
-                  disabled={hasUncheckedRequired || configLoading || saving || (!ignoreCount && maxCount < 0)}
+                  disabled={
+                    hasUncheckedRequired ||
+                    configLoading ||
+                    saveMutation.isPending ||
+                    (!ignoreCount && maxCount < 0)
+                  }
                   onClick={handleSave}
                 >
-                  {saving ? (
+                  {saveMutation.isPending ? (
                     <>
                       <Spinner className='mr-1.5 size-3.5' />
                       Saving...
