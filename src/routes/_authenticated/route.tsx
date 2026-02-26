@@ -12,7 +12,7 @@ const AuthenticatedLayout = () => {
   return (
     <SidebarProvider className='h-svh overflow-hidden'>
       <AppSidebar />
-      <SidebarInset className='overflow-hidden'>
+      <SidebarInset className='flex min-h-0 flex-col overflow-hidden'>
         <header className='flex h-14 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12'>
           <div className='flex min-w-0 flex-1 items-center gap-2 px-4'>
             <SidebarTrigger className='-ml-1 shrink-0' />
@@ -22,7 +22,7 @@ const AuthenticatedLayout = () => {
             <ModeToggle />
           </div>
         </header>
-        <main className='flex min-h-0 flex-1 flex-col p-4'>
+        <main className='flex min-h-0 flex-1 flex-col overflow-hidden p-4'>
           <Outlet />
         </main>
       </SidebarInset>

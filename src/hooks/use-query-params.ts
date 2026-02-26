@@ -121,3 +121,7 @@ export function useCustomerTabParam() {
 export function useOrderProjectIdParam() {
   return useQueryState('project_id', parseAsInteger.withOptions({ shallow: false }))
 }
+
+export function useDashboardCustomerIdParam() {
+  return useQueryState('customer_id', parseAsString.withDefault(''))
+}

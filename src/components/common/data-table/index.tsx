@@ -13,11 +13,14 @@ export const DataTable = <TData,>({
   className,
   renderSubComponent,
   onRowClick,
-  fitWidth = false,
+  fitWidth = false
 }: DataTableProps<TData>) => {
   const tableEl = (
     <Table className={cn(fitWidth && 'w-full table-fixed')}>
-      <DataTableHeader table={table} fitWidth={fitWidth} />
+      <DataTableHeader
+        table={table}
+        fitWidth={fitWidth}
+      />
       <DataTableBody
         table={table}
         isLoading={isLoading}
@@ -43,3 +46,4 @@ export const DataTable = <TData,>({
     </ScrollArea>
   )
 }
+

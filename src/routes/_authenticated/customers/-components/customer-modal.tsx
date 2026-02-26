@@ -9,8 +9,8 @@ import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import {
   Dialog,
+  DialogBody,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -37,7 +37,7 @@ export const CustomerModal = ({ customer, open, onOpenChange }: CustomerModalPro
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className='sm:max-w-lg'>
+      <DialogContent className='flex max-h-[90vh] flex-col sm:max-w-lg'>
         {isEdit ? (
           <EditForm customer={customer} onOpenChange={onOpenChange} />
         ) : (
@@ -228,14 +228,15 @@ function CreateForm({ onOpenChange }: { onOpenChange: (open: boolean) => void })
     <FormProvider {...form}>
       <DialogHeader>
         <DialogTitle>Create Customer</DialogTitle>
-        <DialogDescription>Add a new customer.</DialogDescription>
       </DialogHeader>
 
-      <form id='customer-form' onSubmit={handleSubmit}>
-        <FieldGroup>
-          <SharedFields />
-        </FieldGroup>
-      </form>
+      <DialogBody>
+        <form id='customer-form' onSubmit={handleSubmit}>
+          <FieldGroup>
+            <SharedFields />
+          </FieldGroup>
+        </form>
+      </DialogBody>
 
       <DialogFooter>
         <Button variant='outline' onClick={() => onOpenChange(false)}>
@@ -293,31 +294,30 @@ function EditForm({
     <FormProvider {...form}>
       <DialogHeader>
         <DialogTitle>Edit Customer</DialogTitle>
-        <DialogDescription>
-          Update customer {customer.l_name}.
-        </DialogDescription>
       </DialogHeader>
 
-      <form id='customer-form' onSubmit={handleSubmit}>
-        <FieldGroup>
-          <SharedFields />
+      <DialogBody>
+        <form id='customer-form' onSubmit={handleSubmit}>
+          <FieldGroup>
+            <SharedFields />
 
-          <Controller
-            name='inactive'
-            control={form.control}
-            render={({ field }) => (
-              <Field orientation='horizontal'>
-                <Checkbox
-                  id='inactive'
-                  checked={field.value}
-                  onCheckedChange={field.onChange}
-                />
-                <FieldLabel htmlFor='inactive'>Inactive</FieldLabel>
-              </Field>
-            )}
-          />
-        </FieldGroup>
-      </form>
+            <Controller
+              name='inactive'
+              control={form.control}
+              render={({ field }) => (
+                <Field orientation='horizontal'>
+                  <Checkbox
+                    id='inactive'
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                  />
+                  <FieldLabel htmlFor='inactive'>Inactive</FieldLabel>
+                </Field>
+              )}
+            />
+          </FieldGroup>
+        </form>
+      </DialogBody>
 
       <DialogFooter>
         <Button variant='outline' onClick={() => onOpenChange(false)}>

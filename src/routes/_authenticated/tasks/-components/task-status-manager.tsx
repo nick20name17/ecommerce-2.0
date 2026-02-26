@@ -15,6 +15,7 @@ import { Button } from '@/components/ui/button'
 import { ColorPicker } from '@/components/ui/color-picker'
 import {
   Dialog,
+  DialogBody,
   DialogContent,
   DialogFooter,
   DialogHeader,
@@ -332,21 +333,23 @@ function StatusEditDialog({
         <DialogHeader>
           <DialogTitle>Edit status</DialogTitle>
         </DialogHeader>
-        <form
-          onSubmit={handleSubmit}
-          className='flex gap-2'
-        >
-          <ColorPicker
-            value={color}
-            onChange={setColor}
-          />
-          <Input
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder='Status name'
-            className='flex-1'
-          />
-        </form>
+        <DialogBody>
+          <form
+            onSubmit={handleSubmit}
+            className='flex gap-2'
+          >
+            <ColorPicker
+              value={color}
+              onChange={setColor}
+            />
+            <Input
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder='Status name'
+              className='flex-1'
+            />
+          </form>
+        </DialogBody>
         <DialogFooter>
           <Button
             variant='outline'

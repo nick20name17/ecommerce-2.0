@@ -9,8 +9,8 @@ import { getCustomerDetailQuery } from '@/api/customer/query'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { useCustomerTabParam } from '@/hooks/use-query-params'
 import { useProjectId } from '@/hooks/use-project-id'
+import { useCustomerTabParam } from '@/hooks/use-query-params'
 
 export const Route = createFileRoute('/_authenticated/customers/$customerId/')({
   component: CustomerDetailPage,
@@ -43,7 +43,10 @@ function CustomerDetailPage() {
     return (
       <div className='flex h-full flex-col items-center justify-center gap-4'>
         <p className='text-muted-foreground'>Customer not found.</p>
-        <Button variant='outline' onClick={() => router.history.back()}>
+        <Button
+          variant='outline'
+          onClick={() => router.history.back()}
+        >
           Back to Customers
         </Button>
       </div>
@@ -53,13 +56,17 @@ function CustomerDetailPage() {
   return (
     <div className='flex h-full flex-col gap-4 overflow-y-auto p-1'>
       <div className='flex items-center gap-3'>
-        <Button variant='ghost' size='icon' onClick={() => router.history.back()}>
+        <Button
+          variant='ghost'
+          size='icon'
+          onClick={() => router.history.back()}
+        >
           <ArrowLeft />
         </Button>
         <h1 className='text-2xl font-bold'>{customer.l_name}</h1>
       </div>
 
-      <div className='grid flex-1 items-start gap-4 min-h-0 min-w-0 lg:grid-cols-[380px_1fr]'>
+      <div className='grid min-h-0 min-w-0 flex-1 items-start gap-4 lg:grid-cols-[380px_1fr]'>
         <CustomerInfoCard customer={customer} />
         <div className='flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden'>
           <Tabs
@@ -67,14 +74,23 @@ function CustomerDetailPage() {
             onValueChange={setActiveTab}
             className='flex h-full min-h-0 flex-col'
           >
-            <TabsList variant='line' className='mb-2'>
+            <TabsList
+              variant='line'
+              className='mb-2'
+            >
               <TabsTrigger value='orders'>Orders</TabsTrigger>
               <TabsTrigger value='todos'>To-Do's</TabsTrigger>
             </TabsList>
-            <TabsContent value='orders' className='mt-0 flex-1 min-h-0 min-w-0 overflow-hidden'>
+            <TabsContent
+              value='orders'
+              className='mt-0 min-h-0 min-w-0 flex-1 overflow-hidden'
+            >
               <CustomerOrdersTab customerId={customerId} />
             </TabsContent>
-            <TabsContent value='todos' className='mt-0 flex-1 min-h-0 min-w-0 overflow-hidden'>
+            <TabsContent
+              value='todos'
+              className='mt-0 min-h-0 min-w-0 flex-1 overflow-hidden'
+            >
               <CustomerTasksTab customerId={customerId} />
             </TabsContent>
           </Tabs>
@@ -83,3 +99,4 @@ function CustomerDetailPage() {
     </div>
   )
 }
+

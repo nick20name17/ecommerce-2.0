@@ -15,6 +15,7 @@ import { PasswordInput } from '@/components/common/inputs/password-input'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
+  DialogBody,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -382,16 +383,15 @@ function CreateForm({ onOpenChange }: { onOpenChange: (open: boolean) => void })
     <FormProvider {...form}>
       <DialogHeader className="sticky top-0 z-10 border-b bg-background px-6 py-4">
         <DialogTitle>Create Project</DialogTitle>
-        <DialogDescription>Add a new project to the system.</DialogDescription>
       </DialogHeader>
 
-      <form
-        id="project-form"
-        onSubmit={handleSubmit}
-        className="min-h-0 flex-1 overflow-y-auto px-6 py-4"
-      >
-        <FieldGroup>
-          <SharedFields />
+      <DialogBody className="px-6 py-4">
+        <form
+          id="project-form"
+          onSubmit={handleSubmit}
+        >
+          <FieldGroup>
+            <SharedFields />
 
           <Controller
             name="db_password"
@@ -429,7 +429,8 @@ function CreateForm({ onOpenChange }: { onOpenChange: (open: boolean) => void })
             )}
           />
         </FieldGroup>
-      </form>
+        </form>
+      </DialogBody>
 
       <DialogFooter className="sticky bottom-0 z-10 border-t bg-background px-6 py-4">
         <Button variant="outline" onClick={() => onOpenChange(false)}>
@@ -492,20 +493,18 @@ function EditForm({
     <FormProvider {...form}>
       <DialogHeader className="sticky top-0 z-10 border-b bg-background px-6 py-4">
         <DialogTitle>Edit Project</DialogTitle>
-        <DialogDescription>
-          Update configuration for {project.name}.
-        </DialogDescription>
       </DialogHeader>
 
-      <form
-        id="project-form"
-        onSubmit={handleSubmit}
-        className="min-h-0 flex-1 overflow-y-auto px-6 py-4"
-      >
-        <FieldGroup>
-          <SharedFields />
-        </FieldGroup>
-      </form>
+      <DialogBody className="px-6 py-4">
+        <form
+          id="project-form"
+          onSubmit={handleSubmit}
+        >
+          <FieldGroup>
+            <SharedFields />
+          </FieldGroup>
+        </form>
+      </DialogBody>
 
       <DialogFooter className="sticky bottom-0 z-10 border-t bg-background px-6 py-4">
         <Button variant="outline" onClick={() => onOpenChange(false)}>

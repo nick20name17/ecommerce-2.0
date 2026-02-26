@@ -11,8 +11,8 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import {
   Dialog,
+  DialogBody,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle
@@ -80,14 +80,14 @@ function ChangePasswordDialog({
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className='sm:max-w-md'>
+      <DialogContent className='flex max-h-[90vh] flex-col sm:max-w-md'>
         <DialogHeader>
           <DialogTitle>Change Password</DialogTitle>
-          <DialogDescription>Enter your current password and choose a new one.</DialogDescription>
         </DialogHeader>
 
-        <form id='password-form' onSubmit={handleSubmit}>
-          <FieldGroup>
+        <DialogBody>
+          <form id='password-form' onSubmit={handleSubmit}>
+            <FieldGroup>
             <Controller
               name='old_password'
               control={form.control}
@@ -121,8 +121,9 @@ function ChangePasswordDialog({
                 </Field>
               )}
             />
-          </FieldGroup>
-        </form>
+            </FieldGroup>
+          </form>
+        </DialogBody>
 
         <DialogFooter>
           <Button variant='outline' onClick={() => handleClose(false)} disabled={mutation.isPending}>

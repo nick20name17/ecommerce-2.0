@@ -46,7 +46,7 @@ export function OrderExpandedRow({ row }: { row: Row<Order> }) {
                 <TableHead className='w-[130px] min-w-[130px] shadow-[inset_0_-1px_0_var(--border)]'>
                   Item Code
                 </TableHead>
-                <TableHead className='shadow-[inset_0_-1px_0_var(--border)]'>
+                <TableHead className='w-[240px] min-w-[240px] max-w-[240px] shadow-[inset_0_-1px_0_var(--border)]'>
                   Description
                 </TableHead>
                 <TableHead className='w-[100px] min-w-[100px] shadow-[inset_0_-1px_0_var(--border)]'>
@@ -66,12 +66,14 @@ export function OrderExpandedRow({ row }: { row: Row<Order> }) {
                   <TableCell className='border-b w-[130px] min-w-[130px]'>
                     {item.inven}
                   </TableCell>
-                  <TableCell className='border-b font-semibold max-w-[300px]'>
+                  <TableCell className='border-b font-semibold w-[240px] min-w-0 max-w-[240px]'>
                     <Tooltip>
                       <TooltipTrigger asChild>
-                        <span className='block truncate'>{item.descr || '—'}</span>
+                        <span className='block truncate'>
+                          {item.descr || '—'}
+                        </span>
                       </TooltipTrigger>
-                      <TooltipContent>{item.descr}</TooltipContent>
+                      <TooltipContent>{item.descr || '—'}</TooltipContent>
                     </Tooltip>
                   </TableCell>
                   <TableCell className='border-b w-[100px] min-w-[100px]'>

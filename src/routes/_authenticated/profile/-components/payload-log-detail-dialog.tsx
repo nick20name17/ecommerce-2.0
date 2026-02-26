@@ -3,6 +3,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
+  DialogBody,
   DialogContent,
   DialogFooter,
   DialogHeader,
@@ -60,12 +61,12 @@ export const PayloadLogDetailDialog = ({
       open={open}
       onOpenChange={onOpenChange}
     >
-      <DialogContent className='h-[90vh] sm:max-w-4xl!'>
+      <DialogContent className='flex h-[90vh] flex-col sm:max-w-4xl!'>
         <DialogHeader>
           <DialogTitle>Payload Log #{log.id}</DialogTitle>
         </DialogHeader>
 
-        <div className='h-full space-y-4 overflow-y-auto'>
+        <DialogBody className='min-h-0 space-y-4'>
           <div className='grid grid-cols-2 gap-4'>
             <DetailItem label='Project'>
               {log.project_name} (#{log.project_id})
@@ -140,7 +141,7 @@ export const PayloadLogDetailDialog = ({
               </pre>
             </div>
           </div>
-        </div>
+        </DialogBody>
 
         <DialogFooter>
           <Button

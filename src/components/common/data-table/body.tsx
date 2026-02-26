@@ -12,22 +12,23 @@ import { cn } from '@/lib/utils'
 const TableBodyCell = <TData,>({
   cell,
   fitWidth,
-  widthPercent,
+  widthPercent
 }: {
   cell: Cell<TData, unknown>
   fitWidth?: boolean
   widthPercent?: string
 }) => {
   const size = cell.column.getSize()
-  const style = fitWidth && widthPercent
-    ? { width: widthPercent, minWidth: 0 }
-    : { width: size, minWidth: size, maxWidth: size }
+  const style =
+    fitWidth && widthPercent
+      ? { width: widthPercent, minWidth: 0 }
+      : { width: size, minWidth: size, maxWidth: size }
 
   return (
     <TableCell
       key={cell.id}
       style={style}
-      className={cn('border-b border-border/40')}
+      className={cn('border-border/40 border-b')}
     >
       {flexRender(cell.column.columnDef.cell, cell.getContext())}
     </TableCell>
@@ -38,7 +39,7 @@ const TableBodyRow = <TData,>({
   row,
   onRowClick,
   fitWidth,
-  widthPercent,
+  widthPercent
 }: {
   row: Row<TData>
   onRowClick?: (row: Row<TData>) => void
@@ -50,7 +51,7 @@ const TableBodyRow = <TData,>({
       key={row.id}
       id={`row-${row.id}`}
       className={cn(
-        'last:[&>td]:border-b-0 transition-colors duration-150',
+        'transition-colors duration-150 last:[&>td]:border-b-0',
         onRowClick ? 'hover:bg-muted/50 cursor-pointer' : 'hover:bg-muted/30'
       )}
       data-state={row.getIsSelected() && 'selected'}
@@ -95,7 +96,7 @@ export const DataTableBody = <TData,>({
   isLoading = false,
   renderSubComponent,
   onRowClick,
-  fitWidth = false,
+  fitWidth = false
 }: DataTableProps<TData>) => {
   const colCount = table.getAllColumns().length
   const widthPercent = fitWidth ? `${100 / colCount}%` : undefined
@@ -133,3 +134,4 @@ export const DataTableBody = <TData,>({
     </TableBody>
   )
 }
+

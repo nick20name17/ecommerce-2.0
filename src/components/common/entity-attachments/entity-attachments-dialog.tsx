@@ -6,6 +6,7 @@ import { EntityAttachments } from '@/components/common/entity-attachments/entity
 import type { EntityAttachmentType } from '@/components/common/entity-attachments/entity-attachments'
 import {
   Dialog,
+  DialogBody,
   DialogContent,
   DialogDescription,
   DialogHeader,
@@ -51,7 +52,7 @@ export function EntityAttachmentsDialog({
           <DialogTitle className='text-lg font-semibold'>Attachments</DialogTitle>
           <DialogDescription className='text-sm'>{entityLabel}</DialogDescription>
         </DialogHeader>
-        <div className='min-h-0 flex-1 overflow-y-auto px-6 pt-2 pb-6'>
+        <DialogBody className='min-h-0 flex-1 px-6 pt-2 pb-6'>
           <EntityAttachments
             entityType={entityType}
             entityId={autoid}
@@ -60,7 +61,7 @@ export function EntityAttachmentsDialog({
             mode='immediate'
             isLoading={isLoading}
           />
-        </div>
+        </DialogBody>
       </DialogContent>
     </Dialog>
   )

@@ -19,6 +19,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
   Dialog,
+  DialogBody,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -164,7 +165,8 @@ export const DangerZoneCard = ({ user }: DangerZoneCardProps) => {
             </DialogDescription>
           </DialogHeader>
 
-          <div className='flex flex-col gap-2'>
+          <DialogBody>
+            <div className='flex flex-col gap-2'>
             <label
               htmlFor='delete-confirm'
               className='text-sm font-medium'
@@ -190,7 +192,8 @@ export const DangerZoneCard = ({ user }: DangerZoneCardProps) => {
             {deleteConfirmation && !isDeleteValid ? (
               <p className='text-destructive text-sm'>Confirmation text does not match</p>
             ) : null}
-          </div>
+            </div>
+          </DialogBody>
 
           <DialogFooter>
             <Button

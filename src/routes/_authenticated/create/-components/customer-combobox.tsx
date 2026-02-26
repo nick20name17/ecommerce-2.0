@@ -15,9 +15,17 @@ interface CustomerComboboxProps {
   value: Customer | null
   onChange: (customer: Customer | null) => void
   projectId?: number | null
+  placeholder?: string
+  showAllOption?: boolean
 }
 
-export function CustomerCombobox({ value, onChange, projectId }: CustomerComboboxProps) {
+export function CustomerCombobox({
+  value,
+  onChange,
+  projectId,
+  placeholder = 'Select customer...',
+  showAllOption = false
+}: CustomerComboboxProps) {
   const [open, setOpen] = useState(false)
   const [search, setSearch] = useState('')
   const [debouncedSearch, setDebouncedSearch] = useState('')
@@ -56,6 +64,11 @@ export function CustomerCombobox({ value, onChange, projectId }: CustomerCombobo
     setOpen(false)
   }
 
+  const handleSelectAll = () => {
+    onChange(null)
+    setOpen(false)
+  }
+
   return (
     <Popover open={open} onOpenChange={handleOpenChange}>
       <div className='flex gap-2'>
@@ -70,7 +83,7 @@ export function CustomerCombobox({ value, onChange, projectId }: CustomerCombobo
                 )}
               </span>
             ) : (
-              <span className='text-muted-foreground'>Select customer...</span>
+              <span className='text-muted-foreground'>{placeholder}</span>
             )}
             <ChevronsUpDown className='ml-auto size-4 shrink-0 opacity-50' />
           </Button>
@@ -107,14 +120,34 @@ export function CustomerCombobox({ value, onChange, projectId }: CustomerCombobo
               ))}
             </div>
           ) : customers.length === 0 ? (
-            <div className='text-muted-foreground flex flex-col items-center gap-2 py-8'>
-              <Users className='size-6 opacity-50' />
-              <span className='text-sm'>
-                {search ? 'No customers found' : 'Start typing to search'}
-              </span>
+            <div className='p-1'>
+              {showAllOption && (
+                <button
+                  type='button'
+                  className='hover:bg-accent hover:text-accent-foreground flex w-full items-center gap-2 rounded-md px-2 py-2 text-left text-sm font-medium'
+                  onClick={handleSelectAll}
+                >
+                  All customers
+                </button>
+              )}
+              <div className='text-muted-foreground flex flex-col items-center gap-2 py-6'>
+                <Users className='size-6 opacity-50' />
+                <span className='text-sm'>
+                  {search ? 'No customers found' : 'Start typing to search'}
+                </span>
+              </div>
             </div>
           ) : (
             <div className='p-1'>
+              {showAllOption && (
+                <button
+                  type='button'
+                  className='hover:bg-accent hover:text-accent-foreground flex w-full items-center gap-2 rounded-md px-2 py-2 text-left text-sm font-medium'
+                  onClick={handleSelectAll}
+                >
+                  All customers
+                </button>
+              )}
               {customers.map((c) => (
                 <button
                   key={c.id}
