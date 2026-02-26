@@ -16,6 +16,7 @@ interface OrdersDataTableProps {
   setSorting: (updater: React.SetStateAction<SortingState>) => void
   onDelete: (order: Order) => void
   onDeleteLinkedProposal: (order: Order) => void
+  onAttachments: (order: Order) => void
 }
 
 export function OrdersDataTable({
@@ -25,10 +26,11 @@ export function OrdersDataTable({
   setSorting,
   onDelete,
   onDeleteLinkedProposal,
+  onAttachments,
 }: OrdersDataTableProps) {
   const columns = useMemo(
-    () => getOrderColumns({ onDelete, onDeleteLinkedProposal }),
-    [onDelete, onDeleteLinkedProposal]
+    () => getOrderColumns({ onDelete, onDeleteLinkedProposal, onAttachments }),
+    [onDelete, onDeleteLinkedProposal, onAttachments]
   )
 
   const table = useReactTable({

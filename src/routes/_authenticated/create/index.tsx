@@ -1,9 +1,13 @@
 import { createFileRoute, useNavigate, useRouter } from '@tanstack/react-router'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { useEffect, useReducer, useState } from 'react'
-import { ArrowLeft, FilePlus2, Package, ShoppingCart, User } from 'lucide-react'
+import { useEffect, useReducer, useRef, useState } from 'react'
+import { ArrowLeft, FilePlus2, Paperclip, Package, ShoppingCart, User } from 'lucide-react'
 import { toast } from 'sonner'
 
+import {
+  EntityAttachments,
+  type EntityAttachmentsRef
+} from '@/components/common/entity-attachments/entity-attachments'
 import { CartSummary } from './-components/cart-summary'
 import { CartTable } from './-components/cart-table'
 import { CreatePageActions } from './-components/create-page-actions'
@@ -92,6 +96,7 @@ function CreatePage() {
 
   const [customer, setCustomer] = useState<Customer | null>(null)
   const [catalogOpen, setCatalogOpen] = useState(false)
+  const attachmentsRef = useRef<EntityAttachmentsRef>(null)
   const [busy, busyDispatch] = useReducer(busyReducer, initialBusy)
   const [editState, editDispatch] = useReducer(editReducer, {
     product: null,
@@ -219,15 +224,24 @@ function CreatePage() {
       return
     }
     busyDispatch({ type: 'CREATING_PROPOSAL', value: true })
-    await toast.promise(cartService.submitProposal(customer.id, projectId), {
-      loading: 'Creating proposal...',
-      success: (result) => {
-        invalidateCart()
-        navigate({ to: '/proposals', search: { autoid: result.AUTOID, status: 'all' } })
-        return 'Proposal created successfully'
-      },
-      error: (error) => getErrorMessage(error)
-    })
+    await toast.promise(
+      (async () => {
+        const result = await cartService.submitProposal(customer.id, projectId)
+        if (attachmentsRef.current?.hasPendingFiles()) {
+          await attachmentsRef.current.uploadPendingFiles(result.AUTOID, 'proposal')
+        }
+        return result
+      })(),
+      {
+        loading: 'Creating proposal...',
+        success: (result) => {
+          invalidateCart()
+          navigate({ to: '/proposals', search: { autoid: result.AUTOID, status: 'all' } })
+          return 'Proposal created successfully'
+        },
+        error: (error) => getErrorMessage(error)
+      }
+    )
     busyDispatch({ type: 'CREATING_PROPOSAL', value: false })
   }
 
@@ -241,15 +255,24 @@ function CreatePage() {
       return
     }
     busyDispatch({ type: 'CREATING_ORDER', value: true })
-    await toast.promise(cartService.submitOrder(customer.id, projectId), {
-      loading: 'Creating order...',
-      success: (result) => {
-        invalidateCart()
-        navigate({ to: '/orders', search: { autoid: result.AUTOID, status: 'all' } })
-        return 'Order created successfully'
-      },
-      error: (error) => getErrorMessage(error)
-    })
+    await toast.promise(
+      (async () => {
+        const result = await cartService.submitOrder(customer.id, projectId)
+        if (attachmentsRef.current?.hasPendingFiles()) {
+          await attachmentsRef.current.uploadPendingFiles(result.AUTOID, 'order')
+        }
+        return result
+      })(),
+      {
+        loading: 'Creating order...',
+        success: (result) => {
+          invalidateCart()
+          navigate({ to: '/orders', search: { autoid: result.AUTOID, status: 'all' } })
+          return 'Order created successfully'
+        },
+        error: (error) => getErrorMessage(error)
+      }
+    )
     busyDispatch({ type: 'CREATING_ORDER', value: false })
   }
 
@@ -323,6 +346,21 @@ function CreatePage() {
                   Use the catalog to filter by category and search across products. Configurable products will prompt for options.
                 </p>
               </div>
+            </Section>
+
+            {/* Attachments */}
+            <Section
+              icon={<Paperclip className='size-4' />}
+              title='Attachments'
+              description='Add files to attach to the proposal or order after creation'
+              isDisabled={!customer}
+            >
+              <EntityAttachments
+                ref={attachmentsRef}
+                entityType='proposal'
+                projectId={projectId}
+                mode='deferred'
+              />
             </Section>
           </div>
 

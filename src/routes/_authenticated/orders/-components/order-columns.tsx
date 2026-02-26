@@ -1,7 +1,7 @@
 'use no memo'
 
 import type { ColumnDef } from '@tanstack/react-table'
-import { Link2Off, MoreHorizontal, Pencil, Trash2 } from 'lucide-react'
+import { Link2Off, MoreHorizontal, Paperclip, Trash2 } from 'lucide-react'
 
 import type { Order } from '@/api/order/schema'
 import { ColumnHeader } from '@/components/common/data-table/column-header'
@@ -23,11 +23,13 @@ import { cn } from '@/lib/utils'
 interface OrderColumnsOptions {
   onDelete: (order: Order) => void
   onDeleteLinkedProposal: (order: Order) => void
+  onAttachments: (order: Order) => void
 }
 
 export const getOrderColumns = ({
   onDelete,
   onDeleteLinkedProposal,
+  onAttachments,
 }: OrderColumnsOptions): ColumnDef<Order>[] => [
   createExpanderColumn<Order>(),
   createCheckboxColumn<Order>(),
@@ -140,9 +142,9 @@ export const getOrderColumns = ({
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align='end'>
-            <DropdownMenuItem disabled title='Coming soon'>
-              <Pencil className='size-4' />
-              Edit
+            <DropdownMenuItem onClick={() => onAttachments(row.original)}>
+              <Paperclip className='size-4' />
+              Attachments
             </DropdownMenuItem>
             {row.original.external_id && (
               <DropdownMenuItem

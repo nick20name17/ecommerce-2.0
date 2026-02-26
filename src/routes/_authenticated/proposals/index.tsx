@@ -3,6 +3,7 @@ import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { FileText, Plus, X } from 'lucide-react'
 import { useState } from 'react'
 
+import { EntityAttachmentsDialog } from '@/components/common/entity-attachments/entity-attachments-dialog'
 import { ProposalDeleteDialog } from './-components/proposal-delete-dialog'
 import { ProposalsDataTable } from './-components/proposals-data-table'
 import { getProposalsQuery } from '@/api/proposal/query'
@@ -57,6 +58,7 @@ function ProposalsPage() {
   const userIsSuperAdmin = user?.role ? isSuperAdmin(user.role) : false
 
   const [proposalToDelete, setProposalToDelete] = useState<Proposal | null>(null)
+  const [proposalForAttachments, setProposalForAttachments] = useState<Proposal | null>(null)
 
   const activeStatus = status ?? PROPOSAL_STATUS.open
 
@@ -151,6 +153,7 @@ function ProposalsPage() {
         isSuperAdmin={userIsSuperAdmin}
         projectId={projectId}
         onDelete={setProposalToDelete}
+        onAttachments={setProposalForAttachments}
       />
 
       <Pagination totalCount={data?.count ?? 0} />
@@ -160,6 +163,19 @@ function ProposalsPage() {
         projectId={projectId}
         open={!!proposalToDelete}
         onOpenChange={(open) => !open && setProposalToDelete(null)}
+      />
+
+      <EntityAttachmentsDialog
+        entityType='proposal'
+        entityLabel={
+          proposalForAttachments
+            ? `Proposal ${proposalForAttachments.quote ?? proposalForAttachments.autoid}`
+            : ''
+        }
+        autoid={proposalForAttachments?.autoid ?? ''}
+        projectId={projectId}
+        open={!!proposalForAttachments}
+        onOpenChange={(open) => !open && setProposalForAttachments(null)}
       />
     </div>
   )

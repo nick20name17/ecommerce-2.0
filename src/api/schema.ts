@@ -37,3 +37,18 @@ export interface PaginationParams {
   limit?: number
   offset?: number
 }
+
+export interface EntityAttachment {
+  id: number
+  entity_type: string
+  entity_autoid: string
+  project: number
+  file_name: string
+  file_size: number
+  file_size_mb: string
+  file_type: string
+  uploaded_by: number | null
+  uploaded_by_details: { id: number; full_name?: string } | null
+  download_url: string
+  created_at: string
+}

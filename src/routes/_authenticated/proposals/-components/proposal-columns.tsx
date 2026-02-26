@@ -3,7 +3,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import type { ColumnDef } from '@tanstack/react-table'
 import { useNavigate } from '@tanstack/react-router'
-import { MoreHorizontal, ShoppingCart, Trash2 } from 'lucide-react'
+import { MoreHorizontal, Paperclip, ShoppingCart, Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
 
 import { PROPOSAL_QUERY_KEYS } from '@/api/proposal/query'
@@ -30,6 +30,7 @@ interface ProposalColumnsOptions {
   isSuperAdmin: boolean
   projectId: number | null
   onDelete: (proposal: Proposal) => void
+  onAttachments: (proposal: Proposal) => void
 }
 
 const ToOrderAction = ({
@@ -71,7 +72,8 @@ const ToOrderAction = ({
 export const getProposalColumns = ({
   isSuperAdmin,
   projectId,
-  onDelete
+  onDelete,
+  onAttachments
 }: ProposalColumnsOptions): ColumnDef<Proposal>[] => [
   createExpanderColumn<Proposal>(),
   {
@@ -140,6 +142,10 @@ export const getProposalColumns = ({
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align='end'>
+            <DropdownMenuItem onClick={() => onAttachments(row.original)}>
+              <Paperclip className='size-4' />
+              Attachments
+            </DropdownMenuItem>
             {isSuperAdmin && (
               <ToOrderAction proposal={row.original} projectId={projectId} />
             )}

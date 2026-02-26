@@ -3,6 +3,7 @@ import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { Plus, ShoppingCart, X } from 'lucide-react'
 import { useState } from 'react'
 
+import { EntityAttachmentsDialog } from '@/components/common/entity-attachments/entity-attachments-dialog'
 import { OrderDeleteDialog } from './-components/order-delete-dialog'
 import { OrdersDataTable } from './-components/orders-data-table'
 import { getOrdersQuery, ORDER_QUERY_KEYS } from '@/api/order/query'
@@ -55,6 +56,7 @@ function OrdersPage() {
   const { sorting, setSorting, ordering } = useOrdering()
 
   const [orderToDelete, setOrderToDelete] = useState<Order | null>(null)
+  const [orderForAttachments, setOrderForAttachments] = useState<Order | null>(null)
 
   const deleteLinkedProposalMutation = useMutation({
     mutationFn: (autoid: string) => orderService.deleteLinkedProposal(autoid),
@@ -157,6 +159,7 @@ function OrdersPage() {
         setSorting={setSorting}
         onDelete={setOrderToDelete}
         onDeleteLinkedProposal={(order) => deleteLinkedProposalMutation.mutate(order.autoid)}
+        onAttachments={setOrderForAttachments}
       />
 
       <Pagination totalCount={data?.count ?? 0} />
@@ -166,6 +169,15 @@ function OrdersPage() {
         projectId={projectId}
         open={!!orderToDelete}
         onOpenChange={(open) => !open && setOrderToDelete(null)}
+      />
+
+      <EntityAttachmentsDialog
+        entityType='order'
+        entityLabel={orderForAttachments ? `Order ${orderForAttachments.invoice ?? orderForAttachments.autoid}` : ''}
+        autoid={orderForAttachments?.autoid ?? ''}
+        projectId={projectId}
+        open={!!orderForAttachments}
+        onOpenChange={(open) => !open && setOrderForAttachments(null)}
       />
     </div>
   )

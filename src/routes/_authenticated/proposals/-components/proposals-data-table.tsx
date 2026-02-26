@@ -17,6 +17,7 @@ interface ProposalsDataTableProps {
   isSuperAdmin: boolean
   projectId: number | null
   onDelete: (proposal: Proposal) => void
+  onAttachments: (proposal: Proposal) => void
 }
 
 export function ProposalsDataTable({
@@ -26,11 +27,12 @@ export function ProposalsDataTable({
   setSorting,
   isSuperAdmin,
   projectId,
-  onDelete
+  onDelete,
+  onAttachments
 }: ProposalsDataTableProps) {
   const columns = useMemo(
-    () => getProposalColumns({ isSuperAdmin, projectId, onDelete }),
-    [isSuperAdmin, projectId, onDelete]
+    () => getProposalColumns({ isSuperAdmin, projectId, onDelete, onAttachments }),
+    [isSuperAdmin, projectId, onDelete, onAttachments]
   )
 
   const table = useReactTable({
