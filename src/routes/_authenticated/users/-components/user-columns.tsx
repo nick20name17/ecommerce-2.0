@@ -27,8 +27,20 @@ interface UserColumnsOptions {
   onDelete: (user: User) => void
 }
 
-function getInitials(firstName: string, lastName: string): string {
-  return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase()
+function getInitials(
+  firstName: string | undefined,
+  lastName: string | undefined,
+  email?: string
+): string {
+  const first = firstName?.trim()
+  const last = lastName?.trim()
+  if (first && last) {
+    return `${first.charAt(0)}${last.charAt(0)}`.toUpperCase()
+  }
+  if (first || last) {
+    return (first || last)!.charAt(0).toUpperCase()
+  }
+  return (email?.charAt(0) ?? '?').toUpperCase()
 }
 
 const StatusToggle = ({ user, currentUserId }: { user: User; currentUserId: number | undefined }) => {
@@ -78,13 +90,13 @@ export const getUserColumns = ({
       header: ({ column }) => <ColumnHeader column={column} title='User' />,
       cell: ({ row }) => {
         const user = row.original
-        const fullName = `${user.first_name} ${user.last_name}`
+        const fullName = [user.first_name, user.last_name].filter(Boolean).join(' ').trim() || user.email || 'User'
 
         return (
           <div className='flex min-w-0 items-center gap-3'>
             <Avatar className='size-8 shrink-0'>
               <AvatarFallback className='bg-primary/10 text-xs font-medium text-primary'>
-                {getInitials(user.first_name, user.last_name)}
+                {getInitials(user.first_name, user.last_name, user.email)}
               </AvatarFallback>
             </Avatar>
             <div className='min-w-0'>

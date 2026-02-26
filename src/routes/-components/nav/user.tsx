@@ -24,11 +24,15 @@ export function NavUser() {
 
   const { user, logout } = useAuth()
 
-  const userName = user?.first_name + ' ' + user?.last_name
-  const userInitials = userName
-    ?.split(' ')
-    .map((name) => name?.[0])
-    ?.join('')
+  const namePart = [user?.first_name, user?.last_name].filter(Boolean).join(' ').trim()
+  const userName = namePart || user?.email || 'User'
+  const userInitials = namePart
+    ? namePart
+        .split(' ')
+        .map((n) => n[0])
+        .join('')
+        .toUpperCase()
+    : (user?.email?.[0] ?? '?').toUpperCase()
 
   return (
     <SidebarMenu>
