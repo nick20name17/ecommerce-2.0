@@ -58,7 +58,7 @@ function TrendIndicator({
       className={cn(
         'inline-flex items-center gap-0.5 text-xs font-medium tabular-nums',
         direction === 'same' && 'text-muted-foreground',
-        direction !== 'same' && positive && 'text-primary',
+        direction !== 'same' && positive && 'text-green-600 dark:text-green-400',
         direction !== 'same' && !positive && 'text-destructive'
       )}
     >
