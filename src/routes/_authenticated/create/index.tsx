@@ -23,6 +23,10 @@ import type { CartItem, Product } from '@/api/product/schema'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { getErrorMessage } from '@/helpers/error'
+import {
+  cancelPendingCreatedAutoid,
+  waitForCreatedAutoid
+} from '@/helpers/pending-created-autoid'
 import { useProjectId } from '@/hooks/use-project-id'
 import { useSelectedCustomerId } from '@/hooks/use-selected-customer'
 import { cn } from '@/lib/utils'
@@ -224,21 +228,28 @@ function CreatePage() {
       return
     }
     busyDispatch({ type: 'CREATING_PROPOSAL', value: true })
+    const autoidPromise = waitForCreatedAutoid('proposal')
     await toast.promise(
       (async () => {
-        const result = await cartService.submitProposal(customer.id, projectId)
-        if (attachmentsRef.current?.hasPendingFiles()) {
-          await attachmentsRef.current.uploadPendingFiles(result.AUTOID, 'proposal')
+        try {
+          await cartService.submitProposal(customer.id, projectId)
+        } catch (e) {
+          cancelPendingCreatedAutoid('proposal')
+          throw e
         }
-        return result
+        const autoid = await autoidPromise
+        if (attachmentsRef.current?.hasPendingFiles()) {
+          await attachmentsRef.current.uploadPendingFiles(autoid, 'proposal')
+        }
+        return { autoid }
       })(),
       {
         loading: 'Creating proposal...',
-        success: (result) => {
+        success: ({ autoid }) => {
           invalidateCart()
           setCustomer(null)
           setSavedCustomerId(null)
-          navigate({ to: '/proposals', search: { autoid: result.AUTOID, status: 'all' } })
+          navigate({ to: '/proposals', search: { autoid, status: 'all' } })
           return 'Proposal created successfully'
         },
         error: (error) => getErrorMessage(error)
@@ -257,21 +268,28 @@ function CreatePage() {
       return
     }
     busyDispatch({ type: 'CREATING_ORDER', value: true })
+    const autoidPromise = waitForCreatedAutoid('order')
     await toast.promise(
       (async () => {
-        const result = await cartService.submitOrder(customer.id, projectId)
-        if (attachmentsRef.current?.hasPendingFiles()) {
-          await attachmentsRef.current.uploadPendingFiles(result.AUTOID, 'order')
+        try {
+          await cartService.submitOrder(customer.id, projectId)
+        } catch (e) {
+          cancelPendingCreatedAutoid('order')
+          throw e
         }
-        return result
+        const autoid = await autoidPromise
+        if (attachmentsRef.current?.hasPendingFiles()) {
+          await attachmentsRef.current.uploadPendingFiles(autoid, 'order')
+        }
+        return { autoid }
       })(),
       {
         loading: 'Creating order...',
-        success: (result) => {
+        success: ({ autoid }) => {
           invalidateCart()
           setCustomer(null)
           setSavedCustomerId(null)
-          navigate({ to: '/orders', search: { autoid: result.AUTOID, status: 'all' } })
+          navigate({ to: '/orders', search: { autoid, status: 'all' } })
           return 'Order created successfully'
         },
         error: (error) => getErrorMessage(error)

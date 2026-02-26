@@ -3,6 +3,7 @@ import { Outlet, createFileRoute, redirect } from '@tanstack/react-router'
 import { AppSidebar } from '../-components/app-sidebar'
 
 import { HeaderProjectHealth } from './-components/header-project-health'
+import { NotificationsWsManager } from './-components/notifications-ws-manager'
 import { AUTH_REDIRECTS } from '@/api/constants'
 import { ModeToggle } from '@/components/common/mode-toggle'
 import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
@@ -11,6 +12,7 @@ import { getSession } from '@/helpers/auth'
 const AuthenticatedLayout = () => {
   return (
     <SidebarProvider className='h-svh overflow-hidden'>
+      <NotificationsWsManager />
       <AppSidebar />
       <SidebarInset className='flex min-h-0 flex-col overflow-hidden'>
         <header className='flex h-14 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12'>

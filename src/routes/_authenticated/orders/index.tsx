@@ -1,7 +1,7 @@
 import { keepPreviousData, useMutation, useQuery } from '@tanstack/react-query'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { Plus, ShoppingCart, X } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 import { OrderDeleteDialog } from './-components/order-delete-dialog'
 import { OrdersDataTable } from './-components/orders-data-table'
@@ -84,10 +84,59 @@ function OrdersPage() {
     project_id: projectId ?? undefined
   }
 
-  const { data, isLoading, isPlaceholderData } = useQuery({
+  const { data, refetch, isLoading, isPlaceholderData } = useQuery({
     ...getOrdersQuery(params),
     placeholderData: keepPreviousData
   })
+
+  const results = data?.results ?? []
+  const orderInResults =
+    autoidFromUrl != null &&
+    autoidFromUrl !== '' &&
+    results.some((o) => o.autoid === autoidFromUrl)
+
+  const refetchTimersRef = useRef<ReturnType<typeof setTimeout>[]>([])
+  useEffect(() => {
+    if (!autoidFromUrl) return
+    if (orderInResults) {
+      refetchTimersRef.current.forEach(clearTimeout)
+      refetchTimersRef.current = []
+      return
+    }
+    refetchTimersRef.current = [
+      setTimeout(() => refetch(), 3000),
+      setTimeout(() => refetch(), 6000)
+    ]
+    return () => {
+      refetchTimersRef.current.forEach(clearTimeout)
+      refetchTimersRef.current = []
+    }
+  }, [autoidFromUrl, orderInResults, refetch])
+
+  const hasPendingAutoid =
+    autoidFromUrl != null && autoidFromUrl !== '' && !orderInResults
+  const pendingOrderPlaceholder: Order & { _pending?: true } = hasPendingAutoid
+    ? {
+        autoid: autoidFromUrl,
+        id: '',
+        invoice: '',
+        name: '',
+        inv_date: null,
+        due_date: null,
+        status: 'U',
+        tax: '0',
+        subtotal: '0',
+        total: '0',
+        balance: '0',
+        external_id: null,
+        total_quan: '0',
+        total_ship: '0',
+        _pending: true
+      }
+    : (null as unknown as Order & { _pending?: true })
+  const tableData: (Order & { _pending?: true })[] = hasPendingAutoid
+    ? [pendingOrderPlaceholder, ...results]
+    : results
 
   const handleStatusChange = (value: string) => {
     setStatus(value)
@@ -138,13 +187,13 @@ function OrdersPage() {
       {autoidFromUrl && (
         <Badge
           variant='secondary'
-          className='cursor-pointer w-fit gap-1 pr-1 transition-opacity hover:opacity-80'
+          className='w-fit cursor-pointer gap-1 pr-1 transition-opacity hover:opacity-80'
           onClick={() => setAutoidFromUrl(null)}
         >
           Order: {autoidFromUrl}
           <button
             type='button'
-            className='rounded-sm p-0.5 hover:bg-muted'
+            className='hover:bg-muted rounded-sm p-0.5'
             onClick={(e) => {
               e.stopPropagation()
               setAutoidFromUrl(null)
@@ -157,7 +206,7 @@ function OrdersPage() {
       )}
 
       <OrdersDataTable
-        data={data?.results ?? []}
+        data={tableData}
         isLoading={isLoading || isPlaceholderData}
         sorting={sorting}
         setSorting={setSorting}
@@ -190,4 +239,3 @@ function OrdersPage() {
     </div>
   )
 }
-

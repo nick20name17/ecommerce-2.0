@@ -4,19 +4,18 @@ import type { SortingState } from '@tanstack/react-table'
 import { getCoreRowModel, getExpandedRowModel, useReactTable } from '@tanstack/react-table'
 import { useMemo } from 'react'
 
-import { getOrderColumns } from './order-columns'
+import { getOrderColumns, type OrderRow } from './order-columns'
 import { OrderExpandedRow } from './order-expanded-row'
-import type { Order } from '@/api/order/schema'
 import { DataTable } from '@/components/common/data-table'
 
 interface OrdersDataTableProps {
-  data: Order[]
+  data: OrderRow[]
   isLoading: boolean
   sorting: SortingState
   setSorting: (updater: React.SetStateAction<SortingState>) => void
-  onDelete: (order: Order) => void
-  onDeleteLinkedProposal: (order: Order) => void
-  onAttachments: (order: Order) => void
+  onDelete: (order: OrderRow) => void
+  onDeleteLinkedProposal: (order: OrderRow) => void
+  onAttachments: (order: OrderRow) => void
 }
 
 export function OrdersDataTable({
@@ -38,7 +37,7 @@ export function OrdersDataTable({
     data,
     getCoreRowModel: getCoreRowModel(),
     getExpandedRowModel: getExpandedRowModel(),
-    getRowCanExpand: (row) => !!row.original.items?.length,
+    getRowCanExpand: (row) => !row.original._pending && !!row.original.items?.length,
     onSortingChange: setSorting,
     state: { sorting },
     manualSorting: true,
