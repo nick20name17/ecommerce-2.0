@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { ScrollArea } from '@/components/ui/scroll-area'
+import { Skeleton } from '@/components/ui/skeleton'
 import { formatCurrency } from '@/helpers/formatters'
 import { cn } from '@/lib/utils'
 
@@ -237,7 +238,7 @@ export function CatalogProductGrid({
           {loading ? (
             <div className='grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3'>
               {Array.from({ length: 12 }).map((_, i) => (
-                <div key={`product-skeleton-${i}`} className='h-[110px] animate-pulse rounded-xl bg-muted' />
+                <Skeleton key={`product-skeleton-${i}`} className='h-[110px] rounded-xl' />
               ))}
             </div>
           ) : products.length === 0 ? (

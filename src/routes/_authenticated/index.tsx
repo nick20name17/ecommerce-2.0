@@ -10,6 +10,7 @@ import { getCustomerDetailQuery } from '@/api/customer/query'
 import type { Customer } from '@/api/customer/schema'
 import { getDashboardQuery } from '@/api/dashboard/query'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Skeleton } from '@/components/ui/skeleton'
 import { isSuperAdmin } from '@/constants/user'
 import { getErrorMessage } from '@/helpers/error'
 import { useProjectId } from '@/hooks/use-project-id'
@@ -111,21 +112,21 @@ function DashboardPage() {
             <div className='grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3'>
               {Array.from({ length: 6 }).map((_, i) => (
                 <Card
-                  key={i}
+                  key={`skeleton-${i}`}
                   className='min-w-0 overflow-hidden'
                 >
                   <CardHeader className='flex flex-row items-start justify-between gap-3 pb-2'>
                     <div className='space-y-1'>
                       <div className='flex items-center gap-2'>
-                        <div className='bg-muted size-8 shrink-0 animate-pulse rounded-lg' />
-                        <div className='bg-muted h-4 w-24 animate-pulse rounded' />
+                        <Skeleton className='size-8 shrink-0 rounded-lg' />
+                        <Skeleton className='h-4 w-24' />
                       </div>
-                      <div className='bg-muted h-3 w-20 animate-pulse rounded' />
+                      <Skeleton className='h-3 w-20' />
                     </div>
                   </CardHeader>
                   <CardContent className='pt-0'>
-                    <div className='bg-muted h-8 w-28 animate-pulse rounded' />
-                    <div className='bg-muted mt-1.5 h-3 w-32 animate-pulse rounded' />
+                    <Skeleton className='h-8 w-28' />
+                    <Skeleton className='mt-1.5 h-3 w-32' />
                   </CardContent>
                 </Card>
               ))}
@@ -137,8 +138,8 @@ function DashboardPage() {
                   className='min-w-0 shrink-0 overflow-hidden'
                 >
                   <CardHeader className='border-border/50 bg-muted/20 flex flex-row items-center gap-3 border-b pb-4'>
-                    <div className='bg-muted size-9 shrink-0 animate-pulse rounded-lg' />
-                    <div className='bg-muted h-5 w-48 animate-pulse rounded' />
+                    <Skeleton className='size-9 shrink-0 rounded-lg' />
+                    <Skeleton className='h-5 w-48' />
                   </CardHeader>
                   <CardContent className='pt-4'>
                     <div className='border-border bg-muted/20 flex h-[280px] items-center justify-center rounded-lg border border-dashed'>
@@ -222,4 +223,3 @@ function DashboardPage() {
     </div>
   )
 }
-

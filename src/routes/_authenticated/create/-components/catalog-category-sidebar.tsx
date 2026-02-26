@@ -7,6 +7,7 @@ import type { Category } from '@/api/category/schema'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
+import { Skeleton } from '@/components/ui/skeleton'
 import { cn } from '@/lib/utils'
 
 type Crumb = { tree_id: string; tree_descr: string }
@@ -148,10 +149,7 @@ export function CatalogCategorySidebar({
           {loading ? (
             <div className='space-y-2 p-2'>
               {Array.from({ length: 10 }).map((_, i) => (
-                <div
-                  key={`category-skeleton-${i}`}
-                  className='h-10 w-full animate-pulse rounded-lg bg-muted'
-                />
+                <Skeleton key={`category-skeleton-${i}`} className='h-10 w-full rounded-lg' />
               ))}
             </div>
           ) : results.length === 0 ? (
