@@ -137,7 +137,12 @@ export function useNotificationsWebSocket({
           queryClient.invalidateQueries({ queryKey })
         }
         if (showToasts) {
-          toast.info(getToastMessage(payload))
+          const isCreateOrDeleteOrderProposal =
+            (payload.entity === 'order' || payload.entity === 'proposal') &&
+            (action === 'created' || action === 'deleted')
+          if (!isCreateOrDeleteOrderProposal) {
+            toast.info(getToastMessage(payload))
+          }
         }
       }
     })
