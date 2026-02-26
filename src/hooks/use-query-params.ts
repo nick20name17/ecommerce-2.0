@@ -7,7 +7,9 @@ import {
 } from 'nuqs'
 
 import { DEFAULT_LIMIT } from '@/api/constants'
+import { CUSTOMER_TAB_VALUES } from '@/constants/customer'
 import { ORDER_STATUS } from '@/constants/order'
+import { TASK_PRIORITY_VALUES } from '@/constants/task'
 
 const ORDER_STATUS_VALUES = ['all', ...Object.values(ORDER_STATUS)] as [string, ...string[]]
 const orderStatusParser = parseAsStringLiteral(ORDER_STATUS_VALUES)
@@ -84,12 +86,10 @@ export function useTaskStatusParam() {
   return useQueryState('task_status', parseAsInteger)
 }
 
-const TASK_PRIORITY_VALUES = ['low', 'medium', 'high', 'urgent'] as [string, ...string[]]
-
 export function useTaskPriorityParam() {
   return useQueryState(
     'task_priority',
-    parseAsStringLiteral(TASK_PRIORITY_VALUES).withDefault('')
+    parseAsStringLiteral([...TASK_PRIORITY_VALUES] as [string, ...string[]]).withDefault('')
   )
 }
 
@@ -108,8 +108,6 @@ export function useTaskDueToParam() {
 export function useAutoidParam() {
   return useQueryState('autoid', parseAsString)
 }
-
-const CUSTOMER_TAB_VALUES = ['orders', 'todos', 'dashboard'] as [string, ...string[]]
 
 export function useCustomerTabParam() {
   return useQueryState(

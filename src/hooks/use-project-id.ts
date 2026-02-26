@@ -1,8 +1,11 @@
 import { useLocalStorage } from 'usehooks-ts'
 
-const PROJECT_ID_KEY = 'project_id'
+import { STORAGE_KEYS } from '@/constants/storage'
 
 export function useProjectId(): [number | null, (id: number | null) => void] {
-  const [projectId, setProjectId] = useLocalStorage<number | null>(PROJECT_ID_KEY, null)
+  const [projectId, setProjectId] = useLocalStorage<number | null>(
+    STORAGE_KEYS.projectId,
+    null
+  )
   return [projectId, setProjectId]
 }

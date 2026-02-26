@@ -2,7 +2,7 @@ import type { ErrorComponentProps } from '@tanstack/react-router'
 import { AlertCircle } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
-import { getErrorMessage } from '@/helpers/error'
+import { FALLBACK_ERROR_MESSAGE, getErrorMessage } from '@/helpers/error'
 import { cn } from '@/lib/utils'
 
 interface ErrorProps extends ErrorComponentProps {
@@ -23,7 +23,7 @@ export function Error({ error, reset, className }: ErrorProps) {
         <AlertCircle className='text-destructive size-8' />
       </div>
       <div className='flex flex-col items-center gap-1 text-center'>
-        <h1 className='text-2xl font-semibold'>Something went wrong</h1>
+        <h1 className='text-2xl font-semibold'>{FALLBACK_ERROR_MESSAGE}</h1>
         <p className='text-muted-foreground max-w-md text-sm'>{message}</p>
       </div>
       <Button onClick={() => reset()}>Try again</Button>

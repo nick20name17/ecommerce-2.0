@@ -1,6 +1,6 @@
 import { isAxiosError } from 'axios'
 
-const FALLBACK_ERROR_MESSAGE = 'Something went wrong'
+export const FALLBACK_ERROR_MESSAGE = 'Something went wrong'
 
 export function getErrorMessage(error: unknown): string {
   if (isAxiosError(error)) {

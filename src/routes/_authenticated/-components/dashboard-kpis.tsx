@@ -18,15 +18,14 @@ import {
   TrendingUp
 } from 'lucide-react'
 
+import { formatCurrency } from '@/helpers/formatters'
 import { cn } from '@/lib/utils'
 
-const formatCurrency = (value: number) =>
-  new Intl.NumberFormat(undefined, {
-    style: 'currency',
-    currency: 'USD',
+const formatCurrencyInteger = (value: number) =>
+  formatCurrency(value, '$0', {
     minimumFractionDigits: 0,
     maximumFractionDigits: 0
-  }).format(value)
+  })
 
 interface DashboardKpisProps {
   metrics: DashboardMetrics
@@ -87,8 +86,8 @@ const KPI_CONFIG = [
     icon: DollarSign,
     value: (m: DashboardMetrics) => getFinancial(m).total_sales,
     secondary: (m: DashboardMetrics) =>
-      `Last month: ${formatCurrency(getFinancial(m).last_month_total_sales)}`,
-    format: formatCurrency,
+      `Last month: ${formatCurrencyInteger(getFinancial(m).last_month_total_sales)}`,
+    format: formatCurrencyInteger,
     showTrend: false,
     colSpan: 'sm:col-span-1'
   },
@@ -98,7 +97,7 @@ const KPI_CONFIG = [
     description: 'Current vs last month',
     icon: TrendingUp,
     value: (m: DashboardMetrics) => getFinancial(m).average_order_value,
-    format: formatCurrency,
+    format: formatCurrencyInteger,
     showTrend: true,
     trend: (m: DashboardMetrics) => ({
       current: getFinancial(m).average_order_value,
@@ -132,7 +131,7 @@ const KPI_CONFIG = [
     description: 'Invoice balance',
     icon: Receipt,
     value: (m: DashboardMetrics) => getFinancial(m).outstanding_invoices,
-    format: formatCurrency,
+    format: formatCurrencyInteger,
     showTrend: false,
     colSpan: 'sm:col-span-1'
   }

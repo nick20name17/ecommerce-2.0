@@ -14,13 +14,22 @@ const currencyFormat = new Intl.NumberFormat(LOCALE_DEFAULT, {
 
 export function formatCurrency(
   amount: string | number | null | undefined,
-  fallback: string = '$0.00'
+  fallback: string = '$0.00',
+  options?: { maximumFractionDigits?: number; minimumFractionDigits?: number }
 ): string {
   if (amount === undefined || amount === null || amount === '') return fallback
   const num = typeof amount === 'string' ? parseFloat(amount) : amount
   if (isNaN(num)) return fallback
   try {
-    return currencyFormat.format(num)
+    const formatter =
+      options != null
+        ? new Intl.NumberFormat(LOCALE_DEFAULT, {
+            style: 'currency',
+            currency: CURRENCY_DEFAULT,
+            ...options
+          })
+        : currencyFormat
+    return formatter.format(num)
   } catch {
     return fallback
   }

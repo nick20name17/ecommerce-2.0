@@ -5,6 +5,13 @@ export const TASK_PRIORITY = {
   urgent: 'urgent',
 } as const
 
+export const TASK_PRIORITY_VALUES = [
+  TASK_PRIORITY.low,
+  TASK_PRIORITY.medium,
+  TASK_PRIORITY.high,
+  TASK_PRIORITY.urgent
+] as const
+
 export type TaskPriority = (typeof TASK_PRIORITY)[keyof typeof TASK_PRIORITY]
 
 export const TASK_PRIORITY_LABELS: Record<TaskPriority, string> = {

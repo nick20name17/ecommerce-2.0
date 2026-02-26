@@ -1,3 +1,11 @@
+export const CUSTOMER_TABS = [
+  { value: 'orders', label: 'Orders' },
+  { value: 'todos', label: "To-Do's" },
+  { value: 'dashboard', label: 'Dashboard' }
+] as const
+
+export const CUSTOMER_TAB_VALUES = CUSTOMER_TABS.map((t) => t.value) as [string, ...string[]]
+
 export const CUSTOMER_TYPES = {
   retail: 'R',
   wholesale: 'W',

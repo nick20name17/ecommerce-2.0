@@ -1,6 +1,7 @@
 import { z } from 'zod'
 
-import type { TaskPriority } from '@/constants/task'
+import { TASK_PRIORITY_VALUES, type TaskPriority } from '@/constants/task'
+import { VALIDATION_MESSAGES } from '@/constants/validation-messages'
 
 import type { ApiResponse, PaginationParams } from '@/api/schema'
 import type { UserSummary } from '../user/schema'
@@ -133,12 +134,10 @@ export interface TaskStatusListResponse {
   results: TaskStatus[]
 }
 
-const TASK_PRIORITY_VALUES = ['low', 'medium', 'high', 'urgent'] as const
-
 export const CreateTaskSchema = z.object({
-  title: z.string().min(1, 'Title is required').max(200),
+  title: z.string().min(1, VALIDATION_MESSAGES.titleRequired).max(200),
   description: z.string().max(2000).optional().nullable(),
-  status: z.number({ message: 'Status is required' }),
+  status: z.number({ message: VALIDATION_MESSAGES.statusRequired }),
   priority: z.enum(TASK_PRIORITY_VALUES),
   due_date: z.string().optional().nullable(),
   responsible_user: z.number().optional().nullable(),

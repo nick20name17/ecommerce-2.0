@@ -8,6 +8,7 @@ import { CustomerOrdersTab } from './-components/customer-orders-tab'
 import { CustomerTasksTab } from './-components/customer-tasks-tab'
 import { getCustomerDetailQuery } from '@/api/customer/query'
 import { Button } from '@/components/ui/button'
+import { CUSTOMER_TABS } from '@/constants/customer'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useProjectId } from '@/hooks/use-project-id'
@@ -81,9 +82,14 @@ function CustomerDetailPage() {
               variant='line'
               className='mb-2 shrink-0'
             >
-              <TabsTrigger value='orders'>Orders</TabsTrigger>
-              <TabsTrigger value='todos'>To-Do's</TabsTrigger>
-              <TabsTrigger value='dashboard'>Dashboard</TabsTrigger>
+              {CUSTOMER_TABS.map((tab) => (
+                <TabsTrigger
+                  key={tab.value}
+                  value={tab.value}
+                >
+                  {tab.label}
+                </TabsTrigger>
+              ))}
             </TabsList>
             <TabsContent
               value='dashboard'
