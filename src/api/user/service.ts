@@ -24,8 +24,6 @@ export const userService = {
     return data
   },
   delete: async (id: number) => {
-    const { data } = await api.delete<User>(`/users/${id}/`)
-
-    return data
+    await api.delete(`/users/${id}/`)
   }
 }

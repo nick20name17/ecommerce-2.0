@@ -7,4 +7,5 @@ export interface DataTableProps<TData> {
   className?: string
   renderSubComponent?: (row: Row<TData>) => ReactElement
   onRowClick?: (row: Row<TData>) => void
+  fitWidth?: boolean
 }

@@ -7,9 +7,16 @@ import { cn } from '@/lib/utils'
 
 interface DataTableHeaderProps<TData> {
   table: Table<TData>
+  fitWidth?: boolean
 }
 
-export const DataTableHeader = <TData,>({ table }: DataTableHeaderProps<TData>) => {
+export const DataTableHeader = <TData,>({
+  table,
+  fitWidth = false,
+}: DataTableHeaderProps<TData>) => {
+  const colCount = table.getHeaderGroups()[0]?.headers.length ?? 1
+  const widthPercent = fitWidth ? `${100 / colCount}%` : undefined
+
   return (
     <TableHeader className={cn('bg-muted sticky top-0 z-10')}>
       {table?.getHeaderGroups()?.map((headerGroup) => (
@@ -18,15 +25,18 @@ export const DataTableHeader = <TData,>({ table }: DataTableHeaderProps<TData>) 
           key={headerGroup?.id}
         >
           {headerGroup.headers.map((header) => {
-            const size = header.getSize() ? `${header.getSize()}px` : 'auto'
+            const size = fitWidth
+              ? widthPercent
+              : header.getSize()
+                ? `${header.getSize()}px`
+                : 'auto'
+            const style = fitWidth
+              ? { width: size, minWidth: 0 }
+              : { width: size, minWidth: size, maxWidth: size }
 
             return (
               <TableHead
-                style={{
-                  width: size,
-                  minWidth: size,
-                  maxWidth: size
-                }}
+                style={style}
                 className='border-b border-border text-xs font-medium uppercase tracking-wider text-muted-foreground'
                 key={header.id}
               >

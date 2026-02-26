@@ -255,14 +255,15 @@ export function CustomerOrdersTab({ customerId }: CustomerOrdersTabProps) {
   })
 
   return (
-    <div className='flex h-full flex-col gap-4'>
+    <div className='flex h-full min-w-0 flex-col gap-4'>
       <SearchFilter placeholder='Search orders...' />
 
       <DataTable
         table={table}
         isLoading={isLoading || isPlaceholderData}
-        className='flex-1'
+        className='flex-1 min-w-0'
         renderSubComponent={(row) => <OrderExpandedRow row={row} />}
+        fitWidth
       />
 
       <Pagination totalCount={data?.count ?? 0} />

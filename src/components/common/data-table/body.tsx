@@ -9,13 +9,24 @@ import type { DataTableProps } from './types'
 import { TableBody, TableCell, TableRow } from '@/components/ui/table'
 import { cn } from '@/lib/utils'
 
-const TableBodyCell = <TData,>({ cell }: { cell: Cell<TData, unknown> }) => {
+const TableBodyCell = <TData,>({
+  cell,
+  fitWidth,
+  widthPercent,
+}: {
+  cell: Cell<TData, unknown>
+  fitWidth?: boolean
+  widthPercent?: string
+}) => {
   const size = cell.column.getSize()
+  const style = fitWidth && widthPercent
+    ? { width: widthPercent, minWidth: 0 }
+    : { width: size, minWidth: size, maxWidth: size }
 
   return (
     <TableCell
       key={cell.id}
-      style={{ width: size, minWidth: size, maxWidth: size }}
+      style={style}
       className={cn('border-b border-border/40')}
     >
       {flexRender(cell.column.columnDef.cell, cell.getContext())}
@@ -25,10 +36,14 @@ const TableBodyCell = <TData,>({ cell }: { cell: Cell<TData, unknown> }) => {
 
 const TableBodyRow = <TData,>({
   row,
-  onRowClick
+  onRowClick,
+  fitWidth,
+  widthPercent,
 }: {
   row: Row<TData>
   onRowClick?: (row: Row<TData>) => void
+  fitWidth?: boolean
+  widthPercent?: string
 }) => {
   return (
     <TableRow
@@ -45,6 +60,8 @@ const TableBodyRow = <TData,>({
         <TableBodyCell
           key={cell.id}
           cell={cell}
+          fitWidth={fitWidth}
+          widthPercent={widthPercent}
         />
       ))}
     </TableRow>
@@ -77,8 +94,12 @@ export const DataTableBody = <TData,>({
   table,
   isLoading = false,
   renderSubComponent,
-  onRowClick
+  onRowClick,
+  fitWidth = false,
 }: DataTableProps<TData>) => {
+  const colCount = table.getAllColumns().length
+  const widthPercent = fitWidth ? `${100 / colCount}%` : undefined
+
   if (isLoading) {
     return <DataTableSkeleton headers={table.getHeaderGroups()[0].headers} />
   }
@@ -97,6 +118,8 @@ export const DataTableBody = <TData,>({
             <TableBodyRow
               row={row}
               onRowClick={onRowClick}
+              fitWidth={fitWidth}
+              widthPercent={widthPercent}
             />
             {row.getIsExpanded() && renderSubComponent ? (
               <TableBodyExpandedRow

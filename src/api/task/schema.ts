@@ -124,6 +124,9 @@ export interface TaskParams extends PaginationParams {
   project_id?: number
   due_date_from?: string
   due_date_to?: string
+  linked_customer_autoid?: string
+  linked_order_autoid?: string
+  linked_proposal_autoid?: string
 }
 
 export interface TaskStatusListResponse {

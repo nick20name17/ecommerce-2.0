@@ -109,6 +109,15 @@ export function useAutoidParam() {
   return useQueryState('autoid', parseAsString)
 }
 
+const CUSTOMER_TAB_VALUES = ['orders', 'todos'] as [string, ...string[]]
+
+export function useCustomerTabParam() {
+  return useQueryState(
+    'tab',
+    parseAsStringLiteral(CUSTOMER_TAB_VALUES).withDefault('orders')
+  )
+}
+
 export function useOrderProjectIdParam() {
   return useQueryState('project_id', parseAsInteger.withOptions({ shallow: false }))
 }

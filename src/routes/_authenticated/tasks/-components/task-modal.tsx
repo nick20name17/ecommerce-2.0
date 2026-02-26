@@ -43,9 +43,16 @@ interface TaskModalProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   projectId?: number
+  defaultLinkedCustomerAutoid?: string | null
 }
 
-export const TaskModal = ({ task, open, onOpenChange, projectId }: TaskModalProps) => {
+export const TaskModal = ({
+  task,
+  open,
+  onOpenChange,
+  projectId,
+  defaultLinkedCustomerAutoid
+}: TaskModalProps) => {
   const isEdit = !!task
 
   return (
@@ -64,6 +71,7 @@ export const TaskModal = ({ task, open, onOpenChange, projectId }: TaskModalProp
           <CreateForm
             onOpenChange={onOpenChange}
             projectId={projectId}
+            defaultLinkedCustomerAutoid={defaultLinkedCustomerAutoid}
           />
         )}
       </DialogContent>
@@ -242,10 +250,12 @@ function SharedFields({ statuses, projectId }: { statuses: TaskStatus[]; project
 
 function CreateForm({
   onOpenChange,
-  projectId
+  projectId,
+  defaultLinkedCustomerAutoid
 }: {
   onOpenChange: (open: boolean) => void
   projectId?: number
+  defaultLinkedCustomerAutoid?: string | null
 }) {
   const { data: statusesData, isLoading: statusesLoading } = useQuery(
     getTaskStatusesQuery(projectId)
@@ -292,6 +302,7 @@ function CreateForm({
       statuses={statuses}
       onOpenChange={onOpenChange}
       projectId={projectId}
+      defaultLinkedCustomerAutoid={defaultLinkedCustomerAutoid}
     />
   )
 }
@@ -300,12 +311,14 @@ function CreateFormInner({
   defaultStatus,
   statuses,
   onOpenChange,
-  projectId
+  projectId,
+  defaultLinkedCustomerAutoid
 }: {
   defaultStatus: TaskStatus
   statuses: TaskStatus[]
   onOpenChange: (open: boolean) => void
   projectId?: number
+  defaultLinkedCustomerAutoid?: string | null
 }) {
   const attachmentsRef = useRef<TaskAttachmentsRef>(null)
 
@@ -320,7 +333,7 @@ function CreateFormInner({
       responsible_user: null,
       linked_order_autoid: null,
       linked_proposal_autoid: null,
-      linked_customer_autoid: null
+      linked_customer_autoid: defaultLinkedCustomerAutoid ?? null
     }
   })
 

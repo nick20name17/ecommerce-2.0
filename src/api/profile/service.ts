@@ -17,7 +17,6 @@ export const profileService = {
     return data
   },
   deleteAccount: async (userId: number) => {
-    const { data } = await api.delete(`/users/${userId}/`)
-    return data
+    await api.delete(`/users/${userId}/`)
   }
 }
