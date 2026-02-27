@@ -36,7 +36,7 @@ export interface CreateUserPayload {
   first_name: string
   last_name: string
   role: string
-  project: number
+  project?: number
 }
 
 export interface UpdateUserPayload {
