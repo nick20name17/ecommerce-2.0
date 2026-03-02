@@ -1,5 +1,5 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, redirect } from '@tanstack/react-router'
 import { Plus, Users } from 'lucide-react'
 import { useState } from 'react'
 
@@ -11,10 +11,20 @@ import type { User, UserParams } from '@/api/user/schema'
 import { Pagination } from '@/components/common/filters/pagination'
 import { SearchFilter } from '@/components/common/filters/search'
 import { Button } from '@/components/ui/button'
+import { isAdmin } from '@/constants/user'
+import type { UserRole } from '@/constants/user'
+import { getSession } from '@/helpers/auth'
 import { useOrdering } from '@/hooks/use-ordering'
 import { useLimitParam, useOffsetParam, useSearchParam } from '@/hooks/use-query-params'
 
 export const Route = createFileRoute('/_authenticated/users/')({
+  beforeLoad: () => {
+    const session = getSession()
+    const role = session?.user?.role as UserRole | undefined
+    if (!role || !isAdmin(role)) {
+      throw redirect({ to: '/', replace: true })
+    }
+  },
   component: UsersPage,
   head: () => ({
     meta: [{ title: 'Users' }]

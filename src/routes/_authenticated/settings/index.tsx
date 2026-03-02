@@ -4,7 +4,7 @@ import {
   useQuery,
   useQueryClient
 } from '@tanstack/react-query'
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, redirect } from '@tanstack/react-router'
 import { parseAsString, useQueryState } from 'nuqs'
 import { Database, Settings } from 'lucide-react'
 import { useMemo } from 'react'
@@ -21,9 +21,19 @@ import {
 } from '@/api/field-config/query'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Skeleton } from '@/components/ui/skeleton'
+import { isAdmin } from '@/constants/user'
+import type { UserRole } from '@/constants/user'
+import { getSession } from '@/helpers/auth'
 import { useProjectId } from '@/hooks/use-project-id'
 
 export const Route = createFileRoute('/_authenticated/settings/')({
+  beforeLoad: () => {
+    const session = getSession()
+    const role = session?.user?.role as UserRole | undefined
+    if (!role || !isAdmin(role)) {
+      throw redirect({ to: '/', replace: true })
+    }
+  },
   component: SettingsPage,
   head: () => ({
     meta: [{ title: 'Settings' }]
