@@ -16,18 +16,9 @@ export const getFieldColumns = (
     id: 'field_name',
     accessorKey: 'field',
     header: ({ column }) => <ColumnHeader column={column} title='Field' />,
-    cell: ({ row }) => {
-      const fieldName = row.original.field
-
-      return (
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <span className='block truncate text-sm'>{fieldName}</span>
-          </TooltipTrigger>
-          <TooltipContent>{fieldName}</TooltipContent>
-        </Tooltip>
-      )
-    },
+    cell: ({ row }) => (
+      <span className='block truncate text-sm'>{row.original.field}</span>
+    ),
     size: 280,
     minSize: 200
   },

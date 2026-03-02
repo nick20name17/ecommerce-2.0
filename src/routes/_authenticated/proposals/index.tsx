@@ -195,6 +195,7 @@ function ProposalsPage() {
 
       <ProposalsDataTable
         data={tableData}
+        fieldConfig={null}
         isLoading={isLoading || isPlaceholderData}
         sorting={sorting}
         setSorting={setSorting}

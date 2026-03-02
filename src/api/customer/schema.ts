@@ -17,6 +17,7 @@ export interface Customer {
   in_level?: string
   inactive?: boolean
   last_order_date?: string | null
+  [key: string]: unknown
 }
 
 export interface CreateCustomerPayload {

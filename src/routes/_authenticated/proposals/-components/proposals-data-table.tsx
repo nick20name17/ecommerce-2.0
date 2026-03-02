@@ -6,10 +6,12 @@ import { useMemo } from 'react'
 
 import { getProposalColumns, type ProposalRow } from './proposal-columns'
 import { ProposalExpandedRow } from './proposal-expanded-row'
+import type { FieldConfigResponse } from '@/api/field-config/schema'
 import { DataTable } from '@/components/common/data-table'
 
 interface ProposalsDataTableProps {
   data: ProposalRow[]
+  fieldConfig: FieldConfigResponse | null | undefined
   isLoading: boolean
   sorting: SortingState
   setSorting: (updater: React.SetStateAction<SortingState>) => void
@@ -21,6 +23,7 @@ interface ProposalsDataTableProps {
 
 export function ProposalsDataTable({
   data,
+  fieldConfig,
   isLoading,
   sorting,
   setSorting,
@@ -30,8 +33,16 @@ export function ProposalsDataTable({
   onAttachments
 }: ProposalsDataTableProps) {
   const columns = useMemo(
-    () => getProposalColumns({ isSuperAdmin, projectId, onDelete, onAttachments }),
-    [isSuperAdmin, projectId, onDelete, onAttachments]
+    () =>
+      getProposalColumns({
+        fieldConfig,
+        data,
+        isSuperAdmin,
+        projectId,
+        onDelete,
+        onAttachments
+      }),
+    [fieldConfig, data, isSuperAdmin, projectId, onDelete, onAttachments]
   )
 
   const table = useReactTable({
@@ -42,14 +53,14 @@ export function ProposalsDataTable({
     getRowCanExpand: (row) => !row.original._pending && !!row.original.items?.length,
     onSortingChange: setSorting,
     state: { sorting },
-    manualSorting: true,
+    manualSorting: true
   })
 
   return (
     <DataTable
       table={table}
       isLoading={isLoading}
-      className="flex-1 min-h-0"
+      className='min-h-0 flex-1'
       renderSubComponent={(row) => <ProposalExpandedRow row={row} />}
     />
   )

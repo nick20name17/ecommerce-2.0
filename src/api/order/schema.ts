@@ -20,6 +20,7 @@ export interface Order {
   total_quan: string
   total_ship: string
   items?: OrderItem[]
+  [key: string]: unknown
 }
 
 export interface OrderItem {

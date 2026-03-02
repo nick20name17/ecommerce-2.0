@@ -15,6 +15,7 @@ export interface Proposal {
   subtotal: string
   total: string
   items?: ProposalItem[]
+  [key: string]: unknown
 }
 
 export interface ProposalItem {

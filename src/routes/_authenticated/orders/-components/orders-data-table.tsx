@@ -6,10 +6,12 @@ import { useMemo } from 'react'
 
 import { getOrderColumns, type OrderRow } from './order-columns'
 import { OrderExpandedRow } from './order-expanded-row'
+import type { FieldConfigResponse } from '@/api/field-config/schema'
 import { DataTable } from '@/components/common/data-table'
 
 interface OrdersDataTableProps {
   data: OrderRow[]
+  fieldConfig: FieldConfigResponse | null | undefined
   isLoading: boolean
   sorting: SortingState
   setSorting: (updater: React.SetStateAction<SortingState>) => void
@@ -20,16 +22,24 @@ interface OrdersDataTableProps {
 
 export function OrdersDataTable({
   data,
+  fieldConfig,
   isLoading,
   sorting,
   setSorting,
   onDelete,
   onDeleteLinkedProposal,
-  onAttachments,
+  onAttachments
 }: OrdersDataTableProps) {
   const columns = useMemo(
-    () => getOrderColumns({ onDelete, onDeleteLinkedProposal, onAttachments }),
-    [onDelete, onDeleteLinkedProposal, onAttachments]
+    () =>
+      getOrderColumns({
+        fieldConfig,
+        data,
+        onDelete,
+        onDeleteLinkedProposal,
+        onAttachments
+      }),
+    [fieldConfig, data, onDelete, onDeleteLinkedProposal, onAttachments]
   )
 
   const table = useReactTable({
@@ -40,7 +50,7 @@ export function OrdersDataTable({
     getRowCanExpand: (row) => !row.original._pending && !!row.original.items?.length,
     onSortingChange: setSorting,
     state: { sorting },
-    manualSorting: true,
+    manualSorting: true
   })
 
   return (

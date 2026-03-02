@@ -38,13 +38,12 @@ function CustomersPage() {
     offset,
     limit,
     ordering,
-    project_id: projectId ?? undefined,
-    fields: 'last_order_date',
+    project_id: projectId ?? undefined
   }
 
   const { data, isLoading, isPlaceholderData } = useQuery({
     ...getCustomersQuery(params),
-    placeholderData: keepPreviousData,
+    placeholderData: keepPreviousData
   })
 
   const editingCustomer = typeof modalCustomer === 'object' ? modalCustomer : null
@@ -73,13 +72,14 @@ function CustomersPage() {
 
       <CustomersDataTable
         data={data?.results ?? []}
+        fieldConfig={null}
         isLoading={isLoading || isPlaceholderData}
         sorting={sorting}
         setSorting={setSorting}
         onRowClick={(customer) =>
           navigate({
             to: '/customers/$customerId',
-            params: { customerId: customer.id },
+            params: { customerId: customer.id }
           })
         }
         onEdit={setModalCustomer}

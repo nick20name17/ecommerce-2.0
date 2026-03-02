@@ -21,7 +21,6 @@ import {
 } from '@/api/field-config/query'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Skeleton } from '@/components/ui/skeleton'
-import { queryClient } from '@/providers/react-query'
 import { useProjectId } from '@/hooks/use-project-id'
 
 export const Route = createFileRoute('/_authenticated/settings/')({

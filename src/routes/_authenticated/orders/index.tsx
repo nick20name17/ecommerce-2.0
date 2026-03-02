@@ -207,6 +207,7 @@ function OrdersPage() {
 
       <OrdersDataTable
         data={tableData}
+        fieldConfig={null}
         isLoading={isLoading || isPlaceholderData}
         sorting={sorting}
         setSorting={setSorting}

@@ -6,10 +6,12 @@ import { useMemo } from 'react'
 
 import { getCustomerColumns } from './customer-columns'
 import type { Customer } from '@/api/customer/schema'
+import type { FieldConfigResponse } from '@/api/field-config/schema'
 import { DataTable } from '@/components/common/data-table'
 
 interface CustomersDataTableProps {
   data: Customer[]
+  fieldConfig: FieldConfigResponse | null | undefined
   isLoading: boolean
   sorting: SortingState
   setSorting: (updater: React.SetStateAction<SortingState>) => void
@@ -20,16 +22,17 @@ interface CustomersDataTableProps {
 
 export function CustomersDataTable({
   data,
+  fieldConfig,
   isLoading,
   sorting,
   setSorting,
   onRowClick,
   onEdit,
-  onDelete,
+  onDelete
 }: CustomersDataTableProps) {
   const columns = useMemo(
-    () => getCustomerColumns({ onEdit, onDelete }),
-    [onEdit, onDelete]
+    () => getCustomerColumns({ fieldConfig, data, onEdit, onDelete }),
+    [fieldConfig, data, onEdit, onDelete]
   )
 
   const table = useReactTable({
@@ -38,7 +41,7 @@ export function CustomersDataTable({
     getCoreRowModel: getCoreRowModel(),
     onSortingChange: setSorting,
     state: { sorting },
-    manualSorting: true,
+    manualSorting: true
   })
 
   return (
