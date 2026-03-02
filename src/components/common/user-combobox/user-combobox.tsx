@@ -16,13 +16,15 @@ interface UserComboboxProps {
   onChange: (userId: number | null) => void
   placeholder?: string
   role?: string
+  valueLabel?: string | null
 }
 
 export function UserCombobox({
   value,
   onChange,
   placeholder = 'Select user...',
-  role
+  role,
+  valueLabel
 }: UserComboboxProps) {
   const [open, setOpen] = useState(false)
   const [search, setSearch] = useState('')
@@ -68,7 +70,7 @@ export function UserCombobox({
   const displayLabel = selectedUser
     ? `${selectedUser.first_name} ${selectedUser.last_name}`
     : value != null
-      ? `User #${value}`
+      ? (valueLabel ?? `User #${value}`)
       : null
 
   return (

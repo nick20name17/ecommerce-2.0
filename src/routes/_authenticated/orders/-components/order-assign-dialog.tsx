@@ -29,10 +29,7 @@ export function OrderAssignDialog({
   onOpenChange,
   projectId
 }: OrderAssignDialogProps) {
-  const currentUserId =
-    order && typeof (order as { responsible_user?: number }).responsible_user === 'number'
-      ? (order as { responsible_user?: number }).responsible_user ?? null
-      : null
+  const currentUserId = order?.assigned_user?.id ?? null
   const [selectedUserId, setSelectedUserId] = useState<number | null>(currentUserId)
 
   useEffect(() => {
@@ -89,6 +86,11 @@ export function OrderAssignDialog({
             value={selectedUserId}
             onChange={setSelectedUserId}
             placeholder='Select user...'
+            valueLabel={
+              order.assigned_user
+                ? `${order.assigned_user.first_name} ${order.assigned_user.last_name}`
+                : null
+            }
           />
         </DialogBody>
         <DialogFooter>

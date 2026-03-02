@@ -118,28 +118,6 @@ export const getTaskColumns = ({
     size: 120
   },
   {
-    accessorKey: 'responsible_user_name',
-    header: ({ column }) => (
-      <ColumnHeader
-        column={column}
-        title='Assignee'
-      />
-    ),
-    cell: ({ row }) => {
-      const name = row.original.responsible_user_name
-      if (!name) return <span className='text-muted-foreground'>—</span>
-      return (
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <span className='block max-w-full truncate'>{name}</span>
-          </TooltipTrigger>
-          <TooltipContent>{name}</TooltipContent>
-        </Tooltip>
-      )
-    },
-    size: 140
-  },
-  {
     accessorKey: 'author_name',
     header: ({ column }) => (
       <ColumnHeader

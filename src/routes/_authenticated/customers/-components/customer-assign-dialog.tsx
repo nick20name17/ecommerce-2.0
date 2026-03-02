@@ -29,10 +29,7 @@ export function CustomerAssignDialog({
   onOpenChange,
   projectId
 }: CustomerAssignDialogProps) {
-  const currentUserId =
-    customer && typeof (customer as { responsible_user?: number }).responsible_user === 'number'
-      ? (customer as { responsible_user?: number }).responsible_user ?? null
-      : null
+  const currentUserId = customer?.assigned_user?.id ?? null
   const [selectedUserId, setSelectedUserId] = useState<number | null>(currentUserId)
 
   useEffect(() => {
@@ -93,6 +90,11 @@ export function CustomerAssignDialog({
               value={selectedUserId}
               onChange={setSelectedUserId}
               placeholder='Select user...'
+              valueLabel={
+                customer.assigned_user
+                  ? `${customer.assigned_user.first_name} ${customer.assigned_user.last_name}`
+                  : null
+              }
             />
         </DialogBody>
         <DialogFooter>

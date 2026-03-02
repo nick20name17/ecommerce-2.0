@@ -29,11 +29,7 @@ export function ProposalAssignDialog({
   onOpenChange,
   projectId
 }: ProposalAssignDialogProps) {
-  const currentUserId =
-    proposal &&
-    typeof (proposal as { responsible_user?: number }).responsible_user === 'number'
-      ? (proposal as { responsible_user?: number }).responsible_user ?? null
-      : null
+  const currentUserId = proposal?.assigned_user?.id ?? null
   const [selectedUserId, setSelectedUserId] = useState<number | null>(currentUserId)
 
   useEffect(() => {
@@ -97,6 +93,11 @@ export function ProposalAssignDialog({
             value={selectedUserId}
             onChange={setSelectedUserId}
             placeholder='Select user...'
+            valueLabel={
+              proposal.assigned_user
+                ? `${proposal.assigned_user.first_name} ${proposal.assigned_user.last_name}`
+                : null
+            }
           />
         </DialogBody>
         <DialogFooter>

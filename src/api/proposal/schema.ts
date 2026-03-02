@@ -1,5 +1,6 @@
 import type { ProposalStatus } from '@/constants/proposal'
 
+import type { AssignedUser } from '@/api/schema'
 import type { PaginatedResponse, PaginationParams } from '@/api/schema'
 
 export type { ProposalStatus } from '@/constants/proposal'
@@ -15,6 +16,7 @@ export interface Proposal {
   subtotal: string
   total: string
   items?: ProposalItem[]
+  assigned_user?: AssignedUser | null
   [key: string]: unknown
 }
 

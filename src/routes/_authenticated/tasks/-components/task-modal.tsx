@@ -79,7 +79,15 @@ export const TaskModal = ({
   )
 }
 
-function SharedFields({ statuses, projectId }: { statuses: TaskStatus[]; projectId?: number }) {
+function SharedFields({
+  statuses,
+  projectId,
+  responsibleUserLabel
+}: {
+  statuses: TaskStatus[]
+  projectId?: number
+  responsibleUserLabel?: string | null
+}) {
   const { control } = useFormContext<CreateTaskFormValues>()
 
   return (
@@ -189,6 +197,7 @@ function SharedFields({ statuses, projectId }: { statuses: TaskStatus[]; project
             <UserCombobox
               value={field.value ?? null}
               onChange={field.onChange}
+              valueLabel={responsibleUserLabel}
             />
             {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
           </Field>
@@ -505,6 +514,12 @@ function EditForm({
             <SharedFields
               statuses={statuses}
               projectId={projectId}
+              responsibleUserLabel={(() => {
+                const details = (fullTask as Task).responsible_user_details
+                return details
+                  ? `${details.first_name} ${details.last_name}`.trim()
+                  : (fullTask as TaskListItem).responsible_user_name ?? undefined
+              })()}
             />
 
             <TaskAttachments

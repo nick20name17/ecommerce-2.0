@@ -168,6 +168,11 @@ export const TaskInfoCard = ({ task, onDelete }: TaskInfoCardProps) => {
             <UserCombobox
               value={task.responsible_user ?? null}
               onChange={handleResponsibleChange}
+              valueLabel={
+                task.responsible_user_details
+                  ? `${task.responsible_user_details.first_name} ${task.responsible_user_details.last_name}`.trim()
+                  : task.responsible_user_name ?? undefined
+              }
             />
           </div>
 

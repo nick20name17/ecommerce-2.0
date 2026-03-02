@@ -1,5 +1,6 @@
 import * as z from 'zod/mini'
 
+import type { AssignedUser } from '@/api/schema'
 import { OptionalStringSchema, RequiredStringSchema } from '@/api/schema'
 import type { PaginatedResponse, PaginationParams } from '@/api/schema'
 
@@ -17,6 +18,7 @@ export interface Customer {
   in_level?: string
   inactive?: boolean
   last_order_date?: string | null
+  assigned_user?: AssignedUser | null
   [key: string]: unknown
 }
 

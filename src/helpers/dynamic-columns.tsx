@@ -4,7 +4,7 @@ import type { FieldConfigResponse } from '@/api/field-config/schema'
 import { ColumnHeader } from '@/components/common/data-table/column-header'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 
-export const RESERVED_KEYS = ['_pending', 'items'] as const
+export const RESERVED_KEYS = ['_pending', 'items', 'assigned_user'] as const
 
 function isEmptyValue(value: unknown): boolean {
   if (value == null) return true

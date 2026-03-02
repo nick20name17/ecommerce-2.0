@@ -1,5 +1,6 @@
 import type { OrderStatus } from '@/constants/order'
 
+import type { AssignedUser } from '@/api/schema'
 import type { PaginatedResponse, PaginationParams } from '@/api/schema'
 
 export type { OrderStatus } from '@/constants/order'
@@ -20,6 +21,7 @@ export interface Order {
   total_quan: string
   total_ship: string
   items?: OrderItem[]
+  assigned_user?: AssignedUser | null
   [key: string]: unknown
 }
 
