@@ -3,6 +3,7 @@ import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { Plus, UsersRound } from 'lucide-react'
 import { useState } from 'react'
 
+import { CustomerAssignDialog } from './-components/customer-assign-dialog'
 import { CustomerDeleteDialog } from './-components/customer-delete-dialog'
 import { CustomerModal } from './-components/customer-modal'
 import { CustomersDataTable } from './-components/customers-data-table'
@@ -11,9 +12,11 @@ import type { Customer, CustomerParams } from '@/api/customer/schema'
 import { Pagination } from '@/components/common/filters/pagination'
 import { SearchFilter } from '@/components/common/filters/search'
 import { Button } from '@/components/ui/button'
+import { isAdmin } from '@/constants/user'
 import { useOrdering } from '@/hooks/use-ordering'
 import { useLimitParam, useOffsetParam, useSearchParam } from '@/hooks/use-query-params'
 import { useProjectId } from '@/hooks/use-project-id'
+import { useAuth } from '@/providers/auth'
 
 export const Route = createFileRoute('/_authenticated/customers/')({
   component: CustomersPage,
@@ -30,8 +33,12 @@ function CustomersPage() {
   const [projectId] = useProjectId()
   const { sorting, setSorting, ordering } = useOrdering()
 
+  const { user } = useAuth()
+  const canAssign = !!user?.role && isAdmin(user.role)
+
   const [modalCustomer, setModalCustomer] = useState<Customer | 'create' | null>(null)
   const [deleteCustomer, setDeleteCustomer] = useState<Customer | null>(null)
+  const [assignCustomer, setAssignCustomer] = useState<Customer | null>(null)
 
   const params: CustomerParams = {
     search: search || undefined,
@@ -84,6 +91,8 @@ function CustomersPage() {
         }
         onEdit={setModalCustomer}
         onDelete={setDeleteCustomer}
+        onAssign={setAssignCustomer}
+        canAssign={canAssign}
       />
 
       <Pagination totalCount={data?.count ?? 0} />
@@ -98,6 +107,12 @@ function CustomersPage() {
         customer={deleteCustomer}
         open={!!deleteCustomer}
         onOpenChange={(open) => !open && setDeleteCustomer(null)}
+      />
+      <CustomerAssignDialog
+        customer={assignCustomer}
+        open={!!assignCustomer}
+        onOpenChange={(open) => !open && setAssignCustomer(null)}
+        projectId={projectId}
       />
     </div>
   )

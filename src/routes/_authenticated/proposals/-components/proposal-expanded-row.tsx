@@ -2,12 +2,6 @@ import type { Row } from '@tanstack/react-table'
 
 import type { Proposal } from '@/api/proposal/schema'
 import {
-  formatCellValue,
-  getKeysFromRows,
-  humanizeKey
-} from '@/helpers/dynamic-columns'
-import { formatCurrency, formatQuantity } from '@/helpers/formatters'
-import {
   Table,
   TableBody,
   TableCell,
@@ -16,12 +10,12 @@ import {
   TableRow
 } from '@/components/ui/table'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
+import { formatCellValue, getKeysFromRows, humanizeKey } from '@/helpers/dynamic-columns'
+import { formatCurrency, formatQuantity } from '@/helpers/formatters'
 
 function formatItemCellValue(key: string, value: unknown): string {
-  if (value == null || (typeof value === 'string' && value.trim() === ''))
-    return '—'
-  if (key === 'price' || key === 'amount')
-    return formatCurrency(value as string | number, '—')
+  if (value == null || (typeof value === 'string' && value.trim() === '')) return '—'
+  if (key === 'price' || key === 'amount') return formatCurrency(value as string | number, '—')
   if (key === 'quan') return formatQuantity(value as string | number, 0, '—')
   return formatCellValue(value)
 }
@@ -38,22 +32,30 @@ export function ProposalExpandedRow({ row }: { row: Row<Proposal> }) {
         <h3 className='text-base font-semibold'>Proposal Items</h3>
         <div className='text-muted-foreground flex items-center gap-4 text-sm'>
           <span>
-            Customer: <span className='text-foreground font-semibold'>{proposal.b_name ?? '—'}</span>
+            Customer:{' '}
+            <span className='text-foreground font-semibold'>{proposal.b_name ?? '—'}</span>
           </span>
           <span>
-            Subtotal: <span className='text-foreground font-medium'>{formatCurrency(proposal.subtotal, '—')}</span>
+            Subtotal:{' '}
+            <span className='text-foreground font-medium'>
+              {formatCurrency(proposal.subtotal, '—')}
+            </span>
           </span>
           <span>
-            Tax: <span className='text-foreground font-medium'>{formatCurrency(proposal.tax, '—')}</span>
+            Tax:{' '}
+            <span className='text-foreground font-medium'>{formatCurrency(proposal.tax, '—')}</span>
           </span>
           <span>
-            Total: <span className='text-foreground font-medium'>{formatCurrency(proposal.total, '—')}</span>
+            Total:{' '}
+            <span className='text-foreground font-medium'>
+              {formatCurrency(proposal.total, '—')}
+            </span>
           </span>
         </div>
       </div>
 
       {!items.length ? (
-        <p className='text-muted-foreground text-sm'>No line items.</p>
+        <p className='text-muted-foreground text-sm'>No proposal items.</p>
       ) : (
         <div className='overflow-hidden rounded-md border'>
           <Table>
@@ -76,13 +78,14 @@ export function ProposalExpandedRow({ row }: { row: Row<Proposal> }) {
                     const val = formatItemCellValue(key, item[key])
                     const isTruncate = key === 'descr' || key === 'inven'
                     return (
-                      <TableCell key={key} className='border-b min-w-[80px]'>
+                      <TableCell
+                        key={key}
+                        className='min-w-[80px] border-b'
+                      >
                         {isTruncate ? (
                           <Tooltip>
                             <TooltipTrigger asChild>
-                              <span className='block max-w-[240px] truncate'>
-                                {val}
-                              </span>
+                              <span className='block max-w-[240px] truncate'>{val}</span>
                             </TooltipTrigger>
                             <TooltipContent>{val}</TooltipContent>
                           </Tooltip>
@@ -101,3 +104,4 @@ export function ProposalExpandedRow({ row }: { row: Row<Proposal> }) {
     </div>
   )
 }
+

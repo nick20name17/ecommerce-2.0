@@ -5,7 +5,7 @@ import { FileText, ShoppingCart, Trash2, User } from 'lucide-react'
 import { useState } from 'react'
 
 import { TaskAttachments } from '../../-components/task-attachments'
-import { UserCombobox } from '../../-components/user-combobox'
+import { UserCombobox } from '@/components/common/user-combobox/user-combobox'
 
 import { TASK_QUERY_KEYS, getTaskStatusesQuery } from '@/api/task/query'
 import type { Task } from '@/api/task/schema'

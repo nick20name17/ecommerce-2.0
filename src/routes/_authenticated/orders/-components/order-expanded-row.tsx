@@ -2,12 +2,6 @@ import type { Row } from '@tanstack/react-table'
 
 import type { Order } from '@/api/order/schema'
 import {
-  formatCellValue,
-  getKeysFromRows,
-  humanizeKey
-} from '@/helpers/dynamic-columns'
-import { formatCurrency, formatQuantity } from '@/helpers/formatters'
-import {
   Table,
   TableBody,
   TableCell,
@@ -16,12 +10,12 @@ import {
   TableRow
 } from '@/components/ui/table'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
+import { formatCellValue, getKeysFromRows, humanizeKey } from '@/helpers/dynamic-columns'
+import { formatCurrency, formatQuantity } from '@/helpers/formatters'
 
 function formatItemCellValue(key: string, value: unknown): string {
-  if (value == null || (typeof value === 'string' && value.trim() === ''))
-    return '—'
-  if (key === 'price' || key === 'so_amount')
-    return formatCurrency(value as string | number, '—')
+  if (value == null || (typeof value === 'string' && value.trim() === '')) return '—'
+  if (key === 'price' || key === 'so_amount') return formatCurrency(value as string | number, '—')
   if (key === 'quan') return formatQuantity(value as string | number, 0, '—')
   return formatCellValue(value)
 }
@@ -41,19 +35,26 @@ export function OrderExpandedRow({ row }: { row: Row<Order> }) {
             Customer: <span className='text-foreground font-semibold'>{order.name ?? '—'}</span>
           </span>
           <span>
-            Subtotal: <span className='text-foreground font-medium'>{formatCurrency(order.subtotal, '—')}</span>
+            Subtotal:{' '}
+            <span className='text-foreground font-medium'>
+              {formatCurrency(order.subtotal, '—')}
+            </span>
           </span>
           <span>
-            Tax: <span className='text-foreground font-medium'>{formatCurrency(order.tax, '—')}</span>
+            Tax:{' '}
+            <span className='text-foreground font-medium'>{formatCurrency(order.tax, '—')}</span>
           </span>
           <span>
-            Balance: <span className='text-foreground font-medium'>{formatCurrency(order.balance, '—')}</span>
+            Balance:{' '}
+            <span className='text-foreground font-medium'>
+              {formatCurrency(order.balance, '—')}
+            </span>
           </span>
         </div>
       </div>
 
       {!items.length ? (
-        <p className='text-muted-foreground text-sm'>No line items.</p>
+        <p className='text-muted-foreground text-sm'>No order items.</p>
       ) : (
         <div className='overflow-hidden rounded-md border'>
           <Table>
@@ -76,13 +77,14 @@ export function OrderExpandedRow({ row }: { row: Row<Order> }) {
                     const val = formatItemCellValue(key, item[key])
                     const isTruncate = key === 'descr' || key === 'inven'
                     return (
-                      <TableCell key={key} className='border-b min-w-[80px]'>
+                      <TableCell
+                        key={key}
+                        className='min-w-[80px] border-b'
+                      >
                         {isTruncate ? (
                           <Tooltip>
                             <TooltipTrigger asChild>
-                              <span className='block truncate max-w-[240px]'>
-                                {val}
-                              </span>
+                              <span className='block max-w-[240px] truncate'>{val}</span>
                             </TooltipTrigger>
                             <TooltipContent>{val}</TooltipContent>
                           </Tooltip>
@@ -101,3 +103,4 @@ export function OrderExpandedRow({ row }: { row: Row<Order> }) {
     </div>
   )
 }
+

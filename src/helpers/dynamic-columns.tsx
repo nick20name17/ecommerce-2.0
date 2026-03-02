@@ -49,7 +49,7 @@ export function getOrderedDataKeys(
   }
   const orderedFromConfig =
     fieldConfig?.[entity]
-      ?.filter((e) => e.enabled && !e.extra)
+      ?.filter((e) => e.enabled)
       .map((e) => e.field) ?? []
   const configSet = new Set(orderedFromConfig)
   const ordered =

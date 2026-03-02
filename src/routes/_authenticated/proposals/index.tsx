@@ -3,6 +3,7 @@ import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { FileText, Plus, X } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 
+import { ProposalAssignDialog } from './-components/proposal-assign-dialog'
 import { ProposalDeleteDialog } from './-components/proposal-delete-dialog'
 import { ProposalsDataTable } from './-components/proposals-data-table'
 import { getProposalsQuery } from '@/api/proposal/query'
@@ -15,7 +16,7 @@ import { Button } from '@/components/ui/button'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { PROPOSAL_STATUS } from '@/constants/proposal'
 import type { ProposalStatus } from '@/constants/proposal'
-import { isSuperAdmin } from '@/constants/user'
+import { isAdmin, isSuperAdmin } from '@/constants/user'
 import { useOrdering } from '@/hooks/use-ordering'
 import { useProjectId } from '@/hooks/use-project-id'
 import {
@@ -56,9 +57,11 @@ function ProposalsPage() {
   const { sorting, setSorting, ordering } = useOrdering()
 
   const userIsSuperAdmin = user?.role ? isSuperAdmin(user.role) : false
+  const canAssign = !!user?.role && isAdmin(user.role)
 
   const [proposalToDelete, setProposalToDelete] = useState<Proposal | null>(null)
   const [proposalForAttachments, setProposalForAttachments] = useState<Proposal | null>(null)
+  const [proposalToAssign, setProposalToAssign] = useState<Proposal | null>(null)
 
   const activeStatus = status ?? PROPOSAL_STATUS.open
 
@@ -203,6 +206,8 @@ function ProposalsPage() {
         projectId={projectId}
         onDelete={setProposalToDelete}
         onAttachments={setProposalForAttachments}
+        onAssign={setProposalToAssign}
+        canAssign={canAssign}
       />
 
       <Pagination totalCount={data?.count ?? 0} />
@@ -225,6 +230,13 @@ function ProposalsPage() {
         projectId={projectId}
         open={!!proposalForAttachments}
         onOpenChange={(open) => !open && setProposalForAttachments(null)}
+      />
+
+      <ProposalAssignDialog
+        proposal={proposalToAssign}
+        open={!!proposalToAssign}
+        onOpenChange={(open) => !open && setProposalToAssign(null)}
+        projectId={projectId}
       />
     </div>
   )

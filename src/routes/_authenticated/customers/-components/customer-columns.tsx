@@ -1,7 +1,7 @@
 'use no memo'
 
 import type { ColumnDef } from '@tanstack/react-table'
-import { MoreHorizontal, Pencil, Trash2 } from 'lucide-react'
+import { MoreHorizontal, Pencil, Trash2, UserPlus } from 'lucide-react'
 
 import type { Customer } from '@/api/customer/schema'
 import type { FieldConfigResponse } from '@/api/field-config/schema'
@@ -46,13 +46,17 @@ interface CustomerColumnsOptions {
   data: Customer[]
   onEdit: (customer: Customer) => void
   onDelete: (customer: Customer) => void
+  onAssign?: (customer: Customer) => void
+  canAssign?: boolean
 }
 
 export function getCustomerColumns({
   fieldConfig,
   data,
   onEdit,
-  onDelete
+  onDelete,
+  onAssign,
+  canAssign
 }: CustomerColumnsOptions): ColumnDef<Customer>[] {
   const entity = 'customer'
   const orderedKeys = getOrderedDataKeys(data, entity, fieldConfig)
@@ -82,6 +86,12 @@ export function getCustomerColumns({
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align='end'>
+              {canAssign && onAssign && (
+                <DropdownMenuItem onClick={() => onAssign(customer)}>
+                  <UserPlus className='size-4' />
+                  Assign
+                </DropdownMenuItem>
+              )}
               <DropdownMenuItem onClick={() => onEdit(customer)}>
                 <Pencil className='size-4' />
                 Edit

@@ -18,6 +18,8 @@ interface CustomersDataTableProps {
   onRowClick: (customer: Customer) => void
   onEdit: (customer: Customer) => void
   onDelete: (customer: Customer) => void
+  onAssign?: (customer: Customer) => void
+  canAssign?: boolean
 }
 
 export function CustomersDataTable({
@@ -28,11 +30,21 @@ export function CustomersDataTable({
   setSorting,
   onRowClick,
   onEdit,
-  onDelete
+  onDelete,
+  onAssign,
+  canAssign
 }: CustomersDataTableProps) {
   const columns = useMemo(
-    () => getCustomerColumns({ fieldConfig, data, onEdit, onDelete }),
-    [fieldConfig, data, onEdit, onDelete]
+    () =>
+      getCustomerColumns({
+        fieldConfig,
+        data,
+        onEdit,
+        onDelete,
+        onAssign,
+        canAssign
+      }),
+    [fieldConfig, data, onEdit, onDelete, onAssign, canAssign]
   )
 
   const table = useReactTable({

@@ -38,6 +38,17 @@ export interface PaginationParams {
   offset?: number
 }
 
+export interface EntityAssignRequest {
+  user_id: number | null
+}
+
+export interface EntityAssignmentResponse {
+  entity_type: string
+  entity_autoid: string
+  user_id: number | null
+  user_email: string | null
+}
+
 export interface EntityAttachment {
   id: number
   entity_type: string

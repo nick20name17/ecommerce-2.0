@@ -3,7 +3,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import type { ColumnDef } from '@tanstack/react-table'
 import { useNavigate } from '@tanstack/react-router'
-import { Loader2, MoreHorizontal, Paperclip, ShoppingCart, Trash2 } from 'lucide-react'
+import { Loader2, MoreHorizontal, Paperclip, ShoppingCart, Trash2, UserPlus } from 'lucide-react'
 import { toast } from 'sonner'
 
 import type { Proposal } from '@/api/proposal/schema'
@@ -42,6 +42,8 @@ interface ProposalColumnsOptions {
   projectId: number | null
   onDelete: (proposal: Proposal) => void
   onAttachments: (proposal: Proposal) => void
+  onAssign?: (proposal: Proposal) => void
+  canAssign?: boolean
 }
 
 const ToOrderAction = ({
@@ -126,7 +128,9 @@ export function getProposalColumns({
   isSuperAdmin,
   projectId,
   onDelete,
-  onAttachments
+  onAttachments,
+  onAssign,
+  canAssign
 }: ProposalColumnsOptions): ColumnDef<ProposalRow>[] {
   const entity = 'proposal'
   const orderedKeys = getOrderedDataKeys(data, entity, fieldConfig)
@@ -151,6 +155,12 @@ export function getProposalColumns({
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align='end'>
+              {canAssign && onAssign && (
+                <DropdownMenuItem onClick={() => onAssign(row.original)}>
+                  <UserPlus className='size-4' />
+                  Assign
+                </DropdownMenuItem>
+              )}
               <DropdownMenuItem onClick={() => onAttachments(row.original)}>
                 <Paperclip className='size-4' />
                 Attachments

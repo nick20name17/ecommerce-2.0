@@ -1,4 +1,5 @@
 import { api } from '..'
+import type { EntityAssignRequest, EntityAssignmentResponse } from '../schema'
 
 import type {
   CreateCustomerPayload,
@@ -32,4 +33,17 @@ export const customerService = {
   delete: async (id: string) => {
     await api.delete(`/data/customers/${id}/`)
   },
+
+  assign: async (
+    autoid: string,
+    payload: EntityAssignRequest,
+    projectId?: number | null
+  ) => {
+    const { data } = await api.post<EntityAssignmentResponse>(
+      `/data/customers/${autoid}/assign/`,
+      payload,
+      { params: projectId != null ? { project_id: projectId } : {} }
+    )
+    return data
+  }
 }

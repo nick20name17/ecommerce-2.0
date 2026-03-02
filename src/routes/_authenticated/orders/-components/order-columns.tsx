@@ -1,7 +1,7 @@
 'use no memo'
 
 import type { ColumnDef } from '@tanstack/react-table'
-import { Link2Off, Loader2, MoreHorizontal, Paperclip, Trash2 } from 'lucide-react'
+import { Link2Off, Loader2, MoreHorizontal, Paperclip, Trash2, UserPlus } from 'lucide-react'
 
 import type { Order } from '@/api/order/schema'
 import type { FieldConfigResponse } from '@/api/field-config/schema'
@@ -36,6 +36,8 @@ interface OrderColumnsOptions {
   onDelete: (order: Order) => void
   onDeleteLinkedProposal?: (order: Order) => void
   onAttachments?: (order: Order) => void
+  onAssign?: (order: Order) => void
+  canAssign?: boolean
   actionsVariant?: OrderActionsVariant
 }
 
@@ -117,6 +119,8 @@ export function getOrderColumns({
   onDelete,
   onDeleteLinkedProposal,
   onAttachments,
+  onAssign,
+  canAssign,
   actionsVariant = 'full'
 }: OrderColumnsOptions): ColumnDef<OrderRow>[] {
   const entity = 'order'
@@ -153,6 +157,12 @@ export function getOrderColumns({
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align='end'>
+              {canAssign && onAssign && (
+                <DropdownMenuItem onClick={() => onAssign(row.original)}>
+                  <UserPlus className='size-4' />
+                  Assign
+                </DropdownMenuItem>
+              )}
               {showAttachments && (
                 <DropdownMenuItem onClick={() => onAttachments(row.original)}>
                   <Paperclip className='size-4' />

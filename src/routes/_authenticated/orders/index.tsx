@@ -3,6 +3,7 @@ import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { Plus, ShoppingCart, X } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 
+import { OrderAssignDialog } from './-components/order-assign-dialog'
 import { OrderDeleteDialog } from './-components/order-delete-dialog'
 import { OrdersDataTable } from './-components/orders-data-table'
 import { ORDER_QUERY_KEYS, getOrdersQuery } from '@/api/order/query'
@@ -16,7 +17,9 @@ import { Button } from '@/components/ui/button'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { ORDER_STATUS } from '@/constants/order'
 import type { OrderStatus } from '@/constants/order'
+import { isAdmin } from '@/constants/user'
 import { useOrdering } from '@/hooks/use-ordering'
+import { useAuth } from '@/providers/auth'
 import { useProjectId } from '@/hooks/use-project-id'
 import {
   useAutoidParam,
@@ -45,6 +48,7 @@ const VALID_STATUS_VALUES = new Set<string>(Object.values(ORDER_STATUS))
 
 function OrdersPage() {
   const navigate = useNavigate()
+  const { user } = useAuth()
   const [search] = useSearchParam()
   const [offset, setOffset] = useOffsetParam()
   const [limit] = useLimitParam()
@@ -55,8 +59,11 @@ function OrdersPage() {
   const projectId = projectIdFromUrl ?? projectIdFromStorage
   const { sorting, setSorting, ordering } = useOrdering()
 
+  const canAssign = !!user?.role && isAdmin(user.role)
+
   const [orderToDelete, setOrderToDelete] = useState<Order | null>(null)
   const [orderForAttachments, setOrderForAttachments] = useState<Order | null>(null)
+  const [orderToAssign, setOrderToAssign] = useState<Order | null>(null)
 
   const deleteLinkedProposalMutation = useMutation({
     mutationFn: (autoid: string) => orderService.deleteLinkedProposal(autoid),
@@ -214,6 +221,8 @@ function OrdersPage() {
         onDelete={setOrderToDelete}
         onDeleteLinkedProposal={(order) => deleteLinkedProposalMutation.mutate(order.autoid)}
         onAttachments={setOrderForAttachments}
+        onAssign={setOrderToAssign}
+        canAssign={canAssign}
       />
 
       <Pagination totalCount={data?.count ?? 0} />
@@ -236,6 +245,13 @@ function OrdersPage() {
         projectId={projectId}
         open={!!orderForAttachments}
         onOpenChange={(open) => !open && setOrderForAttachments(null)}
+      />
+
+      <OrderAssignDialog
+        order={orderToAssign}
+        open={!!orderToAssign}
+        onOpenChange={(open) => !open && setOrderToAssign(null)}
+        projectId={projectId}
       />
     </div>
   )

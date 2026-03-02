@@ -8,7 +8,7 @@ import { OrderCombobox } from './order-combobox'
 import { ProposalCombobox } from './proposal-combobox'
 import { TaskAttachments, type TaskAttachmentsRef } from './task-attachments'
 import { TaskStatusManager } from './task-status-manager'
-import { UserCombobox } from './user-combobox'
+import { UserCombobox } from '@/components/common/user-combobox/user-combobox'
 import { TASK_QUERY_KEYS, getTaskDetailQuery, getTaskStatusesQuery } from '@/api/task/query'
 import {
   type CreateTaskFormValues,

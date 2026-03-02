@@ -15,12 +15,14 @@ interface UserComboboxProps {
   value: number | null
   onChange: (userId: number | null) => void
   placeholder?: string
+  role?: string
 }
 
 export function UserCombobox({
   value,
   onChange,
-  placeholder = 'Select user...'
+  placeholder = 'Select user...',
+  role
 }: UserComboboxProps) {
   const [open, setOpen] = useState(false)
   const [search, setSearch] = useState('')
@@ -38,7 +40,12 @@ export function UserCombobox({
     }
   }
 
-  const params = { limit: 50, offset: 0, search: debouncedSearch || undefined }
+  const params = {
+    limit: 50,
+    offset: 0,
+    search: debouncedSearch || undefined,
+    role
+  }
   const { data, isLoading, isFetching } = useQuery({
     ...getUsersQuery(params),
     enabled: open
@@ -168,4 +175,3 @@ export function UserCombobox({
     </Popover>
   )
 }
-

@@ -34,8 +34,8 @@ const TABLE_LABELS: Record<string, string> = {
   customer: 'Customers Data',
   product: 'Products Data',
   order: 'Orders Data',
-  order_item: 'Line Items Data',
-  order_detail: 'Line Items Data',
+  order_item: 'Order Items Data',
+  order_detail: 'Order Items Data',
   default_component: 'Default Components',
   component: 'Components',
   shipper: 'Shippers',
@@ -114,9 +114,7 @@ function SettingsPage() {
   const fields: FieldConfigRow[] = useMemo(() => {
     const entityFields = data?.[currentTab]
     if (!entityFields) return []
-    return entityFields
-      .filter((entry) => !entry.extra)
-      .map((entry) => ({
+    return entityFields.map((entry) => ({
         field: entry.field,
         default: entry.default,
         enabled: entry.enabled,
@@ -126,7 +124,7 @@ function SettingsPage() {
 
   const handleFieldToggle = (entity: string, fieldName: string, enabled: boolean) => {
     if (!projectId || !data?.[entity]) return
-    const entityFields = data[entity].filter((e) => !e.extra)
+    const entityFields = data[entity]
     const nonDefaultFields = entityFields.filter((e) => !e.default)
     const newEnabled = nonDefaultFields
       .filter((e) => (e.field === fieldName ? enabled : e.enabled))

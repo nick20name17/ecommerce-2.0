@@ -56,6 +56,7 @@ export type UserResponse = ApiResponse<User>
 export interface UserParams extends PaginationParams {
   search?: string
   ordering?: string
+  role?: string
 }
 
 const roleValues = Object.values(USER_ROLES) as [string, ...string[]]

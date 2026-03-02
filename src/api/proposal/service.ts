@@ -1,6 +1,10 @@
 import { api } from '..'
 
-import type { EntityAttachment } from '../schema'
+import type {
+  EntityAssignRequest,
+  EntityAssignmentResponse,
+  EntityAttachment
+} from '../schema'
 import type { Proposal, ProposalParams, ProposalResponse } from './schema'
 
 function proposalParams(projectId?: number | null) {
@@ -61,5 +65,18 @@ export const proposalService = {
     await api.delete(`/data/proposals/${autoid}/attachments/${attachmentId}/`, {
       params: proposalParams(projectId)
     })
+  },
+
+  assign: async (
+    autoid: string,
+    payload: EntityAssignRequest,
+    projectId?: number | null
+  ) => {
+    const { data } = await api.post<EntityAssignmentResponse>(
+      `/data/proposals/${autoid}/assign/`,
+      payload,
+      { params: proposalParams(projectId) }
+    )
+    return data
   }
 }
