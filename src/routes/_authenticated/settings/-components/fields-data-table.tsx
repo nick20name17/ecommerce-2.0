@@ -1,35 +1,47 @@
 'use no memo'
 
 import type { SortingState } from '@tanstack/react-table'
-import { getCoreRowModel, useReactTable } from '@tanstack/react-table'
-import { useMemo } from 'react'
+import {
+  getCoreRowModel,
+  getSortedRowModel,
+  useReactTable
+} from '@tanstack/react-table'
+import { useMemo, useState } from 'react'
 
 import { getFieldColumns } from './field-columns'
-import type { TableField } from '@/api/data-schema/schema'
+import type { FieldConfigRow } from '@/api/field-config/schema'
 import { DataTable } from '@/components/common/data-table'
 
 interface FieldsDataTableProps {
-  fields: TableField[]
+  fields: FieldConfigRow[]
   isLoading: boolean
-  sorting: SortingState
-  setSorting: (updater: React.SetStateAction<SortingState>) => void
+  entity: string
+  projectId: number
+  onFieldToggle: (entity: string, fieldName: string, enabled: boolean) => void
+  isPending: boolean
 }
 
 export function FieldsDataTable({
   fields,
   isLoading,
-  sorting,
-  setSorting
+  entity,
+  onFieldToggle,
+  isPending
 }: FieldsDataTableProps) {
-  const columns = useMemo(() => getFieldColumns(), [])
+  const [sorting, setSorting] = useState<SortingState>([])
+
+  const columns = useMemo(
+    () => getFieldColumns(entity, onFieldToggle, isPending),
+    [entity, onFieldToggle, isPending]
+  )
 
   const table = useReactTable({
     columns,
     data: fields,
     getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
     onSortingChange: setSorting,
-    state: { sorting },
-    manualSorting: true
+    state: { sorting }
   })
 
   return <DataTable table={table} isLoading={isLoading} className='h-full' />

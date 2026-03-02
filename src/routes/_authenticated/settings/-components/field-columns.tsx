@@ -1,27 +1,23 @@
 'use no memo'
 
 import type { ColumnDef } from '@tanstack/react-table'
-import { MoreHorizontal } from 'lucide-react'
 
-import type { TableField } from '@/api/data-schema/schema'
+import type { FieldConfigRow } from '@/api/field-config/schema'
 import { ColumnHeader } from '@/components/common/data-table/column-header'
-import { Button } from '@/components/ui/button'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger
-} from '@/components/ui/dropdown-menu'
 import { Switch } from '@/components/ui/switch'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 
-export const getFieldColumns = (): ColumnDef<TableField>[] => [
+export const getFieldColumns = (
+  entity: string,
+  onFieldToggle: (entity: string, fieldName: string, enabled: boolean) => void,
+  isPending: boolean
+): ColumnDef<FieldConfigRow>[] => [
   {
-    id: 'ebms_field_name',
-    accessorFn: (row) => `${row.dbTable}.${row.name.toUpperCase()}`,
-    header: ({ column }) => <ColumnHeader column={column} title='EBMS Field Name' />,
+    id: 'field_name',
+    accessorKey: 'field',
+    header: ({ column }) => <ColumnHeader column={column} title='Field' />,
     cell: ({ row }) => {
-      const fieldName = `${row.original.dbTable}.${row.original.name.toUpperCase()}`
+      const fieldName = row.original.field
 
       return (
         <Tooltip>
@@ -37,35 +33,34 @@ export const getFieldColumns = (): ColumnDef<TableField>[] => [
   },
   {
     id: 'state',
-    accessorKey: 'isEnabled',
+    accessorKey: 'enabled',
     header: ({ column }) => <ColumnHeader column={column} title='State' />,
-    cell: ({ row }) => (
-      <Switch
-        checked={row.original.isEnabled}
-        aria-label={row.original.isEnabled ? 'Disable field' : 'Enable field'}
-      />
-    ),
+    cell: ({ row }) => {
+      const { field, default: isDefault, enabled } = row.original
+
+      if (isDefault) {
+        return (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <span className='inline-flex'>
+                <Switch checked disabled aria-label='Default field, always enabled' />
+              </span>
+            </TooltipTrigger>
+            <TooltipContent>Default field, always enabled</TooltipContent>
+          </Tooltip>
+        )
+      }
+
+      return (
+        <Switch
+          checked={enabled}
+          disabled={isPending}
+          aria-label={enabled ? 'Disable field' : 'Enable field'}
+          onCheckedChange={(checked) => onFieldToggle(entity, field, checked)}
+        />
+      )
+    },
     size: 100,
-    enableSorting: false
-  },
-  {
-    id: 'actions',
-    cell: () => (
-      <div className='flex justify-end'>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant='ghost' size='icon-sm' className='text-muted-foreground'>
-              <MoreHorizontal className='size-4' />
-              <span className='sr-only'>Open menu</span>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align='end'>
-            <DropdownMenuItem disabled>No actions available</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
-    ),
-    size: 48,
     enableSorting: false
   }
 ]
