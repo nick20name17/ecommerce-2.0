@@ -5,8 +5,8 @@ import {
   useQueryClient
 } from '@tanstack/react-query'
 import { useNavigate, useRouter } from '@tanstack/react-router'
-import { type PropsWithChildren, createContext, useContext } from 'react'
 import { parseAsString, useQueryState } from 'nuqs'
+import { type PropsWithChildren, createContext, useContext } from 'react'
 
 import type { SignInPayload, SignInResponse } from '@/api/auth/schema'
 import { authService } from '@/api/auth/service'
@@ -47,11 +47,10 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
   const logout = async () => {
     clearSession()
 
-    queryClient.removeQueries({ queryKey: USER_QUERY_KEYS.detail('me') })
-    queryClient.clear()
-
     await navigate({ to: AUTH_REDIRECTS.logout, replace: true })
+
     router.invalidate()
+    queryClient.clear()
   }
 
   const signInMutation = useMutation({
