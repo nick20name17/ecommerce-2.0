@@ -43,7 +43,7 @@ const TABLE_LABELS: Record<string, string> = {
   shipper: 'Shippers',
   ship_info: 'Ship Info',
   proposal: 'Proposals',
-  proposal_item: 'Proposal Item'
+  proposal_item: 'Proposal Items'
 }
 
 function getTableLabel(name: string): string {
