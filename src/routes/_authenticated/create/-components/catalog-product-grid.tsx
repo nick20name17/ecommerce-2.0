@@ -18,7 +18,7 @@ interface CatalogProductGridProps {
   projectId?: number | null
   categoryId: string | null
   onSelect: (product: Product) => void
-  onClose?: () => void
+  addingProductAutoid?: string | null
 }
 
 const DEFAULT_LIMIT = 24
@@ -94,7 +94,7 @@ export function CatalogProductGrid({
   projectId,
   categoryId,
   onSelect,
-  onClose,
+  addingProductAutoid,
 }: CatalogProductGridProps) {
   const [query, setQuery] = useState('')
   const [debouncedSearch, setDebouncedSearch] = useState('')
@@ -141,7 +141,6 @@ export function CatalogProductGrid({
 
   const handleAdd = (product: Product) => {
     onSelect(product)
-    onClose?.()
   }
 
   const emptyTitle = debouncedSearch ? 'No matches' : 'No products'
@@ -317,9 +316,19 @@ export function CatalogProductGrid({
                             )}
                           </div>
 
-                          <Button type='button' size='sm' className='shrink-0 gap-1.5' onClick={() => handleAdd(product)}>
-                            <ShoppingCart className='size-4' />
-                            Add
+                          <Button
+                            type='button'
+                            size='sm'
+                            className='shrink-0 gap-1.5'
+                            disabled={addingProductAutoid === product.autoid}
+                            onClick={() => handleAdd(product)}
+                          >
+                            {addingProductAutoid === product.autoid ? (
+                              <Loader2 className='size-4 animate-spin' />
+                            ) : (
+                              <ShoppingCart className='size-4' />
+                            )}
+                            {addingProductAutoid === product.autoid ? 'Adding…' : 'Add'}
                           </Button>
                         </div>
                       </div>

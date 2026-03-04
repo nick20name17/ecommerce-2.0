@@ -2,6 +2,7 @@ import { Package, X } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
 import { CatalogCategorySidebar } from './catalog-category-sidebar'
+import { CatalogMiniCart } from './catalog-mini-cart'
 import { CatalogProductGrid } from './catalog-product-grid'
 import type { Product } from '@/api/product/schema'
 import { Button } from '@/components/ui/button'
@@ -15,6 +16,7 @@ interface ProductCatalogDialogProps {
   projectId?: number | null
   onSelect: (product: Product) => void
   disabled?: boolean
+  addingProductAutoid?: string | null
 }
 
 export function ProductCatalogDialog({
@@ -24,6 +26,7 @@ export function ProductCatalogDialog({
   projectId,
   onSelect,
   disabled,
+  addingProductAutoid,
 }: ProductCatalogDialogProps) {
   const [category, setCategory] = useState<{ treeId: string | null; treeDescr: string }>({
     treeId: null,
@@ -72,7 +75,12 @@ export function ProductCatalogDialog({
           </div>
         </div>
 
-        <div className='grid min-h-0 flex-1 grid-cols-1 lg:grid-cols-[360px_1fr]'>
+        <div
+          className={cn(
+            'grid min-h-0 flex-1 grid-cols-1',
+            customerId && !isDisabled ? 'lg:grid-cols-[360px_1fr_280px]' : 'lg:grid-cols-[360px_1fr]'
+          )}
+        >
           <div className='min-h-0 border-b lg:border-b-0 lg:border-r'>
             <CatalogCategorySidebar
               projectId={projectId}
@@ -88,7 +96,7 @@ export function ProductCatalogDialog({
                 projectId={projectId}
                 categoryId={category.treeId}
                 onSelect={onSelect}
-                onClose={() => onOpenChange(false)}
+                addingProductAutoid={addingProductAutoid ?? null}
               />
             ) : customerId ? (
               <div className='flex h-full items-center justify-center p-6 text-center'>
@@ -110,6 +118,16 @@ export function ProductCatalogDialog({
               </div>
             )}
           </div>
+
+          {customerId && !isDisabled && (
+            <div className='hidden min-h-0 lg:block'>
+              <CatalogMiniCart
+                customerId={customerId}
+                projectId={projectId}
+                className='h-full'
+              />
+            </div>
+          )}
         </div>
 
         <div className='shrink-0 border-t bg-muted/30 px-6 py-3'>

@@ -101,6 +101,7 @@ function CreatePage() {
 
   const [customer, setCustomer] = useState<Customer | null>(null)
   const [catalogOpen, setCatalogOpen] = useState(false)
+  const [addingProductAutoid, setAddingProductAutoid] = useState<string | null>(null)
   const attachmentsRef = useRef<EntityAttachmentsRef>(null)
   const [busy, busyDispatch] = useReducer(busyReducer, initialBusy)
   const [editState, editDispatch] = useReducer(editReducer, {
@@ -166,12 +167,15 @@ function CreatePage() {
         quantity: 1,
         unit: product.unit || product.def_unit || ''
       }
+      setAddingProductAutoid(product.autoid)
       try {
         await cartService.addItem(payload, customerId, projectId)
         invalidateCart()
         toast.success(`${product.id} added to cart`)
       } catch (error) {
         toast.error(getErrorMessage(error))
+      } finally {
+        setAddingProductAutoid(null)
       }
     }
   }
@@ -459,6 +463,7 @@ function CreatePage() {
         projectId={projectId}
         onSelect={handleProductSelect}
         disabled={isBusy}
+        addingProductAutoid={addingProductAutoid}
       />
     </div>
   )
