@@ -233,7 +233,7 @@ export const EntityAttachments = forwardRef<EntityAttachmentsRef, EntityAttachme
         clearFiles
       }
     ] = useFileUpload({
-      maxSize: 20 * 1024 * 1024,
+      maxSize: 10 * 1024 * 1024,
       multiple: true,
       onFilesAdded: (addedFiles) => {
         if (mode === 'immediate' && entityId) {
@@ -343,7 +343,7 @@ export const EntityAttachments = forwardRef<EntityAttachmentsRef, EntityAttachme
                   browse files
                 </button>
               </p>
-              <p className='text-muted-foreground text-xs'>Maximum file size: 20MB</p>
+              <p className='text-muted-foreground text-xs'>Maximum file size: 10MB</p>
             </div>
           </div>
         </div>
