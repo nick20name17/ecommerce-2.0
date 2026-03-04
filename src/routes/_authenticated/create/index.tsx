@@ -85,14 +85,7 @@ const initialBusy: BusyState = {
   creatingOrder: false
 }
 
-export const Route = createFileRoute('/_authenticated/create/')({
-  component: CreatePage,
-  head: () => ({
-    meta: [{ title: 'Create' }]
-  })
-})
-
-function CreatePage() {
+const CreatePage = () => {
   const navigate = useNavigate()
   const router = useRouter()
   const queryClient = useQueryClient()
@@ -475,6 +468,13 @@ function CreatePage() {
     </div>
   )
 }
+
+export const Route = createFileRoute('/_authenticated/create/')({
+  component: CreatePage,
+  head: () => ({
+    meta: [{ title: 'Create' }]
+  })
+})
 
 const isCartItemType = (p: Product | CartItem): p is CartItem => {
   return 'product_autoid' in p

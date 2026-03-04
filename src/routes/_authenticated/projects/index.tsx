@@ -17,20 +17,6 @@ import { getSession } from '@/helpers/auth'
 import { useOrdering } from '@/hooks/use-ordering'
 import { useLimitParam, useOffsetParam, useSearchParam } from '@/hooks/use-query-params'
 
-export const Route = createFileRoute('/_authenticated/projects/')({
-  beforeLoad: () => {
-    const session = getSession()
-    const role = session?.user?.role as UserRole | undefined
-    if (!role || !isSuperAdmin(role)) {
-      throw redirect({ to: '/', replace: true })
-    }
-  },
-  component: ProjectsPage,
-  head: () => ({
-    meta: [{ title: 'Projects' }]
-  })
-})
-
 const mergeHealthIntoProjects = (
   projects: Project[],
   healthResults: Array<{ data?: unknown; isLoading?: boolean }>
@@ -81,7 +67,7 @@ const mergeHealthIntoProjects = (
   })
 }
 
-function ProjectsPage() {
+const ProjectsPage = () => {
   const [search] = useSearchParam()
   const [offset] = useOffsetParam()
   const [limit] = useLimitParam()
@@ -171,3 +157,17 @@ function ProjectsPage() {
     </div>
   )
 }
+
+export const Route = createFileRoute('/_authenticated/projects/')({
+  beforeLoad: () => {
+    const session = getSession()
+    const role = session?.user?.role as UserRole | undefined
+    if (!role || !isSuperAdmin(role)) {
+      throw redirect({ to: '/', replace: true })
+    }
+  },
+  component: ProjectsPage,
+  head: () => ({
+    meta: [{ title: 'Projects' }]
+  })
+})

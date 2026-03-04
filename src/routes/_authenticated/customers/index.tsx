@@ -18,14 +18,7 @@ import { useProjectId } from '@/hooks/use-project-id'
 import { useLimitParam, useOffsetParam, useSearchParam } from '@/hooks/use-query-params'
 import { useAuth } from '@/providers/auth'
 
-export const Route = createFileRoute('/_authenticated/customers/')({
-  component: CustomersPage,
-  head: () => ({
-    meta: [{ title: 'Customers' }]
-  })
-})
-
-function CustomersPage() {
+const CustomersPage = () => {
   const navigate = useNavigate()
   const [search] = useSearchParam()
   const [offset] = useOffsetParam()
@@ -120,3 +113,10 @@ function CustomersPage() {
     </div>
   )
 }
+
+export const Route = createFileRoute('/_authenticated/customers/')({
+  component: CustomersPage,
+  head: () => ({
+    meta: [{ title: 'Customers' }]
+  })
+})

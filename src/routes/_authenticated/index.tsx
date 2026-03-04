@@ -19,14 +19,7 @@ import { useDashboardCustomerIdParam } from '@/hooks/use-query-params'
 import { cn } from '@/lib/utils'
 import { useAuth } from '@/providers/auth'
 
-export const Route = createFileRoute('/_authenticated/')({
-  component: DashboardPage,
-  head: () => ({
-    meta: [{ title: 'Dashboard' }]
-  })
-})
-
-function DashboardPage() {
+const DashboardPage = () => {
   const { user } = useAuth()
   const [projectId] = useProjectId()
   const [customerId, setCustomerId] = useDashboardCustomerIdParam()
@@ -220,3 +213,10 @@ function DashboardPage() {
     </div>
   )
 }
+
+export const Route = createFileRoute('/_authenticated/')({
+  component: DashboardPage,
+  head: () => ({
+    meta: [{ title: 'Dashboard' }]
+  })
+})

@@ -17,21 +17,7 @@ import { getSession } from '@/helpers/auth'
 import { useOrdering } from '@/hooks/use-ordering'
 import { useLimitParam, useOffsetParam, useSearchParam } from '@/hooks/use-query-params'
 
-export const Route = createFileRoute('/_authenticated/users/')({
-  beforeLoad: () => {
-    const session = getSession()
-    const role = session?.user?.role as UserRole | undefined
-    if (!role || !isAdmin(role)) {
-      throw redirect({ to: '/', replace: true })
-    }
-  },
-  component: UsersPage,
-  head: () => ({
-    meta: [{ title: 'Users' }]
-  })
-})
-
-function UsersPage() {
+const UsersPage = () => {
   const [search] = useSearchParam()
   const [offset] = useOffsetParam()
   const [limit] = useLimitParam()
@@ -107,3 +93,17 @@ function UsersPage() {
     </div>
   )
 }
+
+export const Route = createFileRoute('/_authenticated/users/')({
+  beforeLoad: () => {
+    const session = getSession()
+    const role = session?.user?.role as UserRole | undefined
+    if (!role || !isAdmin(role)) {
+      throw redirect({ to: '/', replace: true })
+    }
+  },
+  component: UsersPage,
+  head: () => ({
+    meta: [{ title: 'Users' }]
+  })
+})

@@ -9,14 +9,7 @@ import { AUTH_REDIRECTS } from '@/api/constants'
 import { isSuperAdmin } from '@/constants/user'
 import { useAuth } from '@/providers/auth'
 
-export const Route = createFileRoute('/_authenticated/profile/')({
-  component: ProfilePage,
-  head: () => ({
-    meta: [{ title: 'Profile' }]
-  })
-})
-
-function ProfilePage() {
+const ProfilePage = () => {
   const { user } = useAuth()
 
   if (!user) {
@@ -73,3 +66,10 @@ function ProfilePage() {
     </div>
   )
 }
+
+export const Route = createFileRoute('/_authenticated/profile/')({
+  component: ProfilePage,
+  head: () => ({
+    meta: [{ title: 'Profile' }]
+  })
+})

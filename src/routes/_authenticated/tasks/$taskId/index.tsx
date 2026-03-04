@@ -9,14 +9,7 @@ import { getTaskDetailQuery } from '@/api/task/query'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 
-export const Route = createFileRoute('/_authenticated/tasks/$taskId/')({
-  component: TaskDetailPage,
-  head: () => ({
-    meta: [{ title: 'Todo' }]
-  })
-})
-
-function TaskDetailPage() {
+const TaskDetailPage = () => {
   const { taskId } = Route.useParams()
   const router = useRouter()
   const [deleteOpen, setDeleteOpen] = useState(false)
@@ -95,3 +88,10 @@ function TaskDetailPage() {
     </div>
   )
 }
+
+export const Route = createFileRoute('/_authenticated/tasks/$taskId/')({
+  component: TaskDetailPage,
+  head: () => ({
+    meta: [{ title: 'Todo' }]
+  })
+})

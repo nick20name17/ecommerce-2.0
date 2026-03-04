@@ -30,13 +30,6 @@ import {
 } from '@/hooks/use-query-params'
 import { useAuth } from '@/providers/auth'
 
-export const Route = createFileRoute('/_authenticated/orders/')({
-  component: OrdersPage,
-  head: () => ({
-    meta: [{ title: 'Orders' }]
-  })
-})
-
 const STATUS_TABS = [
   { label: 'Unprocessed', value: ORDER_STATUS.unprocessed },
   { label: 'Open', value: ORDER_STATUS.open },
@@ -46,7 +39,7 @@ const STATUS_TABS = [
 
 const VALID_STATUS_VALUES = new Set<string>(Object.values(ORDER_STATUS))
 
-function OrdersPage() {
+const OrdersPage = () => {
   const navigate = useNavigate()
   const { user } = useAuth()
   const [search] = useSearchParam()
@@ -253,3 +246,10 @@ function OrdersPage() {
     </div>
   )
 }
+
+export const Route = createFileRoute('/_authenticated/orders/')({
+  component: OrdersPage,
+  head: () => ({
+    meta: [{ title: 'Orders' }]
+  })
+})

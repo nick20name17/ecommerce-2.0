@@ -29,14 +29,7 @@ import {
   useTaskStatusParam
 } from '@/hooks/use-query-params'
 
-export const Route = createFileRoute('/_authenticated/tasks/')({
-  component: TasksPage,
-  head: () => ({
-    meta: [{ title: "To-Do's" }]
-  })
-})
-
-function TasksPage() {
+const TasksPage = () => {
   const navigate = useNavigate()
   const [search] = useSearchParam()
   const [taskStatusId, setTaskStatusId] = useTaskStatusParam()
@@ -222,3 +215,10 @@ function TasksPage() {
     </div>
   )
 }
+
+export const Route = createFileRoute('/_authenticated/tasks/')({
+  component: TasksPage,
+  head: () => ({
+    meta: [{ title: "To-Do's" }]
+  })
+})

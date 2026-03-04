@@ -28,13 +28,6 @@ import {
 } from '@/hooks/use-query-params'
 import { useAuth } from '@/providers/auth'
 
-export const Route = createFileRoute('/_authenticated/proposals/')({
-  component: ProposalsPage,
-  head: () => ({
-    meta: [{ title: 'Proposals' }]
-  })
-})
-
 const STATUS_TABS = [
   { label: 'Open', value: PROPOSAL_STATUS.open },
   { label: 'Accepted', value: PROPOSAL_STATUS.accepted },
@@ -45,7 +38,7 @@ const STATUS_TABS = [
 
 const VALID_STATUS_VALUES = new Set<string>(Object.values(PROPOSAL_STATUS))
 
-function ProposalsPage() {
+const ProposalsPage = () => {
   const navigate = useNavigate()
   const { user } = useAuth()
   const [search] = useSearchParam()
@@ -238,3 +231,10 @@ function ProposalsPage() {
     </div>
   )
 }
+
+export const Route = createFileRoute('/_authenticated/proposals/')({
+  component: ProposalsPage,
+  head: () => ({
+    meta: [{ title: 'Proposals' }]
+  })
+})

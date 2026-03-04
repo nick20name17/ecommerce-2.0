@@ -18,20 +18,6 @@ import type { UserRole } from '@/constants/user'
 import { getSession } from '@/helpers/auth'
 import { useProjectId } from '@/hooks/use-project-id'
 
-export const Route = createFileRoute('/_authenticated/settings/')({
-  beforeLoad: () => {
-    const session = getSession()
-    const role = session?.user?.role as UserRole | undefined
-    if (!role || !isAdmin(role)) {
-      throw redirect({ to: '/', replace: true })
-    }
-  },
-  component: SettingsPage,
-  head: () => ({
-    meta: [{ title: 'Settings' }]
-  })
-})
-
 const TABLE_LABELS: Record<string, string> = {
   customer: 'Customers',
   product: 'Products',
@@ -80,7 +66,7 @@ const applyFieldToggle = (
   }
 }
 
-function SettingsPage() {
+const SettingsPage = () => {
   const [projectId] = useProjectId()
   const [activeTab, setActiveTab] = useQueryState('tab', parseAsString)
   const client = useQueryClient()
@@ -238,3 +224,17 @@ function SettingsPage() {
     </div>
   )
 }
+
+export const Route = createFileRoute('/_authenticated/settings/')({
+  beforeLoad: () => {
+    const session = getSession()
+    const role = session?.user?.role as UserRole | undefined
+    if (!role || !isAdmin(role)) {
+      throw redirect({ to: '/', replace: true })
+    }
+  },
+  component: SettingsPage,
+  head: () => ({
+    meta: [{ title: 'Settings' }]
+  })
+})

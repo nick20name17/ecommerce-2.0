@@ -14,14 +14,7 @@ import { CUSTOMER_TABS } from '@/constants/customer'
 import { useProjectId } from '@/hooks/use-project-id'
 import { useCustomerTabParam } from '@/hooks/use-query-params'
 
-export const Route = createFileRoute('/_authenticated/customers/$customerId/')({
-  component: CustomerDetailPage,
-  head: () => ({
-    meta: [{ title: 'Customer' }]
-  })
-})
-
-function CustomerDetailPage() {
+const CustomerDetailPage = () => {
   const { customerId } = Route.useParams()
   const router = useRouter()
   const [projectId] = useProjectId()
@@ -118,3 +111,10 @@ function CustomerDetailPage() {
     </div>
   )
 }
+
+export const Route = createFileRoute('/_authenticated/customers/$customerId/')({
+  component: CustomerDetailPage,
+  head: () => ({
+    meta: [{ title: 'Customer' }]
+  })
+})
