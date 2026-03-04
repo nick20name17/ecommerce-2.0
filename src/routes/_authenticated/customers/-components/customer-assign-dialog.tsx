@@ -60,7 +60,7 @@ export function CustomerAssignDialog({
 
   const handleConfirm = () => {
     if (!customer) return
-    assignMutation.mutate({ autoid: customer.id, userId: selectedUserId })
+    assignMutation.mutate({ autoid: customer.autoid, userId: selectedUserId })
   }
 
   if (!customer) return null

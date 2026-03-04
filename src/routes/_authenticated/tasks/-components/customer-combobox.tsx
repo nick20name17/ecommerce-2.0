@@ -48,9 +48,9 @@ export function TaskCustomerCombobox({ value, onChange, projectId }: TaskCustome
 
   const displayCustomer =
     value != null
-      ? (customers.find((x) => x.id === value) ?? { id: value, l_name: `Customer ${value}` })
+      ? (customers.find((x) => x.autoid === value) ?? { autoid: value, l_name: `Customer ${value}` })
       : null
-  const displayLabel = displayCustomer ? `${displayCustomer.id} — ${displayCustomer.l_name}` : null
+  const displayLabel = displayCustomer ? `${displayCustomer.autoid} — ${displayCustomer.l_name}` : null
 
   const handleSearchChange = (q: string) => {
     setSearch(q)
@@ -58,7 +58,7 @@ export function TaskCustomerCombobox({ value, onChange, projectId }: TaskCustome
   }
 
   const handleSelect = (customer: Customer) => {
-    onChange(customer.id)
+    onChange(customer.autoid)
     setOpen(false)
   }
 
@@ -136,13 +136,13 @@ export function TaskCustomerCombobox({ value, onChange, projectId }: TaskCustome
             <div className='p-1'>
               {customers.map((c) => (
                 <button
-                  key={c.id}
+                  key={c.autoid}
                   type='button'
                   className='group hover:bg-accent hover:text-accent-foreground flex w-full items-center justify-between gap-2 rounded-md px-2 py-2 text-left text-sm'
                   onClick={() => handleSelect(c)}
                 >
                   <div className='group-hover:text-accent-foreground flex min-w-0 gap-2'>
-                    <span className='font-semibold'>{c.id}</span>
+                    <span className='font-semibold'>{c.autoid}</span>
                     <span className='truncate'>{c.l_name}</span>
                   </div>
                   {c.contact_1 && (

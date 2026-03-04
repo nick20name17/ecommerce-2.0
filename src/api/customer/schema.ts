@@ -6,6 +6,7 @@ import type { PaginatedResponse, PaginationParams } from '@/api/schema'
 
 export interface Customer {
   id: string
+  autoid: string
   l_name: string
   contact_1?: string
   contact_3?: string
