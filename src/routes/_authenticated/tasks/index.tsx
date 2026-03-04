@@ -19,6 +19,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger
 } from '@/components/ui/collapsible'
+import { dateToLocalDateString } from '@/helpers/date'
 import { useOrdering } from '@/hooks/use-ordering'
 import {
   useLimitParam,
@@ -82,8 +83,8 @@ function TasksPage() {
     status: taskStatusId ?? undefined,
     priority: (priority === '' ? undefined : priority) as TaskPriority | undefined,
     responsible_user: responsibleUserId ?? undefined,
-    due_date_from: dueFrom instanceof Date ? dueFrom.toISOString() : undefined,
-    due_date_to: dueTo instanceof Date ? dueTo.toISOString() : undefined
+    due_date_from: dueFrom instanceof Date ? dateToLocalDateString(dueFrom) : undefined,
+    due_date_to: dueTo instanceof Date ? dateToLocalDateString(dueTo) : undefined
   }
 
   const { data, isLoading, isPlaceholderData } = useQuery({

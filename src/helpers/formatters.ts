@@ -6,6 +6,7 @@ import {
   LOCALE_DEFAULT,
   TEXT_TRUNCATE_LENGTH
 } from '@/constants/app'
+import { localDateStringToDate } from '@/helpers/date'
 
 const currencyFormat = new Intl.NumberFormat(LOCALE_DEFAULT, {
   style: 'currency',
@@ -67,7 +68,12 @@ export function formatDate(
   formatKey: keyof typeof DATE_FORMATS = 'display'
 ): string {
   if (value === null || value === undefined) return '—'
-  const date = typeof value === 'string' ? new Date(value) : value
+  const date =
+    typeof value === 'string'
+      ? /^\d{4}-\d{2}-\d{2}$/.test(value)
+        ? localDateStringToDate(value)
+        : new Date(value)
+      : value
   if (isNaN(date.getTime())) return '—'
   return format(date, DATE_FORMATS[formatKey])
 }

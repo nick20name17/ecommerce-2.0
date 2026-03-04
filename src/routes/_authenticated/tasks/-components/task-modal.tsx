@@ -20,6 +20,7 @@ import {
   UpdateTaskSchema
 } from '@/api/task/schema'
 import { taskService } from '@/api/task/service'
+import { dateToLocalDateString, localDateStringToDate } from '@/helpers/date'
 import { TaskPrioritySelect } from '@/components/common/task-priority-select'
 import { TaskStatusSelect } from '@/components/common/task-status-select'
 import { Button } from '@/components/ui/button'
@@ -180,8 +181,8 @@ function SharedFields({
           <Field>
             <FieldLabel>Due date</FieldLabel>
             <DatePicker
-              value={field.value ? new Date(field.value) : undefined}
-              onChange={(d) => field.onChange(d ? d.toISOString().slice(0, 10) : null)}
+              value={field.value ? localDateStringToDate(field.value) : undefined}
+              onChange={(d) => field.onChange(d ? dateToLocalDateString(d) : null)}
               placeholder='Pick a date'
             />
           </Field>

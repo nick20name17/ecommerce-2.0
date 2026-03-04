@@ -7,6 +7,7 @@ import {
 } from 'nuqs'
 
 import { DEFAULT_LIMIT } from '@/api/constants'
+import { dateToLocalDateTimeString } from '@/helpers/date'
 import { CUSTOMER_TAB_VALUES } from '@/constants/customer'
 import { ORDER_STATUS } from '@/constants/order'
 import { TASK_PRIORITY_VALUES } from '@/constants/task'
@@ -21,6 +22,16 @@ const parseAsIsoDate = createParser<Date | null>({
     return isNaN(d.getTime()) ? null : d
   },
   serialize: (v) => (v instanceof Date ? v.toISOString() : ''),
+  eq: (a, b) => (a?.getTime() ?? null) === (b?.getTime() ?? null)
+})
+
+const parseAsLocalDateTime = createParser<Date | null>({
+  parse: (v) => {
+    if (!v) return null
+    const d = new Date(v)
+    return isNaN(d.getTime()) ? null : d
+  },
+  serialize: (v) => (v instanceof Date ? dateToLocalDateTimeString(v) : ''),
   eq: (a, b) => (a?.getTime() ?? null) === (b?.getTime() ?? null)
 })
 
@@ -98,11 +109,11 @@ export function useTaskResponsibleParam() {
 }
 
 export function useTaskDueFromParam() {
-  return useQueryState('due_from', parseAsIsoDate)
+  return useQueryState('due_from', parseAsLocalDateTime)
 }
 
 export function useTaskDueToParam() {
-  return useQueryState('due_to', parseAsIsoDate)
+  return useQueryState('due_to', parseAsLocalDateTime)
 }
 
 export function useAutoidParam() {
