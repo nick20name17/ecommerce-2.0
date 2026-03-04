@@ -4,9 +4,8 @@ import type { SortingState } from '@tanstack/react-table'
 import { getCoreRowModel, useReactTable } from '@tanstack/react-table'
 import { useMemo } from 'react'
 
-import type { PayloadLog } from '@/api/payload-log/schema'
-
 import { getPayloadLogColumns } from './payload-log-columns'
+import type { PayloadLog } from '@/api/payload-log/schema'
 import { DataTable } from '@/components/common/data-table'
 
 interface PayloadLogsDataTableProps {

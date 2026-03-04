@@ -7,10 +7,10 @@ import {
 } from 'nuqs'
 
 import { DEFAULT_LIMIT } from '@/api/constants'
-import { dateToLocalDateTimeString } from '@/helpers/date'
 import { CUSTOMER_TAB_VALUES } from '@/constants/customer'
 import { ORDER_STATUS } from '@/constants/order'
 import { TASK_PRIORITY_VALUES } from '@/constants/task'
+import { dateToLocalDateTimeString } from '@/helpers/date'
 
 const ORDER_STATUS_VALUES = ['all', ...Object.values(ORDER_STATUS)] as [string, ...string[]]
 const orderStatusParser = parseAsStringLiteral(ORDER_STATUS_VALUES)
@@ -34,7 +34,6 @@ const parseAsLocalDateTime = createParser<Date | null>({
   serialize: (v) => (v instanceof Date ? dateToLocalDateTimeString(v) : ''),
   eq: (a, b) => (a?.getTime() ?? null) === (b?.getTime() ?? null)
 })
-
 
 const offsetParser = parseAsInteger.withDefault(0)
 const limitParser = parseAsInteger.withDefault(DEFAULT_LIMIT)
@@ -121,10 +120,7 @@ export function useAutoidParam() {
 }
 
 export function useCustomerTabParam() {
-  return useQueryState(
-    'tab',
-    parseAsStringLiteral(CUSTOMER_TAB_VALUES).withDefault('orders')
-  )
+  return useQueryState('tab', parseAsStringLiteral(CUSTOMER_TAB_VALUES).withDefault('orders'))
 }
 
 export function useOrderProjectIdParam() {

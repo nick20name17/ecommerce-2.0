@@ -14,8 +14,8 @@ import { SearchFilter } from '@/components/common/filters/search'
 import { Button } from '@/components/ui/button'
 import { isAdmin } from '@/constants/user'
 import { useOrdering } from '@/hooks/use-ordering'
-import { useLimitParam, useOffsetParam, useSearchParam } from '@/hooks/use-query-params'
 import { useProjectId } from '@/hooks/use-project-id'
+import { useLimitParam, useOffsetParam, useSearchParam } from '@/hooks/use-query-params'
 import { useAuth } from '@/providers/auth'
 
 export const Route = createFileRoute('/_authenticated/customers/')({
@@ -59,15 +59,18 @@ function CustomersPage() {
     <div className='flex h-full flex-col gap-5'>
       <header className='flex items-start justify-between'>
         <div className='flex items-center gap-3'>
-          <div className='flex size-10 items-center justify-center rounded-lg bg-primary/10 text-primary'>
+          <div className='bg-primary/10 text-primary flex size-10 items-center justify-center rounded-lg'>
             <UsersRound className='size-5' />
           </div>
           <div>
             <h1 className='text-2xl font-semibold tracking-tight'>Customers</h1>
-            <p className='text-sm text-muted-foreground'>{data?.count ?? 0} total</p>
+            <p className='text-muted-foreground text-sm'>{data?.count ?? 0} total</p>
           </div>
         </div>
-        <Button onClick={() => setModalCustomer('create')} className='gap-2'>
+        <Button
+          onClick={() => setModalCustomer('create')}
+          className='gap-2'
+        >
           <Plus className='size-4' />
           Add Customer
         </Button>

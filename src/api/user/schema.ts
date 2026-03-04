@@ -86,7 +86,11 @@ export function getCreateUserSchema(isCurrentUserSuperAdmin: boolean) {
         !isSuperAdmin(data.role as UserRole) &&
         (!data.project || data.project < 1)
       ) {
-        ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'Project is required', path: ['project'] })
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'Project is required',
+          path: ['project']
+        })
       }
     })
 }
@@ -112,7 +116,11 @@ function updateUserSchemaBase(isCurrentUserSuperAdmin: boolean) {
         !isSuperAdmin(data.role as UserRole) &&
         (!data.project || data.project < 1)
       ) {
-        ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'Project is required', path: ['project'] })
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'Project is required',
+          path: ['project']
+        })
       }
     })
 }
@@ -124,4 +132,3 @@ export function getUpdateUserSchema(isCurrentUserSuperAdmin: boolean) {
 export const UpdateUserSchema = getUpdateUserSchema(true)
 
 export type UpdateUserFormValues = z.infer<ReturnType<typeof getUpdateUserSchema>>
-

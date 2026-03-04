@@ -6,7 +6,7 @@ import type {
   ConfigurationProduct,
   Product,
   ProductParams,
-  ProductResponse,
+  ProductResponse
 } from './schema'
 
 export const productService = {
@@ -15,10 +15,7 @@ export const productService = {
     return data
   },
 
-  getByAutoid: async (
-    autoid: string,
-    params?: { customer_id?: string; project_id?: number }
-  ) => {
+  getByAutoid: async (autoid: string, params?: { customer_id?: string; project_id?: number }) => {
     const { data } = await api.get<Product>(`/data/products/${autoid}/`, { params })
     return data
   },
@@ -35,10 +32,9 @@ export const productService = {
   },
 
   getConfigurationPhotos: async (params: ConfigurationPhotosParams) => {
-    const { data } = await api.get<ConfigurationPhotoItem[]>(
-      '/data/configurations-photos/',
-      { params }
-    )
+    const { data } = await api.get<ConfigurationPhotoItem[]>('/data/configurations-photos/', {
+      params
+    })
     return data
-  },
+  }
 }

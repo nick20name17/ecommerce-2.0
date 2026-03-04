@@ -1,7 +1,6 @@
-import type { ProposalStatus } from '@/constants/proposal'
-
 import type { AssignedUser } from '@/api/schema'
 import type { PaginatedResponse, PaginationParams } from '@/api/schema'
+import type { ProposalStatus } from '@/constants/proposal'
 
 export type { ProposalStatus } from '@/constants/proposal'
 

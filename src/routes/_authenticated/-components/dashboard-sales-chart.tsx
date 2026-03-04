@@ -1,13 +1,14 @@
+import { Bar, BarChart, CartesianGrid, Legend, XAxis, YAxis } from 'recharts'
+
 import type { DashboardMetrics } from '@/api/dashboard/schema'
 import {
+  type ChartConfig,
   ChartContainer,
   ChartLegendContent,
   ChartTooltip,
-  ChartTooltipContent,
-  type ChartConfig
+  ChartTooltipContent
 } from '@/components/ui/chart'
 import { formatCurrency } from '@/helpers/formatters'
-import { Bar, BarChart, CartesianGrid, Legend, XAxis, YAxis } from 'recharts'
 
 const chartConfig = {
   thisMonth: {
@@ -25,9 +26,7 @@ interface DashboardSalesChartProps {
 }
 
 function getFinancial(metrics: DashboardMetrics) {
-  return metrics.sales_total_field === 'total'
-    ? metrics.total
-    : metrics.sub_total
+  return metrics.sales_total_field === 'total' ? metrics.total : metrics.sub_total
 }
 
 export function DashboardSalesChart({ metrics }: DashboardSalesChartProps) {
@@ -42,16 +41,30 @@ export function DashboardSalesChart({ metrics }: DashboardSalesChartProps) {
   ]
 
   return (
-    <ChartContainer config={chartConfig} className='h-[280px] w-full'>
-      <BarChart data={data} margin={{ top: 8, right: 8, bottom: 8, left: 8 }}>
-        <CartesianGrid strokeDasharray='3 3' vertical={false} className='stroke-border/50' />
+    <ChartContainer
+      config={chartConfig}
+      className='h-[280px] w-full'
+    >
+      <BarChart
+        data={data}
+        margin={{ top: 8, right: 8, bottom: 8, left: 8 }}
+      >
+        <CartesianGrid
+          strokeDasharray='3 3'
+          vertical={false}
+          className='stroke-border/50'
+        />
         <XAxis
           dataKey='name'
           tickLine={false}
           axisLine={false}
           tickMargin={8}
         />
-        <YAxis tickLine={false} axisLine={false} tickMargin={8} />
+        <YAxis
+          tickLine={false}
+          axisLine={false}
+          tickMargin={8}
+        />
         <ChartTooltip
           content={
             <ChartTooltipContent

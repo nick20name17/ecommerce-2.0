@@ -125,15 +125,18 @@ function ProjectsPage() {
     <div className='flex h-full flex-col gap-5'>
       <header className='flex items-start justify-between'>
         <div className='flex items-center gap-3'>
-          <div className='flex size-10 items-center justify-center rounded-lg bg-primary/10 text-primary'>
+          <div className='bg-primary/10 text-primary flex size-10 items-center justify-center rounded-lg'>
             <FolderKanban className='size-5' />
           </div>
           <div>
             <h1 className='text-2xl font-semibold tracking-tight'>Projects</h1>
-            <p className='text-sm text-muted-foreground'>{data?.count ?? 0} total</p>
+            <p className='text-muted-foreground text-sm'>{data?.count ?? 0} total</p>
           </div>
         </div>
-        <Button onClick={() => setModalProject('create')} className='gap-2'>
+        <Button
+          onClick={() => setModalProject('create')}
+          className='gap-2'
+        >
           <Plus className='size-4' />
           Add Project
         </Button>

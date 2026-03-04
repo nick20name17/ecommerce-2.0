@@ -167,31 +167,31 @@ export const DangerZoneCard = ({ user }: DangerZoneCardProps) => {
 
           <DialogBody>
             <div className='flex flex-col gap-2'>
-            <label
-              htmlFor='delete-confirm'
-              className='text-sm font-medium'
-            >
-              Type{' '}
-              <button
-                type='button'
-                onClick={handleCopy}
-                className='hover:bg-muted inline-flex cursor-pointer items-center gap-1 rounded px-1 font-bold transition-colors'
+              <label
+                htmlFor='delete-confirm'
+                className='text-sm font-medium'
               >
-                {DELETE_CONFIRMATION_TEXT}
-                {copied ? <Check className='size-3' /> : <Copy className='size-3' />}
-              </button>{' '}
-              to confirm
-            </label>
-            <Input
-              id='delete-confirm'
-              placeholder={DELETE_CONFIRMATION_TEXT}
-              value={deleteConfirmation}
-              onChange={(e) => setDeleteConfirmation(e.target.value)}
-              disabled={deleteMutation.isPending}
-            />
-            {deleteConfirmation && !isDeleteValid ? (
-              <p className='text-destructive text-sm'>Confirmation text does not match</p>
-            ) : null}
+                Type{' '}
+                <button
+                  type='button'
+                  onClick={handleCopy}
+                  className='hover:bg-muted inline-flex cursor-pointer items-center gap-1 rounded px-1 font-bold transition-colors'
+                >
+                  {DELETE_CONFIRMATION_TEXT}
+                  {copied ? <Check className='size-3' /> : <Copy className='size-3' />}
+                </button>{' '}
+                to confirm
+              </label>
+              <Input
+                id='delete-confirm'
+                placeholder={DELETE_CONFIRMATION_TEXT}
+                value={deleteConfirmation}
+                onChange={(e) => setDeleteConfirmation(e.target.value)}
+                disabled={deleteMutation.isPending}
+              />
+              {deleteConfirmation && !isDeleteValid ? (
+                <p className='text-destructive text-sm'>Confirmation text does not match</p>
+              ) : null}
             </div>
           </DialogBody>
 

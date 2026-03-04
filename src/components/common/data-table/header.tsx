@@ -18,7 +18,7 @@ export const DataTableHeader = <TData,>({
   const widthPercent = fitWidth ? `${100 / colCount}%` : undefined
 
   return (
-    <TableHeader className={cn('bg-muted sticky top-0 z-10 border-b border-border')}>
+    <TableHeader className={cn('bg-muted border-border sticky top-0 z-10 border-b')}>
       {table?.getHeaderGroups()?.map((headerGroup) => (
         <TableRow
           className='border-none'
@@ -51,4 +51,3 @@ export const DataTableHeader = <TData,>({
     </TableHeader>
   )
 }
-

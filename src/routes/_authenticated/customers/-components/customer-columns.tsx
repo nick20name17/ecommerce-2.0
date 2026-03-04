@@ -5,13 +5,6 @@ import { MoreHorizontal, Pencil, Trash2, UserPlus } from 'lucide-react'
 
 import type { Customer } from '@/api/customer/schema'
 import type { FieldConfigResponse } from '@/api/field-config/schema'
-import {
-  buildDynamicDataColumns,
-  getColumnLabel,
-  getOrderedDataKeys
-} from '@/helpers/dynamic-columns'
-import type { DynamicCellFormatter } from '@/helpers/dynamic-columns'
-import { formatDate, formatPhone } from '@/helpers/formatters'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
@@ -20,6 +13,13 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
+import {
+  buildDynamicDataColumns,
+  getColumnLabel,
+  getOrderedDataKeys
+} from '@/helpers/dynamic-columns'
+import type { DynamicCellFormatter } from '@/helpers/dynamic-columns'
+import { formatDate, formatPhone } from '@/helpers/formatters'
 
 const CUSTOMER_FORMATTERS: Partial<Record<string, DynamicCellFormatter<Customer>>> = {
   contact_1: (v) =>
@@ -28,15 +28,11 @@ const CUSTOMER_FORMATTERS: Partial<Record<string, DynamicCellFormatter<Customer>
     ) : (
       <span className='text-muted-foreground'>—</span>
     ),
-  last_order_date: (v) => (
-    <span>{formatDate(v as string | null | undefined)}</span>
-  ),
+  last_order_date: (v) => <span>{formatDate(v as string | null | undefined)}</span>,
   inactive: (v) => {
     const inactive = v === true
     return (
-      <Badge variant={inactive ? 'outline' : 'success'}>
-        {inactive ? 'Inactive' : 'Active'}
-      </Badge>
+      <Badge variant={inactive ? 'outline' : 'success'}>{inactive ? 'Inactive' : 'Active'}</Badge>
     )
   }
 }
@@ -61,11 +57,9 @@ export function getCustomerColumns({
   const entity = 'customer'
   const orderedKeys = getOrderedDataKeys(data, entity, fieldConfig)
   const getLabel = (key: string) => getColumnLabel(key, entity, fieldConfig)
-  const dataColumns = buildDynamicDataColumns<Customer>(
-    orderedKeys,
-    getLabel,
-    { formatters: CUSTOMER_FORMATTERS }
-  )
+  const dataColumns = buildDynamicDataColumns<Customer>(orderedKeys, getLabel, {
+    formatters: CUSTOMER_FORMATTERS
+  })
 
   const actionsColumn: ColumnDef<Customer> = {
     id: 'actions',
@@ -80,7 +74,10 @@ export function getCustomerColumns({
         >
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant='ghost' size='icon-sm'>
+              <Button
+                variant='ghost'
+                size='icon-sm'
+              >
                 <MoreHorizontal />
                 <span className='sr-only'>Open menu</span>
               </Button>
@@ -96,7 +93,10 @@ export function getCustomerColumns({
                 <Pencil className='size-4' />
                 Edit
               </DropdownMenuItem>
-              <DropdownMenuItem variant='destructive' onClick={() => onDelete(customer)}>
+              <DropdownMenuItem
+                variant='destructive'
+                onClick={() => onDelete(customer)}
+              >
                 <Trash2 className='size-4' />
                 Delete
               </DropdownMenuItem>

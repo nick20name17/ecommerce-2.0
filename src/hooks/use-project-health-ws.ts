@@ -106,4 +106,3 @@ export function useProjectHealthWebSocket({
 
   return { health, isConnected }
 }
-

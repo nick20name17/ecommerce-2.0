@@ -11,6 +11,5 @@ export const categoryService = {
   getByTreeId: async (treeId: string, params?: { project_id?: number }) => {
     const { data } = await api.get<Category>(`/data/categories/${treeId}/`, { params })
     return data
-  },
+  }
 }
-

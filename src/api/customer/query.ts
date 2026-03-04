@@ -8,17 +8,18 @@ export const CUSTOMER_QUERY_KEYS = {
   lists: () => [...CUSTOMER_QUERY_KEYS.all(), 'list'] as const,
   list: (params: CustomerParams = {}) => [...CUSTOMER_QUERY_KEYS.lists(), params] as const,
   details: () => [...CUSTOMER_QUERY_KEYS.all(), 'detail'] as const,
-  detail: (id: string) => [...CUSTOMER_QUERY_KEYS.details(), id] as const,
+  detail: (id: string) => [...CUSTOMER_QUERY_KEYS.details(), id] as const
 }
 
 export const getCustomersQuery = (params: CustomerParams = {}) =>
   queryOptions({
     queryKey: CUSTOMER_QUERY_KEYS.list(params),
-    queryFn: () => customerService.get(params),
+    queryFn: () => customerService.get(params)
   })
 
 export const getCustomerDetailQuery = (id: string, projectId?: number | null) =>
   queryOptions({
     queryKey: [...CUSTOMER_QUERY_KEYS.detail(id), projectId] as const,
-    queryFn: () => customerService.getById(id, projectId != null ? { project_id: projectId } : undefined),
+    queryFn: () =>
+      customerService.getById(id, projectId != null ? { project_id: projectId } : undefined)
   })

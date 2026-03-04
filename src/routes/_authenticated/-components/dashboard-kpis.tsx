@@ -1,20 +1,7 @@
-import type { DashboardMetrics } from '@/api/dashboard/schema'
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle
-} from '@/components/ui/card'
-import {
-  ArrowDownRight,
-  ArrowUpRight,
-  FileText,
-  Minus,
-  Package,
-  ShoppingCart
-} from 'lucide-react'
+import { ArrowDownRight, ArrowUpRight, FileText, Minus, Package, ShoppingCart } from 'lucide-react'
 
+import type { DashboardMetrics } from '@/api/dashboard/schema'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
 
 // TEMPORARY: used by commented financial KPIs
@@ -158,14 +145,14 @@ export function DashboardKpis({ metrics }: DashboardKpisProps) {
           <Card
             key={config.key}
             className={cn(
-              'min-w-0 overflow-hidden transition-shadow duration-200 hover:shadow-md dark:hover:shadow-none dark:hover:ring-1 dark:hover:ring-border',
+              'dark:hover:ring-border min-w-0 overflow-hidden transition-shadow duration-200 hover:shadow-md dark:hover:shadow-none dark:hover:ring-1',
               config.colSpan
             )}
           >
             <CardHeader className='flex flex-row items-start justify-between gap-3 pb-2'>
               <div className='space-y-1'>
-                <CardTitle className='flex items-center gap-2 text-sm font-medium text-muted-foreground'>
-                  <span className='flex size-8 items-center justify-center rounded-lg bg-primary/10 text-primary'>
+                <CardTitle className='text-muted-foreground flex items-center gap-2 text-sm font-medium'>
+                  <span className='bg-primary/10 text-primary flex size-8 items-center justify-center rounded-lg'>
                     <Icon className='size-4' />
                   </span>
                   {config.title}
@@ -174,7 +161,7 @@ export function DashboardKpis({ metrics }: DashboardKpisProps) {
               </div>
             </CardHeader>
             <CardContent className='min-w-0 pt-0'>
-              <div className='min-w-0 wrap-break-word text-2xl font-semibold tracking-tight tabular-nums'>
+              <div className='min-w-0 text-2xl font-semibold tracking-tight wrap-break-word tabular-nums'>
                 {format(value)}
               </div>
               {trendConfig && (
@@ -187,7 +174,7 @@ export function DashboardKpis({ metrics }: DashboardKpisProps) {
                 </div>
               )}
               {secondary && !trendConfig && (
-                <p className='mt-1.5 text-xs text-muted-foreground'>{secondary}</p>
+                <p className='text-muted-foreground mt-1.5 text-xs'>{secondary}</p>
               )}
             </CardContent>
           </Card>

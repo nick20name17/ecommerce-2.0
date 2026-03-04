@@ -6,10 +6,10 @@ import { getProjectsQuery } from '@/api/project/query'
 import { USER_QUERY_KEYS } from '@/api/user/query'
 import {
   type CreateUserFormValues,
-  getCreateUserSchema,
   type UpdateUserFormValues,
-  getUpdateUserSchema,
-  type User
+  type User,
+  getCreateUserSchema,
+  getUpdateUserSchema
 } from '@/api/user/schema'
 import { userService } from '@/api/user/service'
 import { PasswordInput } from '@/components/common/inputs/password-input'
@@ -245,9 +245,7 @@ function CreateForm({ onOpenChange }: { onOpenChange: (open: boolean) => void })
 
   const handleSubmit = form.handleSubmit((data) => {
     const { project, ...rest } = data
-    const payload = isCurrentUserSuperAdmin
-      ? { ...rest, project: project ?? 0 }
-      : rest
+    const payload = isCurrentUserSuperAdmin ? { ...rest, project: project ?? 0 } : rest
     mutation.mutate(payload)
   })
 
@@ -348,9 +346,7 @@ function EditForm({ user, onOpenChange }: { user: User; onOpenChange: (open: boo
 
   const handleSubmit = form.handleSubmit((data) => {
     const { project, ...rest } = data
-    const payload = isCurrentUserSuperAdmin
-      ? { ...rest, project: project ?? user.project }
-      : rest
+    const payload = isCurrentUserSuperAdmin ? { ...rest, project: project ?? user.project } : rest
     mutation.mutate({ id: user.id, payload })
   })
 
@@ -409,4 +405,3 @@ function EditForm({ user, onOpenChange }: { user: User; onOpenChange: (open: boo
     </FormProvider>
   )
 }
-

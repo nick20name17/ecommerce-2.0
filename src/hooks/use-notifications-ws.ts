@@ -56,10 +56,7 @@ function getInvalidationKeys(entity: string): readonly (readonly unknown[])[] {
     case 'proposal':
       return [PROPOSAL_QUERY_KEYS.lists()]
     default:
-      return [
-        ORDER_QUERY_KEYS.lists(),
-        PROPOSAL_QUERY_KEYS.lists()
-      ]
+      return [ORDER_QUERY_KEYS.lists(), PROPOSAL_QUERY_KEYS.lists()]
   }
 }
 
@@ -68,7 +65,9 @@ function getToastMessage(payload: WSNotificationPayload): string {
   const entityLabel = entity === 'order' ? 'Order' : entity === 'proposal' ? 'Proposal' : entity
   const actionLabel =
     action ||
-    (typeof type === 'string' && type.includes('_') ? type.split('_').slice(1).join('_') : 'updated')
+    (typeof type === 'string' && type.includes('_')
+      ? type.split('_').slice(1).join('_')
+      : 'updated')
   return `${entityLabel} ${autoid} ${actionLabel}`
 }
 
@@ -124,11 +123,19 @@ export function useNotificationsWebSocket({
       }
       if (msg === null || !mountedRef.current) return
 
-      if (typeof msg === 'object' && msg !== null && 'type' in msg && (msg as { type: string }).type === 'pong') return
+      if (
+        typeof msg === 'object' &&
+        msg !== null &&
+        'type' in msg &&
+        (msg as { type: string }).type === 'pong'
+      )
+        return
 
       if (isNotificationPayload(msg)) {
         const payload = msg as WSNotificationPayload
-        const action = payload.action ?? (payload.type?.includes('_') ? payload.type.split('_').slice(1).join('_') : '')
+        const action =
+          payload.action ??
+          (payload.type?.includes('_') ? payload.type.split('_').slice(1).join('_') : '')
         if (action === 'created' && (payload.entity === 'order' || payload.entity === 'proposal')) {
           resolvePendingCreatedAutoid(payload.entity, payload.autoid)
         }

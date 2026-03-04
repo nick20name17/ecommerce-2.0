@@ -9,29 +9,25 @@ export const ORDER_QUERY_KEYS = {
   list: (params: OrderParams = {}) => [...ORDER_QUERY_KEYS.lists(), params] as const,
   details: () => [...ORDER_QUERY_KEYS.all(), 'detail'] as const,
   detail: (id: string) => [...ORDER_QUERY_KEYS.details(), id] as const,
-  attachments: (autoid: string) =>
-    [...ORDER_QUERY_KEYS.all(), 'attachments', autoid] as const,
+  attachments: (autoid: string) => [...ORDER_QUERY_KEYS.all(), 'attachments', autoid] as const
 }
 
 export const getOrdersQuery = (params: OrderParams = {}) =>
   queryOptions({
     queryKey: ORDER_QUERY_KEYS.list(params),
-    queryFn: () => orderService.get(params),
+    queryFn: () => orderService.get(params)
   })
 
 export const getOrderDetailQuery = (id: string) =>
   queryOptions({
     queryKey: ORDER_QUERY_KEYS.detail(id),
     queryFn: () => orderService.getById(id),
-    enabled: !!id,
+    enabled: !!id
   })
 
-export const getOrderAttachmentsQuery = (
-  autoid: string,
-  projectId?: number | null
-) =>
+export const getOrderAttachmentsQuery = (autoid: string, projectId?: number | null) =>
   queryOptions({
     queryKey: ORDER_QUERY_KEYS.attachments(autoid),
     queryFn: () => orderService.getAttachments(autoid, projectId),
-    enabled: !!autoid,
+    enabled: !!autoid
   })

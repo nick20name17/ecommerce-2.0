@@ -6,7 +6,7 @@ import type {
   ProjectHealth,
   ProjectParams,
   ProjectResponse,
-  UpdateProjectPayload,
+  UpdateProjectPayload
 } from './schema'
 
 export const projectService = {
@@ -22,7 +22,7 @@ export const projectService = {
 
   getHealth: async (projectId: number) => {
     const { data } = await api.get<ProjectHealth>('/projects/my-health/', {
-      params: { project_id: projectId },
+      params: { project_id: projectId }
     })
     return data
   },
@@ -40,5 +40,5 @@ export const projectService = {
   delete: async (id: number) => {
     const { data } = await api.delete<Project>(`/projects/${id}/`)
     return data
-  },
+  }
 }

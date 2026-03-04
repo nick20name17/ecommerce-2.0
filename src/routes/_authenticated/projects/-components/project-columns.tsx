@@ -23,7 +23,12 @@ interface ProjectColumnsOptions {
 
 function renderServiceHealthCell(project: ProjectWithHealthLoading, service: ProjectHealthService) {
   if (project._healthLoading) {
-    return <HealthCell status={null} isLoading />
+    return (
+      <HealthCell
+        status={null}
+        isLoading
+      />
+    )
   }
   const { status, responseMs, lastChecked } = getServiceHealthDetails(project, service)
   return (
@@ -35,11 +40,13 @@ function renderServiceHealthCell(project: ProjectWithHealthLoading, service: Pro
   )
 }
 
-function renderStatusOnlyCell(
-  status: 'healthy' | 'unhealthy' | null,
-  isLoading?: boolean
-) {
-  return <HealthCell status={status} isLoading={isLoading} />
+function renderStatusOnlyCell(status: 'healthy' | 'unhealthy' | null, isLoading?: boolean) {
+  return (
+    <HealthCell
+      status={status}
+      isLoading={isLoading}
+    />
+  )
 }
 
 export const getProjectColumns = ({
@@ -170,7 +177,10 @@ export const getProjectColumns = ({
         <div className='flex justify-center'>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant='ghost' size='icon-sm'>
+              <Button
+                variant='ghost'
+                size='icon-sm'
+              >
                 <MoreHorizontal />
                 <span className='sr-only'>Open menu</span>
               </Button>

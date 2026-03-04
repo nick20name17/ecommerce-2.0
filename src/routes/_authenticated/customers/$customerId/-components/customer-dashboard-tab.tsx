@@ -1,8 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { ShoppingCart } from 'lucide-react'
 
-import { DashboardKpis } from '@/routes/_authenticated/-components/dashboard-kpis'
-import { DashboardOrdersChart } from '@/routes/_authenticated/-components/dashboard-orders-chart'
 // TEMPORARY: financial chart hidden
 // import { DashboardSalesChart } from '@/routes/_authenticated/-components/dashboard-sales-chart'
 import { getDashboardQuery } from '@/api/dashboard/query'
@@ -10,13 +8,18 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { getErrorMessage } from '@/helpers/error'
 import { cn } from '@/lib/utils'
+import { DashboardKpis } from '@/routes/_authenticated/-components/dashboard-kpis'
+import { DashboardOrdersChart } from '@/routes/_authenticated/-components/dashboard-orders-chart'
 
 function DashboardTabSkeleton() {
   return (
     <div className='flex flex-col gap-5'>
       <div className='grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3'>
         {Array.from({ length: 3 }).map((_, i) => (
-          <Card key={i} className='min-w-0 overflow-hidden'>
+          <Card
+            key={i}
+            className='min-w-0 overflow-hidden'
+          >
             <CardHeader className='pb-2'>
               <div className='space-y-1'>
                 <div className='flex items-center gap-2'>
@@ -35,7 +38,7 @@ function DashboardTabSkeleton() {
       </div>
       <div className='grid min-w-0 grid-cols-1 gap-5'>
         <Card className='min-w-0 shrink-0 overflow-hidden'>
-          <CardHeader className='border-b border-border/50 bg-muted/20 pb-4'>
+          <CardHeader className='border-border/50 bg-muted/20 border-b pb-4'>
             <div className='flex items-center gap-3'>
               <Skeleton className='size-9 rounded-lg' />
               <Skeleton className='h-4 w-56' />
@@ -68,12 +71,12 @@ export function CustomerDashboardTab({ customerId, projectId }: CustomerDashboar
   if (error) {
     return (
       <div className='flex flex-1 items-center justify-center p-4'>
-        <Card className='max-w-md border-destructive/30 bg-card'>
+        <Card className='border-destructive/30 bg-card max-w-md'>
           <CardHeader>
             <CardTitle className='text-destructive'>Unable to load dashboard</CardTitle>
           </CardHeader>
           <CardContent className='space-y-2'>
-            <p className='text-sm text-muted-foreground'>{getErrorMessage(error)}</p>
+            <p className='text-muted-foreground text-sm'>{getErrorMessage(error)}</p>
           </CardContent>
         </Card>
       </div>
@@ -91,12 +94,12 @@ export function CustomerDashboardTab({ customerId, projectId }: CustomerDashboar
         <Card
           aria-label='Orders this month vs last month'
           className={cn(
-            'min-w-0 shrink-0 overflow-hidden border-border/80 shadow-sm',
-            'dark:bg-card/50 dark:ring-1 dark:ring-border/50'
+            'border-border/80 min-w-0 shrink-0 overflow-hidden shadow-sm',
+            'dark:bg-card/50 dark:ring-border/50 dark:ring-1'
           )}
         >
-          <CardHeader className='flex flex-row items-center gap-3 border-b border-border/50 bg-muted/20 pb-4'>
-            <div className='flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary'>
+          <CardHeader className='border-border/50 bg-muted/20 flex flex-row items-center gap-3 border-b pb-4'>
+            <div className='bg-primary/10 text-primary flex size-9 shrink-0 items-center justify-center rounded-lg'>
               <ShoppingCart className='size-4' />
             </div>
             <CardTitle className='text-base'>Orders — this month vs last month</CardTitle>

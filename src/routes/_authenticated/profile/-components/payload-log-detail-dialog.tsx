@@ -164,4 +164,3 @@ function DetailItem({ label, children }: { label: string; children: React.ReactN
     </div>
   )
 }
-

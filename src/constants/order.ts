@@ -5,7 +5,7 @@ export const ORDER_STATUS = {
   paid: 'P',
   voided: 'V',
   onHold: 'H',
-  adjusted: 'A',
+  adjusted: 'A'
 } as const
 
 export type OrderStatus = (typeof ORDER_STATUS)[keyof typeof ORDER_STATUS]
@@ -17,7 +17,7 @@ export const ORDER_STATUS_LABELS: Record<OrderStatus, string> = {
   [ORDER_STATUS.paid]: 'Paid',
   [ORDER_STATUS.voided]: 'Voided',
   [ORDER_STATUS.onHold]: 'On Hold',
-  [ORDER_STATUS.adjusted]: 'Adjusted',
+  [ORDER_STATUS.adjusted]: 'Adjusted'
 }
 
 export const ORDER_STATUS_CLASS: Record<OrderStatus, string> = {
@@ -33,8 +33,7 @@ export const ORDER_STATUS_CLASS: Record<OrderStatus, string> = {
     'border-red-300 bg-red-500/10 text-red-800 dark:border-red-600 dark:bg-red-500/20 dark:text-red-300',
   [ORDER_STATUS.onHold]:
     'border-slate-300 bg-slate-500/10 text-slate-700 dark:border-slate-600 dark:bg-slate-500/20 dark:text-slate-300',
-  [ORDER_STATUS.adjusted]:
-    'border-border bg-muted text-muted-foreground',
+  [ORDER_STATUS.adjusted]: 'border-border bg-muted text-muted-foreground'
 }
 
 export function getOrderStatusLabel(status: OrderStatus): string {

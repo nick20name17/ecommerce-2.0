@@ -104,4 +104,3 @@ export function ProposalExpandedRow({ row }: { row: Row<Proposal> }) {
     </div>
   )
 }
-

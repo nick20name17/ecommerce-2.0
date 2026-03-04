@@ -10,9 +10,9 @@ export const Route = createFileRoute('/_authenticated/order-desk/')({
 
 function OrderDeskPage() {
   return (
-    <div className='flex h-full flex-col items-center justify-center gap-3 text-muted-foreground'>
+    <div className='text-muted-foreground flex h-full flex-col items-center justify-center gap-3'>
       <ClipboardList className='size-12 opacity-50' />
-      <h1 className='text-2xl font-bold text-foreground'>Order Desk</h1>
+      <h1 className='text-foreground text-2xl font-bold'>Order Desk</h1>
       <p className='text-sm'>Order Desk content will be implemented here.</p>
     </div>
   )

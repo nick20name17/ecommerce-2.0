@@ -4,20 +4,20 @@ import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import { getCoreRowModel, getExpandedRowModel, useReactTable } from '@tanstack/react-table'
 import { useMemo, useState } from 'react'
 
-import {
-  getOrderColumns,
-  type OrderRow
-} from '@/routes/_authenticated/orders/-components/order-columns'
-import { OrderDeleteDialog } from '@/routes/_authenticated/orders/-components/order-delete-dialog'
-import { OrderExpandedRow } from '@/routes/_authenticated/orders/-components/order-expanded-row'
 import { getOrdersQuery } from '@/api/order/query'
 import type { Order, OrderParams } from '@/api/order/schema'
 import { DataTable } from '@/components/common/data-table'
 import { Pagination } from '@/components/common/filters/pagination'
 import { SearchFilter } from '@/components/common/filters/search'
 import { useOrdering } from '@/hooks/use-ordering'
-import { useLimitParam, useOffsetParam, useSearchParam } from '@/hooks/use-query-params'
 import { useProjectId } from '@/hooks/use-project-id'
+import { useLimitParam, useOffsetParam, useSearchParam } from '@/hooks/use-query-params'
+import {
+  type OrderRow,
+  getOrderColumns
+} from '@/routes/_authenticated/orders/-components/order-columns'
+import { OrderDeleteDialog } from '@/routes/_authenticated/orders/-components/order-delete-dialog'
+import { OrderExpandedRow } from '@/routes/_authenticated/orders/-components/order-expanded-row'
 
 interface CustomerOrdersTabProps {
   customerId: string

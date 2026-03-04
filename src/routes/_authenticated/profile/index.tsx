@@ -29,12 +29,12 @@ function ProfilePage() {
     return (
       <div className='flex h-full flex-col gap-5 overflow-y-auto p-1'>
         <header className='flex items-center gap-3'>
-          <div className='flex size-10 items-center justify-center rounded-lg bg-primary/10 text-primary'>
+          <div className='bg-primary/10 text-primary flex size-10 items-center justify-center rounded-lg'>
             <UserCircle className='size-5' />
           </div>
           <div>
             <h1 className='text-2xl font-semibold tracking-tight'>My Profile</h1>
-            <p className='text-sm text-muted-foreground'>Manage your account settings</p>
+            <p className='text-muted-foreground text-sm'>Manage your account settings</p>
           </div>
         </header>
 
@@ -54,12 +54,12 @@ function ProfilePage() {
   return (
     <div className='flex h-full flex-col gap-5 overflow-y-auto p-1'>
       <header className='flex items-center gap-3'>
-        <div className='flex size-10 items-center justify-center rounded-lg bg-primary/10 text-primary'>
+        <div className='bg-primary/10 text-primary flex size-10 items-center justify-center rounded-lg'>
           <UserCircle className='size-5' />
         </div>
         <div>
           <h1 className='text-2xl font-semibold tracking-tight'>My Profile</h1>
-          <p className='text-sm text-muted-foreground'>Manage your account settings</p>
+          <p className='text-muted-foreground text-sm'>Manage your account settings</p>
         </div>
       </header>
 

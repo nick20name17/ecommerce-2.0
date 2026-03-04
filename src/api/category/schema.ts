@@ -37,4 +37,3 @@ export interface CategoryParams {
   parent_id?: string
   project_id?: number
 }
-

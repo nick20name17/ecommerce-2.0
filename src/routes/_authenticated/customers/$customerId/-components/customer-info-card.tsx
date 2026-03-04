@@ -10,15 +10,9 @@ interface CustomerInfoCardProps {
 }
 
 export const CustomerInfoCard = ({ customer }: CustomerInfoCardProps) => {
-  const addressParts = [customer.address1, customer.address2]
-    .filter(Boolean)
-    .join(', ')
-  const cityStateZip = [customer.city, customer.state, customer.zip]
-    .filter(Boolean)
-    .join(', ')
-  const addressBlock = [addressParts, cityStateZip, customer.country]
-    .filter(Boolean)
-    .join(' · ')
+  const addressParts = [customer.address1, customer.address2].filter(Boolean).join(', ')
+  const cityStateZip = [customer.city, customer.state, customer.zip].filter(Boolean).join(', ')
+  const addressBlock = [addressParts, cityStateZip, customer.country].filter(Boolean).join(' · ')
 
   return (
     <Card>

@@ -6,8 +6,8 @@ import type {
   Task,
   TaskAttachment,
   TaskListItem,
-  TaskParams,
   TaskListResponse,
+  TaskParams,
   TaskStatus,
   UpdateTaskPayload,
   UpdateTaskStatusPayload
@@ -64,27 +64,21 @@ export const taskService = {
   },
 
   getAttachments: async (taskId: number) => {
-    const { data } = await api.get<TaskAttachment[]>(
-      `/tasks/${taskId}/attachments/`
-    )
+    const { data } = await api.get<TaskAttachment[]>(`/tasks/${taskId}/attachments/`)
     return data
   },
 
   getAttachment: async (taskId: number, attachmentId: number) => {
-    const { data } = await api.get<TaskAttachment>(
-      `/tasks/${taskId}/attachments/${attachmentId}/`
-    )
+    const { data } = await api.get<TaskAttachment>(`/tasks/${taskId}/attachments/${attachmentId}/`)
     return data
   },
 
   uploadAttachment: async (taskId: number, file: File) => {
     const formData = new FormData()
     formData.append('file', file)
-    const { data } = await api.post<TaskAttachment>(
-      `/tasks/${taskId}/attachments/`,
-      formData,
-      { headers: { 'Content-Type': 'multipart/form-data' } }
-    )
+    const { data } = await api.post<TaskAttachment>(`/tasks/${taskId}/attachments/`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    })
     return data
   },
 

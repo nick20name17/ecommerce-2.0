@@ -6,6 +6,7 @@ import { PROPOSAL_QUERY_KEYS } from '@/api/proposal/query'
 import type { Proposal } from '@/api/proposal/schema'
 import { proposalService } from '@/api/proposal/service'
 import { UserCombobox } from '@/components/common/user-combobox/user-combobox'
+import { Button } from '@/components/ui/button'
 import {
   Dialog,
   DialogBody,
@@ -14,7 +15,6 @@ import {
   DialogHeader,
   DialogTitle
 } from '@/components/ui/dialog'
-import { Button } from '@/components/ui/button'
 
 interface ProposalAssignDialogProps {
   proposal: Proposal | null
@@ -37,18 +37,8 @@ export function ProposalAssignDialog({
   }, [open, proposal, currentUserId])
 
   const assignMutation = useMutation({
-    mutationFn: ({
-      autoid,
-      userId
-    }: {
-      autoid: string
-      userId: number | null
-    }) =>
-      proposalService.assign(
-        autoid,
-        { user_id: userId },
-        projectId ?? undefined
-      ),
+    mutationFn: ({ autoid, userId }: { autoid: string; userId: number | null }) =>
+      proposalService.assign(autoid, { user_id: userId }, projectId ?? undefined),
     meta: {
       successMessage: 'Proposal assigned successfully',
       invalidatesQuery: PROPOSAL_QUERY_KEYS.all()
@@ -83,9 +73,7 @@ export function ProposalAssignDialog({
         <DialogBody className='flex flex-col gap-4'>
           <p className='text-muted-foreground text-sm'>
             Assign a responsible user for proposal{' '}
-            <span className='font-medium text-foreground'>
-              {proposal.quote ?? proposal.autoid}
-            </span>
+            <span className='text-foreground font-medium'>{proposal.quote ?? proposal.autoid}</span>
             .
           </p>
           <UserCombobox

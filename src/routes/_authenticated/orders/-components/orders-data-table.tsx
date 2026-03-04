@@ -4,7 +4,7 @@ import type { SortingState } from '@tanstack/react-table'
 import { getCoreRowModel, getExpandedRowModel, useReactTable } from '@tanstack/react-table'
 import { useMemo } from 'react'
 
-import { getOrderColumns, type OrderRow } from './order-columns'
+import { type OrderRow, getOrderColumns } from './order-columns'
 import { OrderExpandedRow } from './order-expanded-row'
 import type { FieldConfigResponse } from '@/api/field-config/schema'
 import { DataTable } from '@/components/common/data-table'
@@ -45,15 +45,7 @@ export function OrdersDataTable({
         onAssign,
         canAssign
       }),
-    [
-      fieldConfig,
-      data,
-      onDelete,
-      onDeleteLinkedProposal,
-      onAttachments,
-      onAssign,
-      canAssign
-    ]
+    [fieldConfig, data, onDelete, onDeleteLinkedProposal, onAttachments, onAssign, canAssign]
   )
 
   const table = useReactTable({

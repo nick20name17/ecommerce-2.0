@@ -35,8 +35,10 @@ export function CartSummary({ cart, loading, updating }: CartSummaryProps) {
 
   return (
     <div className='space-y-2'>
-      <div className='flex items-center justify-between text-sm text-muted-foreground'>
-        <span>Subtotal ({itemCount} item{itemCount !== 1 ? 's' : ''})</span>
+      <div className='text-muted-foreground flex items-center justify-between text-sm'>
+        <span>
+          Subtotal ({itemCount} item{itemCount !== 1 ? 's' : ''})
+        </span>
         <span className={cn(updating && 'animate-pulse')}>
           {hasDiscount ? formatCurrency(oldTotal) : formatCurrency(total)}
         </span>

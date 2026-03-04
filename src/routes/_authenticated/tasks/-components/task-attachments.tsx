@@ -28,14 +28,9 @@ import {
   TableHeader,
   TableRow
 } from '@/components/ui/table'
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger
-} from '@/components/ui/tooltip'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { formatBytes } from '@/helpers/formatters'
-import { useFileUpload, type FileWithPreview } from '@/hooks/use-file-upload'
+import { type FileWithPreview, useFileUpload } from '@/hooks/use-file-upload'
 import { cn } from '@/lib/utils'
 
 interface TaskAttachmentsProps {
@@ -99,7 +94,10 @@ interface UploadingFile {
 }
 
 export const TaskAttachments = forwardRef<TaskAttachmentsRef, TaskAttachmentsProps>(
-  function TaskAttachments({ taskId, attachments = [], mode = 'immediate', isLoading = false, onPendingFilesChange }, ref) {
+  function TaskAttachments(
+    { taskId, attachments = [], mode = 'immediate', isLoading = false, onPendingFilesChange },
+    ref
+  ) {
     const queryClient = useQueryClient()
     const [uploadingFiles, setUploadingFiles] = useState<UploadingFile[]>([])
     const [recentlyUploaded, setRecentlyUploaded] = useState<TaskAttachment[]>([])
@@ -248,7 +246,8 @@ export const TaskAttachments = forwardRef<TaskAttachmentsRef, TaskAttachmentsPro
     }))
 
     const showPendingFiles = mode === 'deferred' && pendingFiles.length > 0
-    const hasExistingOrUploading = allAttachments.length > 0 || uploadingFiles.length > 0 || isLoading
+    const hasExistingOrUploading =
+      allAttachments.length > 0 || uploadingFiles.length > 0 || isLoading
 
     return (
       <div className='space-y-3'>
@@ -345,7 +344,7 @@ export const TaskAttachments = forwardRef<TaskAttachmentsRef, TaskAttachmentsPro
                           <TooltipProvider>
                             <Tooltip>
                               <TooltipTrigger asChild>
-                                <div className='flex items-center gap-2 min-w-0'>
+                                <div className='flex min-w-0 items-center gap-2'>
                                   <span className='text-muted-foreground/80 shrink-0'>
                                     {getFileIcon(fileType)}
                                   </span>
@@ -441,129 +440,133 @@ export const TaskAttachments = forwardRef<TaskAttachmentsRef, TaskAttachmentsPro
                   </>
                 )}
 
-                {!isLoading && uploadingFiles.map((file) => (
-                  <TableRow
-                    key={file.id}
-                    className='animate-pulse'
-                  >
-                    <TableCell className='py-1.5 ps-3'>
-                      <div className='flex items-center gap-2 min-w-0'>
-                        <span className='text-muted-foreground/80 shrink-0'>
-                          {getFileIcon(file.type)}
-                        </span>
-                        <span className='text-muted-foreground truncate text-sm font-medium'>
-                          {file.name}
-                        </span>
-                        <Badge
-                          variant='secondary'
-                          className='shrink-0 gap-1 text-xs'
-                        >
-                          <LoaderIcon className='size-3 animate-spin' />
-                          Uploading
-                        </Badge>
-                      </div>
-                    </TableCell>
-                    <TableCell className='w-[100px] py-1.5'>
-                      <Skeleton className='h-5 w-14' />
-                    </TableCell>
-                    <TableCell className='w-[100px] py-1.5'>
-                      <Skeleton className='h-4 w-16' />
-                    </TableCell>
-                    <TableCell className='w-[100px] py-1.5'>
-                      <Skeleton className='size-7' />
-                    </TableCell>
-                  </TableRow>
-                ))}
-
-                {!isLoading && allAttachments.map((attachment) => {
-                  const isDeleting = deletingIds.has(attachment.id)
-
-                  return (
+                {!isLoading &&
+                  uploadingFiles.map((file) => (
                     <TableRow
-                      key={attachment.id}
-                      className={cn(isDeleting && 'opacity-50')}
+                      key={file.id}
+                      className='animate-pulse'
                     >
                       <TableCell className='py-1.5 ps-3'>
-                        <TooltipProvider>
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <div className='flex items-center gap-2 min-w-0'>
-                                <span className='text-muted-foreground/80 shrink-0'>
-                                  {getFileIcon(attachment.file_type)}
-                                </span>
-                                <span className='truncate text-sm font-medium'>
-                                  {attachment.file_name}
-                                </span>
-                              </div>
-                            </TooltipTrigger>
-                            <TooltipContent>{attachment.file_name}</TooltipContent>
-                          </Tooltip>
-                        </TooltipProvider>
-                      </TableCell>
-                      <TableCell className='w-[100px] py-1.5'>
-                        {(() => {
-                          const typeInfo = getFileTypeInfo(attachment.file_type)
-                          return (
-                            <Badge className={cn('text-xs', typeInfo.className)}>
-                              {typeInfo.label}
-                            </Badge>
-                          )
-                        })()}
-                      </TableCell>
-                      <TableCell className='text-muted-foreground w-[100px] py-1.5 text-sm'>
-                        {formatBytes(attachment.file_size)}
-                      </TableCell>
-                      <TableCell className='w-[100px] py-1.5'>
-                        <div className='flex items-center gap-1'>
-                          <TooltipProvider>
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <Button
-                                  size='icon'
-                                  variant='ghost'
-                                  className='size-7'
-                                  disabled={isDeleting}
-                                  asChild
-                                >
-                                  <a
-                                    href={attachment.download_url}
-                                    download={attachment.file_name}
-                                    target='_blank'
-                                    rel='noopener noreferrer'
-                                  >
-                                    <DownloadIcon className='size-3.5' />
-                                  </a>
-                                </Button>
-                              </TooltipTrigger>
-                              <TooltipContent>Download</TooltipContent>
-                            </Tooltip>
-                          </TooltipProvider>
-                          <TooltipProvider>
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <Button
-                                  type='button'
-                                  onClick={() => deleteMutation.mutate(attachment.id)}
-                                  variant='ghost'
-                                  size='icon'
-                                  className='size-7'
-                                  disabled={isDeleting}
-                                >
-                                  {isDeleting ? (
-                                    <LoaderIcon className='size-3.5 animate-spin' />
-                                  ) : (
-                                    <Trash2Icon className='size-3.5' />
-                                  )}
-                                </Button>
-                              </TooltipTrigger>
-                              <TooltipContent>{isDeleting ? 'Deleting...' : 'Delete'}</TooltipContent>
-                            </Tooltip>
-                          </TooltipProvider>
+                        <div className='flex min-w-0 items-center gap-2'>
+                          <span className='text-muted-foreground/80 shrink-0'>
+                            {getFileIcon(file.type)}
+                          </span>
+                          <span className='text-muted-foreground truncate text-sm font-medium'>
+                            {file.name}
+                          </span>
+                          <Badge
+                            variant='secondary'
+                            className='shrink-0 gap-1 text-xs'
+                          >
+                            <LoaderIcon className='size-3 animate-spin' />
+                            Uploading
+                          </Badge>
                         </div>
                       </TableCell>
+                      <TableCell className='w-[100px] py-1.5'>
+                        <Skeleton className='h-5 w-14' />
+                      </TableCell>
+                      <TableCell className='w-[100px] py-1.5'>
+                        <Skeleton className='h-4 w-16' />
+                      </TableCell>
+                      <TableCell className='w-[100px] py-1.5'>
+                        <Skeleton className='size-7' />
+                      </TableCell>
                     </TableRow>
-                  )
-                })}
+                  ))}
+
+                {!isLoading &&
+                  allAttachments.map((attachment) => {
+                    const isDeleting = deletingIds.has(attachment.id)
+
+                    return (
+                      <TableRow
+                        key={attachment.id}
+                        className={cn(isDeleting && 'opacity-50')}
+                      >
+                        <TableCell className='py-1.5 ps-3'>
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <div className='flex min-w-0 items-center gap-2'>
+                                  <span className='text-muted-foreground/80 shrink-0'>
+                                    {getFileIcon(attachment.file_type)}
+                                  </span>
+                                  <span className='truncate text-sm font-medium'>
+                                    {attachment.file_name}
+                                  </span>
+                                </div>
+                              </TooltipTrigger>
+                              <TooltipContent>{attachment.file_name}</TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                        </TableCell>
+                        <TableCell className='w-[100px] py-1.5'>
+                          {(() => {
+                            const typeInfo = getFileTypeInfo(attachment.file_type)
+                            return (
+                              <Badge className={cn('text-xs', typeInfo.className)}>
+                                {typeInfo.label}
+                              </Badge>
+                            )
+                          })()}
+                        </TableCell>
+                        <TableCell className='text-muted-foreground w-[100px] py-1.5 text-sm'>
+                          {formatBytes(attachment.file_size)}
+                        </TableCell>
+                        <TableCell className='w-[100px] py-1.5'>
+                          <div className='flex items-center gap-1'>
+                            <TooltipProvider>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Button
+                                    size='icon'
+                                    variant='ghost'
+                                    className='size-7'
+                                    disabled={isDeleting}
+                                    asChild
+                                  >
+                                    <a
+                                      href={attachment.download_url}
+                                      download={attachment.file_name}
+                                      target='_blank'
+                                      rel='noopener noreferrer'
+                                    >
+                                      <DownloadIcon className='size-3.5' />
+                                    </a>
+                                  </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>Download</TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
+                            <TooltipProvider>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Button
+                                    type='button'
+                                    onClick={() => deleteMutation.mutate(attachment.id)}
+                                    variant='ghost'
+                                    size='icon'
+                                    className='size-7'
+                                    disabled={isDeleting}
+                                  >
+                                    {isDeleting ? (
+                                      <LoaderIcon className='size-3.5 animate-spin' />
+                                    ) : (
+                                      <Trash2Icon className='size-3.5' />
+                                    )}
+                                  </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  {isDeleting ? 'Deleting...' : 'Delete'}
+                                </TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    )
+                  })}
               </TableBody>
             </Table>
           </div>

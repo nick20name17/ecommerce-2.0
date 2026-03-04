@@ -1,12 +1,13 @@
+import { Bar, BarChart, CartesianGrid, Legend, XAxis, YAxis } from 'recharts'
+
 import type { DashboardMetrics } from '@/api/dashboard/schema'
 import {
+  type ChartConfig,
   ChartContainer,
   ChartLegendContent,
   ChartTooltip,
-  ChartTooltipContent,
-  type ChartConfig
+  ChartTooltipContent
 } from '@/components/ui/chart'
-import { Bar, BarChart, CartesianGrid, Legend, XAxis, YAxis } from 'recharts'
 
 const chartConfig = {
   thisMonth: {
@@ -33,16 +34,30 @@ export function DashboardOrdersChart({ metrics }: DashboardOrdersChartProps) {
   ]
 
   return (
-    <ChartContainer config={chartConfig} className='h-[280px] w-full'>
-      <BarChart data={data} margin={{ top: 8, right: 8, bottom: 8, left: 8 }}>
-        <CartesianGrid strokeDasharray='3 3' vertical={false} className='stroke-border/50' />
+    <ChartContainer
+      config={chartConfig}
+      className='h-[280px] w-full'
+    >
+      <BarChart
+        data={data}
+        margin={{ top: 8, right: 8, bottom: 8, left: 8 }}
+      >
+        <CartesianGrid
+          strokeDasharray='3 3'
+          vertical={false}
+          className='stroke-border/50'
+        />
         <XAxis
           dataKey='name'
           tickLine={false}
           axisLine={false}
           tickMargin={8}
         />
-        <YAxis tickLine={false} axisLine={false} tickMargin={8} />
+        <YAxis
+          tickLine={false}
+          axisLine={false}
+          tickMargin={8}
+        />
         <ChartTooltip content={<ChartTooltipContent />} />
         <Legend content={<ChartLegendContent />} />
         <Bar

@@ -15,13 +15,13 @@ export const PRODUCT_QUERY_KEYS = {
   details: () => [...PRODUCT_QUERY_KEYS.all(), 'detail'] as const,
   detail: (autoid: string) => [...PRODUCT_QUERY_KEYS.details(), autoid] as const,
   configurations: (autoid: string, params: { customer_id: string; project_id?: number }) =>
-    [...PRODUCT_QUERY_KEYS.detail(autoid), 'configurations', params] as const,
+    [...PRODUCT_QUERY_KEYS.detail(autoid), 'configurations', params] as const
 }
 
 export const getProductsQuery = (params: ProductListParams = {}) =>
   queryOptions({
     queryKey: PRODUCT_QUERY_KEYS.list(params),
-    queryFn: () => productService.get(params),
+    queryFn: () => productService.get(params)
   })
 
 export const getProductConfigurationsQuery = (
@@ -31,7 +31,7 @@ export const getProductConfigurationsQuery = (
   queryOptions({
     queryKey: PRODUCT_QUERY_KEYS.configurations(autoid, params),
     queryFn: () => productService.getConfigurations(autoid, params),
-    enabled: !!autoid && !!params.customer_id,
+    enabled: !!autoid && !!params.customer_id
   })
 
 export const getProductByAutoidQuery = (
@@ -41,5 +41,5 @@ export const getProductByAutoidQuery = (
   queryOptions({
     queryKey: [...PRODUCT_QUERY_KEYS.detail(autoid), params ?? {}] as const,
     queryFn: () => productService.getByAutoid(autoid, params),
-    enabled: !!autoid,
+    enabled: !!autoid
   })

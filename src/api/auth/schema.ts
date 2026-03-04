@@ -1,7 +1,8 @@
 import { z } from 'zod'
 
-import { EmailSchema, PasswordSchema } from '@/api/schema'
 import type { User } from '../user/schema'
+
+import { EmailSchema, PasswordSchema } from '@/api/schema'
 
 export interface Tokens {
   access: string

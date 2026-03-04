@@ -48,18 +48,11 @@ export function getOrderedDataKeys(
     }
   }
   const orderedFromConfig =
-    fieldConfig?.[entity]
-      ?.filter((e) => e.enabled)
-      .map((e) => e.field) ?? []
+    fieldConfig?.[entity]?.filter((e) => e.enabled).map((e) => e.field) ?? []
   const configSet = new Set(orderedFromConfig)
   const ordered =
-    dataRows.length > 0
-      ? orderedFromConfig.filter((k) => fromData.has(k))
-      : orderedFromConfig
-  const rest =
-    dataRows.length > 0
-      ? [...fromData].filter((k) => !configSet.has(k)).sort()
-      : []
+    dataRows.length > 0 ? orderedFromConfig.filter((k) => fromData.has(k)) : orderedFromConfig
+  const rest = dataRows.length > 0 ? [...fromData].filter((k) => !configSet.has(k)).sort() : []
   return [...ordered, ...rest]
 }
 
@@ -73,10 +66,7 @@ export function getColumnLabel(
   return key.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
 }
 
-export type DynamicCellFormatter<T> = (
-  value: unknown,
-  row: T
-) => React.ReactNode
+export type DynamicCellFormatter<T> = (value: unknown, row: T) => React.ReactNode
 
 export interface BuildDynamicDataColumnsOptions<T> {
   formatters?: Partial<Record<string, DynamicCellFormatter<T>>>
@@ -94,7 +84,10 @@ export function buildDynamicDataColumns<T extends Record<string, unknown>>(
     return {
       accessorKey: key,
       header: ({ column }) => (
-        <ColumnHeader column={column} title={getLabel(key)} />
+        <ColumnHeader
+          column={column}
+          title={getLabel(key)}
+        />
       ),
       cell: ({ row }) => {
         const value = row.original[key]
@@ -102,8 +95,7 @@ export function buildDynamicDataColumns<T extends Record<string, unknown>>(
         const pending = row.original._pending as boolean | undefined
         if (pending) return <span className='text-muted-foreground'>—</span>
         const str = formatCellValue(value)
-        if (str === '—')
-          return <span className='text-muted-foreground'>—</span>
+        if (str === '—') return <span className='text-muted-foreground'>—</span>
         return (
           <Tooltip>
             <TooltipTrigger asChild>

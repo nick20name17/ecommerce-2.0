@@ -1,8 +1,3 @@
-import type { TaskPriority } from '@/constants/task'
-import {
-  getTaskPriorityColor,
-  TASK_PRIORITY_LABELS
-} from '@/constants/task'
 import {
   Select,
   SelectContent,
@@ -10,6 +5,8 @@ import {
   SelectTrigger,
   SelectValue
 } from '@/components/ui/select'
+import type { TaskPriority } from '@/constants/task'
+import { TASK_PRIORITY_LABELS, getTaskPriorityColor } from '@/constants/task'
 import { cn } from '@/lib/utils'
 
 const PRIORITY_ENTRIES = Object.entries(TASK_PRIORITY_LABELS) as [TaskPriority, string][]
@@ -43,13 +40,12 @@ export function TaskPrioritySelect({
         <SelectValue placeholder={placeholder} />
       </SelectTrigger>
       <SelectContent>
-        {includeAll && (
-          <SelectItem value='all'>
-            All Priorities
-          </SelectItem>
-        )}
+        {includeAll && <SelectItem value='all'>All Priorities</SelectItem>}
         {PRIORITY_ENTRIES.map(([priorityValue, label]) => (
-          <SelectItem key={priorityValue} value={priorityValue}>
+          <SelectItem
+            key={priorityValue}
+            value={priorityValue}
+          >
             <span className='flex items-center gap-1.5'>
               <span
                 className='size-2 shrink-0 rounded-full'

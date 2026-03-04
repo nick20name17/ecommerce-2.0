@@ -13,12 +13,7 @@ export function Error({ error, reset, className }: ErrorProps) {
   const message = getErrorMessage(error)
 
   return (
-    <div
-      className={cn(
-        'flex min-h-svh flex-col items-center justify-center gap-6 p-6',
-        className
-      )}
-    >
+    <div className={cn('flex min-h-svh flex-col items-center justify-center gap-6 p-6', className)}>
       <div className='bg-destructive/10 flex size-16 items-center justify-center rounded-full'>
         <AlertCircle className='text-destructive size-8' />
       </div>

@@ -1,6 +1,10 @@
 import { useMutation } from '@tanstack/react-query'
 import { Package, X } from 'lucide-react'
 
+import { ProductConfigurations } from './product-configurations'
+import { ProductImageGallery } from './product-image-gallery'
+import { ProductInfoSection } from './product-info-section'
+import { useProductEditSheet } from './use-product-edit-sheet'
 import { CART_QUERY_KEYS } from '@/api/cart/query'
 import type { AddToCartPayload, UpdateCartItemPayload } from '@/api/cart/schema'
 import { cartService } from '@/api/cart/service'
@@ -20,10 +24,6 @@ import { Dialog, DialogContent } from '@/components/ui/dialog'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Spinner } from '@/components/ui/spinner'
 import { formatCurrency } from '@/helpers/formatters'
-import { ProductConfigurations } from './product-configurations'
-import { ProductImageGallery } from './product-image-gallery'
-import { ProductInfoSection } from './product-info-section'
-import { useProductEditSheet } from './use-product-edit-sheet'
 
 interface ProductEditSheetProps {
   open: boolean
@@ -126,7 +126,10 @@ export function ProductEditSheet({
     : product
       ? isCartItem(product)
         ? product.ignore_count
-        : Boolean((product as Product & { ignore_count?: boolean }).ignore_count ?? (product as Product).ignoreCount)
+        : Boolean(
+            (product as Product & { ignore_count?: boolean }).ignore_count ??
+            (product as Product).ignoreCount
+          )
       : false
 
   const hasConfigs = configs.length > 0
@@ -170,15 +173,15 @@ export function ProductEditSheet({
           className='flex h-[92vh] w-[94vw] max-w-[1400px]! flex-col gap-0 overflow-hidden rounded-2xl border-0 p-0 shadow-2xl'
         >
           {/* Header */}
-          <div className='relative shrink-0 border-b bg-muted/30'>
+          <div className='bg-muted/30 relative shrink-0 border-b'>
             <div className='flex items-center justify-between px-6 py-4'>
               <div className='flex items-center gap-3'>
-                <div className='flex size-10 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-sm'>
+                <div className='bg-primary text-primary-foreground flex size-10 items-center justify-center rounded-xl shadow-sm'>
                   <Package className='size-5' />
                 </div>
                 <div>
                   <h2 className='font-semibold'>Configure Product</h2>
-                  <p className='text-xs text-muted-foreground'>
+                  <p className='text-muted-foreground text-xs'>
                     {mode === 'add' ? 'Add to cart' : 'Update configuration'}
                   </p>
                 </div>
@@ -186,7 +189,7 @@ export function ProductEditSheet({
               <Button
                 variant='ghost'
                 size='icon'
-                className='size-8 rounded-full text-muted-foreground hover:bg-muted hover:text-foreground'
+                className='text-muted-foreground hover:bg-muted hover:text-foreground size-8 rounded-full'
                 onClick={handleClose}
               >
                 <X className='size-4' />
@@ -241,16 +244,20 @@ export function ProductEditSheet({
           </ScrollArea>
 
           {/* Footer */}
-          <div className='shrink-0 border-t bg-muted/30'>
+          <div className='bg-muted/30 shrink-0 border-t'>
             <div className='flex items-center justify-between gap-4 px-6 py-4'>
               {/* Price summary */}
               <div className='flex items-center gap-4'>
                 <div>
-                  <p className='text-[10px] font-medium text-muted-foreground uppercase tracking-wider'>Total</p>
-                  <p className='text-xl font-bold tabular-nums'>{formatCurrency(priceDisplay * quantity)}</p>
+                  <p className='text-muted-foreground text-[10px] font-medium tracking-wider uppercase'>
+                    Total
+                  </p>
+                  <p className='text-xl font-bold tabular-nums'>
+                    {formatCurrency(priceDisplay * quantity)}
+                  </p>
                 </div>
                 {quantity > 1 && (
-                  <span className='text-xs text-muted-foreground'>
+                  <span className='text-muted-foreground text-xs'>
                     {formatCurrency(priceDisplay)} × {quantity}
                   </span>
                 )}
@@ -258,7 +265,11 @@ export function ProductEditSheet({
 
               {/* Actions */}
               <div className='flex items-center gap-2'>
-                <Button variant='ghost' size='sm' onClick={handleClose}>
+                <Button
+                  variant='ghost'
+                  size='sm'
+                  onClick={handleClose}
+                >
                   Cancel
                 </Button>
                 <Button

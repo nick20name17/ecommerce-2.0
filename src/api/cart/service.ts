@@ -1,4 +1,5 @@
 import { api } from '..'
+
 import type { Cart } from '../product/schema'
 
 import type {
@@ -20,13 +21,9 @@ export const cartService = {
     return data
   },
 
-  addItem: async (
-    payload: AddToCartPayload,
-    customerId: string,
-    projectId?: number | null
-  ) => {
+  addItem: async (payload: AddToCartPayload, customerId: string, projectId?: number | null) => {
     const { data } = await api.post<Cart>('/cart/', payload, {
-      params: buildParams(customerId, projectId),
+      params: buildParams(customerId, projectId)
     })
     return data
   },
@@ -38,14 +35,14 @@ export const cartService = {
     projectId?: number | null
   ) => {
     const { data } = await api.patch<Cart>(`/cart/${itemId}/`, payload, {
-      params: buildParams(customerId, projectId),
+      params: buildParams(customerId, projectId)
     })
     return data
   },
 
   deleteItem: async (itemId: number, customerId: string, projectId?: number | null) => {
     const { data } = await api.delete<Cart>(`/cart/${itemId}/`, {
-      params: buildParams(customerId, projectId),
+      params: buildParams(customerId, projectId)
     })
     return data
   },
@@ -53,7 +50,7 @@ export const cartService = {
   flush: async (customerId: string, projectId?: number | null) => {
     await api.delete('/cart/', {
       params: buildParams(customerId, projectId),
-      data: { flush: true },
+      data: { flush: true }
     })
   },
 
@@ -62,7 +59,7 @@ export const cartService = {
     projectId?: number | null
   ): Promise<SubmitProposalResponse> => {
     const { data } = await api.post<SubmitProposalResponse>('/cart/proposal/', null, {
-      params: buildParams(customerId, projectId),
+      params: buildParams(customerId, projectId)
     })
     return data
   },
@@ -72,7 +69,7 @@ export const cartService = {
     projectId?: number | null
   ): Promise<SubmitOrderResponse> => {
     const { data } = await api.post<SubmitOrderResponse>('/cart/order/', null, {
-      params: buildParams(customerId, projectId),
+      params: buildParams(customerId, projectId)
     })
     return data
   }

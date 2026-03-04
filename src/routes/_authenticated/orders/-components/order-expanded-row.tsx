@@ -103,4 +103,3 @@ export function OrderExpandedRow({ row }: { row: Row<Order> }) {
     </div>
   )
 }
-

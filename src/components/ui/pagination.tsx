@@ -1,7 +1,3 @@
-import * as React from 'react'
-
-import { Button } from '@/components/ui/button'
-import { cn } from '@/lib/utils'
 import {
   ChevronLeftIcon,
   ChevronRightIcon,
@@ -9,6 +5,10 @@ import {
   ChevronsRightIcon,
   MoreHorizontalIcon
 } from 'lucide-react'
+import * as React from 'react'
+
+import { Button } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
 
 function Pagination({ className, ...props }: React.ComponentProps<'nav'>) {
   return (
@@ -25,14 +25,19 @@ function PaginationContent({ className, ...props }: React.ComponentProps<'ul'>) 
   return (
     <ul
       data-slot='pagination-content'
-      className={cn('gap-0.5 flex items-center', className)}
+      className={cn('flex items-center gap-0.5', className)}
       {...props}
     />
   )
 }
 
 function PaginationItem({ ...props }: React.ComponentProps<'li'>) {
-  return <li data-slot='pagination-item' {...props} />
+  return (
+    <li
+      data-slot='pagination-item'
+      {...props}
+    />
+  )
 }
 
 type PaginationButtonProps = {
@@ -40,12 +45,7 @@ type PaginationButtonProps = {
 } & Pick<React.ComponentProps<typeof Button>, 'size' | 'disabled'> &
   React.ComponentProps<'button'>
 
-function PaginationButton({
-  className,
-  isActive,
-  size = 'icon',
-  ...props
-}: PaginationButtonProps) {
+function PaginationButton({ className, isActive, size = 'icon', ...props }: PaginationButtonProps) {
   return (
     <Button
       variant={isActive ? 'outline' : 'ghost'}
@@ -75,10 +75,7 @@ function PaginationPrevious({
   )
 }
 
-function PaginationNext({
-  className,
-  ...props
-}: React.ComponentProps<typeof PaginationButton>) {
+function PaginationNext({ className, ...props }: React.ComponentProps<typeof PaginationButton>) {
   return (
     <PaginationButton
       aria-label='Go to next page'
@@ -91,10 +88,7 @@ function PaginationNext({
   )
 }
 
-function PaginationFirst({
-  className,
-  ...props
-}: React.ComponentProps<typeof PaginationButton>) {
+function PaginationFirst({ className, ...props }: React.ComponentProps<typeof PaginationButton>) {
   return (
     <PaginationButton
       aria-label='Go to first page'
@@ -107,10 +101,7 @@ function PaginationFirst({
   )
 }
 
-function PaginationLast({
-  className,
-  ...props
-}: React.ComponentProps<typeof PaginationButton>) {
+function PaginationLast({ className, ...props }: React.ComponentProps<typeof PaginationButton>) {
   return (
     <PaginationButton
       aria-label='Go to last page'
@@ -129,7 +120,7 @@ function PaginationEllipsis({ className, ...props }: React.ComponentProps<'span'
       aria-hidden
       data-slot='pagination-ellipsis'
       className={cn(
-        "size-8 [&_svg:not([class*='size-'])]:size-4 flex items-center justify-center",
+        "flex size-8 items-center justify-center [&_svg:not([class*='size-'])]:size-4",
         className
       )}
       {...props}

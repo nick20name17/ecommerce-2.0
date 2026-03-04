@@ -30,11 +30,11 @@ export function ProductCatalogDialog({
   onRemoveItem,
   disabled,
   addingProductAutoid,
-  removingItemId,
+  removingItemId
 }: ProductCatalogDialogProps) {
   const [category, setCategory] = useState<{ treeId: string | null; treeDescr: string }>({
     treeId: null,
-    treeDescr: 'All categories',
+    treeDescr: 'All categories'
   })
 
   useEffect(() => {
@@ -46,22 +46,28 @@ export function ProductCatalogDialog({
   const isDisabled = disabled === true
 
   return (
-    <Dialog open={open} onOpenChange={(v) => (!v ? onOpenChange(false) : onOpenChange(true))}>
+    <Dialog
+      open={open}
+      onOpenChange={(v) => (!v ? onOpenChange(false) : onOpenChange(true))}
+    >
       <DialogContent
         showCloseButton={false}
         className={cn(
           'flex h-[92vh] w-[95vw] max-w-[1600px]! flex-col gap-0 overflow-hidden rounded-2xl border-0 p-0 shadow-2xl'
         )}
       >
-        <div className='relative shrink-0 border-b bg-muted/30'>
+        <div className='bg-muted/30 relative shrink-0 border-b'>
           <div className='flex items-center justify-between gap-4 px-6 py-4'>
             <div className='flex min-w-0 items-center gap-3'>
-              <div className='flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-sm'>
+              <div className='bg-primary text-primary-foreground flex size-10 shrink-0 items-center justify-center rounded-xl shadow-sm'>
                 <Package className='size-5' />
               </div>
               <div className='min-w-0'>
                 <h2 className='truncate font-semibold'>Product catalog</h2>
-                <p className='truncate text-xs text-muted-foreground' title={category.treeDescr}>
+                <p
+                  className='text-muted-foreground truncate text-xs'
+                  title={category.treeDescr}
+                >
                   Filtered by: {category.treeDescr}
                 </p>
               </div>
@@ -71,7 +77,7 @@ export function ProductCatalogDialog({
               type='button'
               variant='ghost'
               size='icon'
-              className='size-8 shrink-0 rounded-full text-muted-foreground hover:bg-muted hover:text-foreground'
+              className='text-muted-foreground hover:bg-muted hover:text-foreground size-8 shrink-0 rounded-full'
               onClick={() => onOpenChange(false)}
             >
               <X className='size-4' />
@@ -85,7 +91,7 @@ export function ProductCatalogDialog({
             customerId ? 'lg:grid-cols-[360px_1fr_280px]' : 'lg:grid-cols-[360px_1fr]'
           )}
         >
-          <div className='min-h-0 border-b lg:border-b-0 lg:border-r'>
+          <div className='min-h-0 border-b lg:border-r lg:border-b-0'>
             <CatalogCategorySidebar
               projectId={projectId}
               value={category.treeId}
@@ -107,8 +113,9 @@ export function ProductCatalogDialog({
               <div className='flex h-full items-center justify-center p-6 text-center'>
                 <div className='max-w-sm'>
                   <p className='text-sm font-semibold'>Select a customer first</p>
-                  <p className='mt-1 text-xs text-muted-foreground'>
-                    Prices and availability depend on the customer. Pick a customer on the Create page to browse products.
+                  <p className='text-muted-foreground mt-1 text-xs'>
+                    Prices and availability depend on the customer. Pick a customer on the Create
+                    page to browse products.
                   </p>
                 </div>
               </div>
@@ -128,12 +135,17 @@ export function ProductCatalogDialog({
           )}
         </div>
 
-        <div className='shrink-0 border-t bg-muted/30 px-6 py-3'>
+        <div className='bg-muted/30 shrink-0 border-t px-6 py-3'>
           <div className='flex items-center justify-between gap-3'>
-            <p className='text-xs text-muted-foreground'>
+            <p className='text-muted-foreground text-xs'>
               Tip: configurable products will open a configuration dialog before adding to cart.
             </p>
-            <Button type='button' variant='outline' size='sm' onClick={() => onOpenChange(false)}>
+            <Button
+              type='button'
+              variant='outline'
+              size='sm'
+              onClick={() => onOpenChange(false)}
+            >
               Close
             </Button>
           </div>
@@ -142,4 +154,3 @@ export function ProductCatalogDialog({
     </Dialog>
   )
 }
-

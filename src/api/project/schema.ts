@@ -1,9 +1,8 @@
 import { z } from 'zod'
 
-import { VALIDATION_MESSAGES } from '@/constants/validation-messages'
-
 import { OptionalStringSchema, RequiredStringSchema } from '@/api/schema'
 import type { ApiResponse, PaginationParams } from '@/api/schema'
+import { VALIDATION_MESSAGES } from '@/constants/validation-messages'
 
 export interface Project {
   id: number
@@ -140,14 +139,14 @@ const sharedFields = {
   parent_category: OptionalStringSchema,
   s3_bucket_name: OptionalStringSchema,
   s3_region: OptionalStringSchema,
-  s3_access_key_id: OptionalStringSchema,
+  s3_access_key_id: OptionalStringSchema
 }
 
 export const CreateProjectSchema = z.object({
   ...sharedFields,
   db_password: RequiredStringSchema,
   api_password: OptionalStringSchema,
-  s3_secret_key: OptionalStringSchema,
+  s3_secret_key: OptionalStringSchema
 })
 
 export type CreateProjectFormValues = z.infer<typeof CreateProjectSchema>

@@ -1,11 +1,11 @@
 import type { TaskStatus } from '@/api/task/schema'
-import type { TaskPriority } from '@/constants/task'
 import { TaskPrioritySelect } from '@/components/common/task-priority-select'
 import { TaskStatusSelect } from '@/components/common/task-status-select'
 import { UserCombobox } from '@/components/common/user-combobox/user-combobox'
 import { Button } from '@/components/ui/button'
 import { DatePicker } from '@/components/ui/date-picker'
 import { Field, FieldLabel } from '@/components/ui/field'
+import type { TaskPriority } from '@/constants/task'
 import { cn } from '@/lib/utils'
 
 interface TaskFiltersPanelProps {
@@ -42,17 +42,10 @@ export function TaskFiltersPanel({
   className
 }: TaskFiltersPanelProps) {
   return (
-    <div
-      className={cn(
-        'rounded-lg border border-border bg-card p-4',
-        className
-      )}
-    >
+    <div className={cn('border-border bg-card rounded-lg border p-4', className)}>
       <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3'>
         <Field className='flex flex-col gap-1.5'>
-          <FieldLabel className='text-xs font-medium text-muted-foreground'>
-            Status
-          </FieldLabel>
+          <FieldLabel className='text-muted-foreground text-xs font-medium'>Status</FieldLabel>
           <TaskStatusSelect
             statuses={statuses}
             value={taskStatusId}
@@ -63,9 +56,7 @@ export function TaskFiltersPanel({
         </Field>
 
         <Field className='flex flex-col gap-1.5'>
-          <FieldLabel className='text-xs font-medium text-muted-foreground'>
-            Priority
-          </FieldLabel>
+          <FieldLabel className='text-muted-foreground text-xs font-medium'>Priority</FieldLabel>
           <TaskPrioritySelect
             value={priority}
             onValueChange={onPriorityChange}
@@ -75,9 +66,7 @@ export function TaskFiltersPanel({
         </Field>
 
         <Field className='flex flex-col gap-1.5'>
-          <FieldLabel className='text-xs font-medium text-muted-foreground'>
-            Responsible
-          </FieldLabel>
+          <FieldLabel className='text-muted-foreground text-xs font-medium'>Responsible</FieldLabel>
           <UserCombobox
             value={responsibleUserId}
             onChange={onResponsibleChange}
@@ -86,7 +75,7 @@ export function TaskFiltersPanel({
         </Field>
 
         <Field className='flex flex-col gap-1.5'>
-          <FieldLabel className='text-xs font-medium text-muted-foreground'>
+          <FieldLabel className='text-muted-foreground text-xs font-medium'>
             Due Date From
           </FieldLabel>
           <DatePicker
@@ -98,9 +87,7 @@ export function TaskFiltersPanel({
         </Field>
 
         <Field className='flex flex-col gap-1.5'>
-          <FieldLabel className='text-xs font-medium text-muted-foreground'>
-            Due Date To
-          </FieldLabel>
+          <FieldLabel className='text-muted-foreground text-xs font-medium'>Due Date To</FieldLabel>
           <DatePicker
             showTime
             value={dueTo}
@@ -112,7 +99,11 @@ export function TaskFiltersPanel({
 
       {hasAnyFilter && (
         <div className='mt-4 flex justify-end'>
-          <Button variant='ghost' size='sm' onClick={onClearFilters}>
+          <Button
+            variant='ghost'
+            size='sm'
+            onClick={onClearFilters}
+          >
             Clear Filters
           </Button>
         </div>

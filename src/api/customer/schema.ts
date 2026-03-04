@@ -60,7 +60,7 @@ export const CustomerSchema = z.object({
   zip: OptionalStringSchema,
   country: OptionalStringSchema,
   in_level: OptionalStringSchema,
-  inactive: z.optional(z.boolean()),
+  inactive: z.optional(z.boolean())
 })
 
 export type CustomerFormValues = z.infer<typeof CustomerSchema>

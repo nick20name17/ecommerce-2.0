@@ -29,4 +29,3 @@ export const getProjectHealthQuery = (id: number) =>
     queryKey: PROJECT_QUERY_KEYS.health(id),
     queryFn: () => projectService.getHealth(id)
   })
-

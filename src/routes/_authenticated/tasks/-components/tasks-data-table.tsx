@@ -31,7 +31,7 @@ export function TasksDataTable({
   onView,
   statuses,
   onStatusChange,
-  fitWidth,
+  fitWidth
 }: TasksDataTableProps) {
   const columns = useMemo(
     () => getTaskColumns({ onEdit, onDelete, statuses, onStatusChange }),
@@ -51,7 +51,7 @@ export function TasksDataTable({
     <DataTable
       table={table}
       isLoading={isLoading}
-      className='flex-1 min-w-0'
+      className='min-w-0 flex-1'
       onRowClick={(row) => onView(row.original)}
       fitWidth={fitWidth}
     />

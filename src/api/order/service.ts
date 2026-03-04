@@ -1,10 +1,7 @@
 import { api } from '..'
 
-import type {
-  EntityAssignRequest,
-  EntityAssignmentResponse,
-  EntityAttachment
-} from '../schema'
+import type { EntityAssignRequest, EntityAssignmentResponse, EntityAttachment } from '../schema'
+
 import type { Order, OrderParams, OrderResponse } from './schema'
 
 function orderParams(projectId?: number | null) {
@@ -29,17 +26,12 @@ export const orderService = {
     await api.delete(`/data/orders/${autoid}/linked-proposal/`)
   },
   getAttachments: async (autoid: string, projectId?: number | null) => {
-    const { data } = await api.get<EntityAttachment[]>(
-      `/data/orders/${autoid}/attachments/`,
-      { params: orderParams(projectId) }
-    )
+    const { data } = await api.get<EntityAttachment[]>(`/data/orders/${autoid}/attachments/`, {
+      params: orderParams(projectId)
+    })
     return data
   },
-  uploadAttachment: async (
-    autoid: string,
-    file: File,
-    projectId?: number | null
-  ) => {
+  uploadAttachment: async (autoid: string, file: File, projectId?: number | null) => {
     const formData = new FormData()
     formData.append('file', file)
     const { data } = await api.post<EntityAttachment>(
@@ -52,21 +44,13 @@ export const orderService = {
     )
     return data
   },
-  deleteAttachment: async (
-    autoid: string,
-    attachmentId: number,
-    projectId?: number | null
-  ) => {
+  deleteAttachment: async (autoid: string, attachmentId: number, projectId?: number | null) => {
     await api.delete(`/data/orders/${autoid}/attachments/${attachmentId}/`, {
       params: orderParams(projectId)
     })
   },
 
-  assign: async (
-    autoid: string,
-    payload: EntityAssignRequest,
-    projectId?: number | null
-  ) => {
+  assign: async (autoid: string, payload: EntityAssignRequest, projectId?: number | null) => {
     const { data } = await api.post<EntityAssignmentResponse>(
       `/data/orders/${autoid}/assign/`,
       payload,

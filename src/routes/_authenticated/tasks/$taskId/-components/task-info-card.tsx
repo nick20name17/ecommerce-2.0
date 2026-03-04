@@ -5,18 +5,19 @@ import { FileText, ShoppingCart, Trash2, User } from 'lucide-react'
 import { useState } from 'react'
 
 import { TaskAttachments } from '../../-components/task-attachments'
-import { dateToLocalDateString, localDateStringToDate } from '@/helpers/date'
-import { UserCombobox } from '@/components/common/user-combobox/user-combobox'
+
 import { TASK_QUERY_KEYS, getTaskStatusesQuery } from '@/api/task/query'
 import type { Task } from '@/api/task/schema'
 import { taskService } from '@/api/task/service'
 import { TaskPrioritySelect } from '@/components/common/task-priority-select'
 import { TaskStatusSelect } from '@/components/common/task-status-select'
+import { UserCombobox } from '@/components/common/user-combobox/user-combobox'
 import { Button } from '@/components/ui/button'
 import { DatePicker } from '@/components/ui/date-picker'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import type { TaskPriority } from '@/constants/task'
+import { dateToLocalDateString, localDateStringToDate } from '@/helpers/date'
 import { useProjectId } from '@/hooks/use-project-id'
 import { cn } from '@/lib/utils'
 
@@ -109,7 +110,7 @@ export const TaskInfoCard = ({ task, onDelete }: TaskInfoCardProps) => {
                 e.currentTarget.blur()
               }
             }}
-            className='border-0 bg-transparent text-xl font-semibold shadow-none focus-visible:ring-0 px-0 py-0.5 placeholder:text-muted-foreground/60'
+            className='placeholder:text-muted-foreground/60 border-0 bg-transparent px-0 py-0.5 text-xl font-semibold shadow-none focus-visible:ring-0'
             placeholder='Task title'
           />
           <Textarea
@@ -123,7 +124,7 @@ export const TaskInfoCard = ({ task, onDelete }: TaskInfoCardProps) => {
               }
             }}
             placeholder='Add description…'
-            className='placeholder:text-muted-foreground/60 min-h-16 resize-none border-0 bg-transparent text-sm leading-relaxed shadow-none focus-visible:ring-0 px-0 py-1'
+            className='placeholder:text-muted-foreground/60 min-h-16 resize-none border-0 bg-transparent px-0 py-1 text-sm leading-relaxed shadow-none focus-visible:ring-0'
             rows={3}
           />
         </div>
@@ -175,13 +176,18 @@ export const TaskInfoCard = ({ task, onDelete }: TaskInfoCardProps) => {
               valueLabel={
                 task.responsible_user_details
                   ? `${task.responsible_user_details.first_name} ${task.responsible_user_details.last_name}`.trim()
-                  : task.responsible_user_name ?? undefined
+                  : (task.responsible_user_name ?? undefined)
               }
             />
           </DetailRow>
           <DetailRow label='Related order'>
             {task.linked_order_autoid ? (
-              <Button variant='ghost' size='sm' className='h-8 justify-start gap-1.5 font-normal' asChild>
+              <Button
+                variant='ghost'
+                size='sm'
+                className='h-8 justify-start gap-1.5 font-normal'
+                asChild
+              >
                 <Link
                   to='/orders'
                   search={{ autoid: task.linked_order_autoid, status: 'all' }}
@@ -210,7 +216,12 @@ export const TaskInfoCard = ({ task, onDelete }: TaskInfoCardProps) => {
           <h2 className='text-muted-foreground mb-3 text-xs font-medium'>Linked to</h2>
           <div className='flex flex-wrap gap-2'>
             {task.linked_order_details && (
-              <Button variant='ghost' size='sm' className='h-7 gap-1.5 font-normal' asChild>
+              <Button
+                variant='ghost'
+                size='sm'
+                className='h-7 gap-1.5 font-normal'
+                asChild
+              >
                 <Link
                   to='/orders'
                   search={{
@@ -224,7 +235,12 @@ export const TaskInfoCard = ({ task, onDelete }: TaskInfoCardProps) => {
               </Button>
             )}
             {task.linked_proposal_details && (
-              <Button variant='ghost' size='sm' className='h-7 gap-1.5 font-normal' asChild>
+              <Button
+                variant='ghost'
+                size='sm'
+                className='h-7 gap-1.5 font-normal'
+                asChild
+              >
                 <Link
                   to='/proposals'
                   search={{ search: task.linked_proposal_details.quote }}
@@ -235,7 +251,12 @@ export const TaskInfoCard = ({ task, onDelete }: TaskInfoCardProps) => {
               </Button>
             )}
             {task.linked_customer_details && (
-              <Button variant='ghost' size='sm' className='h-7 gap-1.5 font-normal' asChild>
+              <Button
+                variant='ghost'
+                size='sm'
+                className='h-7 gap-1.5 font-normal'
+                asChild
+              >
                 <Link
                   to='/customers/$customerId'
                   params={{ customerId: task.linked_customer_details.id }}

@@ -1,5 +1,4 @@
 import {
-  Pagination as PaginationRoot,
   PaginationButton,
   PaginationContent,
   PaginationEllipsis,
@@ -7,7 +6,8 @@ import {
   PaginationItem,
   PaginationLast,
   PaginationNext,
-  PaginationPrevious
+  PaginationPrevious,
+  Pagination as PaginationRoot
 } from '@/components/ui/pagination'
 import {
   Select,
@@ -82,13 +82,19 @@ export const Pagination = ({ totalCount }: PaginationProps) => {
       <div className='flex items-center gap-3'>
         <div className='flex items-center gap-1.5'>
           <span className='text-muted-foreground text-sm'>Rows</span>
-          <Select value={String(limit)} onValueChange={handleLimitChange}>
+          <Select
+            value={String(limit)}
+            onValueChange={handleLimitChange}
+          >
             <SelectTrigger size='sm'>
               <SelectValue />
             </SelectTrigger>
             <SelectContent align='end'>
               {LIMIT_OPTIONS.map((option) => (
-                <SelectItem key={option} value={String(option)}>
+                <SelectItem
+                  key={option}
+                  value={String(option)}
+                >
                   {option}
                 </SelectItem>
               ))}
@@ -99,7 +105,10 @@ export const Pagination = ({ totalCount }: PaginationProps) => {
         <PaginationRoot>
           <PaginationContent>
             <PaginationItem>
-              <PaginationFirst onClick={() => goToPage(1)} disabled={isFirst} />
+              <PaginationFirst
+                onClick={() => goToPage(1)}
+                disabled={isFirst}
+              />
             </PaginationItem>
 
             <PaginationItem>

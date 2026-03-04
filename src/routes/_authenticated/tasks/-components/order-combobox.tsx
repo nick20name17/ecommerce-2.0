@@ -158,4 +158,3 @@ export function OrderCombobox({ value, onChange, projectId }: OrderComboboxProps
     </Popover>
   )
 }
-

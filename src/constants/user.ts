@@ -25,4 +25,3 @@ export function isSuperAdmin(role: UserRole): boolean {
 export function isAdmin(role: UserRole): boolean {
   return role === USER_ROLES.admin || role === USER_ROLES.superadmin
 }
-

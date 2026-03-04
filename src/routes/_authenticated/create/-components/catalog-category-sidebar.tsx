@@ -29,7 +29,7 @@ export function CatalogCategorySidebar({
   projectId,
   value,
   onChange,
-  className,
+  className
 }: CatalogCategorySidebarProps) {
   const [path, setPath] = useState<Crumb[]>([])
 
@@ -42,9 +42,9 @@ export function CatalogCategorySidebar({
   const { data, isLoading, isFetching } = useQuery({
     ...getCategoriesQuery({
       parent_id: parentId,
-      project_id: projectId ?? undefined,
+      project_id: projectId ?? undefined
     }),
-    placeholderData: keepPreviousData,
+    placeholderData: keepPreviousData
   })
 
   const results = data?.results ?? []
@@ -84,8 +84,11 @@ export function CatalogCategorySidebar({
       <div className='shrink-0 border-b px-4 py-3'>
         <div className='flex items-start justify-between gap-3'>
           <div className='min-w-0'>
-            <p className='text-xs font-medium text-muted-foreground'>Categories</p>
-            <p className='truncate text-sm font-semibold' title={currentLabel}>
+            <p className='text-muted-foreground text-xs font-medium'>Categories</p>
+            <p
+              className='truncate text-sm font-semibold'
+              title={currentLabel}
+            >
               {currentLabel}
             </p>
           </div>
@@ -124,8 +127,11 @@ export function CatalogCategorySidebar({
           </button>
 
           {path.map((crumb, index) => (
-            <div key={crumb.tree_id} className='flex shrink-0 items-center gap-1.5'>
-              <ChevronRight className='size-3 shrink-0 text-muted-foreground' />
+            <div
+              key={crumb.tree_id}
+              className='flex shrink-0 items-center gap-1.5'
+            >
+              <ChevronRight className='text-muted-foreground size-3 shrink-0' />
               <button
                 type='button'
                 className={cn(
@@ -149,16 +155,26 @@ export function CatalogCategorySidebar({
           {loading ? (
             <div className='space-y-2 p-2'>
               {Array.from({ length: 10 }).map((_, i) => (
-                <Skeleton key={`category-skeleton-${i}`} className='h-10 w-full rounded-lg' />
+                <Skeleton
+                  key={`category-skeleton-${i}`}
+                  className='h-10 w-full rounded-lg'
+                />
               ))}
             </div>
           ) : results.length === 0 ? (
             <div className='flex flex-col items-center gap-2 px-4 py-10 text-center'>
-              <FolderOpen className='size-6 text-muted-foreground' />
+              <FolderOpen className='text-muted-foreground size-6' />
               <p className='text-sm font-medium'>No categories</p>
-              <p className='text-xs text-muted-foreground'>This folder doesn’t have subcategories.</p>
+              <p className='text-muted-foreground text-xs'>
+                This folder doesn’t have subcategories.
+              </p>
               {path.length > 0 && (
-                <Button type='button' variant='outline' size='sm' onClick={() => handleGoToCrumb(path.length - 2)}>
+                <Button
+                  type='button'
+                  variant='outline'
+                  size='sm'
+                  onClick={() => handleGoToCrumb(path.length - 2)}
+                >
                   Go back
                 </Button>
               )}
@@ -166,60 +182,69 @@ export function CatalogCategorySidebar({
           ) : (
             <div className='space-y-1'>
               {results.map((category) => {
-                  const isActive = value === category.tree_id
-                  const hasChildren = category.subcategory_count > 0
-                  return (
-                    <button
-                      key={category.tree_id}
-                      type='button'
-                      className={cn(
-                        'group flex w-full items-center gap-3 rounded-xl border px-3 py-2 text-left transition-colors',
-                        isActive
-                          ? 'border-primary/30 bg-primary/5'
-                          : 'border-transparent hover:border-border hover:bg-muted/40',
-                        !category.show_web && 'opacity-75'
+                const isActive = value === category.tree_id
+                const hasChildren = category.subcategory_count > 0
+                return (
+                  <button
+                    key={category.tree_id}
+                    type='button'
+                    className={cn(
+                      'group flex w-full items-center gap-3 rounded-xl border px-3 py-2 text-left transition-colors',
+                      isActive
+                        ? 'border-primary/30 bg-primary/5'
+                        : 'hover:border-border hover:bg-muted/40 border-transparent',
+                      !category.show_web && 'opacity-75'
+                    )}
+                    onClick={() => handleEnterCategory(category)}
+                  >
+                    <div className='bg-muted flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-lg'>
+                      {category.photo ? (
+                        <img
+                          src={category.photo}
+                          alt={category.tree_descr}
+                          className='size-full object-cover'
+                          loading='lazy'
+                        />
+                      ) : (
+                        <ImageOff className='text-muted-foreground size-4' />
                       )}
-                      onClick={() => handleEnterCategory(category)}
-                    >
-                      <div className='bg-muted flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-lg'>
-                        {category.photo ? (
-                          <img
-                            src={category.photo}
-                            alt={category.tree_descr}
-                            className='size-full object-cover'
-                            loading='lazy'
-                          />
-                        ) : (
-                          <ImageOff className='size-4 text-muted-foreground' />
-                        )}
-                      </div>
+                    </div>
 
-                      <div className='min-w-0 flex-1'>
-                        <div className='flex items-center justify-between gap-2'>
-                          <div className='min-w-0'>
-                            <p className='truncate text-sm font-medium' title={category.tree_descr}>
-                              {category.tree_descr}
-                            </p>
-                            <p className='text-xs text-muted-foreground'>
-                              {category.product_count} product{category.product_count === 1 ? '' : 's'}
-                              {hasChildren ? ` • ${category.subcategory_count} folder${category.subcategory_count === 1 ? '' : 's'}` : ''}
-                            </p>
-                          </div>
+                    <div className='min-w-0 flex-1'>
+                      <div className='flex items-center justify-between gap-2'>
+                        <div className='min-w-0'>
+                          <p
+                            className='truncate text-sm font-medium'
+                            title={category.tree_descr}
+                          >
+                            {category.tree_descr}
+                          </p>
+                          <p className='text-muted-foreground text-xs'>
+                            {category.product_count} product
+                            {category.product_count === 1 ? '' : 's'}
+                            {hasChildren
+                              ? ` • ${category.subcategory_count} folder${category.subcategory_count === 1 ? '' : 's'}`
+                              : ''}
+                          </p>
+                        </div>
 
-                          <div className='text-muted-foreground flex shrink-0 items-center gap-2'>
-                            {!category.show_web && (
-                              <Badge variant='secondary' className='text-[10px]'>
-                                Hidden
-                              </Badge>
-                            )}
-                            <Folder className='size-4 opacity-70 group-hover:opacity-100' />
-                            <ChevronRight className='size-4 opacity-70 group-hover:opacity-100' />
-                          </div>
+                        <div className='text-muted-foreground flex shrink-0 items-center gap-2'>
+                          {!category.show_web && (
+                            <Badge
+                              variant='secondary'
+                              className='text-[10px]'
+                            >
+                              Hidden
+                            </Badge>
+                          )}
+                          <Folder className='size-4 opacity-70 group-hover:opacity-100' />
+                          <ChevronRight className='size-4 opacity-70 group-hover:opacity-100' />
                         </div>
                       </div>
-                    </button>
-                  )
-                })}
+                    </div>
+                  </button>
+                )
+              })}
             </div>
           )}
         </div>
@@ -227,4 +252,3 @@ export function CatalogCategorySidebar({
     </div>
   )
 }
-

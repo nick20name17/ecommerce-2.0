@@ -28,7 +28,12 @@ interface OrderDeleteDialogProps {
   onOpenChange: (open: boolean) => void
 }
 
-export const OrderDeleteDialog = ({ order, projectId, open, onOpenChange }: OrderDeleteDialogProps) => {
+export const OrderDeleteDialog = ({
+  order,
+  projectId,
+  open,
+  onOpenChange
+}: OrderDeleteDialogProps) => {
   const [confirmText, setConfirmText] = useState('')
   const [copied, setCopied] = useState(false)
 
@@ -66,7 +71,10 @@ export const OrderDeleteDialog = ({ order, projectId, open, onOpenChange }: Orde
   }
 
   return (
-    <AlertDialog open={open} onOpenChange={handleOpenChange}>
+    <AlertDialog
+      open={open}
+      onOpenChange={handleOpenChange}
+    >
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogMedia className='bg-destructive/10 text-destructive'>
@@ -74,7 +82,8 @@ export const OrderDeleteDialog = ({ order, projectId, open, onOpenChange }: Orde
           </AlertDialogMedia>
           <AlertDialogTitle>Delete Order</AlertDialogTitle>
           <AlertDialogDescription>
-            Are you sure you want to delete order {(order?.invoice ?? '').trim() || '—'}? This action cannot be undone.
+            Are you sure you want to delete order {(order?.invoice ?? '').trim() || '—'}? This
+            action cannot be undone.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <div className='space-y-2'>

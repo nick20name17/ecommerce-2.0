@@ -1,11 +1,7 @@
 'use no memo'
 
 import type { SortingState } from '@tanstack/react-table'
-import {
-  getCoreRowModel,
-  getSortedRowModel,
-  useReactTable
-} from '@tanstack/react-table'
+import { getCoreRowModel, getSortedRowModel, useReactTable } from '@tanstack/react-table'
 import { useMemo, useState } from 'react'
 
 import { getFieldColumns } from './field-columns'
@@ -44,5 +40,11 @@ export function FieldsDataTable({
     state: { sorting }
   })
 
-  return <DataTable table={table} isLoading={isLoading} className='h-full' />
+  return (
+    <DataTable
+      table={table}
+      isLoading={isLoading}
+      className='h-full'
+    />
+  )
 }

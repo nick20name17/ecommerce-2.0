@@ -4,7 +4,7 @@ import type { SortingState } from '@tanstack/react-table'
 import { getCoreRowModel, getExpandedRowModel, useReactTable } from '@tanstack/react-table'
 import { useMemo } from 'react'
 
-import { getProposalColumns, type ProposalRow } from './proposal-columns'
+import { type ProposalRow, getProposalColumns } from './proposal-columns'
 import { ProposalExpandedRow } from './proposal-expanded-row'
 import type { FieldConfigResponse } from '@/api/field-config/schema'
 import { DataTable } from '@/components/common/data-table'
@@ -48,16 +48,7 @@ export function ProposalsDataTable({
         onAssign,
         canAssign
       }),
-    [
-      fieldConfig,
-      data,
-      isSuperAdmin,
-      projectId,
-      onDelete,
-      onAttachments,
-      onAssign,
-      canAssign
-    ]
+    [fieldConfig, data, isSuperAdmin, projectId, onDelete, onAttachments, onAssign, canAssign]
   )
 
   const table = useReactTable({

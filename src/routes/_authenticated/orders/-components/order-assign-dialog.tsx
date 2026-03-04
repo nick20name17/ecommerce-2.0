@@ -6,6 +6,7 @@ import { ORDER_QUERY_KEYS } from '@/api/order/query'
 import type { Order } from '@/api/order/schema'
 import { orderService } from '@/api/order/service'
 import { UserCombobox } from '@/components/common/user-combobox/user-combobox'
+import { Button } from '@/components/ui/button'
 import {
   Dialog,
   DialogBody,
@@ -14,7 +15,6 @@ import {
   DialogHeader,
   DialogTitle
 } from '@/components/ui/dialog'
-import { Button } from '@/components/ui/button'
 
 interface OrderAssignDialogProps {
   order: Order | null
@@ -37,13 +37,7 @@ export function OrderAssignDialog({
   }, [open, order, currentUserId])
 
   const assignMutation = useMutation({
-    mutationFn: ({
-      autoid,
-      userId
-    }: {
-      autoid: string
-      userId: number | null
-    }) =>
+    mutationFn: ({ autoid, userId }: { autoid: string; userId: number | null }) =>
       orderService.assign(autoid, { user_id: userId }, projectId ?? undefined),
     meta: {
       successMessage: 'Order assigned successfully',
@@ -79,7 +73,7 @@ export function OrderAssignDialog({
         <DialogBody className='flex flex-col gap-4'>
           <p className='text-muted-foreground text-sm'>
             Assign a responsible user for order{' '}
-            <span className='font-medium text-foreground'>{order.invoice ?? order.autoid}</span>.
+            <span className='text-foreground font-medium'>{order.invoice ?? order.autoid}</span>.
           </p>
           <UserCombobox
             role='sale'

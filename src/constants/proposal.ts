@@ -5,11 +5,10 @@ export const PROPOSAL_STATUS = {
   cancelled: 'C',
   expired: 'E',
   new: 'N',
-  onHold: 'H',
+  onHold: 'H'
 } as const
 
-export type ProposalStatus =
-  (typeof PROPOSAL_STATUS)[keyof typeof PROPOSAL_STATUS]
+export type ProposalStatus = (typeof PROPOSAL_STATUS)[keyof typeof PROPOSAL_STATUS]
 
 export const PROPOSAL_STATUS_LABELS: Record<ProposalStatus, string> = {
   [PROPOSAL_STATUS.open]: 'Open',
@@ -18,7 +17,7 @@ export const PROPOSAL_STATUS_LABELS: Record<ProposalStatus, string> = {
   [PROPOSAL_STATUS.cancelled]: 'Cancelled',
   [PROPOSAL_STATUS.expired]: 'Expired',
   [PROPOSAL_STATUS.new]: 'New',
-  [PROPOSAL_STATUS.onHold]: 'On Hold',
+  [PROPOSAL_STATUS.onHold]: 'On Hold'
 }
 
 export function getProposalStatusLabel(status: ProposalStatus): string {
@@ -32,9 +31,7 @@ export type ProposalStatusBadgeVariant =
   | 'success'
   | 'outline'
 
-export function getProposalStatusBadgeVariant(
-  status: ProposalStatus
-): ProposalStatusBadgeVariant {
+export function getProposalStatusBadgeVariant(status: ProposalStatus): ProposalStatusBadgeVariant {
   switch (status) {
     case PROPOSAL_STATUS.accepted:
       return 'success'

@@ -1,8 +1,8 @@
 import { HealthCell } from '@/components/common/project-health-cell'
 import { isSuperAdmin } from '@/constants/user'
 import { type ProjectHealthService, getServiceHealthDetails } from '@/helpers/project-health'
-import { useProjectId } from '@/hooks/use-project-id'
 import { useProjectHealthWebSocket } from '@/hooks/use-project-health-ws'
+import { useProjectId } from '@/hooks/use-project-id'
 import { useAuth } from '@/providers/auth'
 
 const HEALTH_SERVICES: { label: string; service: ProjectHealthService }[] = [
@@ -29,7 +29,10 @@ export function HeaderProjectHealth() {
         {HEALTH_SERVICES.map(({ label, service }) => {
           const details = health ? getServiceHealthDetails(health, service) : null
           return (
-            <div key={service} className='flex items-center gap-1.5'>
+            <div
+              key={service}
+              className='flex items-center gap-1.5'
+            >
               <HealthCell
                 status={details?.status ?? null}
                 responseMs={details?.responseMs}
@@ -41,7 +44,10 @@ export function HeaderProjectHealth() {
           )
         })}
         <div className='flex items-center gap-1.5'>
-          <HealthCell status={health?.overall_status ?? null} isLoading={!isConnected} />
+          <HealthCell
+            status={health?.overall_status ?? null}
+            isLoading={!isConnected}
+          />
           <span className='text-muted-foreground text-xs'>Status</span>
         </div>
       </div>

@@ -19,7 +19,12 @@ export type SheetAction =
   | { type: 'SET_CONFIRM_CLOSE'; value: boolean }
   | { type: 'SET_PHOTO_INDEX'; value: number }
   | { type: 'SET_SELECTED_UNIT'; value: string }
-  | { type: 'SET_CONFIGS'; configs: Configuration[]; activeTab: string; initialConfigIds: Set<string | number> }
+  | {
+      type: 'SET_CONFIGS'
+      configs: Configuration[]
+      activeTab: string
+      initialConfigIds: Set<string | number>
+    }
   | { type: 'CLEAR_CONFIGS' }
   | { type: 'SET_ACTIVE_TAB'; value: string }
   | { type: 'UPDATE_CONFIGS'; updater: (prev: Configuration[]) => Configuration[] }
@@ -60,7 +65,12 @@ export function sheetReducer(state: SheetState, action: SheetAction): SheetState
     case 'SET_SELECTED_UNIT':
       return { ...state, selectedUnit: action.value }
     case 'SET_CONFIGS':
-      return { ...state, configs: action.configs, activeTab: action.activeTab, initialConfigIds: action.initialConfigIds }
+      return {
+        ...state,
+        configs: action.configs,
+        activeTab: action.activeTab,
+        initialConfigIds: action.initialConfigIds
+      }
     case 'CLEAR_CONFIGS':
       return { ...state, configs: [], activeTab: '' }
     case 'SET_ACTIVE_TAB':

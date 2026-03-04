@@ -158,4 +158,3 @@ export function ProposalCombobox({ value, onChange, projectId }: ProposalCombobo
     </Popover>
   )
 }
-

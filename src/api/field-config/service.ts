@@ -14,15 +14,10 @@ export const fieldConfigService = {
     return data
   },
 
-  patchFieldConfig: async (
-    projectId: number,
-    payload: FieldConfigPatchPayload
-  ) => {
-    const { data } = await api.patch<FieldConfigPatchResponse>(
-      '/data/field-config/',
-      payload,
-      { params: { project_id: projectId } }
-    )
+  patchFieldConfig: async (projectId: number, payload: FieldConfigPatchPayload) => {
+    const { data } = await api.patch<FieldConfigPatchResponse>('/data/field-config/', payload, {
+      params: { project_id: projectId }
+    })
     return data
   }
 }

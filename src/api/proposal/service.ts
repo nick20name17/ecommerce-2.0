@@ -1,10 +1,7 @@
 import { api } from '..'
 
-import type {
-  EntityAssignRequest,
-  EntityAssignmentResponse,
-  EntityAttachment
-} from '../schema'
+import type { EntityAssignRequest, EntityAssignmentResponse, EntityAttachment } from '../schema'
+
 import type { Proposal, ProposalParams, ProposalResponse } from './schema'
 
 function proposalParams(projectId?: number | null) {
@@ -34,17 +31,12 @@ export const proposalService = {
     return data
   },
   getAttachments: async (autoid: string, projectId?: number | null) => {
-    const { data } = await api.get<EntityAttachment[]>(
-      `/data/proposals/${autoid}/attachments/`,
-      { params: proposalParams(projectId) }
-    )
+    const { data } = await api.get<EntityAttachment[]>(`/data/proposals/${autoid}/attachments/`, {
+      params: proposalParams(projectId)
+    })
     return data
   },
-  uploadAttachment: async (
-    autoid: string,
-    file: File,
-    projectId?: number | null
-  ) => {
+  uploadAttachment: async (autoid: string, file: File, projectId?: number | null) => {
     const formData = new FormData()
     formData.append('file', file)
     const { data } = await api.post<EntityAttachment>(
@@ -57,21 +49,13 @@ export const proposalService = {
     )
     return data
   },
-  deleteAttachment: async (
-    autoid: string,
-    attachmentId: number,
-    projectId?: number | null
-  ) => {
+  deleteAttachment: async (autoid: string, attachmentId: number, projectId?: number | null) => {
     await api.delete(`/data/proposals/${autoid}/attachments/${attachmentId}/`, {
       params: proposalParams(projectId)
     })
   },
 
-  assign: async (
-    autoid: string,
-    payload: EntityAssignRequest,
-    projectId?: number | null
-  ) => {
+  assign: async (autoid: string, payload: EntityAssignRequest, projectId?: number | null) => {
     const { data } = await api.post<EntityAssignmentResponse>(
       `/data/proposals/${autoid}/assign/`,
       payload,

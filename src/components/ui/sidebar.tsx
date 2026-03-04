@@ -77,8 +77,7 @@ function SidebarProvider({
     document.cookie = `${SIDEBAR_COOKIE_NAME}=${openState}; path=/; max-age=${SIDEBAR_COOKIE_MAX_AGE}`
   }
 
-  const toggleSidebar = () =>
-    isMobile ? setOpenMobile((open) => !open) : setOpen((open) => !open)
+  const toggleSidebar = () => (isMobile ? setOpenMobile((open) => !open) : setOpen((open) => !open))
 
   // Adds a keyboard shortcut to toggle the sidebar.
   React.useEffect(() => {

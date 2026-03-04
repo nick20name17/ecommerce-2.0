@@ -2,10 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { useEffect } from 'react'
 import { toast } from 'sonner'
 
-import {
-  getProductByAutoidQuery,
-  getProductConfigurationsQuery,
-} from '@/api/product/query'
+import { getProductByAutoidQuery, getProductConfigurationsQuery } from '@/api/product/query'
 import type { CartItem, ConfigurationProduct, Product } from '@/api/product/schema'
 import { getErrorMessage } from '@/helpers/error'
 
@@ -36,21 +33,21 @@ export function useEditSheetData(
   const configQuery = useQuery({
     ...getProductConfigurationsQuery(autoidForConfig ?? '', {
       customer_id: customerId,
-      project_id: projectIdNum,
+      project_id: projectIdNum
     }),
-    enabled: needConfig,
+    enabled: needConfig
   })
   const productQuery = useQuery({
     ...getProductByAutoidQuery(autoidForConfig ?? '', {
       customer_id: customerId || undefined,
-      project_id: projectIdNum,
+      project_id: projectIdNum
     }),
     enabled:
       editSheetOpen &&
       !!editProduct &&
       isCartItem(editProduct) &&
-      !(editProduct.photos?.length) &&
-      !!customerId,
+      !editProduct.photos?.length &&
+      !!customerId
   })
 
   const configData = ((): ConfigurationProduct | null => {
@@ -68,9 +65,7 @@ export function useEditSheetData(
   })()
 
   const editProductWithPhotos =
-    !editProduct ||
-    !isCartItem(editProduct) ||
-    (editProduct.photos?.length ?? 0) > 0
+    !editProduct || !isCartItem(editProduct) || (editProduct.photos?.length ?? 0) > 0
       ? editProduct
       : (() => {
           const photos = productQuery.data?.photos
@@ -87,6 +82,6 @@ export function useEditSheetData(
   return {
     configData,
     configLoading: configQuery.isLoading,
-    editProductWithPhotos,
+    editProductWithPhotos
   }
 }

@@ -24,7 +24,11 @@ export function HealthCell({
   }
 
   if (status === null) {
-    return <span className='text-muted-foreground flex size-6 items-center justify-center text-sm'>—</span>
+    return (
+      <span className='text-muted-foreground flex size-6 items-center justify-center text-sm'>
+        —
+      </span>
+    )
   }
 
   const isHealthy = status === 'healthy'

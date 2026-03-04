@@ -6,6 +6,7 @@ import { CUSTOMER_QUERY_KEYS } from '@/api/customer/query'
 import type { Customer } from '@/api/customer/schema'
 import { customerService } from '@/api/customer/service'
 import { UserCombobox } from '@/components/common/user-combobox/user-combobox'
+import { Button } from '@/components/ui/button'
 import {
   Dialog,
   DialogBody,
@@ -14,7 +15,6 @@ import {
   DialogHeader,
   DialogTitle
 } from '@/components/ui/dialog'
-import { Button } from '@/components/ui/button'
 
 interface CustomerAssignDialogProps {
   customer: Customer | null
@@ -37,18 +37,8 @@ export function CustomerAssignDialog({
   }, [open, customer, currentUserId])
 
   const assignMutation = useMutation({
-    mutationFn: ({
-      autoid,
-      userId
-    }: {
-      autoid: string
-      userId: number | null
-    }) =>
-      customerService.assign(
-        autoid,
-        { user_id: userId },
-        projectId ?? undefined
-      ),
+    mutationFn: ({ autoid, userId }: { autoid: string; userId: number | null }) =>
+      customerService.assign(autoid, { user_id: userId }, projectId ?? undefined),
     meta: {
       successMessage: 'Customer assigned successfully',
       invalidatesQuery: CUSTOMER_QUERY_KEYS.all()
@@ -83,19 +73,19 @@ export function CustomerAssignDialog({
         <DialogBody className='flex flex-col gap-4'>
           <p className='text-muted-foreground text-sm'>
             Assign a responsible user for{' '}
-            <span className='font-medium text-foreground'>{customer.l_name}</span>.
+            <span className='text-foreground font-medium'>{customer.l_name}</span>.
           </p>
           <UserCombobox
-              role='sale'
-              value={selectedUserId}
-              onChange={setSelectedUserId}
-              placeholder='Select user...'
-              valueLabel={
-                customer.assigned_user
-                  ? `${customer.assigned_user.first_name} ${customer.assigned_user.last_name}`
-                  : null
-              }
-            />
+            role='sale'
+            value={selectedUserId}
+            onChange={setSelectedUserId}
+            placeholder='Select user...'
+            valueLabel={
+              customer.assigned_user
+                ? `${customer.assigned_user.first_name} ${customer.assigned_user.last_name}`
+                : null
+            }
+          />
         </DialogBody>
         <DialogFooter>
           <Button

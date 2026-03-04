@@ -2,11 +2,7 @@ import { Eraser, FileCheck, ShoppingCart } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { Spinner } from '@/components/ui/spinner'
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from '@/components/ui/tooltip'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { cn } from '@/lib/utils'
 
 interface CreatePageActionsProps {
@@ -30,7 +26,7 @@ export function CreatePageActions({
   creatingOrder,
   onClearAll,
   onCreateProposal,
-  onCreateOrder,
+  onCreateOrder
 }: CreatePageActionsProps) {
   const isCreating = creatingProposal || creatingOrder
   const canSubmit = customerSelected && hasItems && !isBusy && !isCreating
@@ -56,14 +52,18 @@ export function CreatePageActions({
             onClick={onClearAll}
             className='text-muted-foreground hover:text-destructive'
           >
-            {clearingCart ? <Spinner className='mr-1.5 size-3.5' /> : <Eraser className='mr-1.5 size-3.5' />}
+            {clearingCart ? (
+              <Spinner className='mr-1.5 size-3.5' />
+            ) : (
+              <Eraser className='mr-1.5 size-3.5' />
+            )}
             Clear cart
           </Button>
         </TooltipTrigger>
         {!hasItems && <TooltipContent>No items to clear</TooltipContent>}
       </Tooltip>
 
-      <div className='h-4 w-px bg-border' />
+      <div className='bg-border h-4 w-px' />
 
       <Tooltip>
         <TooltipTrigger asChild>

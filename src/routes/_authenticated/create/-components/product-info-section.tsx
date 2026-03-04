@@ -19,7 +19,9 @@ interface ProductInfoSectionProps {
   maxCount: number
   selectedUnit: string
   onSelectedUnitChange: (unit: string) => void
-  units: Array<{ autoid: string; unit: string; multiplier: string; price: string; old_price: string }> | undefined
+  units:
+    | Array<{ autoid: string; unit: string; multiplier: string; price: string; old_price: string }>
+    | undefined
   specs: Array<{ descr: string; info: string }>
 }
 
@@ -43,7 +45,7 @@ export function ProductInfoSection({
   return (
     <>
       <div className='flex min-w-0 flex-col gap-5'>
-        <h1 className='text-xl font-bold leading-tight tracking-tight wrap-break-word lg:text-2xl'>
+        <h1 className='text-xl leading-tight font-bold tracking-tight wrap-break-word lg:text-2xl'>
           {displayName}
         </h1>
 
@@ -65,7 +67,7 @@ export function ProductInfoSection({
               </span>
               {hasDiscount && Math.round((1 - priceDisplay / oldPriceDisplay) * 100) > 0 && (
                 <>
-                  <span className='text-base text-muted-foreground line-through'>
+                  <span className='text-muted-foreground text-base line-through'>
                     {formatCurrency(oldPriceDisplay)}
                   </span>
                   <span className='rounded-md bg-green-100 px-2 py-0.5 text-xs font-semibold text-green-700 dark:bg-green-900/40 dark:text-green-400'>
@@ -79,7 +81,7 @@ export function ProductInfoSection({
 
         {!configLoading && (
           <div className='space-y-2'>
-            <span className='text-xs font-medium text-muted-foreground uppercase tracking-wider'>
+            <span className='text-muted-foreground text-xs font-medium tracking-wider uppercase'>
               Quantity
             </span>
             <div className='w-fit'>
@@ -100,7 +102,7 @@ export function ProductInfoSection({
         <>
           {hasMultipleUnits && units && (
             <div className='space-y-2'>
-              <span className='text-xs font-medium text-muted-foreground uppercase tracking-wider'>
+              <span className='text-muted-foreground text-xs font-medium tracking-wider uppercase'>
                 Unit of Measure
               </span>
               <div className='flex flex-wrap gap-2'>
@@ -119,11 +121,21 @@ export function ProductInfoSection({
                       onClick={() => onSelectedUnitChange(u.unit)}
                     >
                       <span className='font-semibold'>{u.unit}</span>
-                      <span className={cn('text-xs', isSelected ? 'opacity-80' : 'text-muted-foreground')}>
+                      <span
+                        className={cn(
+                          'text-xs',
+                          isSelected ? 'opacity-80' : 'text-muted-foreground'
+                        )}
+                      >
                         {formatCurrency(u.price)}
                       </span>
                       {u.multiplier !== '1.0000' && (
-                        <span className={cn('rounded px-1 py-0.5 text-[10px] font-medium', isSelected ? 'bg-white/20' : 'bg-muted')}>
+                        <span
+                          className={cn(
+                            'rounded px-1 py-0.5 text-[10px] font-medium',
+                            isSelected ? 'bg-white/20' : 'bg-muted'
+                          )}
+                        >
                           ×{parseFloat(u.multiplier)}
                         </span>
                       )}
@@ -137,12 +149,15 @@ export function ProductInfoSection({
 
           {specs.length > 0 && (
             <div className='space-y-2'>
-              <span className='text-xs font-medium text-muted-foreground uppercase tracking-wider'>
+              <span className='text-muted-foreground text-xs font-medium tracking-wider uppercase'>
                 Specifications
               </span>
-              <div className='divide-y rounded-lg border bg-muted/20'>
+              <div className='bg-muted/20 divide-y rounded-lg border'>
                 {specs.map((spec) => (
-                  <div key={spec.descr} className='flex gap-3 px-3 py-2.5 text-sm'>
+                  <div
+                    key={spec.descr}
+                    className='flex gap-3 px-3 py-2.5 text-sm'
+                  >
                     <span className='w-2/5 shrink-0 font-medium wrap-break-word'>{spec.descr}</span>
                     <span className='text-muted-foreground wrap-break-word'>{spec.info}</span>
                   </div>

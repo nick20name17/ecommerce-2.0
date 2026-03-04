@@ -1,22 +1,16 @@
 'use no memo'
 
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import type { ColumnDef } from '@tanstack/react-table'
 import { useNavigate } from '@tanstack/react-router'
+import type { ColumnDef } from '@tanstack/react-table'
 import { Loader2, MoreHorizontal, Paperclip, ShoppingCart, Trash2, UserPlus } from 'lucide-react'
 import { toast } from 'sonner'
 
-import type { Proposal } from '@/api/proposal/schema'
-import { PROPOSAL_QUERY_KEYS } from '@/api/proposal/query'
-import { proposalService } from '@/api/proposal/service'
 import type { FieldConfigResponse } from '@/api/field-config/schema'
+import { PROPOSAL_QUERY_KEYS } from '@/api/proposal/query'
+import type { Proposal } from '@/api/proposal/schema'
+import { proposalService } from '@/api/proposal/service'
 import { createExpanderColumn } from '@/components/common/data-table/columns'
-import {
-  buildDynamicDataColumns,
-  getColumnLabel,
-  getOrderedDataKeys
-} from '@/helpers/dynamic-columns'
-import type { DynamicCellFormatter } from '@/helpers/dynamic-columns'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
@@ -26,11 +20,14 @@ import {
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
-import {
-  getProposalStatusBadgeVariant,
-  getProposalStatusLabel
-} from '@/constants/proposal'
+import { getProposalStatusBadgeVariant, getProposalStatusLabel } from '@/constants/proposal'
 import type { ProposalStatus } from '@/constants/proposal'
+import {
+  buildDynamicDataColumns,
+  getColumnLabel,
+  getOrderedDataKeys
+} from '@/helpers/dynamic-columns'
+import type { DynamicCellFormatter } from '@/helpers/dynamic-columns'
 import { formatCurrency, formatDate } from '@/helpers/formatters'
 
 export type ProposalRow = Proposal & { _pending?: true }
@@ -82,9 +79,7 @@ const ToOrderAction = ({
   )
 }
 
-const PROPOSAL_FORMATTERS: Partial<
-  Record<string, DynamicCellFormatter<ProposalRow>>
-> = {
+const PROPOSAL_FORMATTERS: Partial<Record<string, DynamicCellFormatter<ProposalRow>>> = {
   quote: (v, row) => {
     if (row._pending)
       return (
@@ -93,7 +88,7 @@ const PROPOSAL_FORMATTERS: Partial<
           Pending…
         </span>
       )
-    const val = (v ?? row.quote) ?? '—'
+    const val = v ?? row.quote ?? '—'
     return (
       <Tooltip>
         <TooltipTrigger asChild>
@@ -106,7 +101,10 @@ const PROPOSAL_FORMATTERS: Partial<
   status: (v, row) => {
     if (row._pending)
       return (
-        <Badge variant='outline' className='text-muted-foreground font-medium'>
+        <Badge
+          variant='outline'
+          className='text-muted-foreground font-medium'
+        >
           Creating…
         </Badge>
       )
@@ -116,10 +114,8 @@ const PROPOSAL_FORMATTERS: Partial<
       </Badge>
     )
   },
-  qt_date: (v, row) =>
-    row._pending ? '—' : formatDate((v ?? row.qt_date) as string | null),
-  total: (v, row) =>
-    row._pending ? '—' : formatCurrency((v ?? row.total) as string, '—')
+  qt_date: (v, row) => (row._pending ? '—' : formatDate((v ?? row.qt_date) as string | null)),
+  total: (v, row) => (row._pending ? '—' : formatCurrency((v ?? row.total) as string, '—'))
 }
 
 export function getProposalColumns({
@@ -135,11 +131,9 @@ export function getProposalColumns({
   const entity = 'proposal'
   const orderedKeys = getOrderedDataKeys(data, entity, fieldConfig)
   const getLabel = (key: string) => getColumnLabel(key, entity, fieldConfig)
-  const dataColumns = buildDynamicDataColumns<ProposalRow>(
-    orderedKeys,
-    getLabel,
-    { formatters: PROPOSAL_FORMATTERS }
-  )
+  const dataColumns = buildDynamicDataColumns<ProposalRow>(orderedKeys, getLabel, {
+    formatters: PROPOSAL_FORMATTERS
+  })
 
   const actionsColumn: ColumnDef<ProposalRow> = {
     id: 'actions',
@@ -149,7 +143,10 @@ export function getProposalColumns({
         <div className='flex justify-center'>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant='ghost' size='icon-sm'>
+              <Button
+                variant='ghost'
+                size='icon-sm'
+              >
                 <MoreHorizontal />
                 <span className='sr-only'>Open menu</span>
               </Button>
@@ -166,9 +163,15 @@ export function getProposalColumns({
                 Attachments
               </DropdownMenuItem>
               {isSuperAdmin && (
-                <ToOrderAction proposal={row.original} projectId={projectId} />
+                <ToOrderAction
+                  proposal={row.original}
+                  projectId={projectId}
+                />
               )}
-              <DropdownMenuItem variant='destructive' onClick={() => onDelete(row.original)}>
+              <DropdownMenuItem
+                variant='destructive'
+                onClick={() => onDelete(row.original)}
+              >
                 <Trash2 className='size-4' />
                 Delete
               </DropdownMenuItem>

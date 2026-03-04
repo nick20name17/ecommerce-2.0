@@ -8,6 +8,7 @@ import { TaskInfoCard } from './-components/task-info-card'
 import { getTaskDetailQuery } from '@/api/task/query'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
+
 export const Route = createFileRoute('/_authenticated/tasks/$taskId/')({
   component: TaskDetailPage,
   head: () => ({
@@ -30,7 +31,10 @@ function TaskDetailPage() {
     return (
       <div className='flex h-full flex-col gap-4'>
         <p className='text-muted-foreground'>Invalid todo ID.</p>
-        <Button variant='outline' onClick={() => router.history.back()}>
+        <Button
+          variant='outline'
+          onClick={() => router.history.back()}
+        >
           Back to To-Do's
         </Button>
       </div>
@@ -53,7 +57,10 @@ function TaskDetailPage() {
     return (
       <div className='flex h-full flex-col items-center justify-center gap-4'>
         <p className='text-muted-foreground'>Todo not found.</p>
-        <Button variant='outline' onClick={() => router.history.back()}>
+        <Button
+          variant='outline'
+          onClick={() => router.history.back()}
+        >
           Back to To-Do's
         </Button>
       </div>
@@ -62,14 +69,21 @@ function TaskDetailPage() {
 
   return (
     <div className='flex h-full min-h-0 flex-col gap-4'>
-      <div className='flex shrink-0 items-center gap-3 min-w-0'>
-        <Button variant='ghost' size='icon' onClick={() => router.history.back()}>
+      <div className='flex min-w-0 shrink-0 items-center gap-3'>
+        <Button
+          variant='ghost'
+          size='icon'
+          onClick={() => router.history.back()}
+        >
           <ArrowLeft />
         </Button>
       </div>
 
       <div className='min-h-0 flex-1 overflow-y-auto'>
-        <TaskInfoCard task={task} onDelete={() => setDeleteOpen(true)} />
+        <TaskInfoCard
+          task={task}
+          onDelete={() => setDeleteOpen(true)}
+        />
       </div>
 
       <TaskDeleteDialog

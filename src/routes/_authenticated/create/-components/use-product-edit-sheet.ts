@@ -1,6 +1,6 @@
 import { useEffect, useReducer, useRef } from 'react'
 
-import { initialSheetState, sheetReducer, type SheetAction } from './product-edit-sheet-reducer'
+import { type SheetAction, initialSheetState, sheetReducer } from './product-edit-sheet-reducer'
 import type { CartItem, ConfigurationProduct, Product } from '@/api/product/schema'
 import { productService } from '@/api/product/service'
 
@@ -54,7 +54,14 @@ export function useProductEditSheet(
         if (i.active) ids.add(i.id)
       })
     )
-    queueMicrotask(() => dispatch({ type: 'SET_CONFIGS', configs: cloned, activeTab: cloned[0]?.name ?? '', initialConfigIds: ids }))
+    queueMicrotask(() =>
+      dispatch({
+        type: 'SET_CONFIGS',
+        configs: cloned,
+        activeTab: cloned[0]?.name ?? '',
+        initialConfigIds: ids
+      })
+    )
   }, [configData])
 
   useEffect(() => {
@@ -94,7 +101,8 @@ export function useProductEditSheet(
       } catch {
         dispatch({
           type: 'UPDATE_CONFIGS',
-          updater: (prev) => prev.map((c) => (c.name === tabToFetch ? { ...c, photosLoading: false } : c))
+          updater: (prev) =>
+            prev.map((c) => (c.name === tabToFetch ? { ...c, photosLoading: false } : c))
         })
       }
     }
@@ -102,7 +110,8 @@ export function useProductEditSheet(
     queueMicrotask(() => {
       dispatch({
         type: 'UPDATE_CONFIGS',
-        updater: (prev) => prev.map((c) => (c.name === tabToFetch ? { ...c, photosLoading: true } : c))
+        updater: (prev) =>
+          prev.map((c) => (c.name === tabToFetch ? { ...c, photosLoading: true } : c))
       })
       fetchPhotos()
     })

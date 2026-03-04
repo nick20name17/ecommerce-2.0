@@ -43,12 +43,17 @@ function getInitials(
   return (email?.charAt(0) ?? '?').toUpperCase()
 }
 
-const StatusToggle = ({ user, currentUserId }: { user: User; currentUserId: number | undefined }) => {
+const StatusToggle = ({
+  user,
+  currentUserId
+}: {
+  user: User
+  currentUserId: number | undefined
+}) => {
   const isSelf = user.id === currentUserId
 
   const toggleMutation = useMutation({
-    mutationFn: () =>
-      userService.update({ id: user.id, payload: { is_active: !user.is_active } }),
+    mutationFn: () => userService.update({ id: user.id, payload: { is_active: !user.is_active } }),
     meta: {
       successMessage: `User ${user.is_active ? 'deactivated' : 'activated'} successfully`,
       invalidatesQuery: USER_QUERY_KEYS.lists()
@@ -87,15 +92,21 @@ export const getUserColumns = ({
     {
       id: 'user',
       accessorFn: (row) => `${row.first_name} ${row.last_name}`,
-      header: ({ column }) => <ColumnHeader column={column} title='User' />,
+      header: ({ column }) => (
+        <ColumnHeader
+          column={column}
+          title='User'
+        />
+      ),
       cell: ({ row }) => {
         const user = row.original
-        const fullName = [user.first_name, user.last_name].filter(Boolean).join(' ').trim() || user.email || 'User'
+        const fullName =
+          [user.first_name, user.last_name].filter(Boolean).join(' ').trim() || user.email || 'User'
 
         return (
           <div className='flex min-w-0 items-center gap-3'>
             <Avatar className='size-8 shrink-0'>
-              <AvatarFallback className='bg-primary/10 text-xs font-medium text-primary'>
+              <AvatarFallback className='bg-primary/10 text-primary text-xs font-medium'>
                 {getInitials(user.first_name, user.last_name, user.email)}
               </AvatarFallback>
             </Avatar>
@@ -108,7 +119,7 @@ export const getUserColumns = ({
               </Tooltip>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <p className='truncate text-xs text-muted-foreground'>{user.email}</p>
+                  <p className='text-muted-foreground truncate text-xs'>{user.email}</p>
                 </TooltipTrigger>
                 <TooltipContent>{user.email}</TooltipContent>
               </Tooltip>
@@ -120,20 +131,35 @@ export const getUserColumns = ({
     },
     {
       accessorKey: 'role',
-      header: ({ column }) => <ColumnHeader column={column} title='Role' />,
+      header: ({ column }) => (
+        <ColumnHeader
+          column={column}
+          title='Role'
+        />
+      ),
       cell: ({ row }) => <RoleBadge role={row.original.role} />,
       size: 120
     },
     {
       accessorKey: 'is_active',
       header: 'Status',
-      cell: ({ row }) => <StatusToggle user={row.original} currentUserId={currentUserId} />,
+      cell: ({ row }) => (
+        <StatusToggle
+          user={row.original}
+          currentUserId={currentUserId}
+        />
+      ),
       size: 80,
       enableSorting: false
     },
     {
       accessorKey: 'date_joined',
-      header: ({ column }) => <ColumnHeader column={column} title='Joined' />,
+      header: ({ column }) => (
+        <ColumnHeader
+          column={column}
+          title='Joined'
+        />
+      ),
       cell: ({ row }) => (
         <span className='text-muted-foreground'>{formatDate(row.original.date_joined)}</span>
       ),
@@ -148,7 +174,10 @@ export const getUserColumns = ({
           <div className='flex justify-center'>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant='ghost' size='icon-sm'>
+                <Button
+                  variant='ghost'
+                  size='icon-sm'
+                >
                   <MoreHorizontal />
                   <span className='sr-only'>Open menu</span>
                 </Button>
@@ -159,7 +188,10 @@ export const getUserColumns = ({
                   Edit
                 </DropdownMenuItem>
                 {!isSelf(user) && (
-                  <DropdownMenuItem variant='destructive' onClick={() => onDelete(user)}>
+                  <DropdownMenuItem
+                    variant='destructive'
+                    onClick={() => onDelete(user)}
+                  >
                     <Trash2 className='size-4' />
                     Delete
                   </DropdownMenuItem>

@@ -8,9 +8,9 @@ import { CustomerOrdersTab } from './-components/customer-orders-tab'
 import { CustomerTasksTab } from './-components/customer-tasks-tab'
 import { getCustomerDetailQuery } from '@/api/customer/query'
 import { Button } from '@/components/ui/button'
-import { CUSTOMER_TABS } from '@/constants/customer'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { CUSTOMER_TABS } from '@/constants/customer'
 import { useProjectId } from '@/hooks/use-project-id'
 import { useCustomerTabParam } from '@/hooks/use-query-params'
 
@@ -118,4 +118,3 @@ function CustomerDetailPage() {
     </div>
   )
 }
-

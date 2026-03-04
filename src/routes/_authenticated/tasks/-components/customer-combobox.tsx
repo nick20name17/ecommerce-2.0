@@ -48,9 +48,14 @@ export function TaskCustomerCombobox({ value, onChange, projectId }: TaskCustome
 
   const displayCustomer =
     value != null
-      ? (customers.find((x) => x.autoid === value) ?? { autoid: value, l_name: `Customer ${value}` })
+      ? (customers.find((x) => x.autoid === value) ?? {
+          autoid: value,
+          l_name: `Customer ${value}`
+        })
       : null
-  const displayLabel = displayCustomer ? `${displayCustomer.autoid} — ${displayCustomer.l_name}` : null
+  const displayLabel = displayCustomer
+    ? `${displayCustomer.autoid} — ${displayCustomer.l_name}`
+    : null
 
   const handleSearchChange = (q: string) => {
     setSearch(q)
@@ -159,4 +164,3 @@ export function TaskCustomerCombobox({ value, onChange, projectId }: TaskCustome
     </Popover>
   )
 }
-

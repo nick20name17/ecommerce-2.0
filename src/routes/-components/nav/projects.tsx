@@ -61,7 +61,10 @@ export function NavProjects() {
               <FolderKanban className='size-4' />
             </div>
             <div className='grid flex-1 text-left text-sm leading-tight'>
-              <span className='truncate font-medium' title={user?.project_name ?? undefined}>
+              <span
+                className='truncate font-medium'
+                title={user?.project_name ?? undefined}
+              >
                 {user?.project_name ?? 'Project'}
               </span>
               <span className='truncate text-xs'>Dashboard</span>

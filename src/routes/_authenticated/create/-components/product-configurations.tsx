@@ -25,24 +25,24 @@ export function ProductConfigurations({
   totalConfigCount
 }: ProductConfigurationsProps) {
   return (
-    <div className='space-y-4 rounded-xl border bg-muted/20 p-4'>
+    <div className='bg-muted/20 space-y-4 rounded-xl border p-4'>
       <div className='flex items-center justify-between'>
         <div className='flex items-center gap-2'>
-          <Sparkles className='size-4 text-primary' />
+          <Sparkles className='text-primary size-4' />
           <h3 className='text-sm font-semibold'>Configurations</h3>
-          <span className='text-xs text-muted-foreground'>
+          <span className='text-muted-foreground text-xs'>
             ({selectedConfigCount}/{totalConfigCount})
           </span>
         </div>
         {hasUncheckedRequired && (
-          <span className='flex items-center gap-1.5 rounded-md bg-destructive/10 px-2 py-1 text-xs font-medium text-destructive'>
+          <span className='bg-destructive/10 text-destructive flex items-center gap-1.5 rounded-md px-2 py-1 text-xs font-medium'>
             <AlertCircle className='size-3' />
             Required
           </span>
         )}
       </div>
 
-      <div className='flex flex-wrap gap-1 rounded-lg bg-muted p-1'>
+      <div className='bg-muted flex flex-wrap gap-1 rounded-lg p-1'>
         {configs.map((c) => {
           const hasSelected = c.items.some((i) => i.active)
           const isRequired = !c.allownone
@@ -60,7 +60,11 @@ export function ProductConfigurations({
               onClick={() => onActiveTabChange(c.name)}
             >
               {hasSelected && (
-                <span className={cn('flex size-4 items-center justify-center rounded-full bg-primary text-white')}>
+                <span
+                  className={cn(
+                    'bg-primary flex size-4 items-center justify-center rounded-full text-white'
+                  )}
+                >
                   <Check className='size-2.5' />
                 </span>
               )}
@@ -88,21 +92,21 @@ export function ProductConfigurations({
                 className={cn(
                   'group relative flex flex-col overflow-hidden rounded-lg border transition-all',
                   isSelected
-                    ? 'border-primary bg-primary/5 ring-1 ring-primary'
+                    ? 'border-primary bg-primary/5 ring-primary ring-1'
                     : 'border-border hover:border-primary/50'
                 )}
                 onClick={() => onSelectConfigItem(c.name, item.id)}
               >
                 {isSelected && (
-                  <div className='absolute top-1.5 right-1.5 z-10 flex size-5 items-center justify-center rounded-full bg-primary text-white'>
+                  <div className='bg-primary absolute top-1.5 right-1.5 z-10 flex size-5 items-center justify-center rounded-full text-white'>
                     <Check className='size-3' />
                   </div>
                 )}
 
-                <div className='relative aspect-square bg-muted/30'>
+                <div className='bg-muted/30 relative aspect-square'>
                   {c.photosLoading ? (
                     <div className='flex size-full items-center justify-center'>
-                      <Spinner className='size-5 text-muted-foreground' />
+                      <Spinner className='text-muted-foreground size-5' />
                     </div>
                   ) : item.photos?.length ? (
                     <img
@@ -112,16 +116,21 @@ export function ProductConfigurations({
                     />
                   ) : (
                     <div className='flex size-full items-center justify-center'>
-                      <ImageIcon className='size-8 text-muted-foreground/40' />
+                      <ImageIcon className='text-muted-foreground/40 size-8' />
                     </div>
                   )}
                 </div>
 
                 <div className='flex flex-1 flex-col gap-0.5 p-2'>
-                  <span className='line-clamp-2 text-left text-[11px] leading-tight text-muted-foreground wrap-break-word'>
+                  <span className='text-muted-foreground line-clamp-2 text-left text-[11px] leading-tight wrap-break-word'>
                     {item.descr_1}
                   </span>
-                  <span className={cn('mt-auto text-left text-xs font-semibold', isSelected && 'text-primary')}>
+                  <span
+                    className={cn(
+                      'mt-auto text-left text-xs font-semibold',
+                      isSelected && 'text-primary'
+                    )}
+                  >
                     +{formatCurrency(item.price)}
                   </span>
                 </div>

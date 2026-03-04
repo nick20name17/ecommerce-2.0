@@ -1,4 +1,5 @@
 import { api } from '..'
+
 import type { User } from '../user/schema'
 
 import type { ChangePasswordPayload, UpdateProfilePayload } from './schema'

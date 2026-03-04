@@ -13,7 +13,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogMedia,
-  AlertDialogTitle,
+  AlertDialogTitle
 } from '@/components/ui/alert-dialog'
 
 interface CustomerDeleteDialogProps {
@@ -25,17 +25,17 @@ interface CustomerDeleteDialogProps {
 export const CustomerDeleteDialog = ({
   customer,
   open,
-  onOpenChange,
+  onOpenChange
 }: CustomerDeleteDialogProps) => {
   const deleteMutation = useMutation({
     mutationFn: customerService.delete,
     meta: {
       successMessage: 'Customer deleted successfully',
-      invalidatesQuery: CUSTOMER_QUERY_KEYS.lists(),
+      invalidatesQuery: CUSTOMER_QUERY_KEYS.lists()
     },
     onSuccess: () => {
       onOpenChange(false)
-    },
+    }
   })
 
   const handleDelete = () => {
@@ -44,7 +44,10 @@ export const CustomerDeleteDialog = ({
   }
 
   return (
-    <AlertDialog open={open} onOpenChange={onOpenChange}>
+    <AlertDialog
+      open={open}
+      onOpenChange={onOpenChange}
+    >
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogMedia className='bg-destructive/10 text-destructive'>
@@ -52,8 +55,8 @@ export const CustomerDeleteDialog = ({
           </AlertDialogMedia>
           <AlertDialogTitle>Delete Customer</AlertDialogTitle>
           <AlertDialogDescription>
-            Are you sure you want to delete{' '}
-            <span className='font-medium'>{customer?.l_name}</span>? This action cannot be undone.
+            Are you sure you want to delete <span className='font-medium'>{customer?.l_name}</span>?
+            This action cannot be undone.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>

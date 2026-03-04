@@ -51,4 +51,3 @@ export const VALIDATION_LIMITS = {
   nameMaxLength: 100,
   searchMinLength: 2
 } as const
-

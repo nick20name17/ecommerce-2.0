@@ -4,8 +4,7 @@ import { fieldConfigService } from './service'
 
 export const FIELD_CONFIG_QUERY_KEYS = {
   all: () => ['field-config'] as const,
-  fieldConfig: (projectId: number) =>
-    [...FIELD_CONFIG_QUERY_KEYS.all(), projectId] as const
+  fieldConfig: (projectId: number) => [...FIELD_CONFIG_QUERY_KEYS.all(), projectId] as const
 }
 
 export const getFieldConfigQuery = (projectId: number | null) =>

@@ -11,8 +11,7 @@ export const TASK_QUERY_KEYS = {
   detail: (id: number) => [...TASK_QUERY_KEYS.details(), id] as const,
   statuses: (projectId?: number | null) =>
     [...TASK_QUERY_KEYS.all(), 'statuses', projectId] as const,
-  attachments: (taskId: number) =>
-    [...TASK_QUERY_KEYS.all(), 'attachments', taskId] as const,
+  attachments: (taskId: number) => [...TASK_QUERY_KEYS.all(), 'attachments', taskId] as const,
   attachment: (taskId: number, attachmentId: number) =>
     [...TASK_QUERY_KEYS.attachments(taskId), attachmentId] as const
 }

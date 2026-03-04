@@ -5,26 +5,18 @@ import { useNavigate } from '@tanstack/react-router'
 import { Plus } from 'lucide-react'
 import { useMemo, useState } from 'react'
 
-import { TaskDeleteDialog } from '@/routes/_authenticated/tasks/$taskId/-components/task-delete-dialog'
-import { TaskModal } from '@/routes/_authenticated/tasks/-components/task-modal'
-import { TasksDataTable } from '@/routes/_authenticated/tasks/-components/tasks-data-table'
-import {
-  TASK_QUERY_KEYS,
-  getTasksQuery,
-  getTaskStatusesQuery
-} from '@/api/task/query'
+import { TASK_QUERY_KEYS, getTaskStatusesQuery, getTasksQuery } from '@/api/task/query'
 import type { TaskListItem } from '@/api/task/schema'
 import { taskService } from '@/api/task/service'
 import { Pagination } from '@/components/common/filters/pagination'
 import { SearchFilter } from '@/components/common/filters/search'
 import { Button } from '@/components/ui/button'
 import { useOrdering } from '@/hooks/use-ordering'
-import {
-  useLimitParam,
-  useOffsetParam,
-  useSearchParam
-} from '@/hooks/use-query-params'
 import { useProjectId } from '@/hooks/use-project-id'
+import { useLimitParam, useOffsetParam, useSearchParam } from '@/hooks/use-query-params'
+import { TaskDeleteDialog } from '@/routes/_authenticated/tasks/$taskId/-components/task-delete-dialog'
+import { TaskModal } from '@/routes/_authenticated/tasks/-components/task-modal'
+import { TasksDataTable } from '@/routes/_authenticated/tasks/-components/tasks-data-table'
 
 interface CustomerTasksTabProps {
   customerId: string
@@ -78,8 +70,7 @@ export function CustomerTasksTab({ customerId }: CustomerTasksTabProps) {
     navigate({ to: '/tasks/$taskId', params: { taskId: String(task.id) } })
   }
 
-  const editingTask =
-    typeof modalTask === 'object' && modalTask !== null ? modalTask : null
+  const editingTask = typeof modalTask === 'object' && modalTask !== null ? modalTask : null
 
   return (
     <div className='flex h-full min-w-0 flex-col gap-4'>
@@ -87,7 +78,7 @@ export function CustomerTasksTab({ customerId }: CustomerTasksTabProps) {
         <SearchFilter placeholder="Search to-do's..." />
         <Button
           onClick={() => setModalTask('create')}
-          className='h-9 gap-2 shrink-0'
+          className='h-9 shrink-0 gap-2'
         >
           <Plus className='size-4' />
           Add todo

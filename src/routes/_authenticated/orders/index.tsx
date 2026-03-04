@@ -19,7 +19,6 @@ import { ORDER_STATUS } from '@/constants/order'
 import type { OrderStatus } from '@/constants/order'
 import { isAdmin } from '@/constants/user'
 import { useOrdering } from '@/hooks/use-ordering'
-import { useAuth } from '@/providers/auth'
 import { useProjectId } from '@/hooks/use-project-id'
 import {
   useAutoidParam,
@@ -29,6 +28,7 @@ import {
   useOrderStatusParam,
   useSearchParam
 } from '@/hooks/use-query-params'
+import { useAuth } from '@/providers/auth'
 
 export const Route = createFileRoute('/_authenticated/orders/')({
   component: OrdersPage,
@@ -98,9 +98,7 @@ function OrdersPage() {
 
   const results = data?.results ?? []
   const orderInResults =
-    autoidFromUrl != null &&
-    autoidFromUrl !== '' &&
-    results.some((o) => o.autoid === autoidFromUrl)
+    autoidFromUrl != null && autoidFromUrl !== '' && results.some((o) => o.autoid === autoidFromUrl)
 
   const refetchTimersRef = useRef<ReturnType<typeof setTimeout>[]>([])
   useEffect(() => {
@@ -120,8 +118,7 @@ function OrdersPage() {
     }
   }, [autoidFromUrl, orderInResults, refetch])
 
-  const hasPendingAutoid =
-    autoidFromUrl != null && autoidFromUrl !== '' && !orderInResults
+  const hasPendingAutoid = autoidFromUrl != null && autoidFromUrl !== '' && !orderInResults
   const pendingOrderPlaceholder: Order & { _pending?: true } = hasPendingAutoid
     ? {
         autoid: autoidFromUrl,

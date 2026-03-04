@@ -13,7 +13,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogMedia,
-  AlertDialogTitle,
+  AlertDialogTitle
 } from '@/components/ui/alert-dialog'
 
 interface ProjectDeleteDialogProps {
@@ -22,20 +22,16 @@ interface ProjectDeleteDialogProps {
   onOpenChange: (open: boolean) => void
 }
 
-export const ProjectDeleteDialog = ({
-  project,
-  open,
-  onOpenChange,
-}: ProjectDeleteDialogProps) => {
+export const ProjectDeleteDialog = ({ project, open, onOpenChange }: ProjectDeleteDialogProps) => {
   const deleteMutation = useMutation({
     mutationFn: projectService.delete,
     meta: {
       successMessage: 'Project deleted successfully',
-      invalidatesQuery: PROJECT_QUERY_KEYS.lists(),
+      invalidatesQuery: PROJECT_QUERY_KEYS.lists()
     },
     onSuccess: () => {
       onOpenChange(false)
-    },
+    }
   })
 
   const handleDelete = () => {
@@ -44,7 +40,10 @@ export const ProjectDeleteDialog = ({
   }
 
   return (
-    <AlertDialog open={open} onOpenChange={onOpenChange}>
+    <AlertDialog
+      open={open}
+      onOpenChange={onOpenChange}
+    >
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogMedia className='bg-destructive/10 text-destructive'>
@@ -52,8 +51,8 @@ export const ProjectDeleteDialog = ({
           </AlertDialogMedia>
           <AlertDialogTitle>Delete Project</AlertDialogTitle>
           <AlertDialogDescription>
-            Are you sure you want to delete{' '}
-            <span className='font-medium'>{project?.name}</span>? This action cannot be undone.
+            Are you sure you want to delete <span className='font-medium'>{project?.name}</span>?
+            This action cannot be undone.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>

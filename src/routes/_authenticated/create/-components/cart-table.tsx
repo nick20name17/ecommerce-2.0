@@ -30,7 +30,7 @@ export function CartTable({
   updatingQuantityItemId,
   onEdit,
   onRemove,
-  onQuantityChange,
+  onQuantityChange
 }: CartTableProps) {
   if (loading) {
     return (
@@ -137,4 +137,3 @@ export function CartTable({
     </div>
   )
 }
-

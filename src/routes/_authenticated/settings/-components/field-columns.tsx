@@ -15,17 +15,25 @@ export const getFieldColumns = (
   {
     id: 'field_name',
     accessorKey: 'field',
-    header: ({ column }) => <ColumnHeader column={column} title='Field' />,
-    cell: ({ row }) => (
-      <span className='block truncate text-sm'>{row.original.field}</span>
+    header: ({ column }) => (
+      <ColumnHeader
+        column={column}
+        title='Field'
+      />
     ),
+    cell: ({ row }) => <span className='block truncate text-sm'>{row.original.field}</span>,
     size: 280,
     minSize: 200
   },
   {
     id: 'state',
     accessorKey: 'enabled',
-    header: ({ column }) => <ColumnHeader column={column} title='State' />,
+    header: ({ column }) => (
+      <ColumnHeader
+        column={column}
+        title='State'
+      />
+    ),
     cell: ({ row }) => {
       const { field, default: isDefault, enabled } = row.original
 
@@ -34,7 +42,11 @@ export const getFieldColumns = (
           <Tooltip>
             <TooltipTrigger asChild>
               <span className='inline-flex'>
-                <Switch checked disabled aria-label='Default field, always enabled' />
+                <Switch
+                  checked
+                  disabled
+                  aria-label='Default field, always enabled'
+                />
               </span>
             </TooltipTrigger>
             <TooltipContent>Default field, always enabled</TooltipContent>

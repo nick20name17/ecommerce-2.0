@@ -59,17 +59,20 @@ function UsersPage() {
     <div className='flex h-full flex-col gap-5'>
       <header className='flex items-start justify-between'>
         <div className='flex items-center gap-3'>
-          <div className='flex size-10 items-center justify-center rounded-lg bg-primary/10 text-primary'>
+          <div className='bg-primary/10 text-primary flex size-10 items-center justify-center rounded-lg'>
             <Users className='size-5' />
           </div>
           <div>
             <h1 className='text-2xl font-semibold tracking-tight'>Users</h1>
-            <p className='text-sm text-muted-foreground'>
+            <p className='text-muted-foreground text-sm'>
               {data?.count ?? 0} total · {activeCount} active
             </p>
           </div>
         </div>
-        <Button onClick={() => setModalUser('create')} className='gap-2'>
+        <Button
+          onClick={() => setModalUser('create')}
+          className='gap-2'
+        >
           <Plus className='size-4' />
           Add User
         </Button>

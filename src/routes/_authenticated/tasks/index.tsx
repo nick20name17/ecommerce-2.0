@@ -7,20 +7,17 @@ import { TaskDeleteDialog } from './$taskId/-components/task-delete-dialog'
 import { TaskFiltersPanel } from './-components/task-filters-panel'
 import { TaskModal } from './-components/task-modal'
 import { TasksDataTable } from './-components/tasks-data-table'
-import { TASK_QUERY_KEYS, getTasksQuery, getTaskStatusesQuery } from '@/api/task/query'
-import type { TaskListItem, Task } from '@/api/task/schema'
-import type { TaskPriority } from '@/constants/task'
+import { TASK_QUERY_KEYS, getTaskStatusesQuery, getTasksQuery } from '@/api/task/query'
+import type { Task, TaskListItem } from '@/api/task/schema'
 import { taskService } from '@/api/task/service'
 import { Pagination } from '@/components/common/filters/pagination'
 import { SearchFilter } from '@/components/common/filters/search'
 import { Button } from '@/components/ui/button'
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger
-} from '@/components/ui/collapsible'
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
+import type { TaskPriority } from '@/constants/task'
 import { dateToLocalDateString } from '@/helpers/date'
 import { useOrdering } from '@/hooks/use-ordering'
+import { useProjectId } from '@/hooks/use-project-id'
 import {
   useLimitParam,
   useOffsetParam,
@@ -31,7 +28,6 @@ import {
   useTaskResponsibleParam,
   useTaskStatusParam
 } from '@/hooks/use-query-params'
-import { useProjectId } from '@/hooks/use-project-id'
 
 export const Route = createFileRoute('/_authenticated/tasks/')({
   component: TasksPage,
@@ -125,27 +121,36 @@ function TasksPage() {
     <div className='flex h-full flex-col gap-5'>
       <header className='flex items-start justify-between'>
         <div className='flex items-center gap-3'>
-          <div className='flex size-10 items-center justify-center rounded-lg bg-primary/10 text-primary'>
+          <div className='bg-primary/10 text-primary flex size-10 items-center justify-center rounded-lg'>
             <CheckSquare className='size-5' />
           </div>
           <div>
             <h1 className='text-2xl font-semibold tracking-tight'>To-Do's</h1>
-            <p className='text-sm text-muted-foreground'>{data?.count ?? 0} total</p>
+            <p className='text-muted-foreground text-sm'>{data?.count ?? 0} total</p>
           </div>
         </div>
-        <Button onClick={() => setModalTask('create')} className='gap-2'>
+        <Button
+          onClick={() => setModalTask('create')}
+          className='gap-2'
+        >
           <Plus className='size-4' />
           Create Todo
         </Button>
       </header>
 
-      <Collapsible open={filtersOpen} onOpenChange={setFiltersOpen}>
+      <Collapsible
+        open={filtersOpen}
+        onOpenChange={setFiltersOpen}
+      >
         <div className='flex flex-wrap items-center gap-2'>
           <div className='min-w-0 flex-1'>
             <SearchFilter placeholder="Search to-do's..." />
           </div>
           <CollapsibleTrigger asChild>
-            <Button variant='outline' size='default'>
+            <Button
+              variant='outline'
+              size='default'
+            >
               <Filter className='size-4' />
               {filtersOpen ? 'Hide Filters' : 'Show Filters'}
             </Button>

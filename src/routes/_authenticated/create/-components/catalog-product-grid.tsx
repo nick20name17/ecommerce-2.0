@@ -1,7 +1,16 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
-import { useDebouncedCallback } from 'use-debounce'
-import { ChevronLeft, ChevronRight, Image, Loader2, Package, Search, ShoppingCart, X } from 'lucide-react'
+import {
+  ChevronLeft,
+  ChevronRight,
+  Image,
+  Loader2,
+  Package,
+  Search,
+  ShoppingCart,
+  X
+} from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
+import { useDebouncedCallback } from 'use-debounce'
 
 import { getProductsQuery } from '@/api/product/query'
 import type { Product } from '@/api/product/schema'
@@ -27,7 +36,7 @@ const DEFAULT_LIMIT = 24
 function CatalogProductCardImage({
   photo,
   photos,
-  alt,
+  alt
 }: {
   photo: string | undefined
   photos: string[] | undefined
@@ -43,14 +52,14 @@ function CatalogProductCardImage({
 
   if (!current) {
     return (
-      <div className='flex size-20 shrink-0 items-center justify-center rounded-xl bg-muted'>
-        <Image className='size-6 text-muted-foreground' />
+      <div className='bg-muted flex size-20 shrink-0 items-center justify-center rounded-xl'>
+        <Image className='text-muted-foreground size-6' />
       </div>
     )
   }
 
   return (
-    <div className='group/img relative flex size-20 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-muted'>
+    <div className='group/img bg-muted relative flex size-20 shrink-0 items-center justify-center overflow-hidden rounded-xl'>
       <img
         src={current}
         alt={alt}
@@ -61,7 +70,7 @@ function CatalogProductCardImage({
         <>
           <button
             type='button'
-            className='absolute left-0 top-1/2 flex size-5 -translate-y-1/2 items-center justify-center rounded-r bg-background/80 text-muted-foreground opacity-0 transition-opacity hover:opacity-100 group-hover/img:opacity-100'
+            className='bg-background/80 text-muted-foreground absolute top-1/2 left-0 flex size-5 -translate-y-1/2 items-center justify-center rounded-r opacity-0 transition-opacity group-hover/img:opacity-100 hover:opacity-100'
             onClick={(e) => {
               e.stopPropagation()
               setIndex((i) => (i === 0 ? urls.length - 1 : i - 1))
@@ -72,7 +81,7 @@ function CatalogProductCardImage({
           </button>
           <button
             type='button'
-            className='absolute right-0 top-1/2 flex size-5 -translate-y-1/2 items-center justify-center rounded-l bg-background/80 text-muted-foreground opacity-0 transition-opacity hover:opacity-100 group-hover/img:opacity-100'
+            className='bg-background/80 text-muted-foreground absolute top-1/2 right-0 flex size-5 -translate-y-1/2 items-center justify-center rounded-l opacity-0 transition-opacity group-hover/img:opacity-100 hover:opacity-100'
             onClick={(e) => {
               e.stopPropagation()
               setIndex((i) => (i === urls.length - 1 ? 0 : i + 1))
@@ -81,7 +90,7 @@ function CatalogProductCardImage({
           >
             <ChevronRight className='size-2.5' />
           </button>
-          <span className='absolute bottom-0.5 right-0.5 rounded bg-foreground/70 px-1 py-0.5 text-[10px] font-medium text-background'>
+          <span className='bg-foreground/70 text-background absolute right-0.5 bottom-0.5 rounded px-1 py-0.5 text-[10px] font-medium'>
             {index + 1}/{urls.length}
           </span>
         </>
@@ -96,7 +105,7 @@ export function CatalogProductGrid({
   categoryId,
   onSelect,
   addingProductAutoid,
-  cartUpdating,
+  cartUpdating
 }: CatalogProductGridProps) {
   const [query, setQuery] = useState('')
   const [debouncedSearch, setDebouncedSearch] = useState('')
@@ -115,7 +124,7 @@ export function CatalogProductGrid({
       search: debouncedSearch || undefined,
       category: categoryId ?? undefined,
       customer_id: customerId,
-      project_id: projectId ?? undefined,
+      project_id: projectId ?? undefined
     }),
     [categoryId, customerId, debouncedSearch, offset, projectId]
   )
@@ -123,7 +132,7 @@ export function CatalogProductGrid({
   const { data, isLoading, isFetching } = useQuery({
     ...getProductsQuery(params),
     placeholderData: keepPreviousData,
-    enabled: !!customerId,
+    enabled: !!customerId
   })
 
   const products = data?.results ?? []
@@ -155,7 +164,7 @@ export function CatalogProductGrid({
       <div className='shrink-0 border-b px-4 py-3'>
         <div className='flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between'>
           <div className='min-w-0'>
-            <p className='text-xs font-medium text-muted-foreground'>Products</p>
+            <p className='text-muted-foreground text-xs font-medium'>Products</p>
             <p className='text-sm font-semibold'>
               {loading ? 'Loading…' : `${rangeStart}–${rangeEnd} of ${count}`}
             </p>
@@ -163,19 +172,23 @@ export function CatalogProductGrid({
 
           <div className='flex min-w-0 flex-1 items-center gap-2 lg:max-w-[520px]'>
             <div className='relative min-w-0 flex-1'>
-              <span className='pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground'>
-                {isFetching ? <Loader2 className='size-4 animate-spin' /> : <Search className='size-4' />}
+              <span className='text-muted-foreground pointer-events-none absolute top-1/2 left-3 -translate-y-1/2'>
+                {isFetching ? (
+                  <Loader2 className='size-4 animate-spin' />
+                ) : (
+                  <Search className='size-4' />
+                )}
               </span>
               <Input
                 value={query}
                 onChange={(e) => handleInput(e.target.value)}
                 placeholder='Search by ID, UPC, description…'
-                className='h-10 pl-9 pr-9'
+                className='h-10 pr-9 pl-9'
               />
               {query && (
                 <button
                   type='button'
-                  className='absolute right-2 top-1/2 -translate-y-1/2 rounded-full p-1 text-muted-foreground transition-colors hover:text-foreground'
+                  className='text-muted-foreground hover:text-foreground absolute top-1/2 right-2 -translate-y-1/2 rounded-full p-1 transition-colors'
                   onClick={() => handleInput('')}
                   title='Clear'
                 >
@@ -208,7 +221,7 @@ export function CatalogProductGrid({
         </div>
 
         <div className='mt-3 flex items-center justify-between gap-3 lg:hidden'>
-          <p className='text-xs text-muted-foreground'>
+          <p className='text-muted-foreground text-xs'>
             Page {Math.floor(offset / DEFAULT_LIMIT) + 1}
           </p>
           <div className='flex items-center gap-1.5'>
@@ -239,14 +252,17 @@ export function CatalogProductGrid({
           {loading ? (
             <div className='grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3'>
               {Array.from({ length: 12 }).map((_, i) => (
-                <Skeleton key={`product-skeleton-${i}`} className='h-[110px] rounded-xl' />
+                <Skeleton
+                  key={`product-skeleton-${i}`}
+                  className='h-[110px] rounded-xl'
+                />
               ))}
             </div>
           ) : products.length === 0 ? (
             <div className='flex flex-col items-center gap-2 px-4 py-14 text-center'>
-              <Package className='size-7 text-muted-foreground' />
+              <Package className='text-muted-foreground size-7' />
               <p className='text-sm font-medium'>{emptyTitle}</p>
-              <p className='text-xs text-muted-foreground'>{emptyHint}</p>
+              <p className='text-muted-foreground text-xs'>{emptyHint}</p>
             </div>
           ) : (
             <div className='grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3'>
@@ -261,7 +277,7 @@ export function CatalogProductGrid({
                 return (
                   <div
                     key={product.autoid}
-                    className='group rounded-2xl border bg-card p-3 shadow-sm transition-colors hover:bg-muted/10'
+                    className='group bg-card hover:bg-muted/10 rounded-2xl border p-3 shadow-sm transition-colors'
                   >
                     <div className='flex gap-3'>
                       <CatalogProductCardImage
@@ -274,20 +290,32 @@ export function CatalogProductGrid({
                         <div className='flex items-start justify-between gap-2'>
                           <div className='min-w-0'>
                             <div className='flex items-center gap-2'>
-                              <Badge variant='secondary' className='shrink-0 text-[10px]'>
+                              <Badge
+                                variant='secondary'
+                                className='shrink-0 text-[10px]'
+                              >
                                 {product.id}
                               </Badge>
                               {product.inactive && (
-                                <Badge variant='secondary' className='shrink-0 text-[10px]'>
+                                <Badge
+                                  variant='secondary'
+                                  className='shrink-0 text-[10px]'
+                                >
                                   Inactive
                                 </Badge>
                               )}
                             </div>
-                            <p className='mt-1 truncate text-sm font-medium' title={product.descr_1}>
+                            <p
+                              className='mt-1 truncate text-sm font-medium'
+                              title={product.descr_1}
+                            >
                               {product.descr_1}
                             </p>
                             {product.descr_2 && (
-                              <p className='truncate text-xs text-muted-foreground' title={product.descr_2}>
+                              <p
+                                className='text-muted-foreground truncate text-xs'
+                                title={product.descr_2}
+                              >
                                 {product.descr_2}
                               </p>
                             )}
@@ -295,11 +323,16 @@ export function CatalogProductGrid({
 
                           <div className='shrink-0 text-right'>
                             {hasDiscount && (
-                              <p className='text-xs text-muted-foreground line-through'>
+                              <p className='text-muted-foreground text-xs line-through'>
                                 {formatCurrency(oldNum)}
                               </p>
                             )}
-                            <p className={cn('text-sm font-semibold tabular-nums', hasDiscount && 'text-green-600')}>
+                            <p
+                              className={cn(
+                                'text-sm font-semibold tabular-nums',
+                                hasDiscount && 'text-green-600'
+                              )}
+                            >
                               {formatCurrency(currentNum)}
                             </p>
                           </div>
@@ -308,11 +341,17 @@ export function CatalogProductGrid({
                         <div className='mt-2 flex items-center justify-between gap-2'>
                           <div className='min-w-0'>
                             {needsConfig ? (
-                              <p className='truncate text-xs text-muted-foreground' title='Configurations or multiple units available'>
+                              <p
+                                className='text-muted-foreground truncate text-xs'
+                                title='Configurations or multiple units available'
+                              >
                                 {hasConfigurations ? 'Configurable' : 'Multiple units'}
                               </p>
                             ) : (
-                              <p className='truncate text-xs text-muted-foreground' title={product.location}>
+                              <p
+                                className='text-muted-foreground truncate text-xs'
+                                title={product.location}
+                              >
                                 {product.location || ' '}
                               </p>
                             )}
@@ -345,4 +384,3 @@ export function CatalogProductGrid({
     </div>
   )
 }
-

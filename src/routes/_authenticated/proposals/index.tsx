@@ -87,9 +87,7 @@ function ProposalsPage() {
 
   const results = data?.results ?? []
   const proposalInResults =
-    autoidFromUrl != null &&
-    autoidFromUrl !== '' &&
-    results.some((p) => p.autoid === autoidFromUrl)
+    autoidFromUrl != null && autoidFromUrl !== '' && results.some((p) => p.autoid === autoidFromUrl)
 
   const refetchTimersRef = useRef<ReturnType<typeof setTimeout>[]>([])
   useEffect(() => {
@@ -109,8 +107,7 @@ function ProposalsPage() {
     }
   }, [autoidFromUrl, proposalInResults, refetch])
 
-  const hasPendingAutoid =
-    autoidFromUrl != null && autoidFromUrl !== '' && !proposalInResults
+  const hasPendingAutoid = autoidFromUrl != null && autoidFromUrl !== '' && !proposalInResults
   const pendingProposalPlaceholder: Proposal & { _pending?: true } = hasPendingAutoid
     ? {
         autoid: autoidFromUrl,
