@@ -19,7 +19,7 @@ interface DashboardKpisProps {
 
 const defaultTrendFormat = (n: number) => String(n)
 
-function TrendIndicator({
+const TrendIndicator = ({
   current,
   previous,
   format = defaultTrendFormat,
@@ -29,7 +29,7 @@ function TrendIndicator({
   previous: number
   format?: (n: number) => string
   invert?: boolean
-}) {
+}) => {
   if (previous === 0) return <span className='text-muted-foreground text-xs'>—</span>
   const direction = current > previous ? 'up' : current < previous ? 'down' : 'same'
   const positive = invert ? direction === 'down' : direction === 'up'
@@ -123,7 +123,7 @@ const KPI_CONFIG = [
   // }
 ] as const
 
-export function DashboardKpis({ metrics }: DashboardKpisProps) {
+export const DashboardKpis = ({ metrics }: DashboardKpisProps) => {
   return (
     <div className='grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3'>
       {KPI_CONFIG.map((config) => {

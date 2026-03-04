@@ -1,7 +1,7 @@
 import type { SortingState } from '@tanstack/react-table'
 import { useState } from 'react'
 
-export function useOrdering() {
+export const useOrdering = () => {
   const [sorting, setSorting] = useState<SortingState>([])
 
   const ordering = !sorting.length

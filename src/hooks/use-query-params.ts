@@ -38,11 +38,9 @@ const parseAsLocalDateTime = createParser<Date | null>({
 const offsetParser = parseAsInteger.withDefault(0)
 const limitParser = parseAsInteger.withDefault(DEFAULT_LIMIT)
 
-export function useSearchParam() {
-  return useQueryState('search', parseAsString.withDefault(''))
-}
+export const useSearchParam = () => useQueryState('search', parseAsString.withDefault(''))
 
-export function useOffsetParam() {
+export const useOffsetParam = () => {
   const [offset, setOffsetRaw] = useQueryState('offset', offsetParser)
   const normalized = Math.max(0, offset)
   const setOffset = (value: number | null) => {
@@ -51,7 +49,7 @@ export function useOffsetParam() {
   return [normalized, setOffset] as const
 }
 
-export function useLimitParam() {
+export const useLimitParam = () => {
   const [limit, setLimitRaw] = useQueryState('limit', limitParser)
   const normalized = Math.max(1, limit)
   const setLimit = (value: number) => {
@@ -60,73 +58,44 @@ export function useLimitParam() {
   return [normalized, setLimit] as const
 }
 
-export function useOrderStatusParam() {
-  return useQueryState('status', orderStatusParser)
-}
+export const useOrderStatusParam = () => useQueryState('status', orderStatusParser)
 
-export function useStatusParam() {
-  return useQueryState('status', parseAsString)
-}
+export const useStatusParam = () => useQueryState('status', parseAsString)
 
-export function usePayloadLogCreatedAfter() {
-  return useQueryState('created_after', parseAsIsoDate)
-}
+export const usePayloadLogCreatedAfter = () => useQueryState('created_after', parseAsIsoDate)
 
-export function usePayloadLogCreatedBefore() {
-  return useQueryState('created_before', parseAsIsoDate)
-}
+export const usePayloadLogCreatedBefore = () => useQueryState('created_before', parseAsIsoDate)
 
-export function usePayloadLogEntity() {
-  return useQueryState('entity', parseAsString)
-}
+export const usePayloadLogEntity = () => useQueryState('entity', parseAsString)
 
-export function usePayloadLogMethod() {
-  return useQueryState('method', parseAsString)
-}
+export const usePayloadLogMethod = () => useQueryState('method', parseAsString)
 
-export function usePayloadLogStatusCode() {
-  return useQueryState('status_code', parseAsInteger)
-}
+export const usePayloadLogStatusCode = () => useQueryState('status_code', parseAsInteger)
 
-export function usePayloadLogIsError() {
-  return useQueryState('is_error', parseAsStringLiteral(['true', 'false']))
-}
+export const usePayloadLogIsError = () =>
+  useQueryState('is_error', parseAsStringLiteral(['true', 'false']))
 
-export function useTaskStatusParam() {
-  return useQueryState('task_status', parseAsInteger)
-}
+export const useTaskStatusParam = () => useQueryState('task_status', parseAsInteger)
 
-export function useTaskPriorityParam() {
-  return useQueryState(
+export const useTaskPriorityParam = () =>
+  useQueryState(
     'task_priority',
     parseAsStringLiteral([...TASK_PRIORITY_VALUES] as [string, ...string[]]).withDefault('')
   )
-}
 
-export function useTaskResponsibleParam() {
-  return useQueryState('task_responsible', parseAsInteger)
-}
+export const useTaskResponsibleParam = () => useQueryState('task_responsible', parseAsInteger)
 
-export function useTaskDueFromParam() {
-  return useQueryState('due_from', parseAsLocalDateTime)
-}
+export const useTaskDueFromParam = () => useQueryState('due_from', parseAsLocalDateTime)
 
-export function useTaskDueToParam() {
-  return useQueryState('due_to', parseAsLocalDateTime)
-}
+export const useTaskDueToParam = () => useQueryState('due_to', parseAsLocalDateTime)
 
-export function useAutoidParam() {
-  return useQueryState('autoid', parseAsString)
-}
+export const useAutoidParam = () => useQueryState('autoid', parseAsString)
 
-export function useCustomerTabParam() {
-  return useQueryState('tab', parseAsStringLiteral(CUSTOMER_TAB_VALUES).withDefault('orders'))
-}
+export const useCustomerTabParam = () =>
+  useQueryState('tab', parseAsStringLiteral(CUSTOMER_TAB_VALUES).withDefault('orders'))
 
-export function useOrderProjectIdParam() {
-  return useQueryState('project_id', parseAsInteger.withOptions({ shallow: false }))
-}
+export const useOrderProjectIdParam = () =>
+  useQueryState('project_id', parseAsInteger.withOptions({ shallow: false }))
 
-export function useDashboardCustomerIdParam() {
-  return useQueryState('customer_id', parseAsString.withDefault(''))
-}
+export const useDashboardCustomerIdParam = () =>
+  useQueryState('customer_id', parseAsString.withDefault(''))

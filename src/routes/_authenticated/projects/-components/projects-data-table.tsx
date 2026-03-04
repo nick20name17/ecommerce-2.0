@@ -17,14 +17,14 @@ interface ProjectsDataTableProps {
   onDelete: (project: Project) => void
 }
 
-export function ProjectsDataTable({
+export const ProjectsDataTable = ({
   data,
   isLoading,
   sorting,
   setSorting,
   onEdit,
   onDelete
-}: ProjectsDataTableProps) {
+}: ProjectsDataTableProps) => {
   const columns = useMemo(
     () =>
       getProjectColumns({

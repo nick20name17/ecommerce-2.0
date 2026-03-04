@@ -19,7 +19,7 @@ interface TaskStatusSelectProps {
   triggerClassName?: string
 }
 
-export function TaskStatusSelect({
+export const TaskStatusSelect = ({
   statuses,
   value,
   onValueChange,
@@ -28,7 +28,7 @@ export function TaskStatusSelect({
   disabled,
   className: _className,
   triggerClassName
-}: TaskStatusSelectProps) {
+}: TaskStatusSelectProps) => {
   const sorted = [...statuses].sort((a, b) => a.order - b.order)
 
   return (

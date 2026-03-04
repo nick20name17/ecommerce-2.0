@@ -22,14 +22,14 @@ interface EntityAttachmentsDialogProps {
   onOpenChange: (open: boolean) => void
 }
 
-export function EntityAttachmentsDialog({
+export const EntityAttachmentsDialog = ({
   entityType,
   entityLabel,
   autoid,
   projectId,
   open,
   onOpenChange
-}: EntityAttachmentsDialogProps) {
+}: EntityAttachmentsDialogProps) => {
   const orderQuery = useQuery({
     ...getOrderAttachmentsQuery(autoid, projectId),
     enabled: open && entityType === 'order' && !!autoid

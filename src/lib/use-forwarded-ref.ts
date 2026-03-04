@@ -1,6 +1,6 @@
 import type { Ref } from 'react'
 
-export function useForwardedRef<T>(forwardedRef: Ref<T> | undefined) {
+export const useForwardedRef = <T>(forwardedRef: Ref<T> | undefined) => {
   return (instance: T | null) => {
     if (typeof forwardedRef === 'function') {
       forwardedRef(instance)

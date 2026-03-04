@@ -20,9 +20,8 @@ export const PROPOSAL_STATUS_LABELS: Record<ProposalStatus, string> = {
   [PROPOSAL_STATUS.onHold]: 'On Hold'
 }
 
-export function getProposalStatusLabel(status: ProposalStatus): string {
-  return PROPOSAL_STATUS_LABELS[status] ?? status
-}
+export const getProposalStatusLabel = (status: ProposalStatus): string =>
+  PROPOSAL_STATUS_LABELS[status] ?? status
 
 export type ProposalStatusBadgeVariant =
   | 'default'
@@ -31,7 +30,7 @@ export type ProposalStatusBadgeVariant =
   | 'success'
   | 'outline'
 
-export function getProposalStatusBadgeVariant(status: ProposalStatus): ProposalStatusBadgeVariant {
+export const getProposalStatusBadgeVariant = (status: ProposalStatus): ProposalStatusBadgeVariant => {
   switch (status) {
     case PROPOSAL_STATUS.accepted:
       return 'success'

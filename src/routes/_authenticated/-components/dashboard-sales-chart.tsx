@@ -25,11 +25,11 @@ interface DashboardSalesChartProps {
   metrics: DashboardMetrics
 }
 
-function getFinancial(metrics: DashboardMetrics) {
+const getFinancial = (metrics: DashboardMetrics) => {
   return metrics.sales_total_field === 'total' ? metrics.total : metrics.sub_total
 }
 
-export function DashboardSalesChart({ metrics }: DashboardSalesChartProps) {
+export const DashboardSalesChart = ({ metrics }: DashboardSalesChartProps) => {
   const fin = getFinancial(metrics)
 
   const data = [

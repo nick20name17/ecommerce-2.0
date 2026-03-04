@@ -21,7 +21,7 @@ const sizeClasses = {
   default: 'size-8 text-base w-14'
 } as const
 
-export function NumberInput({
+export const NumberInput = ({
   value,
   onChange,
   min = 1,
@@ -33,7 +33,7 @@ export function NumberInput({
   showMaxMessage = false,
   id,
   name
-}: NumberInputProps) {
+}: NumberInputProps) => {
   const hasError = max !== undefined && (max <= 0 || value > max)
   const isDisabled = disabled || (max !== undefined && max <= 0)
   const s = sizeClasses[size]

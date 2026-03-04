@@ -1,7 +1,7 @@
 /**
  * Format a Date as local YYYY-MM-DD (avoids UTC off-by-one when storing date-only).
  */
-export function dateToLocalDateString(date: Date): string {
+export const dateToLocalDateString = (date: Date): string => {
   const y = date.getFullYear()
   const m = String(date.getMonth() + 1).padStart(2, '0')
   const d = String(date.getDate()).padStart(2, '0')
@@ -11,7 +11,7 @@ export function dateToLocalDateString(date: Date): string {
 /**
  * Parse a YYYY-MM-DD string as local midnight (avoids UTC off-by-one when displaying).
  */
-export function localDateStringToDate(s: string): Date {
+export const localDateStringToDate = (s: string): Date => {
   const [y, m, d] = s.split('-').map(Number)
   return new Date(y, m - 1, d)
 }
@@ -19,7 +19,7 @@ export function localDateStringToDate(s: string): Date {
 /**
  * Format a Date as local YYYY-MM-DDTHH:mm:ss (for URL/API without UTC shift).
  */
-export function dateToLocalDateTimeString(date: Date): string {
+export const dateToLocalDateTimeString = (date: Date): string => {
   const y = date.getFullYear()
   const m = String(date.getMonth() + 1).padStart(2, '0')
   const d = String(date.getDate()).padStart(2, '0')

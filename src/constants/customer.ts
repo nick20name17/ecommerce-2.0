@@ -26,7 +26,7 @@ export const CUSTOMER_TYPE_OPTIONS = (
   Object.entries(CUSTOMER_TYPE_LABELS) as [CustomerType, string][]
 ).map(([value, label]) => ({ value, label }))
 
-export function getCustomerTypeLabel(type: string | null | undefined): string {
+export const getCustomerTypeLabel = (type: string | null | undefined): string => {
   if (!type) return '—'
   return CUSTOMER_TYPE_LABELS[type as CustomerType] ?? type
 }

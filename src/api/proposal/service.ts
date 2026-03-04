@@ -4,9 +4,8 @@ import type { EntityAssignRequest, EntityAssignmentResponse, EntityAttachment } 
 
 import type { Proposal, ProposalParams, ProposalResponse } from './schema'
 
-function proposalParams(projectId?: number | null) {
-  return projectId != null ? { project_id: projectId } : {}
-}
+const proposalParams = (projectId?: number | null) =>
+  projectId != null ? { project_id: projectId } : {}
 
 export const proposalService = {
   get: async (params: ProposalParams = {}) => {

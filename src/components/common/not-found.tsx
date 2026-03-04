@@ -4,7 +4,7 @@ import { FileQuestion } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 
-export function NotFound(_props: NotFoundRouteProps) {
+export const NotFound = (_props: NotFoundRouteProps) => {
   return (
     <div className='flex min-h-svh flex-col items-center justify-center gap-6 p-6'>
       <div className='bg-muted/50 flex size-16 items-center justify-center rounded-full'>

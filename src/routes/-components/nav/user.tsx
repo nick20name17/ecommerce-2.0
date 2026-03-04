@@ -19,7 +19,7 @@ import {
 } from '@/components/ui/sidebar'
 import { useAuth } from '@/providers/auth'
 
-export function NavUser() {
+export const NavUser = () => {
   const { isMobile } = useSidebar()
 
   const { user, logout } = useAuth()

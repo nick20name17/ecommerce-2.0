@@ -6,21 +6,21 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 
 export const RESERVED_KEYS = ['_pending', 'items', 'assigned_user'] as const
 
-function isEmptyValue(value: unknown): boolean {
+const isEmptyValue = (value: unknown): boolean => {
   if (value == null) return true
   const str = String(value).trim()
   return str === ''
 }
 
-export function formatCellValue(value: unknown): string {
+export const formatCellValue = (value: unknown): string => {
   if (isEmptyValue(value)) return '—'
   return String(value)
 }
 
-export function getKeysFromRows(
+export const getKeysFromRows = (
   rows: Record<string, unknown>[],
   exclude: readonly string[] = []
-): string[] {
+): string[] => {
   const set = new Set<string>()
   for (const row of rows) {
     for (const key of Object.keys(row)) {
@@ -30,15 +30,15 @@ export function getKeysFromRows(
   return [...set].sort()
 }
 
-export function humanizeKey(key: string): string {
+export const humanizeKey = (key: string): string => {
   return key.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
 }
 
-export function getOrderedDataKeys(
+export const getOrderedDataKeys = (
   dataRows: Record<string, unknown>[],
   entity: string,
   fieldConfig: FieldConfigResponse | null | undefined
-): string[] {
+): string[] => {
   const fromData = new Set<string>()
   for (const row of dataRows) {
     for (const key of Object.keys(row)) {
@@ -56,11 +56,11 @@ export function getOrderedDataKeys(
   return [...ordered, ...rest]
 }
 
-export function getColumnLabel(
+export const getColumnLabel = (
   key: string,
   entity: string,
   fieldConfig: FieldConfigResponse | null | undefined
-): string {
+): string => {
   const entry = fieldConfig?.[entity]?.find((e) => e.field === key)
   if (entry?.alias?.trim()) return entry.alias.trim()
   return key.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
@@ -72,11 +72,11 @@ export interface BuildDynamicDataColumnsOptions<T> {
   formatters?: Partial<Record<string, DynamicCellFormatter<T>>>
 }
 
-export function buildDynamicDataColumns<T extends Record<string, unknown>>(
+export const buildDynamicDataColumns = <T extends Record<string, unknown>>(
   orderedKeys: string[],
   getLabel: (key: string) => string,
   options?: BuildDynamicDataColumnsOptions<T>
-): ColumnDef<T>[] {
+): ColumnDef<T>[] => {
   const formatters = options?.formatters ?? {}
 
   return orderedKeys.map((key) => {

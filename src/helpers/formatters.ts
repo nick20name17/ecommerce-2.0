@@ -13,11 +13,11 @@ const currencyFormat = new Intl.NumberFormat(LOCALE_DEFAULT, {
   currency: CURRENCY_DEFAULT
 })
 
-export function formatCurrency(
+export const formatCurrency = (
   amount: string | number | null | undefined,
   fallback: string = '$0.00',
   options?: { maximumFractionDigits?: number; minimumFractionDigits?: number }
-): string {
+): string => {
   if (amount === undefined || amount === null || amount === '') return fallback
   const num = typeof amount === 'string' ? parseFloat(amount) : amount
   if (isNaN(num)) return fallback
@@ -36,11 +36,11 @@ export function formatCurrency(
   }
 }
 
-export function formatQuantity(
+export const formatQuantity = (
   quantity: string | number | null | undefined,
   decimals: number = 2,
   fallback: string = '—'
-): string {
+): string => {
   if (!quantity && quantity !== 0) return fallback
   const num = typeof quantity === 'string' ? parseFloat(quantity) : quantity
   if (isNaN(num)) return fallback
@@ -54,7 +54,7 @@ export function formatQuantity(
   }
 }
 
-export function formatPercentage(value: number, decimals: number = 0): string {
+export const formatPercentage = (value: number, decimals: number = 0): string => {
   return (
     new Intl.NumberFormat(LOCALE_DEFAULT, {
       minimumFractionDigits: decimals,
@@ -63,10 +63,10 @@ export function formatPercentage(value: number, decimals: number = 0): string {
   )
 }
 
-export function formatDate(
+export const formatDate = (
   value: Date | string | null | undefined,
   formatKey: keyof typeof DATE_FORMATS = 'display'
-): string {
+): string => {
   if (value === null || value === undefined) return '—'
   const date =
     typeof value === 'string'
@@ -78,22 +78,22 @@ export function formatDate(
   return format(date, DATE_FORMATS[formatKey])
 }
 
-export function truncateText(
+export const truncateText = (
   text: string | null | undefined,
   maxLength: number = TEXT_TRUNCATE_LENGTH.default
-): string {
+): string => {
   if (!text) return ''
   if (text.length <= maxLength) return text
   return text.slice(0, maxLength) + '...'
 }
 
-export function formatResponseTime(ms: number | null | undefined): string {
+export const formatResponseTime = (ms: number | null | undefined): string => {
   if (ms === null || ms === undefined) return '—'
   if (ms < 1000) return `${ms}ms`
   return `${(ms / 1000).toFixed(1)}s`
 }
 
-export function formatPhone(phone: string | null | undefined): string {
+export const formatPhone = (phone: string | null | undefined): string => {
   if (!phone) return ''
   const cleaned = phone.replace(/\D/g, '')
   if (cleaned.length === 10) {
@@ -105,7 +105,7 @@ export function formatPhone(phone: string | null | undefined): string {
   return phone
 }
 
-export function formatBytes(bytes: number, decimals: number = 2): string {
+export const formatBytes = (bytes: number, decimals: number = 2): string => {
   if (bytes === 0) return '0 Bytes'
 
   const k = 1024

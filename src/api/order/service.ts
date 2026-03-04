@@ -4,9 +4,8 @@ import type { EntityAssignRequest, EntityAssignmentResponse, EntityAttachment } 
 
 import type { Order, OrderParams, OrderResponse } from './schema'
 
-function orderParams(projectId?: number | null) {
-  return projectId != null ? { project_id: projectId } : {}
-}
+const orderParams = (projectId?: number | null) =>
+  projectId != null ? { project_id: projectId } : {}
 
 export const orderService = {
   get: async (params: OrderParams) => {

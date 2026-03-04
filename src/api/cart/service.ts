@@ -9,7 +9,7 @@ import type {
   UpdateCartItemPayload
 } from './schema'
 
-function buildParams(customerId: string, projectId?: number | null) {
+const buildParams = (customerId: string, projectId?: number | null) => {
   const params: Record<string, string> = { customer_id: customerId }
   if (projectId != null) params.project_id = projectId.toString()
   return params

@@ -34,7 +34,7 @@ type EditAction =
   | { type: 'OPEN_EDIT'; item: CartItem }
   | { type: 'CLOSE' }
 
-function editReducer(state: EditState, action: EditAction): EditState {
+const editReducer = (state: EditState, action: EditAction): EditState => {
   switch (action.type) {
     case 'OPEN_ADD':
       return {
@@ -63,7 +63,7 @@ type BusyAction =
   | { type: 'CREATING_PROPOSAL'; value: boolean }
   | { type: 'CREATING_ORDER'; value: boolean }
 
-function busyReducer(state: BusyState, action: BusyAction): BusyState {
+const busyReducer = (state: BusyState, action: BusyAction): BusyState => {
   switch (action.type) {
     case 'CART_UPDATING':
       return { ...state, cartUpdating: action.value }
@@ -476,11 +476,11 @@ function CreatePage() {
   )
 }
 
-function isCartItemType(p: Product | CartItem): p is CartItem {
+const isCartItemType = (p: Product | CartItem): p is CartItem => {
   return 'product_autoid' in p
 }
 
-function Section({
+const Section = ({
   icon,
   title,
   description,
@@ -502,7 +502,7 @@ function Section({
   noPadding?: boolean
   allowOverflow?: boolean
   children: React.ReactNode
-}) {
+}) => {
   return (
     <div
       className={cn(

@@ -18,13 +18,13 @@ interface DatePickerProps {
   showTime?: boolean
 }
 
-export function DatePicker({
+export const DatePicker = ({
   value,
   onChange,
   className,
   placeholder,
   showTime = false
-}: DatePickerProps) {
+}: DatePickerProps) => {
   const [open, setOpen] = React.useState(false)
 
   const hours = Array.from({ length: 12 }, (_, i) => i + 1)

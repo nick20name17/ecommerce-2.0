@@ -12,10 +12,10 @@ const pendingWaiters: PendingWaiter[] = []
 let nextId = 0
 const DEFAULT_TIMEOUT_MS = 15000
 
-export function waitForCreatedAutoid(
+export const waitForCreatedAutoid = (
   entity: Entity,
   timeoutMs = DEFAULT_TIMEOUT_MS
-): Promise<string> {
+): Promise<string> => {
   return new Promise((resolve, reject) => {
     const id = nextId++
     const timeoutId = setTimeout(() => {
@@ -29,7 +29,7 @@ export function waitForCreatedAutoid(
   })
 }
 
-export function resolvePendingCreatedAutoid(entity: string, autoid: string): void {
+export const resolvePendingCreatedAutoid = (entity: string, autoid: string): void => {
   const idx = pendingWaiters.findIndex((w) => w.entity === entity)
   if (idx === -1) return
   const [waiter] = pendingWaiters.splice(idx, 1)
@@ -37,7 +37,7 @@ export function resolvePendingCreatedAutoid(entity: string, autoid: string): voi
   waiter.resolve(autoid)
 }
 
-export function cancelPendingCreatedAutoid(entity: Entity): void {
+export const cancelPendingCreatedAutoid = (entity: Entity): void => {
   const idx = pendingWaiters.findIndex((w) => w.entity === entity)
   if (idx === -1) return
   const [waiter] = pendingWaiters.splice(idx, 1)

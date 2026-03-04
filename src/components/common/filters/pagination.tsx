@@ -21,7 +21,7 @@ import { useLimitParam, useOffsetParam } from '@/hooks/use-query-params'
 const LIMIT_OPTIONS = [10, 20, 50, 100]
 const PAGE_SIBLINGS = 1
 
-function getPageNumbers(currentPage: number, totalPages: number): (number | 'ellipsis')[] {
+const getPageNumbers = (currentPage: number, totalPages: number): (number | 'ellipsis')[] => {
   if (totalPages <= 7) {
     return Array.from({ length: totalPages }, (_, i) => i + 1)
   }

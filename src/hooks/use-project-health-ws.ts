@@ -10,9 +10,7 @@ const RECONNECT_MIN_MS = 1000
 const RECONNECT_MAX_MS = 30000
 const RECONNECT_GROW_FACTOR = 2
 
-function getWsOrigin(): string {
-  return API_ORIGIN.replace(/^http/, 'ws')
-}
+const getWsOrigin = (): string => API_ORIGIN.replace(/^http/, 'ws')
 
 interface ProjectHealthWsMessage {
   type: 'health'
@@ -24,7 +22,7 @@ interface UseProjectHealthWebSocketOptions {
   enabled?: boolean
 }
 
-function buildWsUrl(projectId: number | null): string | null {
+const buildWsUrl = (projectId: number | null): string | null => {
   const session = getSession()
   if (!session?.access || !session?.user?.role) return null
   const userIsSuperAdmin = isSuperAdmin(session.user.role)
@@ -38,10 +36,10 @@ function buildWsUrl(projectId: number | null): string | null {
   return `${wsBaseUrl}/ws/project-health/?${params.toString()}`
 }
 
-export function useProjectHealthWebSocket({
+export const useProjectHealthWebSocket = ({
   projectId,
   enabled = true
-}: UseProjectHealthWebSocketOptions) {
+}: UseProjectHealthWebSocketOptions) => {
   const [health, setHealth] = useState<ProjectHealth | null>(null)
   const [isConnected, setIsConnected] = useState(false)
   const rwsRef = useRef<ReconnectingWebSocket | null>(null)

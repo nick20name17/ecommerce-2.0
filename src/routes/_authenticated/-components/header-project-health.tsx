@@ -12,7 +12,7 @@ const HEALTH_SERVICES: { label: string; service: ProjectHealthService }[] = [
   { label: 'Database', service: 'sync' }
 ]
 
-export function HeaderProjectHealth() {
+export const HeaderProjectHealth = () => {
   const { user } = useAuth()
   const [projectId] = useProjectId()
 

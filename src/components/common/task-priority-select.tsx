@@ -21,7 +21,7 @@ interface TaskPrioritySelectProps {
   triggerClassName?: string
 }
 
-export function TaskPrioritySelect({
+export const TaskPrioritySelect = ({
   value,
   onValueChange,
   placeholder = 'Select priority',
@@ -29,7 +29,7 @@ export function TaskPrioritySelect({
   disabled,
   className: _className,
   triggerClassName
-}: TaskPrioritySelectProps) {
+}: TaskPrioritySelectProps) => {
   return (
     <Select
       value={value || 'all'}

@@ -31,10 +31,10 @@ export const Route = createFileRoute('/_authenticated/projects/')({
   })
 })
 
-function mergeHealthIntoProjects(
+const mergeHealthIntoProjects = (
   projects: Project[],
   healthResults: Array<{ data?: unknown; isLoading?: boolean }>
-): ProjectWithHealthLoading[] {
+): ProjectWithHealthLoading[] => {
   return projects.map((project, index) => {
     const result = healthResults[index]
     const health = result?.data as

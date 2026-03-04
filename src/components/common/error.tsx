@@ -9,7 +9,7 @@ interface ErrorProps extends ErrorComponentProps {
   className?: string
 }
 
-export function Error({ error, reset, className }: ErrorProps) {
+export const Error = ({ error, reset, className }: ErrorProps) => {
   const message = getErrorMessage(error)
 
   return (

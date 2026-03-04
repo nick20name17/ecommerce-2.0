@@ -19,13 +19,13 @@ interface UserComboboxProps {
   valueLabel?: string | null
 }
 
-export function UserCombobox({
+export const UserCombobox = ({
   value,
   onChange,
   placeholder = 'Select user...',
   role,
   valueLabel
-}: UserComboboxProps) {
+}: UserComboboxProps) => {
   const [open, setOpen] = useState(false)
   const [search, setSearch] = useState('')
   const [debouncedSearch, setDebouncedSearch] = useState('')

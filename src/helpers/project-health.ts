@@ -17,10 +17,10 @@ export interface ProjectHealthStatus {
   has_sync_config?: boolean
 }
 
-export function getServiceStatus(
+export const getServiceStatus = (
   health: ProjectHealthStatus | null | undefined,
   service: ProjectHealthService
-): 'healthy' | 'unhealthy' | null {
+): 'healthy' | 'unhealthy' | null => {
   if (!health) return null
 
   switch (service) {
@@ -41,10 +41,10 @@ export interface ServiceHealthDetails {
   lastChecked: string | undefined
 }
 
-export function getServiceHealthDetails(
+export const getServiceHealthDetails = (
   project: ProjectHealthStatus,
   service: ProjectHealthService
-): ServiceHealthDetails {
+): ServiceHealthDetails => {
   const status = getServiceStatus(project, service)
   switch (service) {
     case 'website':

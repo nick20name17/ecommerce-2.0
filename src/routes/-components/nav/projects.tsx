@@ -22,7 +22,7 @@ import { isSuperAdmin } from '@/constants/user'
 import { useProjectId } from '@/hooks/use-project-id'
 import { useAuth } from '@/providers/auth'
 
-export function NavProjects() {
+export const NavProjects = () => {
   const { isMobile } = useSidebar()
   const { user } = useAuth()
   const isSuperAdminUser = !!user?.role && isSuperAdmin(user.role)

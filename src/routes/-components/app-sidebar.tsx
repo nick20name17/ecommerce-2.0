@@ -11,7 +11,7 @@ import {
   SidebarRail
 } from '@/components/ui/sidebar'
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+export const AppSidebar = ({ ...props }: React.ComponentProps<typeof Sidebar>) => {
   return (
     <Sidebar
       collapsible='icon'

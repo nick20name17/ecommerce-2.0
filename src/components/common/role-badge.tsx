@@ -15,6 +15,6 @@ interface RoleBadgeProps {
   className?: string
 }
 
-export function RoleBadge({ role, className }: RoleBadgeProps) {
+export const RoleBadge = ({ role, className }: RoleBadgeProps) => {
   return <Badge className={cn(roleColorClasses[role], className)}>{getUserRoleLabel(role)}</Badge>
 }

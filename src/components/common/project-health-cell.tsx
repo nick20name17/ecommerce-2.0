@@ -4,7 +4,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 import { formatDate, formatResponseTime } from '@/helpers/formatters'
 import { cn } from '@/lib/utils'
 
-export function HealthCell({
+export const HealthCell = ({
   status,
   responseMs,
   lastChecked,
@@ -14,7 +14,7 @@ export function HealthCell({
   responseMs?: number
   lastChecked?: string
   isLoading?: boolean
-}) {
+}) => {
   if (isLoading) {
     return (
       <span className='flex size-6 items-center justify-center'>

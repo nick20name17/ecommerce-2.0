@@ -18,14 +18,14 @@ interface UsersDataTableProps {
   onDelete: (user: User) => void
 }
 
-export function UsersDataTable({
+export const UsersDataTable = ({
   data,
   isLoading,
   sorting,
   setSorting,
   onEdit,
   onDelete
-}: UsersDataTableProps) {
+}: UsersDataTableProps) => {
   const { user: currentUser } = useAuth()
 
   const columns = useMemo(

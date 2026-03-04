@@ -15,9 +15,7 @@ const RECONNECT_MAX_MS = 30000
 const RECONNECT_GROW_FACTOR = 2
 const PING_INTERVAL_MS = 30000
 
-function getWsOrigin(): string {
-  return API_ORIGIN.replace(/^http/, 'ws')
-}
+const getWsOrigin = (): string => API_ORIGIN.replace(/^http/, 'ws')
 
 export interface WSNotificationPayload {
   type: string
@@ -35,7 +33,7 @@ interface UseNotificationsWebSocketOptions {
   showToasts?: boolean
 }
 
-function buildNotificationsWsUrl(projectId: number | null): string | null {
+const buildNotificationsWsUrl = (projectId: number | null): string | null => {
   const session = getSession()
   if (!session?.access || !session?.user?.role) return null
   const userIsSuperAdmin = isSuperAdmin(session.user.role)
@@ -49,7 +47,7 @@ function buildNotificationsWsUrl(projectId: number | null): string | null {
   return `${wsBaseUrl}/ws/notifications/?${params.toString()}`
 }
 
-function getInvalidationKeys(entity: string): readonly (readonly unknown[])[] {
+const getInvalidationKeys = (entity: string): readonly (readonly unknown[])[] => {
   switch (entity) {
     case 'order':
       return [ORDER_QUERY_KEYS.lists()]
@@ -60,7 +58,7 @@ function getInvalidationKeys(entity: string): readonly (readonly unknown[])[] {
   }
 }
 
-function getToastMessage(payload: WSNotificationPayload): string {
+const getToastMessage = (payload: WSNotificationPayload): string => {
   const { entity, action, autoid, type } = payload
   const entityLabel = entity === 'order' ? 'Order' : entity === 'proposal' ? 'Proposal' : entity
   const actionLabel =
@@ -71,9 +69,9 @@ function getToastMessage(payload: WSNotificationPayload): string {
   return `${entityLabel} ${autoid} ${actionLabel}`
 }
 
-function isNotificationPayload(
+const isNotificationPayload = (
   msg: unknown
-): msg is WSNotificationPayload & { entity: string; autoid: string } {
+): msg is WSNotificationPayload & { entity: string; autoid: string } => {
   return (
     typeof msg === 'object' &&
     msg !== null &&
@@ -85,11 +83,11 @@ function isNotificationPayload(
   )
 }
 
-export function useNotificationsWebSocket({
+export const useNotificationsWebSocket = ({
   projectId,
   enabled = true,
   showToasts = true
-}: UseNotificationsWebSocketOptions) {
+}: UseNotificationsWebSocketOptions) => {
   const queryClient = useQueryClient()
   const rwsRef = useRef<ReconnectingWebSocket | null>(null)
   const pingIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null)

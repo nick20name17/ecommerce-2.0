@@ -48,7 +48,7 @@ export type ButtonProps = React.ComponentProps<'button'> &
     isPending?: boolean
   }
 
-function Button({
+const Button = ({
   className,
   variant = 'default',
   size = 'default',
@@ -56,7 +56,7 @@ function Button({
   isPending,
   children,
   ...props
-}: ButtonProps) {
+}: ButtonProps) => {
   const Comp = asChild ? Slot.Root : 'button'
 
   return (

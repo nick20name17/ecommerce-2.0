@@ -61,7 +61,7 @@ export interface UserParams extends PaginationParams {
 
 const roleValues = Object.values(USER_ROLES) as [string, ...string[]]
 
-function createUserSchemaBase(isCurrentUserSuperAdmin: boolean) {
+const createUserSchemaBase = (isCurrentUserSuperAdmin: boolean) => {
   const projectSchema = isCurrentUserSuperAdmin ? z.number() : z.number().optional()
   return z.object({
     first_name: NameSchema,
@@ -74,8 +74,8 @@ function createUserSchemaBase(isCurrentUserSuperAdmin: boolean) {
   })
 }
 
-export function getCreateUserSchema(isCurrentUserSuperAdmin: boolean) {
-  return createUserSchemaBase(isCurrentUserSuperAdmin)
+export const getCreateUserSchema = (isCurrentUserSuperAdmin: boolean) =>
+  createUserSchemaBase(isCurrentUserSuperAdmin)
     .refine((data) => data.password === data.password_confirm, {
       message: 'passwords do not match',
       path: ['password_confirm']
@@ -93,13 +93,12 @@ export function getCreateUserSchema(isCurrentUserSuperAdmin: boolean) {
         })
       }
     })
-}
 
 export const CreateUserSchema = getCreateUserSchema(true)
 
 export type CreateUserFormValues = z.infer<ReturnType<typeof getCreateUserSchema>>
 
-function updateUserSchemaBase(isCurrentUserSuperAdmin: boolean) {
+const updateUserSchemaBase = (isCurrentUserSuperAdmin: boolean) => {
   const projectSchema = isCurrentUserSuperAdmin ? z.number() : z.number().optional()
   return z
     .object({
@@ -125,9 +124,8 @@ function updateUserSchemaBase(isCurrentUserSuperAdmin: boolean) {
     })
 }
 
-export function getUpdateUserSchema(isCurrentUserSuperAdmin: boolean) {
-  return updateUserSchemaBase(isCurrentUserSuperAdmin)
-}
+export const getUpdateUserSchema = (isCurrentUserSuperAdmin: boolean) =>
+  updateUserSchemaBase(isCurrentUserSuperAdmin)
 
 export const UpdateUserSchema = getUpdateUserSchema(true)
 

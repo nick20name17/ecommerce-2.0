@@ -36,6 +36,5 @@ export const ORDER_STATUS_CLASS: Record<OrderStatus, string> = {
   [ORDER_STATUS.adjusted]: 'border-border bg-muted text-muted-foreground'
 }
 
-export function getOrderStatusLabel(status: OrderStatus): string {
-  return ORDER_STATUS_LABELS[status] ?? status
-}
+export const getOrderStatusLabel = (status: OrderStatus): string =>
+  ORDER_STATUS_LABELS[status] ?? status

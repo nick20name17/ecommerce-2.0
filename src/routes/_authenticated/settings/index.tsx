@@ -46,11 +46,10 @@ const TABLE_LABELS: Record<string, string> = {
   proposal_item: 'Proposal Items'
 }
 
-function getTableLabel(name: string): string {
-  return TABLE_LABELS[name] ?? name.charAt(0).toUpperCase() + name.slice(1).replace(/_/g, ' ')
-}
+const getTableLabel = (name: string): string =>
+  TABLE_LABELS[name] ?? name.charAt(0).toUpperCase() + name.slice(1).replace(/_/g, ' ')
 
-function getQueryKeyToInvalidate(entity: string): readonly unknown[] | undefined {
+const getQueryKeyToInvalidate = (entity: string): readonly unknown[] | undefined => {
   switch (entity) {
     case 'customer':
       return CUSTOMER_QUERY_KEYS.all()
@@ -66,12 +65,12 @@ function getQueryKeyToInvalidate(entity: string): readonly unknown[] | undefined
   }
 }
 
-function applyFieldToggle(
+const applyFieldToggle = (
   prev: FieldConfigResponse | undefined,
   entity: string,
   fieldName: string,
   enabled: boolean
-): FieldConfigResponse | undefined {
+): FieldConfigResponse | undefined => {
   if (!prev?.[entity]) return prev
   return {
     ...prev,

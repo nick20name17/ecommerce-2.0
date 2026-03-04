@@ -10,7 +10,7 @@ import { toast } from 'sonner'
 
 import { getErrorMessage } from '@/helpers/error'
 
-function getQueryResourceLabel(query: { queryKey: readonly unknown[] }): string {
+const getQueryResourceLabel = (query: { queryKey: readonly unknown[] }): string => {
   const key = query.queryKey
   const first = key[0]
   if (typeof first !== 'string') return 'Data'

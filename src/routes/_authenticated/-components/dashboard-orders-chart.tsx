@@ -24,7 +24,7 @@ interface DashboardOrdersChartProps {
   metrics: DashboardMetrics
 }
 
-export function DashboardOrdersChart({ metrics }: DashboardOrdersChartProps) {
+export const DashboardOrdersChart = ({ metrics }: DashboardOrdersChartProps) => {
   const data = [
     {
       name: 'Orders',
