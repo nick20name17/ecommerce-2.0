@@ -27,11 +27,11 @@ interface UserColumnsOptions {
   onDelete: (user: User) => void
 }
 
-function getInitials(
+const getInitials = (
   firstName: string | undefined,
   lastName: string | undefined,
   email?: string
-): string {
+): string => {
   const first = firstName?.trim()
   const last = lastName?.trim()
   if (first && last) {

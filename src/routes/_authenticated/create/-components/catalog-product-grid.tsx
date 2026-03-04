@@ -33,7 +33,7 @@ interface CatalogProductGridProps {
 
 const DEFAULT_LIMIT = 24
 
-function CatalogProductCardImage({
+const CatalogProductCardImage = ({
   photo,
   photos,
   alt
@@ -41,7 +41,7 @@ function CatalogProductCardImage({
   photo: string | undefined
   photos: string[] | undefined
   alt: string
-}) {
+}) => {
   const urls = (photos?.length ? (photos as string[]) : null) ?? (photo ? [photo] : [])
   const [index, setIndex] = useState(0)
   useEffect(() => {
@@ -99,14 +99,14 @@ function CatalogProductCardImage({
   )
 }
 
-export function CatalogProductGrid({
+export const CatalogProductGrid = ({
   customerId,
   projectId,
   categoryId,
   onSelect,
   addingProductAutoid,
   cartUpdating
-}: CatalogProductGridProps) {
+}: CatalogProductGridProps) => {
   const [query, setQuery] = useState('')
   const [debouncedSearch, setDebouncedSearch] = useState('')
   const [offset, setOffset] = useState(0)

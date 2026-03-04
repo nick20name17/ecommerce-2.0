@@ -23,7 +23,7 @@ interface ProposalsDataTableProps {
   canAssign?: boolean
 }
 
-export function ProposalsDataTable({
+export const ProposalsDataTable = ({
   data,
   fieldConfig,
   isLoading,
@@ -35,7 +35,7 @@ export function ProposalsDataTable({
   onAttachments,
   onAssign,
   canAssign
-}: ProposalsDataTableProps) {
+}: ProposalsDataTableProps) => {
   const columns = useMemo(
     () =>
       getProposalColumns({

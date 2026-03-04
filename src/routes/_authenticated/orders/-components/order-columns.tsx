@@ -109,7 +109,7 @@ const ORDER_FORMATTERS: Partial<Record<string, DynamicCellFormatter<OrderRow>>> 
   }
 }
 
-export function getOrderColumns({
+export const getOrderColumns = ({
   fieldConfig,
   data,
   onDelete,
@@ -118,7 +118,7 @@ export function getOrderColumns({
   onAssign,
   canAssign,
   actionsVariant = 'full'
-}: OrderColumnsOptions): ColumnDef<OrderRow>[] {
+}: OrderColumnsOptions): ColumnDef<OrderRow>[] => {
   const entity = 'order'
   const orderedKeys = getOrderedDataKeys(data, entity, fieldConfig)
   const getLabel = (key: string) => getColumnLabel(key, entity, fieldConfig)

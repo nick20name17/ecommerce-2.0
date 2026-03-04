@@ -9,7 +9,7 @@ interface CartSummaryProps {
   updating: boolean
 }
 
-export function CartSummary({ cart, loading, updating }: CartSummaryProps) {
+export const CartSummary = ({ cart, loading, updating }: CartSummaryProps) => {
   if (loading) {
     return (
       <div className='space-y-2'>

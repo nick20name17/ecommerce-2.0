@@ -3,44 +3,37 @@ import * as React from 'react'
 
 import { cn } from '@/lib/utils'
 
-function TooltipProvider({
+const TooltipProvider = ({
   delayDuration = 0,
   ...props
-}: React.ComponentProps<typeof TooltipPrimitive.Provider>) {
-  return (
+}: React.ComponentProps<typeof TooltipPrimitive.Provider>) => (
     <TooltipPrimitive.Provider
       data-slot='tooltip-provider'
       delayDuration={delayDuration}
       {...props}
     />
   )
-}
 
-function Tooltip({ ...props }: React.ComponentProps<typeof TooltipPrimitive.Root>) {
-  return (
+const Tooltip = ({ ...props }: React.ComponentProps<typeof TooltipPrimitive.Root>) => (
     <TooltipPrimitive.Root
       data-slot='tooltip'
       {...props}
     />
   )
-}
 
-function TooltipTrigger({ ...props }: React.ComponentProps<typeof TooltipPrimitive.Trigger>) {
-  return (
+const TooltipTrigger = ({ ...props }: React.ComponentProps<typeof TooltipPrimitive.Trigger>) => (
     <TooltipPrimitive.Trigger
       data-slot='tooltip-trigger'
       {...props}
     />
   )
-}
 
-function TooltipContent({
+const TooltipContent = ({
   className,
   sideOffset = 0,
   children,
   ...props
-}: React.ComponentProps<typeof TooltipPrimitive.Content>) {
-  return (
+}: React.ComponentProps<typeof TooltipPrimitive.Content>) => (
     <TooltipPrimitive.Portal>
       <TooltipPrimitive.Content
         data-slot='tooltip-content'
@@ -56,6 +49,5 @@ function TooltipContent({
       </TooltipPrimitive.Content>
     </TooltipPrimitive.Portal>
   )
-}
 
 export { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger }

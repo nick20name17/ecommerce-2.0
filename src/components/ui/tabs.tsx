@@ -4,12 +4,11 @@ import * as React from 'react'
 
 import { cn } from '@/lib/utils'
 
-function Tabs({
+const Tabs = ({
   className,
   orientation = 'horizontal',
   ...props
-}: React.ComponentProps<typeof TabsPrimitive.Root>) {
-  return (
+}: React.ComponentProps<typeof TabsPrimitive.Root>) => (
     <TabsPrimitive.Root
       data-slot='tabs'
       data-orientation={orientation}
@@ -17,7 +16,6 @@ function Tabs({
       {...props}
     />
   )
-}
 
 const tabsListVariants = cva(
   'rounded-lg p-[3px] group-data-horizontal/tabs:h-8 data-[variant=line]:rounded-none data-[variant=outline]:rounded-none group/tabs-list text-muted-foreground inline-flex w-fit items-center justify-center group-data-vertical/tabs:h-fit group-data-vertical/tabs:flex-col',
@@ -35,12 +33,11 @@ const tabsListVariants = cva(
   }
 )
 
-function TabsList({
+const TabsList = ({
   className,
   variant = 'default',
   ...props
-}: React.ComponentProps<typeof TabsPrimitive.List> & VariantProps<typeof tabsListVariants>) {
-  return (
+}: React.ComponentProps<typeof TabsPrimitive.List> & VariantProps<typeof tabsListVariants>) => (
     <TabsPrimitive.List
       data-slot='tabs-list'
       data-variant={variant}
@@ -48,10 +45,8 @@ function TabsList({
       {...props}
     />
   )
-}
 
-function TabsTrigger({ className, ...props }: React.ComponentProps<typeof TabsPrimitive.Trigger>) {
-  return (
+const TabsTrigger = ({ className, ...props }: React.ComponentProps<typeof TabsPrimitive.Trigger>) => (
     <TabsPrimitive.Trigger
       data-slot='tabs-trigger'
       className={cn(
@@ -65,16 +60,13 @@ function TabsTrigger({ className, ...props }: React.ComponentProps<typeof TabsPr
       {...props}
     />
   )
-}
 
-function TabsContent({ className, ...props }: React.ComponentProps<typeof TabsPrimitive.Content>) {
-  return (
+const TabsContent = ({ className, ...props }: React.ComponentProps<typeof TabsPrimitive.Content>) => (
     <TabsPrimitive.Content
       data-slot='tabs-content'
       className={cn('flex-1 text-sm outline-none', className)}
       {...props}
     />
   )
-}
 
 export { Tabs, TabsList, TabsTrigger, TabsContent, tabsListVariants }

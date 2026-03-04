@@ -19,13 +19,13 @@ interface CustomerComboboxProps {
   showAllOption?: boolean
 }
 
-export function CustomerCombobox({
+export const CustomerCombobox = ({
   value,
   onChange,
   projectId,
   placeholder = 'Select customer...',
   showAllOption = false
-}: CustomerComboboxProps) {
+}: CustomerComboboxProps) => {
   const [open, setOpen] = useState(false)
   const [search, setSearch] = useState('')
   const [debouncedSearch, setDebouncedSearch] = useState('')

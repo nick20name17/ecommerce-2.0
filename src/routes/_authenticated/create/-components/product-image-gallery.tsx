@@ -9,12 +9,12 @@ interface ProductImageGalleryProps {
   displayName: string
 }
 
-export function ProductImageGallery({
+export const ProductImageGallery = ({
   photos,
   photoIndex,
   onPhotoIndexChange,
   displayName
-}: ProductImageGalleryProps) {
+}: ProductImageGalleryProps) => {
   return (
     <div className='flex flex-col gap-3'>
       <div className='group relative'>

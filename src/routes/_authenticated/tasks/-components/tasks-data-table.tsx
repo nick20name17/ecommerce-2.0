@@ -21,7 +21,7 @@ interface TasksDataTableProps {
   fitWidth?: boolean
 }
 
-export function TasksDataTable({
+export const TasksDataTable = ({
   data,
   isLoading,
   sorting,
@@ -32,7 +32,7 @@ export function TasksDataTable({
   statuses,
   onStatusChange,
   fitWidth
-}: TasksDataTableProps) {
+}: TasksDataTableProps) => {
   const columns = useMemo(
     () => getTaskColumns({ onEdit, onDelete, statuses, onStatusChange }),
     [onEdit, onDelete, statuses, onStatusChange]

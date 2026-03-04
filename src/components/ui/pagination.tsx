@@ -10,43 +10,41 @@ import * as React from 'react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 
-function Pagination({ className, ...props }: React.ComponentProps<'nav'>) {
-  return (
-    <nav
-      aria-label='pagination'
-      data-slot='pagination'
-      className={cn('mx-auto flex w-full justify-center', className)}
-      {...props}
-    />
-  )
-}
+const Pagination = ({ className, ...props }: React.ComponentProps<'nav'>) => (
+  <nav
+    aria-label='pagination'
+    data-slot='pagination'
+    className={cn('mx-auto flex w-full justify-center', className)}
+    {...props}
+  />
+)
 
-function PaginationContent({ className, ...props }: React.ComponentProps<'ul'>) {
-  return (
-    <ul
-      data-slot='pagination-content'
-      className={cn('flex items-center gap-0.5', className)}
-      {...props}
-    />
-  )
-}
+const PaginationContent = ({ className, ...props }: React.ComponentProps<'ul'>) => (
+  <ul
+    data-slot='pagination-content'
+    className={cn('flex items-center gap-0.5', className)}
+    {...props}
+  />
+)
 
-function PaginationItem({ ...props }: React.ComponentProps<'li'>) {
-  return (
-    <li
-      data-slot='pagination-item'
-      {...props}
-    />
-  )
-}
+const PaginationItem = ({ ...props }: React.ComponentProps<'li'>) => (
+  <li
+    data-slot='pagination-item'
+    {...props}
+  />
+)
 
 type PaginationButtonProps = {
   isActive?: boolean
 } & Pick<React.ComponentProps<typeof Button>, 'size' | 'disabled'> &
   React.ComponentProps<'button'>
 
-function PaginationButton({ className, isActive, size = 'icon', ...props }: PaginationButtonProps) {
-  return (
+const PaginationButton = ({
+  className,
+  isActive,
+  size = 'icon',
+  ...props
+}: PaginationButtonProps) => (
     <Button
       variant={isActive ? 'outline' : 'ghost'}
       size={size}
@@ -57,13 +55,11 @@ function PaginationButton({ className, isActive, size = 'icon', ...props }: Pagi
       {...props}
     />
   )
-}
 
-function PaginationPrevious({
+const PaginationPrevious = ({
   className,
   ...props
-}: React.ComponentProps<typeof PaginationButton>) {
-  return (
+}: React.ComponentProps<typeof PaginationButton>) => (
     <PaginationButton
       aria-label='Go to previous page'
       size='icon'
@@ -73,10 +69,11 @@ function PaginationPrevious({
       <ChevronLeftIcon />
     </PaginationButton>
   )
-}
 
-function PaginationNext({ className, ...props }: React.ComponentProps<typeof PaginationButton>) {
-  return (
+const PaginationNext = ({
+  className,
+  ...props
+}: React.ComponentProps<typeof PaginationButton>) => (
     <PaginationButton
       aria-label='Go to next page'
       size='icon'
@@ -86,10 +83,11 @@ function PaginationNext({ className, ...props }: React.ComponentProps<typeof Pag
       <ChevronRightIcon />
     </PaginationButton>
   )
-}
 
-function PaginationFirst({ className, ...props }: React.ComponentProps<typeof PaginationButton>) {
-  return (
+const PaginationFirst = ({
+  className,
+  ...props
+}: React.ComponentProps<typeof PaginationButton>) => (
     <PaginationButton
       aria-label='Go to first page'
       size='icon'
@@ -99,10 +97,11 @@ function PaginationFirst({ className, ...props }: React.ComponentProps<typeof Pa
       <ChevronsLeftIcon />
     </PaginationButton>
   )
-}
 
-function PaginationLast({ className, ...props }: React.ComponentProps<typeof PaginationButton>) {
-  return (
+const PaginationLast = ({
+  className,
+  ...props
+}: React.ComponentProps<typeof PaginationButton>) => (
     <PaginationButton
       aria-label='Go to last page'
       size='icon'
@@ -112,10 +111,11 @@ function PaginationLast({ className, ...props }: React.ComponentProps<typeof Pag
       <ChevronsRightIcon />
     </PaginationButton>
   )
-}
 
-function PaginationEllipsis({ className, ...props }: React.ComponentProps<'span'>) {
-  return (
+const PaginationEllipsis = ({
+  className,
+  ...props
+}: React.ComponentProps<'span'>) => (
     <span
       aria-hidden
       data-slot='pagination-ellipsis'
@@ -129,7 +129,6 @@ function PaginationEllipsis({ className, ...props }: React.ComponentProps<'span'
       <span className='sr-only'>More pages</span>
     </span>
   )
-}
 
 export {
   Pagination,

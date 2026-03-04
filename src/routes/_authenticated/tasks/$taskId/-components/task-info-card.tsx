@@ -23,7 +23,7 @@ import { cn } from '@/lib/utils'
 
 const DATE_TIME_LONG = 'MMM d, yyyy, h:mm a'
 
-function DetailRow({
+const DetailRow = ({
   label,
   children,
   className
@@ -31,7 +31,7 @@ function DetailRow({
   label: string
   children: React.ReactNode
   className?: string
-}) {
+}) => {
   return (
     <div className={cn('flex flex-col gap-1.5', className)}>
       <span className='text-muted-foreground text-xs'>{label}</span>

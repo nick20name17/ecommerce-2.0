@@ -22,7 +22,7 @@ interface CustomersDataTableProps {
   canAssign?: boolean
 }
 
-export function CustomersDataTable({
+export const CustomersDataTable = ({
   data,
   fieldConfig,
   isLoading,
@@ -33,7 +33,7 @@ export function CustomersDataTable({
   onDelete,
   onAssign,
   canAssign
-}: CustomersDataTableProps) {
+}: CustomersDataTableProps) => {
   const columns = useMemo(
     () =>
       getCustomerColumns({

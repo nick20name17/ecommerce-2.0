@@ -22,7 +22,7 @@ interface CustomerTasksTabProps {
   customerId: string
 }
 
-export function CustomerTasksTab({ customerId }: CustomerTasksTabProps) {
+export const CustomerTasksTab = ({ customerId }: CustomerTasksTabProps) => {
   const navigate = useNavigate()
   const [search] = useSearchParam()
   const [offset] = useOffsetParam()

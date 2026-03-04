@@ -15,7 +15,7 @@ interface ProductConfigurationsProps {
   totalConfigCount: number
 }
 
-export function ProductConfigurations({
+export const ProductConfigurations = ({
   configs,
   activeTab,
   onActiveTabChange,
@@ -23,7 +23,7 @@ export function ProductConfigurations({
   hasUncheckedRequired,
   selectedConfigCount,
   totalConfigCount
-}: ProductConfigurationsProps) {
+}: ProductConfigurationsProps) => {
   return (
     <div className='bg-muted/20 space-y-4 rounded-xl border p-4'>
       <div className='flex items-center justify-between'>

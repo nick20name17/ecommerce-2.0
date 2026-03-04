@@ -19,18 +19,18 @@ interface CatalogCategorySidebarProps {
   className?: string
 }
 
-function getLabelForTreeId(results: Category[], treeId: string | null) {
+const getLabelForTreeId = (results: Category[], treeId: string | null) => {
   if (treeId == null) return 'All categories'
   const match = results.find((c) => c.tree_id === treeId)
   return match?.tree_descr ?? 'Category'
 }
 
-export function CatalogCategorySidebar({
+export const CatalogCategorySidebar = ({
   projectId,
   value,
   onChange,
   className
-}: CatalogCategorySidebarProps) {
+}: CatalogCategorySidebarProps) => {
   const [path, setPath] = useState<Crumb[]>([])
 
   useEffect(() => {

@@ -17,7 +17,7 @@ interface OrderComboboxProps {
   projectId?: number | null
 }
 
-export function OrderCombobox({ value, onChange, projectId }: OrderComboboxProps) {
+export const OrderCombobox = ({ value, onChange, projectId }: OrderComboboxProps) => {
   const [open, setOpen] = useState(false)
   const [search, setSearch] = useState('')
   const [debouncedSearch, setDebouncedSearch] = useState('')

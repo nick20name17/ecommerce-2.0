@@ -80,7 +80,7 @@ export const TaskModal = ({
   )
 }
 
-function SharedFields({
+const SharedFields = ({
   statuses,
   projectId,
   responsibleUserLabel
@@ -88,7 +88,7 @@ function SharedFields({
   statuses: TaskStatus[]
   projectId?: number
   responsibleUserLabel?: string | null
-}) {
+}) => {
   const { control } = useFormContext<CreateTaskFormValues>()
 
   return (
@@ -258,7 +258,7 @@ function SharedFields({
   )
 }
 
-function CreateForm({
+const CreateForm = ({
   onOpenChange,
   projectId,
   defaultLinkedCustomerAutoid
@@ -266,7 +266,7 @@ function CreateForm({
   onOpenChange: (open: boolean) => void
   projectId?: number
   defaultLinkedCustomerAutoid?: string | null
-}) {
+}) => {
   const { data: statusesData, isLoading: statusesLoading } = useQuery(
     getTaskStatusesQuery(projectId)
   )
@@ -317,7 +317,7 @@ function CreateForm({
   )
 }
 
-function CreateFormInner({
+const CreateFormInner = ({
   defaultStatus,
   statuses,
   onOpenChange,
@@ -329,7 +329,7 @@ function CreateFormInner({
   onOpenChange: (open: boolean) => void
   projectId?: number
   defaultLinkedCustomerAutoid?: string | null
-}) {
+}) => {
   const attachmentsRef = useRef<TaskAttachmentsRef>(null)
 
   const form = useForm<CreateTaskFormValues>({
@@ -435,7 +435,7 @@ function CreateFormInner({
   )
 }
 
-function EditForm({
+const EditForm = ({
   task,
   onOpenChange,
   projectId
@@ -443,7 +443,7 @@ function EditForm({
   task: Task | TaskListItem
   onOpenChange: (open: boolean) => void
   projectId?: number
-}) {
+}) => {
   const { data: statusesData } = useQuery(getTaskStatusesQuery(projectId ?? task.project))
   const { data: taskDetails, isLoading: isLoadingTask } = useQuery(getTaskDetailQuery(task.id))
   const statuses = statusesData?.results ?? []

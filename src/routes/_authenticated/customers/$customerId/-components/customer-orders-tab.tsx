@@ -23,7 +23,7 @@ interface CustomerOrdersTabProps {
   customerId: string
 }
 
-export function CustomerOrdersTab({ customerId }: CustomerOrdersTabProps) {
+export const CustomerOrdersTab = ({ customerId }: CustomerOrdersTabProps) => {
   const [search] = useSearchParam()
   const [offset] = useOffsetParam()
   const [limit] = useLimitParam()

@@ -71,7 +71,7 @@ export const ProjectModal = ({ projectId, open, onOpenChange }: ProjectModalProp
   )
 }
 
-function EditFormSkeleton() {
+const EditFormSkeleton = () => {
   return (
     <>
       <DialogHeader className='bg-background sticky top-0 z-10 border-b px-6 py-4'>
@@ -117,13 +117,13 @@ function EditFormSkeleton() {
   )
 }
 
-function EditFormError({
+const EditFormError = ({
   error,
   onOpenChange
 }: {
   error: Error | null
   onOpenChange: (open: boolean) => void
-}) {
+}) => {
   const message = error?.message ?? 'Failed to load project'
   return (
     <>
@@ -143,7 +143,7 @@ function EditFormError({
   )
 }
 
-function SharedFields() {
+const SharedFields = () => {
   const { control } = useFormContext()
 
   return (
@@ -433,7 +433,7 @@ function SharedFields() {
   )
 }
 
-function CreateForm({ onOpenChange }: { onOpenChange: (open: boolean) => void }) {
+const CreateForm = ({ onOpenChange }: { onOpenChange: (open: boolean) => void }) => {
   const form = useForm<CreateProjectFormValues>({
     resolver: zodResolver(CreateProjectSchema),
     defaultValues: {
@@ -559,13 +559,13 @@ function CreateForm({ onOpenChange }: { onOpenChange: (open: boolean) => void })
   )
 }
 
-function EditForm({
+const EditForm = ({
   project,
   onOpenChange
 }: {
   project: Project
   onOpenChange: (open: boolean) => void
-}) {
+}) => {
   const form = useForm<UpdateProjectFormValues>({
     resolver: zodResolver(UpdateProjectSchema),
     defaultValues: {

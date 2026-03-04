@@ -54,7 +54,7 @@ export const CustomerModal = ({ customer, open, onOpenChange }: CustomerModalPro
   )
 }
 
-function SharedFields() {
+const SharedFields = () => {
   const { control } = useFormContext()
 
   return (
@@ -250,7 +250,7 @@ function SharedFields() {
   )
 }
 
-function CreateForm({ onOpenChange }: { onOpenChange: (open: boolean) => void }) {
+const CreateForm = ({ onOpenChange }: { onOpenChange: (open: boolean) => void }) => {
   const form = useForm<CustomerFormValues>({
     resolver: zodResolver(CustomerSchema),
     defaultValues: {
@@ -319,13 +319,13 @@ function CreateForm({ onOpenChange }: { onOpenChange: (open: boolean) => void })
   )
 }
 
-function EditForm({
+const EditForm = ({
   customer,
   onOpenChange
 }: {
   customer: Customer
   onOpenChange: (open: boolean) => void
-}) {
+}) => {
   const form = useForm<CustomerFormValues>({
     resolver: zodResolver(CustomerSchema),
     defaultValues: {

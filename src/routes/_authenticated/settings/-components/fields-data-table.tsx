@@ -17,13 +17,13 @@ interface FieldsDataTableProps {
   isPending: boolean
 }
 
-export function FieldsDataTable({
+export const FieldsDataTable = ({
   fields,
   isLoading,
   entity,
   onFieldToggle,
   isPending
-}: FieldsDataTableProps) {
+}: FieldsDataTableProps) => {
   const [sorting, setSorting] = useState<SortingState>([])
 
   const columns = useMemo(

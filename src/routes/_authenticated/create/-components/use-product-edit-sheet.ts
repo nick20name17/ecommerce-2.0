@@ -4,17 +4,16 @@ import { type SheetAction, initialSheetState, sheetReducer } from './product-edi
 import type { CartItem, ConfigurationProduct, Product } from '@/api/product/schema'
 import { productService } from '@/api/product/service'
 
-function isCartItem(p: Product | CartItem): p is CartItem {
-  return 'id' in p && typeof (p as CartItem).id === 'number' && 'product_autoid' in p
-}
+const isCartItem = (p: Product | CartItem): p is CartItem =>
+  'id' in p && typeof (p as CartItem).id === 'number' && 'product_autoid' in p
 
-export function useProductEditSheet(
+export const useProductEditSheet = (
   product: Product | CartItem | null,
   mode: 'add' | 'edit',
   open: boolean,
   configData: ConfigurationProduct | null,
   projectId?: number | null
-) {
+) => {
   const [state, dispatch] = useReducer(sheetReducer, initialSheetState)
   const requestedTabsRef = useRef<Set<string>>(new Set())
   const { activeTab, configs } = state

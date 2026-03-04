@@ -30,7 +30,7 @@ const SORTABLE_PLUGINS = [...defaultPreset.plugins, OptimisticSortingPlugin, Sor
 
 const defaultStatusColorHex = '#6B7280'
 
-function arrayMove<T>(array: T[], from: number, to: number): T[] {
+const arrayMove = <T,>(array: T[], from: number, to: number): T[] => {
   const next = array.slice()
   next.splice(to, 0, next.splice(from, 1)[0]!)
   return next
@@ -41,7 +41,7 @@ interface TaskStatusManagerProps {
   statuses: TaskStatus[]
 }
 
-export function TaskStatusManager({ projectId, statuses }: TaskStatusManagerProps) {
+export const TaskStatusManager = ({ projectId, statuses }: TaskStatusManagerProps) => {
   const [orderedStatuses, setOrderedStatuses] = useState(() => [...statuses])
 
   useEffect(() => {
@@ -136,7 +136,7 @@ export function TaskStatusManager({ projectId, statuses }: TaskStatusManagerProp
   )
 }
 
-function StatusList({
+const StatusList = ({
   projectId,
   statuses,
   onStatusesChange
@@ -144,7 +144,7 @@ function StatusList({
   projectId: number | null
   statuses: TaskStatus[]
   onStatusesChange: (statuses: TaskStatus[]) => void
-}) {
+}) => {
   const mutationMeta = { meta: { invalidatesQuery: TASK_QUERY_KEYS.statuses(projectId) } }
 
   const createMutation = useMutation({
@@ -193,7 +193,7 @@ function StatusList({
   )
 }
 
-function SortableStatusRow({
+const SortableStatusRow = ({
   status,
   index,
   onDelete,
@@ -211,7 +211,7 @@ function SortableStatusRow({
   canDelete: boolean
   projectId: number | null
   isDeleting: boolean
-}) {
+}) => {
   const { handleRef, ref, isDragging } = useSortable({
     id: status.id,
     index,
@@ -280,7 +280,7 @@ function SortableStatusRow({
   )
 }
 
-function StatusEditDialog({ status, projectId }: { status: TaskStatus; projectId: number | null }) {
+const StatusEditDialog = ({ status, projectId }: { status: TaskStatus; projectId: number | null }) => {
   const [open, setOpen] = useState(false)
   const [name, setName] = useState(status.name)
   const [color, setColor] = useState(status.color ?? defaultStatusColorHex)
@@ -367,13 +367,13 @@ function StatusEditDialog({ status, projectId }: { status: TaskStatus; projectId
   )
 }
 
-function AddStatusRow({
+const AddStatusRow = ({
   onAdd,
   disabled
 }: {
   onAdd: (name: string, color: string) => void
   disabled: boolean
-}) {
+}) => {
   const [name, setName] = useState('')
   const [color, setColor] = useState(defaultStatusColorHex)
 

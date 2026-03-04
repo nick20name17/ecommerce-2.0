@@ -48,13 +48,13 @@ export const SecurityCard = () => {
   )
 }
 
-function ChangePasswordDialog({
+const ChangePasswordDialog = ({
   open,
   onOpenChange
 }: {
   open: boolean
   onOpenChange: (open: boolean) => void
-}) {
+}) => {
   const form = useForm<ChangePasswordFormValues>({
     resolver: zodResolver(ChangePasswordSchema),
     defaultValues: {

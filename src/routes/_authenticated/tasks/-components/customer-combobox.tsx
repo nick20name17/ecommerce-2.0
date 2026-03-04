@@ -17,7 +17,7 @@ interface TaskCustomerComboboxProps {
   projectId?: number | null
 }
 
-export function TaskCustomerCombobox({ value, onChange, projectId }: TaskCustomerComboboxProps) {
+export const TaskCustomerCombobox = ({ value, onChange, projectId }: TaskCustomerComboboxProps) => {
   const [open, setOpen] = useState(false)
   const [search, setSearch] = useState('')
   const [debouncedSearch, setDebouncedSearch] = useState('')

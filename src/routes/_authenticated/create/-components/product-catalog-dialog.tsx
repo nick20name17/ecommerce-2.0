@@ -21,7 +21,7 @@ interface ProductCatalogDialogProps {
   removingItemId?: number | null
 }
 
-export function ProductCatalogDialog({
+export const ProductCatalogDialog = ({
   open,
   onOpenChange,
   customerId,
@@ -31,7 +31,7 @@ export function ProductCatalogDialog({
   disabled,
   addingProductAutoid,
   removingItemId
-}: ProductCatalogDialogProps) {
+}: ProductCatalogDialogProps) => {
   const [category, setCategory] = useState<{ treeId: string | null; treeDescr: string }>({
     treeId: null,
     treeDescr: 'All categories'

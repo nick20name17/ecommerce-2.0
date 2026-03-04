@@ -46,14 +46,14 @@ interface CustomerColumnsOptions {
   canAssign?: boolean
 }
 
-export function getCustomerColumns({
+export const getCustomerColumns = ({
   fieldConfig,
   data,
   onEdit,
   onDelete,
   onAssign,
   canAssign
-}: CustomerColumnsOptions): ColumnDef<Customer>[] {
+}: CustomerColumnsOptions): ColumnDef<Customer>[] => {
   const entity = 'customer'
   const orderedKeys = getOrderedDataKeys(data, entity, fieldConfig)
   const getLabel = (key: string) => getColumnLabel(key, entity, fieldConfig)

@@ -20,13 +20,13 @@ interface CatalogMiniCartProps {
   className?: string
 }
 
-export function CatalogMiniCart({
+export const CatalogMiniCart = ({
   customerId,
   projectId,
   onRemove,
   removingItemId,
   className
-}: CatalogMiniCartProps) {
+}: CatalogMiniCartProps) => {
   const { data: cart, isLoading } = useQuery({
     ...getCartQuery(customerId, projectId)
   })
@@ -111,7 +111,7 @@ export function CatalogMiniCart({
   )
 }
 
-function MiniCartItemRow({
+const MiniCartItemRow = ({
   item,
   onRemove,
   removing
@@ -119,7 +119,7 @@ function MiniCartItemRow({
   item: CartItem
   onRemove?: (itemId: number) => void
   removing?: boolean
-}) {
+}) => {
   const lineTotal = (item.price ?? 0) * (item.quantity ?? 0)
   return (
     <li className='bg-background/60 hover:border-border hover:bg-background/80 flex items-center gap-2 rounded-lg border border-transparent px-2.5 py-2 transition-colors'>

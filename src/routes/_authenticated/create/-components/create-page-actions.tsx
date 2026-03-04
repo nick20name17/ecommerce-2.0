@@ -17,7 +17,7 @@ interface CreatePageActionsProps {
   onCreateOrder: () => void
 }
 
-export function CreatePageActions({
+export const CreatePageActions = ({
   customerSelected,
   hasItems,
   isBusy,
@@ -27,7 +27,7 @@ export function CreatePageActions({
   onClearAll,
   onCreateProposal,
   onCreateOrder
-}: CreatePageActionsProps) {
+}: CreatePageActionsProps) => {
   const isCreating = creatingProposal || creatingOrder
   const canSubmit = customerSelected && hasItems && !isBusy && !isCreating
   const submitTooltip = !customerSelected

@@ -16,13 +16,13 @@ interface PayloadLogsDataTableProps {
   onView: (log: PayloadLog) => void
 }
 
-export function PayloadLogsDataTable({
+export const PayloadLogsDataTable = ({
   data,
   isLoading,
   sorting,
   setSorting,
   onView
-}: PayloadLogsDataTableProps) {
+}: PayloadLogsDataTableProps) => {
   const columns = useMemo(() => getPayloadLogColumns({ onView }), [onView])
 
   const table = useReactTable({

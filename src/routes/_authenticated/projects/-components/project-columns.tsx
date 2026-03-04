@@ -21,7 +21,7 @@ interface ProjectColumnsOptions {
   onDelete: (project: Project) => void
 }
 
-function renderServiceHealthCell(project: ProjectWithHealthLoading, service: ProjectHealthService) {
+const renderServiceHealthCell = (project: ProjectWithHealthLoading, service: ProjectHealthService) => {
   if (project._healthLoading) {
     return (
       <HealthCell
@@ -40,7 +40,7 @@ function renderServiceHealthCell(project: ProjectWithHealthLoading, service: Pro
   )
 }
 
-function renderStatusOnlyCell(status: 'healthy' | 'unhealthy' | null, isLoading?: boolean) {
+const renderStatusOnlyCell = (status: 'healthy' | 'unhealthy' | null, isLoading?: boolean) => {
   return (
     <HealthCell
       status={status}

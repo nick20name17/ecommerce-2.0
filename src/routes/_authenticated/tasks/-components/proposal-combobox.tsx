@@ -17,7 +17,7 @@ interface ProposalComboboxProps {
   projectId?: number | null
 }
 
-export function ProposalCombobox({ value, onChange, projectId }: ProposalComboboxProps) {
+export const ProposalCombobox = ({ value, onChange, projectId }: ProposalComboboxProps) => {
   const [open, setOpen] = useState(false)
   const [search, setSearch] = useState('')
   const [debouncedSearch, setDebouncedSearch] = useState('')

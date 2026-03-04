@@ -118,7 +118,7 @@ const PROPOSAL_FORMATTERS: Partial<Record<string, DynamicCellFormatter<ProposalR
   total: (v, row) => (row._pending ? '—' : formatCurrency((v ?? row.total) as string, '—'))
 }
 
-export function getProposalColumns({
+export const getProposalColumns = ({
   fieldConfig,
   data,
   isSuperAdmin,
@@ -127,7 +127,7 @@ export function getProposalColumns({
   onAttachments,
   onAssign,
   canAssign
-}: ProposalColumnsOptions): ColumnDef<ProposalRow>[] {
+}: ProposalColumnsOptions): ColumnDef<ProposalRow>[] => {
   const entity = 'proposal'
   const orderedKeys = getOrderedDataKeys(data, entity, fieldConfig)
   const getLabel = (key: string) => getColumnLabel(key, entity, fieldConfig)

@@ -3,16 +3,15 @@ import * as React from 'react'
 
 import { cn } from '@/lib/utils'
 
-function Avatar({
+const Avatar = ({
   className,
   size = 'default',
   ...props
 }: React.ComponentProps<typeof AvatarPrimitive.Root> & {
   size?: 'default' | 'sm' | 'lg'
-}) {
-  return (
-    <AvatarPrimitive.Root
-      data-slot='avatar'
+}) => (
+  <AvatarPrimitive.Root
+    data-slot='avatar'
       data-size={size}
       className={cn(
         'after:border-border group/avatar relative flex size-8 shrink-0 rounded-full select-none after:absolute after:inset-0 after:rounded-full after:border after:mix-blend-darken data-[size=lg]:size-10 data-[size=sm]:size-6 dark:after:mix-blend-lighten',
@@ -21,24 +20,23 @@ function Avatar({
       {...props}
     />
   )
-}
 
-function AvatarImage({ className, ...props }: React.ComponentProps<typeof AvatarPrimitive.Image>) {
-  return (
+const AvatarImage = ({
+  className,
+  ...props
+}: React.ComponentProps<typeof AvatarPrimitive.Image>) => (
     <AvatarPrimitive.Image
       data-slot='avatar-image'
       className={cn('aspect-square size-full rounded-full object-cover', className)}
       {...props}
     />
   )
-}
 
-function AvatarFallback({
+const AvatarFallback = ({
   className,
   ...props
-}: React.ComponentProps<typeof AvatarPrimitive.Fallback>) {
-  return (
-    <AvatarPrimitive.Fallback
+}: React.ComponentProps<typeof AvatarPrimitive.Fallback>) => (
+  <AvatarPrimitive.Fallback
       data-slot='avatar-fallback'
       className={cn(
         'bg-muted text-muted-foreground flex size-full items-center justify-center rounded-full text-sm group-data-[size=sm]/avatar:text-xs',
@@ -47,10 +45,11 @@ function AvatarFallback({
       {...props}
     />
   )
-}
 
-function AvatarBadge({ className, ...props }: React.ComponentProps<'span'>) {
-  return (
+const AvatarBadge = ({
+  className,
+  ...props
+}: React.ComponentProps<'span'>) => (
     <span
       data-slot='avatar-badge'
       className={cn(
@@ -63,10 +62,8 @@ function AvatarBadge({ className, ...props }: React.ComponentProps<'span'>) {
       {...props}
     />
   )
-}
 
-function AvatarGroup({ className, ...props }: React.ComponentProps<'div'>) {
-  return (
+const AvatarGroup = ({ className, ...props }: React.ComponentProps<'div'>) => (
     <div
       data-slot='avatar-group'
       className={cn(
@@ -76,10 +73,8 @@ function AvatarGroup({ className, ...props }: React.ComponentProps<'div'>) {
       {...props}
     />
   )
-}
 
-function AvatarGroupCount({ className, ...props }: React.ComponentProps<'div'>) {
-  return (
+const AvatarGroupCount = ({ className, ...props }: React.ComponentProps<'div'>) => (
     <div
       data-slot='avatar-group-count'
       className={cn(
@@ -89,6 +84,5 @@ function AvatarGroupCount({ className, ...props }: React.ComponentProps<'div'>) 
       {...props}
     />
   )
-}
 
 export { Avatar, AvatarImage, AvatarFallback, AvatarGroup, AvatarGroupCount, AvatarBadge }

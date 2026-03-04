@@ -11,8 +11,7 @@ import { cn } from '@/lib/utils'
 import { DashboardKpis } from '@/routes/_authenticated/-components/dashboard-kpis'
 import { DashboardOrdersChart } from '@/routes/_authenticated/-components/dashboard-orders-chart'
 
-function DashboardTabSkeleton() {
-  return (
+const DashboardTabSkeleton = () => (
     <div className='flex flex-col gap-5'>
       <div className='grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3'>
         {Array.from({ length: 3 }).map((_, i) => (
@@ -50,15 +49,14 @@ function DashboardTabSkeleton() {
         </Card>
       </div>
     </div>
-  )
-}
+)
 
 interface CustomerDashboardTabProps {
   customerId: string
   projectId: number | null
 }
 
-export function CustomerDashboardTab({ customerId, projectId }: CustomerDashboardTabProps) {
+export const CustomerDashboardTab = ({ customerId, projectId }: CustomerDashboardTabProps) => {
   const params = {
     customer_id: customerId,
     project_id: projectId ?? undefined

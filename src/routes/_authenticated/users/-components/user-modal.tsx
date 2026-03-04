@@ -64,7 +64,7 @@ export const UserModal = ({ user, open, onOpenChange }: UserModalProps) => {
   )
 }
 
-function SharedFields({ editingUser }: { editingUser?: User | null }) {
+const SharedFields = ({ editingUser }: { editingUser?: User | null }) => {
   const { control, setValue } = useFormContext()
   const role = useWatch({ control, name: 'role', defaultValue: undefined })
   const { user: currentUser } = useAuth()
@@ -215,7 +215,7 @@ function SharedFields({ editingUser }: { editingUser?: User | null }) {
   )
 }
 
-function CreateForm({ onOpenChange }: { onOpenChange: (open: boolean) => void }) {
+const CreateForm = ({ onOpenChange }: { onOpenChange: (open: boolean) => void }) => {
   const { user: currentUser } = useAuth()
   const isCurrentUserSuperAdmin = !!currentUser?.role && isSuperAdmin(currentUser.role)
   const form = useForm<CreateUserFormValues>({
@@ -318,7 +318,7 @@ function CreateForm({ onOpenChange }: { onOpenChange: (open: boolean) => void })
   )
 }
 
-function EditForm({ user, onOpenChange }: { user: User; onOpenChange: (open: boolean) => void }) {
+const EditForm = ({ user, onOpenChange }: { user: User; onOpenChange: (open: boolean) => void }) => {
   const { user: currentUser } = useAuth()
   const isSelf = user.id === currentUser?.id
   const isCurrentUserSuperAdmin = !!currentUser?.role && isSuperAdmin(currentUser.role)

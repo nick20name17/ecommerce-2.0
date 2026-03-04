@@ -37,7 +37,7 @@ interface ProductEditSheetProps {
   onSaved: () => void
 }
 
-export function ProductEditSheet({
+export const ProductEditSheet = ({
   open,
   onOpenChange,
   product,
@@ -47,7 +47,7 @@ export function ProductEditSheet({
   customerId,
   projectId,
   onSaved
-}: ProductEditSheetProps) {
+}: ProductEditSheetProps) => {
   const {
     state,
     dispatch,

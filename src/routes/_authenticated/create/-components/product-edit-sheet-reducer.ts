@@ -42,7 +42,7 @@ export const initialSheetState: SheetState = {
   initialConfigIds: new Set()
 }
 
-export function sheetReducer(state: SheetState, action: SheetAction): SheetState {
+export const sheetReducer = (state: SheetState, action: SheetAction): SheetState => {
   switch (action.type) {
     case 'RESET_PRODUCT':
       return {

@@ -6,17 +6,16 @@ import { getProductByAutoidQuery, getProductConfigurationsQuery } from '@/api/pr
 import type { CartItem, ConfigurationProduct, Product } from '@/api/product/schema'
 import { getErrorMessage } from '@/helpers/error'
 
-function isCartItem(p: Product | CartItem | null): p is CartItem {
-  return p != null && 'product_autoid' in p
-}
+const isCartItem = (p: Product | CartItem | null): p is CartItem =>
+  p != null && 'product_autoid' in p
 
-export function useEditSheetData(
+export const useEditSheetData = (
   editProduct: Product | CartItem | null,
   editSheetOpen: boolean,
   customerId: string,
   projectId: number | null | undefined,
   closeSheet: (action: { type: 'CLOSE' }) => void
-) {
+) => {
   const autoidForConfig =
     editProduct && 'product_autoid' in editProduct
       ? editProduct.product_autoid

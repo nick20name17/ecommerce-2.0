@@ -47,7 +47,7 @@ export interface TaskAttachmentsRef {
   getPendingFiles: () => File[]
 }
 
-function getFileIcon(type: string) {
+const getFileIcon = (type: string) => {
   if (type.startsWith('image/')) return <ImageIcon className='size-4' />
   if (type.startsWith('video/')) return <VideoIcon className='size-4' />
   if (type.startsWith('audio/')) return <HeadphonesIcon className='size-4' />
@@ -64,7 +64,7 @@ interface FileTypeInfo {
   className: string
 }
 
-function getFileTypeInfo(type: string): FileTypeInfo {
+const getFileTypeInfo = (type: string): FileTypeInfo => {
   if (type.startsWith('image/'))
     return { label: 'Image', className: 'bg-purple-500/10 text-purple-600 dark:text-purple-400' }
   if (type.startsWith('video/'))

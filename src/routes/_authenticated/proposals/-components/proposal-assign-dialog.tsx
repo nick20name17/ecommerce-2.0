@@ -23,12 +23,12 @@ interface ProposalAssignDialogProps {
   projectId?: number | null
 }
 
-export function ProposalAssignDialog({
+export const ProposalAssignDialog = ({
   proposal,
   open,
   onOpenChange,
   projectId
-}: ProposalAssignDialogProps) {
+}: ProposalAssignDialogProps) => {
   const currentUserId = proposal?.assigned_user?.id ?? null
   const [selectedUserId, setSelectedUserId] = useState<number | null>(currentUserId)
 

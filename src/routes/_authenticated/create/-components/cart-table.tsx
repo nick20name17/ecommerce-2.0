@@ -24,14 +24,14 @@ interface CartTableProps {
   onQuantityChange: (itemId: number, quantity: number) => void
 }
 
-export function CartTable({
+export const CartTable = ({
   items,
   loading,
   updatingQuantityItemId,
   onEdit,
   onRemove,
   onQuantityChange
-}: CartTableProps) {
+}: CartTableProps) => {
   if (loading) {
     return (
       <div className='space-y-3 p-4'>

@@ -22,7 +22,7 @@ interface OrdersDataTableProps {
   canAssign?: boolean
 }
 
-export function OrdersDataTable({
+export const OrdersDataTable = ({
   data,
   fieldConfig,
   isLoading,
@@ -33,7 +33,7 @@ export function OrdersDataTable({
   onAttachments,
   onAssign,
   canAssign
-}: OrdersDataTableProps) {
+}: OrdersDataTableProps) => {
   const columns = useMemo(
     () =>
       getOrderColumns({

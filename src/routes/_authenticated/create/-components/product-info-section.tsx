@@ -25,7 +25,7 @@ interface ProductInfoSectionProps {
   specs: Array<{ descr: string; info: string }>
 }
 
-export function ProductInfoSection({
+export const ProductInfoSection = ({
   displayName,
   configLoading,
   hasConfigs,
@@ -41,7 +41,7 @@ export function ProductInfoSection({
   onSelectedUnitChange,
   units,
   specs
-}: ProductInfoSectionProps) {
+}: ProductInfoSectionProps) => {
   return (
     <>
       <div className='flex min-w-0 flex-col gap-5'>

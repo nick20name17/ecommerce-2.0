@@ -13,14 +13,14 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 import { formatCellValue, getKeysFromRows, humanizeKey } from '@/helpers/dynamic-columns'
 import { formatCurrency, formatQuantity } from '@/helpers/formatters'
 
-function formatItemCellValue(key: string, value: unknown): string {
+const formatItemCellValue = (key: string, value: unknown): string => {
   if (value == null || (typeof value === 'string' && value.trim() === '')) return '—'
   if (key === 'price' || key === 'amount') return formatCurrency(value as string | number, '—')
   if (key === 'quan') return formatQuantity(value as string | number, 0, '—')
   return formatCellValue(value)
 }
 
-export function ProposalExpandedRow({ row }: { row: Row<Proposal> }) {
+export const ProposalExpandedRow = ({ row }: { row: Row<Proposal> }) => {
   const proposal = row.original
   const items = (proposal.items ?? []) as unknown as Record<string, unknown>[]
 

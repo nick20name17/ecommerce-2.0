@@ -15,7 +15,7 @@ const METHOD_VARIANT: Record<string, 'default' | 'secondary' | 'destructive' | '
   DELETE: 'destructive'
 }
 
-function getStatusVariant(code: number): 'success' | 'destructive' | 'secondary' {
+const getStatusVariant = (code: number): 'success' | 'destructive' | 'secondary' => {
   if (code >= 200 && code < 300) return 'success'
   if (code >= 400) return 'destructive'
   return 'secondary'

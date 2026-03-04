@@ -25,13 +25,13 @@ const METHOD_VARIANT: Record<string, 'default' | 'secondary' | 'destructive' | '
   DELETE: 'destructive'
 }
 
-function getStatusVariant(code: number): 'success' | 'destructive' | 'secondary' {
+const getStatusVariant = (code: number): 'success' | 'destructive' | 'secondary' => {
   if (code >= 200 && code < 300) return 'success'
   if (code >= 400) return 'destructive'
   return 'secondary'
 }
 
-function formatJson(obj: Record<string, unknown> | string | null): string {
+const formatJson = (obj: Record<string, unknown> | string | null): string => {
   if (!obj) return 'null'
 
   if (typeof obj === 'string') {
@@ -154,7 +154,7 @@ export const PayloadLogDetailDialog = ({
   )
 }
 
-function DetailItem({ label, children }: { label: string; children: React.ReactNode }) {
+const DetailItem = ({ label, children }: { label: string; children: React.ReactNode }) => {
   return (
     <div className='flex flex-col gap-1'>
       <span className='text-muted-foreground text-xs font-medium tracking-wide uppercase'>

@@ -5,48 +5,39 @@ import * as React from 'react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 
-function Sheet({ ...props }: React.ComponentProps<typeof SheetPrimitive.Root>) {
-  return (
-    <SheetPrimitive.Root
-      data-slot='sheet'
-      {...props}
-    />
-  )
-}
+const Sheet = ({ ...props }: React.ComponentProps<typeof SheetPrimitive.Root>) => (
+  <SheetPrimitive.Root
+    data-slot='sheet'
+    {...props}
+  />
+)
 
-function SheetTrigger({ ...props }: React.ComponentProps<typeof SheetPrimitive.Trigger>) {
-  return (
-    <SheetPrimitive.Trigger
-      data-slot='sheet-trigger'
-      {...props}
-    />
-  )
-}
+const SheetTrigger = ({ ...props }: React.ComponentProps<typeof SheetPrimitive.Trigger>) => (
+  <SheetPrimitive.Trigger
+    data-slot='sheet-trigger'
+    {...props}
+  />
+)
 
-function SheetClose({ ...props }: React.ComponentProps<typeof SheetPrimitive.Close>) {
-  return (
-    <SheetPrimitive.Close
-      data-slot='sheet-close'
-      {...props}
-    />
-  )
-}
+const SheetClose = ({ ...props }: React.ComponentProps<typeof SheetPrimitive.Close>) => (
+  <SheetPrimitive.Close
+    data-slot='sheet-close'
+    {...props}
+  />
+)
 
-function SheetPortal({ ...props }: React.ComponentProps<typeof SheetPrimitive.Portal>) {
-  return (
-    <SheetPrimitive.Portal
-      data-slot='sheet-portal'
-      {...props}
-    />
-  )
-}
+const SheetPortal = ({ ...props }: React.ComponentProps<typeof SheetPrimitive.Portal>) => (
+  <SheetPrimitive.Portal
+    data-slot='sheet-portal'
+    {...props}
+  />
+)
 
-function SheetOverlay({
+const SheetOverlay = ({
   className,
   ...props
-}: React.ComponentProps<typeof SheetPrimitive.Overlay>) {
-  return (
-    <SheetPrimitive.Overlay
+}: React.ComponentProps<typeof SheetPrimitive.Overlay>) => (
+  <SheetPrimitive.Overlay
       data-slot='sheet-overlay'
       className={cn(
         'data-open:animate-in data-closed:animate-out data-closed:fade-out-0 data-open:fade-in-0 fixed inset-0 z-50 bg-black/10 duration-100 data-ending-style:opacity-0 data-starting-style:opacity-0 supports-backdrop-filter:backdrop-blur-xs',
@@ -55,9 +46,8 @@ function SheetOverlay({
       {...props}
     />
   )
-}
 
-function SheetContent({
+const SheetContent = ({
   className,
   children,
   side = 'right',
@@ -66,8 +56,7 @@ function SheetContent({
 }: React.ComponentProps<typeof SheetPrimitive.Content> & {
   side?: 'top' | 'right' | 'bottom' | 'left'
   showCloseButton?: boolean
-}) {
-  return (
+}) => (
     <SheetPortal>
       <SheetOverlay />
       <SheetPrimitive.Content
@@ -98,50 +87,41 @@ function SheetContent({
       </SheetPrimitive.Content>
     </SheetPortal>
   )
-}
 
-function SheetHeader({ className, ...props }: React.ComponentProps<'div'>) {
-  return (
+const SheetHeader = ({ className, ...props }: React.ComponentProps<'div'>) => (
     <div
       data-slot='sheet-header'
       className={cn('flex flex-col gap-0.5 p-4', className)}
       {...props}
     />
   )
-}
 
-function SheetFooter({ className, ...props }: React.ComponentProps<'div'>) {
-  return (
+const SheetFooter = ({ className, ...props }: React.ComponentProps<'div'>) => (
     <div
       data-slot='sheet-footer'
       className={cn('mt-auto flex flex-col gap-2 p-4', className)}
       {...props}
     />
   )
-}
 
-function SheetTitle({ className, ...props }: React.ComponentProps<typeof SheetPrimitive.Title>) {
-  return (
+const SheetTitle = ({ className, ...props }: React.ComponentProps<typeof SheetPrimitive.Title>) => (
     <SheetPrimitive.Title
       data-slot='sheet-title'
       className={cn('text-foreground text-base font-medium', className)}
       {...props}
     />
   )
-}
 
-function SheetDescription({
+const SheetDescription = ({
   className,
   ...props
-}: React.ComponentProps<typeof SheetPrimitive.Description>) {
-  return (
+}: React.ComponentProps<typeof SheetPrimitive.Description>) => (
     <SheetPrimitive.Description
       data-slot='sheet-description'
       className={cn('text-muted-foreground text-sm', className)}
       {...props}
     />
   )
-}
 
 export {
   Sheet,
