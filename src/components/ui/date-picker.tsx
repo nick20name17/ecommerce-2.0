@@ -123,7 +123,7 @@ export function DatePicker({
               onSelect={handleDateSelect}
             />
             <div className='border-border flex divide-x border-l'>
-              <ScrollArea className='h-[300px] w-16'>
+              <ScrollArea className='h-[300px] w-16 [&>[data-slot=scroll-area-scrollbar]]:hidden'>
                 <div className='flex flex-col p-2'>
                   {hours.map((hour) => (
                     <Button
@@ -138,7 +138,7 @@ export function DatePicker({
                   ))}
                 </div>
               </ScrollArea>
-              <ScrollArea className='h-[300px] w-16'>
+              <ScrollArea className='h-[300px] w-16 [&>[data-slot=scroll-area-scrollbar]]:hidden'>
                 <div className='flex flex-col p-2'>
                   {minutes.map((minute) => (
                     <Button
@@ -153,7 +153,7 @@ export function DatePicker({
                   ))}
                 </div>
               </ScrollArea>
-              <ScrollArea className='h-[300px] w-16'>
+              <ScrollArea className='h-[300px] w-16 [&>[data-slot=scroll-area-scrollbar]]:hidden'>
                 <div className='flex flex-col p-2'>
                   {(['AM', 'PM'] as const).map((ampm) => (
                     <Button
