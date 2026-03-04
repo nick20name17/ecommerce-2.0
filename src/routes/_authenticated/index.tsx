@@ -48,7 +48,7 @@ function DashboardPage() {
   })
 
   const customerFilterValue: Customer | null =
-    selectedCustomer ?? (customerId ? { id: customerId, l_name: '' } : null)
+    selectedCustomer ?? (customerId ? { id: customerId, autoid: '', l_name: '' } : null)
 
   if (userIsSuperAdmin && projectId == null) {
     return (
