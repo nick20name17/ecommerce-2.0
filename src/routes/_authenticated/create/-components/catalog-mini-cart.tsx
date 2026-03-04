@@ -1,5 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
-import { Image, ShoppingBag } from 'lucide-react'
+import { Image, Loader2, ShoppingBag, Trash2 } from 'lucide-react'
+
+import { Button } from '@/components/ui/button'
 
 import { getCartQuery } from '@/api/cart/query'
 import type { CartItem } from '@/api/product/schema'
@@ -14,12 +16,16 @@ const MAX_VISIBLE_ITEMS = 6
 interface CatalogMiniCartProps {
   customerId: string
   projectId?: number | null
+  onRemove?: (itemId: number) => void
+  removingItemId?: number | null
   className?: string
 }
 
 export function CatalogMiniCart({
   customerId,
   projectId,
+  onRemove,
+  removingItemId,
   className,
 }: CatalogMiniCartProps) {
   const { data: cart, isLoading } = useQuery({
@@ -74,7 +80,12 @@ export function CatalogMiniCart({
         <ScrollArea className='min-h-0 flex-1'>
           <ul className='space-y-1 p-3'>
             {displayItems.map((item) => (
-              <MiniCartItemRow key={item.id} item={item} />
+              <MiniCartItemRow
+                key={item.id}
+                item={item}
+                onRemove={onRemove}
+                removing={removingItemId === item.id}
+              />
             ))}
             {hasMore && (
               <li className='text-muted-foreground px-2 py-1.5 text-center text-xs'>
@@ -105,10 +116,18 @@ export function CatalogMiniCart({
   )
 }
 
-function MiniCartItemRow({ item }: { item: CartItem }) {
+function MiniCartItemRow({
+  item,
+  onRemove,
+  removing,
+}: {
+  item: CartItem
+  onRemove?: (itemId: number) => void
+  removing?: boolean
+}) {
   const lineTotal = (item.price ?? 0) * (item.quantity ?? 0)
   return (
-    <li className='flex items-center gap-3 rounded-lg border border-transparent bg-background/60 px-2.5 py-2 transition-colors hover:border-border hover:bg-background/80'>
+    <li className='flex items-center gap-2 rounded-lg border border-transparent bg-background/60 px-2.5 py-2 transition-colors hover:border-border hover:bg-background/80'>
       <div className='flex size-9 shrink-0 items-center justify-center overflow-hidden rounded-md bg-muted'>
         {item.photo ? (
           <img
@@ -136,6 +155,23 @@ function MiniCartItemRow({ item }: { item: CartItem }) {
       <span className='shrink-0 text-right text-xs font-semibold tabular-nums'>
         {formatCurrency(lineTotal)}
       </span>
+      {onRemove && (
+        <Button
+          type='button'
+          variant='ghost'
+          size='icon'
+          className='size-7 shrink-0 text-muted-foreground hover:text-destructive'
+          disabled={removing}
+          onClick={() => onRemove(item.id)}
+          aria-label='Remove'
+        >
+          {removing ? (
+            <Loader2 className='size-3.5 animate-spin' />
+          ) : (
+            <Trash2 className='size-3.5' />
+          )}
+        </Button>
+      )}
     </li>
   )
 }

@@ -103,6 +103,7 @@ function CreatePage() {
   const [catalogOpen, setCatalogOpen] = useState(false)
   const [addingProductAutoid, setAddingProductAutoid] = useState<string | null>(null)
   const [updatingQuantityItemId, setUpdatingQuantityItemId] = useState<number | null>(null)
+  const [removingItemId, setRemovingItemId] = useState<number | null>(null)
   const attachmentsRef = useRef<EntityAttachmentsRef>(null)
   const [busy, busyDispatch] = useReducer(busyReducer, initialBusy)
   const [editState, editDispatch] = useReducer(editReducer, {
@@ -122,11 +123,7 @@ function CreatePage() {
     }
   }, [savedCustomer, customer])
 
-  const {
-    data: cart,
-    isLoading: cartLoading,
-    isFetching: cartFetching
-  } = useQuery({
+  const { data: cart, isLoading: cartLoading } = useQuery({
     ...getCartQuery(customer?.id ?? '', projectId)
   })
   const { product: editProduct, mode: editMode, open: editSheetOpen } = editState
@@ -189,6 +186,7 @@ function CreatePage() {
   const handleRemoveItem = async (itemId: number) => {
     if (!customer) return
     const item = cartItems.find((i) => i.id === itemId)
+    setRemovingItemId(itemId)
     busyDispatch({ type: 'CART_UPDATING', value: true })
     try {
       await cartService.deleteItem(itemId, customer.id, projectId)
@@ -196,8 +194,10 @@ function CreatePage() {
       if (item) toast.success(`${item.product_id} removed`)
     } catch (error) {
       toast.error(getErrorMessage(error))
+    } finally {
+      busyDispatch({ type: 'CART_UPDATING', value: false })
+      setRemovingItemId(null)
     }
-    busyDispatch({ type: 'CART_UPDATING', value: false })
   }
 
   const handleQuantityChange = async (itemId: number, quantity: number) => {
@@ -467,8 +467,10 @@ function CreatePage() {
         customerId={customer?.id ?? null}
         projectId={projectId}
         onSelect={handleProductSelect}
+        onRemoveItem={handleRemoveItem}
         disabled={isBusy}
         addingProductAutoid={addingProductAutoid}
+        removingItemId={removingItemId}
       />
     </div>
   )

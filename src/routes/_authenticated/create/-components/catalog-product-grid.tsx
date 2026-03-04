@@ -19,6 +19,7 @@ interface CatalogProductGridProps {
   categoryId: string | null
   onSelect: (product: Product) => void
   addingProductAutoid?: string | null
+  cartUpdating?: boolean
 }
 
 const DEFAULT_LIMIT = 24
@@ -95,6 +96,7 @@ export function CatalogProductGrid({
   categoryId,
   onSelect,
   addingProductAutoid,
+  cartUpdating,
 }: CatalogProductGridProps) {
   const [query, setQuery] = useState('')
   const [debouncedSearch, setDebouncedSearch] = useState('')
@@ -320,7 +322,7 @@ export function CatalogProductGrid({
                             type='button'
                             size='sm'
                             className='shrink-0 gap-1.5'
-                            disabled={addingProductAutoid === product.autoid}
+                            disabled={cartUpdating || addingProductAutoid === product.autoid}
                             onClick={() => handleAdd(product)}
                           >
                             {addingProductAutoid === product.autoid ? (
@@ -328,7 +330,7 @@ export function CatalogProductGrid({
                             ) : (
                               <ShoppingCart className='size-4' />
                             )}
-                            {addingProductAutoid === product.autoid ? 'Adding…' : 'Add'}
+                            Add
                           </Button>
                         </div>
                       </div>

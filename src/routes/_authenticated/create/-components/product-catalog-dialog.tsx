@@ -15,8 +15,10 @@ interface ProductCatalogDialogProps {
   customerId: string | null
   projectId?: number | null
   onSelect: (product: Product) => void
+  onRemoveItem?: (itemId: number) => void
   disabled?: boolean
   addingProductAutoid?: string | null
+  removingItemId?: number | null
 }
 
 export function ProductCatalogDialog({
@@ -25,8 +27,10 @@ export function ProductCatalogDialog({
   customerId,
   projectId,
   onSelect,
+  onRemoveItem,
   disabled,
   addingProductAutoid,
+  removingItemId,
 }: ProductCatalogDialogProps) {
   const [category, setCategory] = useState<{ treeId: string | null; treeDescr: string }>({
     treeId: null,
@@ -78,7 +82,7 @@ export function ProductCatalogDialog({
         <div
           className={cn(
             'grid min-h-0 flex-1 grid-cols-1',
-            customerId && !isDisabled ? 'lg:grid-cols-[360px_1fr_280px]' : 'lg:grid-cols-[360px_1fr]'
+            customerId ? 'lg:grid-cols-[360px_1fr_280px]' : 'lg:grid-cols-[360px_1fr]'
           )}
         >
           <div className='min-h-0 border-b lg:border-b-0 lg:border-r'>
@@ -90,23 +94,15 @@ export function ProductCatalogDialog({
           </div>
 
           <div className='min-h-0'>
-            {customerId && !isDisabled ? (
+            {customerId ? (
               <CatalogProductGrid
                 customerId={customerId}
                 projectId={projectId}
                 categoryId={category.treeId}
                 onSelect={onSelect}
                 addingProductAutoid={addingProductAutoid ?? null}
+                cartUpdating={isDisabled}
               />
-            ) : customerId ? (
-              <div className='flex h-full items-center justify-center p-6 text-center'>
-                <div className='max-w-sm'>
-                  <p className='text-sm font-semibold'>Please wait</p>
-                  <p className='mt-1 text-xs text-muted-foreground'>
-                    The cart is updating. You can browse again in a moment.
-                  </p>
-                </div>
-              </div>
             ) : (
               <div className='flex h-full items-center justify-center p-6 text-center'>
                 <div className='max-w-sm'>
@@ -119,11 +115,13 @@ export function ProductCatalogDialog({
             )}
           </div>
 
-          {customerId && !isDisabled && (
+          {customerId && (
             <div className='hidden min-h-0 lg:block'>
               <CatalogMiniCart
                 customerId={customerId}
                 projectId={projectId}
+                onRemove={onRemoveItem}
+                removingItemId={removingItemId ?? null}
                 className='h-full'
               />
             </div>
