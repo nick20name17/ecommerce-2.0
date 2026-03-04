@@ -57,7 +57,7 @@ export function CreatePageActions({
             className='text-muted-foreground hover:text-destructive'
           >
             {clearingCart ? <Spinner className='mr-1.5 size-3.5' /> : <Eraser className='mr-1.5 size-3.5' />}
-            Clear
+            Clear cart
           </Button>
         </TooltipTrigger>
         {!hasItems && <TooltipContent>No items to clear</TooltipContent>}
