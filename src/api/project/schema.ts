@@ -18,6 +18,7 @@ export interface Project {
   price_field?: string
   markup_id_trigger?: string
   parent_category?: string
+  salesman?: string
   s3_bucket_name?: string
   s3_region?: string
   s3_access_key_id?: string
@@ -99,6 +100,7 @@ export interface CreateProjectPayload {
   price_field?: string
   markup_id_trigger?: string
   parent_category?: string
+  salesman?: string
   s3_bucket_name?: string
   s3_region?: string
   s3_access_key_id?: string
@@ -137,6 +139,7 @@ const sharedFields = {
   price_field: OptionalStringSchema,
   markup_id_trigger: OptionalStringSchema,
   parent_category: OptionalStringSchema,
+  salesman: OptionalStringSchema,
   s3_bucket_name: OptionalStringSchema,
   s3_region: OptionalStringSchema,
   s3_access_key_id: OptionalStringSchema

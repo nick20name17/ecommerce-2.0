@@ -165,6 +165,24 @@ function SharedFields() {
         )}
       />
 
+      <Controller
+        name='salesman'
+        control={control}
+        render={({ field, fieldState }) => (
+          <Field data-invalid={fieldState.invalid}>
+            <FieldLabel htmlFor='salesman'>Salesman</FieldLabel>
+            <Input
+              {...field}
+              value={field.value ?? ''}
+              id='salesman'
+              placeholder='Salesman name'
+              aria-invalid={fieldState.invalid}
+            />
+            {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+          </Field>
+        )}
+      />
+
       <FieldSeparator>Database</FieldSeparator>
 
       <div className='grid grid-cols-2 gap-4'>
@@ -432,6 +450,7 @@ function CreateForm({ onOpenChange }: { onOpenChange: (open: boolean) => void })
       price_field: '',
       markup_id_trigger: '',
       parent_category: '',
+      salesman: '',
       s3_bucket_name: '',
       s3_region: '',
       s3_access_key_id: '',
@@ -561,6 +580,7 @@ function EditForm({
       price_field: project.price_field ?? '',
       markup_id_trigger: project.markup_id_trigger ?? '',
       parent_category: project.parent_category ?? '',
+      salesman: project.salesman ?? '',
       s3_bucket_name: project.s3_bucket_name ?? '',
       s3_region: project.s3_region ?? '',
       s3_access_key_id: project.s3_access_key_id ?? ''
