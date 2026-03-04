@@ -18,12 +18,20 @@ import { formatCurrency } from '@/helpers/formatters'
 interface CartTableProps {
   items: CartItem[]
   loading: boolean
+  updatingQuantityItemId?: number | null
   onEdit: (item: CartItem) => void
   onRemove: (itemId: number) => void
   onQuantityChange: (itemId: number, quantity: number) => void
 }
 
-export function CartTable({ items, loading, onEdit, onRemove, onQuantityChange }: CartTableProps) {
+export function CartTable({
+  items,
+  loading,
+  updatingQuantityItemId,
+  onEdit,
+  onRemove,
+  onQuantityChange,
+}: CartTableProps) {
   if (loading) {
     return (
       <div className='space-y-3 p-4'>
@@ -93,6 +101,7 @@ export function CartTable({ items, loading, onEdit, onRemove, onQuantityChange }
                   max={item.ignore_count ? undefined : item.max_count}
                   size='sm'
                   showMaxMessage
+                  disabled={updatingQuantityItemId === item.id}
                   onChange={(qty) => onQuantityChange(item.id, qty)}
                 />
               </TableCell>

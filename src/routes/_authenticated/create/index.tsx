@@ -102,6 +102,7 @@ function CreatePage() {
   const [customer, setCustomer] = useState<Customer | null>(null)
   const [catalogOpen, setCatalogOpen] = useState(false)
   const [addingProductAutoid, setAddingProductAutoid] = useState<string | null>(null)
+  const [updatingQuantityItemId, setUpdatingQuantityItemId] = useState<number | null>(null)
   const attachmentsRef = useRef<EntityAttachmentsRef>(null)
   const [busy, busyDispatch] = useReducer(busyReducer, initialBusy)
   const [editState, editDispatch] = useReducer(editReducer, {
@@ -201,14 +202,17 @@ function CreatePage() {
 
   const handleQuantityChange = async (itemId: number, quantity: number) => {
     if (!customer) return
+    setUpdatingQuantityItemId(itemId)
     busyDispatch({ type: 'CART_UPDATING', value: true })
     try {
       await cartService.updateItem(itemId, { quantity }, customer.id, projectId)
       invalidateCart()
     } catch (error) {
       toast.error(getErrorMessage(error))
+    } finally {
+      busyDispatch({ type: 'CART_UPDATING', value: false })
+      setUpdatingQuantityItemId(null)
     }
-    busyDispatch({ type: 'CART_UPDATING', value: false })
   }
 
   const handleClearAll = async () => {
@@ -420,7 +424,8 @@ function CreatePage() {
             >
               <CartTable
                 items={cartItems}
-                loading={cartLoading || customerLoading || cartFetching}
+                loading={cartLoading || customerLoading}
+                updatingQuantityItemId={updatingQuantityItemId}
                 onEdit={handleEditItem}
                 onRemove={handleRemoveItem}
                 onQuantityChange={handleQuantityChange}
