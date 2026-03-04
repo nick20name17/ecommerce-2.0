@@ -8,7 +8,6 @@ import { OrderCombobox } from './order-combobox'
 import { ProposalCombobox } from './proposal-combobox'
 import { TaskAttachments, type TaskAttachmentsRef } from './task-attachments'
 import { TaskStatusManager } from './task-status-manager'
-import { UserCombobox } from '@/components/common/user-combobox/user-combobox'
 import { TASK_QUERY_KEYS, getTaskDetailQuery, getTaskStatusesQuery } from '@/api/task/query'
 import {
   type CreateTaskFormValues,
@@ -20,9 +19,9 @@ import {
   UpdateTaskSchema
 } from '@/api/task/schema'
 import { taskService } from '@/api/task/service'
-import { dateToLocalDateString, localDateStringToDate } from '@/helpers/date'
 import { TaskPrioritySelect } from '@/components/common/task-priority-select'
 import { TaskStatusSelect } from '@/components/common/task-status-select'
+import { UserCombobox } from '@/components/common/user-combobox/user-combobox'
 import { Button } from '@/components/ui/button'
 import { DatePicker } from '@/components/ui/date-picker'
 import {
@@ -38,6 +37,7 @@ import { Field, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { TASK_PRIORITY } from '@/constants/task'
+import { dateToLocalDateString, localDateStringToDate } from '@/helpers/date'
 
 interface TaskModalProps {
   task?: Task | TaskListItem | null
@@ -519,7 +519,7 @@ function EditForm({
                 const details = (fullTask as Task).responsible_user_details
                 return details
                   ? `${details.first_name} ${details.last_name}`.trim()
-                  : (fullTask as TaskListItem).responsible_user_name ?? undefined
+                  : ((fullTask as TaskListItem).responsible_user_name ?? undefined)
               })()}
             />
 

@@ -4,7 +4,7 @@ import { DragDropProvider } from '@dnd-kit/react'
 import { useSortable } from '@dnd-kit/react/sortable'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { GripVertical, Pencil, Plus, Settings, Trash2 } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
 import { TASK_QUERY_KEYS } from '@/api/task/query'
@@ -42,9 +42,11 @@ interface TaskStatusManagerProps {
 }
 
 export function TaskStatusManager({ projectId, statuses }: TaskStatusManagerProps) {
-  const [orderedStatuses, setOrderedStatuses] = useState(() =>
-    [...statuses].sort((a, b) => a.order - b.order)
-  )
+  const [orderedStatuses, setOrderedStatuses] = useState(() => [...statuses])
+
+  useEffect(() => {
+    setOrderedStatuses([...statuses])
+  }, [statuses])
 
   const queryClient = useQueryClient()
 
@@ -152,7 +154,6 @@ function StatusList({
         project: projectId ?? undefined,
         order: statuses.length
       }),
-    onSuccess: (newStatus) => onStatusesChange([...statuses, newStatus]),
     ...mutationMeta
   })
 
