@@ -165,24 +165,6 @@ const SharedFields = () => {
         )}
       />
 
-      <Controller
-        name='salesman'
-        control={control}
-        render={({ field, fieldState }) => (
-          <Field data-invalid={fieldState.invalid}>
-            <FieldLabel htmlFor='salesman'>Salesman</FieldLabel>
-            <Input
-              {...field}
-              value={field.value ?? ''}
-              id='salesman'
-              placeholder='Salesman name'
-              aria-invalid={fieldState.invalid}
-            />
-            {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-          </Field>
-        )}
-      />
-
       <FieldSeparator>Database</FieldSeparator>
 
       <div className='grid grid-cols-2 gap-4'>
@@ -373,6 +355,24 @@ const SharedFields = () => {
       />
 
       <FieldSeparator>Advanced</FieldSeparator>
+
+      <Controller
+        name='salesman'
+        control={control}
+        render={({ field, fieldState }) => (
+          <Field data-invalid={fieldState.invalid}>
+            <FieldLabel htmlFor='salesman'>Salesman</FieldLabel>
+            <Input
+              {...field}
+              value={field.value ?? ''}
+              id='salesman'
+              placeholder='Salesman name'
+              aria-invalid={fieldState.invalid}
+            />
+            {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+          </Field>
+        )}
+      />
 
       <div className='grid grid-cols-2 gap-4'>
         <Controller
