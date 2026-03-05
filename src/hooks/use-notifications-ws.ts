@@ -4,6 +4,7 @@ import ReconnectingWebSocket from 'reconnecting-websocket'
 import { toast } from 'sonner'
 
 import { API_ORIGIN } from '@/api/constants'
+import { NOTE_QUERY_KEYS } from '@/api/note/query'
 import { ORDER_QUERY_KEYS } from '@/api/order/query'
 import { PROPOSAL_QUERY_KEYS } from '@/api/proposal/query'
 import { isSuperAdmin } from '@/constants/user'
@@ -49,6 +50,8 @@ const buildNotificationsWsUrl = (projectId: number | null): string | null => {
 
 const getInvalidationKeys = (entity: string): readonly (readonly unknown[])[] => {
   switch (entity) {
+    case 'note':
+      return [NOTE_QUERY_KEYS.all()]
     case 'order':
       return [ORDER_QUERY_KEYS.lists()]
     case 'proposal':
