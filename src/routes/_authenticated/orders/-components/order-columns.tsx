@@ -5,6 +5,7 @@ import { Link2Off, Loader2, MoreHorizontal, Paperclip, Trash2, UserPlus } from '
 
 import type { FieldConfigResponse } from '@/api/field-config/schema'
 import type { Order } from '@/api/order/schema'
+import { EntityNotesTrigger } from '@/components/common/entity-notes/entity-notes-trigger'
 import { createExpanderColumn } from '@/components/common/data-table/columns'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -36,6 +37,7 @@ interface OrderColumnsOptions {
   onDelete: (order: Order) => void
   onDeleteLinkedProposal?: (order: Order) => void
   onAttachments?: (order: Order) => void
+  onNotes?: (order: Order) => void
   onAssign?: (order: Order) => void
   canAssign?: boolean
   actionsVariant?: OrderActionsVariant
@@ -115,6 +117,7 @@ export const getOrderColumns = ({
   onDelete,
   onDeleteLinkedProposal,
   onAttachments,
+  onNotes,
   onAssign,
   canAssign,
   actionsVariant = 'full'
@@ -125,6 +128,29 @@ export const getOrderColumns = ({
   const dataColumns = buildDynamicDataColumns<OrderRow>(orderedKeys, getLabel, {
     formatters: ORDER_FORMATTERS
   })
+
+  const notesColumn: ColumnDef<OrderRow> = {
+    id: 'notes',
+    header: 'Notes',
+    cell: ({ row }) => {
+      if (row.original._pending || !onNotes) return null
+      return (
+        <div
+          className='max-w-[140px] min-w-0'
+          onClick={(e) => e.stopPropagation()}
+          onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && e.stopPropagation()}
+        >
+          <EntityNotesTrigger
+            entityType='order'
+            autoid={row.original.autoid}
+            onClick={() => onNotes(row.original)}
+          />
+        </div>
+      )
+    },
+    size: 140,
+    enableSorting: false
+  }
 
   const actionsColumn: ColumnDef<OrderRow> = {
     id: 'actions',
@@ -189,5 +215,5 @@ export const getOrderColumns = ({
     enableSorting: false
   }
 
-  return [createExpanderColumn<OrderRow>(), ...dataColumns, actionsColumn]
+  return [createExpanderColumn<OrderRow>(), ...dataColumns, notesColumn, actionsColumn]
 }

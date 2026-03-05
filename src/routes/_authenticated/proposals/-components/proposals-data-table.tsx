@@ -19,6 +19,7 @@ interface ProposalsDataTableProps {
   projectId: number | null
   onDelete: (proposal: ProposalRow) => void
   onAttachments: (proposal: ProposalRow) => void
+  onNotes?: (proposal: ProposalRow) => void
   onAssign?: (proposal: ProposalRow) => void
   canAssign?: boolean
 }
@@ -33,6 +34,7 @@ export const ProposalsDataTable = ({
   projectId,
   onDelete,
   onAttachments,
+  onNotes,
   onAssign,
   canAssign
 }: ProposalsDataTableProps) => {
@@ -45,10 +47,11 @@ export const ProposalsDataTable = ({
         projectId,
         onDelete,
         onAttachments,
+        onNotes,
         onAssign,
         canAssign
       }),
-    [fieldConfig, data, isSuperAdmin, projectId, onDelete, onAttachments, onAssign, canAssign]
+    [fieldConfig, data, isSuperAdmin, projectId, onDelete, onAttachments, onNotes, onAssign, canAssign]
   )
 
   const table = useReactTable({

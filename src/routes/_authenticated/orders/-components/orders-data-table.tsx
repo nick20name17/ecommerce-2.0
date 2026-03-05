@@ -18,6 +18,7 @@ interface OrdersDataTableProps {
   onDelete: (order: OrderRow) => void
   onDeleteLinkedProposal: (order: OrderRow) => void
   onAttachments: (order: OrderRow) => void
+  onNotes?: (order: OrderRow) => void
   onAssign?: (order: OrderRow) => void
   canAssign?: boolean
 }
@@ -31,6 +32,7 @@ export const OrdersDataTable = ({
   onDelete,
   onDeleteLinkedProposal,
   onAttachments,
+  onNotes,
   onAssign,
   canAssign
 }: OrdersDataTableProps) => {
@@ -42,10 +44,11 @@ export const OrdersDataTable = ({
         onDelete,
         onDeleteLinkedProposal,
         onAttachments,
+        onNotes,
         onAssign,
         canAssign
       }),
-    [fieldConfig, data, onDelete, onDeleteLinkedProposal, onAttachments, onAssign, canAssign]
+    [fieldConfig, data, onDelete, onDeleteLinkedProposal, onAttachments, onNotes, onAssign, canAssign]
   )
 
   const table = useReactTable({

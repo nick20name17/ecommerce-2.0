@@ -10,6 +10,7 @@ import type { FieldConfigResponse } from '@/api/field-config/schema'
 import { PROPOSAL_QUERY_KEYS } from '@/api/proposal/query'
 import type { Proposal } from '@/api/proposal/schema'
 import { proposalService } from '@/api/proposal/service'
+import { EntityNotesTrigger } from '@/components/common/entity-notes/entity-notes-trigger'
 import { createExpanderColumn } from '@/components/common/data-table/columns'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -39,6 +40,7 @@ interface ProposalColumnsOptions {
   projectId: number | null
   onDelete: (proposal: Proposal) => void
   onAttachments: (proposal: Proposal) => void
+  onNotes?: (proposal: Proposal) => void
   onAssign?: (proposal: Proposal) => void
   canAssign?: boolean
 }
@@ -125,6 +127,7 @@ export const getProposalColumns = ({
   projectId,
   onDelete,
   onAttachments,
+  onNotes,
   onAssign,
   canAssign
 }: ProposalColumnsOptions): ColumnDef<ProposalRow>[] => {
@@ -134,6 +137,29 @@ export const getProposalColumns = ({
   const dataColumns = buildDynamicDataColumns<ProposalRow>(orderedKeys, getLabel, {
     formatters: PROPOSAL_FORMATTERS
   })
+
+  const notesColumn: ColumnDef<ProposalRow> = {
+    id: 'notes',
+    header: 'Notes',
+    cell: ({ row }) => {
+      if (row.original._pending || !onNotes) return null
+      return (
+        <div
+          className='max-w-[140px] min-w-0'
+          onClick={(e) => e.stopPropagation()}
+          onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && e.stopPropagation()}
+        >
+          <EntityNotesTrigger
+            entityType='proposal'
+            autoid={row.original.autoid}
+            onClick={() => onNotes(row.original)}
+          />
+        </div>
+      )
+    },
+    size: 140,
+    enableSorting: false
+  }
 
   const actionsColumn: ColumnDef<ProposalRow> = {
     id: 'actions',
@@ -184,5 +210,5 @@ export const getProposalColumns = ({
     enableSorting: false
   }
 
-  return [createExpanderColumn<ProposalRow>(), ...dataColumns, actionsColumn]
+  return [createExpanderColumn<ProposalRow>(), ...dataColumns, notesColumn, actionsColumn]
 }

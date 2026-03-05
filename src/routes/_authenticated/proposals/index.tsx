@@ -9,6 +9,7 @@ import { ProposalsDataTable } from './-components/proposals-data-table'
 import { getProposalsQuery } from '@/api/proposal/query'
 import type { Proposal, ProposalParams } from '@/api/proposal/schema'
 import { EntityAttachmentsDialog } from '@/components/common/entity-attachments/entity-attachments-dialog'
+import { EntityNotesSheet } from '@/components/common/entity-notes/entity-notes-sheet'
 import { Pagination } from '@/components/common/filters/pagination'
 import { SearchFilter } from '@/components/common/filters/search'
 import { Badge } from '@/components/ui/badge'
@@ -54,6 +55,7 @@ const ProposalsPage = () => {
 
   const [proposalToDelete, setProposalToDelete] = useState<Proposal | null>(null)
   const [proposalForAttachments, setProposalForAttachments] = useState<Proposal | null>(null)
+  const [proposalForNotes, setProposalForNotes] = useState<Proposal | null>(null)
   const [proposalToAssign, setProposalToAssign] = useState<Proposal | null>(null)
 
   const activeStatus = status ?? PROPOSAL_STATUS.open
@@ -196,6 +198,7 @@ const ProposalsPage = () => {
         projectId={projectId}
         onDelete={setProposalToDelete}
         onAttachments={setProposalForAttachments}
+        onNotes={setProposalForNotes}
         onAssign={setProposalToAssign}
         canAssign={canAssign}
       />
@@ -226,6 +229,19 @@ const ProposalsPage = () => {
         proposal={proposalToAssign}
         open={!!proposalToAssign}
         onOpenChange={(open) => !open && setProposalToAssign(null)}
+        projectId={projectId}
+      />
+
+      <EntityNotesSheet
+        open={!!proposalForNotes}
+        onOpenChange={(open) => !open && setProposalForNotes(null)}
+        entityType='proposal'
+        entityLabel={
+          proposalForNotes
+            ? `Proposal ${proposalForNotes.quote ?? proposalForNotes.autoid}`
+            : ''
+        }
+        autoid={proposalForNotes?.autoid ?? ''}
         projectId={projectId}
       />
     </div>

@@ -18,6 +18,7 @@ interface CustomersDataTableProps {
   onRowClick: (customer: Customer) => void
   onEdit: (customer: Customer) => void
   onDelete: (customer: Customer) => void
+  onNotes?: (customer: Customer) => void
   onAssign?: (customer: Customer) => void
   canAssign?: boolean
 }
@@ -31,6 +32,7 @@ export const CustomersDataTable = ({
   onRowClick,
   onEdit,
   onDelete,
+  onNotes,
   onAssign,
   canAssign
 }: CustomersDataTableProps) => {
@@ -41,10 +43,11 @@ export const CustomersDataTable = ({
         data,
         onEdit,
         onDelete,
+        onNotes,
         onAssign,
         canAssign
       }),
-    [fieldConfig, data, onEdit, onDelete, onAssign, canAssign]
+    [fieldConfig, data, onEdit, onDelete, onNotes, onAssign, canAssign]
   )
 
   const table = useReactTable({

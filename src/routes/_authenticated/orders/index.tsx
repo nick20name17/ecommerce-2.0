@@ -10,6 +10,7 @@ import { ORDER_QUERY_KEYS, getOrdersQuery } from '@/api/order/query'
 import type { Order, OrderParams } from '@/api/order/schema'
 import { orderService } from '@/api/order/service'
 import { EntityAttachmentsDialog } from '@/components/common/entity-attachments/entity-attachments-dialog'
+import { EntityNotesSheet } from '@/components/common/entity-notes/entity-notes-sheet'
 import { Pagination } from '@/components/common/filters/pagination'
 import { SearchFilter } from '@/components/common/filters/search'
 import { Badge } from '@/components/ui/badge'
@@ -56,6 +57,7 @@ const OrdersPage = () => {
 
   const [orderToDelete, setOrderToDelete] = useState<Order | null>(null)
   const [orderForAttachments, setOrderForAttachments] = useState<Order | null>(null)
+  const [orderForNotes, setOrderForNotes] = useState<Order | null>(null)
   const [orderToAssign, setOrderToAssign] = useState<Order | null>(null)
 
   const deleteLinkedProposalMutation = useMutation({
@@ -211,6 +213,7 @@ const OrdersPage = () => {
         onDelete={setOrderToDelete}
         onDeleteLinkedProposal={(order) => deleteLinkedProposalMutation.mutate(order.autoid)}
         onAttachments={setOrderForAttachments}
+        onNotes={setOrderForNotes}
         onAssign={setOrderToAssign}
         canAssign={canAssign}
       />
@@ -241,6 +244,17 @@ const OrdersPage = () => {
         order={orderToAssign}
         open={!!orderToAssign}
         onOpenChange={(open) => !open && setOrderToAssign(null)}
+        projectId={projectId}
+      />
+
+      <EntityNotesSheet
+        open={!!orderForNotes}
+        onOpenChange={(open) => !open && setOrderForNotes(null)}
+        entityType='order'
+        entityLabel={
+          orderForNotes ? `Order ${orderForNotes.invoice ?? orderForNotes.autoid}` : ''
+        }
+        autoid={orderForNotes?.autoid ?? ''}
         projectId={projectId}
       />
     </div>

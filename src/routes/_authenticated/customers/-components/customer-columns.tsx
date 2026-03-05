@@ -5,6 +5,7 @@ import { MoreHorizontal, Pencil, Trash2, UserPlus } from 'lucide-react'
 
 import type { Customer } from '@/api/customer/schema'
 import type { FieldConfigResponse } from '@/api/field-config/schema'
+import { EntityNotesTrigger } from '@/components/common/entity-notes/entity-notes-trigger'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
@@ -42,6 +43,7 @@ interface CustomerColumnsOptions {
   data: Customer[]
   onEdit: (customer: Customer) => void
   onDelete: (customer: Customer) => void
+  onNotes?: (customer: Customer) => void
   onAssign?: (customer: Customer) => void
   canAssign?: boolean
 }
@@ -51,6 +53,7 @@ export const getCustomerColumns = ({
   data,
   onEdit,
   onDelete,
+  onNotes,
   onAssign,
   canAssign
 }: CustomerColumnsOptions): ColumnDef<Customer>[] => {
@@ -60,6 +63,29 @@ export const getCustomerColumns = ({
   const dataColumns = buildDynamicDataColumns<Customer>(orderedKeys, getLabel, {
     formatters: CUSTOMER_FORMATTERS
   })
+
+  const notesColumn: ColumnDef<Customer> = {
+    id: 'notes',
+    header: 'Notes',
+    cell: ({ row }) => {
+      if (!onNotes) return null
+      return (
+        <div
+          className='max-w-[140px] min-w-0'
+          onClick={(e) => e.stopPropagation()}
+          onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && e.stopPropagation()}
+        >
+          <EntityNotesTrigger
+            entityType='customer'
+            autoid={row.original.autoid}
+            onClick={() => onNotes(row.original)}
+          />
+        </div>
+      )
+    },
+    size: 140,
+    enableSorting: false
+  }
 
   const actionsColumn: ColumnDef<Customer> = {
     id: 'actions',
@@ -109,5 +135,5 @@ export const getCustomerColumns = ({
     enableSorting: false
   }
 
-  return [...dataColumns, actionsColumn]
+  return [...dataColumns, notesColumn, actionsColumn]
 }

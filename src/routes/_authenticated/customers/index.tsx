@@ -9,6 +9,7 @@ import { CustomerModal } from './-components/customer-modal'
 import { CustomersDataTable } from './-components/customers-data-table'
 import { getCustomersQuery } from '@/api/customer/query'
 import type { Customer, CustomerParams } from '@/api/customer/schema'
+import { EntityNotesSheet } from '@/components/common/entity-notes/entity-notes-sheet'
 import { Pagination } from '@/components/common/filters/pagination'
 import { SearchFilter } from '@/components/common/filters/search'
 import { Button } from '@/components/ui/button'
@@ -31,6 +32,7 @@ const CustomersPage = () => {
 
   const [modalCustomer, setModalCustomer] = useState<Customer | 'create' | null>(null)
   const [deleteCustomer, setDeleteCustomer] = useState<Customer | null>(null)
+  const [customerForNotes, setCustomerForNotes] = useState<Customer | null>(null)
   const [assignCustomer, setAssignCustomer] = useState<Customer | null>(null)
 
   const params: CustomerParams = {
@@ -87,6 +89,7 @@ const CustomersPage = () => {
         }
         onEdit={setModalCustomer}
         onDelete={setDeleteCustomer}
+        onNotes={setCustomerForNotes}
         onAssign={setAssignCustomer}
         canAssign={canAssign}
       />
@@ -108,6 +111,15 @@ const CustomersPage = () => {
         customer={assignCustomer}
         open={!!assignCustomer}
         onOpenChange={(open) => !open && setAssignCustomer(null)}
+        projectId={projectId}
+      />
+
+      <EntityNotesSheet
+        open={!!customerForNotes}
+        onOpenChange={(open) => !open && setCustomerForNotes(null)}
+        entityType='customer'
+        entityLabel={customerForNotes ? `Customer ${customerForNotes.l_name ?? customerForNotes.autoid}` : ''}
+        autoid={customerForNotes?.autoid ?? ''}
         projectId={projectId}
       />
     </div>
