@@ -49,5 +49,9 @@ export const noteService = {
       params: params.project_id != null ? { ...params, project_id: params.project_id } : params
     })
     return data
+  },
+
+  deleteNote: async (id: number): Promise<void> => {
+    await api.delete(`/notes/${id}/`)
   }
 }

@@ -145,7 +145,8 @@ export const useNotificationsWebSocket = ({
           const isCreateOrDeleteOrderProposal =
             (payload.entity === 'order' || payload.entity === 'proposal') &&
             (action === 'created' || action === 'deleted')
-          if (!isCreateOrDeleteOrderProposal) {
+          const isNote = payload.entity === 'note'
+          if (!isCreateOrDeleteOrderProposal && !isNote) {
             toast.info(getToastMessage(payload))
           }
         }

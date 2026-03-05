@@ -1,10 +1,20 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { MessageSquarePlus, StickyNote } from 'lucide-react'
+import { MessageSquarePlus, StickyNote, Trash2 } from 'lucide-react'
 import { useState } from 'react'
 
 import { NOTE_QUERY_KEYS, getEntityNotesQuery } from '@/api/note/query'
 import type { EntityNoteList, EntityNoteType } from '@/api/note/schema'
 import { noteService } from '@/api/note/service'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle
+} from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
 import { Empty, EmptyContent, EmptyHeader, EmptyMedia, EmptyTitle } from '@/components/ui/empty'
 import { Input } from '@/components/ui/input'
@@ -17,8 +27,10 @@ import {
   SheetHeader,
   SheetTitle
 } from '@/components/ui/sheet'
+import { isAdmin } from '@/constants/user'
 import { formatDate } from '@/helpers/formatters'
 import { cn } from '@/lib/utils'
+import { useAuth } from '@/providers/auth'
 
 interface EntityNotesSheetProps {
   open: boolean
@@ -40,7 +52,9 @@ export const EntityNotesSheet = ({
   projectId
 }: EntityNotesSheetProps) => {
   const queryClient = useQueryClient()
+  const { user } = useAuth()
   const [text, setText] = useState('')
+  const [noteToDelete, setNoteToDelete] = useState<EntityNoteList | null>(null)
 
   const { data: notes = [], isLoading } = useQuery({
     ...getEntityNotesQuery(entityType, autoid, projectId),
@@ -65,6 +79,26 @@ export const EntityNotesSheet = ({
     }
   })
 
+  const deleteMutation = useMutation({
+    mutationFn: (id: number) => noteService.deleteNote(id),
+    meta: {
+      successMessage: 'Note deleted',
+      errorMessage: 'Failed to delete note'
+    },
+    onSuccess: () => {
+      setNoteToDelete(null)
+      queryClient.invalidateQueries({
+        queryKey: NOTE_QUERY_KEYS.entityNotes(entityType, autoid, projectId)
+      })
+      queryClient.invalidateQueries({
+        queryKey: NOTE_QUERY_KEYS.summary(entityType, autoid, projectId)
+      })
+    }
+  })
+
+  const canDeleteNote = (note: EntityNoteList) =>
+    !!user && (isAdmin(user.role) || note.author === user.id)
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     const trimmed = text.trim()
@@ -83,7 +117,7 @@ export const EntityNotesSheet = ({
       onOpenChange={onOpenChange}
     >
       <SheetContent
-        className='flex w-full flex-col gap-0 overflow-hidden p-0 sm:max-w-md'
+        className='flex w-full flex-col gap-0 overflow-hidden p-0 sm:max-w-lg'
         side='right'
       >
         <SheetHeader className='bg-muted/30 shrink-0 border-b px-5 py-4'>
@@ -120,11 +154,39 @@ export const EntityNotesSheet = ({
                 <NoteCard
                   key={note.id}
                   note={note}
+                  isOwn={!!user && note.author === user.id}
+                  canDelete={canDeleteNote(note)}
+                  onDelete={() => setNoteToDelete(note)}
+                  isDeleting={deleteMutation.isPending && noteToDelete?.id === note.id}
                 />
               ))
             )}
           </div>
         </ScrollArea>
+
+        <AlertDialog
+          open={!!noteToDelete}
+          onOpenChange={(open) => !open && setNoteToDelete(null)}
+        >
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Delete note?</AlertDialogTitle>
+              <AlertDialogDescription>
+                This note will be permanently removed. This cannot be undone.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel disabled={deleteMutation.isPending}>Cancel</AlertDialogCancel>
+              <AlertDialogAction
+                variant='destructive'
+                isPending={deleteMutation.isPending}
+                onClick={() => noteToDelete && deleteMutation.mutate(noteToDelete.id)}
+              >
+                Delete
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
 
         <form
           className='shrink-0 border-t bg-background px-4 py-4'
@@ -182,10 +244,25 @@ function NoteCardSkeleton() {
   )
 }
 
-function NoteCard({ note }: { note: EntityNoteList }) {
+interface NoteCardProps {
+  note: EntityNoteList
+  isOwn: boolean
+  canDelete: boolean
+  onDelete: () => void
+  isDeleting: boolean
+}
+
+function NoteCard({ note, isOwn, canDelete, onDelete, isDeleting }: NoteCardProps) {
   const initial = (note.author_name || '?').charAt(0).toUpperCase()
   return (
-    <div className='bg-muted/40 border-border/80 flex gap-3 rounded-lg border p-3 shadow-sm transition-shadow hover:shadow-[0_1px_3px_rgba(0,0,0,0.06)] dark:hover:shadow-[0_1px_3px_rgba(0,0,0,0.2)]'>
+    <div
+      className={cn(
+        'group flex gap-3 rounded-lg border p-3 transition-all duration-200',
+        isOwn
+          ? 'border-primary/30 bg-primary/5 dark:border-primary/40 dark:bg-primary/10'
+          : 'border-border/80 bg-muted/40 shadow-sm hover:shadow-[0_1px_3px_rgba(0,0,0,0.06)] dark:hover:shadow-[0_1px_3px_rgba(0,0,0,0.2)]'
+      )}
+    >
       <div
         className='bg-primary/10 text-primary flex size-8 shrink-0 items-center justify-center rounded-full text-xs font-semibold'
         aria-hidden
@@ -195,9 +272,27 @@ function NoteCard({ note }: { note: EntityNoteList }) {
       <div className='min-w-0 flex-1'>
         <div className='mb-1 flex items-baseline justify-between gap-2'>
           <span className='text-foreground truncate text-sm font-medium'>{note.author_name}</span>
-          <span className='text-muted-foreground shrink-0 text-xs tabular-nums'>
-            {formatDate(note.created_at, 'dateTime')}
-          </span>
+          <div className='flex shrink-0 items-center gap-1'>
+            <span className='text-muted-foreground text-xs tabular-nums'>
+              {formatDate(note.created_at, 'dateTime')}
+            </span>
+            {canDelete && (
+              <Button
+                type='button'
+                variant='ghost'
+                size='icon-xs'
+                className='text-muted-foreground hover:bg-destructive/10 hover:text-destructive'
+                onClick={(e) => {
+                  e.stopPropagation()
+                  onDelete()
+                }}
+                disabled={isDeleting}
+                aria-label='Delete note'
+              >
+                <Trash2 className='size-3' />
+              </Button>
+            )}
+          </div>
         </div>
         <p className='text-muted-foreground whitespace-pre-wrap wrap-break-word text-sm leading-relaxed'>
           {note.text}
