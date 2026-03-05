@@ -119,8 +119,8 @@ export type TaskStatusResponse = ApiResponse<TaskStatus>
 export interface TaskParams extends PaginationParams {
   search?: string
   ordering?: string
-  status?: number
-  priority?: TaskPriority
+  status?: string
+  priority?: string
   responsible_user?: number
   project_id?: number
   due_date_from?: string

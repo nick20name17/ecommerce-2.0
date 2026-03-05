@@ -1,6 +1,6 @@
 import type { TaskStatus } from '@/api/task/schema'
-import { TaskPrioritySelect } from '@/components/common/task-priority-select'
-import { TaskStatusSelect } from '@/components/common/task-status-select'
+import { TaskPriorityMultiCombobox } from '@/components/common/task-priority-multi-combobox'
+import { TaskStatusMultiCombobox } from '@/components/common/task-status-multi-combobox'
 import { UserCombobox } from '@/components/common/user-combobox/user-combobox'
 import { Button } from '@/components/ui/button'
 import { DatePicker } from '@/components/ui/date-picker'
@@ -10,10 +10,10 @@ import { cn } from '@/lib/utils'
 
 interface TaskFiltersPanelProps {
   statuses: TaskStatus[]
-  taskStatusId: number | null
-  onTaskStatusChange: (id: number | null) => void
-  priority: TaskPriority | ''
-  onPriorityChange: (value: TaskPriority | '') => void
+  taskStatusIds: number[]
+  onTaskStatusChange: (ids: number[]) => void
+  priorities: TaskPriority[]
+  onPriorityChange: (priorities: TaskPriority[]) => void
   responsibleUserId: number | null
   onResponsibleChange: (id: number | null) => void
   dueFrom: Date | undefined
@@ -27,9 +27,9 @@ interface TaskFiltersPanelProps {
 
 export const TaskFiltersPanel = ({
   statuses,
-  taskStatusId,
+  taskStatusIds,
   onTaskStatusChange,
-  priority,
+  priorities,
   onPriorityChange,
   responsibleUserId,
   onResponsibleChange,
@@ -46,22 +46,20 @@ export const TaskFiltersPanel = ({
       <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3'>
         <Field className='flex flex-col gap-1.5'>
           <FieldLabel className='text-muted-foreground text-xs font-medium'>Status</FieldLabel>
-          <TaskStatusSelect
+          <TaskStatusMultiCombobox
             statuses={statuses}
-            value={taskStatusId}
+            value={taskStatusIds}
             onValueChange={onTaskStatusChange}
             placeholder='All Statuses'
-            includeAll
           />
         </Field>
 
         <Field className='flex flex-col gap-1.5'>
           <FieldLabel className='text-muted-foreground text-xs font-medium'>Priority</FieldLabel>
-          <TaskPrioritySelect
-            value={priority}
+          <TaskPriorityMultiCombobox
+            value={priorities}
             onValueChange={onPriorityChange}
             placeholder='All Priorities'
-            includeAll
           />
         </Field>
 

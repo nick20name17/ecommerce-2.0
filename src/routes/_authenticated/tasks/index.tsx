@@ -24,16 +24,16 @@ import {
   useSearchParam,
   useTaskDueFromParam,
   useTaskDueToParam,
-  useTaskPriorityParam,
+  useTaskPrioritiesParam,
   useTaskResponsibleParam,
-  useTaskStatusParam
+  useTaskStatusesParam
 } from '@/hooks/use-query-params'
 
 const TasksPage = () => {
   const navigate = useNavigate()
   const [search] = useSearchParam()
-  const [taskStatusId, setTaskStatusId] = useTaskStatusParam()
-  const [priority, setPriority] = useTaskPriorityParam()
+  const [taskStatusIds, setTaskStatusIds] = useTaskStatusesParam()
+  const [priorities, setPriorities] = useTaskPrioritiesParam()
   const [responsibleUserId, setResponsibleUserId] = useTaskResponsibleParam()
   const [dueFrom, setDueFrom] = useTaskDueFromParam()
   const [dueTo, setDueTo] = useTaskDueToParam()
@@ -44,8 +44,8 @@ const TasksPage = () => {
 
   const [filtersOpen, setFiltersOpen] = useState(
     () =>
-      taskStatusId != null ||
-      !!priority ||
+      taskStatusIds.length > 0 ||
+      priorities.length > 0 ||
       responsibleUserId != null ||
       dueFrom != null ||
       dueTo != null
@@ -57,8 +57,8 @@ const TasksPage = () => {
   const statuses = statusesData?.results ?? []
 
   const hasAnyFilter =
-    taskStatusId != null ||
-    !!priority ||
+    taskStatusIds.length > 0 ||
+    priorities.length > 0 ||
     responsibleUserId != null ||
     dueFrom != null ||
     dueTo != null
@@ -69,8 +69,8 @@ const TasksPage = () => {
     limit,
     ordering,
     project_id: projectId ?? undefined,
-    status: taskStatusId ?? undefined,
-    priority: (priority === '' ? undefined : priority) as TaskPriority | undefined,
+    status: taskStatusIds.length > 0 ? taskStatusIds.join(',') : undefined,
+    priority: priorities.length > 0 ? priorities.join(',') : undefined,
     responsible_user: responsibleUserId ?? undefined,
     due_date_from: dueFrom instanceof Date ? dateToLocalDateString(dueFrom) : undefined,
     due_date_to: dueTo instanceof Date ? dateToLocalDateString(dueTo) : undefined
@@ -102,8 +102,8 @@ const TasksPage = () => {
 
   const resetOffset = () => setOffset(null)
   const clearFilters = () => {
-    setTaskStatusId(null)
-    setPriority('')
+    setTaskStatusIds([])
+    setPriorities([])
     setResponsibleUserId(null)
     setDueFrom(null)
     setDueTo(null)
@@ -153,14 +153,14 @@ const TasksPage = () => {
           <TaskFiltersPanel
             className='mt-3'
             statuses={statuses}
-            taskStatusId={taskStatusId}
-            onTaskStatusChange={(id) => {
-              setTaskStatusId(id)
+            taskStatusIds={taskStatusIds}
+            onTaskStatusChange={(ids) => {
+              setTaskStatusIds(ids)
               resetOffset()
             }}
-            priority={priority as TaskPriority | ''}
+            priorities={priorities as TaskPriority[]}
             onPriorityChange={(v) => {
-              setPriority((v === '' ? '' : v) as TaskPriority | '')
+              setPriorities(v)
               resetOffset()
             }}
             responsibleUserId={responsibleUserId}

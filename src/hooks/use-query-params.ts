@@ -9,7 +9,6 @@ import {
 import { DEFAULT_LIMIT } from '@/api/constants'
 import { CUSTOMER_TAB_VALUES } from '@/constants/customer'
 import { ORDER_STATUS } from '@/constants/order'
-import { TASK_PRIORITY_VALUES } from '@/constants/task'
 import { dateToLocalDateTimeString } from '@/helpers/date'
 
 const ORDER_STATUS_VALUES = ['all', ...Object.values(ORDER_STATUS)] as [string, ...string[]]
@@ -33,6 +32,28 @@ const parseAsLocalDateTime = createParser<Date | null>({
   },
   serialize: (v) => (v instanceof Date ? dateToLocalDateTimeString(v) : ''),
   eq: (a, b) => (a?.getTime() ?? null) === (b?.getTime() ?? null)
+})
+
+const parseAsCommaSeparatedStrings = createParser<string[]>({
+  parse: (v) => (v ? v.split(',').map((s) => s.trim()).filter(Boolean) : []),
+  serialize: (v) => (v?.length ? v.join(',') : ''),
+  eq: (a, b) =>
+    (a?.length ?? 0) === (b?.length ?? 0) &&
+    (a ?? []).every((x, i) => (b ?? [])[i] === x)
+})
+
+const parseAsCommaSeparatedNumbers = createParser<number[]>({
+  parse: (v) =>
+    v
+      ? v
+          .split(',')
+          .map((s) => parseInt(s.trim(), 10))
+          .filter((n) => !Number.isNaN(n))
+      : [],
+  serialize: (v) => (v?.length ? v.join(',') : ''),
+  eq: (a, b) =>
+    (a?.length ?? 0) === (b?.length ?? 0) &&
+    (a ?? []).every((x, i) => (b ?? [])[i] === x)
 })
 
 const offsetParser = parseAsInteger.withDefault(0)
@@ -75,13 +96,11 @@ export const usePayloadLogStatusCode = () => useQueryState('status_code', parseA
 export const usePayloadLogIsError = () =>
   useQueryState('is_error', parseAsStringLiteral(['true', 'false']))
 
-export const useTaskStatusParam = () => useQueryState('task_status', parseAsInteger)
+export const useTaskStatusesParam = () =>
+  useQueryState('task_status', parseAsCommaSeparatedNumbers.withDefault([]))
 
-export const useTaskPriorityParam = () =>
-  useQueryState(
-    'task_priority',
-    parseAsStringLiteral([...TASK_PRIORITY_VALUES] as [string, ...string[]]).withDefault('')
-  )
+export const useTaskPrioritiesParam = () =>
+  useQueryState('task_priority', parseAsCommaSeparatedStrings.withDefault([]))
 
 export const useTaskResponsibleParam = () => useQueryState('task_responsible', parseAsInteger)
 
