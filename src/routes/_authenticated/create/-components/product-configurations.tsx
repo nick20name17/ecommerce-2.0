@@ -116,7 +116,7 @@ export const ProductConfigurations = ({
               >
                 {(() => {
                   const quanInt = Math.trunc(Number(item.quan))
-                  return item.quan != null && item.quan !== '' && !Number.isNaN(quanInt) ? (
+                  return item.quan != null && item.quan !== '' && !Number.isNaN(quanInt) && quanInt > 1 ? (
                     <div className='bg-background/95 text-foreground absolute top-1.5 left-1.5 z-10 rounded border border-border px-1.5 py-0.5 text-[10px] font-medium shadow-sm'>
                       {quanInt}x
                     </div>

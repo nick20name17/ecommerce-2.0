@@ -1,439 +1,84 @@
-import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { createFileRoute, useNavigate, useRouter } from '@tanstack/react-router'
-import { ArrowLeft, FilePlus2, Package, Paperclip, ShoppingCart, User } from 'lucide-react'
-import { useEffect, useReducer, useRef, useState } from 'react'
-import { toast } from 'sonner'
+import { createFileRoute } from '@tanstack/react-router'
 
-import { CartSummary } from './-components/cart-summary'
-import { CartTable } from './-components/cart-table'
-import { CreatePageActions } from './-components/create-page-actions'
-import { CustomerCombobox } from './-components/customer-combobox'
+import { CreatePageCartColumn } from './-components/create-page-cart-column'
+import { CreatePageForm } from './-components/create-page-form'
+import { CreatePageHeader } from './-components/create-page-header'
 import { ProductCatalogDialog } from './-components/product-catalog-dialog'
 import { ProductEditSheet } from './-components/product-edit-sheet'
-import { useEditSheetData } from './-components/use-edit-sheet-data'
-import { CART_QUERY_KEYS, getCartQuery } from '@/api/cart/query'
-import { cartService } from '@/api/cart/service'
-import { getCustomerDetailQuery } from '@/api/customer/query'
-import type { Customer } from '@/api/customer/schema'
-import type { CartItem, Product } from '@/api/product/schema'
-import {
-  EntityAttachments,
-  type EntityAttachmentsRef
-} from '@/components/common/entity-attachments/entity-attachments'
-import { Button } from '@/components/ui/button'
+import { useCreatePage } from './-components/use-create-page'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { getErrorMessage } from '@/helpers/error'
-import { cancelPendingCreatedAutoid, waitForCreatedAutoid } from '@/helpers/pending-created-autoid'
-import { useProjectId } from '@/hooks/use-project-id'
-import { useSelectedCustomerId } from '@/hooks/use-selected-customer'
-import { cn } from '@/lib/utils'
-
-type EditState = { product: Product | CartItem | null; mode: 'add' | 'edit'; open: boolean }
-type EditAction =
-  | { type: 'OPEN_ADD'; product: Product }
-  | { type: 'OPEN_EDIT'; item: CartItem }
-  | { type: 'CLOSE' }
-
-const editReducer = (state: EditState, action: EditAction): EditState => {
-  switch (action.type) {
-    case 'OPEN_ADD':
-      return {
-        product: { ...action.product, unit: action.product.unit || action.product.def_unit },
-        mode: 'add',
-        open: true
-      }
-    case 'OPEN_EDIT':
-      return { product: { ...action.item }, mode: 'edit', open: true }
-    case 'CLOSE':
-      return { product: null, mode: 'add', open: false }
-    default:
-      return state
-  }
-}
-
-type BusyState = {
-  cartUpdating: boolean
-  clearingCart: boolean
-  creatingProposal: boolean
-  creatingOrder: boolean
-}
-type BusyAction =
-  | { type: 'CART_UPDATING'; value: boolean }
-  | { type: 'CLEARING'; value: boolean }
-  | { type: 'CREATING_PROPOSAL'; value: boolean }
-  | { type: 'CREATING_ORDER'; value: boolean }
-
-const busyReducer = (state: BusyState, action: BusyAction): BusyState => {
-  switch (action.type) {
-    case 'CART_UPDATING':
-      return { ...state, cartUpdating: action.value }
-    case 'CLEARING':
-      return { ...state, clearingCart: action.value }
-    case 'CREATING_PROPOSAL':
-      return { ...state, creatingProposal: action.value }
-    case 'CREATING_ORDER':
-      return { ...state, creatingOrder: action.value }
-    default:
-      return state
-  }
-}
-
-const initialBusy: BusyState = {
-  cartUpdating: false,
-  clearingCart: false,
-  creatingProposal: false,
-  creatingOrder: false
-}
 
 const CreatePage = () => {
-  const navigate = useNavigate()
-  const router = useRouter()
-  const queryClient = useQueryClient()
-  const [projectId] = useProjectId()
-  const [savedCustomerId, setSavedCustomerId] = useSelectedCustomerId()
-
-  const [customer, setCustomer] = useState<Customer | null>(null)
-  const [catalogOpen, setCatalogOpen] = useState(false)
-  const [addingProductAutoid, setAddingProductAutoid] = useState<string | null>(null)
-  const [updatingQuantityItemId, setUpdatingQuantityItemId] = useState<number | null>(null)
-  const [removingItemId, setRemovingItemId] = useState<number | null>(null)
-  const attachmentsRef = useRef<EntityAttachmentsRef>(null)
-  const [busy, busyDispatch] = useReducer(busyReducer, initialBusy)
-  const [editState, editDispatch] = useReducer(editReducer, {
-    product: null,
-    mode: 'add',
-    open: false
-  })
-
-  const { data: savedCustomer, isLoading: customerLoading } = useQuery({
-    ...getCustomerDetailQuery(savedCustomerId ?? '', projectId),
-    enabled: !!savedCustomerId && !customer
-  })
-
-  useEffect(() => {
-    if (savedCustomer && !customer) {
-      queueMicrotask(() => setCustomer(savedCustomer))
-    }
-  }, [savedCustomer, customer])
-
-  const { data: cart, isLoading: cartLoading } = useQuery({
-    ...getCartQuery(customer?.id ?? '', projectId)
-  })
-  const { product: editProduct, mode: editMode, open: editSheetOpen } = editState
-
-  const { configData, configLoading, editProductWithPhotos } = useEditSheetData(
-    editProduct,
-    editSheetOpen,
-    customer?.id ?? '',
+  const {
     projectId,
-    editDispatch
-  )
-
-  const cartItems = cart?.items ?? []
-  const isBusy = busy.cartUpdating || cartLoading || busy.creatingProposal || busy.creatingOrder
-
-  const invalidateCart = () => {
-    if (customer?.id != null) {
-      queryClient.invalidateQueries({ queryKey: CART_QUERY_KEYS.detail(customer.id, projectId) })
-    }
-  }
-
-  const handleCustomerChange = (c: Customer | null) => {
-    setCustomer(c)
-    setSavedCustomerId(c?.id ?? null)
-  }
-
-  const handleProductSelect = async (product: Product) => {
-    if (!customer) return
-
-    const hasConfigurations = Number(product.configurations) > 0
-    const hasMultipleUnits = (product.units?.length ?? 0) > 1
-
-    if (hasConfigurations || hasMultipleUnits) {
-      editDispatch({ type: 'OPEN_ADD', product })
-    } else {
-      const customerId = customer.id
-      const payload = {
-        product_autoid: product.autoid,
-        quantity: 1,
-        unit: product.unit || product.def_unit || ''
-      }
-      setAddingProductAutoid(product.autoid)
-      try {
-        await cartService.addItem(payload, customerId, projectId)
-        invalidateCart()
-        toast.success(`${product.id} added to cart`)
-      } catch (error) {
-        toast.error(getErrorMessage(error))
-      } finally {
-        setAddingProductAutoid(null)
-      }
-    }
-  }
-
-  const handleEditItem = (item: CartItem) => {
-    if (!customer) return
-    editDispatch({ type: 'OPEN_EDIT', item })
-  }
-
-  const handleRemoveItem = async (itemId: number) => {
-    if (!customer) return
-    const item = cartItems.find((i) => i.id === itemId)
-    setRemovingItemId(itemId)
-    busyDispatch({ type: 'CART_UPDATING', value: true })
-    try {
-      await cartService.deleteItem(itemId, customer.id, projectId)
-      invalidateCart()
-      if (item) toast.success(`${item.product_id} removed`)
-    } catch (error) {
-      toast.error(getErrorMessage(error))
-    } finally {
-      busyDispatch({ type: 'CART_UPDATING', value: false })
-      setRemovingItemId(null)
-    }
-  }
-
-  const handleQuantityChange = async (itemId: number, quantity: number) => {
-    if (!customer) return
-    setUpdatingQuantityItemId(itemId)
-    busyDispatch({ type: 'CART_UPDATING', value: true })
-    try {
-      await cartService.updateItem(itemId, { quantity }, customer.id, projectId)
-      invalidateCart()
-    } catch (error) {
-      toast.error(getErrorMessage(error))
-    } finally {
-      busyDispatch({ type: 'CART_UPDATING', value: false })
-      setUpdatingQuantityItemId(null)
-    }
-  }
-
-  const handleClearAll = async () => {
-    if (!customer || cartItems.length === 0) return
-    busyDispatch({ type: 'CLEARING', value: true })
-    busyDispatch({ type: 'CART_UPDATING', value: true })
-    try {
-      await cartService.flush(customer.id, projectId)
-      invalidateCart()
-      toast.success('All items cleared')
-    } catch (error) {
-      toast.error(getErrorMessage(error))
-    }
-    busyDispatch({ type: 'CLEARING', value: false })
-    busyDispatch({ type: 'CART_UPDATING', value: false })
-  }
-
-  const handleCreateProposal = async () => {
-    if (!customer) {
-      toast.warning('Please select a customer for this proposal')
-      return
-    }
-    if (cartItems.length === 0) {
-      toast.warning('Please add at least one product to the proposal')
-      return
-    }
-    busyDispatch({ type: 'CREATING_PROPOSAL', value: true })
-    const autoidPromise = waitForCreatedAutoid('proposal')
-    await toast.promise(
-      (async () => {
-        try {
-          await cartService.submitProposal(customer.id, projectId)
-        } catch (e) {
-          cancelPendingCreatedAutoid('proposal')
-          throw e
-        }
-        const autoid = await autoidPromise
-        if (attachmentsRef.current?.hasPendingFiles()) {
-          await attachmentsRef.current.uploadPendingFiles(autoid, 'proposal')
-        }
-        return { autoid }
-      })(),
-      {
-        loading: 'Creating proposal...',
-        success: ({ autoid }) => {
-          invalidateCart()
-          setCustomer(null)
-          setSavedCustomerId(null)
-          navigate({ to: '/proposals', search: { autoid, status: 'all' } })
-          return 'Proposal created successfully'
-        },
-        error: (error) => getErrorMessage(error)
-      }
-    )
-    busyDispatch({ type: 'CREATING_PROPOSAL', value: false })
-  }
-
-  const handleCreateOrder = async () => {
-    if (!customer) {
-      toast.warning('Please select a customer for this order')
-      return
-    }
-    if (cartItems.length === 0) {
-      toast.warning('Please add at least one product to the order')
-      return
-    }
-    busyDispatch({ type: 'CREATING_ORDER', value: true })
-    const autoidPromise = waitForCreatedAutoid('order')
-    await toast.promise(
-      (async () => {
-        try {
-          await cartService.submitOrder(customer.id, projectId)
-        } catch (e) {
-          cancelPendingCreatedAutoid('order')
-          throw e
-        }
-        const autoid = await autoidPromise
-        if (attachmentsRef.current?.hasPendingFiles()) {
-          await attachmentsRef.current.uploadPendingFiles(autoid, 'order')
-        }
-        return { autoid }
-      })(),
-      {
-        loading: 'Creating order...',
-        success: ({ autoid }) => {
-          invalidateCart()
-          setCustomer(null)
-          setSavedCustomerId(null)
-          navigate({ to: '/orders', search: { autoid, status: 'all' } })
-          return 'Order created successfully'
-        },
-        error: (error) => getErrorMessage(error)
-      }
-    )
-    busyDispatch({ type: 'CREATING_ORDER', value: false })
-  }
+    customer,
+    catalogOpen,
+    setCatalogOpen,
+    cart,
+    cartItems,
+    cartLoading,
+    customerLoading,
+    isBusy,
+    busy,
+    updatingQuantityItemId,
+    addingProductAutoid,
+    removingItemId,
+    attachmentsRef,
+    editProduct,
+    editProductWithPhotos,
+    editMode,
+    editSheetOpen,
+    editDispatch,
+    configData,
+    configLoading,
+    invalidateCart,
+    handleCustomerChange,
+    handleProductSelect,
+    handleEditItem,
+    handleRemoveItem,
+    handleQuantityChange,
+    handleClearAll,
+    handleCreateProposal,
+    handleCreateOrder,
+    isCartItemType
+  } = useCreatePage()
 
   return (
     <div className='flex h-full flex-col'>
-      {/* Sticky Header */}
-      <header className='flex min-w-0 items-center justify-between gap-4 pb-4'>
-        <div className='flex items-center gap-3'>
-          <Button
-            variant='ghost'
-            size='icon'
-            className='shrink-0'
-            onClick={() => router.history.back()}
-          >
-            <ArrowLeft className='size-4' />
-          </Button>
-          <div className='bg-primary/10 text-primary flex size-10 shrink-0 items-center justify-center rounded-lg'>
-            <FilePlus2 className='size-5' />
-          </div>
-          <div className='min-w-0'>
-            <h1 className='text-2xl font-semibold tracking-tight'>Create New</h1>
-            <p className='text-muted-foreground text-sm'>Build a proposal or order</p>
-          </div>
-        </div>
-        <CreatePageActions
-          customerSelected={!!customer}
-          hasItems={cartItems.length > 0}
-          isBusy={isBusy}
-          clearingCart={busy.clearingCart}
-          creatingProposal={busy.creatingProposal}
-          creatingOrder={busy.creatingOrder}
-          onClearAll={handleClearAll}
-          onCreateProposal={handleCreateProposal}
-          onCreateOrder={handleCreateOrder}
-        />
-      </header>
+      <CreatePageHeader
+        customerSelected={!!customer}
+        hasItems={cartItems.length > 0}
+        isBusy={isBusy}
+        clearingCart={busy.clearingCart}
+        creatingProposal={busy.creatingProposal}
+        creatingOrder={busy.creatingOrder}
+        onClearAll={handleClearAll}
+        onCreateProposal={handleCreateProposal}
+        onCreateOrder={handleCreateOrder}
+      />
 
       <ScrollArea className='-mx-4 min-h-0 flex-1 px-4'>
         <div className='grid gap-4 pb-4 lg:grid-cols-[1fr,380px]'>
-          {/* Left Column - Form */}
-          <div className='flex flex-col gap-4'>
-            {/* Customer Selection Card */}
-            <Section
-              icon={<User className='size-4' />}
-              title='Customer'
-              description='Select a customer for this proposal'
-              step={1}
-              isComplete={!!customer}
-            >
-              <CustomerCombobox
-                value={customer}
-                onChange={handleCustomerChange}
-                projectId={projectId}
-              />
-            </Section>
-
-            {/* Product Search Card */}
-            <Section
-              icon={<Package className='size-4' />}
-              title='Products'
-              description='Search and add products by ID or description'
-              step={2}
-              isComplete={cartItems.length > 0}
-              isDisabled={!customer}
-              allowOverflow
-            >
-              <div className='flex flex-col gap-3'>
-                <Button
-                  type='button'
-                  className='w-full justify-between'
-                  disabled={!customer || isBusy}
-                  onClick={() => setCatalogOpen(true)}
-                >
-                  <span>Browse catalog</span>
-                  <span className='text-primary-foreground/80 text-xs font-normal'>
-                    Categories · Search · Prices
-                  </span>
-                </Button>
-                <p className='text-muted-foreground text-xs'>
-                  Use the catalog to filter by category and search across products. Configurable
-                  products will prompt for options.
-                </p>
-              </div>
-            </Section>
-
-            {/* Attachments */}
-            <Section
-              icon={<Paperclip className='size-4' />}
-              title='Attachments'
-              description='Add files to attach to the proposal or order after creation'
-              isDisabled={!customer}
-            >
-              <EntityAttachments
-                ref={attachmentsRef}
-                entityType='proposal'
-                projectId={projectId}
-                mode='deferred'
-              />
-            </Section>
-          </div>
-
-          {/* Right Column - Cart */}
-          <div className='flex flex-col gap-4'>
-            <Section
-              icon={<ShoppingCart className='size-4' />}
-              title='Cart'
-              trailing={
-                cartItems.length > 0 && !cartLoading ? (
-                  <span className='bg-primary/10 text-primary rounded-full px-2.5 py-0.5 text-xs font-medium'>
-                    {cartItems.length} item{cartItems.length !== 1 ? 's' : ''}
-                  </span>
-                ) : null
-              }
-              noPadding
-            >
-              <CartTable
-                items={cartItems}
-                loading={cartLoading || customerLoading}
-                updatingQuantityItemId={updatingQuantityItemId}
-                onEdit={handleEditItem}
-                onRemove={handleRemoveItem}
-                onQuantityChange={handleQuantityChange}
-              />
-              {(cart || cartLoading || customerLoading) && (
-                <div className='border-t p-4'>
-                  <CartSummary
-                    cart={cart ?? null}
-                    loading={cartLoading || customerLoading}
-                    updating={busy.cartUpdating}
-                  />
-                </div>
-              )}
-            </Section>
-          </div>
+          <CreatePageForm
+            customer={customer}
+            projectId={projectId}
+            hasCartItems={cartItems.length > 0}
+            setCatalogOpen={setCatalogOpen}
+            onCustomerChange={handleCustomerChange}
+            attachmentsRef={attachmentsRef}
+            isBusy={isBusy}
+          />
+          <CreatePageCartColumn
+            cart={cart}
+            cartItems={cartItems}
+            cartLoading={cartLoading}
+            customerLoading={customerLoading}
+            updatingQuantityItemId={updatingQuantityItemId}
+            cartUpdating={busy.cartUpdating}
+            onEdit={handleEditItem}
+            onRemove={handleRemoveItem}
+            onQuantityChange={handleQuantityChange}
+          />
         </div>
       </ScrollArea>
 
@@ -475,65 +120,3 @@ export const Route = createFileRoute('/_authenticated/create/')({
     meta: [{ title: 'Create' }]
   })
 })
-
-const isCartItemType = (p: Product | CartItem): p is CartItem => {
-  return 'product_autoid' in p
-}
-
-const Section = ({
-  icon,
-  title,
-  description,
-  trailing,
-  step,
-  isComplete,
-  isDisabled,
-  noPadding,
-  allowOverflow,
-  children
-}: {
-  icon?: React.ReactNode
-  title: string
-  description?: string
-  trailing?: React.ReactNode
-  step?: number
-  isComplete?: boolean
-  isDisabled?: boolean
-  noPadding?: boolean
-  allowOverflow?: boolean
-  children: React.ReactNode
-}) => {
-  return (
-    <div
-      className={cn(
-        'bg-card rounded-xl border transition-all',
-        !allowOverflow && 'overflow-hidden',
-        isDisabled && 'opacity-60'
-      )}
-    >
-      <div className='bg-muted/30 flex items-center gap-3 border-b px-4 py-3'>
-        {step !== undefined && (
-          <div
-            className={cn(
-              'flex size-6 shrink-0 items-center justify-center rounded-full text-xs font-semibold transition-colors',
-              isComplete ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'
-            )}
-          >
-            {step}
-          </div>
-        )}
-        {icon && !step && (
-          <div className='bg-muted text-muted-foreground flex size-8 shrink-0 items-center justify-center rounded-lg'>
-            {icon}
-          </div>
-        )}
-        <div className='min-w-0 flex-1'>
-          <h3 className='text-sm font-semibold'>{title}</h3>
-          {description && <p className='text-muted-foreground text-xs'>{description}</p>}
-        </div>
-        {trailing}
-      </div>
-      <div className={cn(!noPadding && 'p-4')}>{children}</div>
-    </div>
-  )
-}

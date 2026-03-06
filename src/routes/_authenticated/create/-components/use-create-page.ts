@@ -1,0 +1,329 @@
+import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useNavigate } from '@tanstack/react-router'
+import { useEffect, useReducer, useRef, useState } from 'react'
+import { toast } from 'sonner'
+
+import { useEditSheetData } from './use-edit-sheet-data'
+import { CART_QUERY_KEYS, getCartQuery } from '@/api/cart/query'
+import { cartService } from '@/api/cart/service'
+import { getCustomerDetailQuery } from '@/api/customer/query'
+import type { Customer } from '@/api/customer/schema'
+import type { CartItem, Product } from '@/api/product/schema'
+import type { EntityAttachmentsRef } from '@/components/common/entity-attachments/entity-attachments'
+import { getErrorMessage } from '@/helpers/error'
+import { cancelPendingCreatedAutoid, waitForCreatedAutoid } from '@/helpers/pending-created-autoid'
+import { useProjectId } from '@/hooks/use-project-id'
+import { useSelectedCustomerId } from '@/hooks/use-selected-customer'
+
+type EditState = { product: Product | CartItem | null; mode: 'add' | 'edit'; open: boolean }
+type EditAction =
+  | { type: 'OPEN_ADD'; product: Product }
+  | { type: 'OPEN_EDIT'; item: CartItem }
+  | { type: 'CLOSE' }
+
+const editReducer = (state: EditState, action: EditAction): EditState => {
+  switch (action.type) {
+    case 'OPEN_ADD':
+      return {
+        product: { ...action.product, unit: action.product.unit || action.product.def_unit },
+        mode: 'add',
+        open: true
+      }
+    case 'OPEN_EDIT':
+      return { product: { ...action.item }, mode: 'edit', open: true }
+    case 'CLOSE':
+      return { product: null, mode: 'add', open: false }
+    default:
+      return state
+  }
+}
+
+type BusyState = {
+  cartUpdating: boolean
+  clearingCart: boolean
+  creatingProposal: boolean
+  creatingOrder: boolean
+}
+type BusyAction =
+  | { type: 'CART_UPDATING'; value: boolean }
+  | { type: 'CLEARING'; value: boolean }
+  | { type: 'CREATING_PROPOSAL'; value: boolean }
+  | { type: 'CREATING_ORDER'; value: boolean }
+
+const busyReducer = (state: BusyState, action: BusyAction): BusyState => {
+  switch (action.type) {
+    case 'CART_UPDATING':
+      return { ...state, cartUpdating: action.value }
+    case 'CLEARING':
+      return { ...state, clearingCart: action.value }
+    case 'CREATING_PROPOSAL':
+      return { ...state, creatingProposal: action.value }
+    case 'CREATING_ORDER':
+      return { ...state, creatingOrder: action.value }
+    default:
+      return state
+  }
+}
+
+const initialBusy: BusyState = {
+  cartUpdating: false,
+  clearingCart: false,
+  creatingProposal: false,
+  creatingOrder: false
+}
+
+const isCartItemType = (p: Product | CartItem): p is CartItem => {
+  return 'product_autoid' in p
+}
+
+export function useCreatePage() {
+  const navigate = useNavigate()
+  const queryClient = useQueryClient()
+  const [projectId] = useProjectId()
+  const [savedCustomerId, setSavedCustomerId] = useSelectedCustomerId()
+
+  const [customer, setCustomer] = useState<Customer | null>(null)
+  const [catalogOpen, setCatalogOpen] = useState(false)
+  const [addingProductAutoid, setAddingProductAutoid] = useState<string | null>(null)
+  const [updatingQuantityItemId, setUpdatingQuantityItemId] = useState<number | null>(null)
+  const [removingItemId, setRemovingItemId] = useState<number | null>(null)
+  const attachmentsRef = useRef<EntityAttachmentsRef>(null)
+  const [busy, busyDispatch] = useReducer(busyReducer, initialBusy)
+  const [editState, editDispatch] = useReducer(editReducer, {
+    product: null,
+    mode: 'add',
+    open: false
+  })
+
+  const { data: savedCustomer, isLoading: customerLoading } = useQuery({
+    ...getCustomerDetailQuery(savedCustomerId ?? '', projectId),
+    enabled: !!savedCustomerId && !customer
+  })
+
+  useEffect(() => {
+    if (savedCustomer && !customer) {
+      queueMicrotask(() => setCustomer(savedCustomer))
+    }
+  }, [savedCustomer, customer])
+
+  const { data: cart, isLoading: cartLoading } = useQuery({
+    ...getCartQuery(customer?.id ?? '', projectId)
+  })
+  const { product: editProduct, mode: editMode, open: editSheetOpen } = editState
+
+  const { configData, configLoading, editProductWithPhotos } = useEditSheetData(
+    editProduct,
+    editSheetOpen,
+    customer?.id ?? '',
+    projectId,
+    editDispatch
+  )
+
+  const cartItems = cart?.items ?? []
+  const isBusy = busy.cartUpdating || cartLoading || busy.creatingProposal || busy.creatingOrder
+
+  const invalidateCart = () => {
+    if (customer?.id != null) {
+      queryClient.invalidateQueries({ queryKey: CART_QUERY_KEYS.detail(customer.id, projectId) })
+    }
+  }
+
+  const handleCustomerChange = (c: Customer | null) => {
+    setCustomer(c)
+    setSavedCustomerId(c?.id ?? null)
+  }
+
+  const handleProductSelect = async (product: Product) => {
+    if (!customer) return
+
+    const hasConfigurations = Number(product.configurations) > 0
+    const hasMultipleUnits = (product.units?.length ?? 0) > 1
+
+    if (hasConfigurations || hasMultipleUnits) {
+      editDispatch({ type: 'OPEN_ADD', product })
+    } else {
+      const customerId = customer.id
+      const payload = {
+        product_autoid: product.autoid,
+        quantity: 1,
+        unit: product.unit || product.def_unit || ''
+      }
+      setAddingProductAutoid(product.autoid)
+      try {
+        await cartService.addItem(payload, customerId, projectId)
+        invalidateCart()
+        toast.success(`${product.id} added to cart`)
+      } catch (error) {
+        toast.error(getErrorMessage(error))
+      } finally {
+        setAddingProductAutoid(null)
+      }
+    }
+  }
+
+  const handleEditItem = (item: CartItem) => {
+    if (!customer) return
+    editDispatch({ type: 'OPEN_EDIT', item })
+  }
+
+  const handleRemoveItem = async (itemId: number) => {
+    if (!customer) return
+    const item = cartItems.find((i) => i.id === itemId)
+    setRemovingItemId(itemId)
+    busyDispatch({ type: 'CART_UPDATING', value: true })
+    try {
+      await cartService.deleteItem(itemId, customer.id, projectId)
+      invalidateCart()
+      if (item) toast.success(`${item.product_id} removed`)
+    } catch (error) {
+      toast.error(getErrorMessage(error))
+    } finally {
+      busyDispatch({ type: 'CART_UPDATING', value: false })
+      setRemovingItemId(null)
+    }
+  }
+
+  const handleQuantityChange = async (itemId: number, quantity: number) => {
+    if (!customer) return
+    setUpdatingQuantityItemId(itemId)
+    busyDispatch({ type: 'CART_UPDATING', value: true })
+    try {
+      await cartService.updateItem(itemId, { quantity }, customer.id, projectId)
+      invalidateCart()
+    } catch (error) {
+      toast.error(getErrorMessage(error))
+    } finally {
+      busyDispatch({ type: 'CART_UPDATING', value: false })
+      setUpdatingQuantityItemId(null)
+    }
+  }
+
+  const handleClearAll = async () => {
+    if (!customer || cartItems.length === 0) return
+    busyDispatch({ type: 'CLEARING', value: true })
+    busyDispatch({ type: 'CART_UPDATING', value: true })
+    try {
+      await cartService.flush(customer.id, projectId)
+      invalidateCart()
+      toast.success('All items cleared')
+    } catch (error) {
+      toast.error(getErrorMessage(error))
+    }
+    busyDispatch({ type: 'CLEARING', value: false })
+    busyDispatch({ type: 'CART_UPDATING', value: false })
+  }
+
+  const handleCreateProposal = async () => {
+    if (!customer) {
+      toast.warning('Please select a customer for this proposal')
+      return
+    }
+    if (cartItems.length === 0) {
+      toast.warning('Please add at least one product to the proposal')
+      return
+    }
+    busyDispatch({ type: 'CREATING_PROPOSAL', value: true })
+    const autoidPromise = waitForCreatedAutoid('proposal')
+    await toast.promise(
+      (async () => {
+        try {
+          await cartService.submitProposal(customer.id, projectId)
+        } catch (e) {
+          cancelPendingCreatedAutoid('proposal')
+          throw e
+        }
+        const autoid = await autoidPromise
+        if (attachmentsRef.current?.hasPendingFiles()) {
+          await attachmentsRef.current.uploadPendingFiles(autoid, 'proposal')
+        }
+        return { autoid }
+      })(),
+      {
+        loading: 'Creating proposal...',
+        success: ({ autoid }) => {
+          invalidateCart()
+          setCustomer(null)
+          setSavedCustomerId(null)
+          navigate({ to: '/proposals', search: { autoid, status: 'all' } })
+          return 'Proposal created successfully'
+        },
+        error: (error) => getErrorMessage(error)
+      }
+    )
+    busyDispatch({ type: 'CREATING_PROPOSAL', value: false })
+  }
+
+  const handleCreateOrder = async () => {
+    if (!customer) {
+      toast.warning('Please select a customer for this order')
+      return
+    }
+    if (cartItems.length === 0) {
+      toast.warning('Please add at least one product to the order')
+      return
+    }
+    busyDispatch({ type: 'CREATING_ORDER', value: true })
+    const autoidPromise = waitForCreatedAutoid('order')
+    await toast.promise(
+      (async () => {
+        try {
+          await cartService.submitOrder(customer.id, projectId)
+        } catch (e) {
+          cancelPendingCreatedAutoid('order')
+          throw e
+        }
+        const autoid = await autoidPromise
+        if (attachmentsRef.current?.hasPendingFiles()) {
+          await attachmentsRef.current.uploadPendingFiles(autoid, 'order')
+        }
+        return { autoid }
+      })(),
+      {
+        loading: 'Creating order...',
+        success: ({ autoid }) => {
+          invalidateCart()
+          setCustomer(null)
+          setSavedCustomerId(null)
+          navigate({ to: '/orders', search: { autoid, status: 'all' } })
+          return 'Order created successfully'
+        },
+        error: (error) => getErrorMessage(error)
+      }
+    )
+    busyDispatch({ type: 'CREATING_ORDER', value: false })
+  }
+
+  return {
+    projectId,
+    customer,
+    catalogOpen,
+    setCatalogOpen,
+    cart,
+    cartItems,
+    cartLoading,
+    customerLoading,
+    isBusy,
+    busy,
+    updatingQuantityItemId,
+    addingProductAutoid,
+    removingItemId,
+    attachmentsRef,
+    editProduct,
+    editProductWithPhotos,
+    editMode,
+    editSheetOpen,
+    editDispatch,
+    configData,
+    configLoading,
+    invalidateCart,
+    handleCustomerChange,
+    handleProductSelect,
+    handleEditItem,
+    handleRemoveItem,
+    handleQuantityChange,
+    handleClearAll,
+    handleCreateProposal,
+    handleCreateOrder,
+    isCartItemType
+  }
+}
