@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from 'react'
 import { ProposalAssignDialog } from './-components/proposal-assign-dialog'
 import { ProposalDeleteDialog } from './-components/proposal-delete-dialog'
 import { ProposalsDataTable } from './-components/proposals-data-table'
+import { getFieldConfigQuery } from '@/api/field-config/query'
 import { getProposalsQuery } from '@/api/proposal/query'
 import type { Proposal, ProposalParams } from '@/api/proposal/schema'
 import { EntityAttachmentsDialog } from '@/components/common/entity-attachments/entity-attachments-dialog'
@@ -79,6 +80,8 @@ const ProposalsPage = () => {
     ...getProposalsQuery(params),
     placeholderData: keepPreviousData
   })
+
+  const { data: fieldConfig } = useQuery(getFieldConfigQuery(projectId))
 
   const results = data?.results ?? []
   const proposalInResults =
@@ -190,7 +193,7 @@ const ProposalsPage = () => {
 
       <ProposalsDataTable
         data={tableData}
-        fieldConfig={null}
+        fieldConfig={fieldConfig ?? null}
         isLoading={isLoading || isPlaceholderData}
         sorting={sorting}
         setSorting={setSorting}

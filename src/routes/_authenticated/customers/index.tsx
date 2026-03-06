@@ -8,6 +8,7 @@ import { CustomerDeleteDialog } from './-components/customer-delete-dialog'
 import { CustomerModal } from './-components/customer-modal'
 import { CustomersDataTable } from './-components/customers-data-table'
 import { getCustomersQuery } from '@/api/customer/query'
+import { getFieldConfigQuery } from '@/api/field-config/query'
 import type { Customer, CustomerParams } from '@/api/customer/schema'
 import { EntityNotesSheet } from '@/components/common/entity-notes/entity-notes-sheet'
 import { Pagination } from '@/components/common/filters/pagination'
@@ -48,6 +49,8 @@ const CustomersPage = () => {
     placeholderData: keepPreviousData
   })
 
+  const { data: fieldConfig } = useQuery(getFieldConfigQuery(projectId))
+
   const editingCustomer = typeof modalCustomer === 'object' ? modalCustomer : null
 
   return (
@@ -77,7 +80,7 @@ const CustomersPage = () => {
 
       <CustomersDataTable
         data={data?.results ?? []}
-        fieldConfig={null}
+        fieldConfig={fieldConfig ?? null}
         isLoading={isLoading || isPlaceholderData}
         sorting={sorting}
         setSorting={setSorting}

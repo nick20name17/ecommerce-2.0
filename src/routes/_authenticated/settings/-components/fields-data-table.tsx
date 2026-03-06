@@ -1,7 +1,7 @@
 'use no memo'
 
-import type { SortingState } from '@tanstack/react-table'
 import { getCoreRowModel, getSortedRowModel, useReactTable } from '@tanstack/react-table'
+import type { SortingState } from '@tanstack/react-table'
 import { useMemo, useState } from 'react'
 
 import { getFieldColumns } from './field-columns'
@@ -14,7 +14,9 @@ interface FieldsDataTableProps {
   entity: string
   projectId: number
   onFieldToggle: (entity: string, fieldName: string, enabled: boolean) => void
+  onAliasSubmit: (entity: string, fieldName: string, alias: string) => void
   isPending: boolean
+  isAliasPending: boolean
 }
 
 export const FieldsDataTable = ({
@@ -22,13 +24,15 @@ export const FieldsDataTable = ({
   isLoading,
   entity,
   onFieldToggle,
-  isPending
+  onAliasSubmit,
+  isPending,
+  isAliasPending
 }: FieldsDataTableProps) => {
   const [sorting, setSorting] = useState<SortingState>([])
 
   const columns = useMemo(
-    () => getFieldColumns(entity, onFieldToggle, isPending),
-    [entity, onFieldToggle, isPending]
+    () => getFieldColumns(entity, onFieldToggle, onAliasSubmit, isPending, isAliasPending),
+    [entity, onFieldToggle, onAliasSubmit, isPending, isAliasPending]
   )
 
   const table = useReactTable({
@@ -48,3 +52,4 @@ export const FieldsDataTable = ({
     />
   )
 }
+

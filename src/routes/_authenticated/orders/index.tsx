@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from 'react'
 import { OrderAssignDialog } from './-components/order-assign-dialog'
 import { OrderDeleteDialog } from './-components/order-delete-dialog'
 import { OrdersDataTable } from './-components/orders-data-table'
+import { getFieldConfigQuery } from '@/api/field-config/query'
 import { ORDER_QUERY_KEYS, getOrdersQuery } from '@/api/order/query'
 import type { Order, OrderParams } from '@/api/order/schema'
 import { orderService } from '@/api/order/service'
@@ -90,6 +91,8 @@ const OrdersPage = () => {
     ...getOrdersQuery(params),
     placeholderData: keepPreviousData
   })
+
+  const { data: fieldConfig } = useQuery(getFieldConfigQuery(projectId))
 
   const results = data?.results ?? []
   const orderInResults =
@@ -206,7 +209,7 @@ const OrdersPage = () => {
 
       <OrdersDataTable
         data={tableData}
-        fieldConfig={null}
+        fieldConfig={fieldConfig ?? null}
         isLoading={isLoading || isPlaceholderData}
         sorting={sorting}
         setSorting={setSorting}

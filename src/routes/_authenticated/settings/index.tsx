@@ -11,7 +11,11 @@ import { toast } from 'sonner'
 import { FieldsDataTable } from './-components/fields-data-table'
 import { CUSTOMER_QUERY_KEYS } from '@/api/customer/query'
 import { FIELD_CONFIG_QUERY_KEYS, getFieldConfigQuery } from '@/api/field-config/query'
-import type { FieldConfigResponse, FieldConfigRow } from '@/api/field-config/schema'
+import type {
+  FieldConfigPatchPayload,
+  FieldConfigResponse,
+  FieldConfigRow
+} from '@/api/field-config/schema'
 import { fieldConfigService } from '@/api/field-config/service'
 import { ORDER_QUERY_KEYS } from '@/api/order/query'
 import { PROPOSAL_QUERY_KEYS } from '@/api/proposal/query'
@@ -74,6 +78,21 @@ const applyFieldToggle = (
   }
 }
 
+const applyAliasUpdate = (
+  prev: FieldConfigResponse | undefined,
+  entity: string,
+  fieldName: string,
+  alias: string
+): FieldConfigResponse | undefined => {
+  if (!prev?.[entity]) return prev
+  return {
+    ...prev,
+    [entity]: prev[entity].map((entry) =>
+      entry.field === fieldName ? { ...entry, alias: alias || null } : entry
+    )
+  }
+}
+
 const SettingsPage = () => {
   const [projectId] = useProjectId()
   const [activeTab, setActiveTab] = useQueryState('tab', parseAsString)
@@ -88,7 +107,7 @@ const SettingsPage = () => {
     mutationFn: ({
       payload
     }: {
-      payload: Record<string, string[]>
+      payload: FieldConfigPatchPayload
       entity: string
       fieldName: string
       enabled: boolean
@@ -116,6 +135,37 @@ const SettingsPage = () => {
     }
   })
 
+  const aliasPatchMutation = useMutation({
+    mutationFn: ({
+      payload
+    }: {
+      payload: { _aliases: Record<string, Record<string, string>> }
+    }) => fieldConfigService.patchFieldConfig(projectId!, payload),
+    onMutate: async ({ payload }) => {
+      if (!projectId) return
+      const key = FIELD_CONFIG_QUERY_KEYS.fieldConfig(projectId)
+      await client.cancelQueries({ queryKey: key })
+      const prev = client.getQueryData<FieldConfigResponse>(key)
+      const entity = Object.keys(payload._aliases)[0]
+      const fieldAliases = entity ? payload._aliases[entity] : undefined
+      if (!entity || !fieldAliases) return { prev }
+      let next = prev
+      for (const [fieldName, alias] of Object.entries(fieldAliases)) {
+        next = applyAliasUpdate(next, entity, fieldName, alias)
+      }
+      if (next) client.setQueryData(key, next)
+      return { prev }
+    },
+    onError: (_err, _variables, context) => {
+      if (context?.prev && projectId)
+        client.setQueryData(FIELD_CONFIG_QUERY_KEYS.fieldConfig(projectId), context.prev)
+    },
+    meta: {
+      invalidatesQuery: projectId ? FIELD_CONFIG_QUERY_KEYS.fieldConfig(projectId) : undefined,
+      successMessage: 'Alias saved'
+    }
+  })
+
   const entities = useMemo(() => Object.keys(data ?? {}), [data])
   const currentTab = activeTab ?? entities[0] ?? ''
 
@@ -124,6 +174,7 @@ const SettingsPage = () => {
     if (!entityFields) return []
     return entityFields.map((entry) => ({
       field: entry.field,
+      alias: entry.alias ?? null,
       default: entry.default,
       enabled: entry.enabled,
       entity: currentTab
@@ -142,6 +193,13 @@ const SettingsPage = () => {
       entity,
       fieldName,
       enabled
+    })
+  }
+
+  const handleAliasSubmit = (entity: string, fieldName: string, alias: string) => {
+    if (!projectId) return
+    aliasPatchMutation.mutate({
+      payload: { _aliases: { [entity]: { [fieldName]: alias } } }
     })
   }
 
@@ -213,7 +271,9 @@ const SettingsPage = () => {
               entity={currentTab}
               projectId={projectId}
               onFieldToggle={handleFieldToggle}
+              onAliasSubmit={handleAliasSubmit}
               isPending={patchMutation.isPending}
+              isAliasPending={aliasPatchMutation.isPending}
             />
           </div>
         ) : entities.length === 0 ? (
@@ -233,7 +293,9 @@ const SettingsPage = () => {
                 entity={entity}
                 projectId={projectId}
                 onFieldToggle={handleFieldToggle}
+                onAliasSubmit={handleAliasSubmit}
                 isPending={patchMutation.isPending}
+                isAliasPending={aliasPatchMutation.isPending}
               />
             </TabsContent>
           ))
