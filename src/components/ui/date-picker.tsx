@@ -18,13 +18,13 @@ interface DatePickerProps {
   showTime?: boolean
 }
 
-export const DatePicker = ({
+export function DatePicker({
   value,
   onChange,
   className,
   placeholder,
   showTime = false
-}: DatePickerProps) => {
+}: DatePickerProps) {
   const [open, setOpen] = React.useState(false)
 
   const hours = Array.from({ length: 12 }, (_, i) => i + 1)
@@ -89,7 +89,7 @@ export const DatePicker = ({
     >
       <PopoverTrigger asChild>
         <Button
-          variant='outline'
+          variant={className ? 'ghost' : 'outline'}
           data-empty={!value}
           className={cn(
             'data-[empty=true]:text-muted-foreground justify-start text-left font-normal',
@@ -123,7 +123,7 @@ export const DatePicker = ({
               onSelect={handleDateSelect}
             />
             <div className='border-border flex divide-x border-l'>
-              <ScrollArea className='h-[300px] w-16 [&>[data-slot=scroll-area-scrollbar]]:hidden'>
+              <ScrollArea className='h-[300px] w-16'>
                 <div className='flex flex-col p-2'>
                   {hours.map((hour) => (
                     <Button
@@ -138,7 +138,7 @@ export const DatePicker = ({
                   ))}
                 </div>
               </ScrollArea>
-              <ScrollArea className='h-[300px] w-16 [&>[data-slot=scroll-area-scrollbar]]:hidden'>
+              <ScrollArea className='h-[300px] w-16'>
                 <div className='flex flex-col p-2'>
                   {minutes.map((minute) => (
                     <Button
@@ -153,7 +153,7 @@ export const DatePicker = ({
                   ))}
                 </div>
               </ScrollArea>
-              <ScrollArea className='h-[300px] w-16 [&>[data-slot=scroll-area-scrollbar]]:hidden'>
+              <ScrollArea className='h-[300px] w-16'>
                 <div className='flex flex-col p-2'>
                   {(['AM', 'PM'] as const).map((ampm) => (
                     <Button

@@ -13,6 +13,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as AuthRouteRouteImport } from './routes/_auth/route'
 import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
 import { Route as AuthenticatedUsersIndexRouteImport } from './routes/_authenticated/users/index'
+import { Route as AuthenticatedTodos2IndexRouteImport } from './routes/_authenticated/todos-2/index'
 import { Route as AuthenticatedTasksIndexRouteImport } from './routes/_authenticated/tasks/index'
 import { Route as AuthenticatedShippingIndexRouteImport } from './routes/_authenticated/shipping/index'
 import { Route as AuthenticatedSettingsIndexRouteImport } from './routes/_authenticated/settings/index'
@@ -24,6 +25,7 @@ import { Route as AuthenticatedOrderDeskIndexRouteImport } from './routes/_authe
 import { Route as AuthenticatedCustomersIndexRouteImport } from './routes/_authenticated/customers/index'
 import { Route as AuthenticatedCreateIndexRouteImport } from './routes/_authenticated/create/index'
 import { Route as AuthSignInIndexRouteImport } from './routes/_auth/sign-in/index'
+import { Route as AuthenticatedTodos2TaskIdIndexRouteImport } from './routes/_authenticated/todos-2/$taskId/index'
 import { Route as AuthenticatedTasksTaskIdIndexRouteImport } from './routes/_authenticated/tasks/$taskId/index'
 import { Route as AuthenticatedCustomersCustomerIdIndexRouteImport } from './routes/_authenticated/customers/$customerId/index'
 
@@ -45,6 +47,12 @@ const AuthenticatedUsersIndexRoute = AuthenticatedUsersIndexRouteImport.update({
   path: '/users/',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedTodos2IndexRoute =
+  AuthenticatedTodos2IndexRouteImport.update({
+    id: '/todos-2/',
+    path: '/todos-2/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedTasksIndexRoute = AuthenticatedTasksIndexRouteImport.update({
   id: '/tasks/',
   path: '/tasks/',
@@ -109,6 +117,12 @@ const AuthSignInIndexRoute = AuthSignInIndexRouteImport.update({
   path: '/sign-in/',
   getParentRoute: () => AuthRouteRoute,
 } as any)
+const AuthenticatedTodos2TaskIdIndexRoute =
+  AuthenticatedTodos2TaskIdIndexRouteImport.update({
+    id: '/todos-2/$taskId/',
+    path: '/todos-2/$taskId/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedTasksTaskIdIndexRoute =
   AuthenticatedTasksTaskIdIndexRouteImport.update({
     id: '/tasks/$taskId/',
@@ -135,9 +149,11 @@ export interface FileRoutesByFullPath {
   '/settings/': typeof AuthenticatedSettingsIndexRoute
   '/shipping/': typeof AuthenticatedShippingIndexRoute
   '/tasks/': typeof AuthenticatedTasksIndexRoute
+  '/todos-2/': typeof AuthenticatedTodos2IndexRoute
   '/users/': typeof AuthenticatedUsersIndexRoute
   '/customers/$customerId/': typeof AuthenticatedCustomersCustomerIdIndexRoute
   '/tasks/$taskId/': typeof AuthenticatedTasksTaskIdIndexRoute
+  '/todos-2/$taskId/': typeof AuthenticatedTodos2TaskIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof AuthenticatedIndexRoute
@@ -152,9 +168,11 @@ export interface FileRoutesByTo {
   '/settings': typeof AuthenticatedSettingsIndexRoute
   '/shipping': typeof AuthenticatedShippingIndexRoute
   '/tasks': typeof AuthenticatedTasksIndexRoute
+  '/todos-2': typeof AuthenticatedTodos2IndexRoute
   '/users': typeof AuthenticatedUsersIndexRoute
   '/customers/$customerId': typeof AuthenticatedCustomersCustomerIdIndexRoute
   '/tasks/$taskId': typeof AuthenticatedTasksTaskIdIndexRoute
+  '/todos-2/$taskId': typeof AuthenticatedTodos2TaskIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -172,9 +190,11 @@ export interface FileRoutesById {
   '/_authenticated/settings/': typeof AuthenticatedSettingsIndexRoute
   '/_authenticated/shipping/': typeof AuthenticatedShippingIndexRoute
   '/_authenticated/tasks/': typeof AuthenticatedTasksIndexRoute
+  '/_authenticated/todos-2/': typeof AuthenticatedTodos2IndexRoute
   '/_authenticated/users/': typeof AuthenticatedUsersIndexRoute
   '/_authenticated/customers/$customerId/': typeof AuthenticatedCustomersCustomerIdIndexRoute
   '/_authenticated/tasks/$taskId/': typeof AuthenticatedTasksTaskIdIndexRoute
+  '/_authenticated/todos-2/$taskId/': typeof AuthenticatedTodos2TaskIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -191,9 +211,11 @@ export interface FileRouteTypes {
     | '/settings/'
     | '/shipping/'
     | '/tasks/'
+    | '/todos-2/'
     | '/users/'
     | '/customers/$customerId/'
     | '/tasks/$taskId/'
+    | '/todos-2/$taskId/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -208,9 +230,11 @@ export interface FileRouteTypes {
     | '/settings'
     | '/shipping'
     | '/tasks'
+    | '/todos-2'
     | '/users'
     | '/customers/$customerId'
     | '/tasks/$taskId'
+    | '/todos-2/$taskId'
   id:
     | '__root__'
     | '/_auth'
@@ -227,9 +251,11 @@ export interface FileRouteTypes {
     | '/_authenticated/settings/'
     | '/_authenticated/shipping/'
     | '/_authenticated/tasks/'
+    | '/_authenticated/todos-2/'
     | '/_authenticated/users/'
     | '/_authenticated/customers/$customerId/'
     | '/_authenticated/tasks/$taskId/'
+    | '/_authenticated/todos-2/$taskId/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -265,6 +291,13 @@ declare module '@tanstack/react-router' {
       path: '/users'
       fullPath: '/users/'
       preLoaderRoute: typeof AuthenticatedUsersIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/todos-2/': {
+      id: '/_authenticated/todos-2/'
+      path: '/todos-2'
+      fullPath: '/todos-2/'
+      preLoaderRoute: typeof AuthenticatedTodos2IndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/tasks/': {
@@ -344,6 +377,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthSignInIndexRouteImport
       parentRoute: typeof AuthRouteRoute
     }
+    '/_authenticated/todos-2/$taskId/': {
+      id: '/_authenticated/todos-2/$taskId/'
+      path: '/todos-2/$taskId'
+      fullPath: '/todos-2/$taskId/'
+      preLoaderRoute: typeof AuthenticatedTodos2TaskIdIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/tasks/$taskId/': {
       id: '/_authenticated/tasks/$taskId/'
       path: '/tasks/$taskId'
@@ -385,9 +425,11 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedSettingsIndexRoute: typeof AuthenticatedSettingsIndexRoute
   AuthenticatedShippingIndexRoute: typeof AuthenticatedShippingIndexRoute
   AuthenticatedTasksIndexRoute: typeof AuthenticatedTasksIndexRoute
+  AuthenticatedTodos2IndexRoute: typeof AuthenticatedTodos2IndexRoute
   AuthenticatedUsersIndexRoute: typeof AuthenticatedUsersIndexRoute
   AuthenticatedCustomersCustomerIdIndexRoute: typeof AuthenticatedCustomersCustomerIdIndexRoute
   AuthenticatedTasksTaskIdIndexRoute: typeof AuthenticatedTasksTaskIdIndexRoute
+  AuthenticatedTodos2TaskIdIndexRoute: typeof AuthenticatedTodos2TaskIdIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -402,10 +444,12 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedSettingsIndexRoute: AuthenticatedSettingsIndexRoute,
   AuthenticatedShippingIndexRoute: AuthenticatedShippingIndexRoute,
   AuthenticatedTasksIndexRoute: AuthenticatedTasksIndexRoute,
+  AuthenticatedTodos2IndexRoute: AuthenticatedTodos2IndexRoute,
   AuthenticatedUsersIndexRoute: AuthenticatedUsersIndexRoute,
   AuthenticatedCustomersCustomerIdIndexRoute:
     AuthenticatedCustomersCustomerIdIndexRoute,
   AuthenticatedTasksTaskIdIndexRoute: AuthenticatedTasksTaskIdIndexRoute,
+  AuthenticatedTodos2TaskIdIndexRoute: AuthenticatedTodos2TaskIdIndexRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =

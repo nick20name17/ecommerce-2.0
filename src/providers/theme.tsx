@@ -33,6 +33,9 @@ export const ThemeProvider = ({
   useEffect(() => {
     const root = window.document.documentElement
 
+    // Remove theme-ready to disable transitions during theme swap
+    root.classList.remove('theme-ready')
+
     root.classList.remove('light', 'dark')
 
     if (theme === 'system') {
@@ -41,10 +44,14 @@ export const ThemeProvider = ({
         : 'light'
 
       root.classList.add(systemTheme)
-      return
+    } else {
+      root.classList.add(theme)
     }
 
-    root.classList.add(theme)
+    // Re-enable transitions after theme swap completes
+    requestAnimationFrame(() => {
+      root.classList.add('theme-ready')
+    })
   }, [theme])
 
   const value = {

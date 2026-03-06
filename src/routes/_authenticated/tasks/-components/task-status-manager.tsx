@@ -136,7 +136,7 @@ export const TaskStatusManager = ({ projectId, statuses }: TaskStatusManagerProp
   )
 }
 
-const StatusList = ({
+export const StatusList = ({
   projectId,
   statuses,
   onStatusesChange

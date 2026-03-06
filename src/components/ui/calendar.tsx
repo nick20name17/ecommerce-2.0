@@ -5,7 +5,7 @@ import { type DayButton, DayPicker, type Locale, getDefaultClassNames } from 're
 import { Button, buttonVariants } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 
-const Calendar = ({
+function Calendar({
   className,
   classNames,
   showOutsideDays = true,
@@ -17,7 +17,7 @@ const Calendar = ({
   ...props
 }: React.ComponentProps<typeof DayPicker> & {
   buttonVariant?: React.ComponentProps<typeof Button>['variant']
-}) => {
+}) {
   const defaultClassNames = getDefaultClassNames()
 
   return (
@@ -99,7 +99,7 @@ const Calendar = ({
           defaultClassNames.range_end
         ),
         today: cn(
-          'bg-muted text-foreground rounded-(--cell-radius) data-[selected=true]:rounded-none',
+          'bg-muted dark:bg-white/[0.08] text-foreground rounded-(--cell-radius) data-[selected=true]:rounded-none data-[selected=true]:bg-transparent',
           defaultClassNames.today
         ),
         outside: cn(
@@ -169,13 +169,13 @@ const Calendar = ({
   )
 }
 
-const CalendarDayButton = ({
+function CalendarDayButton({
   className,
   day,
   modifiers,
   locale,
   ...props
-}: React.ComponentProps<typeof DayButton> & { locale?: Partial<Locale> }) => {
+}: React.ComponentProps<typeof DayButton> & { locale?: Partial<Locale> }) {
   const defaultClassNames = getDefaultClassNames()
 
   const ref = React.useRef<HTMLButtonElement>(null)

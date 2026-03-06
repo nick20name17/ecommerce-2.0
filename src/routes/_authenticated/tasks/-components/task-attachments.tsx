@@ -38,6 +38,7 @@ interface TaskAttachmentsProps {
   attachments?: TaskAttachment[]
   mode?: 'immediate' | 'deferred'
   isLoading?: boolean
+  showDropZone?: boolean
   onPendingFilesChange?: (hasPending: boolean) => void
 }
 
@@ -95,7 +96,7 @@ interface UploadingFile {
 
 export const TaskAttachments = forwardRef<TaskAttachmentsRef, TaskAttachmentsProps>(
   function TaskAttachments(
-    { taskId, attachments = [], mode = 'immediate', isLoading = false, onPendingFilesChange },
+    { taskId, attachments = [], mode = 'immediate', isLoading = false, showDropZone = true, onPendingFilesChange },
     ref
   ) {
     const queryClient = useQueryClient()
@@ -255,48 +256,65 @@ export const TaskAttachments = forwardRef<TaskAttachmentsRef, TaskAttachmentsPro
           Attachments
         </p>
 
-        <div
-          className={cn(
-            'relative rounded-lg border border-dashed p-4 text-center transition-colors',
-            isDragging
-              ? 'border-primary bg-primary/5'
-              : 'border-muted-foreground/25 hover:border-muted-foreground/50'
-          )}
-          onDragEnter={handleDragEnter}
-          onDragLeave={handleDragLeave}
-          onDragOver={handleDragOver}
-          onDrop={handleDrop}
-        >
-          <input
-            {...getInputProps()}
-            className='sr-only'
-          />
+        {showDropZone ? (
+          <div
+            className={cn(
+              'relative rounded-lg border border-dashed p-4 text-center transition-colors',
+              isDragging
+                ? 'border-primary bg-primary/5'
+                : 'border-muted-foreground/25 hover:border-muted-foreground/50'
+            )}
+            onDragEnter={handleDragEnter}
+            onDragLeave={handleDragLeave}
+            onDragOver={handleDragOver}
+            onDrop={handleDrop}
+          >
+            <input
+              {...getInputProps()}
+              className='sr-only'
+            />
 
-          <div className='flex flex-col items-center gap-2'>
-            <div
-              className={cn(
-                'bg-muted flex size-10 items-center justify-center rounded-full transition-colors',
-                isDragging ? 'border-primary bg-primary/10' : 'border-muted-foreground/25'
-              )}
-            >
-              <UploadIcon className='text-muted-foreground size-4' />
-            </div>
+            <div className='flex flex-col items-center gap-2'>
+              <div
+                className={cn(
+                  'bg-muted flex size-10 items-center justify-center rounded-full transition-colors',
+                  isDragging ? 'border-primary bg-primary/10' : 'border-muted-foreground/25'
+                )}
+              >
+                <UploadIcon className='text-muted-foreground size-4' />
+              </div>
 
-            <div className='space-y-1'>
-              <p className='text-sm'>
-                Drop files here or{' '}
-                <button
-                  type='button'
-                  onClick={openFileDialog}
-                  className='text-primary cursor-pointer underline-offset-4 hover:underline'
-                >
-                  browse files
-                </button>
-              </p>
-              <p className='text-muted-foreground text-xs'>Maximum file size: 10MB</p>
+              <div className='space-y-1'>
+                <p className='text-sm'>
+                  Drop files here or{' '}
+                  <button
+                    type='button'
+                    onClick={openFileDialog}
+                    className='text-primary cursor-pointer underline-offset-4 hover:underline'
+                  >
+                    browse files
+                  </button>
+                </p>
+                <p className='text-muted-foreground text-xs'>Maximum file size: 10MB</p>
+              </div>
             </div>
           </div>
-        </div>
+        ) : (
+          <>
+            <input
+              {...getInputProps()}
+              className='sr-only'
+            />
+            <button
+              type='button'
+              onClick={openFileDialog}
+              className='inline-flex w-full items-center justify-center gap-1.5 rounded-[6px] border border-dashed border-border px-2.5 py-2 text-[12px] font-medium text-text-secondary transition-colors duration-[80ms] hover:bg-bg-hover hover:text-foreground'
+            >
+              <UploadIcon className='size-3.5' />
+              Add attachment
+            </button>
+          </>
+        )}
 
         {errors.length > 0 && (
           <div className='bg-destructive/10 text-destructive flex items-start gap-2 rounded-lg p-3 text-sm'>

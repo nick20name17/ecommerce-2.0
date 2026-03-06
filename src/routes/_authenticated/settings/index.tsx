@@ -1,8 +1,12 @@
+import { defaultPreset } from '@dnd-kit/dom'
+import { OptimisticSortingPlugin, SortableKeyboardPlugin } from '@dnd-kit/dom/sortable'
+import { DragDropProvider } from '@dnd-kit/react'
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { createFileRoute, redirect } from '@tanstack/react-router'
 import { Database, Settings } from 'lucide-react'
 import { parseAsString, useQueryState } from 'nuqs'
-import { useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
+import { toast } from 'sonner'
 
 import { FieldsDataTable } from './-components/fields-data-table'
 import { CUSTOMER_QUERY_KEYS } from '@/api/customer/query'
@@ -11,6 +15,10 @@ import type { FieldConfigResponse, FieldConfigRow } from '@/api/field-config/sch
 import { fieldConfigService } from '@/api/field-config/service'
 import { ORDER_QUERY_KEYS } from '@/api/order/query'
 import { PROPOSAL_QUERY_KEYS } from '@/api/proposal/query'
+import { TASK_QUERY_KEYS, getTaskStatusesQuery } from '@/api/task/query'
+import type { TaskStatus } from '@/api/task/schema'
+import { taskService } from '@/api/task/service'
+import { StatusList } from '@/routes/_authenticated/tasks/-components/task-status-manager'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { isAdmin } from '@/constants/user'
@@ -171,20 +179,30 @@ const SettingsPage = () => {
           className='flex-wrap'
         >
           {showTabSkeleton
-            ? Array.from({ length: 4 }).map((_, i) => (
-                <Skeleton
-                  key={i}
-                  className='h-9 w-28 rounded-md'
-                />
-              ))
-            : entities.map((entity) => (
-                <TabsTrigger
-                  key={entity}
-                  value={entity}
-                >
-                  {getTableLabel(entity)}
+            ? <>
+                {Array.from({ length: 4 }).map((_, i) => (
+                  <Skeleton
+                    key={i}
+                    className='h-9 w-28 rounded-md'
+                  />
+                ))}
+                <TabsTrigger value='task_statuses'>
+                  Task Statuses
                 </TabsTrigger>
-              ))}
+              </>
+            : <>
+                {entities.map((entity) => (
+                  <TabsTrigger
+                    key={entity}
+                    value={entity}
+                  >
+                    {getTableLabel(entity)}
+                  </TabsTrigger>
+                ))}
+                <TabsTrigger value='task_statuses'>
+                  Task Statuses
+                </TabsTrigger>
+              </>}
         </TabsList>
 
         {showTabSkeleton ? (
@@ -220,7 +238,116 @@ const SettingsPage = () => {
             </TabsContent>
           ))
         )}
+
+        <TabsContent value='task_statuses' className='mt-4 min-h-0 flex-1'>
+          <TaskStatusesTab projectId={projectId} />
+        </TabsContent>
       </Tabs>
+    </div>
+  )
+}
+
+// ── Task Statuses Tab ────────────────────────────────────────
+
+const SORTABLE_PLUGINS = [...defaultPreset.plugins, OptimisticSortingPlugin, SortableKeyboardPlugin]
+
+const arrayMove = <T,>(array: T[], from: number, to: number): T[] => {
+  const next = array.slice()
+  next.splice(to, 0, next.splice(from, 1)[0]!)
+  return next
+}
+
+const TaskStatusesTab = ({ projectId }: { projectId: number }) => {
+  const queryClient = useQueryClient()
+  const { data, isLoading } = useQuery(getTaskStatusesQuery(projectId))
+  const statuses = data?.results ?? []
+
+  const [orderedStatuses, setOrderedStatuses] = useState<TaskStatus[]>([])
+
+  const statusIds = statuses.map((s) => s.id).join(',')
+  useEffect(() => {
+    setOrderedStatuses([...statuses].sort((a, b) => a.order - b.order))
+  }, [statusIds])
+
+  const reorderMutation = useMutation({
+    mutationFn: ({ id, order }: { id: number; order: number }) =>
+      taskService.updateStatus(id, { order })
+  })
+
+  const handleDragEnd = (event: unknown) => {
+    const e = event as {
+      canceled?: boolean
+      operation?: { source: { id: string | number } | null; target: { id: string | number } | null }
+    }
+    if (e.canceled) return
+    const op = e.operation
+    if (!op?.source) return
+
+    const { source, target } = op
+    const sortableSource = source as { initialIndex?: number; index?: number }
+    const useSortableIndices =
+      typeof sortableSource.initialIndex === 'number' && typeof sortableSource.index === 'number'
+
+    const fromIndex = useSortableIndices
+      ? sortableSource.initialIndex
+      : orderedStatuses.findIndex((s) => s.id === Number(source?.id))
+    const toIndex = useSortableIndices
+      ? sortableSource.index
+      : target != null
+        ? orderedStatuses.findIndex((s) => s.id === Number(target.id))
+        : -1
+
+    if (
+      typeof fromIndex !== 'number' ||
+      typeof toIndex !== 'number' ||
+      fromIndex === -1 ||
+      toIndex === -1 ||
+      fromIndex === toIndex
+    )
+      return
+
+    const next = arrayMove(orderedStatuses, fromIndex, toIndex)
+    setOrderedStatuses(next)
+
+    Promise.all(
+      next
+        .filter((s) => !s.is_default && s.id != null)
+        .map((status, i) => reorderMutation.mutateAsync({ id: status.id as number, order: i }))
+    )
+      .then(() => {
+        queryClient.invalidateQueries({
+          queryKey: TASK_QUERY_KEYS.statuses(projectId)
+        })
+        toast.success('Status order saved')
+      })
+      .catch(() => {})
+  }
+
+  if (isLoading) {
+    return (
+      <div className='flex max-w-md flex-col gap-2'>
+        {Array.from({ length: 4 }).map((_, i) => (
+          <Skeleton key={i} className='h-10 w-full rounded-md' />
+        ))}
+      </div>
+    )
+  }
+
+  return (
+    <div className='max-w-md'>
+      <p className='text-muted-foreground mb-3 text-sm'>
+        Drag rows to reorder. Default status is fixed and cannot be edited or deleted.
+      </p>
+      <DragDropProvider
+        plugins={SORTABLE_PLUGINS}
+        onDragEnd={handleDragEnd}
+      >
+        <StatusList
+          projectId={projectId}
+          statuses={orderedStatuses}
+          onStatusesChange={setOrderedStatuses}
+        />
+      </DragDropProvider>
     </div>
   )
 }
