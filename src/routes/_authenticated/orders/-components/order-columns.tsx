@@ -137,6 +137,8 @@ export const getOrderColumns = ({
       return (
         <div
           className='max-w-[140px] min-w-0'
+          role='button'
+          tabIndex={0}
           onClick={(e) => e.stopPropagation()}
           onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && e.stopPropagation()}
         >

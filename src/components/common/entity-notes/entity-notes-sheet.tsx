@@ -131,8 +131,8 @@ export const EntityNotesSheet = ({
           <div className='flex flex-col gap-3 p-4'>
             {isLoading ? (
               <div className='flex flex-col gap-3'>
-                {[1, 2, 3].map((i) => (
-                  <NoteCardSkeleton key={i} />
+                {(['skeleton-1', 'skeleton-2', 'skeleton-3'] as const).map((key) => (
+                  <NoteCardSkeleton key={key} />
                 ))}
               </div>
             ) : orderedNotes.length === 0 ? (
