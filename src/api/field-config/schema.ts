@@ -8,9 +8,9 @@ export interface FieldConfigEntry {
 
 export type FieldConfigResponse = Record<string, FieldConfigEntry[]>
 
-export type FieldConfigPatchPayload = Record<string, string[]> & {
-  _aliases?: Record<string, Record<string, string>>
-}
+export type FieldConfigPatchPayload =
+  | Record<string, string[]>
+  | { _aliases: Record<string, Record<string, string>> }
 
 export interface FieldConfigPatchResponse {
   status: string
