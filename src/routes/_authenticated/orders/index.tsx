@@ -77,7 +77,7 @@ const OrdersPage = () => {
       : undefined
 
   const params: OrderParams = {
-    invoice: search || undefined,
+    search: search || undefined,
     autoid: autoidFromUrl ?? undefined,
     offset,
     limit,

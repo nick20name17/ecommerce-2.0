@@ -34,7 +34,7 @@ export const CustomerOrdersTab = ({ customerId }: CustomerOrdersTabProps) => {
 
   const params: OrderParams = {
     customer_id: customerId,
-    invoice: search || undefined,
+    search: search || undefined,
     offset,
     limit,
     ordering,

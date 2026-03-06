@@ -66,7 +66,7 @@ const ProposalsPage = () => {
       : undefined
 
   const params: ProposalParams = {
-    quote: search || undefined,
+    search: search || undefined,
     autoid: autoidFromUrl ?? undefined,
     offset,
     limit,

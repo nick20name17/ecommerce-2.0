@@ -37,7 +37,7 @@ export interface OrderItem {
 export type OrderResponse = PaginatedResponse<Order>
 
 export interface OrderParams extends PaginationParams {
-  invoice?: string
+  search?: string
   autoid?: string
   ordering?: string
   status?: OrderStatus

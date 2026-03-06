@@ -36,7 +36,7 @@ export const OrderCombobox = ({ value, onChange, projectId }: OrderComboboxProps
 
   const params: OrderParams = {
     limit: 50,
-    invoice: debouncedSearch || undefined,
+    search: debouncedSearch || undefined,
     project_id: projectId ?? undefined
   }
   const { data, isLoading, isFetching } = useQuery({
