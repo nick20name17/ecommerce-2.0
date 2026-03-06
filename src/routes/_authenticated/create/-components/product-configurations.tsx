@@ -1,6 +1,7 @@
-import { AlertCircle, Check, ImageIcon, Sparkles } from 'lucide-react'
+import { AlertCircle, Check, ImageIcon, RotateCcw, Sparkles } from 'lucide-react'
 
 import type { Configuration } from '@/api/product/schema'
+import { Button } from '@/components/ui/button'
 import { Spinner } from '@/components/ui/spinner'
 import { formatCurrency } from '@/helpers/formatters'
 import { cn } from '@/lib/utils'
@@ -10,6 +11,7 @@ interface ProductConfigurationsProps {
   activeTab: string
   onActiveTabChange: (tab: string) => void
   onSelectConfigItem: (configName: string, itemId: string) => void
+  onResetConfigurations?: () => void
   hasUncheckedRequired: boolean
   selectedConfigCount: number
   totalConfigCount: number
@@ -20,6 +22,7 @@ export const ProductConfigurations = ({
   activeTab,
   onActiveTabChange,
   onSelectConfigItem,
+  onResetConfigurations,
   hasUncheckedRequired,
   selectedConfigCount,
   totalConfigCount
@@ -34,12 +37,26 @@ export const ProductConfigurations = ({
             ({selectedConfigCount}/{totalConfigCount})
           </span>
         </div>
-        {hasUncheckedRequired && (
-          <span className='bg-destructive/10 text-destructive flex items-center gap-1.5 rounded-md px-2 py-1 text-xs font-medium'>
-            <AlertCircle className='size-3' />
-            Required
-          </span>
-        )}
+        <div className='flex items-center gap-2'>
+          {selectedConfigCount > 0 && onResetConfigurations && (
+            <Button
+              type='button'
+              variant='ghost'
+              size='sm'
+              className='text-muted-foreground h-8 gap-1.5 text-xs'
+              onClick={onResetConfigurations}
+            >
+              <RotateCcw className='size-3.5' />
+              Reset
+            </Button>
+          )}
+          {hasUncheckedRequired && (
+            <span className='bg-destructive/10 text-destructive flex items-center gap-1.5 rounded-md px-2 py-1 text-xs font-medium'>
+              <AlertCircle className='size-3' />
+              Required
+            </span>
+          )}
+        </div>
       </div>
 
       <div className='bg-muted flex flex-wrap gap-1 rounded-lg p-1'>
@@ -97,6 +114,14 @@ export const ProductConfigurations = ({
                 )}
                 onClick={() => onSelectConfigItem(c.name, item.id)}
               >
+                {(() => {
+                  const quanInt = Math.trunc(Number(item.quan))
+                  return item.quan != null && item.quan !== '' && !Number.isNaN(quanInt) ? (
+                    <div className='bg-background/95 text-foreground absolute top-1.5 left-1.5 z-10 rounded border border-border px-1.5 py-0.5 text-[10px] font-medium shadow-sm'>
+                      {quanInt}x
+                    </div>
+                  ) : null
+                })()}
                 {isSelected && (
                   <div className='bg-primary absolute top-1.5 right-1.5 z-10 flex size-5 items-center justify-center rounded-full text-white'>
                     <Check className='size-3' />
@@ -131,7 +156,14 @@ export const ProductConfigurations = ({
                       isSelected && 'text-primary'
                     )}
                   >
-                    +{formatCurrency(item.price)}
+                    +{formatCurrency(
+                      (() => {
+                        const price = Number(item.price)
+                        const qty = Math.trunc(Number(item.quan))
+                        const multiplier = !Number.isNaN(qty) && qty > 0 ? qty : 1
+                        return price * multiplier
+                      })()
+                    )}
                   </span>
                 </div>
               </button>

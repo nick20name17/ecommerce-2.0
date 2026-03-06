@@ -133,6 +133,7 @@ export const ProductEditSheet = ({
       : false
 
   const hasConfigs = configs.length > 0
+  const selectedConfigCount = activeConfigurations.length
 
   const handleSelectConfigItem = (configName: string, itemId: string) => {
     dispatch({ type: 'SELECT_CONFIG_ITEM', configName, itemId })
@@ -152,14 +153,17 @@ export const ProductEditSheet = ({
   }
 
   const priceDisplay = hasConfigs
-    ? totalPrice
+    ? selectedConfigCount > 0
+      ? totalPrice
+      : Number(configData?.base_price) || 0
     : Number(product?.price || (product && !isCartItem(product) ? product.cost : 0) || 0)
   const oldPriceDisplay = hasConfigs
-    ? totalOldPrice
+    ? selectedConfigCount > 0
+      ? totalOldPrice
+      : Number(configData?.base_old_price) || 0
     : Number((product && !isCartItem(product) ? product.old_price : 0) || 0)
   const hasDiscount = oldPriceDisplay > priceDisplay
 
-  const selectedConfigCount = activeConfigurations.length
   const totalConfigCount = configs.length
 
   return (
@@ -235,6 +239,7 @@ export const ProductEditSheet = ({
                   activeTab={activeTab}
                   onActiveTabChange={(tab) => dispatch({ type: 'SET_ACTIVE_TAB', value: tab })}
                   onSelectConfigItem={handleSelectConfigItem}
+                  onResetConfigurations={() => dispatch({ type: 'DESELECT_ALL_CONFIGS' })}
                   hasUncheckedRequired={hasUncheckedRequired}
                   selectedConfigCount={selectedConfigCount}
                   totalConfigCount={totalConfigCount}

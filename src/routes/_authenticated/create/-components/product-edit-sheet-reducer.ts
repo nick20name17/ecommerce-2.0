@@ -29,6 +29,7 @@ export type SheetAction =
   | { type: 'SET_ACTIVE_TAB'; value: string }
   | { type: 'UPDATE_CONFIGS'; updater: (prev: Configuration[]) => Configuration[] }
   | { type: 'SELECT_CONFIG_ITEM'; configName: string; itemId: string }
+  | { type: 'DESELECT_ALL_CONFIGS' }
 
 export const initialSheetState: SheetState = {
   quantity: 1,
@@ -90,6 +91,14 @@ export const sheetReducer = (state: SheetState, action: SheetAction): SheetState
             }))
           }
         })
+      }
+    case 'DESELECT_ALL_CONFIGS':
+      return {
+        ...state,
+        configs: state.configs.map((c) => ({
+          ...c,
+          items: c.items.map((i) => ({ ...i, active: false }))
+        }))
       }
     default:
       return state

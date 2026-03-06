@@ -132,7 +132,10 @@ export const useProductEditSheet = (
     let total = Number(configData?.base_price) || 0
     configs.forEach((c) =>
       c.items.forEach((i) => {
-        if (i.active) total += Number(i.price) || 0
+        if (!i.active) return
+        const qty = Math.trunc(Number(i.quan))
+        const multiplier = !Number.isNaN(qty) && qty > 0 ? qty : 1
+        total += (Number(i.price) || 0) * multiplier
       })
     )
     return total
@@ -142,7 +145,10 @@ export const useProductEditSheet = (
     let total = Number(configData?.base_old_price) || 0
     configs.forEach((c) =>
       c.items.forEach((i) => {
-        if (i.active) total += Number(i.old_price) || 0
+        if (!i.active) return
+        const qty = Math.trunc(Number(i.quan))
+        const multiplier = !Number.isNaN(qty) && qty > 0 ? qty : 1
+        total += (Number(i.old_price) || 0) * multiplier
       })
     )
     return total
