@@ -49,7 +49,7 @@ const ORDER_FORMATTERS: Partial<Record<string, DynamicCellFormatter<OrderRow>>> 
       return (
         <Badge
           variant='outline'
-          className='text-muted-foreground font-medium'
+          className='text-text-tertiary font-medium'
         >
           Creating…
         </Badge>
@@ -93,13 +93,13 @@ const ORDER_FORMATTERS: Partial<Record<string, DynamicCellFormatter<OrderRow>>> 
   invoice: (v, row) => {
     if (row._pending)
       return (
-        <span className='text-muted-foreground flex items-center gap-2'>
+        <span className='text-text-tertiary flex items-center gap-2'>
           <Loader2 className='size-4 animate-spin' />
           Pending…
         </span>
       )
     const invoice = String(v ?? row.invoice ?? '').trim() || '—'
-    if (invoice === '—') return <span className='text-muted-foreground'>—</span>
+    if (invoice === '—') return <span className='text-text-tertiary'>—</span>
     return (
       <Tooltip>
         <TooltipTrigger asChild>

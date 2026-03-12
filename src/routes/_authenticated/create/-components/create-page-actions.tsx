@@ -50,7 +50,7 @@ export const CreatePageActions = ({
             size='sm'
             disabled={!hasItems || isBusy || isCreating}
             onClick={onClearAll}
-            className='text-muted-foreground hover:text-destructive'
+            className='text-text-tertiary hover:text-destructive'
           >
             {clearingCart ? (
               <Spinner className='mr-1.5 size-3.5' />

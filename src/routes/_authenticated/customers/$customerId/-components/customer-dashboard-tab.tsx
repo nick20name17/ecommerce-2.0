@@ -1,129 +1,225 @@
 import { useQuery } from '@tanstack/react-query'
-import { ShoppingCart } from 'lucide-react'
+import { ArrowDown, ArrowUp, FileText, Minus, Package, ShoppingCart, TrendingUp } from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
 
-// TEMPORARY: financial chart hidden
-// import { DashboardSalesChart } from '@/routes/_authenticated/-components/dashboard-sales-chart'
 import { getDashboardQuery } from '@/api/dashboard/query'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Skeleton } from '@/components/ui/skeleton'
 import { getErrorMessage } from '@/helpers/error'
-import { cn } from '@/lib/utils'
-import { DashboardKpis } from '@/routes/_authenticated/-components/dashboard-kpis'
 import { DashboardOrdersChart } from '@/routes/_authenticated/-components/dashboard-orders-chart'
-
-const DashboardTabSkeleton = () => (
-    <div className='flex flex-col gap-5'>
-      <div className='grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3'>
-        {Array.from({ length: 3 }).map((_, i) => (
-          <Card
-            key={i}
-            className='min-w-0 overflow-hidden'
-          >
-            <CardHeader className='pb-2'>
-              <div className='space-y-1'>
-                <div className='flex items-center gap-2'>
-                  <Skeleton className='size-8 rounded-lg' />
-                  <Skeleton className='h-4 w-24' />
-                </div>
-                <Skeleton className='h-3 w-20' />
-              </div>
-            </CardHeader>
-            <CardContent className='pt-0'>
-              <Skeleton className='h-8 w-16' />
-              <Skeleton className='mt-1.5 h-3 w-28' />
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-      <div className='grid min-w-0 grid-cols-1 gap-5'>
-        <Card className='min-w-0 shrink-0 overflow-hidden'>
-          <CardHeader className='border-border/50 bg-muted/20 border-b pb-4'>
-            <div className='flex items-center gap-3'>
-              <Skeleton className='size-9 rounded-lg' />
-              <Skeleton className='h-4 w-56' />
-            </div>
-          </CardHeader>
-          <CardContent className='pt-4'>
-            <Skeleton className='h-[280px] w-full' />
-          </CardContent>
-        </Card>
-      </div>
-    </div>
-)
+import { cn } from '@/lib/utils'
 
 interface CustomerDashboardTabProps {
   customerId: string
   projectId: number | null
 }
 
-export const CustomerDashboardTab = ({ customerId, projectId }: CustomerDashboardTabProps) => {
+export const CustomerDashboardTab = ({
+  customerId,
+  projectId,
+}: CustomerDashboardTabProps) => {
   const params = {
     customer_id: customerId,
-    project_id: projectId ?? undefined
+    project_id: projectId ?? undefined,
   }
   const { data, isLoading, error } = useQuery({
     ...getDashboardQuery(params),
-    enabled: !!customerId
+    enabled: !!customerId,
   })
 
   if (error) {
     return (
-      <div className='flex flex-1 items-center justify-center p-4'>
-        <Card className='border-destructive/30 bg-card max-w-md'>
-          <CardHeader>
-            <CardTitle className='text-destructive'>Unable to load dashboard</CardTitle>
-          </CardHeader>
-          <CardContent className='space-y-2'>
-            <p className='text-muted-foreground text-sm'>{getErrorMessage(error)}</p>
-          </CardContent>
-        </Card>
+      <div className='flex flex-1 items-center justify-center py-16'>
+        <div className='text-center'>
+          <p className='text-[13px] font-medium text-destructive'>
+            Unable to load dashboard
+          </p>
+          <p className='mt-1 text-[13px] text-text-tertiary'>
+            {getErrorMessage(error)}
+          </p>
+        </div>
       </div>
     )
   }
 
   if (isLoading || !data) {
-    return <DashboardTabSkeleton />
+    return <DashboardSkeleton />
   }
 
+  const thisMonth = data.total_order_count ?? 0
+  const lastMonth = data.last_month_order_count ?? 0
+  const trend = lastMonth > 0 ? ((thisMonth - lastMonth) / lastMonth) * 100 : 0
+  const trendDirection = trend > 0 ? 'up' : trend < 0 ? 'down' : 'neutral'
+
   return (
-    <div className='flex min-w-0 flex-col gap-5'>
-      <DashboardKpis metrics={data} />
-      <div className='grid min-w-0 grid-cols-1 gap-5'>
-        <Card
-          aria-label='Orders this month vs last month'
+    <div className='flex min-w-0 flex-col gap-4'>
+      {/* Highlight stat */}
+      <div className='rounded-[10px] border border-border bg-background p-5'>
+        <div className='flex items-center gap-3'>
+          <div className='flex size-9 items-center justify-center rounded-[8px] bg-primary/10 text-primary'>
+            <TrendingUp className='size-4.5' />
+          </div>
+          <div className='min-w-0 flex-1'>
+            <div className='flex items-baseline gap-2'>
+              <span className='text-[28px] font-semibold tabular-nums tracking-tight text-foreground'>
+                {thisMonth}
+              </span>
+              <span className='text-[13px] font-medium text-text-tertiary'>
+                orders this month
+              </span>
+            </div>
+            <div className='mt-0.5 flex items-center gap-1.5'>
+              {trendDirection === 'up' && (
+                <ArrowUp className='size-3 text-[#34C759]' />
+              )}
+              {trendDirection === 'down' && (
+                <ArrowDown className='size-3 text-[#FF3B30]' />
+              )}
+              {trendDirection === 'neutral' && (
+                <Minus className='size-3 text-text-tertiary' />
+              )}
+              <span
+                className={cn(
+                  'text-[13px] font-medium tabular-nums',
+                  trendDirection === 'up' && 'text-[#34C759]',
+                  trendDirection === 'down' && 'text-[#FF3B30]',
+                  trendDirection === 'neutral' && 'text-text-tertiary'
+                )}
+              >
+                {trend > 0 ? '+' : ''}
+                {trend.toFixed(0)}% vs last month ({lastMonth})
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* KPI cards */}
+      <div className='grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-2'>
+        <KpiCard
+          icon={Package}
+          title='Unprocessed'
+          value={String(data.unprocessed_orders)}
+          description='Orders requiring action'
+          accent={data.unprocessed_orders > 0 ? 'warning' : undefined}
+        />
+        <KpiCard
+          icon={FileText}
+          title='Pending Invoices'
+          value={String(data.pending_invoices)}
+          description='Awaiting payment'
+          accent={data.pending_invoices > 0 ? 'info' : undefined}
+        />
+      </div>
+
+      {/* Orders chart */}
+      <div className='rounded-[10px] border border-border bg-background'>
+        <div className='flex items-center gap-3 border-b border-border px-5 py-3'>
+          <div className='flex size-8 items-center justify-center rounded-[6px] bg-primary/10 text-primary'>
+            <ShoppingCart className='size-4' />
+          </div>
+          <div>
+            <span className='text-[13px] font-semibold text-foreground'>
+              Orders Trend
+            </span>
+            <p className='text-[13px] text-text-tertiary'>
+              This month vs last month
+            </p>
+          </div>
+        </div>
+        <div className='p-4'>
+          <DashboardOrdersChart metrics={data} />
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ── KPI Card ────────────────────────────────────────────────
+
+function KpiCard({
+  icon: Icon,
+  title,
+  description,
+  value,
+  accent,
+}: {
+  icon: LucideIcon
+  title: string
+  description: string
+  value: string
+  accent?: 'warning' | 'info'
+}) {
+  return (
+    <div className='min-w-0 rounded-[10px] border border-border bg-background p-4'>
+      <div className='mb-3 flex items-center gap-2'>
+        <div
           className={cn(
-            'border-border/80 min-w-0 shrink-0 overflow-hidden shadow-sm',
-            'dark:bg-card/50 dark:ring-border/50 dark:ring-1'
+            'flex size-7 items-center justify-center rounded-[6px]',
+            accent === 'warning'
+              ? 'bg-[#FF9500]/10 text-[#FF9500]'
+              : accent === 'info'
+                ? 'bg-primary/10 text-primary'
+                : 'bg-bg-secondary text-text-tertiary'
           )}
         >
-          <CardHeader className='border-border/50 bg-muted/20 flex flex-row items-center gap-3 border-b pb-4'>
-            <div className='bg-primary/10 text-primary flex size-9 shrink-0 items-center justify-center rounded-lg'>
-              <ShoppingCart className='size-4' />
+          <Icon className='size-3.5' />
+        </div>
+        <span className='text-[13px] font-medium text-text-tertiary'>{title}</span>
+      </div>
+      <div
+        className={cn(
+          'text-[22px] font-semibold tabular-nums tracking-tight',
+          accent === 'warning' && Number(value) > 0
+            ? 'text-[#FF9500]'
+            : 'text-foreground'
+        )}
+      >
+        {value}
+      </div>
+      <p className='mt-0.5 text-[13px] text-text-tertiary'>{description}</p>
+    </div>
+  )
+}
+
+// ── Skeleton ────────────────────────────────────────────────
+
+function DashboardSkeleton() {
+  return (
+    <div className='flex flex-col gap-4'>
+      {/* Highlight skeleton */}
+      <div className='rounded-[10px] border border-border bg-background p-5'>
+        <div className='flex items-center gap-3'>
+          <div className='size-9 animate-pulse rounded-[8px] bg-border' />
+          <div>
+            <div className='h-8 w-16 animate-pulse rounded bg-border' />
+            <div className='mt-1.5 h-3 w-32 animate-pulse rounded bg-border' />
+          </div>
+        </div>
+      </div>
+      {/* KPI skeletons */}
+      <div className='grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-2'>
+        {Array.from({ length: 2 }).map((_, i) => (
+          <div key={i} className='rounded-[10px] border border-border bg-background p-4'>
+            <div className='mb-3 flex items-center gap-2'>
+              <div className='size-7 animate-pulse rounded-[6px] bg-border' />
+              <div className='h-3 w-20 animate-pulse rounded bg-border' />
             </div>
-            <CardTitle className='text-base'>Orders — this month vs last month</CardTitle>
-          </CardHeader>
-          <CardContent className='pt-4'>
-            <DashboardOrdersChart metrics={data} />
-          </CardContent>
-        </Card>
-        {/* TEMPORARY: financial chart hidden */}
-        {/* <Card
-          aria-label='Sales this month vs last month'
-          className={cn(
-            'min-w-0 shrink-0 overflow-hidden border-border/80 shadow-sm',
-            'dark:bg-card/50 dark:ring-1 dark:ring-border/50'
-          )}
-        >
-          <CardHeader className='flex flex-row items-center gap-3 border-b border-border/50 bg-muted/20 pb-4'>
-            <div className='flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary'>
-              <DollarSign className='size-4' />
-            </div>
-            <CardTitle className='text-base'>Sales — this month vs last month</CardTitle>
-          </CardHeader>
-          <CardContent className='pt-4'>
-            <DashboardSalesChart metrics={data} />
-          </CardContent>
-        </Card> */}
+            <div className='h-7 w-12 animate-pulse rounded bg-border' />
+            <div className='mt-2 h-2.5 w-24 animate-pulse rounded bg-border' />
+          </div>
+        ))}
+      </div>
+      {/* Chart skeleton */}
+      <div className='rounded-[10px] border border-border bg-background'>
+        <div className='flex items-center gap-3 border-b border-border px-5 py-3'>
+          <div className='size-8 animate-pulse rounded-[6px] bg-border' />
+          <div>
+            <div className='h-4 w-24 animate-pulse rounded bg-border' />
+            <div className='mt-1 h-3 w-36 animate-pulse rounded bg-border' />
+          </div>
+        </div>
+        <div className='p-4'>
+          <div className='h-[280px] animate-pulse rounded bg-border/50' />
+        </div>
       </div>
     </div>
   )

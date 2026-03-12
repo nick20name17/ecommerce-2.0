@@ -2,7 +2,6 @@ import { useRouter } from '@tanstack/react-router'
 import { ArrowLeft, FilePlus2 } from 'lucide-react'
 
 import { CreatePageActions } from './create-page-actions'
-import { Button } from '@/components/ui/button'
 
 interface CreatePageHeaderProps {
   customerSelected: boolean
@@ -30,21 +29,19 @@ export const CreatePageHeader = ({
   const router = useRouter()
   return (
     <header className='flex min-w-0 items-center justify-between gap-4 pb-4'>
-      <div className='flex items-center gap-3'>
-        <Button
-          variant='ghost'
-          size='icon'
-          className='shrink-0'
+      <div className='flex items-center gap-2'>
+        <button
+          type='button'
+          className='flex items-center gap-1 text-[13px] font-medium text-text-secondary transition-colors duration-[80ms] hover:text-foreground'
           onClick={() => router.history.back()}
         >
-          <ArrowLeft className='size-4' />
-        </Button>
-        <div className='bg-primary/10 text-primary flex size-10 shrink-0 items-center justify-center rounded-lg'>
-          <FilePlus2 className='size-5' />
-        </div>
-        <div className='min-w-0'>
-          <h1 className='text-2xl font-semibold tracking-tight'>Create New</h1>
-          <p className='text-muted-foreground text-sm'>Build a proposal or order</p>
+          <ArrowLeft className='size-3.5' />
+          Back
+        </button>
+        <span className='text-text-tertiary'>/</span>
+        <div className='flex items-center gap-1.5'>
+          <FilePlus2 className='size-4 shrink-0 text-text-tertiary' />
+          <h1 className='text-[14px] font-semibold tracking-[-0.01em]'>Create New</h1>
         </div>
       </div>
       <CreatePageActions

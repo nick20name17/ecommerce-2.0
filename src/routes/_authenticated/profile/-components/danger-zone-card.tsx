@@ -89,8 +89,8 @@ export const DangerZoneCard = ({ user }: DangerZoneCardProps) => {
         </CardHeader>
         <CardContent className='flex flex-col gap-4'>
           <div className='flex flex-col gap-1'>
-            <span className='text-muted-foreground text-xs font-medium'>Deactivate Account</span>
-            <p className='text-muted-foreground text-sm'>
+            <span className='text-text-tertiary text-[13px] font-medium'>Deactivate Account</span>
+            <p className='text-text-tertiary text-[13px]'>
               Temporarily disable your account. You can reactivate it later.
             </p>
             <div className='mt-2'>
@@ -105,8 +105,8 @@ export const DangerZoneCard = ({ user }: DangerZoneCardProps) => {
           </div>
 
           <div className='flex flex-col gap-1'>
-            <span className='text-muted-foreground text-xs font-medium'>Delete Account</span>
-            <p className='text-muted-foreground text-sm'>
+            <span className='text-text-tertiary text-[13px] font-medium'>Delete Account</span>
+            <p className='text-text-tertiary text-[13px]'>
               Permanently delete your account. This cannot be undone.
             </p>
             <div className='mt-2'>
@@ -169,13 +169,13 @@ export const DangerZoneCard = ({ user }: DangerZoneCardProps) => {
             <div className='flex flex-col gap-2'>
               <label
                 htmlFor='delete-confirm'
-                className='text-sm font-medium'
+                className='text-[13px] font-medium'
               >
                 Type{' '}
                 <button
                   type='button'
                   onClick={handleCopy}
-                  className='hover:bg-muted inline-flex cursor-pointer items-center gap-1 rounded px-1 font-bold transition-colors'
+                  className='hover:bg-bg-hover inline-flex cursor-pointer items-center gap-1 rounded px-1 font-bold transition-colors'
                 >
                   {DELETE_CONFIRMATION_TEXT}
                   {copied ? <Check className='size-3' /> : <Copy className='size-3' />}

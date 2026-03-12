@@ -31,7 +31,7 @@ export const getPayloadLogColumns = ({
   {
     accessorKey: 'id',
     header: 'ID',
-    cell: ({ row }) => <span className='font-mono text-xs'>{row.original.id}</span>,
+    cell: ({ row }) => <span className='font-mono text-[13px]'>{row.original.id}</span>,
     size: 70
   },
   {
@@ -42,7 +42,7 @@ export const getPayloadLogColumns = ({
       return (
         <Badge
           variant={METHOD_VARIANT[method] ?? 'secondary'}
-          className='font-mono text-[11px]'
+          className='font-mono text-[13px]'
         >
           {method}
         </Badge>
@@ -54,7 +54,7 @@ export const getPayloadLogColumns = ({
     accessorKey: 'entity',
     header: 'Entity',
     cell: ({ row }) => (
-      <span className='text-muted-foreground text-sm'>{row.original.entity || '—'}</span>
+      <span className='text-text-tertiary text-[13px]'>{row.original.entity || '—'}</span>
     ),
     size: 100
   },
@@ -66,7 +66,7 @@ export const getPayloadLogColumns = ({
       return (
         <Badge
           variant={getStatusVariant(code)}
-          className='font-mono text-[11px]'
+          className='font-mono text-[13px]'
         >
           {code}
         </Badge>
@@ -83,7 +83,7 @@ export const getPayloadLogColumns = ({
       />
     ),
     cell: ({ row }) => (
-      <span className='text-muted-foreground text-xs'>
+      <span className='text-text-tertiary text-[13px]'>
         {formatResponseTime(row.original.duration_ms)}
       </span>
     ),
@@ -98,7 +98,7 @@ export const getPayloadLogColumns = ({
       />
     ),
     cell: ({ row }) => (
-      <span className='text-muted-foreground text-xs'>
+      <span className='text-text-tertiary text-[13px]'>
         {formatDate(row.original.created_at, 'dateTime')}
       </span>
     ),

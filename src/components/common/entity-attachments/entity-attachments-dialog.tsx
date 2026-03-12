@@ -1,3 +1,4 @@
+import { Paperclip } from 'lucide-react'
 import { useQuery } from '@tanstack/react-query'
 
 import { getOrderAttachmentsQuery } from '@/api/order/query'
@@ -6,9 +7,7 @@ import { EntityAttachments } from '@/components/common/entity-attachments/entity
 import type { EntityAttachmentType } from '@/components/common/entity-attachments/entity-attachments'
 import {
   Dialog,
-  DialogBody,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogTitle
 } from '@/components/ui/dialog'
@@ -42,16 +41,16 @@ export const EntityAttachmentsDialog = ({
   const { data: attachments = [], isLoading } = entityType === 'order' ? orderQuery : proposalQuery
 
   return (
-    <Dialog
-      open={open}
-      onOpenChange={onOpenChange}
-    >
-      <DialogContent className='flex max-h-[85vh] flex-col gap-0 overflow-hidden p-0 sm:max-w-lg'>
-        <DialogHeader className='bg-background sticky top-0 z-10 shrink-0 space-y-1 border-b px-6 py-4'>
-          <DialogTitle className='text-lg font-semibold'>Attachments</DialogTitle>
-          <DialogDescription className='text-sm'>{entityLabel}</DialogDescription>
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className='flex max-h-[85vh] flex-col gap-0 overflow-hidden p-0 sm:max-w-md'>
+        <DialogHeader className='border-b border-border px-5 py-3'>
+          <DialogTitle className='flex items-center gap-2 text-[14px]'>
+            <Paperclip className='size-4 text-text-tertiary' />
+            Attachments
+            <span className='text-[12px] font-normal text-text-tertiary'>{entityLabel}</span>
+          </DialogTitle>
         </DialogHeader>
-        <DialogBody className='min-h-0 flex-1 px-6 pt-2 pb-6'>
+        <div className='min-h-0 flex-1 overflow-y-auto'>
           <EntityAttachments
             entityType={entityType}
             entityId={autoid}
@@ -60,7 +59,7 @@ export const EntityAttachmentsDialog = ({
             mode='immediate'
             isLoading={isLoading}
           />
-        </DialogBody>
+        </div>
       </DialogContent>
     </Dialog>
   )

@@ -26,8 +26,8 @@ export const ColumnHeader = <TData, TValue>({
       className={cn(
         'inline-flex size-full cursor-pointer items-center justify-between gap-1.5 whitespace-nowrap transition-colors',
         'hover:text-foreground focus-visible:outline-0 disabled:pointer-events-none',
-        '[&_svg]:pointer-events-none [&_svg]:size-3.5 [&_svg]:shrink-0',
-        isSorted ? 'text-foreground' : 'text-muted-foreground'
+        '[&_svg]:pointer-events-none [&_svg]:size-3 [&_svg]:shrink-0',
+        isSorted ? 'text-foreground' : 'text-text-tertiary'
       )}
     >
       <span className='truncate'>{title}</span>

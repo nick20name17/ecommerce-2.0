@@ -8,25 +8,24 @@ import {
   SidebarContent,
   SidebarFooter,
   SidebarHeader,
-  SidebarRail
 } from '@/components/ui/sidebar'
 
 export const AppSidebar = ({ ...props }: React.ComponentProps<typeof Sidebar>) => {
   return (
     <Sidebar
-      collapsible='icon'
+      collapsible='offcanvas'
       {...props}
+      className='border-none bg-transparent'
     >
-      <SidebarHeader>
+      <SidebarHeader className='p-0'>
         <NavProjects />
       </SidebarHeader>
-      <SidebarContent>
+      <SidebarContent className='flex flex-col gap-0 overflow-y-auto overflow-x-hidden px-0'>
         <NavMain />
       </SidebarContent>
-      <SidebarFooter>
+      <SidebarFooter className='p-0'>
         <NavUser />
       </SidebarFooter>
-      <SidebarRail />
     </Sidebar>
   )
 }

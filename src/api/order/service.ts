@@ -2,7 +2,7 @@ import { api } from '..'
 
 import type { EntityAssignRequest, EntityAssignmentResponse, EntityAttachment } from '../schema'
 
-import type { Order, OrderParams, OrderResponse } from './schema'
+import type { BulkPickStatusRequest, Order, OrderParams, OrderPatchPayload, OrderResponse, PickStatusRequest, ShippingPackagePayload, ShippingRatesResponse } from './schema'
 
 const orderParams = (projectId?: number | null) =>
   projectId != null ? { project_id: projectId } : {}
@@ -12,8 +12,16 @@ export const orderService = {
     const { data } = await api.get<OrderResponse>('/data/orders/', { params })
     return data
   },
-  getById: async (id: string) => {
-    const { data } = await api.get<Order>(`/data/orders/${id}/`)
+  getById: async (id: string, projectId?: number | null) => {
+    const { data } = await api.get<Order>(`/data/orders/${id}/`, {
+      params: orderParams(projectId)
+    })
+    return data
+  },
+  patch: async (autoid: string, payload: OrderPatchPayload, projectId?: number | null) => {
+    const { data } = await api.patch<Order>(`/data/orders/${autoid}/`, payload, {
+      params: orderParams(projectId),
+    })
     return data
   },
   delete: async (autoid: string, projectId: number) => {
@@ -47,6 +55,26 @@ export const orderService = {
     await api.delete(`/data/orders/${autoid}/attachments/${attachmentId}/`, {
       params: orderParams(projectId)
     })
+  },
+
+  setItemPickStatus: async (autoid: string, itemAutoid: string, payload: PickStatusRequest, projectId?: number | null) => {
+    await api.patch(`/data/orders/${autoid}/items/${itemAutoid}/pick/`, payload, {
+      params: orderParams(projectId),
+    })
+  },
+
+  bulkSetPickStatus: async (autoid: string, payload: BulkPickStatusRequest, projectId?: number | null) => {
+    await api.patch(`/data/orders/${autoid}/pick-status/`, payload, {
+      params: orderParams(projectId),
+    })
+  },
+
+  getShippingRates: async (autoid: string, payload: { packages: ShippingPackagePayload[] }) => {
+    const { data } = await api.post<ShippingRatesResponse>(
+      `/data/orders/${autoid}/shipping-rates/`,
+      payload
+    )
+    return data
   },
 
   assign: async (autoid: string, payload: EntityAssignRequest, projectId?: number | null) => {

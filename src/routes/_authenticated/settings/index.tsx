@@ -3,32 +3,78 @@ import { OptimisticSortingPlugin, SortableKeyboardPlugin } from '@dnd-kit/dom/so
 import { DragDropProvider } from '@dnd-kit/react'
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { createFileRoute, redirect } from '@tanstack/react-router'
-import { Database, Settings } from 'lucide-react'
+import { Database, MapPin, MoreHorizontal, Pencil, Plus, Star, Trash2, TriangleAlert } from 'lucide-react'
+
+import { ISettings, PAGE_COLORS, PageHeaderIcon, ViewToggle, type ViewOption } from '@/components/ds'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
 import { FieldsDataTable } from './-components/fields-data-table'
+import { ShippingAddressModal } from './-components/shipping-address-modal'
+import { SHIPPING_ADDRESS_QUERY_KEYS, getShippingAddressesQuery } from '@/api/shipping-address/query'
+import type { ShippingAddress } from '@/api/shipping-address/schema'
+import { shippingAddressService } from '@/api/shipping-address/service'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogMedia,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import { CUSTOMER_QUERY_KEYS } from '@/api/customer/query'
 import { FIELD_CONFIG_QUERY_KEYS, getFieldConfigQuery } from '@/api/field-config/query'
-import type {
-  FieldConfigPatchPayload,
-  FieldConfigResponse,
-  FieldConfigRow
-} from '@/api/field-config/schema'
+import type { FieldConfigResponse, FieldConfigRow } from '@/api/field-config/schema'
 import { fieldConfigService } from '@/api/field-config/service'
 import { ORDER_QUERY_KEYS } from '@/api/order/query'
 import { PROPOSAL_QUERY_KEYS } from '@/api/proposal/query'
 import { TASK_QUERY_KEYS, getTaskStatusesQuery } from '@/api/task/query'
 import type { TaskStatus } from '@/api/task/schema'
 import { taskService } from '@/api/task/service'
-import { StatusList } from '@/routes/_authenticated/tasks/-components/task-status-manager'
+import { getUsersQuery } from '@/api/user/query'
+import type { User, UserParams } from '@/api/user/schema'
+import { StatusList } from '@/components/tasks/task-status-manager'
+import { Pagination } from '@/components/common/filters/pagination'
+import { SearchFilter } from '@/components/common/filters/search'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { isAdmin } from '@/constants/user'
 import type { UserRole } from '@/constants/user'
 import { getSession } from '@/helpers/auth'
 import { useProjectId } from '@/hooks/use-project-id'
+import { useOrdering } from '@/hooks/use-ordering'
+import { useLimitParam, useOffsetParam, useSearchParam } from '@/hooks/use-query-params'
+import { UserDeleteDialog } from '../users/-components/user-delete-dialog'
+import { UserModal } from '../users/-components/user-modal'
+import { UsersDataTable } from '../users/-components/users-data-table'
+
+// ── Top-level section type ──────────────────────────────────
+
+type SettingsSection = 'data-control' | 'tasks' | 'shipping' | 'users'
+
+const SECTION_LABELS: Record<SettingsSection, string> = {
+  'data-control': 'Data Control',
+  tasks: 'Tasks',
+  shipping: 'Shipping',
+  users: 'Users',
+}
+
+const SECTION_OPTIONS: ViewOption<SettingsSection>[] = Object.entries(SECTION_LABELS).map(([key, label]) => ({
+  value: key as SettingsSection,
+  label,
+}))
+
+// ── Field config helpers ────────────────────────────────────
 
 const TABLE_LABELS: Record<string, string> = {
   customer: 'Customers',
@@ -78,23 +124,51 @@ const applyFieldToggle = (
   }
 }
 
-const applyAliasUpdate = (
-  prev: FieldConfigResponse | undefined,
-  entity: string,
-  fieldName: string,
-  alias: string
-): FieldConfigResponse | undefined => {
-  if (!prev?.[entity]) return prev
-  return {
-    ...prev,
-    [entity]: prev[entity].map((entry) =>
-      entry.field === fieldName ? { ...entry, alias: alias || null } : entry
-    )
-  }
-}
+// ── Main component ──────────────────────────────────────────
 
 const SettingsPage = () => {
   const [projectId] = useProjectId()
+  const [section, setSection] = useQueryState('section', parseAsString)
+
+  const currentSection = (section ?? 'data-control') as SettingsSection
+
+  if (!projectId) {
+    return (
+      <div className='text-text-tertiary flex h-full flex-col items-center justify-center gap-3'>
+        <Database className='size-12 opacity-50' />
+        <h1 className='text-foreground text-[16px] font-semibold'>Settings</h1>
+        <p className='text-[13px]'>Please select a project first.</p>
+      </div>
+    )
+  }
+
+  return (
+    <div className='flex h-full flex-col overflow-hidden'>
+      <header className='flex h-12 shrink-0 items-center gap-2.5 border-b border-border px-6'>
+        <div className='flex items-center gap-1.5'>
+          <PageHeaderIcon icon={ISettings} color={PAGE_COLORS.settings} />
+          <h1 className='text-[14px] font-semibold tracking-[-0.01em]'>Settings</h1>
+        </div>
+
+        {/* Top-level section tabs */}
+        <ViewToggle
+          options={SECTION_OPTIONS}
+          value={currentSection}
+          onChange={(val) => setSection(val === 'data-control' ? null : val)}
+        />
+      </header>
+
+      {currentSection === 'data-control' && <DataControlSection projectId={projectId} />}
+      {currentSection === 'tasks' && <TasksSection projectId={projectId} />}
+      {currentSection === 'shipping' && <ShippingSection projectId={projectId} />}
+      {currentSection === 'users' && <UsersSection />}
+    </div>
+  )
+}
+
+// ── Data Control Section ────────────────────────────────────
+
+const DataControlSection = ({ projectId }: { projectId: number }) => {
   const [activeTab, setActiveTab] = useQueryState('tab', parseAsString)
   const client = useQueryClient()
 
@@ -107,13 +181,12 @@ const SettingsPage = () => {
     mutationFn: ({
       payload
     }: {
-      payload: FieldConfigPatchPayload
+      payload: Record<string, string[]>
       entity: string
       fieldName: string
       enabled: boolean
-    }) => fieldConfigService.patchFieldConfig(projectId!, payload),
+    }) => fieldConfigService.patchFieldConfig(projectId, payload),
     onMutate: async ({ entity, fieldName, enabled }) => {
-      if (!projectId) return
       const key = FIELD_CONFIG_QUERY_KEYS.fieldConfig(projectId)
       await client.cancelQueries({ queryKey: key })
       const prev = client.getQueryData<FieldConfigResponse>(key)
@@ -122,7 +195,7 @@ const SettingsPage = () => {
       return { prev }
     },
     onError: (_err, _variables, context) => {
-      if (context?.prev && projectId)
+      if (context?.prev)
         client.setQueryData(FIELD_CONFIG_QUERY_KEYS.fieldConfig(projectId), context.prev)
     },
     onSuccess: (_data, variables) => {
@@ -130,39 +203,8 @@ const SettingsPage = () => {
       if (queryKey) client.invalidateQueries({ queryKey })
     },
     meta: {
-      invalidatesQuery: projectId ? FIELD_CONFIG_QUERY_KEYS.fieldConfig(projectId) : undefined,
+      invalidatesQuery: FIELD_CONFIG_QUERY_KEYS.fieldConfig(projectId),
       successMessage: 'Field configuration updated'
-    }
-  })
-
-  const aliasPatchMutation = useMutation({
-    mutationFn: ({
-      payload
-    }: {
-      payload: { _aliases: Record<string, Record<string, string>> }
-    }) => fieldConfigService.patchFieldConfig(projectId!, payload),
-    onMutate: async ({ payload }) => {
-      if (!projectId) return
-      const key = FIELD_CONFIG_QUERY_KEYS.fieldConfig(projectId)
-      await client.cancelQueries({ queryKey: key })
-      const prev = client.getQueryData<FieldConfigResponse>(key)
-      const entity = Object.keys(payload._aliases)[0]
-      const fieldAliases = entity ? payload._aliases[entity] : undefined
-      if (!entity || !fieldAliases) return { prev }
-      let next = prev
-      for (const [fieldName, alias] of Object.entries(fieldAliases)) {
-        next = applyAliasUpdate(next, entity, fieldName, alias)
-      }
-      if (next) client.setQueryData(key, next)
-      return { prev }
-    },
-    onError: (_err, _variables, context) => {
-      if (context?.prev && projectId)
-        client.setQueryData(FIELD_CONFIG_QUERY_KEYS.fieldConfig(projectId), context.prev)
-    },
-    meta: {
-      invalidatesQuery: projectId ? FIELD_CONFIG_QUERY_KEYS.fieldConfig(projectId) : undefined,
-      successMessage: 'Alias saved'
     }
   })
 
@@ -174,7 +216,6 @@ const SettingsPage = () => {
     if (!entityFields) return []
     return entityFields.map((entry) => ({
       field: entry.field,
-      alias: entry.alias ?? null,
       default: entry.default,
       enabled: entry.enabled,
       entity: currentTab
@@ -182,7 +223,7 @@ const SettingsPage = () => {
   }, [data, currentTab])
 
   const handleFieldToggle = (entity: string, fieldName: string, enabled: boolean) => {
-    if (!projectId || !data?.[entity]) return
+    if (!data?.[entity]) return
     const entityFields = data[entity]
     const nonDefaultFields = entityFields.filter((e) => !e.default)
     const newEnabled = nonDefaultFields
@@ -196,120 +237,62 @@ const SettingsPage = () => {
     })
   }
 
-  const handleAliasSubmit = (entity: string, fieldName: string, alias: string) => {
-    if (!projectId) return
-    aliasPatchMutation.mutate({
-      payload: { _aliases: { [entity]: { [fieldName]: alias } } }
-    })
-  }
-
-  if (!projectId) {
-    return (
-      <div className='text-muted-foreground flex h-full flex-col items-center justify-center gap-3'>
-        <Database className='size-12 opacity-50' />
-        <h1 className='text-foreground text-2xl font-bold'>Settings</h1>
-        <p className='text-sm'>Please select a project first.</p>
-      </div>
-    )
-  }
-
   const showTabSkeleton = isLoading && !data
 
   return (
-    <div className='flex h-full flex-col gap-5'>
-      <header className='flex items-center gap-3'>
-        <div className='bg-primary/10 text-primary flex size-10 items-center justify-center rounded-lg'>
-          <Settings className='size-5' />
-        </div>
-        <div>
-          <h1 className='text-2xl font-semibold tracking-tight'>Settings</h1>
-          <p className='text-muted-foreground text-sm'>Data schema and field configuration</p>
-        </div>
-      </header>
-
-      <Tabs
-        value={currentTab}
-        onValueChange={setActiveTab}
-        className='flex h-full min-h-0 flex-col'
-      >
-        <TabsList
-          variant='line'
-          className='flex-wrap'
-        >
+    <Tabs
+      value={currentTab}
+      onValueChange={setActiveTab}
+      className='flex min-h-0 flex-1 flex-col'
+    >
+      <div className='shrink-0 border-b border-border px-6'>
+        <TabsList variant='line' className='flex-wrap'>
           {showTabSkeleton
-            ? <>
-                {Array.from({ length: 4 }).map((_, i) => (
-                  <Skeleton
-                    key={i}
-                    className='h-9 w-28 rounded-md'
-                  />
-                ))}
-                <TabsTrigger value='task_statuses'>
-                  Task Statuses
+            ? Array.from({ length: 4 }).map((_, i) => (
+                <Skeleton key={i} className='h-9 w-28 rounded-md' />
+              ))
+            : entities.map((entity) => (
+                <TabsTrigger key={entity} value={entity}>
+                  {getTableLabel(entity)}
                 </TabsTrigger>
-              </>
-            : <>
-                {entities.map((entity) => (
-                  <TabsTrigger
-                    key={entity}
-                    value={entity}
-                  >
-                    {getTableLabel(entity)}
-                  </TabsTrigger>
-                ))}
-                <TabsTrigger value='task_statuses'>
-                  Task Statuses
-                </TabsTrigger>
-              </>}
+              ))}
         </TabsList>
+      </div>
 
+      <div className='flex-1 overflow-auto px-6 py-4'>
         {showTabSkeleton ? (
-          <div className='mt-4 min-h-0 flex-1'>
-            <FieldsDataTable
-              fields={[]}
-              isLoading
-              entity={currentTab}
-              projectId={projectId}
-              onFieldToggle={handleFieldToggle}
-              onAliasSubmit={handleAliasSubmit}
-              isPending={patchMutation.isPending}
-              isAliasPending={aliasPatchMutation.isPending}
-            />
-          </div>
+          <FieldsDataTable
+            fields={[]}
+            isLoading
+            entity={currentTab}
+            projectId={projectId}
+            onFieldToggle={handleFieldToggle}
+            isPending={patchMutation.isPending}
+          />
         ) : entities.length === 0 ? (
-          <div className='text-muted-foreground mt-4 flex flex-1 items-center justify-center text-sm'>
+          <div className='text-text-tertiary mt-4 flex flex-1 items-center justify-center text-[13px]'>
             No field configuration available.
           </div>
         ) : (
           entities.map((entity) => (
-            <TabsContent
-              key={entity}
-              value={entity}
-              className='mt-4 min-h-0 flex-1'
-            >
+            <TabsContent key={entity} value={entity}>
               <FieldsDataTable
                 fields={entity === currentTab ? fields : []}
                 isLoading={isLoading || isPlaceholderData}
                 entity={entity}
                 projectId={projectId}
                 onFieldToggle={handleFieldToggle}
-                onAliasSubmit={handleAliasSubmit}
                 isPending={patchMutation.isPending}
-                isAliasPending={aliasPatchMutation.isPending}
               />
             </TabsContent>
           ))
         )}
-
-        <TabsContent value='task_statuses' className='mt-4 min-h-0 flex-1'>
-          <TaskStatusesTab projectId={projectId} />
-        </TabsContent>
-      </Tabs>
-    </div>
+      </div>
+    </Tabs>
   )
 }
 
-// ── Task Statuses Tab ────────────────────────────────────────
+// ── Tasks Section ───────────────────────────────────────────
 
 const SORTABLE_PLUGINS = [...defaultPreset.plugins, OptimisticSortingPlugin, SortableKeyboardPlugin]
 
@@ -319,7 +302,7 @@ const arrayMove = <T,>(array: T[], from: number, to: number): T[] => {
   return next
 }
 
-const TaskStatusesTab = ({ projectId }: { projectId: number }) => {
+const TasksSection = ({ projectId }: { projectId: number }) => {
   const queryClient = useQueryClient()
   const { data, isLoading } = useQuery(getTaskStatusesQuery(projectId))
   const statuses = data?.results ?? []
@@ -387,29 +370,258 @@ const TaskStatusesTab = ({ projectId }: { projectId: number }) => {
 
   if (isLoading) {
     return (
-      <div className='flex max-w-md flex-col gap-2'>
-        {Array.from({ length: 4 }).map((_, i) => (
-          <Skeleton key={i} className='h-10 w-full rounded-md' />
-        ))}
+      <div className='px-6 py-4'>
+        <div className='flex max-w-md flex-col gap-2'>
+          {Array.from({ length: 4 }).map((_, i) => (
+            <Skeleton key={i} className='h-10 w-full rounded-md' />
+          ))}
+        </div>
       </div>
     )
   }
 
   return (
-    <div className='max-w-md'>
-      <p className='text-muted-foreground mb-3 text-sm'>
-        Drag rows to reorder. Default status is fixed and cannot be edited or deleted.
-      </p>
-      <DragDropProvider
-        plugins={SORTABLE_PLUGINS}
-        onDragEnd={handleDragEnd}
-      >
-        <StatusList
-          projectId={projectId}
-          statuses={orderedStatuses}
-          onStatusesChange={setOrderedStatuses}
+    <div className='flex-1 overflow-auto px-6 py-4'>
+      <div className='max-w-md'>
+        <p className='text-text-tertiary mb-3 text-[13px]'>
+          Drag rows to reorder. Default status is fixed and cannot be edited or deleted.
+        </p>
+        <DragDropProvider
+          plugins={SORTABLE_PLUGINS}
+          onDragEnd={handleDragEnd}
+        >
+          <StatusList
+            projectId={projectId}
+            statuses={orderedStatuses}
+            onStatusesChange={setOrderedStatuses}
+          />
+        </DragDropProvider>
+      </div>
+    </div>
+  )
+}
+
+// ── Shipping Section ────────────────────────────────────────
+
+const ShippingSection = ({ projectId }: { projectId: number }) => {
+  const queryClient = useQueryClient()
+  const { data: addresses, isLoading } = useQuery(getShippingAddressesQuery(projectId))
+
+  const [modalAddress, setModalAddress] = useState<ShippingAddress | 'create' | null>(null)
+  const [deleteAddress, setDeleteAddress] = useState<ShippingAddress | null>(null)
+
+  const deleteMutation = useMutation({
+    mutationFn: (id: number) => shippingAddressService.delete(id, projectId),
+    meta: {
+      successMessage: 'Address deleted',
+      invalidatesQuery: SHIPPING_ADDRESS_QUERY_KEYS.all(),
+    },
+    onSuccess: () => setDeleteAddress(null),
+  })
+
+  const editingAddress = typeof modalAddress === 'object' ? modalAddress : null
+
+  if (isLoading) {
+    return (
+      <div className='px-6 py-4'>
+        <div className='flex max-w-2xl flex-col gap-2'>
+          {Array.from({ length: 3 }).map((_, i) => (
+            <Skeleton key={i} className='h-20 w-full rounded-lg' />
+          ))}
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className='flex min-h-0 flex-1 flex-col'>
+      <div className='flex h-12 shrink-0 items-center gap-2.5 border-b border-border px-6'>
+        <p className='text-[13px] text-text-tertiary'>
+          Ship-from addresses used with ShipEngine for label creation.
+        </p>
+        <div className='flex-1' />
+        <button
+          type='button'
+          className='inline-flex h-7 items-center gap-1 rounded-[5px] bg-primary px-2.5 text-[13px] font-semibold text-primary-foreground transition-colors duration-[80ms] hover:opacity-90'
+          onClick={() => setModalAddress('create')}
+        >
+          <Plus className='size-3.5' />
+          <span className='hidden sm:inline'>Add Address</span>
+        </button>
+      </div>
+
+      <div className='flex-1 overflow-auto px-6 py-4'>
+        {!addresses?.length ? (
+          <div className='flex flex-col items-center justify-center py-16 text-center'>
+            <MapPin className='mb-3 size-10 text-text-quaternary' />
+            <p className='text-[13px] font-medium text-text-secondary'>No shipping addresses</p>
+            <p className='mt-1 text-[12px] text-text-tertiary'>
+              Add a warehouse or office address to use as ship-from when creating shipping labels.
+            </p>
+          </div>
+        ) : (
+          <div className='flex max-w-2xl flex-col gap-2'>
+            {addresses.map((addr) => (
+              <div
+                key={addr.id}
+                className='group relative flex items-start gap-4 rounded-lg border border-border bg-bg-secondary/40 px-4 py-3 transition-colors duration-75 hover:bg-bg-secondary/70'
+              >
+                <div className='flex size-8 shrink-0 items-center justify-center rounded-md bg-bg-secondary text-text-tertiary'>
+                  <MapPin className='size-4' />
+                </div>
+                <div className='min-w-0 flex-1'>
+                  <div className='flex items-center gap-2'>
+                    <span className='text-[13px] font-semibold text-foreground'>{addr.title}</span>
+                    {addr.is_default && (
+                      <span className='inline-flex items-center gap-1 rounded-full border border-amber-300 bg-amber-500/10 px-1.5 py-0.5 text-[11px] font-semibold leading-none text-amber-700 dark:border-amber-600 dark:bg-amber-500/20 dark:text-amber-300'>
+                        <Star className='size-2.5' />
+                        Default
+                      </span>
+                    )}
+                  </div>
+                  <p className='mt-0.5 text-[13px] text-text-secondary'>
+                    {[addr.address_line1, addr.address_line2].filter(Boolean).join(', ')}
+                  </p>
+                  <p className='text-[12px] text-text-tertiary'>
+                    {[addr.city, addr.state, addr.postal_code, addr.country_code].filter(Boolean).join(', ')}
+                  </p>
+                  {(addr.name || addr.phone) && (
+                    <p className='mt-1 text-[12px] text-text-tertiary'>
+                      {[addr.name, addr.phone].filter(Boolean).join(' \u00b7 ')}
+                    </p>
+                  )}
+                </div>
+
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button
+                      type='button'
+                      className='inline-flex size-7 items-center justify-center rounded-[5px] text-text-tertiary opacity-0 transition-all duration-75 hover:bg-bg-hover hover:text-foreground group-hover:opacity-100'
+                    >
+                      <MoreHorizontal className='size-4' />
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align='end'>
+                    <DropdownMenuItem onClick={() => setModalAddress(addr)}>
+                      <Pencil className='mr-2 size-3.5' />
+                      Edit
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      className='text-destructive focus:text-destructive'
+                      onClick={() => setDeleteAddress(addr)}
+                    >
+                      <Trash2 className='mr-2 size-3.5' />
+                      Delete
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <ShippingAddressModal
+        key={editingAddress?.id ?? 'create'}
+        address={editingAddress}
+        projectId={projectId}
+        open={modalAddress !== null}
+        onOpenChange={(open) => !open && setModalAddress(null)}
+      />
+
+      <AlertDialog open={!!deleteAddress} onOpenChange={(open) => !open && setDeleteAddress(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogMedia className='bg-destructive/10 text-destructive'>
+              <TriangleAlert />
+            </AlertDialogMedia>
+            <AlertDialogTitle>Delete Address</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete &ldquo;{deleteAddress?.title}&rdquo;? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              variant='destructive'
+              onClick={() => deleteAddress && deleteMutation.mutate(deleteAddress.id)}
+              isPending={deleteMutation.isPending}
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </div>
+  )
+}
+
+// ── Users Section ───────────────────────────────────────────
+
+const UsersSection = () => {
+  const [search] = useSearchParam()
+  const [offset] = useOffsetParam()
+  const [limit] = useLimitParam()
+  const { sorting, setSorting, ordering } = useOrdering()
+
+  const [modalUser, setModalUser] = useState<User | 'create' | null>(null)
+  const [deleteUser, setDeleteUser] = useState<User | null>(null)
+
+  const params: UserParams = {
+    search: search || undefined,
+    offset,
+    limit,
+    ordering
+  }
+
+  const { data, isLoading, isPlaceholderData } = useQuery({
+    ...getUsersQuery(params),
+    placeholderData: keepPreviousData
+  })
+
+  const editingUser = typeof modalUser === 'object' ? modalUser : null
+
+  return (
+    <div className='flex min-h-0 flex-1 flex-col'>
+      <div className='flex h-12 shrink-0 items-center gap-2.5 border-b border-border px-6'>
+        <SearchFilter className='max-w-[240px]' placeholder='Search by name or email...' />
+        <div className='flex-1' />
+        <button
+          type='button'
+          className='inline-flex h-7 items-center gap-1 rounded-[5px] bg-primary px-2.5 text-[13px] font-semibold text-primary-foreground transition-colors duration-[80ms] hover:opacity-90'
+          onClick={() => setModalUser('create')}
+        >
+          <Plus className='size-3.5' />
+          <span className='hidden sm:inline'>Add User</span>
+        </button>
+      </div>
+
+      <div className='flex-1 overflow-auto'>
+        <UsersDataTable
+          data={data?.results ?? []}
+          isLoading={isLoading || isPlaceholderData}
+          sorting={sorting}
+          setSorting={setSorting}
+          onEdit={setModalUser}
+          onDelete={setDeleteUser}
         />
-      </DragDropProvider>
+      </div>
+
+      <div className='shrink-0 border-t border-border px-6 py-2'>
+        <Pagination totalCount={data?.count ?? 0} />
+      </div>
+
+      <UserModal
+        key={editingUser?.id ?? 'create'}
+        open={modalUser !== null}
+        onOpenChange={(open) => !open && setModalUser(null)}
+        user={editingUser}
+      />
+      <UserDeleteDialog
+        user={deleteUser}
+        open={!!deleteUser}
+        onOpenChange={(open) => !open && setDeleteUser(null)}
+      />
     </div>
   )
 }

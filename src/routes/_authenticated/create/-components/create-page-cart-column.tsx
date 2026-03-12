@@ -35,7 +35,7 @@ export const CreatePageCartColumn = ({
       title='Cart'
       trailing={
         cartItems.length > 0 && !cartLoading ? (
-          <span className='bg-primary/10 text-primary rounded-full px-2.5 py-0.5 text-xs font-medium'>
+          <span className='bg-accent/10 text-primary rounded-full px-2.5 py-0.5 text-[13px] font-medium'>
             {cartItems.length} item{cartItems.length !== 1 ? 's' : ''}
           </span>
         ) : null

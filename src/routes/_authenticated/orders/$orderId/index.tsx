@@ -1,0 +1,858 @@
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { createFileRoute, useRouter } from '@tanstack/react-router'
+import { Check, ChevronLeft, Copy, ListTodo, Paperclip, Trash2, Truck, X } from 'lucide-react'
+
+import { EntityAttachmentsDialog } from '@/components/common/entity-attachments/entity-attachments-dialog'
+import { ShippingRatesDialog } from './-components/shipping-rates-dialog'
+import { useCallback, useMemo, useRef, useState } from 'react'
+
+import { getFieldConfigQuery } from '@/api/field-config/query'
+import { getOrderDetailQuery, ORDER_QUERY_KEYS } from '@/api/order/query'
+import type { Order, OrderPatchPayload } from '@/api/order/schema'
+import { orderService } from '@/api/order/service'
+import { InitialsAvatar, IOrders, PAGE_COLORS, PageHeaderIcon } from '@/components/ds'
+import { UserCombobox } from '@/components/common/user-combobox/user-combobox'
+import { CommandBarCreate } from '@/components/tasks/command-bar-create'
+import { ORDER_STATUS_CLASS, ORDER_STATUS_LABELS } from '@/constants/order'
+import type { OrderStatus } from '@/constants/order'
+import { getColumnLabel } from '@/helpers/dynamic-columns'
+import { Skeleton } from '@/components/ui/skeleton'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
+import { useBreakpoint } from '@/hooks/use-breakpoint'
+import { useProjectId } from '@/hooks/use-project-id'
+import { formatCurrency, formatDate } from '@/helpers/formatters'
+import { cn } from '@/lib/utils'
+import { toast } from 'sonner'
+
+export const Route = createFileRoute('/_authenticated/orders/$orderId/')({
+  component: OrderDetailPage,
+  head: () => ({
+    meta: [{ title: 'Order Detail' }],
+  }),
+})
+
+// ── Helpers ──────────────────────────────────────────────────
+
+const STATUS_DOT_COLORS: Record<string, string> = {
+  U: 'bg-amber-500',
+  O: 'bg-blue-500',
+  X: 'bg-emerald-500',
+  P: 'bg-green-500',
+  V: 'bg-red-500',
+  H: 'bg-slate-400',
+  A: 'bg-purple-500',
+}
+
+function formatAddress(
+  line1?: string | null,
+  line2?: string | null,
+  city?: string | null,
+  state?: string | null,
+  zip?: string | null,
+) {
+  const parts = [line1, line2, [city, state, zip].filter(Boolean).join(', ')].filter(Boolean)
+  return parts.length > 0 ? parts.join('\n') : null
+}
+
+// ── Page Component ───────────────────────────────────────────
+
+function OrderDetailPage() {
+  const { orderId } = Route.useParams()
+  const router = useRouter()
+  const queryClient = useQueryClient()
+  const bp = useBreakpoint()
+  const isMobile = bp === 'mobile'
+  const [projectId] = useProjectId()
+  const [deleteOpen, setDeleteOpen] = useState(false)
+  const [panelTab, setPanelTab] = useState<'general' | 'custom'>('general')
+  const [taskModalOpen, setTaskModalOpen] = useState(false)
+  const [shippingOpen, setShippingOpen] = useState(false)
+  const [attachmentsOpen, setAttachmentsOpen] = useState(false)
+
+  const { data: order, isLoading } = useQuery(getOrderDetailQuery(orderId, projectId))
+  const { data: fieldConfig } = useQuery(getFieldConfigQuery(projectId))
+
+  const patchMutation = useMutation({
+    mutationFn: (payload: OrderPatchPayload) =>
+      orderService.patch(orderId, payload, projectId),
+    onSuccess: (updated) => {
+      queryClient.setQueryData(ORDER_QUERY_KEYS.detail(orderId), updated)
+    },
+    meta: {
+      errorMessage: 'Failed to update order',
+    },
+  })
+
+  const handleFieldSave = useCallback(
+    (field: keyof OrderPatchPayload, value: string) => {
+      if (!order) return
+      const current = (order[field] as string | null) ?? ''
+      if (value === current) return
+      patchMutation.mutate({ [field]: value || null })
+    },
+    [order, patchMutation],
+  )
+
+  // Custom fields: enabled non-default fields from field config
+  const customFields = useMemo(() => {
+    const entries = fieldConfig?.order ?? []
+    return entries.filter((e) => !e.default && e.enabled)
+  }, [fieldConfig])
+
+  const assignMutation = useMutation({
+    mutationFn: (userId: number | null) =>
+      orderService.assign(orderId, { user_id: userId }, projectId),
+    meta: {
+      successMessage: 'Assignee updated',
+      invalidatesQuery: ORDER_QUERY_KEYS.all(),
+    },
+  })
+
+  const pickMutation = useMutation({
+    mutationFn: ({ itemAutoid, isPicked }: { itemAutoid: string; isPicked: boolean }) =>
+      orderService.setItemPickStatus(orderId, itemAutoid, { is_picked: isPicked }, projectId),
+    onMutate: async ({ itemAutoid, isPicked }) => {
+      // Optimistic update
+      await queryClient.cancelQueries({ queryKey: ORDER_QUERY_KEYS.detail(orderId) })
+      const prev = queryClient.getQueryData<Order>(ORDER_QUERY_KEYS.detail(orderId))
+      if (prev?.items) {
+        const updatedItems = prev.items.map((item) =>
+          item.autoid === itemAutoid ? { ...item, is_picked: isPicked } : item,
+        )
+        const pickedCount = updatedItems.filter((i) => i.is_picked).length
+        queryClient.setQueryData(ORDER_QUERY_KEYS.detail(orderId), {
+          ...prev,
+          items: updatedItems,
+          pick_status: `${pickedCount}/${updatedItems.length}`,
+        })
+      }
+      return { prev }
+    },
+    onError: (_err, _vars, ctx) => {
+      if (ctx?.prev) queryClient.setQueryData(ORDER_QUERY_KEYS.detail(orderId), ctx.prev)
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ORDER_QUERY_KEYS.detail(orderId) })
+      queryClient.invalidateQueries({ queryKey: ORDER_QUERY_KEYS.lists() })
+    },
+    meta: { errorMessage: 'Failed to update pick status' },
+  })
+
+  const deleteMutation = useMutation({
+    mutationFn: () => orderService.delete(orderId, projectId!),
+    meta: {
+      successMessage: 'Order deleted',
+      invalidatesQuery: ORDER_QUERY_KEYS.lists(),
+    },
+    onSuccess: () => router.history.back(),
+  })
+
+  // Loading
+  if (isLoading) {
+    return (
+      <div className='flex h-full flex-col overflow-hidden'>
+        {/* Header skeleton */}
+        <header className='flex h-12 shrink-0 items-center gap-2.5 border-b border-border px-6'>
+          <Skeleton className='h-4 w-12' />
+          <div className='mx-0.5 h-4 w-px bg-border' />
+          <Skeleton className='size-5 rounded-[5px]' />
+          <Skeleton className='h-4 w-20' />
+          <Skeleton className='h-5 w-[72px] rounded-full' />
+          <div className='flex-1' />
+          <Skeleton className='size-7 rounded-[5px]' />
+          <Skeleton className='size-7 rounded-[5px]' />
+        </header>
+
+        <div className={cn('flex min-h-0 flex-1', isMobile && 'flex-col')}>
+          {/* Table skeleton */}
+          <div className='flex min-h-0 flex-1 flex-col overflow-hidden'>
+            {/* Table header */}
+            <div className='flex items-center gap-3 border-b border-border bg-bg-secondary/60 py-1.5 pl-6 pr-6'>
+              <Skeleton className='h-3 w-10' />
+              <Skeleton className='h-3 w-16' />
+              <Skeleton className='h-3 w-32' />
+              <div className='flex-1' />
+              <Skeleton className='h-3 w-8' />
+              <Skeleton className='h-3 w-8' />
+              <Skeleton className='h-3 w-12' />
+              <Skeleton className='h-3 w-14' />
+            </div>
+            {/* Table rows */}
+            <div className='flex-1'>
+              {Array.from({ length: 6 }).map((_, i) => (
+                <div key={i} className='flex items-center gap-3 border-b border-border-light py-2 pl-6 pr-6'>
+                  <Skeleton className='size-[18px] rounded-[4px]' />
+                  <Skeleton className='h-3 w-20' />
+                  <Skeleton className='h-3 w-40' />
+                  <div className='flex-1' />
+                  <Skeleton className='h-3 w-8' />
+                  <Skeleton className='h-3 w-8' />
+                  <Skeleton className='h-3 w-14' />
+                  <Skeleton className='h-3 w-16' />
+                </div>
+              ))}
+            </div>
+            {/* Summary footer skeleton */}
+            <div className='flex shrink-0 items-center gap-5 border-t border-border bg-bg-secondary/40 px-6 py-2'>
+              <Skeleton className='h-3 w-14' />
+              <Skeleton className='h-3 w-14' />
+              <Skeleton className='h-3 w-14' />
+              <div className='flex-1' />
+              <Skeleton className='h-3 w-16' />
+              <Skeleton className='h-3 w-12' />
+              <Skeleton className='h-3 w-16' />
+              <Skeleton className='h-3 w-16' />
+            </div>
+          </div>
+
+          {/* Right panel skeleton */}
+          {!isMobile && (
+            <div className='w-[380px] shrink-0 border-l border-border bg-bg-secondary/50'>
+              <div className='flex items-center gap-0 border-b border-border px-4'>
+                <Skeleton className='my-2 h-4 w-14' />
+                <Skeleton className='my-2 ml-4 h-4 w-14' />
+              </div>
+              <div className='space-y-3 px-4 py-3'>
+                <Skeleton className='h-3 w-16' />
+                <div className='grid grid-cols-2 gap-x-4 gap-y-2'>
+                  {Array.from({ length: 6 }).map((_, i) => (
+                    <div key={i}>
+                      <Skeleton className='mb-1 h-2.5 w-12' />
+                      <Skeleton className='h-3.5 w-full' />
+                    </div>
+                  ))}
+                </div>
+                <Skeleton className='h-3 w-20' />
+                <div className='grid grid-cols-2 gap-x-4 gap-y-2'>
+                  {Array.from({ length: 4 }).map((_, i) => (
+                    <div key={i}>
+                      <Skeleton className='mb-1 h-2.5 w-12' />
+                      <Skeleton className='h-3.5 w-full' />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    )
+  }
+
+  // Not found
+  if (!order) {
+    return (
+      <div className='flex h-full items-center justify-center'>
+        <p className='text-[13px] text-text-secondary'>Order not found.</p>
+      </div>
+    )
+  }
+
+  const statusLabel = ORDER_STATUS_LABELS[order.status as OrderStatus] ?? order.status
+  const dotColor = STATUS_DOT_COLORS[order.status] ?? 'bg-slate-400'
+  const statusClass = ORDER_STATUS_CLASS[order.status as OrderStatus] ?? ''
+  const items = order.items ?? []
+  const billToAddress = formatAddress(order.address1, order.address2, order.city, order.state, order.zip)
+  const shipToAddress = formatAddress(order.c_address1, order.c_address2, order.c_city, order.c_state, order.c_zip)
+
+  return (
+    <div className='flex h-full flex-col overflow-hidden'>
+      {/* ── Header bar ── */}
+      <header className='flex h-12 shrink-0 items-center gap-2.5 border-b border-border px-6'>
+        <button
+          type='button'
+          className='flex items-center gap-1 text-[13px] font-medium text-text-tertiary transition-colors duration-[80ms] hover:text-foreground'
+          onClick={() => router.history.back()}
+        >
+          <ChevronLeft className='size-4' />
+          <span className='hidden sm:inline'>Orders</span>
+        </button>
+
+        <div className='mx-0.5 h-4 w-px bg-border' />
+
+        <PageHeaderIcon icon={IOrders} color={PAGE_COLORS.orders} />
+        <h1 className='text-[14px] font-semibold tracking-[-0.01em]'>
+          {order.invoice || `Order ${order.id}`}
+        </h1>
+        {order.invoice && (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button
+                type='button'
+                className='inline-flex size-6 items-center justify-center rounded-[5px] text-text-tertiary transition-colors duration-[80ms] hover:bg-bg-hover hover:text-foreground'
+                onClick={() => {
+                  navigator.clipboard.writeText(order.invoice)
+                  toast.success('Invoice # copied')
+                }}
+              >
+                <Copy className='size-3' />
+              </button>
+            </TooltipTrigger>
+            <TooltipContent>Copy invoice #</TooltipContent>
+          </Tooltip>
+        )}
+
+        <span
+          className={cn(
+            'inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-[12px] font-semibold leading-none',
+            statusClass,
+          )}
+        >
+          <span className={cn('size-1.5 rounded-full', dotColor)} />
+          {statusLabel}
+        </span>
+
+        {/* Assignee */}
+        <div className='hidden items-center gap-1.5 sm:flex'>
+          <UserCombobox
+            value={order.assigned_user?.id ?? null}
+            onChange={(userId) => assignMutation.mutate(userId)}
+            valueLabel={
+              order.assigned_user
+                ? `${order.assigned_user.first_name} ${order.assigned_user.last_name}`
+                : undefined
+            }
+            role='sale'
+            placeholder='Assign'
+            triggerClassName='inline-flex items-center gap-1.5 rounded-[5px] px-2 py-1 text-[13px] font-medium text-text-tertiary transition-colors duration-75 hover:bg-bg-hover cursor-pointer'
+          />
+        </div>
+
+        <div className='flex-1' />
+
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <button
+              type='button'
+              className='inline-flex h-7 items-center gap-1.5 rounded-[5px] border border-border bg-bg-secondary px-2.5 text-[12px] font-medium text-text-secondary transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground'
+              onClick={() => setShippingOpen(true)}
+            >
+              <Truck className='size-3.5' />
+              <span className='hidden sm:inline'>Shipping</span>
+            </button>
+          </TooltipTrigger>
+          <TooltipContent>Manage Shipping</TooltipContent>
+        </Tooltip>
+
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <button
+              type='button'
+              className='inline-flex h-7 items-center gap-1.5 rounded-[5px] border border-border bg-bg-secondary px-2.5 text-[12px] font-medium text-text-secondary transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground'
+              onClick={() => setTaskModalOpen(true)}
+            >
+              <ListTodo className='size-3.5' />
+              <span className='hidden sm:inline'>Create Task</span>
+            </button>
+          </TooltipTrigger>
+          <TooltipContent>Create Task</TooltipContent>
+        </Tooltip>
+
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <button
+              type='button'
+              className='inline-flex h-7 items-center gap-1.5 rounded-[5px] border border-border bg-bg-secondary px-2.5 text-[12px] font-medium text-text-secondary transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground'
+              onClick={() => setAttachmentsOpen(true)}
+            >
+              <Paperclip className='size-3.5' />
+              <span className='hidden sm:inline'>Attachments</span>
+            </button>
+          </TooltipTrigger>
+          <TooltipContent>Attachments</TooltipContent>
+        </Tooltip>
+
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <button
+              type='button'
+              className='inline-flex size-7 items-center justify-center rounded-[5px] text-text-tertiary transition-colors duration-[80ms] hover:bg-bg-hover hover:text-destructive'
+              onClick={() => setDeleteOpen(true)}
+            >
+              <Trash2 className='size-3.5' />
+            </button>
+          </TooltipTrigger>
+          <TooltipContent>Delete</TooltipContent>
+        </Tooltip>
+      </header>
+
+      {/* ── Main content area ── */}
+      <div className={cn('flex min-h-0 flex-1', isMobile && 'flex-col')}>
+        {/* Left: Line items */}
+        <div className='flex min-h-0 flex-1 flex-col overflow-hidden'>
+          <div className='flex-1 overflow-auto'>
+            {items.length === 0 ? (
+              <div className='flex flex-col items-center justify-center py-24 text-center'>
+                <p className='text-[13px] text-text-tertiary'>No items in this order</p>
+              </div>
+            ) : (
+              <table className='w-full text-[13px]'>
+                <thead className='sticky top-0 z-10 select-none bg-bg-secondary/60 backdrop-blur-sm'>
+                  <tr className='border-b border-border text-left'>
+                    <th className='w-[36px] py-1.5 pl-6 pr-0 font-medium text-text-tertiary'>Picked</th>
+                    <th className='min-w-[100px] px-3 py-1.5 font-medium text-text-tertiary'>Inventory</th>
+                    <th className='min-w-[200px] px-3 py-1.5 font-medium text-text-tertiary'>Description</th>
+                    <th className='w-[70px] px-3 py-1.5 text-right font-medium text-text-tertiary'>Qty</th>
+                    <th className='w-[60px] px-3 py-1.5 text-right font-medium text-text-tertiary'>Ship</th>
+                    <th className='w-[90px] px-3 py-1.5 text-right font-medium text-text-tertiary'>Price</th>
+                    <th className='w-[100px] py-1.5 pl-3 pr-6 text-right font-medium text-text-tertiary'>Amount</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {items.map((item, i) => (
+                    <tr
+                      key={item.autoid ?? i}
+                      className={cn(
+                        'border-b border-border-light transition-colors duration-100 hover:bg-bg-hover',
+                        item.is_picked && 'bg-emerald-500/[0.03]',
+                      )}
+                    >
+                      <td className='py-1.5 pl-6 pr-0'>
+                        <button
+                          type='button'
+                          className={cn(
+                            'flex size-[18px] items-center justify-center rounded-[4px] border transition-colors duration-75',
+                            item.is_picked
+                              ? 'border-emerald-500 bg-emerald-500 text-white'
+                              : 'border-border-heavy hover:border-primary/50 hover:bg-primary/5',
+                          )}
+                          onClick={() => pickMutation.mutate({ itemAutoid: item.autoid, isPicked: !item.is_picked })}
+                          disabled={pickMutation.isPending}
+                        >
+                          {item.is_picked && <Check className='size-3' />}
+                        </button>
+                      </td>
+                      <td className={cn('px-3 py-1.5 font-medium', item.is_picked ? 'text-text-tertiary line-through' : 'text-foreground')}>
+                        {item.inven || '—'}
+                      </td>
+                      <td className={cn('max-w-[400px] px-3 py-1.5', item.is_picked ? 'text-text-tertiary line-through' : 'text-text-secondary')}>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <span className='block truncate'>{item.descr || '—'}</span>
+                          </TooltipTrigger>
+                          <TooltipContent className='max-w-[300px]'>{item.descr || '—'}</TooltipContent>
+                        </Tooltip>
+                      </td>
+                      <td className='px-3 py-1.5 text-right tabular-nums text-text-secondary'>
+                        {item.quan ?? '—'}
+                      </td>
+                      <td className='px-3 py-1.5 text-right tabular-nums text-text-tertiary'>
+                        {item.ship ?? '0'}
+                      </td>
+                      <td className='px-3 py-1.5 text-right tabular-nums text-text-secondary'>
+                        {formatCurrency(item.price)}
+                      </td>
+                      <td className='py-1.5 pl-3 pr-6 text-right font-medium tabular-nums text-foreground'>
+                        {formatCurrency(item.so_amount)}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
+
+          {/* Summary footer */}
+          <div
+            className={cn(
+              'flex shrink-0 flex-wrap items-center gap-x-5 gap-y-1 border-t border-border bg-bg-secondary/40',
+              isMobile ? 'px-4 py-2' : 'px-6 py-2',
+            )}
+          >
+            <SummaryCell label='Items' value={String(items.length)} />
+            <SummaryCell label='Qty' value={order.total_quan ?? '0'} />
+            <SummaryCell label='Shipped' value={order.total_ship ?? '0'} />
+            <div className='flex-1' />
+            <SummaryCell label='Subtotal' value={formatCurrency(order.subtotal)} />
+            <SummaryCell label='Tax' value={formatCurrency(order.tax)} />
+            <SummaryCell label='Total' value={formatCurrency(order.total)} bold />
+            <SummaryCell
+              label='Balance'
+              value={formatCurrency(order.balance)}
+              accent={Number(order.balance) > 0 ? 'warning' : 'success'}
+            />
+          </div>
+        </div>
+
+        {/* Right: Properties panel */}
+        <div
+          className={cn(
+            'flex shrink-0 flex-col overflow-hidden bg-bg-secondary/50',
+            isMobile
+              ? 'border-t border-border'
+              : 'w-[380px] border-l border-border',
+          )}
+        >
+          {/* Panel tabs */}
+          <div className='flex shrink-0 items-center gap-0 border-b border-border px-1'>
+            {(['general', 'custom'] as const).map((tab) => (
+              <button
+                key={tab}
+                type='button'
+                className={cn(
+                  'relative px-3 py-2 text-[13px] font-medium capitalize transition-colors duration-75',
+                  panelTab === tab
+                    ? 'text-foreground'
+                    : 'text-text-tertiary hover:text-text-secondary',
+                )}
+                onClick={() => setPanelTab(tab)}
+              >
+                {tab}
+                {tab === 'custom' && customFields.length > 0 && (
+                  <span className='ml-1 text-[11px] text-text-quaternary'>{customFields.length}</span>
+                )}
+                {panelTab === tab && (
+                  <span className='absolute bottom-0 left-3 right-3 h-[2px] rounded-full bg-primary' />
+                )}
+              </button>
+            ))}
+          </div>
+
+          {/* Panel content */}
+          <div className='flex-1 overflow-y-auto px-4 py-3'>
+            {panelTab === 'general' ? (
+              <>
+                {/* Bill To */}
+                <SectionLabel>Bill To</SectionLabel>
+                <div className='grid grid-cols-2 gap-x-4'>
+                  <PropertyField label='Name' value={order.name} field='name' onSave={handleFieldSave} />
+                  <PropertyCell label='Address'>
+                    {billToAddress ? (
+                      <span className='whitespace-pre-line text-[13px] leading-snug text-foreground'>{billToAddress}</span>
+                    ) : (
+                      <span className='text-[13px] text-text-quaternary'>—</span>
+                    )}
+                  </PropertyCell>
+                </div>
+
+                {/* Ship To */}
+                <SectionLabel>Ship To</SectionLabel>
+                <div className='grid grid-cols-2 gap-x-4'>
+                  <PropertyField label='Name' value={order.c_name} field='c_name' onSave={handleFieldSave} />
+                  <PropertyCell label='Address'>
+                    {shipToAddress ? (
+                      <span className='whitespace-pre-line text-[13px] leading-snug text-foreground'>{shipToAddress}</span>
+                    ) : (
+                      <span className='text-[13px] text-text-quaternary'>—</span>
+                    )}
+                  </PropertyCell>
+                </div>
+
+                {/* Contact */}
+                <SectionLabel>Contact</SectionLabel>
+                <div className='grid grid-cols-2 gap-x-4'>
+                  <PropertyField label='Email' value={order.email} field='email' onSave={handleFieldSave} />
+                  <PropertyField label='Phone' value={order.phone} field='phone' onSave={handleFieldSave} />
+                </div>
+
+                {/* Order Details */}
+                <SectionLabel>Order Details</SectionLabel>
+                <div className='grid grid-cols-2 gap-x-4'>
+                  <PropertyCell label='Invoice'>
+                    <span className='text-[13px] font-medium tabular-nums text-foreground'>{order.invoice || '—'}</span>
+                  </PropertyCell>
+                  <PropertyCell label='Date'>
+                    <span className='text-[13px] tabular-nums text-foreground'>{order.inv_date ? formatDate(order.inv_date) : '—'}</span>
+                  </PropertyCell>
+                  <PropertyCell label='Due Date'>
+                    <span className='text-[13px] tabular-nums text-foreground'>{order.due_date ? formatDate(order.due_date) : '—'}</span>
+                  </PropertyCell>
+                  <PropertyField label='Sales Person' value={order.salesman} field='salesman' onSave={handleFieldSave} />
+                  <PropertyField label='PO No.' value={order.po_no} field='po_no' onSave={handleFieldSave} />
+                  <PropertyField label='Ship Date' value={order.ship_date} field='ship_date' onSave={handleFieldSave} />
+                  <PropertyField label='Ship Via' value={order.ship_via} field='ship_via' onSave={handleFieldSave} />
+                  <PropertyField label='Price Level' value={order.in_level} field='in_level' onSave={handleFieldSave} />
+                  <PropertyField label='Due' value={order.charge} field='charge' onSave={handleFieldSave} />
+                </div>
+
+                {/* Notes */}
+                <SectionLabel>Notes</SectionLabel>
+                <PropertyField label='Memo' value={order.memo} field='memo' onSave={handleFieldSave} multiline fullWidth />
+                <PropertyField label='Internal Note' value={order.internalnt} field='internalnt' onSave={handleFieldSave} multiline fullWidth />
+              </>
+            ) : (
+              <>
+                {customFields.length === 0 ? (
+                  <div className='flex flex-col items-center justify-center py-12 text-center'>
+                    <p className='text-[13px] text-text-tertiary'>No custom fields enabled</p>
+                    <p className='mt-1 text-[12px] text-text-quaternary'>
+                      Enable fields in Settings &rarr; Data Control
+                    </p>
+                  </div>
+                ) : (
+                  <SectionLabel>Custom Fields</SectionLabel>
+                )}
+                <div className='grid grid-cols-2 gap-x-4'>
+                  {customFields.map((entry) => {
+                    const label = getColumnLabel(entry.field, 'order', fieldConfig)
+                    const val = order[entry.field]
+                    const strVal = val != null ? String(val) : null
+                    return (
+                      <PropertyCell key={entry.field} label={label}>
+                        <span className='text-[13px] font-medium text-foreground'>{strVal ?? '—'}</span>
+                      </PropertyCell>
+                    )
+                  })}
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* ── Attachments dialog ── */}
+      <EntityAttachmentsDialog
+        entityType='order'
+        entityLabel={order.invoice || `Order ${order.id}`}
+        autoid={orderId}
+        projectId={projectId}
+        open={attachmentsOpen}
+        onOpenChange={setAttachmentsOpen}
+      />
+
+      {/* ── Shipping rates dialog ── */}
+      <ShippingRatesDialog
+        open={shippingOpen}
+        onOpenChange={setShippingOpen}
+        orderAutoid={orderId}
+        items={items}
+        order={order}
+        onPatch={(payload) => patchMutation.mutate(payload)}
+      />
+
+      {/* ── Delete confirmation ── */}
+      {deleteOpen && (
+        <>
+          <div className='fixed inset-0 z-40 bg-black/40' onClick={() => setDeleteOpen(false)} />
+          <div className='fixed inset-0 z-50 flex items-center justify-center px-4'>
+            <div
+              className='w-full max-w-[400px] rounded-[12px] border border-border bg-background p-6'
+              style={{ boxShadow: '0 16px 70px rgba(0,0,0,.2)' }}
+            >
+              <h3 className='mb-2 text-[15px] font-semibold'>Delete order</h3>
+              <p className='mb-5 text-[13px] text-text-secondary'>
+                Are you sure you want to delete order &ldquo;{order.invoice || order.id}&rdquo;?
+                This action cannot be undone.
+              </p>
+              <div className='flex justify-end gap-2'>
+                <button
+                  type='button'
+                  className='rounded-[6px] border border-border px-3 py-1.5 text-[13px] font-medium transition-colors duration-[80ms] hover:bg-bg-hover'
+                  onClick={() => setDeleteOpen(false)}
+                >
+                  Cancel
+                </button>
+                <button
+                  type='button'
+                  className='rounded-[6px] bg-destructive px-3 py-1.5 text-[13px] font-medium text-white transition-colors duration-[80ms] hover:opacity-90'
+                  onClick={() => deleteMutation.mutate()}
+                  disabled={deleteMutation.isPending}
+                >
+                  {deleteMutation.isPending ? 'Deleting...' : 'Delete'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* ── Create Task command bar ── */}
+      {taskModalOpen && (
+        <CommandBarCreate
+          onClose={() => setTaskModalOpen(false)}
+          defaultLinkedOrderAutoid={order.autoid}
+        />
+      )}
+    </div>
+  )
+}
+
+// ── Section Label ────────────────────────────────────────────
+
+function SectionLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <div className='mt-3 pb-1 text-[11px] font-semibold uppercase tracking-[0.06em] text-text-tertiary first:mt-0'>
+      {children}
+    </div>
+  )
+}
+
+// ── Property Cell (read-only, stacked) ───────────────────────
+
+function PropertyCell({
+  label,
+  children,
+}: {
+  label: string
+  children: React.ReactNode
+}) {
+  return (
+    <div className='border-b border-border-light py-2'>
+      <span className='mb-0.5 block text-[12px] font-medium text-text-tertiary'>{label}</span>
+      {children}
+    </div>
+  )
+}
+
+// ── Property Field (editable) ────────────────────────────────
+
+function PropertyField({
+  label,
+  value,
+  field,
+  onSave,
+  multiline,
+  fullWidth,
+}: {
+  label: string
+  value: string | null | undefined
+  field: keyof OrderPatchPayload
+  onSave: (field: keyof OrderPatchPayload, value: string) => void
+  multiline?: boolean
+  fullWidth?: boolean
+}) {
+  const [editing, setEditing] = useState(false)
+  const [draft, setDraft] = useState('')
+  const containerRef = useRef<HTMLDivElement>(null)
+  const displayValue = value ?? ''
+
+  const startEditing = () => {
+    setDraft(displayValue)
+    setEditing(true)
+  }
+
+  const commit = () => {
+    setEditing(false)
+    onSave(field, draft.trim())
+  }
+
+  const cancel = () => {
+    setEditing(false)
+  }
+
+  const isDirty = draft.trim() !== displayValue
+
+  const actionButtons = (
+    <div className='flex shrink-0 items-center gap-0.5'>
+      <button
+        type='button'
+        className={cn(
+          'inline-flex size-5 items-center justify-center rounded transition-colors duration-75',
+          isDirty
+            ? 'bg-primary text-primary-foreground hover:bg-primary/90'
+            : 'text-text-tertiary hover:bg-bg-hover',
+        )}
+        onMouseDown={(e) => {
+          e.preventDefault()
+          commit()
+        }}
+      >
+        <Check className='size-3' />
+      </button>
+      <button
+        type='button'
+        className='inline-flex size-5 items-center justify-center rounded text-text-tertiary transition-colors duration-75 hover:bg-bg-hover hover:text-foreground'
+        onMouseDown={(e) => {
+          e.preventDefault()
+          cancel()
+        }}
+      >
+        <X className='size-3' />
+      </button>
+    </div>
+  )
+
+  if (editing) {
+    if (multiline) {
+      return (
+        <div ref={containerRef} className={cn('border-b border-border-light py-2', fullWidth && 'col-span-2')}>
+          <div className='mb-1 flex items-center justify-between'>
+            <span className='text-[12px] font-medium text-text-tertiary'>{label}</span>
+            {actionButtons}
+          </div>
+          <textarea
+            value={draft}
+            onChange={(e) => setDraft(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Escape') cancel()
+            }}
+            autoFocus
+            rows={3}
+            className='w-full resize-none rounded border border-border bg-background px-2 py-1 text-[13px] text-foreground shadow-sm outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20'
+          />
+        </div>
+      )
+    }
+
+    return (
+      <div ref={containerRef} className='border-b border-border-light py-2'>
+        <div className='mb-1 flex items-center justify-between'>
+          <span className='text-[12px] font-medium text-text-tertiary'>{label}</span>
+          {actionButtons}
+        </div>
+        <input
+          value={draft}
+          onChange={(e) => setDraft(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') commit()
+            if (e.key === 'Escape') cancel()
+          }}
+          autoFocus
+          className='w-full rounded border border-border bg-background px-2 py-0.5 text-[13px] text-foreground shadow-sm outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20'
+        />
+      </div>
+    )
+  }
+
+  return (
+    <div
+      className={cn(
+        'group/field cursor-pointer border-b border-border-light py-2 transition-colors duration-75 hover:bg-background/60',
+        fullWidth && 'col-span-2',
+      )}
+      onClick={startEditing}
+    >
+      <span className='mb-0.5 block text-[12px] font-medium text-text-tertiary'>{label}</span>
+      <span
+        className={cn(
+          'block truncate text-[13px]',
+          displayValue
+            ? 'font-medium text-foreground'
+            : 'text-text-quaternary',
+        )}
+      >
+        {displayValue || '—'}
+      </span>
+    </div>
+  )
+}
+
+// ── Summary Cell ─────────────────────────────────────────────
+
+function SummaryCell({
+  label,
+  value,
+  bold,
+  accent,
+}: {
+  label: string
+  value: string
+  bold?: boolean
+  accent?: 'warning' | 'success'
+}) {
+  return (
+    <div className='flex items-center gap-1.5'>
+      <span className='text-[13px] text-text-tertiary'>{label}:</span>
+      <span
+        className={cn(
+          'text-[13px] tabular-nums',
+          bold ? 'font-semibold text-foreground' : 'font-medium text-text-secondary',
+          accent === 'warning' && 'text-amber-600 dark:text-amber-400',
+          accent === 'success' && 'text-emerald-600 dark:text-emerald-400',
+        )}
+      >
+        {value}
+      </span>
+    </div>
+  )
+}

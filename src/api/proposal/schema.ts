@@ -11,7 +11,9 @@ export interface Proposal {
   b_name: string
   qt_date: string | null
   status: ProposalStatus
+  descr: string
   tax: string
+  tot_tax: string
   subtotal: string
   total: string
   items?: ProposalItem[]
@@ -23,9 +25,22 @@ export interface ProposalItem {
   autoid: string
   inven: string
   doc_aid: string
+  arqt_aid: string
   quan: string
+  unit: string
   descr: string
   amount: string
+}
+
+export interface ToOrderResponse {
+  AUTOID: string
+  INVOICE: string
+  ID: string
+  C_ID: string
+  TOTAL: string
+  SUBTOTAL: string
+  STATUS: string
+  WEBSALE: boolean
 }
 
 export type ProposalResponse = PaginatedResponse<Proposal>

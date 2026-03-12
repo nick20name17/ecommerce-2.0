@@ -1,62 +1,149 @@
 import type { Customer } from '@/api/customer/schema'
-import { Badge } from '@/components/ui/badge'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { InitialsAvatar } from '@/components/ds'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { getCustomerTypeLabel } from '@/constants/customer'
 import { formatDate, formatPhone } from '@/helpers/formatters'
+import { cn } from '@/lib/utils'
 
-interface CustomerInfoCardProps {
+interface CustomerInfoPanelProps {
   customer: Customer
 }
 
-export const CustomerInfoCard = ({ customer }: CustomerInfoCardProps) => {
+export const CustomerInfoPanel = ({ customer }: CustomerInfoPanelProps) => {
+  const isActive = !customer.inactive
+  const phone = customer.contact_1 ? formatPhone(customer.contact_1) : null
+  const email = customer.contact_3 || null
+  const typeLabel = getCustomerTypeLabel(customer.in_level)
+  const lastOrderDate = formatDate(customer.last_order_date)
+
   const addressParts = [customer.address1, customer.address2].filter(Boolean).join(', ')
   const cityStateZip = [customer.city, customer.state, customer.zip].filter(Boolean).join(', ')
-  const addressBlock = [addressParts, cityStateZip, customer.country].filter(Boolean).join(' · ')
+  const country = customer.country || null
+  const hasAddress = addressParts || cityStateZip || country
+
+  const assigneeName = customer.assigned_user
+    ? `${customer.assigned_user.first_name} ${customer.assigned_user.last_name}`.trim()
+    : null
+  const assigneeInitials = assigneeName
+    ? assigneeName.split(' ').slice(0, 2).map(n => n[0]?.toUpperCase() ?? '').join('')
+    : null
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className='flex items-center justify-between'>
-          Customer Information
-          <Badge variant={customer.inactive ? 'outline' : 'success'}>
-            {customer.inactive ? 'Inactive' : 'Active'}
-          </Badge>
-        </CardTitle>
-      </CardHeader>
-      <CardContent className='space-y-4'>
-        <div className='grid grid-cols-2 gap-x-4 gap-y-1 text-sm'>
-          <span className='text-muted-foreground'>ID</span>
-          <span className='font-medium'>{customer.id}</span>
+    <div>
+      {/* Details section */}
+      <div className='border-b border-border px-4 py-2.5'>
+        <span className='text-[12px] font-semibold uppercase tracking-[0.06em] text-text-tertiary'>
+          Details
+        </span>
+      </div>
 
-          <span className='text-muted-foreground'>Name</span>
-          <span>{customer.l_name}</span>
-
-          <span className='text-muted-foreground'>Phone</span>
-          <span>{customer.contact_1 ? formatPhone(customer.contact_1) : '—'}</span>
-
-          <span className='text-muted-foreground'>Email</span>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <span className='block truncate'>{customer.contact_3 ?? '—'}</span>
-            </TooltipTrigger>
-            <TooltipContent>{customer.contact_3 ?? '—'}</TooltipContent>
-          </Tooltip>
-
-          <span className='text-muted-foreground'>Customer Type</span>
-          <span>{getCustomerTypeLabel(customer.in_level)}</span>
-
-          <span className='text-muted-foreground'>Last Order Date</span>
-          <span>{formatDate(customer.last_order_date)}</span>
-        </div>
-
-        {addressBlock ? (
-          <div className='text-sm'>
-            <span className='text-muted-foreground'>Address</span>
-            <p className='mt-0.5'>{addressBlock}</p>
+      <div className='grid grid-cols-2 gap-x-4'>
+        <PropertyCell label='Status'>
+          <div className='flex items-center gap-1.5'>
+            <div
+              className={cn(
+                'size-2 rounded-full',
+                isActive ? 'bg-green-500' : 'bg-slate-400'
+              )}
+            />
+            <span className='text-[13px] font-medium'>
+              {isActive ? 'Active' : 'Inactive'}
+            </span>
           </div>
-        ) : null}
-      </CardContent>
-    </Card>
+        </PropertyCell>
+
+        <PropertyCell label='ID'>
+          <span className='text-[13px] tabular-nums'>{customer.id}</span>
+        </PropertyCell>
+
+        <PropertyCell label='Type'>
+          {typeLabel !== '—' ? (
+            <span className='inline-flex items-center rounded-[4px] bg-bg-secondary px-1.5 py-0.5 text-[12px] font-medium text-text-secondary'>
+              {typeLabel}
+            </span>
+          ) : (
+            <span className='text-[13px] text-text-tertiary'>—</span>
+          )}
+        </PropertyCell>
+
+        <PropertyCell label='Last Order'>
+          <span className='text-[13px]'>{lastOrderDate}</span>
+        </PropertyCell>
+      </div>
+
+      {/* Contact section */}
+      <div className='border-b border-border px-4 py-2.5'>
+        <span className='text-[12px] font-semibold uppercase tracking-[0.06em] text-text-tertiary'>
+          Contact
+        </span>
+      </div>
+
+      <div className='grid grid-cols-2 gap-x-4'>
+        <PropertyCell label='Phone'>
+          <span className='text-[13px]'>{phone ?? '—'}</span>
+        </PropertyCell>
+
+        <PropertyCell label='Email'>
+          {email ? (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span className='block max-w-full truncate text-[13px]'>{email}</span>
+              </TooltipTrigger>
+              <TooltipContent>{email}</TooltipContent>
+            </Tooltip>
+          ) : (
+            <span className='text-[13px] text-text-tertiary'>—</span>
+          )}
+        </PropertyCell>
+      </div>
+
+      {/* Address section */}
+      {hasAddress && (
+        <>
+          <div className='border-b border-border px-4 py-2.5'>
+            <span className='text-[12px] font-semibold uppercase tracking-[0.06em] text-text-tertiary'>
+              Address
+            </span>
+          </div>
+          <div className='space-y-0.5 px-4 py-3 text-[13px] text-text-secondary'>
+            {addressParts && <p>{addressParts}</p>}
+            {cityStateZip && <p>{cityStateZip}</p>}
+            {country && <p>{country}</p>}
+          </div>
+        </>
+      )}
+
+      {/* Assigned user */}
+      {customer.assigned_user && (
+        <>
+          <div className='border-b border-border px-4 py-2.5'>
+            <span className='text-[12px] font-semibold uppercase tracking-[0.06em] text-text-tertiary'>
+              Assigned To
+            </span>
+          </div>
+          <div className='flex items-center gap-2 px-4 py-3'>
+            {assigneeInitials && <InitialsAvatar initials={assigneeInitials} size={20} />}
+            <span className='text-[13px] font-medium'>
+              {assigneeName}
+            </span>
+          </div>
+        </>
+      )}
+    </div>
+  )
+}
+
+function PropertyCell({
+  label,
+  children,
+}: {
+  label: string
+  children: React.ReactNode
+}) {
+  return (
+    <div className='border-b border-border-light px-4 py-2.5'>
+      <div className='mb-1 text-[12px] font-medium text-text-tertiary'>{label}</div>
+      <div className='flex items-center'>{children}</div>
+    </div>
   )
 }

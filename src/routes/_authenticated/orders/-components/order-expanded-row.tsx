@@ -30,7 +30,7 @@ export const OrderExpandedRow = ({ row }: { row: Row<Order> }) => {
     <div className='space-y-3'>
       <div className='flex items-center justify-between'>
         <h3 className='text-base font-semibold'>Order Items</h3>
-        <div className='text-muted-foreground flex items-center gap-4 text-sm'>
+        <div className='text-text-tertiary flex items-center gap-4 text-[13px]'>
           <span>
             Customer: <span className='text-foreground font-semibold'>{order.name ?? '—'}</span>
           </span>
@@ -54,11 +54,11 @@ export const OrderExpandedRow = ({ row }: { row: Row<Order> }) => {
       </div>
 
       {!items.length ? (
-        <p className='text-muted-foreground text-sm'>No order items.</p>
+        <p className='text-text-tertiary text-[13px]'>No order items.</p>
       ) : (
         <div className='overflow-hidden rounded-md border'>
           <Table>
-            <TableHeader className='bg-muted'>
+            <TableHeader className='bg-bg-secondary'>
               <TableRow className='border-none'>
                 {keys.map((key) => (
                   <TableHead

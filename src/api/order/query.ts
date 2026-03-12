@@ -18,10 +18,10 @@ export const getOrdersQuery = (params: OrderParams = {}) =>
     queryFn: () => orderService.get(params)
   })
 
-export const getOrderDetailQuery = (id: string) =>
+export const getOrderDetailQuery = (id: string, projectId?: number | null) =>
   queryOptions({
     queryKey: ORDER_QUERY_KEYS.detail(id),
-    queryFn: () => orderService.getById(id),
+    queryFn: () => orderService.getById(id, projectId),
     enabled: !!id
   })
 

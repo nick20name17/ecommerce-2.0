@@ -74,7 +74,7 @@ export const PayloadLogDetailDialog = ({
             <DetailItem label='Method'>
               <Badge
                 variant={METHOD_VARIANT[log.method] ?? 'secondary'}
-                className='font-mono text-[11px]'
+                className='font-mono text-[13px]'
               >
                 {log.method}
               </Badge>
@@ -84,7 +84,7 @@ export const PayloadLogDetailDialog = ({
             <DetailItem label='Status'>
               <Badge
                 variant={getStatusVariant(log.status_code)}
-                className='font-mono text-[11px]'
+                className='font-mono text-[13px]'
               >
                 {log.status_code}
               </Badge>
@@ -99,19 +99,19 @@ export const PayloadLogDetailDialog = ({
           </div>
 
           <div className='flex flex-col gap-1.5 overflow-hidden'>
-            <span className='text-muted-foreground text-xs font-medium tracking-wide uppercase'>
+            <span className='text-text-tertiary text-[13px] font-medium tracking-wide uppercase'>
               URL
             </span>
-            <div className='bg-muted rounded-md p-3 font-mono text-xs break-words'>{log.url}</div>
+            <div className='bg-bg-secondary rounded-md p-3 font-mono text-[13px] break-words'>{log.url}</div>
           </div>
 
           {log.error_message ? (
             <div className='flex flex-col gap-1.5 overflow-hidden'>
-              <span className='text-muted-foreground text-xs font-medium tracking-wide uppercase'>
+              <span className='text-text-tertiary text-[13px] font-medium tracking-wide uppercase'>
                 Error Message
               </span>
               <div className='rounded-md border border-red-200 bg-red-50 dark:border-red-900 dark:bg-red-950'>
-                <pre className='max-h-[200px] overflow-y-auto p-3 font-mono text-xs break-words whitespace-pre-wrap text-red-700 dark:text-red-300'>
+                <pre className='max-h-[200px] overflow-y-auto p-3 font-mono text-[13px] break-words whitespace-pre-wrap text-red-700 dark:text-red-300'>
                   {formatJson(log.error_message)}
                 </pre>
               </div>
@@ -119,22 +119,22 @@ export const PayloadLogDetailDialog = ({
           ) : null}
 
           <div className='flex flex-col gap-1.5 overflow-hidden'>
-            <span className='text-muted-foreground text-xs font-medium tracking-wide uppercase'>
+            <span className='text-text-tertiary text-[13px] font-medium tracking-wide uppercase'>
               Payload
             </span>
-            <div className='bg-muted rounded-md'>
-              <pre className='max-h-[200px] overflow-y-auto p-3 font-mono text-xs break-words whitespace-pre-wrap'>
+            <div className='bg-bg-secondary rounded-md'>
+              <pre className='max-h-[200px] overflow-y-auto p-3 font-mono text-[13px] break-words whitespace-pre-wrap'>
                 {formatJson(log.payload)}
               </pre>
             </div>
           </div>
 
           <div className='flex flex-col gap-1.5 overflow-hidden'>
-            <span className='text-muted-foreground text-xs font-medium tracking-wide uppercase'>
+            <span className='text-text-tertiary text-[13px] font-medium tracking-wide uppercase'>
               Response
             </span>
-            <div className='bg-muted rounded-md'>
-              <pre className='max-h-[200px] overflow-y-auto p-3 font-mono text-xs break-words whitespace-pre-wrap'>
+            <div className='bg-bg-secondary rounded-md'>
+              <pre className='max-h-[200px] overflow-y-auto p-3 font-mono text-[13px] break-words whitespace-pre-wrap'>
                 {formatJson(log.response)}
               </pre>
             </div>
@@ -157,10 +157,10 @@ export const PayloadLogDetailDialog = ({
 const DetailItem = ({ label, children }: { label: string; children: React.ReactNode }) => {
   return (
     <div className='flex flex-col gap-1'>
-      <span className='text-muted-foreground text-xs font-medium tracking-wide uppercase'>
+      <span className='text-text-tertiary text-[13px] font-medium tracking-wide uppercase'>
         {label}
       </span>
-      <div className='text-sm'>{children}</div>
+      <div className='text-[13px]'>{children}</div>
     </div>
   )
 }

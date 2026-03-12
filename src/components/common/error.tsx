@@ -19,7 +19,7 @@ export const Error = ({ error, reset, className }: ErrorProps) => {
       </div>
       <div className='flex flex-col items-center gap-1 text-center'>
         <h1 className='text-2xl font-semibold'>{FALLBACK_ERROR_MESSAGE}</h1>
-        <p className='text-muted-foreground max-w-md text-sm'>{message}</p>
+        <p className='text-text-tertiary max-w-md text-sm'>{message}</p>
       </div>
       <Button onClick={() => reset()}>Try again</Button>
     </div>

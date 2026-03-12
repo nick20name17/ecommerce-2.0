@@ -61,6 +61,9 @@ export const EntityNotesSheet = ({
     enabled: open && !!autoid
   })
 
+  const notesQueryKey = NOTE_QUERY_KEYS.entityNotes(entityType, autoid, projectId)
+  const summaryQueryKey = NOTE_QUERY_KEYS.summary(entityType, autoid, projectId)
+
   const createMutation = useMutation({
     mutationFn: (payload: { text: string }) =>
       noteService.createEntityNote(entityType, autoid, payload, projectId),
@@ -68,14 +71,47 @@ export const EntityNotesSheet = ({
       successMessage: 'Note added',
       errorMessage: 'Failed to add note'
     },
-    onSuccess: () => {
+    onMutate: async (payload) => {
+      await queryClient.cancelQueries({ queryKey: notesQueryKey, exact: true })
+      const previous = queryClient.getQueryData<EntityNoteList[]>(notesQueryKey)
+      const optimistic: EntityNoteList = {
+        id: -Date.now(),
+        entity_type: entityType,
+        entity_autoid: autoid,
+        project: projectId ?? 0,
+        text: payload.text,
+        author: user?.id ?? null,
+        author_name: user?.full_name ?? user?.username ?? '',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      }
+      queryClient.setQueryData<EntityNoteList[]>(notesQueryKey, (old) =>
+        old ? [optimistic, ...old] : [optimistic]
+      )
       setText('')
-      queryClient.invalidateQueries({
-        queryKey: NOTE_QUERY_KEYS.entityNotes(entityType, autoid, projectId)
-      })
-      queryClient.invalidateQueries({
-        queryKey: NOTE_QUERY_KEYS.summary(entityType, autoid, projectId)
-      })
+      return { previous }
+    },
+    onSuccess: (serverNote) => {
+      // Replace optimistic entry with real server data — no refetch needed
+      const real: EntityNoteList = {
+        id: serverNote.id,
+        entity_type: serverNote.entity_type,
+        entity_autoid: serverNote.entity_autoid,
+        project: serverNote.project,
+        text: serverNote.text,
+        author: serverNote.author,
+        author_name: serverNote.author_details?.full_name ?? user?.full_name ?? '',
+        created_at: serverNote.created_at,
+        updated_at: serverNote.updated_at
+      }
+      queryClient.setQueryData<EntityNoteList[]>(notesQueryKey, (old) =>
+        old?.map((n) => (n.id < 0 ? real : n))
+      )
+    },
+    onError: (_err, _vars, context) => {
+      if (context?.previous) {
+        queryClient.setQueryData(notesQueryKey, context.previous)
+      }
     }
   })
 
@@ -85,14 +121,19 @@ export const EntityNotesSheet = ({
       successMessage: 'Note deleted',
       errorMessage: 'Failed to delete note'
     },
-    onSuccess: () => {
+    onMutate: async (id) => {
+      await queryClient.cancelQueries({ queryKey: notesQueryKey, exact: true })
+      const previous = queryClient.getQueryData<EntityNoteList[]>(notesQueryKey)
+      queryClient.setQueryData<EntityNoteList[]>(notesQueryKey, (old) =>
+        old ? old.filter((n) => n.id !== id) : old
+      )
       setNoteToDelete(null)
-      queryClient.invalidateQueries({
-        queryKey: NOTE_QUERY_KEYS.entityNotes(entityType, autoid, projectId)
-      })
-      queryClient.invalidateQueries({
-        queryKey: NOTE_QUERY_KEYS.summary(entityType, autoid, projectId)
-      })
+      return { previous }
+    },
+    onError: (_err, _vars, context) => {
+      if (context?.previous) {
+        queryClient.setQueryData(notesQueryKey, context.previous)
+      }
     }
   })
 
@@ -120,9 +161,9 @@ export const EntityNotesSheet = ({
         className='flex w-full flex-col gap-0 overflow-hidden p-0 sm:max-w-lg'
         side='right'
       >
-        <SheetHeader className='bg-muted/30 shrink-0 border-b px-5 py-4'>
+        <SheetHeader className='bg-bg-secondary/30 shrink-0 border-b px-5 py-4'>
           <SheetTitle className='text-base font-semibold tracking-tight'>Notes</SheetTitle>
-          <SheetDescription className='text-muted-foreground mt-0.5 text-sm'>
+          <SheetDescription className='text-text-tertiary mt-0.5 text-sm'>
             {entityLabel}
           </SheetDescription>
         </SheetHeader>
@@ -139,11 +180,11 @@ export const EntityNotesSheet = ({
               <Empty className='border-0 py-12'>
                 <EmptyHeader>
                   <EmptyMedia variant='icon' className='rounded-xl'>
-                    <StickyNote className='text-muted-foreground size-5' />
+                    <StickyNote className='text-text-tertiary size-5' />
                   </EmptyMedia>
                   <EmptyTitle className='text-foreground font-medium'>No notes yet</EmptyTitle>
                   <EmptyContent>
-                    <p className='text-muted-foreground max-w-[240px] text-sm leading-relaxed'>
+                    <p className='text-text-tertiary max-w-[240px] text-sm leading-relaxed'>
                       Add a note below to keep context for this record.
                     </p>
                   </EmptyContent>
@@ -214,10 +255,10 @@ export const EntityNotesSheet = ({
           </div>
           <p
             className={cn(
-              'mt-1.5 text-xs tabular-nums',
+              'mt-1.5 text-[13px] tabular-nums',
               text.length > NOTE_TEXT_MAX * 0.9
                 ? 'text-destructive'
-                : 'text-muted-foreground'
+                : 'text-text-tertiary'
             )}
           >
             {text.length}/{NOTE_TEXT_MAX}
@@ -260,11 +301,11 @@ function NoteCard({ note, isOwn, canDelete, onDelete, isDeleting }: NoteCardProp
         'group flex gap-3 rounded-lg border p-3 transition-all duration-200',
         isOwn
           ? 'border-primary/30 bg-primary/5 dark:border-primary/40 dark:bg-primary/10'
-          : 'border-border/80 bg-muted/40 shadow-sm hover:shadow-[0_1px_3px_rgba(0,0,0,0.06)] dark:hover:shadow-[0_1px_3px_rgba(0,0,0,0.2)]'
+          : 'border-border/80 bg-bg-secondary/40 shadow-sm hover:shadow-[0_1px_3px_rgba(0,0,0,0.06)] dark:hover:shadow-[0_1px_3px_rgba(0,0,0,0.2)]'
       )}
     >
       <div
-        className='bg-primary/10 text-primary flex size-8 shrink-0 items-center justify-center rounded-full text-xs font-semibold'
+        className='bg-primary/10 text-primary flex size-8 shrink-0 items-center justify-center rounded-full text-[13px] font-semibold'
         aria-hidden
       >
         {initial}
@@ -273,7 +314,7 @@ function NoteCard({ note, isOwn, canDelete, onDelete, isDeleting }: NoteCardProp
         <div className='mb-1 flex items-baseline justify-between gap-2'>
           <span className='text-foreground truncate text-sm font-medium'>{note.author_name}</span>
           <div className='flex shrink-0 items-center gap-1'>
-            <span className='text-muted-foreground text-xs tabular-nums'>
+            <span className='text-text-tertiary text-[13px] tabular-nums'>
               {formatDate(note.created_at, 'dateTime')}
             </span>
             {canDelete && (
@@ -281,7 +322,7 @@ function NoteCard({ note, isOwn, canDelete, onDelete, isDeleting }: NoteCardProp
                 type='button'
                 variant='ghost'
                 size='icon-xs'
-                className='text-muted-foreground hover:bg-destructive/10 hover:text-destructive'
+                className='text-text-tertiary hover:bg-destructive/10 hover:text-destructive'
                 onClick={(e) => {
                   e.stopPropagation()
                   onDelete()
@@ -294,7 +335,7 @@ function NoteCard({ note, isOwn, canDelete, onDelete, isDeleting }: NoteCardProp
             )}
           </div>
         </div>
-        <p className='text-muted-foreground whitespace-pre-wrap wrap-break-word text-sm leading-relaxed'>
+        <p className='text-text-tertiary whitespace-pre-wrap wrap-break-word text-sm leading-relaxed'>
           {note.text}
         </p>
       </div>

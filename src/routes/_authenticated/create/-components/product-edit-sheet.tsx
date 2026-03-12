@@ -1,5 +1,5 @@
 import { useMutation } from '@tanstack/react-query'
-import { Package, X } from 'lucide-react'
+import { X } from 'lucide-react'
 
 import { ProductConfigurations } from './product-configurations'
 import { ProductImageGallery } from './product-image-gallery'
@@ -19,9 +19,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle
 } from '@/components/ui/alert-dialog'
-import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent } from '@/components/ui/dialog'
-import { ScrollArea } from '@/components/ui/scroll-area'
 import { Spinner } from '@/components/ui/spinner'
 import { formatCurrency } from '@/helpers/formatters'
 
@@ -174,45 +172,40 @@ export const ProductEditSheet = ({
       >
         <DialogContent
           showCloseButton={false}
-          className='flex h-[92vh] w-[94vw] max-w-[1400px]! flex-col gap-0 overflow-hidden rounded-2xl border-0 p-0 shadow-2xl'
+          className='flex h-[92vh] w-[94vw] max-w-[1200px]! flex-col gap-0 overflow-hidden rounded-[12px] border p-0 shadow-2xl'
         >
           {/* Header */}
-          <div className='bg-muted/30 relative shrink-0 border-b'>
-            <div className='flex items-center justify-between px-6 py-4'>
-              <div className='flex items-center gap-3'>
-                <div className='bg-primary text-primary-foreground flex size-10 items-center justify-center rounded-xl shadow-sm'>
-                  <Package className='size-5' />
-                </div>
-                <div>
-                  <h2 className='font-semibold'>Configure Product</h2>
-                  <p className='text-muted-foreground text-xs'>
-                    {mode === 'add' ? 'Add to cart' : 'Update configuration'}
-                  </p>
-                </div>
-              </div>
-              <Button
-                variant='ghost'
-                size='icon'
-                className='text-muted-foreground hover:bg-muted hover:text-foreground size-8 rounded-full'
-                onClick={handleClose}
-              >
-                <X className='size-4' />
-              </Button>
-            </div>
+          <div className='flex h-12 shrink-0 items-center gap-2.5 border-b border-border px-5'>
+            <h2 className='text-[14px] font-semibold tracking-[-0.01em]'>
+              {mode === 'add' ? 'Add Product' : 'Edit Product'}
+            </h2>
+            <span className='text-[13px] text-text-tertiary'>
+              {displayName}
+            </span>
+            <div className='flex-1' />
+            <button
+              type='button'
+              className='inline-flex size-7 items-center justify-center rounded-[5px] text-text-tertiary transition-colors duration-[80ms] hover:bg-bg-hover hover:text-foreground'
+              onClick={handleClose}
+            >
+              <X className='size-4' />
+            </button>
           </div>
 
-          <ScrollArea className='min-h-0 flex-1'>
-            <div className='flex flex-col gap-6 p-6'>
-              <div className='grid grid-cols-1 gap-6 lg:grid-cols-[360px_1fr]'>
-                {/* Left: Image Gallery */}
+          {/* Body — two-panel layout */}
+          <div className='flex min-h-0 flex-1'>
+            {/* Left panel: image + info */}
+            <div className='flex w-[380px] shrink-0 flex-col overflow-y-auto border-r border-border bg-bg-secondary/30 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]'>
+              <div className='p-4'>
                 <ProductImageGallery
                   photos={photos}
                   photoIndex={photoIndex}
                   onPhotoIndexChange={(i) => dispatch({ type: 'SET_PHOTO_INDEX', value: i })}
                   displayName={displayName}
                 />
+              </div>
 
-                {/* Right: Product Info */}
+              <div className='border-t border-border p-4'>
                 <ProductInfoSection
                   displayName={displayName}
                   configLoading={configLoading}
@@ -231,9 +224,11 @@ export const ProductEditSheet = ({
                   specs={specs}
                 />
               </div>
+            </div>
 
-              {/* Configurations section */}
-              {!configLoading && hasConfigs && (
+            {/* Right panel: configurations */}
+            <div className='flex min-h-0 flex-1 flex-col overflow-hidden'>
+              {!configLoading && hasConfigs ? (
                 <ProductConfigurations
                   configs={configs}
                   activeTab={activeTab}
@@ -244,61 +239,66 @@ export const ProductEditSheet = ({
                   selectedConfigCount={selectedConfigCount}
                   totalConfigCount={totalConfigCount}
                 />
+              ) : configLoading ? (
+                <div className='flex flex-1 items-center justify-center'>
+                  <Spinner className='size-5 text-text-tertiary' />
+                </div>
+              ) : (
+                <div className='flex flex-1 items-center justify-center text-[13px] text-text-tertiary'>
+                  No configurations available
+                </div>
               )}
             </div>
-          </ScrollArea>
+          </div>
 
           {/* Footer */}
-          <div className='bg-muted/30 shrink-0 border-t'>
-            <div className='flex items-center justify-between gap-4 px-6 py-4'>
-              {/* Price summary */}
-              <div className='flex items-center gap-4'>
-                <div>
-                  <p className='text-muted-foreground text-[10px] font-medium tracking-wider uppercase'>
-                    Total
-                  </p>
-                  <p className='text-xl font-bold tabular-nums'>
-                    {formatCurrency(priceDisplay * quantity)}
-                  </p>
-                </div>
-                {quantity > 1 && (
-                  <span className='text-muted-foreground text-xs'>
-                    {formatCurrency(priceDisplay)} × {quantity}
-                  </span>
-                )}
+          <div className='flex shrink-0 items-center justify-between gap-4 border-t border-border px-5 py-3'>
+            <div className='flex items-center gap-3'>
+              <div>
+                <span className='text-[12px] font-medium uppercase tracking-[0.04em] text-text-tertiary'>
+                  Total
+                </span>
+                <p className='text-[18px] font-bold tabular-nums leading-tight'>
+                  {formatCurrency(priceDisplay * quantity)}
+                </p>
               </div>
+              {quantity > 1 && (
+                <span className='text-[12px] tabular-nums text-text-tertiary'>
+                  {formatCurrency(priceDisplay)} × {quantity}
+                </span>
+              )}
+            </div>
 
-              {/* Actions */}
-              <div className='flex items-center gap-2'>
-                <Button
-                  variant='ghost'
-                  size='sm'
-                  onClick={handleClose}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  size='sm'
-                  disabled={
-                    hasUncheckedRequired ||
-                    configLoading ||
-                    saveMutation.isPending ||
-                    (!ignoreCount && maxCount < 0)
-                  }
-                  onClick={handleSave}
-                >
-                  {saveMutation.isPending ? (
-                    <>
-                      <Spinner className='mr-1.5 size-3.5' />
-                      Saving...
-                    </>
-                  ) : mode === 'add' ? (
-                    'Add to Cart'
-                  ) : (
-                    'Update'
-                  )}
-                </Button>
-              </div>
+            <div className='flex items-center gap-2'>
+              <button
+                type='button'
+                className='inline-flex h-8 items-center rounded-[6px] px-3 text-[13px] font-medium text-text-secondary transition-colors duration-[80ms] hover:bg-bg-hover hover:text-foreground'
+                onClick={handleClose}
+              >
+                Cancel
+              </button>
+              <button
+                type='button'
+                className='inline-flex h-8 items-center gap-1.5 rounded-[6px] bg-primary px-4 text-[13px] font-medium text-primary-foreground transition-opacity duration-[80ms] hover:opacity-90 disabled:pointer-events-none disabled:opacity-50'
+                disabled={
+                  hasUncheckedRequired ||
+                  configLoading ||
+                  saveMutation.isPending ||
+                  (!ignoreCount && maxCount < 0)
+                }
+                onClick={handleSave}
+              >
+                {saveMutation.isPending ? (
+                  <>
+                    <Spinner className='size-3.5' />
+                    Saving…
+                  </>
+                ) : mode === 'add' ? (
+                  'Add to Cart'
+                ) : (
+                  'Update'
+                )}
+              </button>
             </div>
           </div>
         </DialogContent>
@@ -308,7 +308,7 @@ export const ProductEditSheet = ({
         open={confirmClose}
         onOpenChange={(v) => dispatch({ type: 'SET_CONFIRM_CLOSE', value: v })}
       >
-        <AlertDialogContent className='rounded-2xl'>
+        <AlertDialogContent className='rounded-[12px]'>
           <AlertDialogHeader>
             <AlertDialogTitle>Discard changes?</AlertDialogTitle>
             <AlertDialogDescription>

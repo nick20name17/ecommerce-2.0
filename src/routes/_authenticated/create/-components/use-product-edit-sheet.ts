@@ -63,58 +63,62 @@ export const useProductEditSheet = (
     )
   }, [configData])
 
+  // Fetch photos for all config groups (since all are shown inline, not tabbed)
   useEffect(() => {
-    if (!activeTab || !product) return
-    if (requestedTabsRef.current.has(activeTab)) return
+    if (configs.length === 0 || !product) return
 
     const configurationId = configData?.id || configData?.autoid
     if (!configurationId) return
 
-    requestedTabsRef.current.add(activeTab)
-
-    const tabToFetch = activeTab
     const projectIdValue = projectId ?? undefined
-    const fetchPhotos = async () => {
-      try {
-        const photos = await productService.getConfigurationPhotos({
-          configuration_id: configurationId,
-          category_name: tabToFetch,
-          project_id: projectIdValue
-        })
-        const photosMap = new Map(photos.map((p) => [p.id, p.photos]))
-        dispatch({
-          type: 'UPDATE_CONFIGS',
-          updater: (prev) =>
-            prev.map((c) => {
-              if (c.name !== tabToFetch) return c
-              return {
-                ...c,
-                photosLoading: false,
-                items: c.items.map((item) => ({
-                  ...item,
-                  photos: photosMap.get(item.id) ?? item.photos
-                }))
-              }
-            })
-        })
-      } catch {
-        dispatch({
-          type: 'UPDATE_CONFIGS',
-          updater: (prev) =>
-            prev.map((c) => (c.name === tabToFetch ? { ...c, photosLoading: false } : c))
-        })
-      }
-    }
 
-    queueMicrotask(() => {
-      dispatch({
-        type: 'UPDATE_CONFIGS',
-        updater: (prev) =>
-          prev.map((c) => (c.name === tabToFetch ? { ...c, photosLoading: true } : c))
+    for (const config of configs) {
+      if (requestedTabsRef.current.has(config.name)) continue
+      requestedTabsRef.current.add(config.name)
+
+      const tabToFetch = config.name
+      const fetchPhotos = async () => {
+        try {
+          const photos = await productService.getConfigurationPhotos({
+            configuration_id: configurationId,
+            category_name: tabToFetch,
+            project_id: projectIdValue
+          })
+          const photosMap = new Map(photos.map((p) => [p.id, p.photos]))
+          dispatch({
+            type: 'UPDATE_CONFIGS',
+            updater: (prev) =>
+              prev.map((c) => {
+                if (c.name !== tabToFetch) return c
+                return {
+                  ...c,
+                  photosLoading: false,
+                  items: c.items.map((item) => ({
+                    ...item,
+                    photos: photosMap.get(item.id) ?? item.photos
+                  }))
+                }
+              })
+          })
+        } catch {
+          dispatch({
+            type: 'UPDATE_CONFIGS',
+            updater: (prev) =>
+              prev.map((c) => (c.name === tabToFetch ? { ...c, photosLoading: false } : c))
+          })
+        }
+      }
+
+      queueMicrotask(() => {
+        dispatch({
+          type: 'UPDATE_CONFIGS',
+          updater: (prev) =>
+            prev.map((c) => (c.name === tabToFetch ? { ...c, photosLoading: true } : c))
+        })
+        fetchPhotos()
       })
-      fetchPhotos()
-    })
-  }, [activeTab, product, projectId, configData])
+    }
+  }, [configs.length, product, projectId, configData]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const activeConfigurations = (() => {
     const result: { name: string; id: string | number }[] = []

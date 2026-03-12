@@ -1,156 +1,216 @@
 ---
 name: linear-ui-skills
-description: Linear's UI design system. Use when building interfaces inspired by Linear's aesthetic - dark mode, Inter font, 4px grid.
+description: Linear-inspired UI design system used in this project. Reference when building or modifying any UI component.
 license: MIT
 metadata:
   author: design-skills
-  version: "1.0.0"
-  source: https://linear.app
+  version: "2.0.0"
 ---
 
-# Linear UI Skills
+# Linear-Inspired UI Design System
 
-Opinionated constraints for building Linear-style interfaces with AI agents.
+Opinionated patterns extracted from the actual codebase (tasks page is the reference implementation).
 
 ## When to Apply
 
-Reference these guidelines when:
-- Building dark-mode interfaces
-- Creating Linear-inspired design systems
-- Implementing UIs with Inter font and 4px grid
+Reference these guidelines when building or modifying ANY UI in this project.
 
-## Colors
+## Design Tokens (Tailwind CSS custom properties)
 
-- MUST use dark backgrounds (lightness < 20) for primary surfaces - detected lightness: 4
-- MUST use `#080A0A` as page background (`surface-base`)
-- SHOULD limit color palette to 10 distinct colors
-- MUST maintain text contrast ratio of at least 4.5:1 for accessibility
+Use these Tailwind classes — never hardcode hex values except for semantic status/priority colors.
 
-### Semantic Tokens
+| Token class | Usage |
+|-------------|-------|
+| `bg-background` | Page/panel background |
+| `bg-bg-hover` | Hover state for rows, cards |
+| `bg-bg-active` | Active/pressed state |
+| `bg-bg-secondary` | Subtle badge/tag backgrounds |
+| `text-foreground` | Primary text |
+| `text-text-secondary` | Secondary text (labels, metadata) |
+| `text-text-tertiary` | Tertiary text (placeholders, disabled) |
+| `border-border` | Default borders |
+| `border-border-light` | Subtle row dividers |
+| `primary` | Brand accent (buttons, focus rings) |
 
-| Token | HEX | RGB | Usage |
-|-------|-----|-----|-------|
-| `surface-base` | #080A0A | rgb(8,10,10) | Page background |
-| `surface-raised` | #D2D2D3 | rgb(210,210,211) | Cards, modals, raised surfaces |
-| `surface-overlay` | #E3E3E6 | rgb(227,227,230) | Overlays, tooltips, dropdowns |
-| `text-primary` | #5C5C5C | rgb(92,92,92) | Headings, body text |
-| `text-secondary` | #2D2E30 | rgb(45,46,48) | Secondary, muted text |
-| `text-tertiary` | #444749 | rgb(68,71,73) | Additional text |
-| `border-default` | #B0B1B1 | rgb(176,177,177) | Subtle borders, dividers |
+### Status Colors (hardcoded)
+- Done: `#34C759` / dark `#30D158`
+- In Progress: `#007AFF` / dark `#0A84FF`
+- Todo: `#8E8E93`
+- Backlog: `#C7C7CC` / dark `#48484A`
+
+### Priority Colors (from `TASK_PRIORITY_COLORS`)
+- Low: `#34C759` (green)
+- Medium: `#FFCC00` (yellow)
+- High: `#FF9500` (orange)
+- Urgent: `#FF3B30` (red)
 
 ## Typography
 
-- MUST use `Inter` as primary font family
-- SHOULD use single font family for consistency
-- MUST use `60px` / `700` for primary headings
-- MUST use `17px` / `400` for body text
-- SHOULD reduce font weights (currently 4 detected)
-- MUST use `text-balance` for headings and `text-pretty` for body text
-- SHOULD use `tabular-nums` for numeric data
-- NEVER modify letter-spacing unless explicitly requested
+- Font: `Inter Variable` via `@fontsource-variable/inter`
+- MUST use `tabular-nums` for all numeric data (counts, IDs, dates)
 
-### Text Styles
-
-| Style | Font | Size | Weight | Color | Count |
-|-------|------|------|--------|-------|-------|
-| `heading-1` | Inter | 60px | 700 | #E2E4E3 | 1 |
-| `body` | Inter | 17px | 400 | #444749 | 1 |
-| `body-secondary` | Inter | 16px | 400 | #5C5C5C | 1 |
-| `body-secondary` | Inter | 15px | 500 | #2D2E30 | 1 |
-| `text-14px` | Inter | 14px | 400 | #B2B3B3 | 1 |
-| `text-13px` | Inter | 13px | 400 | #4C4C4C | 1 |
-| `text-13px` | Inter | 13px | 400 | #525355 | 1 |
-| `text-12px` | Inter | 12px | 400 | #525456 | 1 |
-| `caption` | Inter | 9px | 400 | #545557 | 1 |
-| `label` | Inter | 9px | 400 | #565759 | 1 |
-
-### Typography Reference
-
-**Font Families:**
-- `Inter` (used 13x)
-
-**Font Sizes:** 9px, 12px, 13px, 14px, 15px, 16px, 17px, 60px
+| Usage | Size | Weight | Class example |
+|-------|------|--------|---------------|
+| Page title | 14px | 600 | `text-[14px] font-semibold` |
+| Row/card text | 13px | 500 | `text-[13px] font-medium` |
+| Badges, labels | 12px | 500 | `text-[12px] font-medium` |
+| Metadata, IDs | 11px | 500 | `text-[11px] font-medium tabular-nums` |
+| Detail title | 24px | 600 | `text-[24px] font-semibold` |
 
 ## Spacing
 
-- MUST use 4px grid for spacing
-- SHOULD use spacing from scale: 5px, 11px, 12px, 13px, 14px, 16px, 19px, 20px
-- SHOULD use 5px as default gap between elements
-- NEVER use arbitrary spacing values (use design scale)
-- SHOULD maintain consistent padding within containers
+- MUST use 4px grid
+- Common gaps: `gap-1` (4), `gap-1.5` (6), `gap-2` (8), `gap-2.5` (10), `gap-3` (12), `gap-4` (16)
+- Row padding: `px-8 py-1.5` desktop, `px-5 py-1.5` tablet
+- Toolbar padding: `px-6 py-2` desktop, `px-4 py-2` mobile
+- Modal body: `px-6 py-4`
 
-## Borders
+## Borders & Radius
 
-- MUST use border-radius from scale: 6px, 8px
-- MUST use 1px border width consistently
-- SHOULD use 6px as default border-radius
-- NEVER use arbitrary border-radius values (use design scale)
-- SHOULD use subtle borders (1px) for element separation
+- Default radius: `rounded-[6px]` for buttons, inputs, dropdown items, cards
+- Larger elements: `rounded-lg` (8px) for cards, modals, popovers
+- MUST use 1px borders only
+- Row dividers: `border-b border-border-light`
+- Section dividers: `border-b border-border`
 
-### Border Radius Reference
+## Shadows
 
-**Scale:** 6px, 8px
+- Dropdowns/popovers: `style={{ boxShadow: 'var(--dropdown-shadow)' }}`
+- Card hover: `shadow-md`
+- Drag overlay: `shadow-lg`
 
-## Layout
+## Transitions
 
-- MUST design for 1920px base viewport width
-- SHOULD use consistent element widths: 52px
-- SHOULD maintain text-heavy layout with clear hierarchy
-- NEVER use `h-screen`, use `h-dvh` for full viewport height
-- MUST respect `safe-area-inset` for fixed elements
-- SHOULD use `size-*` for square elements instead of `w-*` + `h-*`
+- MUST use `transition-colors duration-[80ms]` for interactive elements
+- MUST use `transition-opacity` for show/hide (e.g. row actions on hover)
 
-### Detected Layout Patterns
+## Component Patterns
 
-- **Main Content**: width: 1920px, height: 1013px
-- **Header**: height: 63px
+### List Rows
 
-## Components
+```
+group/row flex cursor-pointer items-center border-b border-border-light
+hover:bg-bg-hover transition-colors duration-100
+gap-6 px-8 py-1.5  (desktop)
+gap-4 px-5 py-1.5  (tablet)
+```
 
-### Buttons
+- Primary content: `flex min-w-0 flex-1` with `truncate` on text
+- Right metadata: `flex shrink-0 items-center gap-4` with fixed-width columns
+- Row actions: `opacity-0 group-hover/row:opacity-100 transition-opacity`
 
-| Variant | Background | Text | Border | Height | Radius |
-|---------|------------|------|--------|--------|--------|
-| Ghost | transparent | #5C5C5C | none | - | - |
+### Icon Buttons (inline, ghost)
 
-## Interactive States
+```
+inline-flex size-6 items-center justify-center rounded-[6px]
+text-text-tertiary transition-colors duration-[80ms]
+hover:bg-bg-active hover:text-foreground
+```
 
-### Focus
+- Icon size: `size-3.5` or `size-4`
+- MUST include `aria-label`
 
-- MUST use `2px` outline with accent color (`#5E6AD2`)
-- MUST use `2px` outline-offset
-- NEVER remove focus indicators
+### Counter Buttons (notes, attachments)
 
-### Hover
+Two states: empty (ghost) and with count (bordered badge).
 
-- Buttons (primary): lighten background by 10%
-- Buttons (secondary): use `#D2D2D3` background
-- List items: use `#D2D2D3` background
+```tsx
+// Empty: ghost style
+'border-transparent text-text-tertiary hover:bg-bg-hover hover:text-text-secondary'
+// With count: subtle bordered badge
+'border-border bg-bg-secondary text-text-secondary hover:bg-bg-active'
+// Shared base
+'inline-flex items-center gap-1.5 rounded-[6px] border px-2 py-1 text-[12px] font-medium transition-colors duration-[80ms]'
+```
 
-### Disabled
+- Icon: `size-3.5`
+- Counter: `tabular-nums`
+- Always show the count (0 when empty)
 
-- MUST use `opacity: 0.5`
-- MUST use `cursor: not-allowed`
+### Dropdowns & Popovers
 
-## Interaction
+```
+PopoverContent: w-64 overflow-hidden rounded-lg border-border p-0
+  style={{ boxShadow: 'var(--dropdown-shadow)' }}
+```
 
-- MUST use an `AlertDialog` for destructive or irreversible actions
-- SHOULD use structural skeletons for loading states
-- MUST show errors next to where the action happens
-- NEVER block paste in `input` or `textarea` elements
-- MUST add an `aria-label` to icon-only buttons
+- Search header: `flex items-center gap-1.5 border-b border-border px-2.5 py-[6px]`
+- Search input: `flex-1 bg-transparent text-[13px] font-medium outline-none placeholder:text-text-tertiary`
+- Item list: `max-h-64 overflow-y-auto overscroll-contain p-1`
+- Items: `rounded-[6px] px-2.5 py-[7px] text-[13px] font-medium hover:bg-bg-hover`
+- Loading: 5 `Skeleton` rows `h-8 w-full rounded-[6px]`
+- Empty: centered icon + text `text-xs text-text-tertiary py-6`
 
-## Animation
+### Combobox Pattern
 
-- NEVER add animation unless it is explicitly requested
-- MUST animate only compositor props (`transform`, `opacity`)
-- NEVER animate layout properties (`width`, `height`, `top`, `left`, `margin`, `padding`)
-- SHOULD use `ease-out` on entrance animations
-- NEVER exceed `200ms` for interaction feedback
-- SHOULD respect `prefers-reduced-motion`
+- Trigger: outline button or custom trigger with `ChevronsUpDown` icon
+- Popover opens on click, auto-focuses search input via `queueMicrotask`
+- Debounced search (300ms) with `useDebouncedCallback`
+- `enabled: open` on query (only fetch when open)
+- `staleTime: 30_000` + `placeholderData: keepPreviousData` for performance
+- Clear button: destructive hover `hover:bg-destructive/10 hover:text-destructive`
 
-## Performance
+### Kanban Cards
 
-- NEVER animate large `blur()` or `backdrop-filter` surfaces
-- NEVER apply `will-change` outside an active animation
-- NEVER use `useEffect` for anything that can be expressed as render logic
+```
+rounded-lg border border-border p-3
+hover:border-foreground/15 hover:shadow-md hover:bg-bg-hover/50
+```
+
+- Title: `text-[13px] font-medium leading-snug line-clamp-2`
+- Meta: `text-[11px] tabular-nums text-text-tertiary`
+- Dragging: `rotate-[2deg] shadow-lg ring-1 ring-primary/20`
+
+### Modals (Dialog)
+
+- Max width: `sm:max-w-2xl`
+- Sticky header: `bg-background border-b px-6 py-4 z-10`
+- Scrollable body: `px-6 py-4`
+- Sticky footer: `bg-background border-t z-10`
+- Form grid: `grid-cols-1 gap-2.5 sm:grid-cols-2`
+
+### Status Indicators
+
+- Color dot: `size-1.5 rounded-full` with inline `backgroundColor`
+- Status icon: `StatusIcon` component from `@/components/ds`
+- Priority: 4-bar chart SVG from `TASK_PRIORITY_COLORS`
+
+### Badges
+
+```
+inline-flex items-center rounded-[4px] bg-bg-secondary px-1.5 py-0.5
+text-[11px] font-medium text-text-secondary
+```
+
+### Delete Confirmation
+
+- MUST use `AlertDialog` for destructive actions
+- Show entity title in description
+- Cancel + destructive Delete buttons
+
+## Data Patterns
+
+### Query Structure
+- Query keys: `ENTITY_QUERY_KEYS.list(params)`, `.detail(id)`
+- Optimistic updates for status changes
+- `staleTime` on frequently-opened dropdowns
+- `enabled` flag to defer fetching until needed
+
+### Form Pattern
+- React Hook Form + Zod validation
+- `Controller` for each field
+- Inline validation errors
+- Loading state on submit button via `isPending`
+
+## Rules
+
+- NEVER hardcode colors — use design tokens
+- MUST use `rounded-[6px]` as default radius (not `rounded-md`)
+- MUST use `duration-[80ms]` for hover transitions (not default 150ms)
+- MUST use `text-[13px]` as primary UI text size
+- MUST add `aria-label` to icon-only buttons
+- MUST use `truncate` on text that could overflow
+- MUST use `tabular-nums` on numeric data
+- SHOULD use `Skeleton` components for loading states
+- SHOULD use `AlertDialog` for destructive actions
+- NEVER use `useEffect` for render-derivable logic

@@ -106,7 +106,7 @@ export const getUserColumns = ({
         return (
           <div className='flex min-w-0 items-center gap-3'>
             <Avatar className='size-8 shrink-0'>
-              <AvatarFallback className='bg-primary/10 text-primary text-xs font-medium'>
+              <AvatarFallback className='bg-primary/10 text-primary text-[13px] font-medium'>
                 {getInitials(user.first_name, user.last_name, user.email)}
               </AvatarFallback>
             </Avatar>
@@ -119,7 +119,7 @@ export const getUserColumns = ({
               </Tooltip>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <p className='text-muted-foreground truncate text-xs'>{user.email}</p>
+                  <p className='text-text-tertiary truncate text-[13px]'>{user.email}</p>
                 </TooltipTrigger>
                 <TooltipContent>{user.email}</TooltipContent>
               </Tooltip>
@@ -161,7 +161,7 @@ export const getUserColumns = ({
         />
       ),
       cell: ({ row }) => (
-        <span className='text-muted-foreground'>{formatDate(row.original.date_joined)}</span>
+        <span className='text-text-tertiary'>{formatDate(row.original.date_joined)}</span>
       ),
       size: 130
     },

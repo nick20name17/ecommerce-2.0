@@ -10,45 +10,45 @@
 :root {
   /* Background */
   --background: #FFFFFF;
-  --foreground: #1D1D1F;
-  --bg-secondary: #F5F5F7;
-  --bg-tertiary: #FAFAFA;
-  --bg-hover: #F0F0F2;
-  --bg-active: #E8E8ED;
+  --foreground: #1A1A1E;
+  --bg-secondary: #F5F5F6;
+  --bg-tertiary: #FAFAF9;
+  --bg-hover: #F0EFF1;
+  --bg-active: #E8E7EB;
 
   /* Card / Surface */
   --card: #FFFFFF;
-  --card-foreground: #1D1D1F;
-  --surface-shadow: 0 1px 2px rgba(0,0,0,0.06);
+  --card-foreground: #1A1A1E;
+  --surface-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 0 0 1px rgba(0,0,0,0.02);
 
   /* Popover / Dropdown */
   --popover: #FFFFFF;
-  --popover-foreground: #1D1D1F;
-  --dropdown-shadow: 0 4px 20px rgba(0,0,0,0.12), 0 1px 3px rgba(0,0,0,0.06);
+  --popover-foreground: #1A1A1E;
+  --dropdown-shadow: 0 6px 24px rgba(0,0,0,0.07), 0 1px 4px rgba(0,0,0,0.04);
 
   /* Text */
-  --text-secondary: #6E6E73;
-  --text-tertiary: #AEAEB2;
+  --text-secondary: #65656D;
+  --text-tertiary: #A8A8B0;
 
   /* Primary / Accent — Apple Blue */
   --primary: #007AFF;
   --primary-foreground: #FFFFFF;
   --accent: #007AFF;
   --accent-foreground: #FFFFFF;
-  --accent-bg: rgba(0, 122, 255, 0.08);
+  --accent-bg: rgba(0, 122, 255, 0.07);
 
   /* Secondary */
-  --secondary: #F5F5F7;
-  --secondary-foreground: #1D1D1F;
+  --secondary: #F5F5F6;
+  --secondary-foreground: #1A1A1E;
 
   /* Muted */
-  --muted: #F5F5F7;
-  --muted-foreground: #6E6E73;
+  --muted: #F5F5F6;
+  --muted-foreground: #65656D;
 
   /* Border */
-  --border: #E5E5EA;
-  --border-light: #F2F2F7;
-  --input: #E5E5EA;
+  --border: #E6E5EB;
+  --border-light: #F0EFF4;
+  --input: #E0DFE5;
   --ring: #007AFF;
 
   /* Destructive */
@@ -82,15 +82,18 @@
   /* Radius */
   --radius: 0.625rem;
 
-  /* Sidebar */
-  --sidebar: #FAFAFA;
-  --sidebar-foreground: #1D1D1F;
+  /* Sidebar — subtle warm gray */
+  --sidebar: #F2F1F4;
+  --sidebar-foreground: #1A1A1E;
   --sidebar-primary: #007AFF;
   --sidebar-primary-foreground: #FFFFFF;
-  --sidebar-accent: #007AFF;
-  --sidebar-accent-foreground: #FFFFFF;
-  --sidebar-border: #E5E5EA;
+  --sidebar-accent: #E8E7EC;
+  --sidebar-accent-foreground: #1A1A1E;
+  --sidebar-border: transparent;
   --sidebar-ring: #007AFF;
+
+  /* Page canvas — matches sidebar */
+  --page-canvas: #F2F1F4;
 
   /* Roles */
   --role-superadmin: oklch(0.65 0.2 330);
@@ -101,53 +104,53 @@
 
 .dark {
   /* Background */
-  --background: #000000;
-  --foreground: #F5F5F7;
-  --bg-secondary: #1C1C1E;
-  --bg-tertiary: #111111;
-  --bg-hover: #343436;
-  --bg-active: #3A3A3C;
+  --background: #161618;
+  --foreground: #ECECEE;
+  --bg-secondary: #1E1E20;
+  --bg-tertiary: #1A1A1C;
+  --bg-hover: #2C2C2E;
+  --bg-active: #333336;
 
   /* Card / Surface */
-  --card: #1C1C1E;
-  --card-foreground: #F5F5F7;
-  --surface-shadow: 0 1px 2px rgba(0,0,0,0.4);
+  --card: #1E1E20;
+  --card-foreground: #ECECEE;
+  --surface-shadow: 0 1px 2px rgba(0,0,0,0.3);
 
   /* Popover / Dropdown */
-  --popover: #2C2C2E;
-  --popover-foreground: #F5F5F7;
-  --dropdown-shadow: 0 4px 20px rgba(0,0,0,0.5), 0 1px 3px rgba(0,0,0,0.3);
+  --popover: #252528;
+  --popover-foreground: #ECECEE;
+  --dropdown-shadow: 0 4px 20px rgba(0,0,0,0.4), 0 1px 3px rgba(0,0,0,0.2);
 
   /* Text */
-  --text-secondary: #98989D;
-  --text-tertiary: #636366;
+  --text-secondary: #A0A0A5;
+  --text-tertiary: #6E6E73;
 
   /* Primary / Accent — Apple Blue (dark) */
   --primary: #0A84FF;
   --primary-foreground: #FFFFFF;
   --accent: #0A84FF;
   --accent-foreground: #FFFFFF;
-  --accent-bg: rgba(10, 132, 255, 0.12);
+  --accent-bg: rgba(10, 132, 255, 0.14);
 
   /* Secondary */
-  --secondary: #1C1C1E;
-  --secondary-foreground: #F5F5F7;
+  --secondary: #232326;
+  --secondary-foreground: #ECECEE;
 
   /* Muted */
-  --muted: #1C1C1E;
-  --muted-foreground: #98989D;
+  --muted: #232326;
+  --muted-foreground: #A0A0A5;
 
   /* Border */
-  --border: #38383A;
-  --border-light: #2C2C2E;
-  --input: #38383A;
+  --border: #2E2E32;
+  --border-light: #262628;
+  --input: #2E2E32;
   --ring: #0A84FF;
 
   /* Destructive */
   --destructive: #FF453A;
 
   /* Nav (frosted glass) */
-  --nav-bg: rgba(0, 0, 0, 0.72);
+  --nav-bg: rgba(22, 22, 24, 0.78);
   --nav-blur: saturate(180%) blur(20px);
 
   /* Semantic: Status */
@@ -171,15 +174,18 @@
   --chart-4: #BF5AF2;
   --chart-5: #FF453A;
 
-  /* Sidebar */
-  --sidebar: #1C1C1E;
-  --sidebar-foreground: #F5F5F7;
+  /* Sidebar — blends with page gray */
+  --sidebar: #1E1E20;
+  --sidebar-foreground: #ECECEE;
   --sidebar-primary: #0A84FF;
   --sidebar-primary-foreground: #FFFFFF;
-  --sidebar-accent: #0A84FF;
-  --sidebar-accent-foreground: #FFFFFF;
-  --sidebar-border: #38383A;
+  --sidebar-accent: #2C2C2E;
+  --sidebar-accent-foreground: #ECECEE;
+  --sidebar-border: transparent;
   --sidebar-ring: #0A84FF;
+
+  /* Page canvas — matches sidebar */
+  --page-canvas: #1E1E20;
 
   /* Roles */
   --role-superadmin: oklch(0.75 0.18 330);
@@ -250,6 +256,9 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+
+  /* Page canvas */
+  --color-page-canvas: var(--page-canvas);
 
   /* Roles */
   --color-role-superadmin: var(--role-superadmin);

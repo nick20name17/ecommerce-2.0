@@ -118,7 +118,7 @@ export const TaskStatusManager = ({ projectId, statuses }: TaskStatusManagerProp
         className='w-80'
         onOpenAutoFocus={(e) => e.preventDefault()}
       >
-        <p className='text-muted-foreground mb-2 text-xs'>
+        <p className='text-text-tertiary mb-2 text-[13px]'>
           Drag rows to reorder. Default status is fixed and cannot be edited or deleted.
         </p>
         <DragDropProvider
@@ -223,7 +223,7 @@ const SortableStatusRow = ({
       ref={ref}
       className={cn(
         'flex items-center gap-2 rounded-md border px-3 py-2',
-        isDefault && 'bg-muted/30',
+        isDefault && 'bg-bg-secondary/30',
         !isDefault && 'bg-background',
         isDragging && 'opacity-60 shadow-md'
       )}
@@ -236,7 +236,7 @@ const SortableStatusRow = ({
       ) : (
         <button
           ref={handleRef}
-          className='text-muted-foreground cursor-grab touch-none'
+          className='text-text-tertiary cursor-grab touch-none'
         >
           <GripVertical className='h-4 w-4' />
         </button>
@@ -251,7 +251,7 @@ const SortableStatusRow = ({
       {isDefault ? (
         <Badge
           variant='secondary'
-          className='text-xs font-normal'
+          className='text-[13px] font-normal'
         >
           Default
         </Badge>

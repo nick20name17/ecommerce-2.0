@@ -6,7 +6,6 @@ import { useDebouncedCallback } from 'use-debounce'
 import { getCustomersQuery } from '@/api/customer/query'
 import type { Customer } from '@/api/customer/schema'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Spinner } from '@/components/ui/spinner'
@@ -15,9 +14,12 @@ interface TaskCustomerComboboxProps {
   value: string | null
   onChange: (customerId: string | null) => void
   projectId?: number | null
+  placeholder?: string
+  valueLabel?: string | null
+  triggerClassName?: string
 }
 
-export const TaskCustomerCombobox = ({ value, onChange, projectId }: TaskCustomerComboboxProps) => {
+export const TaskCustomerCombobox = ({ value, onChange, projectId, placeholder = 'Select customer...', valueLabel, triggerClassName }: TaskCustomerComboboxProps) => {
   const [open, setOpen] = useState(false)
   const [search, setSearch] = useState('')
   const [debouncedSearch, setDebouncedSearch] = useState('')
@@ -53,9 +55,11 @@ export const TaskCustomerCombobox = ({ value, onChange, projectId }: TaskCustome
           l_name: `Customer ${value}`
         })
       : null
-  const displayLabel = displayCustomer
-    ? `${displayCustomer.autoid} — ${displayCustomer.l_name}`
-    : null
+
+  const displayLabel = valueLabel
+    ?? (displayCustomer
+      ? `${displayCustomer.l_name}`
+      : null)
 
   const handleSearchChange = (q: string) => {
     setSearch(q)
@@ -67,97 +71,100 @@ export const TaskCustomerCombobox = ({ value, onChange, projectId }: TaskCustome
     setOpen(false)
   }
 
-  const handleClear = () => onChange(null)
-
   return (
-    <Popover
-      open={open}
-      onOpenChange={handleOpenChange}
-    >
-      <div className='flex min-w-0 gap-2'>
+    <Popover open={open} onOpenChange={handleOpenChange}>
+      {triggerClassName ? (
         <PopoverTrigger asChild>
-          <Button
-            variant='outline'
-            className='min-w-0 flex-1 justify-between font-normal'
-          >
+          <button type='button' className={triggerClassName}>
             {displayLabel ? (
               <span className='truncate'>{displayLabel}</span>
             ) : (
-              <span className='text-muted-foreground'>Select customer...</span>
+              <span>{placeholder}</span>
             )}
-            <ChevronsUpDown className='ml-auto size-4 shrink-0 opacity-50' />
-          </Button>
+            <ChevronsUpDown className='ml-auto size-3 shrink-0 text-text-tertiary' />
+          </button>
         </PopoverTrigger>
-        {value != null && (
-          <Button
-            variant='ghost'
-            size='icon'
-            className='shrink-0'
-            onClick={handleClear}
-          >
-            <X className='size-4' />
-          </Button>
-        )}
-      </div>
-      <PopoverContent
-        className='w-(--radix-popover-trigger-width) p-0'
-        align='start'
-      >
-        <div className='flex items-center gap-2 border-b px-3 py-2'>
-          {loading ? (
-            <Spinner className='size-4 shrink-0' />
-          ) : (
-            <Search className='size-4 shrink-0 opacity-50' />
+      ) : (
+        <div className='flex min-w-0 gap-2'>
+          <PopoverTrigger asChild>
+            <Button variant='outline' className='min-w-0 flex-1 justify-between font-normal'>
+              {displayLabel ? (
+                <span className='truncate'>{displayLabel}</span>
+              ) : (
+                <span className='text-text-tertiary'>{placeholder}</span>
+              )}
+              <ChevronsUpDown className='ml-auto size-4 shrink-0 opacity-50' />
+            </Button>
+          </PopoverTrigger>
+          {value != null && (
+            <Button variant='ghost' size='icon' className='shrink-0' onClick={() => onChange(null)}>
+              <X className='size-4' />
+            </Button>
           )}
-          <Input
+        </div>
+      )}
+      <PopoverContent
+        className='w-64 overflow-hidden rounded-lg border-border p-0'
+        align='start'
+        style={{ boxShadow: 'var(--dropdown-shadow)' }}
+      >
+        <div className='flex items-center gap-1.5 border-b border-border px-2.5 py-[6px]'>
+          {loading ? (
+            <Spinner className='size-3.5 shrink-0' />
+          ) : (
+            <Search className='size-3.5 shrink-0 text-text-tertiary' />
+          )}
+          <input
             ref={inputRef}
             placeholder='Search by name or ID...'
             value={search}
             onChange={(e) => handleSearchChange(e.target.value)}
-            className='h-8 border-0 p-0 shadow-none focus-visible:ring-0'
+            className='flex-1 bg-transparent text-[13px] font-medium outline-none placeholder:text-text-tertiary'
           />
         </div>
         <div
-          className='max-h-64 overflow-y-auto overscroll-contain'
+          className='max-h-64 overflow-y-auto overscroll-contain p-1'
           onWheel={(e) => e.stopPropagation()}
         >
           {loading && customers.length === 0 ? (
-            <div className='space-y-2 p-2'>
+            <div className='space-y-1'>
               {Array.from({ length: 5 }).map((_, i) => (
-                <Skeleton
-                  key={i}
-                  className='h-10 w-full'
-                />
+                <Skeleton key={i} className='h-8 w-full rounded-[6px]' />
               ))}
             </div>
           ) : customers.length === 0 ? (
-            <div className='text-muted-foreground flex flex-col items-center gap-2 py-8'>
-              <Users className='size-6 opacity-50' />
-              <span className='text-sm'>
+            <div className='flex flex-col items-center gap-2 py-6 text-text-tertiary'>
+              <Users className='size-5 opacity-50' />
+              <span className='text-[13px]'>
                 {search ? 'No customers found' : 'Start typing to search'}
               </span>
             </div>
           ) : (
-            <div className='p-1'>
+            <>
+              {value && (
+                <button
+                  type='button'
+                  className='flex w-full items-center gap-2 rounded-[6px] px-2.5 py-[7px] text-left text-[13px] font-medium text-text-secondary transition-colors duration-[80ms] hover:bg-destructive/10 hover:text-destructive'
+                  onClick={() => { onChange(null); setOpen(false) }}
+                >
+                  <X className='size-3.5 shrink-0' />
+                  Remove customer
+                </button>
+              )}
               {customers.map((c) => (
                 <button
                   key={c.autoid}
                   type='button'
-                  className='group hover:bg-accent hover:text-accent-foreground flex w-full items-center justify-between gap-2 rounded-md px-2 py-2 text-left text-sm'
+                  className='flex w-full items-center justify-between gap-2 rounded-[6px] px-2.5 py-[7px] text-left text-[13px] font-medium transition-colors duration-[80ms] hover:bg-bg-hover'
                   onClick={() => handleSelect(c)}
                 >
-                  <div className='group-hover:text-accent-foreground flex min-w-0 gap-2'>
-                    <span className='font-semibold'>{c.autoid}</span>
-                    <span className='truncate'>{c.l_name}</span>
-                  </div>
+                  <span className='truncate font-semibold'>{c.autoid}</span>
                   {c.contact_1 && (
-                    <span className='text-muted-foreground group-hover:text-accent-foreground shrink-0 text-xs'>
-                      {c.contact_1}
-                    </span>
+                    <span className='shrink-0 text-[13px] text-text-tertiary'>{c.contact_1}</span>
                   )}
                 </button>
               ))}
-            </div>
+            </>
           )}
         </div>
       </PopoverContent>

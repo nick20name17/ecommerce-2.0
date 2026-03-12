@@ -2,31 +2,27 @@ import { Outlet, createFileRoute, redirect } from '@tanstack/react-router'
 
 import { AppSidebar } from '../-components/app-sidebar'
 
-import { HeaderProjectHealth } from './-components/header-project-health'
 import { NotificationsWsManager } from './-components/notifications-ws-manager'
 import { AUTH_REDIRECTS } from '@/api/constants'
-import { ModeToggle } from '@/components/common/mode-toggle'
 import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
 import { getSession } from '@/helpers/auth'
 
 const AuthenticatedLayout = () => {
   return (
-    <SidebarProvider className='h-svh overflow-hidden'>
+    <SidebarProvider className='h-svh overflow-hidden bg-page-canvas'>
       <NotificationsWsManager />
       <AppSidebar />
-      <SidebarInset className='flex min-h-0 flex-col overflow-hidden'>
-        <header className='flex h-14 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12'>
-          <div className='flex min-w-0 flex-1 items-center gap-2 px-4'>
-            <SidebarTrigger className='-ml-1 shrink-0' />
-            <HeaderProjectHealth />
-          </div>
-          <div className='shrink-0 px-4'>
-            <ModeToggle />
-          </div>
-        </header>
-        <main className='flex min-h-0 flex-1 flex-col overflow-hidden p-4'>
-          <Outlet />
-        </main>
+      <SidebarInset className='flex min-h-0 flex-col overflow-hidden bg-transparent p-2'>
+        <div className='flex min-h-0 flex-1 flex-col overflow-hidden rounded-xl bg-background shadow-sm ring-1 ring-black/[0.04]'>
+          <header className='flex h-11 shrink-0 items-center gap-2 border-b border-border/40'>
+            <div className='flex min-w-0 flex-1 items-center gap-2 px-6'>
+              <SidebarTrigger className='-ml-1.5 shrink-0' />
+            </div>
+          </header>
+          <main className='flex min-h-0 flex-1 flex-col overflow-hidden'>
+            <Outlet />
+          </main>
+        </div>
       </SidebarInset>
     </SidebarProvider>
   )

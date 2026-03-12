@@ -23,8 +23,8 @@ export const HeaderProjectHealth = () => {
   if (userIsSuperAdmin && projectId == null) return null
 
   return (
-    <div className='border-border bg-muted/30 flex items-center gap-4 rounded-md border px-3 py-1.5'>
-      <span className='text-muted-foreground text-xs font-medium'>Project health</span>
+    <div className='border-border bg-bg-secondary/30 flex items-center gap-4 rounded-md border px-3 py-1.5'>
+      <span className='text-text-tertiary text-[13px] font-medium'>Project health</span>
       <div className='flex items-center gap-3'>
         {HEALTH_SERVICES.map(({ label, service }) => {
           const details = health ? getServiceHealthDetails(health, service) : null
@@ -39,7 +39,7 @@ export const HeaderProjectHealth = () => {
                 lastChecked={details?.lastChecked}
                 isLoading={!isConnected}
               />
-              <span className='text-muted-foreground text-xs'>{label}</span>
+              <span className='text-text-tertiary text-[13px]'>{label}</span>
             </div>
           )
         })}
@@ -48,7 +48,7 @@ export const HeaderProjectHealth = () => {
             status={health?.overall_status ?? null}
             isLoading={!isConnected}
           />
-          <span className='text-muted-foreground text-xs'>Status</span>
+          <span className='text-text-tertiary text-[13px]'>Status</span>
         </div>
       </div>
     </div>

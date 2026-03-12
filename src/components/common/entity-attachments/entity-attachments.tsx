@@ -7,7 +7,8 @@ import {
   FileTextIcon,
   HeadphonesIcon,
   ImageIcon,
-  LoaderIcon,
+  Loader2,
+  Paperclip,
   Trash2Icon,
   UploadIcon,
   VideoIcon
@@ -19,18 +20,7 @@ import { orderService } from '@/api/order/service'
 import { PROPOSAL_QUERY_KEYS } from '@/api/proposal/query'
 import { proposalService } from '@/api/proposal/service'
 import type { EntityAttachment } from '@/api/schema'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow
-} from '@/components/ui/table'
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { formatBytes } from '@/helpers/formatters'
 import { type FileWithPreview, useFileUpload } from '@/hooks/use-file-upload'
 import { cn } from '@/lib/utils'
@@ -72,24 +62,24 @@ interface FileTypeInfo {
 
 const getFileTypeInfo = (type: string): FileTypeInfo => {
   if (type.startsWith('image/'))
-    return { label: 'Image', className: 'bg-purple-500/10 text-purple-600 dark:text-purple-400' }
+    return { label: 'Image', className: 'text-purple-600 bg-purple-500/10 dark:text-purple-400' }
   if (type.startsWith('video/'))
-    return { label: 'Video', className: 'bg-pink-500/10 text-pink-600 dark:text-pink-400' }
+    return { label: 'Video', className: 'text-pink-600 bg-pink-500/10 dark:text-pink-400' }
   if (type.startsWith('audio/'))
-    return { label: 'Audio', className: 'bg-orange-500/10 text-orange-600 dark:text-orange-400' }
+    return { label: 'Audio', className: 'text-orange-600 bg-orange-500/10 dark:text-orange-400' }
   if (type.includes('pdf'))
-    return { label: 'PDF', className: 'bg-red-500/10 text-red-600 dark:text-red-400' }
+    return { label: 'PDF', className: 'text-red-600 bg-red-500/10 dark:text-red-400' }
   if (type.includes('word') || type.includes('doc'))
-    return { label: 'Word', className: 'bg-blue-500/10 text-blue-600 dark:text-blue-400' }
+    return { label: 'Word', className: 'text-blue-600 bg-blue-500/10 dark:text-blue-400' }
   if (type.includes('excel') || type.includes('sheet'))
-    return { label: 'Excel', className: 'bg-green-500/10 text-green-600 dark:text-green-400' }
+    return { label: 'Excel', className: 'text-green-600 bg-green-500/10 dark:text-green-400' }
   if (type.includes('zip') || type.includes('rar'))
-    return { label: 'Archive', className: 'bg-amber-500/10 text-amber-600 dark:text-amber-400' }
+    return { label: 'Archive', className: 'text-amber-600 bg-amber-500/10 dark:text-amber-400' }
   if (type.includes('json'))
-    return { label: 'JSON', className: 'bg-yellow-500/10 text-yellow-600 dark:text-yellow-400' }
+    return { label: 'JSON', className: 'text-yellow-600 bg-yellow-500/10 dark:text-yellow-400' }
   if (type.includes('text'))
-    return { label: 'Text', className: 'bg-slate-500/10 text-slate-600 dark:text-slate-400' }
-  return { label: 'File', className: 'bg-gray-500/10 text-gray-600 dark:text-gray-400' }
+    return { label: 'Text', className: 'text-slate-600 bg-slate-500/10 dark:text-slate-400' }
+  return { label: 'File', className: 'text-gray-600 bg-gray-500/10 dark:text-gray-400' }
 }
 
 interface UploadingFile {
@@ -105,7 +95,7 @@ const uploadAttachment =
     return proposalService.uploadAttachment(autoid, file, projectId)
   }
 
-const deleteAttachment =
+const deleteAttachmentFn =
   (entityType: EntityAttachmentType) =>
   (autoid: string, attachmentId: number, projectId?: number | null) => {
     if (entityType === 'order')
@@ -191,7 +181,7 @@ export const EntityAttachments = forwardRef<EntityAttachmentsRef, EntityAttachme
         autoid: string
         type: EntityAttachmentType
       }) => {
-        await deleteAttachment(type)(autoid, attachmentId, projectId)
+        await deleteAttachmentFn(type)(autoid, attachmentId, projectId)
         return attachmentId
       },
       onMutate: ({ attachmentId }) => {
@@ -296,69 +286,48 @@ export const EntityAttachments = forwardRef<EntityAttachmentsRef, EntityAttachme
     }))
 
     const showPendingFiles = mode === 'deferred' && pendingFiles.length > 0
-    const hasExistingOrUploading =
-      allAttachments.length > 0 || uploadingFiles.length > 0 || isLoading
 
     return (
-      <div className='space-y-3'>
-        <p className='text-muted-foreground text-xs font-medium tracking-wide uppercase'>
-          Attachments
-        </p>
-
+      <div>
+        {/* Drop zone */}
         <div
           className={cn(
-            'relative overflow-hidden rounded-xl border border-dashed p-4 text-center transition-colors',
+            'flex items-center justify-center gap-2 border-b px-5 py-3 transition-colors',
             isDragging
               ? 'border-primary bg-primary/5'
-              : 'border-muted-foreground/25 hover:border-muted-foreground/50'
+              : 'border-border'
           )}
           onDragEnter={handleDragEnter}
           onDragLeave={handleDragLeave}
           onDragOver={handleDragOver}
           onDrop={handleDrop}
         >
-          <input
-            {...getInputProps()}
-            className='sr-only'
-          />
-
-          <div className='flex flex-col items-center gap-2'>
-            <div
-              className={cn(
-                'bg-muted flex size-10 items-center justify-center rounded-full transition-colors',
-                isDragging ? 'border-primary bg-primary/10' : 'border-muted-foreground/25'
-              )}
+          <input {...getInputProps()} className='sr-only' />
+          <UploadIcon className='size-3.5 text-text-tertiary' />
+          <span className='text-[13px] text-text-secondary'>
+            Drop files here or{' '}
+            <button
+              type='button'
+              onClick={openFileDialog}
+              className='font-medium text-primary hover:underline'
             >
-              <UploadIcon className='text-muted-foreground size-4' />
-            </div>
-
-            <div className='space-y-1'>
-              <p className='text-sm'>
-                Drop files here or{' '}
-                <button
-                  type='button'
-                  onClick={openFileDialog}
-                  className='text-primary cursor-pointer underline-offset-4 hover:underline'
-                >
-                  browse files
-                </button>
-              </p>
-              <p className='text-muted-foreground text-xs'>Maximum file size: 10MB</p>
-            </div>
-          </div>
+              browse
+            </button>
+          </span>
+          <span className='text-[11px] text-text-quaternary'>Max 10MB</span>
         </div>
 
         {errors.length > 0 && (
-          <div className='bg-destructive/10 text-destructive flex items-start gap-2 rounded-lg p-3 text-sm'>
-            <CircleAlertIcon className='mt-0.5 size-4 shrink-0' />
-            <div className='space-y-1'>
+          <div className='flex items-start gap-2 border-b border-destructive/20 bg-destructive/5 px-5 py-2 text-[12px] text-destructive'>
+            <CircleAlertIcon className='mt-0.5 size-3.5 shrink-0' />
+            <div>
               {errors.map((error) => (
                 <p key={error}>{error}</p>
               ))}
               <button
                 type='button'
                 onClick={clearErrors}
-                className='text-destructive/80 hover:text-destructive text-xs underline'
+                className='mt-0.5 text-destructive/80 underline hover:text-destructive'
               >
                 Dismiss
               </button>
@@ -366,269 +335,164 @@ export const EntityAttachments = forwardRef<EntityAttachmentsRef, EntityAttachme
           </div>
         )}
 
-        {showPendingFiles && (
-          <div className='space-y-2'>
-            <p className='text-muted-foreground text-xs'>
-              {pendingFiles.length} file{pendingFiles.length > 1 ? 's' : ''} ready to upload
-            </p>
-            <div className='overflow-hidden rounded-xl border'>
-              <Table>
-                <TableHeader>
-                  <TableRow className='text-xs'>
-                    <TableHead className='h-8 ps-3'>Name</TableHead>
-                    <TableHead className='h-8 w-[100px]'>Type</TableHead>
-                    <TableHead className='h-8 w-[100px]'>Size</TableHead>
-                    <TableHead className='h-8 w-[80px]'>Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {pendingFiles.map((fileItem) => {
-                    const file = fileItem.file
-                    const fileName = file instanceof File ? file.name : file.name
-                    const fileType = file instanceof File ? file.type : file.type
-                    const fileSize = file instanceof File ? file.size : file.size
-
-                    return (
-                      <TableRow key={fileItem.id}>
-                        <TableCell className='py-1.5 ps-3'>
-                          <TooltipProvider>
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <div className='flex min-w-0 items-center gap-2'>
-                                  <span className='text-muted-foreground/80 shrink-0'>
-                                    {getFileIcon(fileType)}
-                                  </span>
-                                  <span className='truncate text-sm font-medium'>{fileName}</span>
-                                  <Badge
-                                    variant='outline'
-                                    className='text-primary border-primary/30 bg-primary/5 shrink-0 text-xs'
-                                  >
-                                    New
-                                  </Badge>
-                                </div>
-                              </TooltipTrigger>
-                              <TooltipContent>{fileName}</TooltipContent>
-                            </Tooltip>
-                          </TooltipProvider>
-                        </TableCell>
-                        <TableCell className='w-[100px] py-1.5'>
-                          {(() => {
-                            const typeInfo = getFileTypeInfo(fileType)
-                            return (
-                              <Badge className={cn('text-xs', typeInfo.className)}>
-                                {typeInfo.label}
-                              </Badge>
-                            )
-                          })()}
-                        </TableCell>
-                        <TableCell className='text-muted-foreground w-[100px] py-1.5 text-sm'>
-                          {formatBytes(fileSize)}
-                        </TableCell>
-                        <TableCell className='w-[80px] py-1.5'>
-                          <TooltipProvider>
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <Button
-                                  type='button'
-                                  onClick={() => removeFile(fileItem.id)}
-                                  variant='ghost'
-                                  size='icon'
-                                  className='size-7'
-                                >
-                                  <Trash2Icon className='size-3.5' />
-                                </Button>
-                              </TooltipTrigger>
-                              <TooltipContent>Remove</TooltipContent>
-                            </Tooltip>
-                          </TooltipProvider>
-                        </TableCell>
-                      </TableRow>
-                    )
-                  })}
-                </TableBody>
-              </Table>
+        {/* File list */}
+        <div>
+          {/* Loading skeleton */}
+          {isLoading && (
+            <div>
+              {[1, 2].map((i) => (
+                <div key={i} className='flex items-center gap-3 border-b border-border-light px-5 py-2.5'>
+                  <Skeleton className='size-8 shrink-0 rounded-[6px]' />
+                  <div className='min-w-0 flex-1'>
+                    <Skeleton className='mb-1 h-3.5 w-40' />
+                    <Skeleton className='h-3 w-20' />
+                  </div>
+                </div>
+              ))}
             </div>
-          </div>
-        )}
+          )}
 
-        {hasExistingOrUploading && (
-          <div className='overflow-hidden rounded-xl border'>
-            <Table>
-              <TableHeader>
-                <TableRow className='text-xs'>
-                  <TableHead className='h-8 ps-3'>Name</TableHead>
-                  <TableHead className='h-8 w-[100px]'>Type</TableHead>
-                  <TableHead className='h-8 w-[100px]'>Size</TableHead>
-                  <TableHead className='h-8 w-[100px]'>Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {isLoading && (
-                  <>
-                    {['skeleton-row-1', 'skeleton-row-2'].map((skeletonId) => (
-                      <TableRow key={skeletonId}>
-                        <TableCell className='py-1.5 ps-3'>
-                          <div className='flex items-center gap-2'>
-                            <Skeleton className='size-4 shrink-0' />
-                            <Skeleton className='h-4 w-32' />
-                          </div>
-                        </TableCell>
-                        <TableCell className='w-[100px] py-1.5'>
-                          <Skeleton className='h-5 w-14' />
-                        </TableCell>
-                        <TableCell className='w-[100px] py-1.5'>
-                          <Skeleton className='h-4 w-16' />
-                        </TableCell>
-                        <TableCell className='w-[100px] py-1.5'>
-                          <div className='flex items-center gap-1'>
-                            <Skeleton className='size-7' />
-                            <Skeleton className='size-7' />
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </>
-                )}
+          {/* Uploading files */}
+          {uploadingFiles.map((file) => (
+            <div
+              key={file.id}
+              className='flex items-center gap-3 border-b border-border-light px-5 py-2.5'
+            >
+              <div className='flex size-8 shrink-0 items-center justify-center rounded-[6px] bg-bg-secondary text-text-tertiary'>
+                {getFileIcon(file.type)}
+              </div>
+              <div className='min-w-0 flex-1'>
+                <div className='flex items-center gap-2'>
+                  <span className='truncate text-[13px] font-medium text-text-secondary'>{file.name}</span>
+                  <span className='inline-flex shrink-0 items-center gap-1 rounded-full bg-bg-secondary px-1.5 py-px text-[10px] font-medium text-text-tertiary'>
+                    <Loader2 className='size-2.5 animate-spin' />
+                    Uploading
+                  </span>
+                </div>
+                <div className='text-[11px] text-text-quaternary'>{formatBytes(file.size)}</div>
+              </div>
+            </div>
+          ))}
 
-                {!isLoading &&
-                  uploadingFiles.map((file) => (
-                    <TableRow
-                      key={file.id}
-                      className='animate-pulse'
+          {/* Pending files (deferred mode) */}
+          {showPendingFiles &&
+            pendingFiles.map((fileItem) => {
+              const file = fileItem.file
+              const fileName = file instanceof File ? file.name : file.name
+              const fileType = file instanceof File ? file.type : file.type
+              const fileSize = file instanceof File ? file.size : file.size
+              const typeInfo = getFileTypeInfo(fileType)
+
+              return (
+                <div
+                  key={fileItem.id}
+                  className='group/file flex items-center gap-3 border-b border-border-light px-5 py-2.5 transition-colors hover:bg-bg-hover'
+                >
+                  <div className='flex size-8 shrink-0 items-center justify-center rounded-[6px] bg-bg-secondary text-text-tertiary'>
+                    {getFileIcon(fileType)}
+                  </div>
+                  <div className='min-w-0 flex-1'>
+                    <div className='flex items-center gap-2'>
+                      <span className='truncate text-[13px] font-medium text-foreground'>{fileName}</span>
+                      <span className={cn(
+                        'shrink-0 rounded px-1.5 py-px text-[10px] font-semibold',
+                        typeInfo.className
+                      )}>
+                        {typeInfo.label}
+                      </span>
+                      <span className='shrink-0 rounded border border-primary/30 bg-primary/5 px-1.5 py-px text-[10px] font-semibold text-primary'>
+                        New
+                      </span>
+                    </div>
+                    <div className='text-[11px] text-text-quaternary'>{formatBytes(fileSize)}</div>
+                  </div>
+                  <button
+                    type='button'
+                    onClick={() => removeFile(fileItem.id)}
+                    className='hidden size-6 shrink-0 items-center justify-center rounded-[4px] text-text-quaternary transition-colors hover:bg-bg-active hover:text-destructive group-hover/file:inline-flex'
+                  >
+                    <Trash2Icon className='size-3' />
+                  </button>
+                </div>
+              )
+            })}
+
+          {/* Existing attachments */}
+          {!isLoading &&
+            allAttachments.map((attachment) => {
+              const isDeleting = deletingIds.has(attachment.id)
+              if (!entityId) return null
+              const typeInfo = getFileTypeInfo(attachment.file_type)
+
+              return (
+                <div
+                  key={attachment.id}
+                  className={cn(
+                    'group/file flex items-center gap-3 border-b border-border-light px-5 py-2.5 transition-colors hover:bg-bg-hover',
+                    isDeleting && 'opacity-40 pointer-events-none',
+                  )}
+                >
+                  <div className='flex size-8 shrink-0 items-center justify-center rounded-[6px] bg-bg-secondary text-text-tertiary'>
+                    {getFileIcon(attachment.file_type)}
+                  </div>
+                  <div className='min-w-0 flex-1'>
+                    <div className='flex items-center gap-2'>
+                      <span className='truncate text-[13px] font-medium text-foreground' title={attachment.file_name}>
+                        {attachment.file_name}
+                      </span>
+                      <span className={cn(
+                        'shrink-0 rounded px-1.5 py-px text-[10px] font-semibold',
+                        typeInfo.className
+                      )}>
+                        {typeInfo.label}
+                      </span>
+                    </div>
+                    <div className='text-[11px] text-text-quaternary'>{formatBytes(attachment.file_size)}</div>
+                  </div>
+
+                  <div className='hidden shrink-0 items-center gap-0.5 group-hover/file:flex'>
+                    <a
+                      href={attachment.download_url}
+                      download={attachment.file_name}
+                      target='_blank'
+                      rel='noopener noreferrer'
+                      className='inline-flex size-6 items-center justify-center rounded-[4px] text-text-quaternary transition-colors hover:bg-bg-active hover:text-foreground'
                     >
-                      <TableCell className='py-1.5 ps-3'>
-                        <div className='flex min-w-0 items-center gap-2'>
-                          <span className='text-muted-foreground/80 shrink-0'>
-                            {getFileIcon(file.type)}
-                          </span>
-                          <span className='text-muted-foreground truncate text-sm font-medium'>
-                            {file.name}
-                          </span>
-                          <Badge
-                            variant='secondary'
-                            className='shrink-0 gap-1 text-xs'
-                          >
-                            <LoaderIcon className='size-3 animate-spin' />
-                            Uploading
-                          </Badge>
-                        </div>
-                      </TableCell>
-                      <TableCell className='w-[100px] py-1.5'>
-                        <Skeleton className='h-5 w-14' />
-                      </TableCell>
-                      <TableCell className='w-[100px] py-1.5'>
-                        <Skeleton className='h-4 w-16' />
-                      </TableCell>
-                      <TableCell className='w-[100px] py-1.5'>
-                        <Skeleton className='size-7' />
-                      </TableCell>
-                    </TableRow>
-                  ))}
+                      <DownloadIcon className='size-3' />
+                    </a>
+                    <button
+                      type='button'
+                      onClick={() =>
+                        deleteMutation.mutate({
+                          attachmentId: attachment.id,
+                          autoid: entityId,
+                          type: entityType
+                        })
+                      }
+                      disabled={isDeleting}
+                      className='inline-flex size-6 items-center justify-center rounded-[4px] text-text-quaternary transition-colors hover:bg-bg-active hover:text-destructive'
+                    >
+                      {isDeleting ? (
+                        <Loader2 className='size-3 animate-spin' />
+                      ) : (
+                        <Trash2Icon className='size-3' />
+                      )}
+                    </button>
+                  </div>
+                </div>
+              )
+            })}
 
-                {!isLoading &&
-                  allAttachments.map((attachment) => {
-                    const isDeleting = deletingIds.has(attachment.id)
-                    if (!entityId) return null
-
-                    return (
-                      <TableRow
-                        key={attachment.id}
-                        className={cn(isDeleting && 'opacity-50')}
-                      >
-                        <TableCell className='py-1.5 ps-3'>
-                          <TooltipProvider>
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <div className='flex min-w-0 items-center gap-2'>
-                                  <span className='text-muted-foreground/80 shrink-0'>
-                                    {getFileIcon(attachment.file_type)}
-                                  </span>
-                                  <span className='truncate text-sm font-medium'>
-                                    {attachment.file_name}
-                                  </span>
-                                </div>
-                              </TooltipTrigger>
-                              <TooltipContent>{attachment.file_name}</TooltipContent>
-                            </Tooltip>
-                          </TooltipProvider>
-                        </TableCell>
-                        <TableCell className='w-[100px] py-1.5'>
-                          {(() => {
-                            const typeInfo = getFileTypeInfo(attachment.file_type)
-                            return (
-                              <Badge className={cn('text-xs', typeInfo.className)}>
-                                {typeInfo.label}
-                              </Badge>
-                            )
-                          })()}
-                        </TableCell>
-                        <TableCell className='text-muted-foreground w-[100px] py-1.5 text-sm'>
-                          {formatBytes(attachment.file_size)}
-                        </TableCell>
-                        <TableCell className='w-[100px] py-1.5'>
-                          <div className='flex items-center gap-1'>
-                            <TooltipProvider>
-                              <Tooltip>
-                                <TooltipTrigger asChild>
-                                  <Button
-                                    size='icon'
-                                    variant='ghost'
-                                    className='size-7'
-                                    disabled={isDeleting}
-                                    asChild
-                                  >
-                                    <a
-                                      href={attachment.download_url}
-                                      download={attachment.file_name}
-                                      target='_blank'
-                                      rel='noopener noreferrer'
-                                    >
-                                      <DownloadIcon className='size-3.5' />
-                                    </a>
-                                  </Button>
-                                </TooltipTrigger>
-                                <TooltipContent>Download</TooltipContent>
-                              </Tooltip>
-                            </TooltipProvider>
-                            <TooltipProvider>
-                              <Tooltip>
-                                <TooltipTrigger asChild>
-                                  <Button
-                                    type='button'
-                                    onClick={() =>
-                                      deleteMutation.mutate({
-                                        attachmentId: attachment.id,
-                                        autoid: entityId,
-                                        type: entityType
-                                      })
-                                    }
-                                    variant='ghost'
-                                    size='icon'
-                                    className='size-7'
-                                    disabled={isDeleting}
-                                  >
-                                    {isDeleting ? (
-                                      <LoaderIcon className='size-3.5 animate-spin' />
-                                    ) : (
-                                      <Trash2Icon className='size-3.5' />
-                                    )}
-                                  </Button>
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                  {isDeleting ? 'Deleting...' : 'Delete'}
-                                </TooltipContent>
-                              </Tooltip>
-                            </TooltipProvider>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    )
-                  })}
-              </TableBody>
-            </Table>
-          </div>
-        )}
+          {/* Empty state */}
+          {!isLoading && allAttachments.length === 0 && uploadingFiles.length === 0 && !showPendingFiles && (
+            <div className='flex flex-col items-center justify-center py-10 text-center'>
+              <Paperclip className='mb-2 size-5 text-text-quaternary' />
+              <p className='text-[13px] text-text-tertiary'>No attachments yet</p>
+            </div>
+          )}
+        </div>
       </div>
     )
   }
 )
+

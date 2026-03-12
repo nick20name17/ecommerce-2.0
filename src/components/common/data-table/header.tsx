@@ -18,7 +18,7 @@ export const DataTableHeader = <TData,>({
   const widthPercent = fitWidth ? `${100 / colCount}%` : undefined
 
   return (
-    <TableHeader className={cn('bg-muted border-border sticky top-0 z-10 border-b')}>
+    <TableHeader className={cn('bg-bg-secondary/60 border-border sticky top-0 z-10 border-b')}>
       {table?.getHeaderGroups()?.map((headerGroup) => (
         <TableRow
           className='border-none'
@@ -37,7 +37,7 @@ export const DataTableHeader = <TData,>({
             return (
               <TableHead
                 style={style}
-                className='border-border text-muted-foreground border-b text-xs font-medium tracking-wider uppercase'
+                className='border-border text-text-tertiary border-b text-[13px] font-medium first:pl-6 last:pr-6'
                 key={header.id}
               >
                 {header.isPlaceholder

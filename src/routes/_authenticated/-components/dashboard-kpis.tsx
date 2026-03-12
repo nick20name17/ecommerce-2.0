@@ -1,183 +1,104 @@
-import { ArrowDownRight, ArrowUpRight, FileText, Minus, Package, ShoppingCart } from 'lucide-react'
+import { ArrowDownRight, ArrowUpRight, Minus } from 'lucide-react'
 
 import type { DashboardMetrics } from '@/api/dashboard/schema'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { formatCurrency } from '@/helpers/formatters'
 import { cn } from '@/lib/utils'
-
-// TEMPORARY: used by commented financial KPIs
-// import type { DashboardFinancialTotal } from '@/api/dashboard/schema'
-// import { formatCurrency } from '@/helpers/formatters'
-// const formatCurrencyInteger = (value: number) =>
-//   formatCurrency(value, '$0', { minimumFractionDigits: 0, maximumFractionDigits: 0 })
-// function getFinancial(metrics: DashboardMetrics): DashboardFinancialTotal {
-//   return metrics.sales_total_field === 'total' ? metrics.total : metrics.sub_total
-// }
 
 interface DashboardKpisProps {
   metrics: DashboardMetrics
 }
 
-const defaultTrendFormat = (n: number) => String(n)
-
-const TrendIndicator = ({
-  current,
-  previous,
-  format = defaultTrendFormat,
-  invert = false
-}: {
-  current: number
-  previous: number
-  format?: (n: number) => string
-  invert?: boolean
-}) => {
-  if (previous === 0) return <span className='text-muted-foreground text-xs'>—</span>
-  const direction = current > previous ? 'up' : current < previous ? 'down' : 'same'
-  const positive = invert ? direction === 'down' : direction === 'up'
-  const Icon = direction === 'up' ? ArrowUpRight : direction === 'down' ? ArrowDownRight : Minus
-  const pct = Math.round((Math.abs(current - previous) / previous) * 100)
-
-  return (
-    <span
-      className={cn(
-        'inline-flex items-center gap-0.5 text-xs font-medium tabular-nums',
-        direction === 'same' && 'text-muted-foreground',
-        direction !== 'same' && positive && 'text-green-600 dark:text-green-400',
-        direction !== 'same' && !positive && 'text-destructive'
-      )}
-    >
-      <Icon className='size-3.5 shrink-0' />
-      {direction !== 'same' ? `${pct}% vs ${format(previous)}` : 'No change'}
-    </span>
-  )
-}
-
 const KPI_CONFIG = [
   {
     key: 'orders',
-    title: 'Total orders',
-    description: 'Current month',
-    icon: ShoppingCart,
+    title: 'Orders',
     value: (m: DashboardMetrics) => m.total_order_count,
-    secondary: (m: DashboardMetrics) => `Last month: ${m.last_month_order_count}`,
     format: (n: number) => String(n),
-    showTrend: false,
-    colSpan: 'sm:col-span-1'
+    prev: (m: DashboardMetrics) => m.last_month_order_count,
   },
-  // TEMPORARY: financial KPIs hidden
-  // {
-  //   key: 'sales',
-  //   title: 'Total sales',
-  //   description: 'Current month',
-  //   icon: DollarSign,
-  //   value: (m: DashboardMetrics) => getFinancial(m).total_sales,
-  //   secondary: (m: DashboardMetrics) =>
-  //     `Last month: ${formatCurrencyInteger(getFinancial(m).last_month_total_sales)}`,
-  //   format: formatCurrencyInteger,
-  //   showTrend: false,
-  //   colSpan: 'sm:col-span-1'
-  // },
-  // {
-  //   key: 'aov',
-  //   title: 'Average order value',
-  //   description: 'Current vs last month',
-  //   icon: TrendingUp,
-  //   value: (m: DashboardMetrics) => getFinancial(m).average_order_value,
-  //   format: formatCurrencyInteger,
-  //   showTrend: true,
-  //   trend: (m: DashboardMetrics) => ({
-  //     current: getFinancial(m).average_order_value,
-  //     previous: getFinancial(m).last_month_average_order_value
-  //   }),
-  //   colSpan: 'sm:col-span-1'
-  // },
   {
     key: 'unprocessed',
-    title: 'Unprocessed orders',
-    description: 'Require action',
-    icon: Package,
+    title: 'Unprocessed',
     value: (m: DashboardMetrics) => m.unprocessed_orders,
     format: (n: number) => String(n),
-    showTrend: false,
-    colSpan: 'sm:col-span-1'
+    prev: null,
   },
   {
     key: 'pending',
-    title: 'Pending invoices',
-    description: 'Count',
-    icon: FileText,
+    title: 'Pending Invoices',
     value: (m: DashboardMetrics) => m.pending_invoices,
     format: (n: number) => String(n),
-    showTrend: false,
-    colSpan: 'sm:col-span-1'
-  }
-  // TEMPORARY: financial KPIs hidden
-  // {
-  //   key: 'outstanding',
-  //   title: 'Outstanding',
-  //   description: 'Invoice balance',
-  //   icon: Receipt,
-  //   value: (m: DashboardMetrics) => getFinancial(m).outstanding_invoices,
-  //   format: formatCurrencyInteger,
-  //   showTrend: false,
-  //   colSpan: 'sm:col-span-1'
-  // }
+    prev: null,
+  },
+  {
+    key: 'totalSales',
+    title: 'Total Sales',
+    value: (m: DashboardMetrics) => m.total.total_sales,
+    format: (n: number) => formatCurrency(n),
+    prev: (m: DashboardMetrics) => m.total.last_month_total_sales,
+    hidden: true,
+  },
+  {
+    key: 'avgOrder',
+    title: 'Avg Order',
+    value: (m: DashboardMetrics) => m.total.average_order_value,
+    format: (n: number) => formatCurrency(n),
+    prev: (m: DashboardMetrics) => m.total.last_month_average_order_value,
+    hidden: true,
+  },
+  {
+    key: 'outstanding',
+    title: 'Outstanding',
+    value: (m: DashboardMetrics) => m.total.outstanding_invoices,
+    format: (n: number) => formatCurrency(n),
+    prev: null,
+    hidden: true,
+  },
 ] as const
+
+function getChange(current: number, previous: number): { pct: number; direction: 'up' | 'down' | 'same' } | null {
+  if (previous === 0) return null
+  const pct = Math.round(((current - previous) / previous) * 100)
+  const direction = pct > 0 ? 'up' : pct < 0 ? 'down' : 'same'
+  return { pct, direction }
+}
 
 export const DashboardKpis = ({ metrics }: DashboardKpisProps) => {
   return (
-    <div className='grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3'>
+    <div className='grid min-w-0 grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6'>
       {KPI_CONFIG.map((config) => {
-        const Icon = config.icon
         const value = config.value(metrics)
-        const format = config.format
-        const trendConfig =
-          config.showTrend && 'trend' in config
-            ? (config.trend as (m: DashboardMetrics) => { current: number; previous: number })(
-                metrics
-              )
-            : null
-        const secondary =
-          'secondary' in config && typeof config.secondary === 'function'
-            ? config.secondary(metrics)
-            : null
+        const prev = config.prev ? config.prev(metrics) : null
+        const change = prev != null ? getChange(value, prev) : null
 
         return (
-          <Card
+          <div
             key={config.key}
-            className={cn(
-              'dark:hover:ring-border min-w-0 overflow-hidden transition-shadow duration-200 hover:shadow-md dark:hover:shadow-none dark:hover:ring-1',
-              config.colSpan
-            )}
+            className='rounded-[8px] border border-border bg-background px-4 py-4'
           >
-            <CardHeader className='flex flex-row items-start justify-between gap-3 pb-2'>
-              <div className='space-y-1'>
-                <CardTitle className='text-muted-foreground flex items-center gap-2 text-sm font-medium'>
-                  <span className='bg-primary/10 text-primary flex size-8 items-center justify-center rounded-lg'>
-                    <Icon className='size-4' />
-                  </span>
-                  {config.title}
-                </CardTitle>
-                <CardDescription>{config.description}</CardDescription>
-              </div>
-            </CardHeader>
-            <CardContent className='min-w-0 pt-0'>
-              <div className='min-w-0 text-2xl font-semibold tracking-tight wrap-break-word tabular-nums'>
-                {format(value)}
-              </div>
-              {trendConfig && (
-                <div className='mt-1.5'>
-                  <TrendIndicator
-                    current={trendConfig.current}
-                    previous={trendConfig.previous}
-                    format={format}
-                  />
-                </div>
-              )}
-              {secondary && !trendConfig && (
-                <p className='text-muted-foreground mt-1.5 text-xs'>{secondary}</p>
-              )}
-            </CardContent>
-          </Card>
+            <div className='text-[12px] font-medium uppercase tracking-[0.04em] text-text-tertiary'>
+              {config.title}
+            </div>
+            <div className='mt-1.5 truncate text-[20px] font-semibold tabular-nums leading-none tracking-tight'>
+              {'hidden' in config && config.hidden ? '—' : config.format(value)}
+            </div>
+            {change && !('hidden' in config && config.hidden) && (
+              <span
+                className={cn(
+                  'mt-1.5 inline-flex items-center gap-0.5 text-[11px] font-medium tabular-nums leading-none',
+                  change.direction === 'up' && 'text-green-600 dark:text-green-400',
+                  change.direction === 'down' && 'text-destructive',
+                  change.direction === 'same' && 'text-text-tertiary'
+                )}
+              >
+                {change.direction === 'up' && <ArrowUpRight className='size-3' />}
+                {change.direction === 'down' && <ArrowDownRight className='size-3' />}
+                {change.direction === 'same' && <Minus className='size-3' />}
+                {change.direction === 'same' ? '0%' : `${Math.abs(change.pct)}%`}
+                <span className='text-text-tertiary'> vs last mo</span>
+              </span>
+            )}
+          </div>
         )
       })}
     </div>

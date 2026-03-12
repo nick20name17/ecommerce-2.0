@@ -75,13 +75,13 @@ export const Pagination = ({ totalCount }: PaginationProps) => {
 
   return (
     <div className='flex items-center justify-between'>
-      <p className='text-muted-foreground text-sm'>
+      <p className='text-text-tertiary text-sm'>
         {rangeStart}–{rangeEnd} of {totalCount}
       </p>
 
       <div className='flex items-center gap-3'>
         <div className='flex items-center gap-1.5'>
-          <span className='text-muted-foreground text-sm'>Rows</span>
+          <span className='text-text-tertiary text-sm'>Rows</span>
           <Select
             value={String(limit)}
             onValueChange={handleLimitChange}

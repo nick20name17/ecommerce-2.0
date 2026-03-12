@@ -1,7 +1,7 @@
-import { AlertCircle, Check, ImageIcon, RotateCcw, Sparkles } from 'lucide-react'
+import { AlertCircle, Check, ChevronDown, ImageIcon, RotateCcw } from 'lucide-react'
+import { useState } from 'react'
 
 import type { Configuration } from '@/api/product/schema'
-import { Button } from '@/components/ui/button'
 import { Spinner } from '@/components/ui/spinner'
 import { formatCurrency } from '@/helpers/formatters'
 import { cn } from '@/lib/utils'
@@ -19,8 +19,6 @@ interface ProductConfigurationsProps {
 
 export const ProductConfigurations = ({
   configs,
-  activeTab,
-  onActiveTabChange,
   onSelectConfigItem,
   onResetConfigurations,
   hasUncheckedRequired,
@@ -28,149 +26,188 @@ export const ProductConfigurations = ({
   totalConfigCount
 }: ProductConfigurationsProps) => {
   return (
-    <div className='bg-muted/20 space-y-4 rounded-xl border p-4'>
-      <div className='flex items-center justify-between'>
+    <div className='flex h-full flex-col overflow-hidden'>
+      {/* Header */}
+      <div className='flex shrink-0 items-center justify-between border-b border-border px-4 py-2'>
         <div className='flex items-center gap-2'>
-          <Sparkles className='text-primary size-4' />
-          <h3 className='text-sm font-semibold'>Configurations</h3>
-          <span className='text-muted-foreground text-xs'>
-            ({selectedConfigCount}/{totalConfigCount})
+          <span className='text-[13px] font-semibold'>Configurations</span>
+          <span className='text-[12px] tabular-nums text-text-tertiary'>
+            {selectedConfigCount} of {totalConfigCount} selected
           </span>
         </div>
         <div className='flex items-center gap-2'>
-          {selectedConfigCount > 0 && onResetConfigurations && (
-            <Button
-              type='button'
-              variant='ghost'
-              size='sm'
-              className='text-muted-foreground h-8 gap-1.5 text-xs'
-              onClick={onResetConfigurations}
-            >
-              <RotateCcw className='size-3.5' />
-              Reset
-            </Button>
-          )}
           {hasUncheckedRequired && (
-            <span className='bg-destructive/10 text-destructive flex items-center gap-1.5 rounded-md px-2 py-1 text-xs font-medium'>
-              <AlertCircle className='size-3' />
+            <span className='flex items-center gap-1 rounded-[4px] bg-destructive/10 px-1.5 py-0.5 text-[11px] font-semibold text-destructive'>
+              <AlertCircle className='size-2.5' />
               Required
             </span>
+          )}
+          {selectedConfigCount > 0 && onResetConfigurations && (
+            <button
+              type='button'
+              className='flex items-center gap-1 rounded-[5px] px-2 py-1 text-[12px] font-medium text-text-tertiary transition-colors duration-[80ms] hover:bg-bg-hover hover:text-foreground'
+              onClick={onResetConfigurations}
+            >
+              <RotateCcw className='size-3' />
+              Reset
+            </button>
           )}
         </div>
       </div>
 
-      <div className='bg-muted flex flex-wrap gap-1 rounded-lg p-1'>
-        {configs.map((c) => {
-          const hasSelected = c.items.some((i) => i.active)
-          const isRequired = !c.allownone
-          const isActive = activeTab === c.name
-          return (
-            <button
-              key={c.name}
-              type='button'
-              className={cn(
-                'flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-all',
-                isActive
-                  ? 'bg-background text-foreground shadow-sm'
-                  : 'text-muted-foreground hover:text-foreground'
-              )}
-              onClick={() => onActiveTabChange(c.name)}
-            >
-              {hasSelected && (
-                <span
-                  className={cn(
-                    'bg-primary flex size-4 items-center justify-center rounded-full text-white'
-                  )}
-                >
-                  <Check className='size-2.5' />
-                </span>
-              )}
-              <span>{c.name}</span>
-              {isRequired && !hasSelected && <span className='text-destructive'>*</span>}
-            </button>
-          )
-        })}
+      {/* All configuration groups — inline, no tabs */}
+      <div className='min-h-0 flex-1 overflow-y-auto'>
+        {configs.map((config) => (
+          <ConfigGroup
+            key={config.name}
+            config={config}
+            onSelect={(itemId) => onSelectConfigItem(config.name, itemId)}
+          />
+        ))}
       </div>
+    </div>
+  )
+}
 
-      {configs.map((c) => (
-        <div
-          key={c.name}
+// ── Config Group (collapsible section) ───────────────────────
+
+function ConfigGroup({
+  config,
+  onSelect,
+}: {
+  config: Configuration
+  onSelect: (itemId: string) => void
+}) {
+  const [collapsed, setCollapsed] = useState(false)
+  const hasSelected = config.items.some((i) => i.active)
+  const isRequired = !config.allownone
+  const selectedItem = config.items.find((i) => i.active)
+
+  return (
+    <div className='border-b border-border'>
+      {/* Group header */}
+      <button
+        type='button'
+        className='flex w-full items-center gap-2 px-4 py-2.5 text-left transition-colors duration-75 hover:bg-bg-hover/50'
+        onClick={() => setCollapsed(!collapsed)}
+      >
+        <ChevronDown
           className={cn(
-            'grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6',
-            activeTab !== c.name && 'hidden'
+            'size-3.5 shrink-0 text-text-tertiary transition-transform duration-150',
+            collapsed && '-rotate-90',
           )}
-        >
-          {c.items.map((item) => {
+        />
+        <span className='text-[13px] font-semibold'>{config.name}</span>
+        {isRequired && !hasSelected && (
+          <span className='text-[11px] font-medium text-destructive'>Required</span>
+        )}
+        {hasSelected && (
+          <>
+            <span className='flex size-3.5 items-center justify-center rounded-full bg-primary text-white'>
+              <Check className='size-2' />
+            </span>
+            <span className='truncate text-[12px] text-text-tertiary'>
+              {selectedItem?.descr_1}
+            </span>
+          </>
+        )}
+        <div className='flex-1' />
+        <span className='text-[12px] tabular-nums text-text-tertiary'>
+          {config.items.filter((i) => i.active).length}/{config.items.length}
+        </span>
+      </button>
+
+      {/* Items */}
+      {!collapsed && (
+        <div>
+          {config.items.map((item) => {
             const isSelected = item.active
+            const quanInt = Math.trunc(Number(item.quan))
+            const hasQuan =
+              item.quan != null &&
+              item.quan !== '' &&
+              !Number.isNaN(quanInt) &&
+              quanInt > 1
+            const price = Number(item.price)
+            const multiplier = hasQuan ? quanInt : 1
+            const totalPrice = price * multiplier
+            const photo = item.photos?.[0]
+
             return (
               <button
                 key={item.id}
                 type='button'
                 className={cn(
-                  'group relative flex flex-col overflow-hidden rounded-lg border transition-all',
-                  isSelected
-                    ? 'border-primary bg-primary/5 ring-primary ring-1'
-                    : 'border-border hover:border-primary/50'
+                  'flex w-full items-center gap-3 border-t border-border-light px-4 py-2 text-left transition-colors duration-75',
+                  isSelected ? 'bg-primary/5' : 'hover:bg-bg-hover/50',
                 )}
-                onClick={() => onSelectConfigItem(c.name, item.id)}
+                onClick={() => onSelect(item.id)}
               >
-                {(() => {
-                  const quanInt = Math.trunc(Number(item.quan))
-                  return item.quan != null && item.quan !== '' && !Number.isNaN(quanInt) && quanInt > 1 ? (
-                    <div className='bg-background/95 text-foreground absolute top-1.5 left-1.5 z-10 rounded border border-border px-1.5 py-0.5 text-[10px] font-medium shadow-sm'>
-                      {quanInt}x
-                    </div>
-                  ) : null
-                })()}
-                {isSelected && (
-                  <div className='bg-primary absolute top-1.5 right-1.5 z-10 flex size-5 items-center justify-center rounded-full text-white'>
-                    <Check className='size-3' />
-                  </div>
-                )}
-
-                <div className='bg-muted/30 relative aspect-square'>
-                  {c.photosLoading ? (
-                    <div className='flex size-full items-center justify-center'>
-                      <Spinner className='text-muted-foreground size-5' />
-                    </div>
-                  ) : item.photos?.length ? (
+                {/* Thumbnail */}
+                <div
+                  className={cn(
+                    'flex size-9 shrink-0 items-center justify-center overflow-hidden rounded-[5px] border',
+                    isSelected ? 'border-primary' : 'border-border',
+                  )}
+                >
+                  {config.photosLoading ? (
+                    <Spinner className='size-3 text-text-tertiary' />
+                  ) : photo ? (
                     <img
-                      src={item.photos[0]}
+                      src={photo}
                       alt={item.descr_1}
-                      className='size-full object-contain p-2 transition-transform group-hover:scale-105'
+                      className='size-full object-contain p-0.5'
                     />
                   ) : (
-                    <div className='flex size-full items-center justify-center'>
-                      <ImageIcon className='text-muted-foreground/40 size-8' />
-                    </div>
+                    <ImageIcon className='size-3.5 text-text-tertiary/40' />
                   )}
                 </div>
 
-                <div className='flex flex-1 flex-col gap-0.5 p-2'>
-                  <span className='text-muted-foreground line-clamp-2 text-left text-[11px] leading-tight wrap-break-word'>
-                    {item.descr_1}
-                  </span>
-                  <span
-                    className={cn(
-                      'mt-auto text-left text-xs font-semibold',
-                      isSelected && 'text-primary'
+                {/* Info */}
+                <div className='min-w-0 flex-1'>
+                  <div className='flex items-center gap-1.5'>
+                    <span
+                      className={cn(
+                        'truncate text-[13px] font-medium',
+                        isSelected ? 'text-foreground' : 'text-text-secondary',
+                      )}
+                    >
+                      {item.descr_1}
+                    </span>
+                    {hasQuan && (
+                      <span className='shrink-0 rounded-[3px] border border-border bg-bg-secondary px-1 py-px text-[11px] font-medium tabular-nums'>
+                        {quanInt}×
+                      </span>
                     )}
-                  >
-                    +{formatCurrency(
-                      (() => {
-                        const price = Number(item.price)
-                        const qty = Math.trunc(Number(item.quan))
-                        const multiplier = !Number.isNaN(qty) && qty > 0 ? qty : 1
-                        return price * multiplier
-                      })()
-                    )}
-                  </span>
+                  </div>
+                </div>
+
+                {/* Price */}
+                <span
+                  className={cn(
+                    'shrink-0 text-[13px] font-medium tabular-nums',
+                    isSelected ? 'text-primary' : 'text-text-tertiary',
+                  )}
+                >
+                  +{formatCurrency(totalPrice)}
+                </span>
+
+                {/* Checkbox */}
+                <div
+                  className={cn(
+                    'flex size-[18px] shrink-0 items-center justify-center rounded-[4px] border transition-colors',
+                    isSelected
+                      ? 'border-primary bg-primary text-white'
+                      : 'border-border',
+                  )}
+                >
+                  {isSelected && <Check className='size-3' />}
                 </div>
               </button>
             )
           })}
         </div>
-      ))}
+      )}
     </div>
   )
 }

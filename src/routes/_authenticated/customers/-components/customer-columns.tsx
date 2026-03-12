@@ -6,7 +6,6 @@ import { MoreHorizontal, Pencil, Trash2, UserPlus } from 'lucide-react'
 import type { Customer } from '@/api/customer/schema'
 import type { FieldConfigResponse } from '@/api/field-config/schema'
 import { EntityNotesTrigger } from '@/components/common/entity-notes/entity-notes-trigger'
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -27,15 +26,9 @@ const CUSTOMER_FORMATTERS: Partial<Record<string, DynamicCellFormatter<Customer>
     v ? (
       <span className='block max-w-full truncate'>{formatPhone(String(v))}</span>
     ) : (
-      <span className='text-muted-foreground'>—</span>
+      <span className='text-text-tertiary'>—</span>
     ),
-  last_order_date: (v) => <span>{formatDate(v as string | null | undefined)}</span>,
-  inactive: (v) => {
-    const inactive = v === true
-    return (
-      <Badge variant={inactive ? 'outline' : 'success'}>{inactive ? 'Inactive' : 'Active'}</Badge>
-    )
-  }
+  last_order_date: (v) => <span>{formatDate(v as string | null | undefined)}</span>
 }
 
 interface CustomerColumnsOptions {

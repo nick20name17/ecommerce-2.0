@@ -67,12 +67,12 @@ export const ProfileInfoCard = ({ user }: ProfileInfoCardProps) => {
           <FieldGroup>
             <div className='grid grid-cols-2 gap-4'>
               <Field>
-                <FieldLabel className='text-muted-foreground text-xs'>Email</FieldLabel>
-                <p className='text-sm'>{user.email}</p>
+                <FieldLabel className='text-text-tertiary text-[13px]'>Email</FieldLabel>
+                <p className='text-[13px]'>{user.email}</p>
               </Field>
               <Field>
-                <FieldLabel className='text-muted-foreground text-xs'>Member Since</FieldLabel>
-                <p className='text-sm'>{formatDate(user.date_joined)}</p>
+                <FieldLabel className='text-text-tertiary text-[13px]'>Member Since</FieldLabel>
+                <p className='text-[13px]'>{formatDate(user.date_joined)}</p>
               </Field>
             </div>
 
@@ -111,7 +111,7 @@ export const ProfileInfoCard = ({ user }: ProfileInfoCardProps) => {
             />
 
             <Field>
-              <FieldLabel className='text-muted-foreground text-xs'>Role</FieldLabel>
+              <FieldLabel className='text-text-tertiary text-[13px]'>Role</FieldLabel>
               <div>
                 <RoleBadge role={user.role} />
               </div>
@@ -119,8 +119,8 @@ export const ProfileInfoCard = ({ user }: ProfileInfoCardProps) => {
 
             {user.project ? (
               <Field>
-                <FieldLabel className='text-muted-foreground text-xs'>Project</FieldLabel>
-                <p className='text-sm'>{user.project_name || `Project #${user.project}`}</p>
+                <FieldLabel className='text-text-tertiary text-[13px]'>Project</FieldLabel>
+                <p className='text-[13px]'>{user.project_name || `Project #${user.project}`}</p>
               </Field>
             ) : null}
           </FieldGroup>

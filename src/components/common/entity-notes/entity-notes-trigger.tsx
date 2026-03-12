@@ -39,7 +39,7 @@ export const EntityNotesTrigger = ({
       aria-label={`Open notes for ${entityType} ${autoid}`}
     >
       <StickyNote className='size-3.5' />
-      <span className='text-xs'>Notes</span>
+      <span className='text-[13px]'>Notes</span>
     </Button>
   )
 }

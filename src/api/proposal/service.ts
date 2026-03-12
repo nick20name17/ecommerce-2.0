@@ -2,7 +2,7 @@ import { api } from '..'
 
 import type { EntityAssignRequest, EntityAssignmentResponse, EntityAttachment } from '../schema'
 
-import type { Proposal, ProposalParams, ProposalResponse } from './schema'
+import type { Proposal, ProposalParams, ProposalResponse, ToOrderResponse } from './schema'
 
 const proposalParams = (projectId?: number | null) =>
   projectId != null ? { project_id: projectId } : {}
@@ -24,7 +24,7 @@ export const proposalService = {
     })
   },
   toOrder: async (autoid: string, projectId: number) => {
-    const { data } = await api.post(`/data/proposals/${autoid}/to-order/`, null, {
+    const { data } = await api.post<ToOrderResponse>(`/data/proposals/${autoid}/to-order/`, null, {
       params: { project_id: projectId }
     })
     return data

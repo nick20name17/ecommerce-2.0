@@ -100,7 +100,7 @@ export const getProjectColumns = ({
       return (
         <Tooltip>
           <TooltipTrigger asChild>
-            <span className='text-muted-foreground block max-w-full truncate'>{host}</span>
+            <span className='text-text-tertiary block max-w-full truncate'>{host}</span>
           </TooltipTrigger>
           <TooltipContent>{host}</TooltipContent>
         </Tooltip>

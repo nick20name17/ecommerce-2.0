@@ -1,6 +1,8 @@
 import { keepPreviousData, useQueries, useQuery } from '@tanstack/react-query'
 import { createFileRoute, redirect } from '@tanstack/react-router'
-import { FolderKanban, Plus } from 'lucide-react'
+import { Plus, Search } from 'lucide-react'
+
+import { IProjects, PAGE_COLORS, PageHeaderIcon } from '@/components/ds'
 import { useState } from 'react'
 
 import { ProjectDeleteDialog } from './-components/project-delete-dialog'
@@ -9,13 +11,12 @@ import { ProjectsDataTable } from './-components/projects-data-table'
 import { getProjectHealthQuery, getProjectsQuery } from '@/api/project/query'
 import type { Project, ProjectParams, ProjectWithHealthLoading } from '@/api/project/schema'
 import { Pagination } from '@/components/common/filters/pagination'
-import { SearchFilter } from '@/components/common/filters/search'
-import { Button } from '@/components/ui/button'
 import { isSuperAdmin } from '@/constants/user'
 import type { UserRole } from '@/constants/user'
 import { getSession } from '@/helpers/auth'
 import { useOrdering } from '@/hooks/use-ordering'
 import { useLimitParam, useOffsetParam, useSearchParam } from '@/hooks/use-query-params'
+import { useDebouncedCallback } from 'use-debounce'
 
 const mergeHealthIntoProjects = (
   projects: Project[],
@@ -68,7 +69,8 @@ const mergeHealthIntoProjects = (
 }
 
 const ProjectsPage = () => {
-  const [search] = useSearchParam()
+  const [search, setSearch] = useSearchParam()
+  const handleSearch = useDebouncedCallback((value: string) => setSearch(value || null), 300)
   const [offset] = useOffsetParam()
   const [limit] = useLimitParam()
   const { sorting, setSorting, ordering } = useOrdering()
@@ -108,40 +110,49 @@ const ProjectsPage = () => {
   const editingProjectId = typeof modalProject === 'number' ? modalProject : null
 
   return (
-    <div className='flex h-full flex-col gap-5'>
-      <header className='flex items-start justify-between'>
-        <div className='flex items-center gap-3'>
-          <div className='bg-primary/10 text-primary flex size-10 items-center justify-center rounded-lg'>
-            <FolderKanban className='size-5' />
-          </div>
-          <div>
-            <h1 className='text-2xl font-semibold tracking-tight'>Projects</h1>
-            <p className='text-muted-foreground text-sm'>{data?.count ?? 0} total</p>
-          </div>
+    <div className='flex h-full flex-col overflow-hidden'>
+      <header className='flex h-12 shrink-0 items-center gap-2.5 border-b border-border px-6'>
+        <div className='flex items-center gap-1.5'>
+          <PageHeaderIcon icon={IProjects} color={PAGE_COLORS.projects} />
+          <h1 className='text-[14px] font-semibold tracking-[-0.01em]'>Projects</h1>
         </div>
-        <Button
+
+        <div className='flex-1' />
+
+        <div className='hidden h-7 w-[260px] items-center gap-1.5 rounded-[5px] border border-border bg-background px-2 transition-[border-color,box-shadow] focus-within:border-ring focus-within:ring-2 focus-within:ring-ring/50 sm:flex'>
+          <Search className='size-3 shrink-0 text-text-tertiary' />
+          <input
+            defaultValue={search}
+            onChange={(e) => handleSearch(e.target.value)}
+            placeholder='Search projects...'
+            className='flex-1 bg-transparent text-[13px] outline-none placeholder:text-text-tertiary'
+          />
+        </div>
+
+        <button
+          type='button'
+          className='inline-flex h-7 items-center gap-1 rounded-[5px] bg-primary px-2 text-[13px] font-semibold text-primary-foreground transition-colors duration-[80ms] hover:opacity-90 sm:px-2.5'
           onClick={() => setModalProject('create')}
-          className='gap-2'
         >
-          <Plus className='size-4' />
-          Add Project
-        </Button>
+          <Plus className='size-3.5' />
+          <span className='hidden sm:inline'>Add Project</span>
+        </button>
       </header>
 
-      <div className='flex items-center gap-3'>
-        <SearchFilter placeholder='Search projects...' />
+      <div className='flex-1 overflow-auto'>
+        <ProjectsDataTable
+          data={projectsWithHealth}
+          isLoading={isLoading || isPlaceholderData}
+          sorting={sorting}
+          setSorting={setSorting}
+          onEdit={(project) => setModalProject(project.id)}
+          onDelete={setDeleteProject}
+        />
       </div>
 
-      <ProjectsDataTable
-        data={projectsWithHealth}
-        isLoading={isLoading || isPlaceholderData}
-        sorting={sorting}
-        setSorting={setSorting}
-        onEdit={(project) => setModalProject(project.id)}
-        onDelete={setDeleteProject}
-      />
-
-      <Pagination totalCount={data?.count ?? 0} />
+      <div className='shrink-0 border-t border-border px-6 py-2'>
+        <Pagination totalCount={data?.count ?? 0} />
+      </div>
 
       <ProjectModal
         key={editingProjectId ?? 'create'}

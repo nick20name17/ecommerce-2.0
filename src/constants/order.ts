@@ -33,7 +33,7 @@ export const ORDER_STATUS_CLASS: Record<OrderStatus, string> = {
     'border-red-300 bg-red-500/10 text-red-800 dark:border-red-600 dark:bg-red-500/20 dark:text-red-300',
   [ORDER_STATUS.onHold]:
     'border-slate-300 bg-slate-500/10 text-slate-700 dark:border-slate-600 dark:bg-slate-500/20 dark:text-slate-300',
-  [ORDER_STATUS.adjusted]: 'border-border bg-muted text-muted-foreground'
+  [ORDER_STATUS.adjusted]: 'border-border bg-bg-secondary text-text-tertiary'
 }
 
 export const getOrderStatusLabel = (status: OrderStatus): string =>

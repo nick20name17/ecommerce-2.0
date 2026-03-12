@@ -2,10 +2,10 @@ import { createFileRoute } from '@tanstack/react-router'
 import { ClipboardList } from 'lucide-react'
 
 const OrderDeskPage = () => (
-  <div className='text-muted-foreground flex h-full flex-col items-center justify-center gap-3'>
+  <div className='text-text-tertiary flex h-full flex-col items-center justify-center gap-3'>
     <ClipboardList className='size-12 opacity-50' />
     <h1 className='text-foreground text-2xl font-bold'>Order Desk</h1>
-    <p className='text-sm'>Order Desk content will be implemented here.</p>
+    <p className='text-[13px]'>Order Desk content will be implemented here.</p>
   </div>
 )
 

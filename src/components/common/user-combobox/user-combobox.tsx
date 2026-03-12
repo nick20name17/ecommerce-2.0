@@ -140,7 +140,7 @@ export function UserCombobox({
           ) : users.length === 0 ? (
             <div className='flex flex-col items-center gap-2 py-6 text-text-tertiary'>
               <User className='size-5 opacity-50' />
-              <span className='text-xs'>
+              <span className='text-[13px]'>
                 {search ? 'No users found' : 'Start typing to search'}
               </span>
             </div>
@@ -176,7 +176,7 @@ export function UserCombobox({
                     <span className='flex-1 truncate'>
                       {fullName || '\u2014'}
                     </span>
-                    <span className='shrink-0 text-xs text-text-tertiary'>
+                    <span className='shrink-0 text-[13px] text-text-tertiary'>
                       {USER_ROLE_LABELS[u.role as UserRole] ?? u.role}
                     </span>
                     {selected && <Check className='size-3.5 shrink-0 text-primary' strokeWidth={2} />}

@@ -172,7 +172,7 @@ function KanbanColumn({
         <span className='text-[13px] font-semibold text-foreground'>
           {status.name}
         </span>
-        <span className='text-[12px] tabular-nums text-text-tertiary'>
+        <span className='text-[13px] tabular-nums text-text-tertiary'>
           {tasks.length}
         </span>
         <div className='flex-1' />
@@ -201,7 +201,7 @@ function KanbanColumn({
         ))}
         {tasks.length === 0 && !isCreating && (
           <div className={cn(
-            'flex items-center justify-center rounded-lg border border-dashed py-8 text-[12px] text-text-tertiary transition-colors duration-150',
+            'flex items-center justify-center rounded-lg border border-dashed py-8 text-[13px] text-text-tertiary transition-colors duration-150',
             isDropTarget ? 'border-primary/40 bg-primary/5' : 'border-border-light'
           )}>
             Drop tasks here
@@ -234,7 +234,7 @@ function KanbanColumn({
               <button
                 type='button'
                 className={cn(
-                  'rounded-[6px] bg-primary px-2.5 py-1 text-[12px] font-medium text-primary-foreground transition-colors duration-[80ms]',
+                  'rounded-[6px] bg-primary px-2.5 py-1 text-[13px] font-medium text-primary-foreground transition-colors duration-[80ms]',
                   !newTitle.trim() ? 'opacity-40' : 'hover:opacity-90'
                 )}
                 disabled={!newTitle.trim()}
@@ -287,12 +287,12 @@ function KanbanCardContent({ task, isDragging }: { task: TaskListItem; isDraggin
         'cursor-pointer rounded-lg border border-border bg-background p-3 transition-all duration-100',
         isDragging
           ? 'rotate-[2deg] shadow-lg ring-1 ring-primary/20'
-          : 'hover:border-border hover:shadow-sm'
+          : 'hover:border-foreground/15 hover:shadow-md hover:bg-bg-hover/50'
       )}
       onClick={(e) => {
         if (isDragging) return
         e.stopPropagation()
-        navigate({ to: '/todos-2/$taskId', params: { taskId: String(task.id) } })
+        navigate({ to: '/tasks/$taskId', params: { taskId: String(task.id) } })
       }}
       style={isDragging ? { width: 290 } : undefined}
     >
@@ -303,20 +303,20 @@ function KanbanCardContent({ task, isDragging }: { task: TaskListItem; isDraggin
 
       {/* Meta row */}
       <div className='flex items-center gap-2'>
-        <span className='text-[11px] tabular-nums text-text-tertiary'>
+        <span className='text-[13px] tabular-nums text-text-tertiary'>
           TSK-{task.id.toString().padStart(3, '0')}
         </span>
 
         <span className='inline-flex items-center gap-1'>
           <PriorityIcon priority={task.priority} color={priorityColor} size={12} />
-          <span className='text-[11px] font-medium text-text-secondary'>{priorityLabel}</span>
+          <span className='text-[13px] font-medium text-text-secondary'>{priorityLabel}</span>
         </span>
 
         <div className='flex-1' />
 
         {dueDateLabel && (
           <span className={cn(
-            'text-[11px]',
+            'text-[13px]',
             overdue ? 'font-medium text-destructive' : 'text-text-tertiary'
           )}>
             {dueDateLabel}

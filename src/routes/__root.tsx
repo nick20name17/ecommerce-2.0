@@ -11,10 +11,10 @@ const RootComponent = () => {
       <HeadContent />
       <Outlet />
       <Toaster
-        position='top-right'
-        closeButton
-        duration={7000}
-        richColors
+        position='bottom-center'
+        duration={3000}
+        gap={6}
+        offset={24}
       />
     </AuthProvider>
   )

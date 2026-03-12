@@ -21,7 +21,7 @@ import {
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
-import { getProposalStatusBadgeVariant, getProposalStatusLabel } from '@/constants/proposal'
+import { PROPOSAL_STATUS_CLASS, getProposalStatusLabel } from '@/constants/proposal'
 import type { ProposalStatus } from '@/constants/proposal'
 import {
   buildDynamicDataColumns,
@@ -30,6 +30,7 @@ import {
 } from '@/helpers/dynamic-columns'
 import type { DynamicCellFormatter } from '@/helpers/dynamic-columns'
 import { formatCurrency, formatDate } from '@/helpers/formatters'
+import { cn } from '@/lib/utils'
 
 export type ProposalRow = Proposal & { _pending?: true }
 
@@ -85,7 +86,7 @@ const PROPOSAL_FORMATTERS: Partial<Record<string, DynamicCellFormatter<ProposalR
   quote: (v, row) => {
     if (row._pending)
       return (
-        <span className='text-muted-foreground flex items-center gap-2'>
+        <span className='text-text-tertiary flex items-center gap-2'>
           <Loader2 className='size-4 animate-spin' />
           Pending…
         </span>
@@ -105,15 +106,22 @@ const PROPOSAL_FORMATTERS: Partial<Record<string, DynamicCellFormatter<ProposalR
       return (
         <Badge
           variant='outline'
-          className='text-muted-foreground font-medium'
+          className='text-text-tertiary font-medium'
         >
           Creating…
         </Badge>
       )
+    const status = (v ?? row.status) as ProposalStatus
     return (
-      <Badge variant={getProposalStatusBadgeVariant((v ?? row.status) as ProposalStatus)}>
-        {getProposalStatusLabel((v ?? row.status) as ProposalStatus)}
-      </Badge>
+      <span
+        className={cn(
+          'inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-[12px] font-medium leading-none',
+          PROPOSAL_STATUS_CLASS[status]
+        )}
+      >
+        <span className='size-1.5 rounded-full bg-current' />
+        {getProposalStatusLabel(status)}
+      </span>
     )
   },
   qt_date: (v, row) => (row._pending ? '—' : formatDate((v ?? row.qt_date) as string | null)),

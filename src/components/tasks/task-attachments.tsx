@@ -12,10 +12,11 @@ import {
   UploadIcon,
   VideoIcon
 } from 'lucide-react'
-import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react'
+import { forwardRef, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react'
 
 import { TASK_QUERY_KEYS } from '@/api/task/query'
 import type { TaskAttachment } from '@/api/task/schema'
+import { AttachmentLightbox } from '@/components/tasks/attachment-lightbox'
 import { taskService } from '@/api/task/service'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -107,6 +108,24 @@ export const TaskAttachments = forwardRef<TaskAttachmentsRef, TaskAttachmentsPro
     const existingIds = new Set(attachments.map((a) => a.id))
     const optimisticAttachments = recentlyUploaded.filter((a) => !existingIds.has(a.id))
     const allAttachments = [...attachments, ...optimisticAttachments]
+    const [previewIndex, setPreviewIndex] = useState<number | null>(null)
+
+    const imageAttachments = useMemo(
+      () => allAttachments.filter((a) => a.file_type.startsWith('image/')),
+      [allAttachments]
+    )
+
+    const openPreview = (attachment: TaskAttachment) => {
+      const idx = imageAttachments.findIndex((a) => a.id === attachment.id)
+      if (idx !== -1) setPreviewIndex(idx)
+    }
+
+    // Clean up recentlyUploaded once server data includes them
+    useEffect(() => {
+      if (recentlyUploaded.length > 0 && recentlyUploaded.every((a) => existingIds.has(a.id))) {
+        setRecentlyUploaded([])
+      }
+    }, [existingIds, recentlyUploaded])
 
     const uploadMutation = useMutation({
       mutationFn: async ({ file, tempId }: { file: File; tempId: string }) => {
@@ -121,18 +140,21 @@ export const TaskAttachments = forwardRef<TaskAttachmentsRef, TaskAttachmentsPro
         ])
       },
       onSuccess: ({ result, tempId }) => {
-        setUploadingFiles((prev) => prev.filter((f) => f.id !== tempId))
+        setUploadingFiles((prev) => {
+          const next = prev.filter((f) => f.id !== tempId)
+          // Only invalidate when all uploads are done to avoid repeated re-renders
+          if (next.length === 0) {
+            if (taskId) {
+              queryClient.invalidateQueries({ queryKey: TASK_QUERY_KEYS.detail(taskId) })
+            }
+            queryClient.invalidateQueries({ queryKey: TASK_QUERY_KEYS.lists() })
+          }
+          return next
+        })
         setRecentlyUploaded((prev) => [...prev, result])
-        if (taskId) {
-          queryClient.invalidateQueries({ queryKey: TASK_QUERY_KEYS.detail(taskId) })
-        }
-        queryClient.invalidateQueries({ queryKey: TASK_QUERY_KEYS.lists() })
       },
       onError: (_, { tempId }) => {
         setUploadingFiles((prev) => prev.filter((f) => f.id !== tempId))
-      },
-      meta: {
-        successMessage: 'Attachment uploaded successfully'
       }
     })
 
@@ -144,6 +166,8 @@ export const TaskAttachments = forwardRef<TaskAttachmentsRef, TaskAttachmentsPro
       },
       onMutate: (attachmentId) => {
         setDeletingIds((prev) => new Set(prev).add(attachmentId))
+        // Optimistically remove from recentlyUploaded so it disappears immediately
+        setRecentlyUploaded((prev) => prev.filter((a) => a.id !== attachmentId))
       },
       onSettled: (_, __, attachmentId) => {
         setDeletingIds((prev) => {
@@ -159,7 +183,7 @@ export const TaskAttachments = forwardRef<TaskAttachmentsRef, TaskAttachmentsPro
         queryClient.invalidateQueries({ queryKey: TASK_QUERY_KEYS.lists() })
       },
       meta: {
-        successMessage: 'Attachment deleted successfully'
+        successMessage: 'Attachment deleted'
       }
     })
 
@@ -252,7 +276,7 @@ export const TaskAttachments = forwardRef<TaskAttachmentsRef, TaskAttachmentsPro
 
     return (
       <div className='space-y-3'>
-        <p className='text-muted-foreground text-xs font-medium tracking-wide uppercase'>
+        <p className='text-[13px] font-semibold uppercase tracking-[0.06em] text-text-tertiary'>
           Attachments
         </p>
 
@@ -277,11 +301,11 @@ export const TaskAttachments = forwardRef<TaskAttachmentsRef, TaskAttachmentsPro
             <div className='flex flex-col items-center gap-2'>
               <div
                 className={cn(
-                  'bg-muted flex size-10 items-center justify-center rounded-full transition-colors',
+                  'bg-bg-secondary flex size-10 items-center justify-center rounded-full transition-colors',
                   isDragging ? 'border-primary bg-primary/10' : 'border-muted-foreground/25'
                 )}
               >
-                <UploadIcon className='text-muted-foreground size-4' />
+                <UploadIcon className='text-text-tertiary size-4' />
               </div>
 
               <div className='space-y-1'>
@@ -295,7 +319,7 @@ export const TaskAttachments = forwardRef<TaskAttachmentsRef, TaskAttachmentsPro
                     browse files
                   </button>
                 </p>
-                <p className='text-muted-foreground text-xs'>Maximum file size: 10MB</p>
+                <p className='text-text-tertiary text-[13px]'>Maximum file size: 10MB</p>
               </div>
             </div>
           </div>
@@ -308,7 +332,7 @@ export const TaskAttachments = forwardRef<TaskAttachmentsRef, TaskAttachmentsPro
             <button
               type='button'
               onClick={openFileDialog}
-              className='inline-flex w-full items-center justify-center gap-1.5 rounded-[6px] border border-dashed border-border px-2.5 py-2 text-[12px] font-medium text-text-secondary transition-colors duration-[80ms] hover:bg-bg-hover hover:text-foreground'
+              className='inline-flex w-full items-center justify-center gap-1.5 rounded-[6px] border border-dashed border-border px-2.5 py-2 text-[13px] font-medium text-text-secondary transition-colors duration-[80ms] hover:bg-bg-hover hover:text-foreground'
             >
               <UploadIcon className='size-3.5' />
               Add attachment
@@ -326,7 +350,7 @@ export const TaskAttachments = forwardRef<TaskAttachmentsRef, TaskAttachmentsPro
               <button
                 type='button'
                 onClick={clearErrors}
-                className='text-destructive/80 hover:text-destructive text-xs underline'
+                className='text-destructive/80 hover:text-destructive text-[13px] underline'
               >
                 Dismiss
               </button>
@@ -336,13 +360,13 @@ export const TaskAttachments = forwardRef<TaskAttachmentsRef, TaskAttachmentsPro
 
         {showPendingFiles && (
           <div className='space-y-2'>
-            <p className='text-muted-foreground text-xs'>
+            <p className='text-text-tertiary text-[13px]'>
               {pendingFiles.length} file{pendingFiles.length > 1 ? 's' : ''} ready to upload
             </p>
             <div className='rounded-lg border'>
               <Table>
                 <TableHeader>
-                  <TableRow className='text-xs'>
+                  <TableRow className='text-[13px]'>
                     <TableHead className='h-8 ps-3'>Name</TableHead>
                     <TableHead className='h-8 w-[100px]'>Type</TableHead>
                     <TableHead className='h-8 w-[100px]'>Size</TableHead>
@@ -363,13 +387,13 @@ export const TaskAttachments = forwardRef<TaskAttachmentsRef, TaskAttachmentsPro
                             <Tooltip>
                               <TooltipTrigger asChild>
                                 <div className='flex min-w-0 items-center gap-2'>
-                                  <span className='text-muted-foreground/80 shrink-0'>
+                                  <span className='text-text-tertiary/80 shrink-0'>
                                     {getFileIcon(fileType)}
                                   </span>
                                   <span className='truncate text-sm font-medium'>{fileName}</span>
                                   <Badge
                                     variant='outline'
-                                    className='text-primary border-primary/30 bg-primary/5 shrink-0 text-xs'
+                                    className='text-primary border-primary/30 bg-primary/5 shrink-0 text-[13px]'
                                   >
                                     New
                                   </Badge>
@@ -383,13 +407,13 @@ export const TaskAttachments = forwardRef<TaskAttachmentsRef, TaskAttachmentsPro
                           {(() => {
                             const typeInfo = getFileTypeInfo(fileType)
                             return (
-                              <Badge className={cn('text-xs', typeInfo.className)}>
+                              <Badge className={cn('text-[13px]', typeInfo.className)}>
                                 {typeInfo.label}
                               </Badge>
                             )
                           })()}
                         </TableCell>
-                        <TableCell className='text-muted-foreground w-[100px] py-1.5 text-sm'>
+                        <TableCell className='text-text-tertiary w-[100px] py-1.5 text-sm'>
                           {formatBytes(fileSize)}
                         </TableCell>
                         <TableCell className='w-[80px] py-1.5'>
@@ -420,14 +444,14 @@ export const TaskAttachments = forwardRef<TaskAttachmentsRef, TaskAttachmentsPro
         )}
 
         {hasExistingOrUploading && (
-          <div className='rounded-lg border'>
+          <div className='overflow-hidden rounded-lg border'>
             <Table>
               <TableHeader>
-                <TableRow className='text-xs'>
+                <TableRow className='text-[13px]'>
                   <TableHead className='h-8 ps-3'>Name</TableHead>
                   <TableHead className='h-8 w-[100px]'>Type</TableHead>
                   <TableHead className='h-8 w-[100px]'>Size</TableHead>
-                  <TableHead className='h-8 w-[100px]'>Actions</TableHead>
+                  <TableHead className='h-8 w-[80px] pe-3 text-right'>Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -447,8 +471,8 @@ export const TaskAttachments = forwardRef<TaskAttachmentsRef, TaskAttachmentsPro
                         <TableCell className='w-[100px] py-1.5'>
                           <Skeleton className='h-4 w-16' />
                         </TableCell>
-                        <TableCell className='w-[100px] py-1.5'>
-                          <div className='flex items-center gap-1'>
+                        <TableCell className='w-[80px] pe-3 py-1.5'>
+                          <div className='flex items-center justify-end gap-1'>
                             <Skeleton className='size-7' />
                             <Skeleton className='size-7' />
                           </div>
@@ -459,43 +483,40 @@ export const TaskAttachments = forwardRef<TaskAttachmentsRef, TaskAttachmentsPro
                 )}
 
                 {!isLoading &&
-                  uploadingFiles.map((file) => (
-                    <TableRow
-                      key={file.id}
-                      className='animate-pulse'
-                    >
-                      <TableCell className='py-1.5 ps-3'>
-                        <div className='flex min-w-0 items-center gap-2'>
-                          <span className='text-muted-foreground/80 shrink-0'>
-                            {getFileIcon(file.type)}
-                          </span>
-                          <span className='text-muted-foreground truncate text-sm font-medium'>
-                            {file.name}
-                          </span>
-                          <Badge
-                            variant='secondary'
-                            className='shrink-0 gap-1 text-xs'
-                          >
-                            <LoaderIcon className='size-3 animate-spin' />
-                            Uploading
+                  uploadingFiles.map((file) => {
+                    const typeInfo = getFileTypeInfo(file.type)
+                    return (
+                      <TableRow key={file.id}>
+                        <TableCell className='py-1.5 ps-3'>
+                          <div className='flex min-w-0 items-center gap-2'>
+                            <span className='shrink-0 text-text-tertiary'>
+                              {getFileIcon(file.type)}
+                            </span>
+                            <span className='truncate text-sm font-medium text-text-secondary'>
+                              {file.name}
+                            </span>
+                            <span className='flex shrink-0 items-center gap-1 text-[13px] text-text-tertiary'>
+                              <LoaderIcon className='size-3 animate-spin' />
+                            </span>
+                          </div>
+                        </TableCell>
+                        <TableCell className='w-[100px] py-1.5'>
+                          <Badge className={cn('text-[13px]', typeInfo.className)}>
+                            {typeInfo.label}
                           </Badge>
-                        </div>
-                      </TableCell>
-                      <TableCell className='w-[100px] py-1.5'>
-                        <Skeleton className='h-5 w-14' />
-                      </TableCell>
-                      <TableCell className='w-[100px] py-1.5'>
-                        <Skeleton className='h-4 w-16' />
-                      </TableCell>
-                      <TableCell className='w-[100px] py-1.5'>
-                        <Skeleton className='size-7' />
-                      </TableCell>
-                    </TableRow>
-                  ))}
+                        </TableCell>
+                        <TableCell className='w-[100px] py-1.5 text-sm text-text-tertiary'>
+                          {formatBytes(file.size)}
+                        </TableCell>
+                        <TableCell className='w-[80px] pe-3 py-1.5' />
+                      </TableRow>
+                    )
+                  })}
 
                 {!isLoading &&
                   allAttachments.map((attachment) => {
                     const isDeleting = deletingIds.has(attachment.id)
+                    const isImage = attachment.file_type.startsWith('image/')
 
                     return (
                       <TableRow
@@ -506,10 +527,24 @@ export const TaskAttachments = forwardRef<TaskAttachmentsRef, TaskAttachmentsPro
                           <TooltipProvider>
                             <Tooltip>
                               <TooltipTrigger asChild>
-                                <div className='flex min-w-0 items-center gap-2'>
-                                  <span className='text-muted-foreground/80 shrink-0'>
-                                    {getFileIcon(attachment.file_type)}
-                                  </span>
+                                <div
+                                  className={cn(
+                                    'flex min-w-0 items-center gap-2',
+                                    isImage && 'cursor-pointer'
+                                  )}
+                                  onClick={isImage ? () => openPreview(attachment) : undefined}
+                                >
+                                  {isImage ? (
+                                    <img
+                                      src={attachment.download_url}
+                                      alt={attachment.file_name}
+                                      className='size-8 shrink-0 rounded object-cover'
+                                    />
+                                  ) : (
+                                    <span className='text-text-tertiary/80 shrink-0'>
+                                      {getFileIcon(attachment.file_type)}
+                                    </span>
+                                  )}
                                   <span className='truncate text-sm font-medium'>
                                     {attachment.file_name}
                                   </span>
@@ -523,17 +558,17 @@ export const TaskAttachments = forwardRef<TaskAttachmentsRef, TaskAttachmentsPro
                           {(() => {
                             const typeInfo = getFileTypeInfo(attachment.file_type)
                             return (
-                              <Badge className={cn('text-xs', typeInfo.className)}>
+                              <Badge className={cn('text-[13px]', typeInfo.className)}>
                                 {typeInfo.label}
                               </Badge>
                             )
                           })()}
                         </TableCell>
-                        <TableCell className='text-muted-foreground w-[100px] py-1.5 text-sm'>
+                        <TableCell className='text-text-tertiary w-[100px] py-1.5 text-sm'>
                           {formatBytes(attachment.file_size)}
                         </TableCell>
-                        <TableCell className='w-[100px] py-1.5'>
-                          <div className='flex items-center gap-1'>
+                        <TableCell className='w-[80px] pe-3 py-1.5'>
+                          <div className='flex items-center justify-end gap-1'>
                             <TooltipProvider>
                               <Tooltip>
                                 <TooltipTrigger asChild>
@@ -588,6 +623,15 @@ export const TaskAttachments = forwardRef<TaskAttachmentsRef, TaskAttachmentsPro
               </TableBody>
             </Table>
           </div>
+        )}
+
+        {previewIndex !== null && imageAttachments.length > 0 && (
+          <AttachmentLightbox
+            images={imageAttachments}
+            currentIndex={previewIndex}
+            onIndexChange={setPreviewIndex}
+            onClose={() => setPreviewIndex(null)}
+          />
         )}
       </div>
     )

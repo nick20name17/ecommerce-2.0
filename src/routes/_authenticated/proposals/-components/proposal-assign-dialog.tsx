@@ -71,7 +71,7 @@ export const ProposalAssignDialog = ({
           </DialogTitle>
         </DialogHeader>
         <DialogBody className='flex flex-col gap-4'>
-          <p className='text-muted-foreground text-sm'>
+          <p className='text-text-tertiary text-[13px]'>
             Assign a responsible user for proposal{' '}
             <span className='text-foreground font-medium'>{proposal.quote ?? proposal.autoid}</span>
             .

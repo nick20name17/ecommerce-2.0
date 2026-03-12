@@ -45,6 +45,8 @@ interface TaskModalProps {
   onOpenChange: (open: boolean) => void
   projectId?: number
   defaultLinkedCustomerAutoid?: string | null
+  defaultLinkedOrderAutoid?: string | null
+  defaultLinkedProposalAutoid?: string | null
 }
 
 export const TaskModal = ({
@@ -52,7 +54,9 @@ export const TaskModal = ({
   open,
   onOpenChange,
   projectId,
-  defaultLinkedCustomerAutoid
+  defaultLinkedCustomerAutoid,
+  defaultLinkedOrderAutoid,
+  defaultLinkedProposalAutoid
 }: TaskModalProps) => {
   const isEdit = !!task
 
@@ -73,6 +77,8 @@ export const TaskModal = ({
             onOpenChange={onOpenChange}
             projectId={projectId}
             defaultLinkedCustomerAutoid={defaultLinkedCustomerAutoid}
+            defaultLinkedOrderAutoid={defaultLinkedOrderAutoid}
+            defaultLinkedProposalAutoid={defaultLinkedProposalAutoid}
           />
         )}
       </DialogContent>
@@ -206,7 +212,7 @@ const SharedFields = ({
       />
 
       <div className='space-y-2.5 pt-1.5 sm:col-span-2'>
-        <p className='text-muted-foreground text-xs font-medium tracking-wide uppercase'>
+        <p className='text-text-tertiary text-[13px] font-medium tracking-wide uppercase'>
           Linked items (optional)
         </p>
         <div className='grid gap-2.5 sm:grid-cols-2'>
@@ -261,11 +267,15 @@ const SharedFields = ({
 const CreateForm = ({
   onOpenChange,
   projectId,
-  defaultLinkedCustomerAutoid
+  defaultLinkedCustomerAutoid,
+  defaultLinkedOrderAutoid,
+  defaultLinkedProposalAutoid
 }: {
   onOpenChange: (open: boolean) => void
   projectId?: number
   defaultLinkedCustomerAutoid?: string | null
+  defaultLinkedOrderAutoid?: string | null
+  defaultLinkedProposalAutoid?: string | null
 }) => {
   const { data: statusesData, isLoading: statusesLoading } = useQuery(
     getTaskStatusesQuery(projectId)
@@ -280,7 +290,7 @@ const CreateForm = ({
           <DialogTitle>Create Todo</DialogTitle>
           <DialogDescription>Loading statuses…</DialogDescription>
         </DialogHeader>
-        <div className='text-muted-foreground py-6 text-center'>Loading…</div>
+        <div className='text-text-tertiary py-6 text-center'>Loading…</div>
       </>
     )
   }
@@ -313,6 +323,8 @@ const CreateForm = ({
       onOpenChange={onOpenChange}
       projectId={projectId}
       defaultLinkedCustomerAutoid={defaultLinkedCustomerAutoid}
+      defaultLinkedOrderAutoid={defaultLinkedOrderAutoid}
+      defaultLinkedProposalAutoid={defaultLinkedProposalAutoid}
     />
   )
 }
@@ -322,13 +334,17 @@ const CreateFormInner = ({
   statuses,
   onOpenChange,
   projectId,
-  defaultLinkedCustomerAutoid
+  defaultLinkedCustomerAutoid,
+  defaultLinkedOrderAutoid,
+  defaultLinkedProposalAutoid
 }: {
   defaultStatus: TaskStatus
   statuses: TaskStatus[]
   onOpenChange: (open: boolean) => void
   projectId?: number
   defaultLinkedCustomerAutoid?: string | null
+  defaultLinkedOrderAutoid?: string | null
+  defaultLinkedProposalAutoid?: string | null
 }) => {
   const attachmentsRef = useRef<TaskAttachmentsRef>(null)
 
@@ -341,8 +357,8 @@ const CreateFormInner = ({
       priority: TASK_PRIORITY.medium,
       due_date: null,
       responsible_user: null,
-      linked_order_autoid: null,
-      linked_proposal_autoid: null,
+      linked_order_autoid: defaultLinkedOrderAutoid ?? null,
+      linked_proposal_autoid: defaultLinkedProposalAutoid ?? null,
       linked_customer_autoid: defaultLinkedCustomerAutoid ?? null
     }
   })
@@ -381,8 +397,8 @@ const CreateFormInner = ({
         priority: TASK_PRIORITY.medium,
         due_date: null,
         responsible_user: null,
-        linked_order_autoid: null,
-        linked_proposal_autoid: null,
+        linked_order_autoid: defaultLinkedOrderAutoid ?? null,
+        linked_proposal_autoid: defaultLinkedProposalAutoid ?? null,
         linked_customer_autoid: defaultLinkedCustomerAutoid ?? null
       })
     }

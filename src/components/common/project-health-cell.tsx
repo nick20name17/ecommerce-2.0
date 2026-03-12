@@ -18,14 +18,14 @@ export const HealthCell = ({
   if (isLoading) {
     return (
       <span className='flex size-6 items-center justify-center'>
-        <Loader2 className='text-muted-foreground size-4 animate-spin' />
+        <Loader2 className='text-text-tertiary size-4 animate-spin' />
       </span>
     )
   }
 
   if (status === null) {
     return (
-      <span className='text-muted-foreground flex size-6 items-center justify-center text-sm'>
+      <span className='text-text-tertiary flex size-6 items-center justify-center text-sm'>
         —
       </span>
     )

@@ -31,25 +31,25 @@ export const CreatePageSection = ({
         isDisabled && 'opacity-60'
       )}
     >
-      <div className='bg-muted/30 flex items-center gap-3 border-b px-4 py-3'>
+      <div className='bg-bg-secondary/30 flex items-center gap-3 border-b px-4 py-3'>
         {step !== undefined && (
           <div
             className={cn(
-              'flex size-6 shrink-0 items-center justify-center rounded-full text-xs font-semibold transition-colors',
-              isComplete ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'
+              'flex size-6 shrink-0 items-center justify-center rounded-full text-[13px] font-semibold transition-colors',
+              isComplete ? 'bg-primary text-primary-foreground' : 'bg-bg-secondary text-text-tertiary'
             )}
           >
             {step}
           </div>
         )}
         {icon && !step && (
-          <div className='bg-muted text-muted-foreground flex size-8 shrink-0 items-center justify-center rounded-lg'>
+          <div className='bg-bg-secondary text-text-tertiary flex size-8 shrink-0 items-center justify-center rounded-lg'>
             {icon}
           </div>
         )}
         <div className='min-w-0 flex-1'>
           <h3 className='text-sm font-semibold'>{title}</h3>
-          {description && <p className='text-muted-foreground text-xs'>{description}</p>}
+          {description && <p className='text-text-tertiary text-[13px]'>{description}</p>}
         </div>
         {trailing}
       </div>

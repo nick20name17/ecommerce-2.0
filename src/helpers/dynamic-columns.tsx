@@ -93,9 +93,9 @@ export const buildDynamicDataColumns = <T extends Record<string, unknown>>(
         const value = row.original[key]
         if (formatter) return formatter(value, row.original)
         const pending = row.original._pending as boolean | undefined
-        if (pending) return <span className='text-muted-foreground'>—</span>
+        if (pending) return <span className='text-text-tertiary'>—</span>
         const str = formatCellValue(value)
-        if (str === '—') return <span className='text-muted-foreground'>—</span>
+        if (str === '—') return <span className='text-text-tertiary'>—</span>
         return (
           <Tooltip>
             <TooltipTrigger asChild>

@@ -71,7 +71,7 @@ export const CustomerAssignDialog = ({
           </DialogTitle>
         </DialogHeader>
         <DialogBody className='flex flex-col gap-4'>
-          <p className='text-muted-foreground text-sm'>
+          <p className='text-text-tertiary text-[13px]'>
             Assign a responsible user for{' '}
             <span className='text-foreground font-medium'>{customer.l_name}</span>.
           </p>

@@ -92,7 +92,7 @@ export const ProposalDeleteDialog = ({
             <button
               type='button'
               onClick={handleCopy}
-              className='hover:bg-muted inline-flex cursor-pointer items-center gap-1 rounded px-1 font-semibold transition-colors'
+              className='hover:bg-bg-hover inline-flex cursor-pointer items-center gap-1 rounded px-1 font-semibold transition-colors'
             >
               {CONFIRMATION_TEXT}
               {copied ? <Check className='size-3' /> : <Copy className='size-3' />}

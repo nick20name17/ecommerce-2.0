@@ -35,7 +35,7 @@ export const CartSummary = ({ cart, loading, updating }: CartSummaryProps) => {
 
   return (
     <div className='space-y-2'>
-      <div className='text-muted-foreground flex items-center justify-between text-sm'>
+      <div className='text-text-tertiary flex items-center justify-between text-sm'>
         <span>
           Subtotal ({itemCount} item{itemCount !== 1 ? 's' : ''})
         </span>

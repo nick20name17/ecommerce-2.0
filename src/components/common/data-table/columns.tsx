@@ -1,9 +1,9 @@
 'use no memo'
 
 import type { AccessorKeyColumnDef, Row } from '@tanstack/react-table'
-import { ChevronDown, ChevronUp } from 'lucide-react'
+import { ChevronDown } from 'lucide-react'
 
-import { Button } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
 
 export const createExpanderColumn = <TData,>(): AccessorKeyColumnDef<TData> => ({
   accessorKey: 'expander',
@@ -11,15 +11,18 @@ export const createExpanderColumn = <TData,>(): AccessorKeyColumnDef<TData> => (
   cell: ({ row }: { row: Row<TData> }) =>
     row.getCanExpand() ? (
       <div className='flex items-center justify-center'>
-        <Button
-          id='expander'
-          className='size-7'
-          size='icon-sm'
-          variant='ghost'
+        <button
+          type='button'
+          className='inline-flex size-6 items-center justify-center rounded-[5px] text-text-tertiary transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground'
           onClick={row.getToggleExpandedHandler()}
         >
-          {row.getIsExpanded() ? <ChevronUp /> : <ChevronDown />}
-        </Button>
+          <ChevronDown
+            className={cn(
+              'size-3.5 transition-transform duration-100',
+              row.getIsExpanded() && '-rotate-180'
+            )}
+          />
+        </button>
       </div>
     ) : null,
   size: 40,
