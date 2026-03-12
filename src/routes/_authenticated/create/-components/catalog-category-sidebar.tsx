@@ -1,18 +1,20 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import { ChevronLeft, ChevronRight, Folder, FolderOpen, ImageOff } from 'lucide-react'
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo } from 'react'
 
 import { getCategoriesQuery } from '@/api/category/query'
 import type { Category } from '@/api/category/schema'
 import { Skeleton } from '@/components/ui/skeleton'
 import { cn } from '@/lib/utils'
 
-type Crumb = { tree_id: string; tree_descr: string }
+export type Crumb = { tree_id: string; tree_descr: string }
 
 interface CatalogCategorySidebarProps {
   projectId?: number | null
   value: string | null
   onChange: (next: { treeId: string | null; treeDescr: string }) => void
+  path: Crumb[]
+  onPathChange: (path: Crumb[]) => void
   className?: string
 }
 
@@ -26,14 +28,10 @@ export const CatalogCategorySidebar = ({
   projectId,
   value,
   onChange,
+  path,
+  onPathChange,
   className
 }: CatalogCategorySidebarProps) => {
-  const [path, setPath] = useState<Crumb[]>([])
-
-  useEffect(() => {
-    if (value == null) setPath([])
-  }, [value])
-
   const parentId = path.length > 0 ? path[path.length - 1]?.tree_id : undefined
 
   const { data, isLoading, isFetching } = useQuery({
@@ -55,22 +53,21 @@ export const CatalogCategorySidebar = ({
     onChange({ treeId, treeDescr })
   }
 
-  const handleGoRoot = () => {
-    setPath([])
-    setTreeId(null, 'All categories')
-  }
-
-  const handleGoToCrumb = (index: number) => {
-    const nextPath = path.slice(0, index + 1)
-    setPath(nextPath)
-    const last = nextPath[nextPath.length - 1]
-    if (!last) return handleGoRoot()
-    setTreeId(last.tree_id, last.tree_descr)
+  const handleGoBack = () => {
+    if (path.length <= 1) {
+      onPathChange([])
+      setTreeId(null, 'All categories')
+    } else {
+      const nextPath = path.slice(0, -1)
+      onPathChange(nextPath)
+      const last = nextPath[nextPath.length - 1]!
+      setTreeId(last.tree_id, last.tree_descr)
+    }
   }
 
   const handleEnterCategory = (category: Category) => {
     const nextPath = [...path, { tree_id: category.tree_id, tree_descr: category.tree_descr }]
-    setPath(nextPath)
+    onPathChange(nextPath)
     setTreeId(category.tree_id, category.tree_descr)
   }
 
@@ -81,7 +78,7 @@ export const CatalogCategorySidebar = ({
       {/* Header */}
       <div className='flex shrink-0 items-center justify-between gap-2 border-b border-border px-4 py-2'>
         <div className='min-w-0'>
-          <span className='text-[12px] font-medium uppercase tracking-[0.04em] text-text-tertiary'>
+          <span className='text-[11px] font-semibold uppercase tracking-[0.05em] text-text-tertiary'>
             Categories
           </span>
           <p className='truncate text-[13px] font-semibold' title={currentLabel}>
@@ -92,51 +89,12 @@ export const CatalogCategorySidebar = ({
           <button
             type='button'
             className='inline-flex size-7 shrink-0 items-center justify-center rounded-[5px] text-text-tertiary transition-colors duration-[80ms] hover:bg-bg-hover hover:text-foreground'
-            onClick={() => handleGoToCrumb(path.length - 2)}
+            onClick={handleGoBack}
             title='Back'
           >
             <ChevronLeft className='size-4' />
           </button>
         )}
-      </div>
-
-      {/* Breadcrumbs */}
-      <div
-        className='flex shrink-0 items-center gap-0.5 overflow-x-auto border-b border-border px-4 py-1.5 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden'
-        role='navigation'
-        aria-label='Category path'
-      >
-        <button
-          type='button'
-          className={cn(
-            'shrink-0 rounded-[5px] px-1.5 py-0.5 text-[12px] font-medium transition-colors duration-[80ms]',
-            path.length === 0
-              ? 'bg-primary/10 text-primary'
-              : 'text-text-tertiary hover:bg-bg-hover hover:text-foreground'
-          )}
-          onClick={handleGoRoot}
-        >
-          Root
-        </button>
-
-        {path.map((crumb, index) => (
-          <div key={crumb.tree_id} className='flex shrink-0 items-center gap-0.5'>
-            <ChevronRight className='size-3 shrink-0 text-text-quaternary' />
-            <button
-              type='button'
-              className={cn(
-                'max-w-[130px] shrink-0 truncate rounded-[5px] px-1.5 py-0.5 text-[12px] font-medium transition-colors duration-[80ms]',
-                index === path.length - 1
-                  ? 'bg-primary/10 text-primary'
-                  : 'text-text-tertiary hover:bg-bg-hover hover:text-foreground'
-              )}
-              onClick={() => handleGoToCrumb(index)}
-              title={crumb.tree_descr}
-            >
-              {crumb.tree_descr}
-            </button>
-          </div>
-        ))}
       </div>
 
       {/* Category list */}
@@ -167,7 +125,7 @@ export const CatalogCategorySidebar = ({
               <button
                 type='button'
                 className='mt-1 inline-flex h-7 items-center gap-1 rounded-[5px] border border-border bg-bg-secondary px-2.5 text-[12px] font-medium text-text-secondary transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground'
-                onClick={() => handleGoToCrumb(path.length - 2)}
+                onClick={handleGoBack}
               >
                 <ChevronLeft className='size-3' />
                 Go back

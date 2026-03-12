@@ -1,9 +1,10 @@
-import { Package, X } from 'lucide-react'
+import { ChevronRight, Package, X } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
 import { CatalogCategorySidebar } from './catalog-category-sidebar'
 import { CatalogMiniCart } from './catalog-mini-cart'
 import { CatalogProductGrid } from './catalog-product-grid'
+import type { Crumb } from './catalog-category-sidebar'
 import type { Product } from '@/api/product/schema'
 import { Dialog, DialogContent } from '@/components/ui/dialog'
 import { cn } from '@/lib/utils'
@@ -35,12 +36,27 @@ export const ProductCatalogDialog = ({
     treeId: null,
     treeDescr: 'All categories'
   })
+  const [path, setPath] = useState<Crumb[]>([])
 
   useEffect(() => {
     if (!open) {
       setCategory({ treeId: null, treeDescr: 'All categories' })
+      setPath([])
     }
   }, [open])
+
+  const handleGoRoot = () => {
+    setPath([])
+    setCategory({ treeId: null, treeDescr: 'All categories' })
+  }
+
+  const handleGoToCrumb = (index: number) => {
+    const nextPath = path.slice(0, index + 1)
+    setPath(nextPath)
+    const last = nextPath[nextPath.length - 1]
+    if (!last) return handleGoRoot()
+    setCategory({ treeId: last.tree_id, treeDescr: last.tree_descr })
+  }
 
   const isDisabled = disabled === true
 
@@ -56,24 +72,57 @@ export const ProductCatalogDialog = ({
         )}
       >
         {/* Header */}
-        <div className='flex h-12 shrink-0 items-center gap-2.5 border-b border-border px-5'>
-          <div className='flex size-6 items-center justify-center rounded-[5px] bg-primary/10 text-primary'>
-            <Package className='size-3.5' />
+        <div className='shrink-0 border-b border-border'>
+          <div className='flex h-12 items-center gap-2.5 px-5'>
+            <div className='flex size-6 items-center justify-center rounded-[5px] bg-primary/10 text-primary'>
+              <Package className='size-3.5' />
+            </div>
+            <h2 className='text-[14px] font-semibold tracking-[-0.01em]'>Product Catalog</h2>
+
+            <div className='flex-1' />
+
+            <button
+              type='button'
+              className='inline-flex size-7 items-center justify-center rounded-[5px] text-text-tertiary transition-colors duration-[80ms] hover:bg-bg-hover hover:text-foreground'
+              onClick={() => onOpenChange(false)}
+            >
+              <X className='size-4' />
+            </button>
           </div>
-          <h2 className='text-[14px] font-semibold tracking-[-0.01em]'>Product Catalog</h2>
-          <span className='text-[13px] text-text-tertiary' title={category.treeDescr}>
-            {category.treeDescr}
-          </span>
 
-          <div className='flex-1' />
+          {/* Breadcrumbs */}
+          <div className='flex items-center gap-0.5 px-5 pb-2.5'>
+            <button
+              type='button'
+              className={cn(
+                'shrink-0 rounded-[5px] px-1.5 py-0.5 text-[12px] font-medium transition-colors duration-[80ms]',
+                path.length === 0
+                  ? 'bg-primary/10 text-primary'
+                  : 'text-text-tertiary hover:bg-bg-hover hover:text-foreground'
+              )}
+              onClick={handleGoRoot}
+            >
+              All Categories
+            </button>
 
-          <button
-            type='button'
-            className='inline-flex size-7 items-center justify-center rounded-[5px] text-text-tertiary transition-colors duration-[80ms] hover:bg-bg-hover hover:text-foreground'
-            onClick={() => onOpenChange(false)}
-          >
-            <X className='size-4' />
-          </button>
+            {path.map((crumb, index) => (
+              <div key={crumb.tree_id} className='flex shrink-0 items-center gap-0.5'>
+                <ChevronRight className='size-3 shrink-0 text-text-quaternary' />
+                <button
+                  type='button'
+                  className={cn(
+                    'shrink-0 rounded-[5px] px-1.5 py-0.5 text-[12px] font-medium transition-colors duration-[80ms]',
+                    index === path.length - 1
+                      ? 'bg-primary/10 text-primary'
+                      : 'text-text-tertiary hover:bg-bg-hover hover:text-foreground'
+                  )}
+                  onClick={() => handleGoToCrumb(index)}
+                >
+                  {crumb.tree_descr}
+                </button>
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* Body */}
@@ -88,6 +137,8 @@ export const ProductCatalogDialog = ({
               projectId={projectId}
               value={category.treeId}
               onChange={(next) => setCategory(next)}
+              path={path}
+              onPathChange={setPath}
             />
           </div>
 

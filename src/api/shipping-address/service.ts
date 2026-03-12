@@ -7,10 +7,11 @@ const projectParams = (projectId?: number | null) =>
 
 export const shippingAddressService = {
   getAll: async (projectId?: number | null) => {
-    const { data } = await api.get<ShippingAddress[]>('/data/shipping-addresses/', {
+    const { data } = await api.get<{ results: ShippingAddress[] } | ShippingAddress[]>('/data/shipping-addresses/', {
       params: projectParams(projectId),
     })
-    return data
+    // API may return { results: [...] } or a flat array
+    return Array.isArray(data) ? data : data.results
   },
 
   getById: async (id: number, projectId?: number | null) => {

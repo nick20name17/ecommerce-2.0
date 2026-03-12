@@ -1,15 +1,15 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { Eye, EyeOff, Loader2, LogIn, Mail } from 'lucide-react'
+import { useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 
 import { type SignInPayload, SignInPayloadSchema } from '@/api/auth/schema'
-import { PasswordInput } from '@/components/common/inputs/password-input'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
-import { Field, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field'
-import { Input } from '@/components/ui/input'
+import { cn } from '@/lib/utils'
 import { useAuth } from '@/providers/auth'
 
 export const SignInForm = () => {
+  const [showPassword, setShowPassword] = useState(false)
+
   const form = useForm<SignInPayload>({
     resolver: zodResolver(SignInPayloadSchema),
     defaultValues: {
@@ -25,69 +25,112 @@ export const SignInForm = () => {
   })
 
   return (
-    <Card className='w-72 sm:w-100'>
-      <CardHeader>
-        <CardTitle>
-          <h1 className='text-primary text-center text-xl leading-none font-bold md:text-3xl'>
-            Sign In
-          </h1>
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <form
-          id='sign-in-form'
-          onSubmit={handleSignIn}
-        >
-          <FieldGroup>
-            <Controller
-              name='email'
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor='email'>Email</FieldLabel>
-                  <Input
-                    {...field}
-                    id='email'
-                    aria-invalid={fieldState.invalid}
-                    placeholder='example@example.com'
-                  />
-                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                </Field>
+    <div className='rounded-[12px] border border-border bg-background p-6 shadow-sm'>
+      <form onSubmit={handleSignIn} className='space-y-4'>
+        {/* Email field */}
+        <Controller
+          name='email'
+          control={form.control}
+          render={({ field, fieldState }) => (
+            <div className='space-y-1.5'>
+              <label
+                htmlFor='email'
+                className='block text-[13px] font-medium text-text-secondary'
+              >
+                Email
+              </label>
+              <div
+                className={cn(
+                  'flex items-center gap-2 rounded-[8px] border bg-background px-3 py-2 transition-colors duration-[80ms] focus-within:border-primary focus-within:ring-1 focus-within:ring-primary/20',
+                  fieldState.invalid
+                    ? 'border-destructive focus-within:border-destructive focus-within:ring-destructive/20'
+                    : 'border-border'
+                )}
+              >
+                <Mail className='size-4 shrink-0 text-text-quaternary' />
+                <input
+                  {...field}
+                  id='email'
+                  type='email'
+                  placeholder='you@example.com'
+                  autoComplete='email'
+                  className='flex-1 bg-transparent text-[13px] outline-none placeholder:text-text-quaternary'
+                />
+              </div>
+              {fieldState.error && (
+                <p className='text-[12px] text-destructive'>{fieldState.error.message}</p>
               )}
-            />
-            <Controller
-              name='password'
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor='password'>Password</FieldLabel>
-                  <PasswordInput
-                    id='password'
-                    {...field}
-                  />
+            </div>
+          )}
+        />
 
-                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                </Field>
+        {/* Password field */}
+        <Controller
+          name='password'
+          control={form.control}
+          render={({ field, fieldState }) => (
+            <div className='space-y-1.5'>
+              <label
+                htmlFor='password'
+                className='block text-[13px] font-medium text-text-secondary'
+              >
+                Password
+              </label>
+              <div
+                className={cn(
+                  'flex items-center gap-2 rounded-[8px] border bg-background px-3 py-2 transition-colors duration-[80ms] focus-within:border-primary focus-within:ring-1 focus-within:ring-primary/20',
+                  fieldState.invalid
+                    ? 'border-destructive focus-within:border-destructive focus-within:ring-destructive/20'
+                    : 'border-border'
+                )}
+              >
+                <input
+                  {...field}
+                  id='password'
+                  type={showPassword ? 'text' : 'password'}
+                  placeholder='••••••••'
+                  autoComplete='current-password'
+                  className='flex-1 bg-transparent text-[13px] outline-none placeholder:text-text-quaternary'
+                />
+                <button
+                  type='button'
+                  className='inline-flex size-5 shrink-0 items-center justify-center rounded-[4px] text-text-quaternary transition-colors hover:text-text-secondary'
+                  onClick={() => setShowPassword(!showPassword)}
+                  tabIndex={-1}
+                >
+                  {showPassword ? (
+                    <EyeOff className='size-3.5' />
+                  ) : (
+                    <Eye className='size-3.5' />
+                  )}
+                </button>
+              </div>
+              {fieldState.error && (
+                <p className='text-[12px] text-destructive'>{fieldState.error.message}</p>
               )}
-            />
-          </FieldGroup>
-        </form>
-      </CardContent>
-      <CardFooter>
-        <FieldGroup>
-          <Field>
-            <Button
-              isPending={signInMutation.isPending}
-              disabled={signInMutation.isPending}
-              className='w-full'
-              type='submit'
-              form='sign-in-form'
-            >
+            </div>
+          )}
+        />
+
+        {/* Submit */}
+        <button
+          type='submit'
+          disabled={signInMutation.isPending}
+          className='inline-flex h-9 w-full items-center justify-center gap-2 rounded-[8px] bg-primary text-[13px] font-semibold text-primary-foreground transition-opacity duration-[80ms] hover:opacity-90 disabled:pointer-events-none disabled:opacity-50'
+        >
+          {signInMutation.isPending ? (
+            <>
+              <Loader2 className='size-3.5 animate-spin' />
+              Signing in…
+            </>
+          ) : (
+            <>
+              <LogIn className='size-3.5' />
               Sign In
-            </Button>
-          </Field>
-        </FieldGroup>
-      </CardFooter>
-    </Card>
+            </>
+          )}
+        </button>
+      </form>
+    </div>
   )
 }

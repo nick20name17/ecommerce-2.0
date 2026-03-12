@@ -65,24 +65,25 @@ function getChange(current: number, previous: number): { pct: number; direction:
 
 export const DashboardKpis = ({ metrics }: DashboardKpisProps) => {
   return (
-    <div className='grid min-w-0 grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6'>
+    <div className='grid min-w-0 grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-3 lg:grid-cols-6'>
       {KPI_CONFIG.map((config) => {
         const value = config.value(metrics)
         const prev = config.prev ? config.prev(metrics) : null
         const change = prev != null ? getChange(value, prev) : null
+        const isHidden = 'hidden' in config && config.hidden
 
         return (
           <div
             key={config.key}
-            className='rounded-[8px] border border-border bg-background px-4 py-4'
+            className='rounded-[8px] border border-border bg-background px-3 py-3 sm:px-4 sm:py-4'
           >
-            <div className='text-[12px] font-medium uppercase tracking-[0.04em] text-text-tertiary'>
+            <div className='text-[11px] font-medium uppercase tracking-[0.04em] text-text-tertiary sm:text-[12px]'>
               {config.title}
             </div>
-            <div className='mt-1.5 truncate text-[20px] font-semibold tabular-nums leading-none tracking-tight'>
-              {'hidden' in config && config.hidden ? '—' : config.format(value)}
+            <div className='mt-1 truncate text-[16px] font-semibold tabular-nums leading-none tracking-tight sm:mt-1.5 sm:text-[20px]'>
+              {isHidden ? '—' : config.format(value)}
             </div>
-            {change && !('hidden' in config && config.hidden) && (
+            {change && !isHidden && (
               <span
                 className={cn(
                   'mt-1.5 inline-flex items-center gap-0.5 text-[11px] font-medium tabular-nums leading-none',

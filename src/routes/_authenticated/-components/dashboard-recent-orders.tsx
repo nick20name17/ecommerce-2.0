@@ -47,7 +47,6 @@ export function DashboardRecentOrders({ projectId, customerId }: DashboardRecent
               <Skeleton className='h-3 w-32' />
               <div className='flex-1' />
               <Skeleton className='h-3 w-16' />
-              <Skeleton className='h-3 w-20' />
             </div>
           ))}
         </div>
@@ -64,53 +63,97 @@ export function DashboardRecentOrders({ projectId, customerId }: DashboardRecent
       <div className='px-4 py-3'>
         <h2 className='text-[14px] font-semibold'>Recent orders</h2>
       </div>
-      <table className='w-full'>
-        <thead>
-          <tr className='border-t border-border text-[13px] text-text-tertiary'>
-            <th className='px-4 py-2 text-left font-medium'>Status</th>
-            <th className='px-4 py-2 text-left font-medium'>Invoice</th>
-            <th className='px-4 py-2 text-left font-medium'>Name</th>
-            <th className='px-4 py-2 text-right font-medium'>Total</th>
-            <th className='px-4 py-2 text-right font-medium'>Date</th>
-          </tr>
-        </thead>
-        <tbody className='divide-y divide-border'>
-          {orders.map((order) => (
-            <tr key={order.autoid} className='group'>
-              <td className='px-4 py-2.5'>
-                <div className='flex items-center gap-2'>
-                  <StatusIcon
-                    status={ORDER_STATUS_LABELS[order.status]}
-                    color={STATUS_COLORS[order.status]}
-                    size={14}
-                  />
-                  <span className='text-[13px] text-text-tertiary'>
-                    {ORDER_STATUS_LABELS[order.status]}
-                  </span>
-                </div>
-              </td>
-              <td className='px-4 py-2.5'>
-                <Link
-                  to='/orders/$orderId'
-                  params={{ orderId: order.autoid }}
-                  className='text-[13px] font-medium text-text-primary hover:underline'
-                >
-                  {order.invoice || order.id}
-                </Link>
-              </td>
-              <td className='max-w-[200px] truncate px-4 py-2.5 text-[13px] text-text-secondary'>
-                {order.name || '—'}
-              </td>
-              <td className='px-4 py-2.5 text-right text-[13px] tabular-nums'>
-                {formatCurrency(order.total)}
-              </td>
-              <td className='px-4 py-2.5 text-right text-[13px] text-text-tertiary tabular-nums'>
-                {formatDate(order.inv_date)}
-              </td>
+
+      {/* Desktop table (sm+) */}
+      <div className='hidden overflow-x-auto sm:block'>
+        <table className='w-full'>
+          <thead>
+            <tr className='border-t border-border text-[12px] text-text-tertiary'>
+              <th className='px-3 py-2 text-left font-medium sm:px-4'>Status</th>
+              <th className='px-3 py-2 text-left font-medium sm:px-4'>Invoice</th>
+              <th className='hidden px-3 py-2 text-left font-medium md:table-cell'>Name</th>
+              <th className='px-3 py-2 text-right font-medium sm:px-4'>Total</th>
+              <th className='px-3 py-2 text-right font-medium sm:px-4'>Date</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody className='divide-y divide-border'>
+            {orders.map((order) => (
+              <tr key={order.autoid}>
+                <td className='px-3 py-2.5 sm:px-4'>
+                  <div className='flex items-center gap-2'>
+                    <StatusIcon
+                      status={ORDER_STATUS_LABELS[order.status]}
+                      color={STATUS_COLORS[order.status]}
+                      size={14}
+                    />
+                    <span className='hidden text-[13px] text-text-tertiary lg:inline'>
+                      {ORDER_STATUS_LABELS[order.status]}
+                    </span>
+                  </div>
+                </td>
+                <td className='px-3 py-2.5 sm:px-4'>
+                  <Link
+                    to='/orders/$orderId'
+                    params={{ orderId: order.autoid }}
+                    className='whitespace-nowrap text-[13px] font-medium text-text-primary hover:underline'
+                  >
+                    {order.invoice || order.id}
+                  </Link>
+                </td>
+                <td className='hidden max-w-[200px] truncate px-3 py-2.5 text-[13px] text-text-secondary md:table-cell'>
+                  {order.name || '—'}
+                </td>
+                <td className='whitespace-nowrap px-3 py-2.5 text-right text-[13px] tabular-nums sm:px-4'>
+                  {formatCurrency(order.total)}
+                </td>
+                <td className='whitespace-nowrap px-3 py-2.5 text-right text-[13px] text-text-tertiary tabular-nums sm:px-4'>
+                  {formatDate(order.inv_date)}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Mobile stacked list */}
+      <div className='divide-y divide-border sm:hidden'>
+        {orders.map((order) => (
+          <Link
+            key={order.autoid}
+            to='/orders/$orderId'
+            params={{ orderId: order.autoid }}
+            className='flex items-center gap-3 px-4 py-2.5 transition-colors duration-100 hover:bg-bg-hover'
+          >
+            <StatusIcon
+              status={ORDER_STATUS_LABELS[order.status]}
+              color={STATUS_COLORS[order.status]}
+              size={14}
+            />
+            <div className='min-w-0 flex-1'>
+              <div className='flex items-center gap-2'>
+                <span className='text-[13px] font-medium text-foreground'>
+                  {order.invoice || order.id}
+                </span>
+                <span className='text-[12px] text-text-tertiary'>
+                  {ORDER_STATUS_LABELS[order.status]}
+                </span>
+              </div>
+              <div className='flex items-center gap-2 text-[12px] text-text-tertiary'>
+                {order.name && (
+                  <span className='truncate'>{order.name}</span>
+                )}
+                {order.name && order.inv_date && <span>·</span>}
+                {order.inv_date && (
+                  <span className='shrink-0 tabular-nums'>{formatDate(order.inv_date)}</span>
+                )}
+              </div>
+            </div>
+            <span className='shrink-0 text-[13px] font-medium tabular-nums'>
+              {formatCurrency(order.total)}
+            </span>
+          </Link>
+        ))}
+      </div>
     </div>
   )
 }

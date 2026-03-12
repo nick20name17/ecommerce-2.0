@@ -59,8 +59,8 @@ function BarRow({
   const pct = max > 0 ? (value / max) * 100 : 0
 
   return (
-    <div className='flex items-center gap-3'>
-      <span className='w-20 shrink-0 text-[13px] text-text-tertiary'>{label}</span>
+    <div className='flex items-center gap-2 sm:gap-3'>
+      <span className='w-16 shrink-0 text-[12px] text-text-tertiary sm:w-20 sm:text-[13px]'>{label}</span>
       <div className='relative h-8 flex-1 overflow-hidden rounded-[6px] bg-border/30'>
         <div
           className='absolute inset-y-0 left-0 rounded-[6px]'
