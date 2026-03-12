@@ -9,6 +9,7 @@ import {
   StickyNote,
   Trash2,
   UserPlus,
+  Users,
 } from 'lucide-react'
 import { useState } from 'react'
 
@@ -19,6 +20,7 @@ import { getCustomersQuery } from '@/api/customer/query'
 import { getFieldConfigQuery } from '@/api/field-config/query'
 import type { Customer, CustomerParams } from '@/api/customer/schema'
 import { EntityNotesSheet } from '@/components/common/entity-notes/entity-notes-sheet'
+import { PageEmpty } from '@/components/common/page-empty'
 import { getEntityNotesQuery } from '@/api/note/query'
 import { FilterChip, FilterPopover, ICustomers, InitialsAvatar, PAGE_COLORS, PageHeaderIcon } from '@/components/ds'
 import {
@@ -243,26 +245,7 @@ function CustomersPage() {
             </div>
           ))
         ) : customers.length === 0 ? (
-          <div className='flex flex-col items-center justify-center py-24 text-center'>
-            <div className='mb-1 text-text-tertiary/30'>
-              <svg
-                width='28'
-                height='28'
-                viewBox='0 0 24 24'
-                fill='none'
-                stroke='currentColor'
-                strokeWidth='1.5'
-                strokeLinecap='round'
-                strokeLinejoin='round'
-              >
-                <path d='M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2' />
-                <circle cx='9' cy='7' r='4' />
-                <path d='M22 21v-2a4 4 0 0 0-3-3.87' />
-                <path d='M16 3.13a4 4 0 0 1 0 7.75' />
-              </svg>
-            </div>
-            <p className='text-[13px] text-text-tertiary'>No matching customers</p>
-          </div>
+          <PageEmpty icon={Users} title='No matching customers' description='Try adjusting your search or filters.' />
         ) : (
           customers.map((customer) => (
             <CustomerRow

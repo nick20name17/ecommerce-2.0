@@ -13,6 +13,7 @@ import {
 import { useEffect, useMemo, useState } from 'react'
 import { useDebouncedCallback } from 'use-debounce'
 
+import { PageEmpty } from '@/components/common/page-empty'
 import { getProductsQuery } from '@/api/product/query'
 import type { Product } from '@/api/product/schema'
 import { formatCurrency } from '@/helpers/formatters'
@@ -137,13 +138,10 @@ export const CatalogProductGrid = ({
       {/* Table header */}
       <div className='flex shrink-0 items-center gap-3 border-b border-border bg-bg-secondary/60 px-4 py-1.5'>
         <div className='w-10 shrink-0' />
-        <div className='w-[80px] shrink-0 text-[12px] font-medium uppercase tracking-[0.04em] text-text-tertiary'>
-          ID
+        <div className='min-w-0 flex-1 text-[11px] font-semibold uppercase tracking-[0.05em] text-text-tertiary'>
+          Product
         </div>
-        <div className='min-w-0 flex-1 text-[12px] font-medium uppercase tracking-[0.04em] text-text-tertiary'>
-          Description
-        </div>
-        <div className='hidden w-[80px] shrink-0 text-right text-[12px] font-medium uppercase tracking-[0.04em] text-text-tertiary sm:block'>
+        <div className='hidden w-[80px] shrink-0 text-right text-[11px] font-semibold uppercase tracking-[0.05em] text-text-tertiary sm:block'>
           Price
         </div>
         <div className='w-[60px] shrink-0' />
@@ -156,25 +154,22 @@ export const CatalogProductGrid = ({
             {Array.from({ length: 12 }).map((_, i) => (
               <div key={i} className='flex items-center gap-3 border-b border-border-light px-4 py-2'>
                 <div className='size-10 shrink-0 animate-pulse rounded-[6px] bg-border' />
-                <div className='h-3 w-16 animate-pulse rounded bg-border' />
-                <div className='h-3 flex-1 animate-pulse rounded bg-border' />
+                <div className='min-w-0 flex-1 space-y-1'>
+                  <div className='h-3.5 w-3/4 animate-pulse rounded bg-border' />
+                  <div className='h-3 w-1/3 animate-pulse rounded bg-border' />
+                </div>
                 <div className='hidden h-3 w-14 animate-pulse rounded bg-border sm:block' />
                 <div className='h-6 w-12 animate-pulse rounded bg-border' />
               </div>
             ))}
           </div>
         ) : products.length === 0 ? (
-          <div className='flex flex-col items-center gap-2 px-4 py-16 text-center'>
-            <Package className='size-6 text-text-tertiary opacity-40' />
-            <p className='text-[13px] font-medium'>
-              {debouncedSearch ? 'No matches' : 'No products'}
-            </p>
-            <p className='text-[13px] text-text-tertiary'>
-              {debouncedSearch
-                ? 'Try another search term.'
-                : 'Use search or choose another category.'}
-            </p>
-          </div>
+          <PageEmpty
+            icon={Package}
+            title={debouncedSearch ? 'No matches' : 'No products'}
+            description={debouncedSearch ? 'Try another search term.' : 'Use search or choose another category.'}
+            compact
+          />
         ) : (
           products.map((product) => {
             const currentNum = Math.round((parseFloat(String(product.price)) || 0) * 100) / 100
@@ -205,28 +200,19 @@ export const CatalogProductGrid = ({
                   )}
                 </div>
 
-                {/* Product ID */}
-                <div className='w-[80px] shrink-0'>
-                  <span className='text-[13px] font-semibold tabular-nums text-foreground'>
-                    {product.id}
-                  </span>
-                  {product.inactive && (
-                    <span className='ml-1 rounded border border-border px-1 py-px text-[10px] font-medium text-text-tertiary'>
-                      Inactive
-                    </span>
-                  )}
-                </div>
-
-                {/* Description */}
+                {/* Product info */}
                 <div className='min-w-0 flex-1'>
-                  <p className='truncate text-[13px] font-medium' title={product.descr_1}>
-                    {product.descr_1}
-                  </p>
                   <div className='flex items-center gap-2'>
-                    {product.descr_2 && (
-                      <p className='truncate text-[12px] text-text-tertiary' title={product.descr_2}>
-                        {product.descr_2}
-                      </p>
+                    <span className='shrink-0 text-[13px] font-semibold tabular-nums text-foreground'>
+                      {product.id}
+                    </span>
+                    <span className='truncate text-[13px] text-text-secondary' title={product.descr_1}>
+                      {product.descr_1}
+                    </span>
+                    {product.inactive && (
+                      <span className='shrink-0 rounded border border-border px-1 py-px text-[10px] font-medium text-text-tertiary'>
+                        Inactive
+                      </span>
                     )}
                     {needsConfig && (
                       <span className='inline-flex shrink-0 items-center gap-1 rounded-[4px] bg-primary/10 px-1.5 py-0.5 text-[11px] font-medium text-primary'>
@@ -235,6 +221,11 @@ export const CatalogProductGrid = ({
                       </span>
                     )}
                   </div>
+                  {product.descr_2 && (
+                    <p className='truncate text-[12px] text-text-quaternary' title={product.descr_2}>
+                      {product.descr_2}
+                    </p>
+                  )}
                 </div>
 
                 {/* Price */}

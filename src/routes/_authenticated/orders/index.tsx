@@ -6,6 +6,7 @@ import {
   ListTodo,
   Loader2,
   MoreHorizontal,
+  Package,
   PackageCheck,
   Paperclip,
   Plus,
@@ -27,6 +28,7 @@ import { ORDER_QUERY_KEYS, getOrdersQuery } from '@/api/order/query'
 import { getEntityNotesQuery } from '@/api/note/query'
 import type { Order, OrderParams } from '@/api/order/schema'
 import { orderService } from '@/api/order/service'
+import { PageEmpty } from '@/components/common/page-empty'
 import { EntityAttachmentsDialog } from '@/components/common/entity-attachments/entity-attachments-dialog'
 import { EntityNotesSheet } from '@/components/common/entity-notes/entity-notes-sheet'
 import { Pagination } from '@/components/common/filters/pagination'
@@ -263,25 +265,7 @@ const OrdersPage = () => {
             </div>
           ))
         ) : results.length === 0 && !hasPendingAutoid ? (
-          <div className='flex flex-col items-center justify-center py-24 text-center'>
-            <div className='mb-1 text-text-tertiary/30'>
-              <svg
-                width='28'
-                height='28'
-                viewBox='0 0 24 24'
-                fill='none'
-                stroke='currentColor'
-                strokeWidth='1.5'
-                strokeLinecap='round'
-                strokeLinejoin='round'
-              >
-                <path d='M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z' />
-                <polyline points='3.27 6.96 12 12.01 20.73 6.96' />
-                <line x1='12' y1='22.08' x2='12' y2='12' />
-              </svg>
-            </div>
-            <p className='text-[13px] text-text-tertiary'>No matching orders</p>
-          </div>
+          <PageEmpty icon={Package} title='No matching orders' description='Try adjusting your search or filters.' />
         ) : (
           <>
             {hasPendingAutoid && (

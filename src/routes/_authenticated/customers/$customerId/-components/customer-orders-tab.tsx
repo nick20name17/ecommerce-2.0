@@ -1,6 +1,6 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
-import { Search, Trash2 } from 'lucide-react'
+import { Package, Search, Trash2 } from 'lucide-react'
 import { useState } from 'react'
 
 import { getOrdersQuery } from '@/api/order/query'
@@ -11,6 +11,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { PageEmpty } from '@/components/common/page-empty'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { ORDER_STATUS_CLASS, ORDER_STATUS_LABELS } from '@/constants/order'
 import type { OrderStatus } from '@/constants/order'
@@ -122,9 +123,7 @@ export const CustomerOrdersTab = ({ customerId }: CustomerOrdersTabProps) => {
             ))}
           </div>
         ) : orders.length === 0 ? (
-          <div className='flex flex-col items-center justify-center py-16 text-center'>
-            <p className='text-[13px] text-text-tertiary'>No orders found</p>
-          </div>
+          <PageEmpty icon={Package} title='No orders found' description='This customer has no orders yet.' compact />
         ) : (
           orders.map((order) => (
             <OrderRow

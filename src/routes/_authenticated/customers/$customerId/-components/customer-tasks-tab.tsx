@@ -1,12 +1,13 @@
 'use no memo'
 
 import { keepPreviousData, useMutation, useQuery } from '@tanstack/react-query'
-import { Plus, Search, Trash2 } from 'lucide-react'
+import { CheckSquare, Plus, Search, Trash2 } from 'lucide-react'
 import { useState } from 'react'
 
 import { TASK_QUERY_KEYS, getTaskStatusesQuery, getTasksQuery } from '@/api/task/query'
 import type { TaskListItem, TaskStatus } from '@/api/task/schema'
 import { taskService } from '@/api/task/service'
+import { PageEmpty } from '@/components/common/page-empty'
 import { InitialsAvatar, StatusIcon } from '@/components/ds'
 import {
   DropdownMenu,
@@ -160,9 +161,7 @@ export const CustomerTasksTab = ({ customerId }: CustomerTasksTabProps) => {
             ))}
           </div>
         ) : tasks.length === 0 ? (
-          <div className='flex flex-col items-center justify-center py-16 text-center'>
-            <p className='text-[13px] text-text-tertiary'>No to-do&apos;s found</p>
-          </div>
+          <PageEmpty icon={CheckSquare} title="No to-do's found" description='This customer has no tasks yet.' compact />
         ) : (
           tasks.map((task) => (
             <TaskRow

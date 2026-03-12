@@ -1,7 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { createFileRoute, useRouter } from '@tanstack/react-router'
-import { Check, ChevronLeft, Copy, ListTodo, Paperclip, Trash2, Truck, X } from 'lucide-react'
+import { Check, ChevronLeft, Copy, ListTodo, Package, Paperclip, Trash2, Truck, X } from 'lucide-react'
 
+import { PageEmpty } from '@/components/common/page-empty'
 import { EntityAttachmentsDialog } from '@/components/common/entity-attachments/entity-attachments-dialog'
 import { ShippingRatesDialog } from './-components/shipping-rates-dialog'
 import { useCallback, useMemo, useRef, useState } from 'react'
@@ -243,7 +244,7 @@ function OrderDetailPage() {
   if (!order) {
     return (
       <div className='flex h-full items-center justify-center'>
-        <p className='text-[13px] text-text-secondary'>Order not found.</p>
+        <PageEmpty icon={Package} title='Order not found' description='This order may have been deleted or you may not have access.' />
       </div>
     )
   }
@@ -382,9 +383,7 @@ function OrderDetailPage() {
         <div className='flex min-h-0 flex-1 flex-col overflow-hidden'>
           <div className='flex-1 overflow-auto'>
             {items.length === 0 ? (
-              <div className='flex flex-col items-center justify-center py-24 text-center'>
-                <p className='text-[13px] text-text-tertiary'>No items in this order</p>
-              </div>
+              <PageEmpty icon={Package} title='No items in this order' compact />
             ) : (
               <table className='w-full text-[13px]'>
                 <thead className='sticky top-0 z-10 select-none bg-bg-secondary/60 backdrop-blur-sm'>

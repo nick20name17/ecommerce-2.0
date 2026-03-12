@@ -1,5 +1,6 @@
-import { Image, Pencil, Settings2, Trash2 } from 'lucide-react'
+import { Image, Package, Pencil, Settings2, Trash2 } from 'lucide-react'
 
+import { PageEmpty } from '@/components/common/page-empty'
 import type { CartItem } from '@/api/product/schema'
 import { NumberInput } from '@/components/ui/number-input'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -43,11 +44,7 @@ export const CartTable = ({
 
   if (items.length === 0) {
     return (
-      <div className='flex flex-col items-center gap-1.5 py-16 text-text-tertiary'>
-        <Image className='size-6 opacity-30' />
-        <span className='text-[13px]'>No products added yet</span>
-        <span className='text-[12px] text-text-quaternary'>Use the catalog to add products</span>
-      </div>
+      <PageEmpty icon={Package} title='No products added yet' description='Use the catalog to add products.' compact />
     )
   }
 

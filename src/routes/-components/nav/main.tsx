@@ -87,11 +87,18 @@ const WORKSPACE_ITEMS: NavItem[] = [
     iconBg: 'bg-violet-500',
     iconColor: 'text-white',
   },
+  {
+    title: 'Settings',
+    url: '/settings',
+    icon: ISettings,
+    iconBg: 'bg-zinc-500',
+    iconColor: 'text-white',
+    adminOnly: true,
+  },
 ]
 
 const BOTTOM_ITEMS: NavItem[] = [
   { title: 'Projects', url: '/projects', icon: IProjects, superAdminOnly: true },
-  { title: 'Settings', url: '/settings', icon: ISettings, adminOnly: true },
   { title: 'Testing', url: '/nav-options', icon: ITesting },
 ]
 

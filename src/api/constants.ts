@@ -1,6 +1,6 @@
 import type { FileRoutesByTo } from '@/routeTree.gen'
 
-export const API_ORIGIN = 'https://api.store.rivne.app'
+export const API_ORIGIN = import.meta.env.VITE_API_URL || 'https://api.ebms.app'
 export const API_BASE_URL = `${API_ORIGIN}/api/`
 
 export const DEFAULT_LIMIT = 20

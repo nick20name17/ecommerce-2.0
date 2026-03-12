@@ -3,6 +3,7 @@ import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import {
   Calendar,
   Check,
+  CheckSquare,
   ChevronDown,
   Columns3,
   List,
@@ -17,6 +18,7 @@ import { KanbanView } from './-components/kanban-view'
 import { TASK_QUERY_KEYS, getTasksQuery, getTaskStatusesQuery } from '@/api/task/query'
 import type { TaskListItem, TaskParams, TaskStatus } from '@/api/task/schema'
 import { taskService } from '@/api/task/service'
+import { PageEmpty } from '@/components/common/page-empty'
 import { CommandBarCreate, PriorityIcon } from '@/components/tasks/command-bar-create'
 import { UserCombobox } from '@/components/common/user-combobox/user-combobox'
 import { FilterChip, FilterPopover, ITodos, InitialsAvatar, PAGE_COLORS, PageHeaderIcon, StatusIcon, ViewToggle, type ViewOption } from '@/components/ds'
@@ -842,18 +844,6 @@ function StatusChangeButton({
 
 function EmptyState() {
   return (
-    <div className='flex flex-col items-center justify-center py-24 text-center'>
-      <div className='mb-1 text-text-tertiary/30'>
-        <svg width='28' height='28' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='1.5' strokeLinecap='round' strokeLinejoin='round'>
-          <rect x='3' y='3' width='7' height='7' rx='1' />
-          <rect x='14' y='3' width='7' height='7' rx='1' />
-          <rect x='3' y='14' width='7' height='7' rx='1' />
-          <rect x='14' y='14' width='7' height='7' rx='1' />
-        </svg>
-      </div>
-      <p className='text-[13px] text-text-tertiary'>
-        No matching tasks
-      </p>
-    </div>
+    <PageEmpty icon={CheckSquare} title='No matching tasks' description='Try adjusting your search or filters.' />
   )
 }

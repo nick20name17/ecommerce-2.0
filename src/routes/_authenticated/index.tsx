@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
-import { LayoutDashboard } from 'lucide-react'
+import { LayoutDashboard, TriangleAlert } from 'lucide-react'
 
 import { DashboardKpis } from './-components/dashboard-kpis'
 import { IDashboard, PAGE_COLORS, PageHeaderIcon } from '@/components/ds'
@@ -48,17 +48,15 @@ const DashboardPage = () => {
   // ── Super admin: no project selected ──
   if (userIsSuperAdmin && projectId == null) {
     return (
-      <div className='flex h-full flex-col items-center justify-center gap-6 px-4'>
-        <div className='flex flex-col items-center gap-4 rounded-[10px] border border-border bg-background px-8 py-10 text-center'>
-          <div className='flex size-12 items-center justify-center rounded-[10px] bg-primary/10'>
-            <LayoutDashboard className='size-6 text-primary' />
-          </div>
-          <div className='space-y-1'>
-            <h1 className='text-[16px] font-semibold tracking-[-0.02em]'>Dashboard</h1>
-            <p className='max-w-sm text-[13px] text-text-tertiary'>
-              Select a project in the sidebar to view metrics.
-            </p>
-          </div>
+      <div className='flex h-full flex-col items-center justify-center gap-5 px-4'>
+        <div className='flex size-12 items-center justify-center rounded-[12px] bg-primary/[0.08] text-primary dark:bg-primary/15'>
+          <LayoutDashboard className='size-6' strokeWidth={1.75} />
+        </div>
+        <div className='flex flex-col items-center gap-1.5 text-center'>
+          <h1 className='text-[16px] font-semibold tracking-[-0.02em] text-foreground'>Dashboard</h1>
+          <p className='max-w-[280px] text-[13px] leading-snug text-text-tertiary'>
+            Select a project in the sidebar to view metrics.
+          </p>
         </div>
       </div>
     )
@@ -74,9 +72,14 @@ const DashboardPage = () => {
           projectId={projectId}
         />
         <div className='flex flex-1 items-center justify-center px-4'>
-          <div className='rounded-[10px] border border-destructive/30 bg-background px-6 py-5 text-center'>
-            <p className='text-[13px] font-medium text-destructive'>Unable to load dashboard</p>
-            <p className='mt-1 text-[13px] text-text-tertiary'>{getErrorMessage(error)}</p>
+          <div className='flex flex-col items-center gap-5'>
+            <div className='flex size-12 items-center justify-center rounded-[12px] bg-destructive/10 text-destructive'>
+              <TriangleAlert className='size-6' strokeWidth={1.75} />
+            </div>
+            <div className='flex flex-col items-center gap-1.5 text-center'>
+              <p className='text-[14px] font-semibold text-foreground'>Unable to load dashboard</p>
+              <p className='max-w-[280px] text-[13px] leading-snug text-text-tertiary'>{getErrorMessage(error)}</p>
+            </div>
           </div>
         </div>
       </div>
@@ -92,12 +95,12 @@ const DashboardPage = () => {
           onCustomerChange={handleCustomerChange}
           projectId={projectId}
         />
-        <div className='flex-1 overflow-y-auto px-6 py-5'>
+        <div className='flex-1 overflow-y-auto px-4 py-4 sm:px-6 sm:py-5'>
           <div className='flex flex-col gap-5'>
             {/* KPI skeletons */}
-            <div className='grid min-w-0 grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6'>
+            <div className='grid min-w-0 grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-3 lg:grid-cols-6'>
               {['sk-1', 'sk-2', 'sk-3', 'sk-4', 'sk-5', 'sk-6'].map((id) => (
-                <div key={id} className='rounded-[8px] border border-border bg-background px-4 py-4'>
+                <div key={id} className='rounded-[8px] border border-border bg-background px-3 py-3 sm:px-4 sm:py-4'>
                   <Skeleton className='h-3 w-16' />
                   <Skeleton className='mt-2.5 h-6 w-14' />
                 </div>
@@ -144,14 +147,14 @@ const DashboardPage = () => {
         onCustomerChange={handleCustomerChange}
         projectId={projectId}
       />
-      <div className='flex-1 overflow-y-auto px-6 py-5'>
+      <div className='flex-1 overflow-y-auto px-4 py-4 sm:px-6 sm:py-5'>
         <div className='flex flex-col gap-5'>
           <DashboardKpis metrics={data} />
 
           {/* Orders chart */}
           <div className='rounded-[8px] border border-border bg-background'>
-            <div className='flex items-center gap-2.5 px-4 py-3'>
-              <h2 className='text-[14px] font-semibold'>Orders — this month vs last month</h2>
+            <div className='flex flex-wrap items-center gap-2 px-4 py-3 sm:gap-2.5'>
+              <h2 className='text-[13px] font-semibold sm:text-[14px]'>Orders — this month vs last month</h2>
               <OrdersChangeBadge metrics={data} />
             </div>
             <div className='p-4'>
@@ -182,12 +185,12 @@ function DashboardHeader({
   projectId: number | null
 }) {
   return (
-    <header className='flex h-12 shrink-0 items-center gap-3 border-b border-border px-6'>
+    <header className='flex h-12 shrink-0 items-center gap-3 border-b border-border px-4 sm:px-6'>
       <div className='flex items-center gap-1.5'>
         <PageHeaderIcon icon={IDashboard} color={PAGE_COLORS.dashboard} />
         <h1 className='text-[14px] font-semibold tracking-[-0.01em]'>Dashboard</h1>
       </div>
-      <div className='w-[280px] min-w-0'>
+      <div className='w-40 min-w-0 sm:w-[280px]'>
         <CustomerCombobox
           value={customerFilterValue}
           onChange={onCustomerChange}

@@ -1,8 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { createFileRoute, useNavigate, useRouter } from '@tanstack/react-router'
-import { ChevronLeft, Copy, ListTodo, Paperclip, ShoppingCart, Trash2 } from 'lucide-react'
+import { ChevronLeft, Copy, FileText, ListTodo, Paperclip, Settings, ShoppingCart, Trash2 } from 'lucide-react'
 import { useState } from 'react'
 
+import { PageEmpty } from '@/components/common/page-empty'
 import { EntityAttachmentsDialog } from '@/components/common/entity-attachments/entity-attachments-dialog'
 import { getFieldConfigQuery } from '@/api/field-config/query'
 import { ORDER_QUERY_KEYS } from '@/api/order/query'
@@ -168,7 +169,7 @@ function ProposalDetailPage() {
   if (!proposal) {
     return (
       <div className='flex h-full items-center justify-center'>
-        <p className='text-[13px] text-text-secondary'>Proposal not found.</p>
+        <PageEmpty icon={FileText} title='Proposal not found' description='This proposal may have been deleted or you may not have access.' />
       </div>
     )
   }
@@ -311,9 +312,7 @@ function ProposalDetailPage() {
         <div className='flex min-h-0 flex-1 flex-col overflow-hidden'>
           <div className='flex-1 overflow-auto'>
             {items.length === 0 ? (
-              <div className='flex flex-col items-center justify-center py-24 text-center'>
-                <p className='text-[13px] text-text-tertiary'>No items in this proposal</p>
-              </div>
+              <PageEmpty icon={FileText} title='No items in this proposal' compact />
             ) : (
               <table className='w-full text-[13px]'>
                 <thead className='sticky top-0 z-10 select-none bg-bg-secondary/60 backdrop-blur-sm'>
@@ -441,12 +440,7 @@ function ProposalDetailPage() {
             ) : (
               <>
                 {customFields.length === 0 ? (
-                  <div className='flex flex-col items-center justify-center py-12 text-center'>
-                    <p className='text-[13px] text-text-tertiary'>No custom fields enabled</p>
-                    <p className='mt-1 text-[12px] text-text-quaternary'>
-                      Enable fields in Settings &rarr; Data Control
-                    </p>
-                  </div>
+                  <PageEmpty icon={Settings} title='No custom fields enabled' description='Enable fields in Settings &rarr; Data Control' compact />
                 ) : (
                   <SectionLabel>Custom Fields</SectionLabel>
                 )}

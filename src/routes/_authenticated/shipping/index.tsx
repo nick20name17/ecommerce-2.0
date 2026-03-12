@@ -8,6 +8,7 @@ import {
 } from 'lucide-react'
 import { useState } from 'react'
 
+import { PageEmpty } from '@/components/common/page-empty'
 import { IShipping, PAGE_COLORS, PageHeaderIcon } from '@/components/ds'
 import {
   Dialog,
@@ -278,10 +279,7 @@ const ShippingPage = () => {
       {/* Table body */}
       <div className='flex-1 overflow-y-auto'>
         {filtered.length === 0 ? (
-          <div className='flex flex-col items-center justify-center py-16 text-center'>
-            <Truck className='size-6 text-text-tertiary opacity-40' />
-            <p className='mt-2 text-[13px] text-text-tertiary'>No shipments found</p>
-          </div>
+          <PageEmpty icon={Truck} title='No shipments found' description='Try adjusting your search or filters.' />
         ) : (
           filtered.map((shipment) => {
             const status = STATUS_CONFIG[shipment.status]
