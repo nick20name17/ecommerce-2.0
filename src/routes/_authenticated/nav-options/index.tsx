@@ -5,7 +5,6 @@ import {
   Bell,
   Check,
   ChevronDown,
-  ChevronRight,
   Circle,
   FlaskConical,
   Gift,

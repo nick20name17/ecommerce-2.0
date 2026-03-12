@@ -16,7 +16,6 @@ import { useEffect, useRef, useState } from 'react'
 
 import { ProposalAssignDialog } from './-components/proposal-assign-dialog'
 import { ProposalDeleteDialog } from './-components/proposal-delete-dialog'
-import { ProposalsDataTable } from './-components/proposals-data-table'
 import { getFieldConfigQuery } from '@/api/field-config/query'
 import { CommandBarCreate } from '@/components/tasks/command-bar-create'
 import { IProposals, PAGE_COLORS, PageHeaderIcon, ViewToggle, type ViewOption } from '@/components/ds'
@@ -116,7 +115,7 @@ const ProposalsPage = () => {
     placeholderData: keepPreviousData,
   })
 
-  const { data: fieldConfig } = useQuery(getFieldConfigQuery(projectId))
+  const { data: _fieldConfig } = useQuery(getFieldConfigQuery(projectId))
 
   const results = data?.results ?? []
   const proposalInResults =

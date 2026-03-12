@@ -19,7 +19,6 @@ import { useEffect, useRef, useState } from 'react'
 
 import { OrderAssignDialog } from './-components/order-assign-dialog'
 import { OrderDeleteDialog } from './-components/order-delete-dialog'
-import { OrdersDataTable } from './-components/orders-data-table'
 import { getFieldConfigQuery } from '@/api/field-config/query'
 import { CommandBarCreate } from '@/components/tasks/command-bar-create'
 import { IOrders, PAGE_COLORS, PageHeaderIcon, ViewToggle } from '@/components/ds'
@@ -132,7 +131,7 @@ const OrdersPage = () => {
     placeholderData: keepPreviousData,
   })
 
-  const { data: fieldConfig } = useQuery(getFieldConfigQuery(projectId))
+  const { data: _fieldConfig } = useQuery(getFieldConfigQuery(projectId))
 
   const results = data?.results ?? []
   const orderInResults =

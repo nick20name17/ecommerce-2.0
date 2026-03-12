@@ -81,7 +81,7 @@ function CustomersPage() {
     placeholderData: keepPreviousData,
   })
 
-  const { data: fieldConfig } = useQuery(getFieldConfigQuery(projectId))
+  const { data: _fieldConfig } = useQuery(getFieldConfigQuery(projectId))
 
   const allCustomers = data?.results ?? []
 

@@ -62,7 +62,6 @@ export const EntityNotesSheet = ({
   })
 
   const notesQueryKey = NOTE_QUERY_KEYS.entityNotes(entityType, autoid, projectId)
-  const summaryQueryKey = NOTE_QUERY_KEYS.summary(entityType, autoid, projectId)
 
   const createMutation = useMutation({
     mutationFn: (payload: { text: string }) =>
@@ -81,7 +80,7 @@ export const EntityNotesSheet = ({
         project: projectId ?? 0,
         text: payload.text,
         author: user?.id ?? null,
-        author_name: user?.full_name ?? user?.username ?? '',
+        author_name: user ? `${user.first_name} ${user.last_name}`.trim() : '',
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
       }
@@ -100,7 +99,7 @@ export const EntityNotesSheet = ({
         project: serverNote.project,
         text: serverNote.text,
         author: serverNote.author,
-        author_name: serverNote.author_details?.full_name ?? user?.full_name ?? '',
+        author_name: serverNote.author_details?.full_name ?? (user ? `${user.first_name} ${user.last_name}`.trim() : ''),
         created_at: serverNote.created_at,
         updated_at: serverNote.updated_at
       }

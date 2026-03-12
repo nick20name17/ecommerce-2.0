@@ -16,7 +16,7 @@ export const useProductEditSheet = (
 ) => {
   const [state, dispatch] = useReducer(sheetReducer, initialSheetState)
   const requestedTabsRef = useRef<Set<string>>(new Set())
-  const { activeTab, configs } = state
+  const { configs } = state
 
   useEffect(() => {
     if (!product || !open) return

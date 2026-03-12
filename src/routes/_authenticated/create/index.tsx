@@ -9,7 +9,6 @@ import {
   Paperclip,
   ShoppingCart,
   User,
-  X,
 } from 'lucide-react'
 import { useState } from 'react'
 
@@ -21,7 +20,6 @@ import { ProductEditSheet } from './-components/product-edit-sheet'
 import { useCreatePage } from './-components/use-create-page'
 import {
   EntityAttachments,
-  type EntityAttachmentsRef,
 } from '@/components/common/entity-attachments/entity-attachments'
 import {
   Dialog,

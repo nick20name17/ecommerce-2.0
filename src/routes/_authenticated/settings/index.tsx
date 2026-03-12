@@ -216,11 +216,21 @@ const DataControlSection = ({ projectId }: { projectId: number }) => {
     if (!entityFields) return []
     return entityFields.map((entry) => ({
       field: entry.field,
+      alias: entry.alias,
       default: entry.default,
       enabled: entry.enabled,
       entity: currentTab
     }))
   }, [data, currentTab])
+
+  const handleAliasSubmit = (entity: string, fieldName: string, alias: string) => {
+    patchMutation.mutate({
+      payload: { _aliases: { [entity]: { [fieldName]: alias } } } as unknown as Record<string, string[]>,
+      entity,
+      fieldName,
+      enabled: true
+    })
+  }
 
   const handleFieldToggle = (entity: string, fieldName: string, enabled: boolean) => {
     if (!data?.[entity]) return
@@ -267,7 +277,9 @@ const DataControlSection = ({ projectId }: { projectId: number }) => {
             entity={currentTab}
             projectId={projectId}
             onFieldToggle={handleFieldToggle}
+            onAliasSubmit={handleAliasSubmit}
             isPending={patchMutation.isPending}
+            isAliasPending={patchMutation.isPending}
           />
         ) : entities.length === 0 ? (
           <div className='text-text-tertiary mt-4 flex flex-1 items-center justify-center text-[13px]'>
@@ -282,7 +294,9 @@ const DataControlSection = ({ projectId }: { projectId: number }) => {
                 entity={entity}
                 projectId={projectId}
                 onFieldToggle={handleFieldToggle}
+                onAliasSubmit={handleAliasSubmit}
                 isPending={patchMutation.isPending}
+                isAliasPending={patchMutation.isPending}
               />
             </TabsContent>
           ))
@@ -404,7 +418,6 @@ const TasksSection = ({ projectId }: { projectId: number }) => {
 // ── Shipping Section ────────────────────────────────────────
 
 const ShippingSection = ({ projectId }: { projectId: number }) => {
-  const queryClient = useQueryClient()
   const { data: addresses, isLoading } = useQuery(getShippingAddressesQuery(projectId))
 
   const [modalAddress, setModalAddress] = useState<ShippingAddress | 'create' | null>(null)
