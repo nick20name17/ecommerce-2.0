@@ -4,9 +4,6 @@ import { useEffect, useMemo, useState } from 'react'
 
 import { getCategoriesQuery } from '@/api/category/query'
 import type { Category } from '@/api/category/schema'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { ScrollArea } from '@/components/ui/scroll-area'
 import { Skeleton } from '@/components/ui/skeleton'
 import { cn } from '@/lib/utils'
 
@@ -81,174 +78,166 @@ export const CatalogCategorySidebar = ({
 
   return (
     <div className={cn('flex h-full min-h-0 flex-col', className)}>
-      <div className='shrink-0 border-b px-4 py-3'>
-        <div className='flex items-start justify-between gap-3'>
-          <div className='min-w-0'>
-            <p className='text-muted-foreground text-xs font-medium'>Categories</p>
-            <p
-              className='truncate text-sm font-semibold'
-              title={currentLabel}
-            >
-              {currentLabel}
-            </p>
-          </div>
-
-          {path.length > 0 && (
-            <Button
-              type='button'
-              size='icon-sm'
-              variant='ghost'
-              className='shrink-0'
-              onClick={() => handleGoToCrumb(path.length - 2)}
-              title='Back'
-            >
-              <ChevronLeft className='size-4' />
-            </Button>
-          )}
+      {/* Header */}
+      <div className='flex shrink-0 items-center justify-between gap-2 border-b border-border px-4 py-2'>
+        <div className='min-w-0'>
+          <span className='text-[12px] font-medium uppercase tracking-[0.04em] text-text-tertiary'>
+            Categories
+          </span>
+          <p className='truncate text-[13px] font-semibold' title={currentLabel}>
+            {currentLabel}
+          </p>
         </div>
-
-        <div
-          className='mt-2 flex min-w-0 flex-nowrap items-center gap-1.5 overflow-x-auto pb-0.5 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden'
-          role='navigation'
-          aria-label='Category path'
-        >
+        {path.length > 0 && (
           <button
             type='button'
-            className={cn(
-              'shrink-0 rounded-md px-2 py-0.5 text-xs transition-colors',
-              path.length === 0
-                ? 'bg-primary/10 text-primary'
-                : 'text-muted-foreground hover:bg-muted hover:text-foreground'
-            )}
-            onClick={handleGoRoot}
-            title='Root'
+            className='inline-flex size-7 shrink-0 items-center justify-center rounded-[5px] text-text-tertiary transition-colors duration-[80ms] hover:bg-bg-hover hover:text-foreground'
+            onClick={() => handleGoToCrumb(path.length - 2)}
+            title='Back'
           >
-            Root
+            <ChevronLeft className='size-4' />
           </button>
-
-          {path.map((crumb, index) => (
-            <div
-              key={crumb.tree_id}
-              className='flex shrink-0 items-center gap-1.5'
-            >
-              <ChevronRight className='text-muted-foreground size-3 shrink-0' />
-              <button
-                type='button'
-                className={cn(
-                  'max-w-[140px] shrink-0 truncate rounded-md px-2 py-0.5 text-xs transition-colors sm:max-w-[180px]',
-                  index === path.length - 1
-                    ? 'bg-primary/10 text-primary'
-                    : 'text-muted-foreground hover:bg-muted hover:text-foreground'
-                )}
-                onClick={() => handleGoToCrumb(index)}
-                title={crumb.tree_descr}
-              >
-                {crumb.tree_descr}
-              </button>
-            </div>
-          ))}
-        </div>
+        )}
       </div>
 
-      <ScrollArea className='min-h-0 flex-1'>
-        <div className='p-2'>
-          {loading ? (
-            <div className='space-y-2 p-2'>
-              {Array.from({ length: 10 }).map((_, i) => (
-                <Skeleton
-                  key={`category-skeleton-${i}`}
-                  className='h-10 w-full rounded-lg'
-                />
-              ))}
-            </div>
-          ) : results.length === 0 ? (
-            <div className='flex flex-col items-center gap-2 px-4 py-10 text-center'>
-              <FolderOpen className='text-muted-foreground size-6' />
-              <p className='text-sm font-medium'>No categories</p>
-              <p className='text-muted-foreground text-xs'>
-                This folder doesn’t have subcategories.
-              </p>
-              {path.length > 0 && (
-                <Button
-                  type='button'
-                  variant='outline'
-                  size='sm'
-                  onClick={() => handleGoToCrumb(path.length - 2)}
-                >
-                  Go back
-                </Button>
-              )}
-            </div>
-          ) : (
-            <div className='space-y-1'>
-              {results.map((category) => {
-                const isActive = value === category.tree_id
-                const hasChildren = category.subcategory_count > 0
-                return (
-                  <button
-                    key={category.tree_id}
-                    type='button'
-                    className={cn(
-                      'group flex w-full items-center gap-3 rounded-xl border px-3 py-2 text-left transition-colors',
-                      isActive
-                        ? 'border-primary/30 bg-primary/5'
-                        : 'hover:border-border hover:bg-muted/40 border-transparent',
-                      !category.show_web && 'opacity-75'
-                    )}
-                    onClick={() => handleEnterCategory(category)}
-                  >
-                    <div className='bg-muted flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-lg'>
-                      {category.photo ? (
-                        <img
-                          src={category.photo}
-                          alt={category.tree_descr}
-                          className='size-full object-cover'
-                          loading='lazy'
-                        />
-                      ) : (
-                        <ImageOff className='text-muted-foreground size-4' />
-                      )}
-                    </div>
-
-                    <div className='min-w-0 flex-1'>
-                      <div className='flex items-center justify-between gap-2'>
-                        <div className='min-w-0'>
-                          <p
-                            className='truncate text-sm font-medium'
-                            title={category.tree_descr}
-                          >
-                            {category.tree_descr}
-                          </p>
-                          <p className='text-muted-foreground text-xs'>
-                            {category.product_count} product
-                            {category.product_count === 1 ? '' : 's'}
-                            {hasChildren
-                              ? ` • ${category.subcategory_count} folder${category.subcategory_count === 1 ? '' : 's'}`
-                              : ''}
-                          </p>
-                        </div>
-
-                        <div className='text-muted-foreground flex shrink-0 items-center gap-2'>
-                          {!category.show_web && (
-                            <Badge
-                              variant='secondary'
-                              className='text-[10px]'
-                            >
-                              Hidden
-                            </Badge>
-                          )}
-                          <Folder className='size-4 opacity-70 group-hover:opacity-100' />
-                          <ChevronRight className='size-4 opacity-70 group-hover:opacity-100' />
-                        </div>
-                      </div>
-                    </div>
-                  </button>
-                )
-              })}
-            </div>
+      {/* Breadcrumbs */}
+      <div
+        className='flex shrink-0 items-center gap-0.5 overflow-x-auto border-b border-border px-4 py-1.5 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden'
+        role='navigation'
+        aria-label='Category path'
+      >
+        <button
+          type='button'
+          className={cn(
+            'shrink-0 rounded-[5px] px-1.5 py-0.5 text-[12px] font-medium transition-colors duration-[80ms]',
+            path.length === 0
+              ? 'bg-primary/10 text-primary'
+              : 'text-text-tertiary hover:bg-bg-hover hover:text-foreground'
           )}
-        </div>
-      </ScrollArea>
+          onClick={handleGoRoot}
+        >
+          Root
+        </button>
+
+        {path.map((crumb, index) => (
+          <div key={crumb.tree_id} className='flex shrink-0 items-center gap-0.5'>
+            <ChevronRight className='size-3 shrink-0 text-text-quaternary' />
+            <button
+              type='button'
+              className={cn(
+                'max-w-[130px] shrink-0 truncate rounded-[5px] px-1.5 py-0.5 text-[12px] font-medium transition-colors duration-[80ms]',
+                index === path.length - 1
+                  ? 'bg-primary/10 text-primary'
+                  : 'text-text-tertiary hover:bg-bg-hover hover:text-foreground'
+              )}
+              onClick={() => handleGoToCrumb(index)}
+              title={crumb.tree_descr}
+            >
+              {crumb.tree_descr}
+            </button>
+          </div>
+        ))}
+      </div>
+
+      {/* Category list */}
+      <div className='min-h-0 flex-1 overflow-y-auto'>
+        {loading ? (
+          <div className='space-y-0'>
+            {Array.from({ length: 10 }).map((_, i) => (
+              <div
+                key={`category-skeleton-${i}`}
+                className='flex items-center gap-3 border-b border-border-light px-4 py-2'
+              >
+                <Skeleton className='size-8 rounded-[5px]' />
+                <div className='min-w-0 flex-1 space-y-1'>
+                  <Skeleton className='h-3.5 w-24' />
+                  <Skeleton className='h-3 w-16' />
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : results.length === 0 ? (
+          <div className='flex flex-col items-center gap-1.5 px-4 py-14 text-center'>
+            <FolderOpen className='size-6 text-text-tertiary opacity-40' />
+            <p className='text-[13px] font-medium'>No categories</p>
+            <p className='text-[12px] text-text-quaternary'>
+              This folder doesn't have subcategories.
+            </p>
+            {path.length > 0 && (
+              <button
+                type='button'
+                className='mt-1 inline-flex h-7 items-center gap-1 rounded-[5px] border border-border bg-bg-secondary px-2.5 text-[12px] font-medium text-text-secondary transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground'
+                onClick={() => handleGoToCrumb(path.length - 2)}
+              >
+                <ChevronLeft className='size-3' />
+                Go back
+              </button>
+            )}
+          </div>
+        ) : (
+          results.map((category) => {
+            const isActive = value === category.tree_id
+            const hasChildren = category.subcategory_count > 0
+            return (
+              <button
+                key={category.tree_id}
+                type='button'
+                className={cn(
+                  'group/cat flex w-full items-center gap-3 border-b border-border-light px-4 py-2 text-left transition-colors duration-75',
+                  isActive ? 'bg-primary/5' : 'hover:bg-bg-hover/50',
+                  !category.show_web && 'opacity-60'
+                )}
+                onClick={() => handleEnterCategory(category)}
+              >
+                {/* Thumbnail */}
+                <div
+                  className={cn(
+                    'flex size-8 shrink-0 items-center justify-center overflow-hidden rounded-[5px] border',
+                    isActive ? 'border-primary/30' : 'border-border'
+                  )}
+                >
+                  {category.photo ? (
+                    <img
+                      src={category.photo}
+                      alt={category.tree_descr}
+                      className='size-full object-cover'
+                      loading='lazy'
+                    />
+                  ) : (
+                    <ImageOff className='size-3 text-text-quaternary' />
+                  )}
+                </div>
+
+                {/* Info */}
+                <div className='min-w-0 flex-1'>
+                  <p className='truncate text-[13px] font-medium' title={category.tree_descr}>
+                    {category.tree_descr}
+                  </p>
+                  <p className='text-[12px] text-text-tertiary'>
+                    {category.product_count} product{category.product_count === 1 ? '' : 's'}
+                    {hasChildren
+                      ? ` · ${category.subcategory_count} folder${category.subcategory_count === 1 ? '' : 's'}`
+                      : ''}
+                  </p>
+                </div>
+
+                {/* Right side */}
+                <div className='flex shrink-0 items-center gap-1.5 text-text-quaternary'>
+                  {!category.show_web && (
+                    <span className='rounded-[4px] border border-border px-1.5 py-px text-[10px] font-medium text-text-tertiary'>
+                      Hidden
+                    </span>
+                  )}
+                  {hasChildren && (
+                    <Folder className='size-3.5 opacity-60 group-hover/cat:opacity-100' />
+                  )}
+                  <ChevronRight className='size-3.5 opacity-60 group-hover/cat:opacity-100' />
+                </div>
+              </button>
+            )
+          })
+        )}
+      </div>
     </div>
   )
 }

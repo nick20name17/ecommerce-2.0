@@ -3,14 +3,11 @@ import { Image, Loader2, ShoppingBag, Trash2 } from 'lucide-react'
 
 import { getCartQuery } from '@/api/cart/query'
 import type { CartItem } from '@/api/product/schema'
-import { Button } from '@/components/ui/button'
-import { ScrollArea } from '@/components/ui/scroll-area'
-import { Skeleton } from '@/components/ui/skeleton'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { formatCurrency } from '@/helpers/formatters'
 import { cn } from '@/lib/utils'
 
-const MAX_VISIBLE_ITEMS = 6
+const MAX_VISIBLE_ITEMS = 8
 
 interface CatalogMiniCartProps {
   customerId: string
@@ -39,71 +36,71 @@ export const CatalogMiniCart = ({
   const hasDiscount = oldTotal - total > 0.01
 
   return (
-    <div className={cn('bg-muted/20 flex flex-col border-l', className)}>
-      <div className='bg-muted/40 shrink-0 border-b px-4 py-3'>
-        <div className='flex items-center gap-2'>
-          <div className='bg-primary/15 text-primary flex size-8 shrink-0 items-center justify-center rounded-lg'>
-            <ShoppingBag className='size-4' />
-          </div>
-          <div className='min-w-0'>
-            <h3 className='text-sm font-semibold'>Cart</h3>
-            <p className='text-muted-foreground text-xs'>
-              {isLoading ? '…' : `${items.length} item${items.length !== 1 ? 's' : ''}`}
-            </p>
-          </div>
-        </div>
+    <div className={cn('flex flex-col border-l border-border bg-bg-secondary/20', className)}>
+      {/* Header */}
+      <div className='flex shrink-0 items-center gap-2 border-b border-border px-4 py-2'>
+        <ShoppingBag className='size-3.5 text-text-tertiary' />
+        <span className='text-[12px] font-semibold uppercase tracking-[0.04em] text-text-tertiary'>
+          Cart
+        </span>
+        <span className='text-[12px] tabular-nums text-text-tertiary'>
+          {isLoading ? '…' : `${items.length} item${items.length !== 1 ? 's' : ''}`}
+        </span>
       </div>
 
       {isLoading ? (
-        <div className='flex-1 space-y-2 p-4'>
+        <div className='flex-1 space-y-0'>
           {Array.from({ length: 3 }).map((_, i) => (
-            <Skeleton
+            <div
               key={i}
-              className='h-14 w-full rounded-lg'
-            />
+              className='flex items-center gap-2.5 border-b border-border-light px-4 py-2'
+            >
+              <div className='size-7 shrink-0 animate-pulse rounded-[4px] bg-border' />
+              <div className='min-w-0 flex-1 space-y-1'>
+                <div className='h-3 w-14 animate-pulse rounded bg-border' />
+                <div className='h-3 w-20 animate-pulse rounded bg-border' />
+              </div>
+            </div>
           ))}
         </div>
       ) : items.length === 0 ? (
-        <div className='flex flex-1 flex-col items-center justify-center gap-2 px-4 py-8 text-center'>
-          <div className='bg-muted flex size-12 items-center justify-center rounded-full'>
-            <ShoppingBag className='text-muted-foreground size-5' />
-          </div>
-          <p className='text-sm font-medium'>Empty cart</p>
-          <p className='text-muted-foreground text-xs'>Add products from the catalog</p>
+        <div className='flex flex-1 flex-col items-center justify-center gap-1.5 px-4 py-10'>
+          <ShoppingBag className='size-5 text-text-tertiary opacity-30' />
+          <p className='text-[13px] font-medium text-text-secondary'>Empty cart</p>
+          <p className='text-[12px] text-text-quaternary'>Add products from the catalog</p>
         </div>
       ) : (
-        <ScrollArea className='min-h-0 flex-1'>
-          <ul className='space-y-1 p-3'>
-            {displayItems.map((item) => (
-              <MiniCartItemRow
-                key={item.id}
-                item={item}
-                onRemove={onRemove}
-                removing={removingItemId === item.id}
-              />
-            ))}
-            {hasMore && (
-              <li className='text-muted-foreground px-2 py-1.5 text-center text-xs'>
-                +{items.length - MAX_VISIBLE_ITEMS} more
-              </li>
-            )}
-          </ul>
-        </ScrollArea>
+        <div className='min-h-0 flex-1 overflow-y-auto'>
+          {displayItems.map((item) => (
+            <MiniCartItemRow
+              key={item.id}
+              item={item}
+              onRemove={onRemove}
+              removing={removingItemId === item.id}
+            />
+          ))}
+          {hasMore && (
+            <div className='border-b border-border-light px-4 py-1.5 text-center text-[12px] text-text-tertiary'>
+              +{items.length - MAX_VISIBLE_ITEMS} more item{items.length - MAX_VISIBLE_ITEMS !== 1 ? 's' : ''}
+            </div>
+          )}
+        </div>
       )}
 
+      {/* Footer total */}
       {!isLoading && items.length > 0 && (
-        <div className='bg-muted/30 shrink-0 border-t p-4'>
-          <div className='space-y-1.5 text-sm'>
-            {hasDiscount && (
-              <div className='text-muted-foreground flex justify-between'>
-                <span>Subtotal</span>
-                <span>{formatCurrency(oldTotal)}</span>
-              </div>
-            )}
-            <div className='flex items-center justify-between font-semibold'>
-              <span>Total</span>
-              <span className='tabular-nums'>{formatCurrency(total)}</span>
+        <div className='shrink-0 border-t border-border px-4 py-2.5'>
+          {hasDiscount && (
+            <div className='flex justify-between text-[12px] text-text-tertiary'>
+              <span>Subtotal</span>
+              <span className='tabular-nums line-through'>{formatCurrency(oldTotal)}</span>
             </div>
+          )}
+          <div className='flex items-center justify-between'>
+            <span className='text-[12px] font-medium uppercase tracking-[0.04em] text-text-tertiary'>
+              Total
+            </span>
+            <span className='text-[14px] font-bold tabular-nums'>{formatCurrency(total)}</span>
           </div>
         </div>
       )}
@@ -111,7 +108,7 @@ export const CatalogMiniCart = ({
   )
 }
 
-const MiniCartItemRow = ({
+function MiniCartItemRow({
   item,
   onRemove,
   removing
@@ -119,52 +116,55 @@ const MiniCartItemRow = ({
   item: CartItem
   onRemove?: (itemId: number) => void
   removing?: boolean
-}) => {
+}) {
   const lineTotal = (item.price ?? 0) * (item.quantity ?? 0)
   return (
-    <li className='bg-background/60 hover:border-border hover:bg-background/80 flex items-center gap-2 rounded-lg border border-transparent px-2.5 py-2 transition-colors'>
-      <div className='bg-muted flex size-9 shrink-0 items-center justify-center overflow-hidden rounded-md'>
+    <div className='group/item flex items-center gap-2.5 border-b border-border-light px-4 py-1.5 transition-colors duration-75 hover:bg-bg-hover/50'>
+      {/* Thumbnail */}
+      <div className='flex size-7 shrink-0 items-center justify-center overflow-hidden rounded-[4px] bg-bg-secondary'>
         {item.photo ? (
-          <img
-            src={item.photo}
-            alt={item.name}
-            className='size-full object-cover'
-          />
+          <img src={item.photo} alt={item.name} className='size-full object-cover' />
         ) : (
-          <Image className='text-muted-foreground size-4' />
+          <Image className='size-3 text-text-quaternary' />
         )}
       </div>
+
+      {/* Info */}
       <div className='min-w-0 flex-1'>
         <Tooltip>
           <TooltipTrigger asChild>
-            <span className='block truncate font-mono text-xs font-medium'>{item.product_id}</span>
+            <span className='block truncate text-[12px] font-semibold tabular-nums'>
+              {item.product_id}
+            </span>
           </TooltipTrigger>
           <TooltipContent>{item.name}</TooltipContent>
         </Tooltip>
-        <p className='text-muted-foreground truncate text-xs'>
+        <p className='truncate text-[11px] text-text-tertiary'>
           {item.quantity} × {formatCurrency(item.price ?? 0)}
         </p>
       </div>
-      <span className='shrink-0 text-right text-xs font-semibold tabular-nums'>
+
+      {/* Amount */}
+      <span className='shrink-0 text-[12px] font-medium tabular-nums text-text-secondary'>
         {formatCurrency(lineTotal)}
       </span>
+
+      {/* Remove */}
       {onRemove && (
-        <Button
+        <button
           type='button'
-          variant='ghost'
-          size='icon'
-          className='text-muted-foreground hover:text-destructive size-7 shrink-0'
+          className='inline-flex size-6 shrink-0 items-center justify-center rounded-[4px] text-text-quaternary opacity-0 transition-all duration-75 hover:bg-bg-active hover:text-destructive group-hover/item:opacity-100'
           disabled={removing}
           onClick={() => onRemove(item.id)}
           aria-label='Remove'
         >
           {removing ? (
-            <Loader2 className='size-3.5 animate-spin' />
+            <Loader2 className='size-3 animate-spin' />
           ) : (
-            <Trash2 className='size-3.5' />
+            <Trash2 className='size-3' />
           )}
-        </Button>
+        </button>
       )}
-    </li>
+    </div>
   )
 }
