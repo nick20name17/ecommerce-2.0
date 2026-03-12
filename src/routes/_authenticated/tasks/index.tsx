@@ -19,6 +19,7 @@ import { TASK_QUERY_KEYS, getTasksQuery, getTaskStatusesQuery } from '@/api/task
 import type { TaskListItem, TaskParams, TaskStatus } from '@/api/task/schema'
 import { taskService } from '@/api/task/service'
 import { PageEmpty } from '@/components/common/page-empty'
+import { SidebarTrigger } from '@/components/ui/sidebar'
 import { CommandBarCreate, PriorityIcon } from '@/components/tasks/command-bar-create'
 import { UserCombobox } from '@/components/common/user-combobox/user-combobox'
 import { FilterChip, FilterPopover, ITodos, InitialsAvatar, PAGE_COLORS, PageHeaderIcon, StatusIcon, ViewToggle, type ViewOption } from '@/components/ds'
@@ -304,6 +305,7 @@ function Todos2Page() {
       <header
         className='flex h-12 shrink-0 items-center gap-2.5 border-b border-border px-6'
       >
+        <SidebarTrigger className='-ml-1' />
         <div className='flex items-center gap-1.5'>
           <PageHeaderIcon icon={ITodos} color={PAGE_COLORS.todos} />
           <h1 className='text-[14px] font-semibold tracking-[-0.01em]'>To-Do&apos;s</h1>
@@ -699,14 +701,14 @@ function TaskRow({
         </Popover>
 
         {/* Assignee */}
-        <div className='w-[130px] min-w-0' onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()}>
+        <div className='w-[160px] min-w-0' onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()}>
           <UserCombobox
             value={task.responsible_user ?? null}
             onChange={(userId) => onUpdate(task, { responsible_user: userId, responsible_user_name: null })}
             valueLabel={assigneeName ?? undefined}
             placeholder='Assignee'
             triggerClassName={cn(
-              'flex w-full items-center gap-1.5 rounded-[5px] px-1 py-0.5 text-sm transition-colors duration-75 hover:bg-bg-active cursor-pointer',
+              'flex w-full items-center gap-1.5 rounded-[5px] px-1 py-0.5 text-[13px] transition-colors duration-75 hover:bg-bg-active cursor-pointer',
               assigneeName ? 'text-text-secondary' : 'text-text-tertiary'
             )}
           />

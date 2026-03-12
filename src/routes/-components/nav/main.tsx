@@ -11,7 +11,6 @@ import {
   IProposals,
   ISettings,
   IShipping,
-  ITesting,
   ITodos,
 } from '@/components/ds'
 import { isAdmin, isSuperAdmin } from '@/constants/user'
@@ -44,7 +43,7 @@ const TOP_ITEMS: NavItem[] = [
   },
   {
     title: 'Order Desk',
-    url: '/create',
+    url: '/order-desk',
     icon: IOrderDesk,
     iconBg: 'bg-orange-500',
     iconColor: 'text-white',
@@ -99,7 +98,6 @@ const WORKSPACE_ITEMS: NavItem[] = [
 
 const BOTTOM_ITEMS: NavItem[] = [
   { title: 'Projects', url: '/projects', icon: IProjects, superAdminOnly: true },
-  { title: 'Testing', url: '/nav-options', icon: ITesting },
 ]
 
 // ── Hook ────────────────────────────────────────────────────

@@ -1,15 +1,22 @@
+import { UserPlus } from 'lucide-react'
+
 import type { Customer } from '@/api/customer/schema'
 import { InitialsAvatar } from '@/components/ds'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { getCustomerTypeLabel } from '@/constants/customer'
+import { isAdmin } from '@/constants/user'
 import { formatDate, formatPhone } from '@/helpers/formatters'
 import { cn } from '@/lib/utils'
+import { useAuth } from '@/providers/auth'
 
 interface CustomerInfoPanelProps {
   customer: Customer
+  onAssign?: () => void
 }
 
-export const CustomerInfoPanel = ({ customer }: CustomerInfoPanelProps) => {
+export const CustomerInfoPanel = ({ customer, onAssign }: CustomerInfoPanelProps) => {
+  const { user } = useAuth()
+  const canAssign = !!user?.role && isAdmin(user.role)
   const isActive = !customer.inactive
   const phone = customer.contact_1 ? formatPhone(customer.contact_1) : null
   const email = customer.contact_3 || null
@@ -114,20 +121,44 @@ export const CustomerInfoPanel = ({ customer }: CustomerInfoPanelProps) => {
       )}
 
       {/* Assigned user */}
-      {customer.assigned_user && (
-        <>
-          <div className='border-b border-border px-4 py-2.5'>
-            <span className='text-[12px] font-semibold uppercase tracking-[0.06em] text-text-tertiary'>
-              Assigned To
-            </span>
+      <div className='border-b border-border px-4 py-2.5'>
+        <span className='text-[12px] font-semibold uppercase tracking-[0.06em] text-text-tertiary'>
+          Assigned To
+        </span>
+      </div>
+      {customer.assigned_user ? (
+        <button
+          type='button'
+          className={cn(
+            'flex w-full items-center gap-2 px-4 py-3 text-left transition-colors duration-75',
+            canAssign && onAssign && 'hover:bg-bg-hover',
+            !(canAssign && onAssign) && 'cursor-default'
+          )}
+          onClick={canAssign && onAssign ? onAssign : undefined}
+        >
+          {assigneeInitials && <InitialsAvatar initials={assigneeInitials} size={20} />}
+          <span className='min-w-0 flex-1 truncate text-[13px] font-medium'>
+            {assigneeName}
+          </span>
+          {canAssign && onAssign && (
+            <UserPlus className='size-3.5 shrink-0 text-text-quaternary' />
+          )}
+        </button>
+      ) : canAssign && onAssign ? (
+        <button
+          type='button'
+          className='flex w-full items-center gap-2 px-4 py-3 text-left transition-colors duration-75 hover:bg-bg-hover'
+          onClick={onAssign}
+        >
+          <div className='flex size-5 items-center justify-center rounded-full border border-dashed border-border'>
+            <UserPlus className='size-3 text-text-quaternary' />
           </div>
-          <div className='flex items-center gap-2 px-4 py-3'>
-            {assigneeInitials && <InitialsAvatar initials={assigneeInitials} size={20} />}
-            <span className='text-[13px] font-medium'>
-              {assigneeName}
-            </span>
-          </div>
-        </>
+          <span className='text-[13px] text-text-tertiary'>Assign a sales user</span>
+        </button>
+      ) : (
+        <div className='px-4 py-3'>
+          <span className='text-[13px] text-text-tertiary'>—</span>
+        </div>
       )}
     </div>
   )

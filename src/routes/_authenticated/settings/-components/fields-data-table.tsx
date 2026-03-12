@@ -34,10 +34,16 @@ export const FieldsDataTable = ({
     return (
       <div className='space-y-0'>
         {Array.from({ length: 8 }).map((_, i) => (
-          <div key={i} className='flex items-center gap-4 border-b border-border-light px-1 py-2.5'>
-            <Skeleton className='h-4 w-40' />
-            <Skeleton className='h-7 w-48' />
-            <Skeleton className='h-5 w-10 rounded-full' />
+          <div key={i} className='flex items-center gap-4 border-b border-border-light px-6 py-1.5'>
+            <div className='w-[200px] shrink-0'>
+              <Skeleton className='h-3.5 w-28' />
+            </div>
+            <div className='min-w-0 flex-1'>
+              <Skeleton className='h-6 w-40 rounded-[5px]' />
+            </div>
+            <div className='flex w-[60px] shrink-0 justify-end'>
+              <Skeleton className='h-5 w-9 rounded-full' />
+            </div>
           </div>
         ))}
       </div>
@@ -53,14 +59,14 @@ export const FieldsDataTable = ({
   return (
     <div>
       {/* Table header */}
-      <div className='flex items-center gap-4 border-b border-border pb-2'>
-        <div className='w-[220px] shrink-0 text-[11px] font-semibold uppercase tracking-[0.05em] text-text-tertiary'>
+      <div className='sticky top-0 z-10 flex items-center gap-4 border-b border-border bg-bg-secondary/60 px-6 py-1.5 backdrop-blur-sm'>
+        <div className='w-[200px] shrink-0 text-[11px] font-semibold uppercase tracking-[0.05em] text-text-tertiary'>
           Field
         </div>
         <div className='min-w-0 flex-1 text-[11px] font-semibold uppercase tracking-[0.05em] text-text-tertiary'>
-          Display Alias
+          Display Name
         </div>
-        <div className='w-[80px] shrink-0 text-right text-[11px] font-semibold uppercase tracking-[0.05em] text-text-tertiary'>
+        <div className='w-[60px] shrink-0 text-right text-[11px] font-semibold uppercase tracking-[0.05em] text-text-tertiary'>
           Visible
         </div>
       </div>
@@ -105,12 +111,12 @@ function FieldRow({
   return (
     <div
       className={cn(
-        'flex items-center gap-4 border-b border-border-light py-2 transition-colors duration-75',
+        'flex items-center gap-4 border-b border-border-light px-6 py-1.5 transition-colors duration-75',
         !row.enabled && !isDefault && 'opacity-50'
       )}
     >
       {/* Field name */}
-      <div className='flex w-[220px] shrink-0 items-center gap-2'>
+      <div className='flex w-[200px] shrink-0 items-center gap-2'>
         <Tooltip>
           <TooltipTrigger asChild>
             <span className='block truncate text-[13px] font-medium text-foreground'>
@@ -139,7 +145,7 @@ function FieldRow({
           onChange={(e) => setAliasValue(e.target.value)}
           placeholder='Display name…'
           disabled={isAliasPending}
-          className='h-7 min-w-0 flex-1 rounded-[6px] border border-border bg-background px-2.5 text-[13px] outline-none transition-colors duration-[80ms] placeholder:text-text-quaternary focus:border-primary focus:ring-1 focus:ring-primary/20 disabled:opacity-50'
+          className='h-6 min-w-0 max-w-[240px] flex-1 rounded-[5px] border border-border bg-background px-2 text-[12px] outline-none transition-colors duration-[80ms] placeholder:text-text-quaternary focus:border-primary focus:ring-1 focus:ring-primary/20 disabled:opacity-50'
           onKeyDown={(e) => {
             if (e.key === 'Enter') {
               e.preventDefault()
@@ -150,7 +156,7 @@ function FieldRow({
         {isDirty && (
           <button
             type='button'
-            className='inline-flex size-7 shrink-0 items-center justify-center rounded-[5px] border border-border bg-bg-secondary text-text-secondary transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground disabled:opacity-50'
+            className='inline-flex size-6 shrink-0 items-center justify-center rounded-[5px] border border-border bg-bg-secondary text-text-secondary transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground disabled:opacity-50'
             disabled={isAliasPending}
             onClick={() => onAliasSubmit(entity, row.field, aliasValue.trim())}
             aria-label='Save alias'
@@ -161,7 +167,7 @@ function FieldRow({
       </div>
 
       {/* Toggle */}
-      <div className='flex w-[80px] shrink-0 justify-end'>
+      <div className='flex w-[60px] shrink-0 justify-end'>
         {isDefault ? (
           <Tooltip>
             <TooltipTrigger asChild>

@@ -3,6 +3,7 @@ import { createFileRoute, redirect } from '@tanstack/react-router'
 import { Plus, Search } from 'lucide-react'
 
 import { IUser, PAGE_COLORS, PageHeaderIcon } from '@/components/ds'
+import { SidebarTrigger } from '@/components/ui/sidebar'
 import { useState } from 'react'
 
 import { UserDeleteDialog } from './-components/user-delete-dialog'
@@ -52,6 +53,7 @@ const UsersPage = () => {
   return (
     <div className='flex h-full flex-col overflow-hidden'>
       <header className='flex h-12 shrink-0 items-center gap-2.5 border-b border-border px-6'>
+        <SidebarTrigger className='-ml-1' />
         <div className='flex items-center gap-1.5'>
           <PageHeaderIcon icon={IUser} color={PAGE_COLORS.users} />
           <h1 className='text-[14px] font-semibold tracking-[-0.01em]'>Users</h1>

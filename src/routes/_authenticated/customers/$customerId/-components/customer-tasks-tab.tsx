@@ -1,6 +1,7 @@
 'use no memo'
 
 import { keepPreviousData, useMutation, useQuery } from '@tanstack/react-query'
+import { useNavigate } from '@tanstack/react-router'
 import { CheckSquare, Plus, Search, Trash2 } from 'lucide-react'
 import { useState } from 'react'
 
@@ -22,11 +23,11 @@ import { useBreakpoint } from '@/hooks/use-breakpoint'
 import { useProjectId } from '@/hooks/use-project-id'
 import { TaskDeleteDialog } from '@/components/tasks/task-delete-dialog'
 import { CommandBarCreate } from '@/components/tasks/command-bar-create'
-import { TaskModal } from '@/components/tasks/task-modal'
 import { cn } from '@/lib/utils'
 
 interface CustomerTasksTabProps {
   customerId: string
+  customerName?: string | null
 }
 
 // ── Helpers ──────────────────────────────────────────────────
@@ -74,13 +75,14 @@ function PriorityIcon({ priority, color, size = 14 }: { priority: string; color:
 
 // ── Tab Component ────────────────────────────────────────────
 
-export const CustomerTasksTab = ({ customerId }: CustomerTasksTabProps) => {
+export const CustomerTasksTab = ({ customerId, customerName }: CustomerTasksTabProps) => {
   const bp = useBreakpoint()
   const isMobile = bp === 'mobile'
+  const navigate = useNavigate()
   const [projectId] = useProjectId()
   const [search, setSearch] = useState('')
 
-  const [modalTask, setModalTask] = useState<TaskListItem | 'create' | null>(null)
+  const [showCreate, setShowCreate] = useState(false)
   const [taskToDelete, setTaskToDelete] = useState<TaskListItem | null>(null)
 
   const { data: statusesData } = useQuery(getTaskStatusesQuery(projectId ?? null))
@@ -112,7 +114,9 @@ export const CustomerTasksTab = ({ customerId }: CustomerTasksTabProps) => {
   const handleStatusChange = (task: TaskListItem, statusId: number) =>
     statusChangeMutation.mutate({ taskId: task.id, statusId })
 
-  const editingTask = typeof modalTask === 'object' && modalTask !== null ? modalTask : null
+  const handleTaskClick = (task: TaskListItem) => {
+    navigate({ to: '/tasks/$taskId', params: { taskId: String(task.id) } })
+  }
 
   return (
     <div className='flex h-full flex-col overflow-hidden'>
@@ -135,7 +139,7 @@ export const CustomerTasksTab = ({ customerId }: CustomerTasksTabProps) => {
         <button
           type='button'
           className='inline-flex h-8 shrink-0 items-center gap-1.5 rounded-[6px] bg-primary px-3 text-[13px] font-medium text-primary-foreground transition-colors duration-[80ms] hover:opacity-90'
-          onClick={() => setModalTask('create')}
+          onClick={() => setShowCreate(true)}
         >
           <Plus className='size-4' />
           Add
@@ -172,7 +176,7 @@ export const CustomerTasksTab = ({ customerId }: CustomerTasksTabProps) => {
               isTablet={bp === 'tablet'}
               onStatusChange={handleStatusChange}
               onDelete={setTaskToDelete}
-              onClick={() => setModalTask(task)}
+              onClick={() => handleTaskClick(task)}
             />
           ))
         )}
@@ -192,20 +196,12 @@ export const CustomerTasksTab = ({ customerId }: CustomerTasksTabProps) => {
         </div>
       )}
 
-      {modalTask === 'create' && (
+      {showCreate && (
         <CommandBarCreate
-          onClose={() => setModalTask(null)}
+          onClose={() => setShowCreate(false)}
           defaultLinkedCustomerAutoid={customerId}
-        />
-      )}
-
-      {editingTask && (
-        <TaskModal
-          key={editingTask.id}
-          open
-          onOpenChange={(open) => !open && setModalTask(null)}
-          task={editingTask}
-          projectId={projectId ?? undefined}
+          lockLinkedCustomer
+          linkedCustomerLabel={customerName}
         />
       )}
 

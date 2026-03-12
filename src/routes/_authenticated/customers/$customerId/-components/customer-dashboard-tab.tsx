@@ -1,16 +1,74 @@
 import { useQuery } from '@tanstack/react-query'
-import { ArrowDown, ArrowUp, FileText, Minus, Package, ShoppingCart, TrendingUp } from 'lucide-react'
-import type { LucideIcon } from 'lucide-react'
+import { ArrowDownRight, ArrowUpRight, Minus } from 'lucide-react'
 
 import { getDashboardQuery } from '@/api/dashboard/query'
+import type { DashboardMetrics } from '@/api/dashboard/schema'
+import { DashboardOrdersChart, OrdersChangeBadge } from '@/routes/_authenticated/-components/dashboard-orders-chart'
 import { getErrorMessage } from '@/helpers/error'
-import { DashboardOrdersChart } from '@/routes/_authenticated/-components/dashboard-orders-chart'
+import { formatCurrency } from '@/helpers/formatters'
+import { Skeleton } from '@/components/ui/skeleton'
 import { cn } from '@/lib/utils'
 
 interface CustomerDashboardTabProps {
   customerId: string
   projectId: number | null
 }
+
+// ── KPI config ───────────────────────────────────────────────
+
+const KPI_CONFIG = [
+  {
+    key: 'orders',
+    title: 'Orders',
+    value: (m: DashboardMetrics) => m.total_order_count,
+    format: (n: number) => String(n),
+    prev: (m: DashboardMetrics) => m.last_month_order_count,
+  },
+  {
+    key: 'unprocessed',
+    title: 'Unprocessed',
+    value: (m: DashboardMetrics) => m.unprocessed_orders,
+    format: (n: number) => String(n),
+    prev: null,
+  },
+  {
+    key: 'pending',
+    title: 'Pending',
+    value: (m: DashboardMetrics) => m.pending_invoices,
+    format: (n: number) => String(n),
+    prev: null,
+  },
+  {
+    key: 'totalSales',
+    title: 'Total Sales',
+    value: (m: DashboardMetrics) => m.total.total_sales,
+    format: (n: number) => formatCurrency(n),
+    prev: (m: DashboardMetrics) => m.total.last_month_total_sales,
+  },
+  {
+    key: 'avgOrder',
+    title: 'Avg Order',
+    value: (m: DashboardMetrics) => m.total.average_order_value,
+    format: (n: number) => formatCurrency(n),
+    prev: (m: DashboardMetrics) => m.total.last_month_average_order_value,
+  },
+  {
+    key: 'outstanding',
+    title: 'Outstanding',
+    value: (m: DashboardMetrics) => m.total.outstanding_invoices,
+    format: (n: number) => formatCurrency(n),
+    prev: null,
+  },
+] as const
+
+function getChange(current: number, previous: number): { pct: number; direction: 'up' | 'down' | 'same' } | null {
+  if (previous === 0) return null
+  const pct = Math.round(((current - previous) / previous) * 100)
+  const direction = pct > 0 ? 'up' : pct < 0 ? 'down' : 'same'
+  return { pct, direction }
+}
+
+// ── Component ────────────────────────────────────────────────
 
 export const CustomerDashboardTab = ({
   customerId,
@@ -44,86 +102,52 @@ export const CustomerDashboardTab = ({
     return <DashboardSkeleton />
   }
 
-  const thisMonth = data.total_order_count ?? 0
-  const lastMonth = data.last_month_order_count ?? 0
-  const trend = lastMonth > 0 ? ((thisMonth - lastMonth) / lastMonth) * 100 : 0
-  const trendDirection = trend > 0 ? 'up' : trend < 0 ? 'down' : 'neutral'
-
   return (
-    <div className='flex min-w-0 flex-col gap-4'>
-      {/* Highlight stat */}
-      <div className='rounded-[10px] border border-border bg-background p-5'>
-        <div className='flex items-center gap-3'>
-          <div className='flex size-9 items-center justify-center rounded-[8px] bg-primary/10 text-primary'>
-            <TrendingUp className='size-4.5' />
-          </div>
-          <div className='min-w-0 flex-1'>
-            <div className='flex items-baseline gap-2'>
-              <span className='text-[28px] font-semibold tabular-nums tracking-tight text-foreground'>
-                {thisMonth}
-              </span>
-              <span className='text-[13px] font-medium text-text-tertiary'>
-                orders this month
-              </span>
-            </div>
-            <div className='mt-0.5 flex items-center gap-1.5'>
-              {trendDirection === 'up' && (
-                <ArrowUp className='size-3 text-[#34C759]' />
-              )}
-              {trendDirection === 'down' && (
-                <ArrowDown className='size-3 text-[#FF3B30]' />
-              )}
-              {trendDirection === 'neutral' && (
-                <Minus className='size-3 text-text-tertiary' />
-              )}
-              <span
-                className={cn(
-                  'text-[13px] font-medium tabular-nums',
-                  trendDirection === 'up' && 'text-[#34C759]',
-                  trendDirection === 'down' && 'text-[#FF3B30]',
-                  trendDirection === 'neutral' && 'text-text-tertiary'
-                )}
-              >
-                {trend > 0 ? '+' : ''}
-                {trend.toFixed(0)}% vs last month ({lastMonth})
-              </span>
-            </div>
-          </div>
-        </div>
-      </div>
-
+    <div className='flex min-w-0 flex-col gap-5'>
       {/* KPI cards */}
-      <div className='grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-2'>
-        <KpiCard
-          icon={Package}
-          title='Unprocessed'
-          value={String(data.unprocessed_orders)}
-          description='Orders requiring action'
-          accent={data.unprocessed_orders > 0 ? 'warning' : undefined}
-        />
-        <KpiCard
-          icon={FileText}
-          title='Pending Invoices'
-          value={String(data.pending_invoices)}
-          description='Awaiting payment'
-          accent={data.pending_invoices > 0 ? 'info' : undefined}
-        />
+      <div className='grid min-w-0 grid-cols-2 gap-2 sm:gap-3 lg:grid-cols-3'>
+        {KPI_CONFIG.map((config) => {
+          const value = config.value(data)
+          const prev = config.prev ? config.prev(data) : null
+          const change = prev != null ? getChange(value, prev) : null
+
+          return (
+            <div
+              key={config.key}
+              className='rounded-[8px] border border-border bg-background px-3 py-3 sm:px-4 sm:py-4'
+            >
+              <div className='truncate text-[11px] font-medium uppercase tracking-[0.04em] text-text-tertiary sm:text-[12px]'>
+                {config.title}
+              </div>
+              <div className='mt-1 truncate text-[16px] font-semibold tabular-nums leading-none tracking-tight sm:mt-1.5 sm:text-[20px]'>
+                {config.format(value)}
+              </div>
+              {change && (
+                <div
+                  className={cn(
+                    'mt-1.5 flex items-center gap-0.5 whitespace-nowrap text-[11px] font-medium tabular-nums leading-none',
+                    change.direction === 'up' && 'text-green-600 dark:text-green-400',
+                    change.direction === 'down' && 'text-destructive',
+                    change.direction === 'same' && 'text-text-tertiary'
+                  )}
+                >
+                  {change.direction === 'up' && <ArrowUpRight className='size-3' />}
+                  {change.direction === 'down' && <ArrowDownRight className='size-3' />}
+                  {change.direction === 'same' && <Minus className='size-3' />}
+                  {change.direction === 'same' ? '0%' : `${Math.abs(change.pct)}%`}
+                  <span className='text-text-quaternary'> vs prev</span>
+                </div>
+              )}
+            </div>
+          )
+        })}
       </div>
 
       {/* Orders chart */}
-      <div className='rounded-[10px] border border-border bg-background'>
-        <div className='flex items-center gap-3 border-b border-border px-5 py-3'>
-          <div className='flex size-8 items-center justify-center rounded-[6px] bg-primary/10 text-primary'>
-            <ShoppingCart className='size-4' />
-          </div>
-          <div>
-            <span className='text-[13px] font-semibold text-foreground'>
-              Orders Trend
-            </span>
-            <p className='text-[13px] text-text-tertiary'>
-              This month vs last month
-            </p>
-          </div>
+      <div className='rounded-[8px] border border-border bg-background'>
+        <div className='flex flex-wrap items-center gap-2 px-4 py-3 sm:gap-2.5'>
+          <h2 className='text-[13px] font-semibold sm:text-[14px]'>Orders — this month vs last month</h2>
+          <OrdersChangeBadge metrics={data} />
         </div>
         <div className='p-4'>
           <DashboardOrdersChart metrics={data} />
@@ -133,92 +157,28 @@ export const CustomerDashboardTab = ({
   )
 }
 
-// ── KPI Card ────────────────────────────────────────────────
-
-function KpiCard({
-  icon: Icon,
-  title,
-  description,
-  value,
-  accent,
-}: {
-  icon: LucideIcon
-  title: string
-  description: string
-  value: string
-  accent?: 'warning' | 'info'
-}) {
-  return (
-    <div className='min-w-0 rounded-[10px] border border-border bg-background p-4'>
-      <div className='mb-3 flex items-center gap-2'>
-        <div
-          className={cn(
-            'flex size-7 items-center justify-center rounded-[6px]',
-            accent === 'warning'
-              ? 'bg-[#FF9500]/10 text-[#FF9500]'
-              : accent === 'info'
-                ? 'bg-primary/10 text-primary'
-                : 'bg-bg-secondary text-text-tertiary'
-          )}
-        >
-          <Icon className='size-3.5' />
-        </div>
-        <span className='text-[13px] font-medium text-text-tertiary'>{title}</span>
-      </div>
-      <div
-        className={cn(
-          'text-[22px] font-semibold tabular-nums tracking-tight',
-          accent === 'warning' && Number(value) > 0
-            ? 'text-[#FF9500]'
-            : 'text-foreground'
-        )}
-      >
-        {value}
-      </div>
-      <p className='mt-0.5 text-[13px] text-text-tertiary'>{description}</p>
-    </div>
-  )
-}
-
 // ── Skeleton ────────────────────────────────────────────────
 
 function DashboardSkeleton() {
   return (
-    <div className='flex flex-col gap-4'>
-      {/* Highlight skeleton */}
-      <div className='rounded-[10px] border border-border bg-background p-5'>
-        <div className='flex items-center gap-3'>
-          <div className='size-9 animate-pulse rounded-[8px] bg-border' />
-          <div>
-            <div className='h-8 w-16 animate-pulse rounded bg-border' />
-            <div className='mt-1.5 h-3 w-32 animate-pulse rounded bg-border' />
-          </div>
-        </div>
-      </div>
+    <div className='flex flex-col gap-5'>
       {/* KPI skeletons */}
-      <div className='grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-2'>
-        {Array.from({ length: 2 }).map((_, i) => (
-          <div key={i} className='rounded-[10px] border border-border bg-background p-4'>
-            <div className='mb-3 flex items-center gap-2'>
-              <div className='size-7 animate-pulse rounded-[6px] bg-border' />
-              <div className='h-3 w-20 animate-pulse rounded bg-border' />
-            </div>
-            <div className='h-7 w-12 animate-pulse rounded bg-border' />
-            <div className='mt-2 h-2.5 w-24 animate-pulse rounded bg-border' />
+      <div className='grid min-w-0 grid-cols-2 gap-2 sm:gap-3 lg:grid-cols-3'>
+        {Array.from({ length: 6 }).map((_, i) => (
+          <div key={i} className='rounded-[8px] border border-border bg-background px-3 py-3 sm:px-4 sm:py-4'>
+            <Skeleton className='h-3 w-16' />
+            <Skeleton className='mt-2.5 h-6 w-14' />
           </div>
         ))}
       </div>
       {/* Chart skeleton */}
-      <div className='rounded-[10px] border border-border bg-background'>
-        <div className='flex items-center gap-3 border-b border-border px-5 py-3'>
-          <div className='size-8 animate-pulse rounded-[6px] bg-border' />
-          <div>
-            <div className='h-4 w-24 animate-pulse rounded bg-border' />
-            <div className='mt-1 h-3 w-36 animate-pulse rounded bg-border' />
-          </div>
+      <div className='rounded-[8px] border border-border bg-background'>
+        <div className='flex items-center gap-2.5 px-4 py-3'>
+          <Skeleton className='h-4 w-48' />
         </div>
-        <div className='p-4'>
-          <div className='h-[280px] animate-pulse rounded bg-border/50' />
+        <div className='space-y-3 p-4'>
+          <Skeleton className='h-8 w-full rounded-[6px]' />
+          <Skeleton className='h-8 w-1/4 rounded-[6px]' />
         </div>
       </div>
     </div>

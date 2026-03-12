@@ -2,11 +2,14 @@ import { createFileRoute } from '@tanstack/react-router'
 import {
   ChevronRight,
   ExternalLink,
+  Info,
   Package,
+  Printer,
   Search,
   Truck,
 } from 'lucide-react'
 import { useState } from 'react'
+import { toast } from 'sonner'
 
 import { PageEmpty } from '@/components/common/page-empty'
 import { IShipping, PAGE_COLORS, PageHeaderIcon } from '@/components/ds'
@@ -16,6 +19,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
+import { SidebarTrigger } from '@/components/ui/sidebar'
 import { cn } from '@/lib/utils'
 
 // ── Sample Data ──────────────────────────────────────────────
@@ -230,12 +234,22 @@ const ShippingPage = () => {
     <div className='flex h-full flex-col overflow-hidden'>
       {/* Header */}
       <header className='flex h-12 shrink-0 items-center gap-2.5 border-b border-border px-6'>
+        <SidebarTrigger className='-ml-1' />
         <PageHeaderIcon icon={IShipping} color={PAGE_COLORS.shipping} />
         <h1 className='text-[14px] font-semibold tracking-[-0.01em]'>Shipping</h1>
         <span className='text-[13px] tabular-nums text-text-tertiary'>
           {filtered.length} shipment{filtered.length !== 1 ? 's' : ''}
         </span>
       </header>
+
+
+      {/* Sample data banner */}
+      <div className='flex shrink-0 items-center gap-2.5 border-b border-amber-200 bg-amber-50 px-6 py-2 dark:border-amber-900/50 dark:bg-amber-950/30'>
+        <Info className='size-4 shrink-0 text-amber-600 dark:text-amber-400' />
+        <p className='text-[13px] text-amber-800 dark:text-amber-300'>
+          This page displays sample data. Live shipping integration is coming soon.
+        </p>
+      </div>
 
       {/* Search bar */}
       <div className='flex shrink-0 items-center gap-2 border-b border-border px-6 py-2'>
@@ -386,6 +400,27 @@ function ShipmentDetailDialog({
         </DialogHeader>
 
         <div className='min-h-0 flex-1 overflow-y-auto'>
+          {/* Print label action */}
+          <div className='flex items-center justify-between border-b border-border bg-foreground/[0.02] px-5 py-2.5'>
+            <div className='flex items-center gap-2'>
+              <div className='flex size-7 items-center justify-center rounded-[6px] bg-primary/10'>
+                <Printer className='size-3.5 text-primary' />
+              </div>
+              <div>
+                <p className='text-[13px] font-medium text-foreground'>Shipping Label</p>
+                <p className='text-[11px] text-text-tertiary'>{shipment.carrier} · {shipment.trackingNumber.slice(-8)}</p>
+              </div>
+            </div>
+            <button
+              type='button'
+              className='inline-flex h-7 items-center gap-1.5 rounded-[6px] border border-border bg-background px-3 text-[12px] font-medium text-text-secondary shadow-xs transition-colors duration-[80ms] hover:bg-bg-hover hover:text-foreground'
+              onClick={() => toast.info('Label printing will be available when connected to real shipping data.')}
+            >
+              <Printer className='size-3' />
+              Print Label
+            </button>
+          </div>
+
           {/* Info grid */}
           <div className='grid grid-cols-2 gap-x-4'>
             <PropertyCell label='Order' value={shipment.orderInvoice} />
@@ -404,35 +439,45 @@ function ShipmentDetailDialog({
           </div>
 
           {/* Packages */}
-          <div className='border-t border-border px-5 py-3'>
-            <h4 className='text-[12px] font-semibold uppercase tracking-[0.06em] text-text-tertiary'>
-              Packages ({shipment.packages.length})
-            </h4>
-          </div>
-
-          {shipment.packages.map((pkg) => (
-            <div key={pkg.id} className='border-t border-border-light'>
-              <div className='flex items-center gap-2 px-5 py-2.5'>
-                <div className='flex size-7 items-center justify-center rounded-[6px] bg-bg-secondary'>
-                  <Package className='size-3.5 text-text-tertiary' />
-                </div>
-                <div className='min-w-0 flex-1'>
-                  <span className='text-[13px] font-semibold'>{pkg.id}</span>
-                  <span className='ml-2 text-[12px] text-text-tertiary'>
-                    {pkg.weight} · {pkg.dimensions}
-                  </span>
-                </div>
-              </div>
-              <div className='px-5 pb-3'>
-                {pkg.items.map((item) => (
-                  <div key={item.name} className='flex items-center justify-between py-1'>
-                    <span className='text-[13px] text-text-secondary'>{item.name}</span>
-                    <span className='text-[13px] tabular-nums text-text-tertiary'>×{item.quantity}</span>
-                  </div>
-                ))}
-              </div>
+          <div className='border-t border-border'>
+            <div className='px-5 py-3'>
+              <h4 className='text-[12px] font-semibold uppercase tracking-[0.06em] text-text-tertiary'>
+                Packages ({shipment.packages.length})
+              </h4>
             </div>
-          ))}
+
+            {shipment.packages.map((pkg, i) => (
+              <div key={pkg.id} className={cn('px-5', i < shipment.packages.length - 1 ? 'pb-3' : 'pb-4')}>
+                <div className='rounded-[8px] border border-border'>
+                  {/* Package header bar */}
+                  <div className='flex items-center gap-3 rounded-t-[8px] bg-foreground/[0.03] px-3 py-2'>
+                    <div className='flex size-6 items-center justify-center rounded-[5px] bg-foreground/[0.07]'>
+                      <Package className='size-3.5 text-text-secondary' />
+                    </div>
+                    <span className='text-[13px] font-semibold text-foreground'>{pkg.id}</span>
+                    <div className='flex-1' />
+                    <div className='flex items-center gap-1.5 text-[11px] font-medium text-text-secondary'>
+                      <span className='rounded-[4px] bg-foreground/[0.08] px-1.5 py-0.5 tabular-nums leading-none'>{pkg.weight}</span>
+                      <span className='rounded-[4px] bg-foreground/[0.08] px-1.5 py-0.5 tabular-nums leading-none'>{pkg.dimensions}</span>
+                    </div>
+                  </div>
+                  {/* Items table */}
+                  <div className='divide-y divide-border-light/60'>
+                    {pkg.items.map((item) => (
+                      <div key={item.name} className='flex items-center px-3 py-2'>
+                        <span className='min-w-0 flex-1 text-[13px] text-foreground'>{item.name}</span>
+                        {item.quantity > 1 && (
+                          <span className='ml-2 shrink-0 rounded-full bg-primary/[0.08] px-2 py-0.5 text-[11px] font-semibold tabular-nums leading-none text-primary'>
+                            {item.quantity}
+                          </span>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </DialogContent>
     </Dialog>

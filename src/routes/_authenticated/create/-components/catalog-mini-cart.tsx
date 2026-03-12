@@ -7,7 +7,6 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 import { formatCurrency } from '@/helpers/formatters'
 import { cn } from '@/lib/utils'
 
-const MAX_VISIBLE_ITEMS = 8
 
 interface CatalogMiniCartProps {
   customerId: string
@@ -29,8 +28,6 @@ export const CatalogMiniCart = ({
   })
 
   const items = cart?.items ?? []
-  const displayItems = items.slice(0, MAX_VISIBLE_ITEMS)
-  const hasMore = items.length > MAX_VISIBLE_ITEMS
   const total = Number(cart?.total) ?? 0
   const oldTotal = Number(cart?.old_total) ?? 0
   const hasDiscount = oldTotal - total > 0.01
@@ -71,7 +68,7 @@ export const CatalogMiniCart = ({
         </div>
       ) : (
         <div className='min-h-0 flex-1 overflow-y-auto'>
-          {displayItems.map((item) => (
+          {items.map((item) => (
             <MiniCartItemRow
               key={item.id}
               item={item}
@@ -79,11 +76,6 @@ export const CatalogMiniCart = ({
               removing={removingItemId === item.id}
             />
           ))}
-          {hasMore && (
-            <div className='border-b border-border-light px-4 py-1.5 text-center text-[12px] text-text-tertiary'>
-              +{items.length - MAX_VISIBLE_ITEMS} more item{items.length - MAX_VISIBLE_ITEMS !== 1 ? 's' : ''}
-            </div>
-          )}
         </div>
       )}
 

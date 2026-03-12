@@ -8,3 +8,4 @@ coverage
 *.md
 package-lock.json
 bun.lock
+src/routeTree.gen.ts

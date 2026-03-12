@@ -76,6 +76,10 @@ export function UserCombobox({
       ? (valueLabel ?? `User #${value}`)
       : null
 
+  const displayInitials = displayLabel
+    ? displayLabel.split(' ').slice(0, 2).map((n) => n[0]?.toUpperCase() ?? '').join('')
+    : null
+
   return (
     <Popover
       open={open}
@@ -85,7 +89,10 @@ export function UserCombobox({
         {triggerClassName ? (
           <button type='button' className={triggerClassName}>
             {displayLabel ? (
-              <span className='truncate'>{displayLabel}</span>
+              <>
+                <InitialsAvatar initials={displayInitials!} size={18} />
+                <span className='truncate'>{displayLabel}</span>
+              </>
             ) : (
               <span className='text-text-tertiary'>{placeholder}</span>
             )}
@@ -97,7 +104,10 @@ export function UserCombobox({
             className='flex h-9 min-w-0 w-full items-center justify-between gap-2 rounded-[6px] border border-input bg-background px-3 text-[13px] font-medium shadow-sm transition-colors duration-[80ms] hover:bg-bg-hover'
           >
             {displayLabel ? (
-              <span className='truncate'>{displayLabel}</span>
+              <span className='flex items-center gap-2 truncate'>
+                <InitialsAvatar initials={displayInitials!} size={18} />
+                <span className='truncate'>{displayLabel}</span>
+              </span>
             ) : (
               <span className='text-text-tertiary'>{placeholder}</span>
             )}

@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { ArrowRight, Box, Check, ChevronDown, ChevronRight, GripVertical, Loader2, MapPin, Package, Plus, Trash2, Truck, Warehouse } from 'lucide-react'
+import { Box, Check, ChevronDown, ChevronRight, GripVertical, Loader2, Package, Plus, Trash2 } from 'lucide-react'
 import { useCallback, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
@@ -258,18 +258,19 @@ export function ShippingRatesDialog({
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className='max-w-[960px] sm:max-w-[960px] gap-0 p-0'>
-        <DialogHeader className='border-b border-border px-5 py-3'>
+      <DialogContent className='gap-0 p-0 sm:max-w-[960px] max-sm:max-w-full max-sm:rounded-none max-sm:border-0'>
+        <DialogHeader className='border-b border-border px-4 py-3 sm:px-5'>
           <div className='flex items-center gap-3'>
-            <DialogTitle className='flex items-center gap-2 text-[14px]'>
-              <Truck className='size-4 text-text-tertiary' />
-              Manage Shipping
+            <DialogTitle className='text-[14px] font-semibold text-foreground'>
+              Shipping
             </DialogTitle>
 
+            <div className='mx-1 h-4 w-px bg-border' />
+
             {/* Steps indicator */}
-            <div className='flex items-center gap-1'>
+            <div className='flex items-center gap-0.5'>
               {(['configure', 'rates'] as const).map((s, i) => (
-                <span key={s} className='flex items-center gap-1'>
+                <span key={s} className='flex items-center gap-0.5'>
                   {i > 0 && <ChevronRight className='size-3 text-text-quaternary' />}
                   <button
                     type='button'
@@ -297,130 +298,110 @@ export function ShippingRatesDialog({
 
         {step === 'configure' ? (
           <>
-            {/* Ship from → Ship to */}
-            <div className='flex items-stretch border-b border-border'>
-              {/* Ship from */}
-              <div className='flex min-w-0 flex-1 flex-col px-5 py-3'>
-                <div className='mb-2 flex items-center gap-1.5'>
-                  <Warehouse className='size-3.5 text-text-tertiary' />
-                  <span className='text-[11px] font-semibold uppercase tracking-[0.06em] text-text-tertiary'>Ship from</span>
-                </div>
-                <Popover open={addressPopoverOpen} onOpenChange={setAddressPopoverOpen}>
-                  <PopoverTrigger asChild>
-                    <button
-                      type='button'
-                      className={cn(
-                        'flex h-auto w-full items-center gap-2.5 rounded-[6px] border px-3 py-2 text-left transition-colors duration-75',
-                        selectedAddress
-                          ? 'border-border bg-background hover:bg-bg-hover'
-                          : 'border-dashed border-border hover:border-border-heavy hover:bg-bg-hover',
-                      )}
-                    >
-                      {selectedAddress ? (
-                        <div className='min-w-0 flex-1'>
-                          <div className='flex items-center gap-1.5'>
-                            <span className='text-[13px] font-medium text-foreground'>{selectedAddress.title}</span>
-                            {selectedAddress.is_default && (
-                              <span className='rounded bg-primary/10 px-1 py-px text-[10px] font-semibold text-primary'>Default</span>
-                            )}
-                          </div>
-                          <p className='mt-0.5 truncate text-[12px] leading-snug text-text-tertiary'>
-                            {[selectedAddress.address_line1, selectedAddress.city, selectedAddress.state, selectedAddress.postal_code].filter(Boolean).join(', ')}
-                          </p>
+            {/* Route: Origin → Destination */}
+            <div className='grid grid-cols-1 gap-3 border-b border-border px-4 py-4 sm:grid-cols-2 sm:px-5'>
+              {/* Origin */}
+              <div className='min-w-0'>
+                <div className='mb-1.5 text-[12px] font-medium text-text-tertiary'>Ship from</div>
+                  <Popover open={addressPopoverOpen} onOpenChange={setAddressPopoverOpen}>
+                    <PopoverTrigger asChild>
+                      <button
+                        type='button'
+                        className={cn(
+                          'flex h-9 w-full items-center gap-2 rounded-[6px] border px-3 text-left transition-colors duration-75',
+                          selectedAddress
+                            ? 'border-border hover:bg-bg-hover'
+                            : 'border-dashed border-border-heavy/40 hover:border-border-heavy hover:bg-bg-hover',
+                        )}
+                      >
+                        <span className='min-w-0 flex-1 truncate text-[13px]'>
+                          {selectedAddress ? (
+                            <>
+                              <span className='font-medium text-foreground'>{selectedAddress.title}</span>
+                              <span className='text-text-quaternary'> · </span>
+                              <span className='text-text-tertiary'>
+                                {[selectedAddress.city, selectedAddress.state].filter(Boolean).join(', ')}
+                              </span>
+                            </>
+                          ) : (
+                            <span className='text-text-quaternary'>Select warehouse address…</span>
+                          )}
+                        </span>
+                        <ChevronDown className='size-3.5 shrink-0 text-text-quaternary' />
+                      </button>
+                    </PopoverTrigger>
+                    <PopoverContent align='start' className='w-[var(--radix-popover-trigger-width)] gap-0 p-1'>
+                      {shippingAddresses.length === 0 ? (
+                        <div className='px-3 py-4 text-center text-[13px] text-text-tertiary'>
+                          No shipping addresses configured
                         </div>
                       ) : (
-                        <div className='min-w-0 flex-1'>
-                          <span className='text-[13px] text-text-quaternary'>Select origin address…</span>
-                        </div>
-                      )}
-                      <ChevronDown className='size-3.5 shrink-0 text-text-quaternary' />
-                    </button>
-                  </PopoverTrigger>
-                  <PopoverContent align='start' className='w-[var(--radix-popover-trigger-width)] gap-0 p-1'>
-                    {shippingAddresses.length === 0 ? (
-                      <div className='px-3 py-4 text-center text-[13px] text-text-tertiary'>
-                        No shipping addresses configured
-                      </div>
-                    ) : (
-                      shippingAddresses.map((addr) => {
-                        const isSelected = addr.id === selectedAddressId
-                        return (
-                          <button
-                            key={addr.id}
-                            type='button'
-                            className={cn(
-                              'flex w-full items-center gap-2.5 rounded-[5px] px-2.5 py-2 text-left transition-colors duration-75',
-                              isSelected ? 'bg-primary/[0.08]' : 'hover:bg-bg-hover',
-                            )}
-                            onClick={() => {
-                              setSelectedAddressId(addr.id)
-                              setAddressPopoverOpen(false)
-                            }}
-                          >
-                            <div className='min-w-0 flex-1'>
-                              <div className='flex items-center gap-1.5'>
-                                <span className={cn('text-[13px] font-medium', isSelected ? 'text-primary' : 'text-foreground')}>
-                                  {addr.title}
-                                </span>
-                                {addr.is_default && (
-                                  <span className='rounded bg-primary/10 px-1 py-px text-[10px] font-semibold text-primary'>Default</span>
-                                )}
+                        shippingAddresses.map((addr) => {
+                          const isSelected = addr.id === selectedAddressId
+                          return (
+                            <button
+                              key={addr.id}
+                              type='button'
+                              className={cn(
+                                'flex w-full items-center gap-2.5 rounded-[5px] px-2.5 py-2 text-left transition-colors duration-75',
+                                isSelected ? 'bg-primary/[0.08]' : 'hover:bg-bg-hover',
+                              )}
+                              onClick={() => {
+                                setSelectedAddressId(addr.id)
+                                setAddressPopoverOpen(false)
+                              }}
+                            >
+                              <div className='min-w-0 flex-1'>
+                                <div className='flex items-center gap-1.5'>
+                                  <span className={cn('text-[13px] font-medium', isSelected ? 'text-primary' : 'text-foreground')}>
+                                    {addr.title}
+                                  </span>
+                                  {addr.is_default && (
+                                    <span className='rounded bg-primary/10 px-1 py-px text-[10px] font-semibold text-primary'>Default</span>
+                                  )}
+                                </div>
+                                <p className='mt-0.5 text-[12px] leading-snug text-text-tertiary'>
+                                  {[addr.address_line1, addr.city, addr.state, addr.postal_code].filter(Boolean).join(', ')}
+                                </p>
                               </div>
-                              <p className='mt-0.5 text-[12px] leading-snug text-text-tertiary'>
-                                {[addr.address_line1, addr.city, addr.state, addr.postal_code].filter(Boolean).join(', ')}
-                              </p>
-                            </div>
-                            {isSelected && <Check className='size-3.5 shrink-0 text-primary' />}
-                          </button>
-                        )
-                      })
-                    )}
-                  </PopoverContent>
-                </Popover>
-              </div>
-
-              {/* Arrow separator */}
-              <div className='flex items-center px-1'>
-                <div className='flex size-7 items-center justify-center rounded-full border border-border bg-bg-secondary'>
-                  <ArrowRight className='size-3.5 text-text-tertiary' />
-                </div>
-              </div>
-
-              {/* Ship to */}
-              <div className='flex min-w-0 flex-1 flex-col px-5 py-3'>
-                <div className='mb-2 flex items-center gap-1.5'>
-                  <MapPin className='size-3.5 text-text-tertiary' />
-                  <span className='text-[11px] font-semibold uppercase tracking-[0.06em] text-text-tertiary'>Ship to</span>
-                </div>
-                <div
-                  className={cn(
-                    'flex h-auto min-h-[44px] w-full items-center rounded-[6px] border px-3 py-2',
-                    hasAddress ? 'border-border bg-background' : 'border-dashed border-border',
-                  )}
-                >
-                  {hasAddress ? (
-                    <div className='min-w-0 flex-1'>
-                      {address.c_name && (
-                        <div className='text-[13px] font-medium text-foreground'>{address.c_name}</div>
+                              {isSelected && <Check className='size-3.5 shrink-0 text-primary' />}
+                            </button>
+                          )
+                        })
                       )}
-                      <p className='text-[12px] leading-snug text-text-tertiary'>
-                        {[address.c_address1, address.c_address2].filter(Boolean).join(', ')}
-                        {(address.c_city || address.c_state || address.c_zip) && (
-                          <>{address.c_address1 ? ', ' : ''}{[address.c_city, address.c_state, address.c_zip].filter(Boolean).join(', ')}</>
-                        )}
-                      </p>
-                    </div>
-                  ) : (
-                    <span className='text-[13px] text-text-quaternary'>No ship-to address on order</span>
-                  )}
-                </div>
+                    </PopoverContent>
+                  </Popover>
+              </div>
+
+              {/* Destination */}
+              <div className='min-w-0'>
+                <div className='mb-1.5 text-[12px] font-medium text-text-tertiary'>Ship to</div>
+                  <div
+                    className={cn(
+                      'flex h-9 w-full items-center rounded-[6px] border px-3',
+                      hasAddress ? 'border-border' : 'border-dashed border-border-heavy/40',
+                    )}
+                  >
+                    <span className='min-w-0 flex-1 truncate text-[13px]'>
+                      {hasAddress ? (
+                        <>
+                          {address.c_name && <span className='font-medium text-foreground'>{address.c_name}<span className='text-text-quaternary'> · </span></span>}
+                          <span className='text-text-tertiary'>
+                            {[address.c_address1, address.c_city, address.c_state, address.c_zip].filter(Boolean).join(', ')}
+                          </span>
+                        </>
+                      ) : (
+                        <span className='text-text-quaternary'>No destination on order</span>
+                      )}
+                    </span>
+                  </div>
               </div>
             </div>
 
-            {/* Two-panel layout */}
-            <div className='flex min-h-[480px] max-h-[70vh]'>
+            {/* Two-panel layout — stacks on mobile */}
+            <div className='flex max-h-[70vh] min-h-0 flex-1 max-md:flex-col md:min-h-[480px]'>
               {/* Left: Packages */}
-              <div className='flex w-[380px] shrink-0 flex-col border-r border-border'>
+              <div className='flex shrink-0 flex-col border-b border-border max-md:max-h-[40vh] md:w-[380px] md:border-b-0 md:border-r'>
                 <div className='flex items-center justify-between border-b border-border bg-bg-secondary/60 px-4 py-2'>
                   <span className='text-[12px] font-semibold uppercase tracking-[0.06em] text-text-tertiary'>
                     Packages ({packages.length})
@@ -435,7 +416,7 @@ export function ShippingRatesDialog({
                   </button>
                 </div>
 
-                <div className='flex-1 overflow-y-auto p-3 space-y-2'>
+                <div className='flex-1 space-y-2 overflow-y-auto p-3'>
                   {packages.length === 0 ? (
                     <div className='flex flex-col items-center justify-center py-12 text-center'>
                       <Package className='mb-2 size-6 text-text-quaternary' />
@@ -492,16 +473,16 @@ export function ShippingRatesDialog({
                   )}
                 </div>
 
-                <div className='flex-1 overflow-y-auto'>
+                <div className='flex-1 overflow-x-auto overflow-y-auto'>
                   <table className='w-full text-[13px]'>
                     <thead className='sticky top-0 z-10 bg-bg-secondary/80 backdrop-blur-sm'>
                       <tr className='border-b border-border text-left'>
                         <th className='w-[28px] py-1.5 pl-2 pr-0'></th>
                         <th className='min-w-[90px] px-3 py-1.5 font-medium text-text-tertiary'>Inventory</th>
-                        <th className='min-w-[120px] px-3 py-1.5 font-medium text-text-tertiary'>Description</th>
+                        <th className='min-w-[120px] px-3 py-1.5 font-medium text-text-tertiary max-sm:hidden'>Description</th>
                         <th className='w-[50px] px-3 py-1.5 text-right font-medium text-text-tertiary'>Qty</th>
-                        <th className='w-[70px] px-3 py-1.5 font-medium text-text-tertiary'>Status</th>
-                        <th className='w-[80px] py-1.5 pl-3 pr-4 font-medium text-text-tertiary'>Package</th>
+                        <th className='w-[70px] px-3 py-1.5 font-medium text-text-tertiary max-sm:hidden'>Status</th>
+                        <th className='w-[80px] py-1.5 pl-3 pr-4 font-medium text-text-tertiary'>Pkg</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -526,11 +507,11 @@ export function ShippingRatesDialog({
                               <GripVertical className='size-3.5 text-text-quaternary' />
                             </td>
                             <td className='px-3 py-1.5 font-medium text-foreground'>{item.inven || '—'}</td>
-                            <td className='max-w-[200px] px-3 py-1.5 text-text-secondary'>
+                            <td className='max-w-[200px] px-3 py-1.5 text-text-secondary max-sm:hidden'>
                               <span className='block truncate'>{item.descr || '—'}</span>
                             </td>
-                            <td className='px-3 py-1.5 text-right tabular-nums text-text-secondary'>{item.quan}</td>
-                            <td className='py-1.5 pl-3 pr-3'>
+                            <td className='px-3 py-1.5 text-right tabular-nums text-text-secondary'>{parseFloat(String(item.quan))}</td>
+                            <td className='py-1.5 pl-3 pr-3 max-sm:hidden'>
                               {item.is_picked ? (
                                 <span className='inline-flex items-center gap-1 text-[11px] font-medium text-emerald-600'>
                                   <Check className='size-3' /> Picked
@@ -559,9 +540,12 @@ export function ShippingRatesDialog({
             </div>
 
             {/* Footer */}
-            <div className='flex items-center justify-between border-t border-border px-5 py-3'>
-              <div className='text-[12px] text-text-tertiary'>
+            <div className='flex items-center justify-between border-t border-border px-4 py-3 sm:px-5'>
+              <div className='text-[12px] text-text-tertiary max-sm:hidden'>
                 {packages.length} package(s) · {items.length - unassignedItems.length} of {items.length} items assigned
+              </div>
+              <div className='text-[12px] text-text-tertiary sm:hidden'>
+                {packages.length} pkg · {items.length - unassignedItems.length}/{items.length} assigned
               </div>
               <button
                 type='button'
@@ -589,7 +573,7 @@ export function ShippingRatesDialog({
             <div className='max-h-[60vh] overflow-y-auto'>
               <RatesResultStep data={ratesData!} itemMap={itemMap} />
             </div>
-            <div className='flex items-center justify-between border-t border-border px-5 py-3'>
+            <div className='flex items-center justify-between border-t border-border px-4 py-3 sm:px-5'>
               <div className='text-[12px] text-text-tertiary'>
                 {ratesData?.rates.length ?? 0} rate(s) found
               </div>
@@ -605,7 +589,7 @@ export function ShippingRatesDialog({
         )}
 
         {error && (
-          <div className='border-t border-destructive/20 bg-destructive/5 px-5 py-2 text-[12px] text-destructive'>
+          <div className='border-t border-destructive/20 bg-destructive/5 px-4 py-2 text-[12px] text-destructive sm:px-5'>
             {error}
           </div>
         )}
@@ -639,10 +623,12 @@ function PackageCard({
   onDragLeave: () => void
   onDrop: (e: React.DragEvent) => void
 }) {
+  const hasItems = pkg.items.length > 0
+
   return (
     <div
       className={cn(
-        'rounded-[6px] border transition-colors',
+        'group/pkg overflow-hidden rounded-[8px] border transition-all',
         isDragOver
           ? 'border-primary bg-primary/[0.04] ring-1 ring-primary/20'
           : 'border-border',
@@ -651,94 +637,123 @@ function PackageCard({
       onDragLeave={onDragLeave}
       onDrop={onDrop}
     >
-      {/* Header */}
-      <div className='flex items-center gap-2 border-b border-border-light px-3 py-2'>
-        <Package className='size-3.5 text-text-tertiary' />
-        <span className='text-[13px] font-semibold text-foreground'>Package {index + 1}</span>
-        <span className='text-[12px] text-text-tertiary'>{pkg.items.length} item(s)</span>
-        <div className='flex-1' />
+      {/* Header — shipping-label style */}
+      <div className='flex items-center gap-2.5 bg-foreground/[0.03] px-3 py-2'>
+        <div className='flex size-7 items-center justify-center rounded-[6px] bg-foreground/[0.07]'>
+          <Box className='size-4 text-text-secondary' />
+        </div>
+        <div className='min-w-0 flex-1'>
+          <div className='text-[13px] font-semibold leading-tight text-foreground'>Package {index + 1}</div>
+          <div className='text-[11px] leading-tight text-text-quaternary'>
+            {hasItems
+              ? `${pkg.items.length} item${pkg.items.length !== 1 ? 's' : ''} assigned`
+              : 'No items yet'}
+          </div>
+        </div>
         <button
           type='button'
-          className='inline-flex size-5 items-center justify-center rounded-[3px] text-text-quaternary transition-colors hover:bg-bg-active hover:text-destructive'
+          className='inline-flex size-6 items-center justify-center rounded-[5px] text-text-quaternary opacity-0 transition-all hover:bg-destructive/10 hover:text-destructive group-hover/pkg:opacity-100'
           onClick={onRemove}
         >
           <Trash2 className='size-3' />
         </button>
       </div>
 
-      {/* Dimensions */}
-      <div className='grid grid-cols-4 gap-1.5 px-3 py-2'>
+      {/* Dimensions — 2×2 grid with inline units */}
+      <div className='grid grid-cols-3 gap-x-1.5 gap-y-1.5 px-3 py-2.5'>
         {([
-          ['weight', 'Weight'],
-          ['length', 'Length'],
-          ['width', 'Width'],
-          ['height', 'Height'],
-        ] as const).map(([field, label]) => {
-          const needsMin = field !== 'weight'
-          const isInvalid = needsMin && pkg[field] < 0.01
+          ['length', 'L', 'cm'],
+          ['width', 'W', 'cm'],
+          ['height', 'H', 'cm'],
+        ] as const).map(([field, label, unit]) => {
+          const isInvalid = pkg[field] < 0.01
           return (
-            <div key={field}>
-              <label className='mb-0.5 block text-[10px] text-text-quaternary'>{label}{needsMin && ' *'}</label>
-              <input
-                type='number'
-                min={needsMin ? 0.01 : 0}
-                step={0.01}
-                value={pkg[field] || ''}
-                onChange={(e) => onUpdateDimension(field, Number(e.target.value) || 0)}
-                className={cn(
-                  'h-6 w-full rounded-[4px] border bg-background px-1.5 text-[12px] tabular-nums outline-none focus:ring-1',
-                  isInvalid
-                    ? 'border-destructive/50 focus:border-destructive focus:ring-destructive/30'
-                    : 'border-border focus:border-ring focus:ring-ring/50',
-                )}
-                placeholder={needsMin ? '≥ 0.01' : '0'}
-              />
-              {isInvalid && (
-                <span className='mt-0.5 block text-[9px] text-destructive'>Min 0.01</span>
-              )}
+            <div key={field} className='relative'>
+              <div className={cn(
+                'flex h-8 items-center overflow-hidden rounded-[5px] border transition-colors focus-within:ring-1',
+                isInvalid
+                  ? 'border-destructive/40 focus-within:border-destructive focus-within:ring-destructive/30'
+                  : 'border-border focus-within:border-ring focus-within:ring-ring/50',
+              )}>
+                <span className={cn(
+                  'flex h-full w-6 shrink-0 items-center justify-center border-r bg-foreground/[0.03] text-[11px] font-semibold',
+                  isInvalid ? 'border-destructive/20 text-destructive/70' : 'border-border text-text-tertiary',
+                )}>{label}</span>
+                <input
+                  type='number'
+                  min={0.01}
+                  step={0.01}
+                  value={pkg[field] || ''}
+                  onChange={(e) => onUpdateDimension(field, Number(e.target.value) || 0)}
+                  className='h-full min-w-0 flex-1 bg-background px-1.5 text-[12px] tabular-nums text-foreground outline-none'
+                  placeholder='0'
+                />
+                <span className='pr-1.5 text-[10px] text-text-quaternary'>{unit}</span>
+              </div>
             </div>
           )
         })}
+        <div className='col-span-3'>
+          <div className={cn(
+            'flex h-8 items-center overflow-hidden rounded-[5px] border transition-colors focus-within:ring-1',
+            'border-border focus-within:border-ring focus-within:ring-ring/50',
+          )}>
+            <span className='flex h-full shrink-0 items-center justify-center border-r border-border bg-foreground/[0.03] px-2 text-[11px] font-medium text-text-tertiary'>
+              Weight
+            </span>
+            <input
+              type='number'
+              min={0}
+              step={0.01}
+              value={pkg.weight || ''}
+              onChange={(e) => onUpdateDimension('weight', Number(e.target.value) || 0)}
+              className='h-full min-w-0 flex-1 bg-background px-2 text-[12px] tabular-nums text-foreground outline-none'
+              placeholder='0'
+            />
+            <span className='pr-2 text-[10px] text-text-quaternary'>kg</span>
+          </div>
+        </div>
       </div>
 
       {/* Assigned items */}
-      {pkg.items.length > 0 && (
-        <div className='border-t border-border-light px-3 py-2'>
-          <div className='space-y-0.5'>
-            {pkg.items.map((autoid) => {
-              const item = itemMap.get(autoid)
-              if (!item) return null
-              return (
-                <div
-                  key={autoid}
-                  className='group/item flex items-center gap-1.5 rounded-[4px] px-1.5 py-0.5 transition-colors hover:bg-bg-hover'
+      {hasItems && (
+        <div className='border-t border-border/60 px-2 py-2 space-y-0.5'>
+          {pkg.items.map((autoid) => {
+            const item = itemMap.get(autoid)
+            if (!item) return null
+            return (
+              <div
+                key={autoid}
+                className='group/item flex items-center gap-1.5 rounded-[5px] px-1.5 py-1 transition-colors hover:bg-foreground/[0.03]'
+              >
+                <Package className='size-3 shrink-0 text-text-quaternary' />
+                <span className='shrink-0 text-[12px] font-medium tabular-nums text-foreground'>{item.inven}</span>
+                <span className='min-w-0 flex-1 truncate text-[11px] text-text-tertiary'>{item.descr}</span>
+                <button
+                  type='button'
+                  className='flex size-5 shrink-0 items-center justify-center rounded-[4px] text-text-quaternary opacity-0 transition-all hover:bg-destructive/10 hover:text-destructive group-hover/item:opacity-100'
+                  onClick={() => onUnassignItem(autoid)}
                 >
-                  <span className='text-[12px] font-medium text-foreground'>{item.inven}</span>
-                  <span className='min-w-0 truncate text-[11px] text-text-tertiary'>{item.descr}</span>
-                  <div className='flex-1' />
-                  <button
-                    type='button'
-                    className='hidden shrink-0 text-[10px] font-medium text-text-quaternary transition-colors hover:text-destructive group-hover/item:inline-flex'
-                    onClick={() => onUnassignItem(autoid)}
-                  >
-                    Remove
-                  </button>
-                </div>
-              )
-            })}
-          </div>
+                  <Trash2 className='size-2.5' />
+                </button>
+              </div>
+            )
+          })}
         </div>
       )}
 
-      {/* Drop zone hint */}
-      {pkg.items.length === 0 && !isDragOver && (
-        <div className='px-3 pb-2 text-center text-[11px] text-text-quaternary'>
-          Drag items here
-        </div>
-      )}
-      {isDragOver && (
-        <div className='px-3 pb-2 text-center text-[11px] font-medium text-primary'>
-          Drop to add item
+      {/* Drop zone */}
+      {!hasItems && (
+        <div className={cn(
+          'mx-2 mb-2 flex flex-col items-center gap-1 rounded-[6px] border border-dashed py-3 transition-colors',
+          isDragOver
+            ? 'border-primary bg-primary/[0.04] text-primary'
+            : 'border-border-heavy/30 text-text-quaternary',
+        )}>
+          <GripVertical className='size-3.5 opacity-40' />
+          <span className='text-[11px]'>
+            {isDragOver ? 'Drop to add' : 'Drag items here'}
+          </span>
         </div>
       )}
     </div>

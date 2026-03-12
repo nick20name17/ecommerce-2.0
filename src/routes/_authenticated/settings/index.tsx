@@ -5,7 +5,6 @@ import { useSortable } from '@dnd-kit/react/sortable'
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { createFileRoute, redirect } from '@tanstack/react-router'
 import {
-  GripVertical,
   MapPin,
   MoreHorizontal,
   Pencil,
@@ -18,9 +17,12 @@ import {
 import { parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
+import { useDebouncedCallback } from 'use-debounce'
 
 import { PageEmpty } from '@/components/common/page-empty'
+import { SidebarTrigger } from '@/components/ui/sidebar'
 import { FieldsDataTable } from './-components/fields-data-table'
+import { FilterGroupsSection } from './-components/filter-groups-section'
 import { ShippingAddressModal } from './-components/shipping-address-modal'
 import { SHIPPING_ADDRESS_QUERY_KEYS, getShippingAddressesQuery } from '@/api/shipping-address/query'
 import type { ShippingAddress } from '@/api/shipping-address/schema'
@@ -51,31 +53,33 @@ import { PROPOSAL_QUERY_KEYS } from '@/api/proposal/query'
 import { TASK_QUERY_KEYS, getTaskStatusesQuery } from '@/api/task/query'
 import type { TaskStatus } from '@/api/task/schema'
 import { taskService } from '@/api/task/service'
-import { getUsersQuery } from '@/api/user/query'
+import { USER_QUERY_KEYS, getUsersQuery } from '@/api/user/query'
 import type { User, UserParams } from '@/api/user/schema'
+import { userService } from '@/api/user/service'
 import { ColorPicker } from '@/components/ui/color-picker'
-import { ISettings, PAGE_COLORS, PageHeaderIcon } from '@/components/ds'
-import { Pagination } from '@/components/common/filters/pagination'
+import { ISettings, InitialsAvatar, PAGE_COLORS, PageHeaderIcon } from '@/components/ds'
+import { RoleBadge } from '@/components/common/role-badge'
 import { Skeleton } from '@/components/ui/skeleton'
+import { Switch } from '@/components/ui/switch'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { isAdmin } from '@/constants/user'
 import type { UserRole } from '@/constants/user'
 import { getSession } from '@/helpers/auth'
 import { useProjectId } from '@/hooks/use-project-id'
-import { useOrdering } from '@/hooks/use-ordering'
-import { useLimitParam, useOffsetParam, useSearchParam } from '@/hooks/use-query-params'
+import { useSearchParam } from '@/hooks/use-query-params'
 import { cn } from '@/lib/utils'
+import { useAuth } from '@/providers/auth'
 import { UserDeleteDialog } from '../users/-components/user-delete-dialog'
 import { UserModal } from '../users/-components/user-modal'
-import { UsersDataTable } from '../users/-components/users-data-table'
 
 // ── Section definitions ─────────────────────────────────────
 
-type SettingsSection = 'data-control' | 'tasks' | 'shipping' | 'users'
+type SettingsSection = 'data-control' | 'filters' | 'tasks' | 'shipping' | 'users'
 
 const SECTIONS: { value: SettingsSection; label: string }[] = [
   { value: 'data-control', label: 'Data Control' },
+  { value: 'filters', label: 'Filters' },
   { value: 'tasks', label: 'Statuses' },
   { value: 'shipping', label: 'Shipping' },
   { value: 'users', label: 'Users' },
@@ -157,6 +161,7 @@ const SettingsPage = () => {
     <div className='flex h-full flex-col overflow-hidden'>
       {/* ── Header bar ── */}
       <header className='flex h-12 shrink-0 items-center gap-2.5 border-b border-border px-6'>
+        <SidebarTrigger className='-ml-1' />
         <PageHeaderIcon icon={ISettings} color={PAGE_COLORS.settings} />
         <h1 className='text-[14px] font-semibold tracking-[-0.01em]'>Settings</h1>
       </header>
@@ -188,6 +193,7 @@ const SettingsPage = () => {
         {/* Content */}
         <div className='flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden'>
           {currentSection === 'data-control' && <DataControlSection projectId={projectId} />}
+          {currentSection === 'filters' && <FilterGroupsSection />}
           {currentSection === 'tasks' && <TasksSection projectId={projectId} />}
           {currentSection === 'shipping' && <ShippingSection projectId={projectId} />}
           {currentSection === 'users' && <UsersSection />}
@@ -203,7 +209,7 @@ const DataControlSection = ({ projectId }: { projectId: number }) => {
   const [activeTab, setActiveTab] = useQueryState('tab', parseAsString)
   const client = useQueryClient()
 
-  const { data, isLoading, isPlaceholderData } = useQuery({
+  const { data, isLoading } = useQuery({
     ...getFieldConfigQuery(projectId),
     placeholderData: keepPreviousData
   })
@@ -290,7 +296,7 @@ const DataControlSection = ({ projectId }: { projectId: number }) => {
         <TabsList variant='line' className='flex-wrap'>
           {showTabSkeleton
             ? Array.from({ length: 4 }).map((_, i) => (
-                <Skeleton key={i} className='h-9 w-28 rounded-md' />
+                <Skeleton key={i} className='h-4 w-20 rounded' />
               ))
             : entities.map((entity) => (
                 <TabsTrigger key={entity} value={entity}>
@@ -300,7 +306,7 @@ const DataControlSection = ({ projectId }: { projectId: number }) => {
         </TabsList>
       </div>
 
-      <div className='flex-1 overflow-auto px-6 py-4'>
+      <div className='min-h-0 flex-1 overflow-auto'>
         {showTabSkeleton ? (
           <FieldsDataTable
             fields={[]}
@@ -319,7 +325,7 @@ const DataControlSection = ({ projectId }: { projectId: number }) => {
             <TabsContent key={entity} value={entity}>
               <FieldsDataTable
                 fields={entity === currentTab ? fields : []}
-                isLoading={isLoading || isPlaceholderData}
+                isLoading={isLoading}
                 entity={entity}
                 projectId={projectId}
                 onFieldToggle={handleFieldToggle}
@@ -355,11 +361,12 @@ const TasksSection = ({ projectId }: { projectId: number }) => {
   const [orderedStatuses, setOrderedStatuses] = useState<TaskStatus[]>([])
   const [newName, setNewName] = useState('')
   const [newColor, setNewColor] = useState(defaultStatusColorHex)
+  const [deleteTarget, setDeleteTarget] = useState<TaskStatus | null>(null)
 
-  const statusIds = statuses.map((s) => s.id).join(',')
+  const statusKey = statuses.map((s) => `${s.id}:${s.name}:${s.color}`).join(',')
   useEffect(() => {
     setOrderedStatuses([...statuses].sort((a, b) => a.order - b.order))
-  }, [statusIds]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [statusKey]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const reorderMutation = useMutation({
     mutationFn: ({ id, order }: { id: number; order: number }) =>
@@ -378,7 +385,10 @@ const TasksSection = ({ projectId }: { projectId: number }) => {
 
   const deleteMutation = useMutation({
     mutationFn: (id: number) => taskService.deleteStatus(id),
-    onSuccess: (_, id) => setOrderedStatuses((prev) => prev.filter((s) => s.id !== id)),
+    onSuccess: (_, id) => {
+      setOrderedStatuses((prev) => prev.filter((s) => s.id !== id))
+      setDeleteTarget(null)
+    },
     meta: { invalidatesQuery: TASK_QUERY_KEYS.statuses(projectId) }
   })
 
@@ -404,13 +414,17 @@ const TasksSection = ({ projectId }: { projectId: number }) => {
     const useSortableIndices =
       typeof sortableSource.initialIndex === 'number' && typeof sortableSource.index === 'number'
 
+    // Only custom (non-default) statuses are in the sortable — indices are relative to that sub-array
+    const nonDefault = orderedStatuses.filter((s) => !s.is_default)
+    const defaults = orderedStatuses.filter((s) => s.is_default)
+
     const fromIndex = useSortableIndices
       ? sortableSource.initialIndex
-      : orderedStatuses.findIndex((s) => s.id === Number(source?.id))
+      : nonDefault.findIndex((s) => s.id === Number(source?.id))
     const toIndex = useSortableIndices
       ? sortableSource.index
       : target != null
-        ? orderedStatuses.findIndex((s) => s.id === Number(target.id))
+        ? nonDefault.findIndex((s) => s.id === Number(target.id))
         : -1
 
     if (
@@ -422,14 +436,11 @@ const TasksSection = ({ projectId }: { projectId: number }) => {
     )
       return
 
-    const next = arrayMove(orderedStatuses, fromIndex, toIndex)
-    setOrderedStatuses(next)
+    const next = arrayMove(nonDefault, fromIndex, toIndex)
+    setOrderedStatuses([...defaults, ...next])
 
-    // Use 1-based ordering (backend requires 1–99)
     Promise.all(
-      next
-        .filter((s) => !s.is_default && s.id != null)
-        .map((status, i) => reorderMutation.mutateAsync({ id: status.id as number, order: i + 1 }))
+      next.map((status, i) => reorderMutation.mutateAsync({ id: status.id as number, order: i + 1 }))
     )
       .then(() => {
         queryClient.invalidateQueries({
@@ -440,62 +451,132 @@ const TasksSection = ({ projectId }: { projectId: number }) => {
       .catch(() => {})
   }
 
+  // Split for rendering: defaults (non-done) at top, custom (sortable) in middle, "Done" pinned at bottom
+  const defaultStatuses = orderedStatuses.filter((s) => s.is_default && s.name.toLowerCase() !== 'done')
+  const doneStatus = orderedStatuses.find((s) => s.is_default && s.name.toLowerCase() === 'done')
+  const customStatuses = orderedStatuses.filter((s) => !s.is_default)
+
   return (
     <div className='flex min-h-0 flex-1 flex-col'>
       <div className='flex-1 overflow-auto'>
-        {isLoading ? (
-          <div>
-            {Array.from({ length: 5 }).map((_, i) => (
-              <div key={i} className='flex items-center gap-2.5 border-b border-border-light px-6 py-2'>
-                <Skeleton className='size-3.5 rounded-full' />
-                <Skeleton className='h-3.5 w-28' />
-              </div>
-            ))}
-          </div>
-        ) : (
-          <DragDropProvider plugins={SORTABLE_PLUGINS} onDragEnd={handleDragEnd}>
-            <div>
-              {orderedStatuses.map((status, index) => (
-                <SortableStatusRow
-                  key={status.id}
-                  status={status}
-                  index={index}
-                  projectId={projectId}
-                  onDelete={() => deleteMutation.mutate(status.id)}
-                  isDeleting={deleteMutation.isPending && deleteMutation.variables === status.id}
-                />
+        <div className='mx-auto max-w-[560px] px-8 py-8'>
+          {isLoading ? (
+            <div className='overflow-hidden rounded-[10px] border border-border'>
+              {Array.from({ length: 6 }).map((_, i) => (
+                <div key={i} className={cn('flex items-center gap-3 px-4 py-3', i < 5 && 'border-b border-border-light')}>
+                  <Skeleton className='size-4 rounded-full' />
+                  <Skeleton className='h-4 w-32' />
+                </div>
               ))}
             </div>
-          </DragDropProvider>
-        )}
+          ) : (
+            <div className='overflow-hidden rounded-[10px] border border-border'>
+              {/* Add new status row — at the top */}
+              <div className='flex items-center gap-3 border-b border-dashed border-border-light px-4 py-2'>
+                <ColorPicker
+                  value={newColor}
+                  onChange={setNewColor}
+                  className='!size-4 !min-h-0 !min-w-0 !rounded-full !border-0 !p-0 !shadow-none ring-2 ring-border'
+                />
+                <input
+                  value={newName}
+                  onChange={(e) => setNewName(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleAddStatus()}
+                  placeholder='Add a status...'
+                  className='h-7 min-w-0 flex-1 bg-transparent text-[13px] font-medium outline-none placeholder:text-text-quaternary'
+                />
+                {newName.trim() && (
+                  <button
+                    type='button'
+                    className='inline-flex h-7 shrink-0 items-center gap-1.5 rounded-[6px] bg-primary px-3 text-[12px] font-medium text-primary-foreground transition-opacity duration-[80ms] hover:opacity-90 disabled:opacity-40'
+                    disabled={createMutation.isPending}
+                    onClick={handleAddStatus}
+                  >
+                    {createMutation.isPending ? 'Adding...' : 'Add'}
+                  </button>
+                )}
+              </div>
 
-        {/* Add status row */}
-        {!isLoading && (
-          <div className='flex items-center gap-2.5 border-b border-dashed border-border-light px-6 py-1.5'>
-            <div className='flex items-center gap-2'>
-              <ColorPicker value={newColor} onChange={setNewColor} />
+              {/* Default statuses — static, not draggable */}
+              {defaultStatuses.map((status) => (
+                <div
+                  key={status.id}
+                  className='flex items-center gap-3 border-b border-border-light px-4 py-2.5'
+                >
+                  <div
+                    className='size-4 shrink-0 rounded-full'
+                    style={{ backgroundColor: status.color ?? defaultStatusColorHex }}
+                  />
+                  <span className='min-w-0 flex-1 truncate text-[13px] font-medium text-foreground'>
+                    {status.name}
+                  </span>
+                  <span className='shrink-0 rounded-[5px] bg-bg-secondary/80 px-2 py-[3px] text-[11px] font-medium text-text-quaternary'>
+                    Default
+                  </span>
+                </div>
+              ))}
+
+              {/* Custom statuses — sortable, whole row is draggable */}
+              {customStatuses.length > 0 && (
+                <DragDropProvider plugins={SORTABLE_PLUGINS} onDragEnd={handleDragEnd}>
+                  <div>
+                    {customStatuses.map((status, index) => (
+                      <SortableStatusRow
+                        key={status.id}
+                        status={status}
+                        index={index}
+                        projectId={projectId}
+                        onDelete={() => setDeleteTarget(status)}
+                      />
+                    ))}
+                  </div>
+                </DragDropProvider>
+              )}
+
+              {/* Done status — always pinned at the bottom */}
+              {doneStatus && (
+                <div className='flex items-center gap-3 px-4 py-2.5'>
+                  <div
+                    className='size-4 shrink-0 rounded-full'
+                    style={{ backgroundColor: doneStatus.color ?? defaultStatusColorHex }}
+                  />
+                  <span className='min-w-0 flex-1 truncate text-[13px] font-medium text-foreground'>
+                    {doneStatus.name}
+                  </span>
+                  <span className='shrink-0 rounded-[5px] bg-bg-secondary/80 px-2 py-[3px] text-[11px] font-medium text-text-quaternary'>
+                    Default
+                  </span>
+                </div>
+              )}
             </div>
-            <div className='min-w-0 flex-1'>
-              <input
-                value={newName}
-                onChange={(e) => setNewName(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleAddStatus()}
-                placeholder='New status…'
-                className='h-7 w-full bg-transparent text-[13px] outline-none placeholder:text-text-quaternary'
-              />
-            </div>
-            <button
-              type='button'
-              className='inline-flex h-6 shrink-0 items-center gap-1 rounded-[5px] bg-primary px-2 text-[12px] font-medium text-primary-foreground transition-opacity duration-[80ms] hover:opacity-90 disabled:opacity-40'
-              disabled={!newName.trim() || createMutation.isPending}
-              onClick={handleAddStatus}
-            >
-              <Plus className='size-3' />
-              Add
-            </button>
-          </div>
-        )}
+          )}
+        </div>
       </div>
+
+      {/* Delete confirmation */}
+      <AlertDialog open={!!deleteTarget} onOpenChange={(open) => !open && setDeleteTarget(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogMedia className='bg-destructive/10 text-destructive'>
+              <TriangleAlert />
+            </AlertDialogMedia>
+            <AlertDialogTitle>Delete Status</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete &ldquo;{deleteTarget?.name}&rdquo;? Tasks using this status will need to be reassigned.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              variant='destructive'
+              onClick={() => deleteTarget && deleteMutation.mutate(deleteTarget.id)}
+              isPending={deleteMutation.isPending}
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }
@@ -507,19 +588,15 @@ const SortableStatusRow = ({
   index,
   projectId,
   onDelete,
-  isDeleting,
 }: {
   status: TaskStatus
   index: number
   projectId: number
   onDelete: () => void
-  isDeleting: boolean
 }) => {
-  const isDefault = status.is_default
-  const { handleRef, ref, isDragging } = useSortable({
+  const { ref, isDragging } = useSortable({
     id: status.id,
     index,
-    disabled: isDefault,
   })
 
   const [editing, setEditing] = useState(false)
@@ -542,13 +619,19 @@ const SortableStatusRow = ({
     updateMutation.mutate({ name: trimmed, color: editColor })
   }
 
+  const statusColor = status.color ?? defaultStatusColorHex
+
   if (editing) {
     return (
       <div
         ref={ref}
-        className='flex items-center gap-2.5 border-b border-border-light px-6 py-1.5'
+        className='flex items-center gap-3 border-b border-border-light bg-bg-hover/20 px-4 py-2.5'
       >
-        <ColorPicker value={editColor} onChange={setEditColor} />
+        <ColorPicker
+          value={editColor}
+          onChange={setEditColor}
+          className='!size-4 !min-h-0 !min-w-0 !rounded-full !border-0 !p-0 !shadow-none ring-2 ring-border'
+        />
         <input
           value={editName}
           onChange={(e) => setEditName(e.target.value)}
@@ -556,24 +639,26 @@ const SortableStatusRow = ({
             if (e.key === 'Enter') handleSave()
             if (e.key === 'Escape') setEditing(false)
           }}
-          className='h-7 min-w-0 flex-1 rounded-[5px] border border-border bg-background px-2 text-[13px] outline-none focus:border-primary focus:ring-1 focus:ring-primary/20'
+          className='h-7 min-w-0 flex-1 rounded-[6px] border border-border bg-background px-2.5 text-[13px] font-medium outline-none transition-[border-color,box-shadow] focus:border-primary focus:ring-2 focus:ring-primary/20'
           autoFocus
         />
-        <button
-          type='button'
-          className='inline-flex h-6 shrink-0 items-center rounded-[5px] px-2 text-[12px] font-medium text-text-tertiary transition-colors hover:bg-bg-hover hover:text-foreground'
-          onClick={() => setEditing(false)}
-        >
-          Cancel
-        </button>
-        <button
-          type='button'
-          className='inline-flex h-6 shrink-0 items-center rounded-[5px] bg-primary px-2.5 text-[12px] font-medium text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-40'
-          onClick={handleSave}
-          disabled={updateMutation.isPending}
-        >
-          Save
-        </button>
+        <div className='flex shrink-0 items-center gap-1.5'>
+          <button
+            type='button'
+            className='inline-flex h-7 items-center rounded-[6px] px-2.5 text-[12px] font-medium text-text-tertiary transition-colors duration-[80ms] hover:bg-bg-hover hover:text-foreground'
+            onClick={() => setEditing(false)}
+          >
+            Cancel
+          </button>
+          <button
+            type='button'
+            className='inline-flex h-7 items-center rounded-[6px] bg-primary px-3 text-[12px] font-medium text-primary-foreground transition-opacity duration-[80ms] hover:opacity-90 disabled:opacity-40'
+            onClick={handleSave}
+            disabled={updateMutation.isPending || !editName.trim()}
+          >
+            Save
+          </button>
+        </div>
       </div>
     )
   }
@@ -582,77 +667,55 @@ const SortableStatusRow = ({
     <div
       ref={ref}
       className={cn(
-        'group/row flex items-center gap-2.5 border-b border-border-light px-6 py-1.5 transition-colors duration-75',
-        isDragging && 'opacity-50 shadow-sm',
-        !isDefault && !isDragging && 'hover:bg-bg-hover',
+        'group/row flex cursor-grab items-center gap-3 border-b border-border-light px-4 py-2.5 transition-colors duration-75 active:cursor-grabbing',
+        isDragging && 'z-10 rounded-[10px] border border-primary/20 bg-background shadow-lg shadow-primary/5',
+        !isDragging && 'hover:bg-bg-hover/40',
       )}
     >
-      {/* Drag handle — only for non-default */}
-      {!isDefault ? (
-        <button ref={handleRef} className='cursor-grab touch-none text-text-quaternary hover:text-text-tertiary'>
-          <GripVertical className='size-3.5' />
-        </button>
-      ) : (
-        <div className='size-3.5' />
-      )}
-
       {/* Color dot */}
       <div
-        className='size-3 shrink-0 rounded-full'
-        style={{ backgroundColor: status.color ?? 'var(--status-default)' }}
+        className='size-4 shrink-0 rounded-full'
+        style={{ backgroundColor: statusColor }}
       />
 
       {/* Name */}
-      <span className='min-w-0 flex-1 truncate text-[13px] font-medium'>{status.name}</span>
+      <span className='min-w-0 flex-1 truncate text-[13px] font-medium text-foreground'>{status.name}</span>
 
-      {/* Default badge */}
-      {isDefault && (
-        <span className='shrink-0 rounded-[4px] bg-bg-secondary px-1.5 py-0.5 text-[11px] font-medium text-text-tertiary'>
-          Default
-        </span>
-      )}
-
-      {/* Actions — three-dot menu */}
-      {!isDefault && (
-        <div className='flex shrink-0 items-center'>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button
-                type='button'
-                className='inline-flex size-6 items-center justify-center rounded-[5px] text-text-tertiary opacity-0 transition-all duration-75 hover:bg-bg-active hover:text-foreground group-hover/row:opacity-100'
-              >
-                <MoreHorizontal className='size-4' />
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent
-              align='end'
-              className='w-[160px] rounded-[8px] p-1'
-              style={{ boxShadow: 'var(--dropdown-shadow)' }}
+      {/* Actions — appear on hover */}
+      <div className='flex shrink-0 items-center gap-1 opacity-0 transition-opacity duration-75 group-hover/row:opacity-100'>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <button
+              type='button'
+              className='inline-flex size-7 items-center justify-center rounded-[6px] text-text-quaternary transition-colors duration-75 hover:bg-bg-active hover:text-foreground'
+              onClick={(e) => {
+                e.stopPropagation()
+                setEditName(status.name)
+                setEditColor(status.color ?? defaultStatusColorHex)
+                setEditing(true)
+              }}
             >
-              <DropdownMenuItem
-                className='cursor-pointer gap-2 rounded-[6px] px-2 py-1 text-[13px]'
-                onClick={() => {
-                  setEditName(status.name)
-                  setEditColor(status.color ?? defaultStatusColorHex)
-                  setEditing(true)
-                }}
-              >
-                <Pencil className='size-3.5' />
-                Edit
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                variant='destructive'
-                className='cursor-pointer gap-2 rounded-[6px] px-2 py-1 text-[13px]'
-                onClick={onDelete}
-                disabled={isDeleting}
-              >
-                <Trash2 className='size-3.5' />
-                Delete
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-      )}
+              <Pencil className='size-3.5' />
+            </button>
+          </TooltipTrigger>
+          <TooltipContent>Edit</TooltipContent>
+        </Tooltip>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <button
+              type='button'
+              className='inline-flex size-7 items-center justify-center rounded-[6px] text-text-quaternary transition-colors duration-75 hover:bg-destructive/10 hover:text-destructive'
+              onClick={(e) => {
+                e.stopPropagation()
+                onDelete()
+              }}
+            >
+              <Trash2 className='size-3.5' />
+            </button>
+          </TooltipTrigger>
+          <TooltipContent>Delete</TooltipContent>
+        </Tooltip>
+      </div>
     </div>
   )
 }
@@ -844,28 +907,73 @@ const ShippingSection = ({ projectId }: { projectId: number }) => {
 
 // ── Users Section ───────────────────────────────────────────
 
+const getInitials = (firstName?: string, lastName?: string, email?: string): string => {
+  const first = firstName?.trim()
+  const last = lastName?.trim()
+  if (first && last) return `${first.charAt(0)}${last.charAt(0)}`.toUpperCase()
+  if (first || last) return (first || last)!.charAt(0).toUpperCase()
+  return (email?.charAt(0) ?? '?').toUpperCase()
+}
+
+const UserStatusToggle = ({
+  user,
+  currentUserId,
+}: {
+  user: User
+  currentUserId: number | undefined
+}) => {
+  const isSelf = user.id === currentUserId
+
+  const toggleMutation = useMutation({
+    mutationFn: () => userService.update({ id: user.id, payload: { is_active: !user.is_active } }),
+    meta: {
+      successMessage: `User ${user.is_active ? 'deactivated' : 'activated'}`,
+      invalidatesQuery: USER_QUERY_KEYS.lists(),
+    },
+  })
+
+  const toggle = (
+    <Switch
+      checked={user.is_active}
+      disabled={isSelf || toggleMutation.isPending}
+      onCheckedChange={() => toggleMutation.mutate()}
+      aria-label={user.is_active ? 'Deactivate user' : 'Activate user'}
+    />
+  )
+
+  if (!isSelf) return toggle
+
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <span className='inline-flex'>{toggle}</span>
+      </TooltipTrigger>
+      <TooltipContent>You cannot deactivate yourself</TooltipContent>
+    </Tooltip>
+  )
+}
+
 const UsersSection = () => {
   const [search, setSearch] = useSearchParam()
-  const [offset] = useOffsetParam()
-  const [limit] = useLimitParam()
-  const { sorting, setSorting, ordering } = useOrdering()
+  const debouncedSetSearch = useDebouncedCallback((value: string) => setSearch(value || null), 300)
+  const { user: currentUser } = useAuth()
 
   const [modalUser, setModalUser] = useState<User | 'create' | null>(null)
   const [deleteUser, setDeleteUser] = useState<User | null>(null)
 
   const params: UserParams = {
     search: search || undefined,
-    offset,
-    limit,
-    ordering
+    limit: 500,
   }
 
   const { data, isLoading, isPlaceholderData } = useQuery({
     ...getUsersQuery(params),
-    placeholderData: keepPreviousData
+    placeholderData: keepPreviousData,
   })
 
+  const users = data?.results ?? []
   const editingUser = typeof modalUser === 'object' ? modalUser : null
+  const loading = isLoading || isPlaceholderData
 
   return (
     <div className='flex min-h-0 flex-1 flex-col'>
@@ -874,9 +982,9 @@ const UsersSection = () => {
         <div className='flex h-7 w-[220px] items-center gap-1.5 rounded-[5px] border border-border bg-background px-2 transition-[border-color,box-shadow] focus-within:border-ring focus-within:ring-2 focus-within:ring-ring/50'>
           <Search className='size-3 shrink-0 text-text-tertiary' />
           <input
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder='Search users…'
+            defaultValue={search}
+            onChange={(e) => debouncedSetSearch(e.target.value)}
+            placeholder='Search users...'
             className='flex-1 bg-transparent text-[13px] outline-none placeholder:text-text-tertiary'
           />
         </div>
@@ -887,23 +995,125 @@ const UsersSection = () => {
           onClick={() => setModalUser('create')}
         >
           <Plus className='size-3.5' />
-          Add User
+          New User
         </button>
       </div>
 
-      <div className='min-h-0 flex-1 overflow-auto'>
-        <UsersDataTable
-          data={data?.results ?? []}
-          isLoading={isLoading || isPlaceholderData}
-          sorting={sorting}
-          setSorting={setSorting}
-          onEdit={setModalUser}
-          onDelete={setDeleteUser}
-        />
+      {/* Table header */}
+      <div className='sticky top-0 z-10 flex shrink-0 items-center gap-4 border-b border-border bg-bg-secondary/60 px-6 py-1.5 backdrop-blur-sm'>
+        <div className='min-w-0 flex-1 text-[11px] font-semibold uppercase tracking-[0.05em] text-text-tertiary'>
+          User
+        </div>
+        <div className='hidden w-[180px] shrink-0 text-[11px] font-semibold uppercase tracking-[0.05em] text-text-tertiary sm:block'>
+          Email
+        </div>
+        <div className='w-[80px] shrink-0 text-[11px] font-semibold uppercase tracking-[0.05em] text-text-tertiary'>
+          Role
+        </div>
+        <div className='w-[60px] shrink-0 text-center text-[11px] font-semibold uppercase tracking-[0.05em] text-text-tertiary'>
+          Active
+        </div>
+        <div className='w-[56px] shrink-0' />
       </div>
 
-      <div className='shrink-0 border-t border-border px-6 py-2'>
-        <Pagination totalCount={data?.count ?? 0} />
+      {/* Table body */}
+      <div className='min-h-0 flex-1 overflow-auto'>
+        {loading && !users.length ? (
+          <div>
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className='flex items-center gap-4 border-b border-border-light px-6 py-2'>
+                <div className='flex min-w-0 flex-1 items-center gap-2.5'>
+                  <Skeleton className='size-7 rounded-full' />
+                  <Skeleton className='h-3.5 w-28' />
+                </div>
+                <div className='hidden w-[180px] shrink-0 sm:block'>
+                  <Skeleton className='h-3.5 w-36' />
+                </div>
+                <div className='w-[80px] shrink-0'>
+                  <Skeleton className='h-5 w-14 rounded-[4px]' />
+                </div>
+                <div className='flex w-[60px] shrink-0 justify-center'>
+                  <Skeleton className='h-5 w-9 rounded-full' />
+                </div>
+                <div className='w-[56px] shrink-0' />
+              </div>
+            ))}
+          </div>
+        ) : users.length === 0 ? (
+          <PageEmpty icon={Search} title='No users found' description={search ? 'Try a different search term.' : 'Add your first user to get started.'} />
+        ) : (
+          users.map((user) => {
+            const fullName = [user.first_name, user.last_name].filter(Boolean).join(' ').trim() || user.email
+            const initials = getInitials(user.first_name, user.last_name, user.email)
+            const isSelf = user.id === currentUser?.id
+
+            return (
+              <div
+                key={user.id}
+                className={cn(
+                  'group/row flex items-center gap-4 border-b border-border-light px-6 py-1.5 transition-colors duration-75 hover:bg-bg-hover/40',
+                  loading && 'opacity-60',
+                )}
+              >
+                {/* Name + avatar */}
+                <div className='flex min-w-0 flex-1 items-center gap-2.5'>
+                  <InitialsAvatar initials={initials} size={26} />
+                  <span className='truncate text-[13px] font-medium text-foreground'>{fullName}</span>
+                  {isSelf && (
+                    <span className='shrink-0 rounded-[4px] bg-primary/10 px-1.5 py-[1px] text-[10px] font-semibold text-primary'>
+                      You
+                    </span>
+                  )}
+                </div>
+
+                {/* Email */}
+                <div className='hidden w-[180px] shrink-0 sm:block'>
+                  <span className='block truncate text-[13px] text-text-tertiary'>{user.email}</span>
+                </div>
+
+                {/* Role */}
+                <div className='w-[80px] shrink-0'>
+                  <RoleBadge role={user.role} />
+                </div>
+
+                {/* Active toggle */}
+                <div className='flex w-[60px] shrink-0 justify-center'>
+                  <UserStatusToggle user={user} currentUserId={currentUser?.id} />
+                </div>
+
+                {/* Actions */}
+                <div className='flex w-[56px] shrink-0 items-center justify-end gap-1 opacity-0 transition-opacity duration-75 group-hover/row:opacity-100'>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <button
+                        type='button'
+                        className='inline-flex size-7 items-center justify-center rounded-[6px] text-text-quaternary transition-colors duration-75 hover:bg-bg-active hover:text-foreground'
+                        onClick={() => setModalUser(user)}
+                      >
+                        <Pencil className='size-3.5' />
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent>Edit</TooltipContent>
+                  </Tooltip>
+                  {!isSelf && (
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <button
+                          type='button'
+                          className='inline-flex size-7 items-center justify-center rounded-[6px] text-text-quaternary transition-colors duration-75 hover:bg-destructive/10 hover:text-destructive'
+                          onClick={() => setDeleteUser(user)}
+                        >
+                          <Trash2 className='size-3.5' />
+                        </button>
+                      </TooltipTrigger>
+                      <TooltipContent>Delete</TooltipContent>
+                    </Tooltip>
+                  )}
+                </div>
+              </div>
+            )
+          })
+        )}
       </div>
 
       <UserModal

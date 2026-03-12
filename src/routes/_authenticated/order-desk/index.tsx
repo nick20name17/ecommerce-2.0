@@ -1,6 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
 import {
-  ClipboardList,
   Eraser,
   FileCheck,
   LayoutGrid,
@@ -19,6 +18,7 @@ import { useCreatePage } from '../create/-components/use-create-page'
 import {
   EntityAttachments,
 } from '@/components/common/entity-attachments/entity-attachments'
+import { IOrderDesk, PAGE_COLORS, PageHeaderIcon } from '@/components/ds'
 import {
   Dialog,
   DialogContent,
@@ -27,6 +27,7 @@ import {
 } from '@/components/ui/dialog'
 import { Spinner } from '@/components/ui/spinner'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
+import { SidebarTrigger } from '@/components/ui/sidebar'
 import { cn } from '@/lib/utils'
 
 const OrderDeskPage = () => {
@@ -72,48 +73,41 @@ const OrderDeskPage = () => {
 
   return (
     <div className='flex h-full flex-col overflow-hidden'>
-      {/* ── Hero Header ── */}
-      <header className='shrink-0 border-b border-border'>
-        <div className='flex items-center gap-3 px-6 py-4'>
-          <div className='flex size-9 items-center justify-center rounded-[8px] bg-amber-500'>
-            <ClipboardList className='size-[18px] text-white' />
-          </div>
-          <div>
-            <h1 className='text-[16px] font-semibold tracking-[-0.01em]'>Order Desk</h1>
-            <p className='text-[12px] text-text-tertiary'>
-              Create proposals and orders for customers
-            </p>
-          </div>
-          <div className='flex-1' />
+      {/* ── Header ── */}
+      <header className='flex h-12 shrink-0 items-center gap-2.5 border-b border-border px-6'>
+        <SidebarTrigger className='-ml-1' />
+        <PageHeaderIcon icon={IOrderDesk} color={PAGE_COLORS.orderDesk} />
+        <h1 className='text-[14px] font-semibold tracking-[-0.01em]'>Order Desk</h1>
 
-          {/* Catalog */}
-          <button
-            type='button'
-            className={cn(
-              'inline-flex h-7 items-center gap-1.5 rounded-[5px] border border-border bg-bg-secondary px-2.5 text-[12px] font-medium text-text-secondary transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground disabled:pointer-events-none disabled:opacity-40',
-            )}
-            disabled={!customer || isBusy}
-            onClick={() => setCatalogOpen(true)}
-          >
-            <LayoutGrid className='size-3.5' />
-            <span className='hidden sm:inline'>Catalog</span>
-          </button>
+        <div className='flex-1' />
 
-          {/* Clear */}
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <button
-                type='button'
-                className='inline-flex size-7 items-center justify-center rounded-[5px] text-text-tertiary transition-colors duration-[80ms] hover:bg-bg-hover hover:text-destructive disabled:pointer-events-none disabled:opacity-40'
-                disabled={cartItems.length === 0 || isBusy || isCreating}
-                onClick={handleClearAll}
-              >
-                {busy.clearingCart ? <Spinner className='size-3.5' /> : <Eraser className='size-3.5' />}
-              </button>
-            </TooltipTrigger>
-            <TooltipContent>Clear all items</TooltipContent>
-          </Tooltip>
-        </div>
+        {/* Catalog */}
+        <button
+          type='button'
+          className={cn(
+            'inline-flex h-7 items-center gap-1.5 rounded-[5px] border border-border bg-bg-secondary px-2.5 text-[12px] font-medium text-text-secondary transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground disabled:pointer-events-none disabled:opacity-40',
+          )}
+          disabled={!customer || isBusy}
+          onClick={() => setCatalogOpen(true)}
+        >
+          <LayoutGrid className='size-3.5' />
+          <span className='hidden sm:inline'>Catalog</span>
+        </button>
+
+        {/* Clear */}
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <button
+              type='button'
+              className='inline-flex size-7 items-center justify-center rounded-[5px] text-text-tertiary transition-colors duration-[80ms] hover:bg-bg-hover hover:text-destructive disabled:pointer-events-none disabled:opacity-40'
+              disabled={cartItems.length === 0 || isBusy || isCreating}
+              onClick={handleClearAll}
+            >
+              {busy.clearingCart ? <Spinner className='size-3.5' /> : <Eraser className='size-3.5' />}
+            </button>
+          </TooltipTrigger>
+          <TooltipContent>Clear all items</TooltipContent>
+        </Tooltip>
       </header>
 
       {/* ── Content — two-column Shopify-style ── */}

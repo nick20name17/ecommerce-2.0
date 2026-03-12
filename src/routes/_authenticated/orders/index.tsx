@@ -1,6 +1,8 @@
-import { keepPreviousData, useMutation, useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery } from '@tanstack/react-query'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import {
+  ArrowDown,
+  ArrowUp,
   Check,
   Link2Off,
   ListTodo,
@@ -14,7 +16,6 @@ import {
   StickyNote,
   Trash2,
   UserPlus,
-  X,
 } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 
@@ -22,13 +23,12 @@ import { OrderAssignDialog } from './-components/order-assign-dialog'
 import { OrderDeleteDialog } from './-components/order-delete-dialog'
 import { getFieldConfigQuery } from '@/api/field-config/query'
 import { CommandBarCreate } from '@/components/tasks/command-bar-create'
-import { IOrders, PAGE_COLORS, PageHeaderIcon, ViewToggle } from '@/components/ds'
-import type { ViewOption } from '@/components/ds'
+import { FilterChip, FilterPopover, IOrders, PAGE_COLORS, PageHeaderIcon } from '@/components/ds'
 import { ORDER_QUERY_KEYS, getOrdersQuery } from '@/api/order/query'
-import { getEntityNotesQuery } from '@/api/note/query'
 import type { Order, OrderParams } from '@/api/order/schema'
 import { orderService } from '@/api/order/service'
 import { PageEmpty } from '@/components/common/page-empty'
+import { SidebarTrigger } from '@/components/ui/sidebar'
 import { EntityAttachmentsDialog } from '@/components/common/entity-attachments/entity-attachments-dialog'
 import { EntityNotesSheet } from '@/components/common/entity-notes/entity-notes-sheet'
 import { Pagination } from '@/components/common/filters/pagination'
@@ -40,7 +40,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
-import { ORDER_STATUS, ORDER_STATUS_CLASS, getOrderStatusLabel } from '@/constants/order'
+import { ORDER_STATUS, ORDER_STATUS_CLASS, ORDER_STATUS_LABELS, getOrderStatusLabel } from '@/constants/order'
 import type { OrderStatus } from '@/constants/order'
 import { isAdmin } from '@/constants/user'
 import { useBreakpoint } from '@/hooks/use-breakpoint'
@@ -52,21 +52,11 @@ import {
   useLimitParam,
   useOffsetParam,
   useOrderProjectIdParam,
-  useOrderStatusParam,
   useSearchParam,
 } from '@/hooks/use-query-params'
 import { useAuth } from '@/providers/auth'
 
 // ── Constants ────────────────────────────────────────────────
-
-const STATUS_TABS: ViewOption<string>[] = [
-  { label: 'Unprocessed', value: ORDER_STATUS.unprocessed },
-  { label: 'Open', value: ORDER_STATUS.open },
-  { label: 'Closed', value: ORDER_STATUS.closed },
-  { label: 'All Orders', value: 'all' },
-]
-
-const VALID_STATUS_VALUES = new Set<string>(Object.values(ORDER_STATUS))
 
 const STATUS_DOT_COLORS: Record<string, string> = {
   U: 'bg-amber-500',
@@ -77,6 +67,18 @@ const STATUS_DOT_COLORS: Record<string, string> = {
   H: 'bg-slate-400',
   A: 'bg-purple-500',
 }
+
+type OrderSortField = 'invoice' | 'name' | 'inv_date' | 'total' | 'balance'
+type SortDir = 'asc' | 'desc'
+
+const FILTER_STATUSES: { value: OrderStatus; label: string }[] = [
+  { value: ORDER_STATUS.unprocessed, label: 'Unprocessed' },
+  { value: ORDER_STATUS.open, label: 'Open' },
+  { value: ORDER_STATUS.closed, label: 'Closed' },
+  { value: ORDER_STATUS.paid, label: 'Paid' },
+  { value: ORDER_STATUS.voided, label: 'Voided' },
+  { value: ORDER_STATUS.onHold, label: 'On Hold' },
+]
 
 // ── Page Component ───────────────────────────────────────────
 
@@ -92,16 +94,31 @@ const OrdersPage = () => {
   const [projectIdFromStorage] = useProjectId()
   const [autoidFromUrl, setAutoidFromUrl] = useAutoidParam()
   const [projectIdFromUrl] = useOrderProjectIdParam()
-  const [status, setStatus] = useOrderStatusParam()
   const projectId = projectIdFromUrl ?? projectIdFromStorage
 
   const canAssign = !!user?.role && isAdmin(user.role)
 
+  const [sortField, setSortField] = useState<OrderSortField | null>(null)
+  const [sortDir, setSortDir] = useState<SortDir>('asc')
+
+  const [activeStatus, setActiveStatus] = useState<OrderStatus | null>(ORDER_STATUS.unprocessed)
   const [orderToDelete, setOrderToDelete] = useState<Order | null>(null)
   const [orderForAttachments, setOrderForAttachments] = useState<Order | null>(null)
   const [orderForNotes, setOrderForNotes] = useState<Order | null>(null)
   const [orderToAssign, setOrderToAssign] = useState<Order | null>(null)
   const [orderForTask, setOrderForTask] = useState<Order | null>(null)
+
+  const ordering = sortField ? (sortDir === 'desc' ? `-${sortField}` : sortField) : undefined
+
+  const handleSort = (field: OrderSortField) => {
+    if (sortField === field) {
+      if (sortDir === 'asc') setSortDir('desc')
+      else { setSortField(null); setSortDir('asc') }
+    } else {
+      setSortField(field)
+      setSortDir('asc')
+    }
+  }
 
   const deleteLinkedProposalMutation = useMutation({
     mutationFn: (autoid: string) => orderService.deleteLinkedProposal(autoid),
@@ -112,26 +129,29 @@ const OrdersPage = () => {
     },
   })
 
-  const activeStatus = status ?? ORDER_STATUS.unprocessed
+  const selectStatus = (s: OrderStatus) => {
+    setActiveStatus((prev) => (prev === s ? null : s))
+    setOffset(null)
+  }
 
-  const apiStatus: OrderStatus | undefined =
-    activeStatus !== 'all' && VALID_STATUS_VALUES.has(activeStatus)
-      ? (activeStatus as OrderStatus)
-      : undefined
+  const clearAllFilters = () => {
+    setActiveStatus(null)
+    setOffset(null)
+  }
+
+  const hasFilters = activeStatus !== null
 
   const params: OrderParams = {
     search: search || undefined,
     autoid: autoidFromUrl ?? undefined,
     offset,
     limit,
-    status: apiStatus,
+    status: activeStatus ?? undefined,
     project_id: projectId ?? undefined,
+    ordering,
   }
 
-  const { data, refetch, isLoading, isPlaceholderData } = useQuery({
-    ...getOrdersQuery(params),
-    placeholderData: keepPreviousData,
-  })
+  const { data, refetch, isLoading } = useQuery(getOrdersQuery(params))
 
   const { data: _fieldConfig } = useQuery(getFieldConfigQuery(projectId))
 
@@ -159,21 +179,15 @@ const OrdersPage = () => {
 
   const hasPendingAutoid = autoidFromUrl != null && autoidFromUrl !== '' && !orderInResults
 
-  const handleStatusChange = (value: string) => {
-    setStatus(value)
-    setOffset(null)
-  }
-
   return (
     <div className='flex h-full flex-col overflow-hidden'>
       {/* Header */}
       <header className='flex h-12 shrink-0 items-center gap-2.5 border-b border-border px-6'>
+        <SidebarTrigger className='-ml-1' />
         <div className='flex items-center gap-1.5'>
           <PageHeaderIcon icon={IOrders} color={PAGE_COLORS.orders} />
           <h1 className='text-[14px] font-semibold tracking-[-0.01em]'>Orders</h1>
         </div>
-
-        <ViewToggle options={STATUS_TABS} value={activeStatus} onChange={handleStatusChange} />
 
         <div className='flex-1' />
 
@@ -190,55 +204,98 @@ const OrdersPage = () => {
           />
         </div>
 
-        <button
-          type='button'
-          className='inline-flex h-7 items-center gap-1 rounded-[5px] bg-primary px-2 text-[13px] font-semibold text-primary-foreground transition-colors duration-[80ms] hover:opacity-90 sm:px-2.5'
-          onClick={() => navigate({ to: '/create' })}
-        >
-          <Plus className='size-3.5' />
-          <span className='hidden sm:inline'>Create Order</span>
-        </button>
+        <div className='flex items-center gap-1.5'>
+          <FilterPopover
+            label='Status'
+            active={activeStatus !== null}
+            icon={<div className={cn('size-2.5 rounded-full', activeStatus ? STATUS_DOT_COLORS[activeStatus] : 'bg-current')} />}
+          >
+            {FILTER_STATUSES.map((s) => {
+              const selected = activeStatus === s.value
+              return (
+                <button
+                  key={s.value}
+                  type='button'
+                  className={cn(
+                    'flex w-full items-center gap-2 rounded-[5px] px-2 py-[3px] text-left text-[13px] font-medium',
+                    'transition-colors duration-[80ms] hover:bg-bg-hover'
+                  )}
+                  onClick={() => selectStatus(s.value)}
+                >
+                  <div className={cn(
+                    'flex size-3.5 items-center justify-center rounded-full border transition-colors duration-[80ms]',
+                    selected ? 'border-primary bg-primary' : 'border-border'
+                  )}>
+                    {selected && <div className='size-1.5 rounded-full bg-primary-foreground' />}
+                  </div>
+                  <div className={cn('size-2.5 shrink-0 rounded-full', STATUS_DOT_COLORS[s.value] ?? 'bg-slate-400')} />
+                  <span className='flex-1'>{s.label}</span>
+                </button>
+              )
+            })}
+          </FilterPopover>
+
+          <button
+            type='button'
+            className='inline-flex h-7 items-center gap-1 rounded-[5px] bg-primary px-2 text-[13px] font-semibold text-primary-foreground transition-colors duration-[80ms] hover:opacity-90 sm:px-2.5'
+            onClick={() => navigate({ to: '/create' })}
+          >
+            <Plus className='size-3.5' />
+            <span className='hidden sm:inline'>Create Order</span>
+          </button>
+        </div>
       </header>
 
-      {/* Autoid filter chip */}
-      {autoidFromUrl && (
-        <div className='flex shrink-0 items-center gap-1.5 border-b border-border px-6 py-1.5'>
-          <span className='inline-flex items-center gap-1 rounded-[5px] border border-border bg-bg-secondary px-2 py-0.5 text-[13px] font-medium text-foreground'>
-            Order: {autoidFromUrl}
+      {/* Active filter chips */}
+      {(hasFilters || autoidFromUrl) && (
+        <div className='flex shrink-0 flex-wrap items-center gap-1.5 border-b border-border px-6 py-1.5'>
+          {hasFilters && (
             <button
               type='button'
-              className='ml-0.5 rounded-[3px] p-0.5 text-text-tertiary transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground'
-              onClick={() => setAutoidFromUrl(null)}
-              aria-label='Clear order filter'
+              className='text-[13px] font-medium text-text-tertiary transition-colors duration-[80ms] hover:text-foreground'
+              onClick={clearAllFilters}
             >
-              <X className='size-3' />
+              Clear
             </button>
-          </span>
+          )}
+          {activeStatus && (
+            <FilterChip onRemove={() => setActiveStatus(null)}>
+              <span className='text-text-tertiary'>Status is</span>
+              <div className={cn('size-2 rounded-full', STATUS_DOT_COLORS[activeStatus] ?? 'bg-slate-400')} />
+              {ORDER_STATUS_LABELS[activeStatus]}
+            </FilterChip>
+          )}
+          {autoidFromUrl && (
+            <FilterChip onRemove={() => setAutoidFromUrl(null)}>
+              <span className='text-text-tertiary'>Order:</span>
+              {autoidFromUrl}
+            </FilterChip>
+          )}
         </div>
       )}
 
       {/* Order list */}
       <div className='flex-1 overflow-y-auto'>
         {/* Column labels */}
-        {!isMobile && (results.length > 0 || isLoading || isPlaceholderData) && (
+        {!isMobile && (results.length > 0 || isLoading) && (
           <div
             className={cn(
               'sticky top-0 z-10 flex select-none items-center border-b border-border bg-bg-secondary/60 text-[13px] font-medium text-text-tertiary backdrop-blur-sm',
               isTablet ? 'gap-4 px-5 py-1' : 'gap-6 px-6 py-1',
             )}
           >
-            <div className='min-w-0 flex-1'>Invoice / Customer</div>
+            <OrderSortableHeader field='invoice' label='Invoice / Customer' sortField={sortField} sortDir={sortDir} onSort={handleSort} className='min-w-0 flex-1' />
             <div className='w-[88px] shrink-0'>Status</div>
-            {!isTablet && <div className='w-[92px] shrink-0'>Date</div>}
-            <div className='w-[100px] shrink-0 text-right'>Total</div>
-            {!isTablet && <div className='w-[100px] shrink-0 text-right'>Balance</div>}
+            {!isTablet && <OrderSortableHeader field='inv_date' label='Date' sortField={sortField} sortDir={sortDir} onSort={handleSort} className='w-[92px] shrink-0' />}
+            <OrderSortableHeader field='total' label='Total' sortField={sortField} sortDir={sortDir} onSort={handleSort} className='w-[100px] shrink-0 justify-end text-right' />
+            {!isTablet && <OrderSortableHeader field='balance' label='Balance' sortField={sortField} sortDir={sortDir} onSort={handleSort} className='w-[100px] shrink-0 justify-end text-right' />}
             {!isTablet && <div className='w-[56px] shrink-0 text-center'>Pick</div>}
             <div className='w-[62px] shrink-0' />
             <div className='w-[28px] shrink-0' />
           </div>
         )}
 
-        {isLoading || isPlaceholderData ? (
+        {isLoading ? (
           Array.from({ length: 10 }).map((_, i) => (
             <div
               key={i}
@@ -399,11 +456,6 @@ function OrderRow({
   const statusClass = ORDER_STATUS_CLASS[order.status] ?? ''
   const dotColor = STATUS_DOT_COLORS[order.status] ?? 'bg-slate-400'
 
-  const { data: notes } = useQuery({
-    ...getEntityNotesQuery('order', order.autoid, projectId),
-    staleTime: 5 * 60 * 1000,
-  })
-  const noteCount = notes?.length ?? 0
 
   if (isMobile) {
     return (
@@ -496,12 +548,7 @@ function OrderRow({
       <div className='flex w-[62px] shrink-0 justify-center'>
         <button
           type='button'
-          className={cn(
-            'inline-flex items-center gap-1.5 rounded-[6px] border px-2 py-1 text-[13px] font-medium transition-colors duration-[80ms]',
-            noteCount > 0
-              ? 'border-border bg-bg-secondary text-text-secondary hover:bg-bg-active'
-              : 'border-transparent text-text-tertiary hover:bg-bg-hover hover:text-text-secondary',
-          )}
+          className='inline-flex items-center gap-1.5 rounded-[6px] border border-transparent px-2 py-1 text-[13px] font-medium text-text-tertiary transition-colors duration-[80ms] hover:bg-bg-hover hover:text-text-secondary'
           aria-label='Open notes'
           onClick={(e) => {
             e.stopPropagation()
@@ -509,7 +556,6 @@ function OrderRow({
           }}
         >
           <StickyNote className='size-3.5' />
-          <span className='tabular-nums'>{noteCount}</span>
         </button>
       </div>
 
@@ -619,6 +665,46 @@ function PickBadge({ pickStatus }: { pickStatus?: string }) {
       </TooltipTrigger>
       <TooltipContent>{allPicked ? 'All items picked' : `${picked} of ${total} items picked`}</TooltipContent>
     </Tooltip>
+  )
+}
+
+// ── Sortable Header ─────────────────────────────────────────
+
+function OrderSortableHeader({
+  field,
+  label,
+  sortField,
+  sortDir,
+  onSort,
+  className,
+}: {
+  field: OrderSortField
+  label: string
+  sortField: OrderSortField | null
+  sortDir: SortDir
+  onSort: (field: OrderSortField) => void
+  className?: string
+}) {
+  const active = sortField === field
+  return (
+    <button
+      type='button'
+      className={cn(
+        'group inline-flex items-center gap-1 text-left transition-colors duration-[80ms] hover:text-foreground',
+        active && 'text-foreground',
+        className
+      )}
+      onClick={() => onSort(field)}
+    >
+      {label}
+      {active ? (
+        sortDir === 'asc'
+          ? <ArrowUp className='size-3' />
+          : <ArrowDown className='size-3' />
+      ) : (
+        <ArrowUp className='size-3 opacity-30 group-hover:opacity-60 transition-opacity' />
+      )}
+    </button>
   )
 }
 

@@ -129,7 +129,7 @@ export const ProductCatalogDialog = ({
         <div
           className={cn(
             'grid min-h-0 flex-1 grid-cols-1',
-            customerId ? 'lg:grid-cols-[320px_1fr_260px]' : 'lg:grid-cols-[320px_1fr]'
+            customerId ? 'lg:grid-cols-[320px_1fr_340px]' : 'lg:grid-cols-[320px_1fr]'
           )}
         >
           <div className='min-h-0 border-b lg:border-r lg:border-b-0'>

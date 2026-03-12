@@ -1,62 +1,57 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
-import { Package, Search, Trash2 } from 'lucide-react'
+import { FileText, Search } from 'lucide-react'
 import { useState } from 'react'
 
-import { getOrdersQuery } from '@/api/order/query'
-import type { Order, OrderParams } from '@/api/order/schema'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
+import { getProposalsQuery } from '@/api/proposal/query'
+import type { ProposalParams } from '@/api/proposal/schema'
 import { PageEmpty } from '@/components/common/page-empty'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
-import { ORDER_STATUS_CLASS, ORDER_STATUS_LABELS } from '@/constants/order'
-import type { OrderStatus } from '@/constants/order'
+import {
+  PROPOSAL_STATUS_CLASS,
+  getProposalStatusLabel,
+} from '@/constants/proposal'
 import { useBreakpoint } from '@/hooks/use-breakpoint'
 import { useProjectId } from '@/hooks/use-project-id'
 import { formatCurrency, formatDate } from '@/helpers/formatters'
-import { OrderDeleteDialog } from '@/routes/_authenticated/orders/-components/order-delete-dialog'
 import { cn } from '@/lib/utils'
+import type { Proposal } from '@/api/proposal/schema'
 
 const STATUS_DOT_COLORS: Record<string, string> = {
-  U: 'bg-amber-500',
   O: 'bg-blue-500',
-  X: 'bg-emerald-500',
-  P: 'bg-green-500',
-  V: 'bg-red-500',
+  A: 'bg-emerald-500',
+  L: 'bg-red-500',
+  C: 'bg-slate-400',
+  E: 'bg-amber-500',
+  N: 'bg-violet-500',
   H: 'bg-slate-400',
-  A: 'bg-purple-500',
 }
 
-interface CustomerOrdersTabProps {
+interface CustomerProposalsTabProps {
   customerId: string
 }
 
-export const CustomerOrdersTab = ({ customerId }: CustomerOrdersTabProps) => {
+export const CustomerProposalsTab = ({ customerId }: CustomerProposalsTabProps) => {
   const navigate = useNavigate()
   const bp = useBreakpoint()
   const isMobile = bp === 'mobile'
   const isTablet = bp === 'tablet'
   const [projectId] = useProjectId()
   const [search, setSearch] = useState('')
-  const [orderToDelete, setOrderToDelete] = useState<Order | null>(null)
 
-  const params: OrderParams = {
-    customer_id: customerId,
+  const params: ProposalParams = {
+    b_id: customerId,
     search: search || undefined,
     project_id: projectId ?? undefined,
     limit: 200,
   }
 
   const { data, isLoading } = useQuery({
-    ...getOrdersQuery(params),
+    ...getProposalsQuery(params),
     placeholderData: keepPreviousData,
   })
 
-  const orders = data?.results ?? []
+  const proposals = data?.results ?? []
 
   return (
     <div className='flex h-full flex-col overflow-hidden'>
@@ -72,7 +67,7 @@ export const CustomerOrdersTab = ({ customerId }: CustomerOrdersTabProps) => {
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder='Search orders...'
+            placeholder='Search proposals...'
             className='flex-1 bg-transparent text-[13px] outline-none placeholder:text-text-tertiary'
           />
         </div>
@@ -84,31 +79,25 @@ export const CustomerOrdersTab = ({ customerId }: CustomerOrdersTabProps) => {
           className={cn(
             'grid shrink-0 items-center border-b border-border bg-bg-secondary/60',
             isTablet
-              ? 'grid-cols-[1fr_80px_26px] gap-3 px-5 py-1.5'
-              : 'grid-cols-[1fr_100px_60px_80px_26px] gap-4 px-6 py-1.5'
+              ? 'grid-cols-[1fr_80px] gap-3 px-5 py-1.5'
+              : 'grid-cols-[1fr_100px_80px] gap-4 px-6 py-1.5'
           )}
         >
           <div className='min-w-0 text-[12px] font-medium uppercase tracking-[0.04em] text-text-tertiary'>
-            Invoice
+            Quote
           </div>
           {!isTablet && (
             <div className='min-w-0 text-[12px] font-medium uppercase tracking-[0.04em] text-text-tertiary'>
               Date
             </div>
           )}
-          {!isTablet && (
-            <div className='text-right text-[12px] font-medium uppercase tracking-[0.04em] text-text-tertiary'>
-              Qty
-            </div>
-          )}
           <div className='text-right text-[12px] font-medium uppercase tracking-[0.04em] text-text-tertiary'>
             Total
           </div>
-          <div />
         </div>
       )}
 
-      {/* Order list */}
+      {/* Proposal list */}
       <div className='flex-1 overflow-y-auto'>
         {isLoading ? (
           <div className='space-y-0'>
@@ -126,20 +115,19 @@ export const CustomerOrdersTab = ({ customerId }: CustomerOrdersTabProps) => {
               </div>
             ))}
           </div>
-        ) : orders.length === 0 ? (
-          <PageEmpty icon={Package} title='No orders found' description='This customer has no orders yet.' compact />
+        ) : proposals.length === 0 ? (
+          <PageEmpty icon={FileText} title='No proposals found' description='This customer has no proposals yet.' compact />
         ) : (
-          orders.map((order) => (
-            <OrderRow
-              key={order.autoid}
-              order={order}
+          proposals.map((proposal) => (
+            <ProposalRow
+              key={proposal.autoid}
+              proposal={proposal}
               isMobile={isMobile}
               isTablet={isTablet}
-              onDelete={setOrderToDelete}
               onClick={() =>
                 navigate({
-                  to: '/orders/$orderId',
-                  params: { orderId: order.autoid },
+                  to: '/proposals/$proposalId',
+                  params: { proposalId: proposal.autoid },
                 })
               }
             />
@@ -148,7 +136,7 @@ export const CustomerOrdersTab = ({ customerId }: CustomerOrdersTabProps) => {
       </div>
 
       {/* Footer */}
-      {orders.length > 0 && (
+      {proposals.length > 0 && (
         <div
           className={cn(
             'shrink-0 border-t border-border py-1.5',
@@ -156,41 +144,31 @@ export const CustomerOrdersTab = ({ customerId }: CustomerOrdersTabProps) => {
           )}
         >
           <p className='text-[13px] tabular-nums text-text-tertiary'>
-            {orders.length} order{orders.length !== 1 ? 's' : ''}
+            {proposals.length} proposal{proposals.length !== 1 ? 's' : ''}
           </p>
         </div>
       )}
-
-      <OrderDeleteDialog
-        order={orderToDelete}
-        projectId={projectId}
-        open={!!orderToDelete}
-        onOpenChange={(open) => !open && setOrderToDelete(null)}
-      />
     </div>
   )
 }
 
-// ── Order Row ───────────────────────────────────────────────
+// ── Proposal Row ───────────────────────────────────────────────
 
-function OrderRow({
-  order,
+function ProposalRow({
+  proposal,
   isMobile,
   isTablet,
-  onDelete,
   onClick,
 }: {
-  order: Order
+  proposal: Proposal
   isMobile: boolean
   isTablet: boolean
-  onDelete: (order: Order) => void
   onClick: () => void
 }) {
-  const statusLabel = ORDER_STATUS_LABELS[order.status as OrderStatus] ?? order.status ?? '—'
-  const statusClass = ORDER_STATUS_CLASS[order.status as OrderStatus] ?? ''
-  const dotColor = STATUS_DOT_COLORS[order.status] ?? 'bg-slate-400'
-  const invoiceDate = formatDate(order.inv_date)
-  const total = formatCurrency(order.total)
+  const quote = proposal.quote?.trim() || `#${proposal.b_id}`
+  const statusLabel = getProposalStatusLabel(proposal.status)
+  const statusClass = PROPOSAL_STATUS_CLASS[proposal.status] ?? ''
+  const dotColor = STATUS_DOT_COLORS[proposal.status] ?? 'bg-slate-400'
 
   if (isMobile) {
     return (
@@ -201,20 +179,19 @@ function OrderRow({
         <div className='flex items-center justify-between gap-2'>
           <div className='flex items-center gap-2'>
             <span className='text-[13px] font-medium text-foreground'>
-              {order.invoice || order.id}
+              {quote}
             </span>
-            <StatusBadge status={order.status} label={statusLabel} statusClass={statusClass} dotColor={dotColor} />
+            <StatusBadge label={statusLabel} statusClass={statusClass} dotColor={dotColor} />
           </div>
           <span className='text-[13px] font-medium tabular-nums text-foreground'>
-            {total}
+            {formatCurrency(proposal.total, '—')}
           </span>
         </div>
-        <div className='mt-0.5 flex items-center gap-2 text-[13px] text-text-tertiary'>
-          <span>{invoiceDate}</span>
-          <span className='tabular-nums'>
-            Qty: {order.total_quan ?? '—'}
-          </span>
-        </div>
+        {proposal.qt_date && (
+          <div className='mt-0.5 text-[13px] tabular-nums text-text-tertiary'>
+            {formatDate(proposal.qt_date)}
+          </div>
+        )}
       </div>
     )
   }
@@ -224,81 +201,34 @@ function OrderRow({
       className={cn(
         'group/row grid cursor-pointer items-center border-b border-border-light transition-colors duration-100 hover:bg-bg-hover',
         isTablet
-          ? 'grid-cols-[1fr_80px_26px] gap-3 px-5 py-1.5'
-          : 'grid-cols-[1fr_100px_60px_80px_26px] gap-4 px-6 py-1.5'
+          ? 'grid-cols-[1fr_80px] gap-3 px-5 py-1.5'
+          : 'grid-cols-[1fr_100px_80px] gap-4 px-6 py-1.5'
       )}
       onClick={onClick}
     >
-      {/* Invoice / ID */}
+      {/* Quote + Status */}
       <div className='flex min-w-0 items-center gap-2'>
         <Tooltip>
           <TooltipTrigger asChild>
             <span className='truncate text-[13px] font-medium text-foreground'>
-              {order.invoice || order.id}
+              {quote}
             </span>
           </TooltipTrigger>
-          <TooltipContent side='top'>
-            {order.invoice || order.id}
-          </TooltipContent>
+          <TooltipContent side='top'>{quote}</TooltipContent>
         </Tooltip>
-        <StatusBadge status={order.status} label={statusLabel} statusClass={statusClass} dotColor={dotColor} />
+        <StatusBadge label={statusLabel} statusClass={statusClass} dotColor={dotColor} />
       </div>
 
       {/* Date */}
       {!isTablet && (
         <div className='min-w-0 text-[13px] tabular-nums text-text-tertiary'>
-          {invoiceDate}
-        </div>
-      )}
-
-      {/* Qty */}
-      {!isTablet && (
-        <div className='text-right text-[13px] tabular-nums text-text-secondary'>
-          {order.total_quan ?? '—'}
+          {proposal.qt_date ? formatDate(proposal.qt_date) : '—'}
         </div>
       )}
 
       {/* Total */}
       <div className='text-right text-[13px] font-medium tabular-nums text-foreground'>
-        {total}
-      </div>
-
-      {/* Actions */}
-      <div
-        className='flex justify-center opacity-0 transition-opacity group-hover/row:opacity-100'
-        onClick={(e) => e.stopPropagation()}
-        onKeyDown={(e) => e.stopPropagation()}
-        role='group'
-      >
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <button
-              type='button'
-              className='inline-flex size-6 items-center justify-center rounded-[6px] text-text-tertiary transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground'
-              aria-label='Order actions'
-            >
-              <svg width='15' height='15' viewBox='0 0 15 15' fill='none'>
-                <circle cx='3' cy='7.5' r='1.2' fill='currentColor' />
-                <circle cx='7.5' cy='7.5' r='1.2' fill='currentColor' />
-                <circle cx='12' cy='7.5' r='1.2' fill='currentColor' />
-              </svg>
-            </button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent
-            align='end'
-            className='w-[180px] rounded-[8px] p-1'
-            style={{ boxShadow: 'var(--dropdown-shadow)' }}
-          >
-            <DropdownMenuItem
-              variant='destructive'
-              className='cursor-pointer gap-2 rounded-[6px] px-2 py-1 text-[13px]'
-              onClick={() => onDelete(order)}
-            >
-              <Trash2 className='size-3.5' />
-              Delete order
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        {formatCurrency(proposal.total, '—')}
       </div>
     </div>
   )
@@ -311,7 +241,6 @@ function StatusBadge({
   statusClass,
   dotColor,
 }: {
-  status: string
   label: string
   statusClass: string
   dotColor: string

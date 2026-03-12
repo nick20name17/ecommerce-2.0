@@ -1,5 +1,6 @@
 export const CUSTOMER_TABS = [
   { value: 'orders', label: 'Orders' },
+  { value: 'proposals', label: 'Proposals' },
   { value: 'todos', label: "To-Do's" },
   { value: 'dashboard', label: 'Dashboard' }
 ] as const

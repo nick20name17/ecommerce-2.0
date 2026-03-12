@@ -118,7 +118,7 @@ export function CustomerCombobox({
             className='h-5 flex-1 bg-transparent text-sm outline-none placeholder:text-text-tertiary'
           />
         </div>
-        <div className='max-h-64 overflow-y-auto overscroll-contain' onWheel={(e) => e.stopPropagation()}>
+        <div className='max-h-80 overflow-y-auto overscroll-contain' onWheel={(e) => e.stopPropagation()}>
           {loading && customers.length === 0 ? (
             <div className='p-1'>
               {showAllOption && (

@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
 import { ArrowRight, Package, Search, Users } from 'lucide-react'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState, type RefObject } from 'react'
 import { createPortal } from 'react-dom'
 
 import { getCustomersQuery } from '@/api/customer/query'
@@ -14,6 +14,7 @@ export const GlobalSearch = () => {
   const [query, setQuery] = useState('')
   const [activeIdx, setActiveIdx] = useState(0)
   const inputRef = useRef<HTMLInputElement>(null)
+  const listRef = useRef<HTMLDivElement>(null)
   const navigate = useNavigate()
   const [projectId] = useProjectId()
 
@@ -69,6 +70,14 @@ export const GlobalSearch = () => {
 
   // Reset active index when results change
   useEffect(() => setActiveIdx(0), [results.length])
+
+  // Scroll active result into view on keyboard navigation
+  useEffect(() => {
+    const el = listRef.current?.querySelector(`[data-result-index="${activeIdx}"]`)
+    if (el) {
+      el.scrollIntoView({ block: 'nearest' })
+    }
+  }, [activeIdx])
 
   const handleSelect = useCallback(
     (result: Result) => {
@@ -151,15 +160,15 @@ export const GlobalSearch = () => {
               className='flex w-full max-w-[520px] flex-col overflow-hidden rounded-[12px] border border-border bg-popover shadow-[0_16px_70px_rgba(0,0,0,0.15)]'
               style={{ animation: 'dropIn 120ms ease-out' }}
               onClick={(e) => e.stopPropagation()}
-              onKeyDown={handleKeyDown}
             >
               {/* Search input */}
-              <div className='flex items-center gap-2.5 border-b border-border px-4 py-3'>
+              <div className='flex items-center gap-2.5 px-4 py-3'>
                 <Search className='size-4 shrink-0 text-text-tertiary' />
                 <input
                   ref={inputRef}
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
+                  onKeyDown={handleKeyDown}
                   placeholder='Search orders, customers…'
                   className='flex-1 bg-transparent text-[14px] outline-none placeholder:text-text-tertiary'
                 />
@@ -169,7 +178,7 @@ export const GlobalSearch = () => {
               </div>
 
               {/* Results */}
-              <div className='max-h-[360px] overflow-y-auto overscroll-contain p-1.5'>
+              <div ref={listRef} className='max-h-[360px] overflow-y-auto overscroll-contain p-1.5'>
                 {!enabled && (
                   <div className='px-3 py-10 text-center text-[13px] text-text-tertiary'>
                     Type at least 2 characters to search
@@ -194,6 +203,7 @@ export const GlobalSearch = () => {
                         <button
                           key={o.autoid}
                           type='button'
+                          data-result-index={idx}
                           className={cn(
                             'flex w-full items-center gap-2.5 rounded-[6px] px-2.5 py-1.5 text-left transition-colors duration-75',
                             isActive ? 'bg-bg-active' : 'hover:bg-bg-hover',
@@ -229,6 +239,7 @@ export const GlobalSearch = () => {
                         <button
                           key={c.autoid}
                           type='button'
+                          data-result-index={idx}
                           className={cn(
                             'flex w-full items-center gap-2.5 rounded-[6px] px-2.5 py-1.5 text-left transition-colors duration-75',
                             isActive ? 'bg-bg-active' : 'hover:bg-bg-hover',
@@ -254,23 +265,25 @@ export const GlobalSearch = () => {
               </div>
 
               {/* Footer with keyboard hints */}
-              {hasResults && (
-                <div className='flex items-center gap-3 border-t border-border px-4 py-2'>
-                  <div className='flex items-center gap-1.5 text-[11px] text-text-quaternary'>
-                    <kbd className='inline-flex size-4 items-center justify-center rounded-[3px] border border-border bg-bg-secondary text-[10px]'>↑</kbd>
-                    <kbd className='inline-flex size-4 items-center justify-center rounded-[3px] border border-border bg-bg-secondary text-[10px]'>↓</kbd>
-                    <span>Navigate</span>
-                  </div>
-                  <div className='flex items-center gap-1.5 text-[11px] text-text-quaternary'>
-                    <kbd className='inline-flex h-4 items-center justify-center rounded-[3px] border border-border bg-bg-secondary px-1 text-[10px]'>↵</kbd>
-                    <span>Open</span>
-                  </div>
-                  <div className='flex items-center gap-1.5 text-[11px] text-text-quaternary'>
-                    <kbd className='inline-flex h-4 items-center justify-center rounded-[3px] border border-border bg-bg-secondary px-1 text-[10px]'>esc</kbd>
-                    <span>Close</span>
-                  </div>
+              <div className='flex items-center gap-3 border-t border-border px-4 py-2'>
+                {hasResults && (
+                  <>
+                    <div className='flex items-center gap-1.5 text-[11px] text-text-quaternary'>
+                      <kbd className='inline-flex size-4 items-center justify-center rounded-[3px] border border-border bg-bg-secondary text-[10px]'>↑</kbd>
+                      <kbd className='inline-flex size-4 items-center justify-center rounded-[3px] border border-border bg-bg-secondary text-[10px]'>↓</kbd>
+                      <span>Navigate</span>
+                    </div>
+                    <div className='flex items-center gap-1.5 text-[11px] text-text-quaternary'>
+                      <kbd className='inline-flex h-4 items-center justify-center rounded-[3px] border border-border bg-bg-secondary px-1 text-[10px]'>↵</kbd>
+                      <span>Open</span>
+                    </div>
+                  </>
+                )}
+                <div className='flex items-center gap-1.5 text-[11px] text-text-quaternary'>
+                  <kbd className='inline-flex h-4 items-center justify-center rounded-[3px] border border-border bg-bg-secondary px-1 text-[10px]'>esc</kbd>
+                  <span>Close</span>
                 </div>
-              )}
+              </div>
             </div>
           </div>,
         document.body,

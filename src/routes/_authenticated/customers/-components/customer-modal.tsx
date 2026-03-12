@@ -15,7 +15,7 @@ import {
   DialogHeader,
   DialogTitle
 } from '@/components/ui/dialog'
-import { Field, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field'
+import { Field, FieldError, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import {
   Select,
@@ -24,7 +24,7 @@ import {
   SelectTrigger,
   SelectValue
 } from '@/components/ui/select'
-import { CUSTOMER_TYPE_OPTIONS } from '@/constants/customer'
+import { CUSTOMER_TYPE_OPTIONS, getCustomerTypeLabel } from '@/constants/customer'
 
 interface CustomerModalProps {
   customer?: Customer | null
@@ -40,7 +40,7 @@ export const CustomerModal = ({ customer, open, onOpenChange }: CustomerModalPro
       open={open}
       onOpenChange={onOpenChange}
     >
-      <DialogContent className='flex max-h-[90vh] flex-col overflow-hidden p-0 sm:max-w-lg'>
+      <DialogContent className='flex max-h-[90vh] flex-col overflow-hidden p-0 sm:max-w-md'>
         {isEdit ? (
           <EditForm
             customer={customer}
@@ -54,11 +54,13 @@ export const CustomerModal = ({ customer, open, onOpenChange }: CustomerModalPro
   )
 }
 
+// ── Shared Fields ───────────────────────────────────────────
+
 const SharedFields = () => {
   const { control } = useFormContext()
 
   return (
-    <>
+    <div className='space-y-3'>
       <Controller
         name='l_name'
         control={control}
@@ -75,8 +77,65 @@ const SharedFields = () => {
           </Field>
         )}
       />
+      <div className='grid grid-cols-2 gap-3'>
+        <Controller
+          name='in_level'
+          control={control}
+          render={({ field, fieldState }) => {
+            const currentValue = field.value ? String(field.value) : ''
+            const hasUnknownValue = currentValue && !CUSTOMER_TYPE_OPTIONS.some(o => o.value === currentValue)
+            return (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel>Type</FieldLabel>
+                <Select
+                  value={currentValue || undefined}
+                  onValueChange={field.onChange}
+                >
+                  <SelectTrigger
+                    className='w-full'
+                    aria-invalid={fieldState.invalid}
+                  >
+                    <SelectValue placeholder='Select type' />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {CUSTOMER_TYPE_OPTIONS.map(({ value, label }) => (
+                      <SelectItem key={value} value={value}>
+                        {label}
+                      </SelectItem>
+                    ))}
+                    {hasUnknownValue && (
+                      <SelectItem value={currentValue}>
+                        {getCustomerTypeLabel(currentValue)}
+                      </SelectItem>
+                    )}
+                  </SelectContent>
+                </Select>
+                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+              </Field>
+            )
+          }}
+        />
+        <Controller
+          name='country'
+          control={control}
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel htmlFor='country'>Country</FieldLabel>
+              <Input
+                {...field}
+                value={field.value ?? ''}
+                id='country'
+                placeholder='US'
+              />
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
+          )}
+        />
+      </div>
 
-      <div className='grid grid-cols-2 gap-4'>
+      <div className='border-t border-border-light' />
+
+      <div className='grid grid-cols-2 gap-3'>
         <Controller
           name='contact_1'
           control={control}
@@ -112,12 +171,14 @@ const SharedFields = () => {
         />
       </div>
 
+      <div className='border-t border-border-light' />
+
       <Controller
         name='address1'
         control={control}
         render={({ field, fieldState }) => (
           <Field data-invalid={fieldState.invalid}>
-            <FieldLabel htmlFor='address1'>Address Line 1</FieldLabel>
+            <FieldLabel htmlFor='address1'>Street</FieldLabel>
             <Input
               {...field}
               value={field.value ?? ''}
@@ -128,13 +189,12 @@ const SharedFields = () => {
           </Field>
         )}
       />
-
       <Controller
         name='address2'
         control={control}
         render={({ field, fieldState }) => (
           <Field data-invalid={fieldState.invalid}>
-            <FieldLabel htmlFor='address2'>Address Line 2</FieldLabel>
+            <FieldLabel htmlFor='address2'>Apt / Suite</FieldLabel>
             <Input
               {...field}
               value={field.value ?? ''}
@@ -145,8 +205,7 @@ const SharedFields = () => {
           </Field>
         )}
       />
-
-      <div className='grid grid-cols-3 gap-4'>
+      <div className='grid grid-cols-3 gap-3'>
         <Controller
           name='city'
           control={control}
@@ -196,59 +255,11 @@ const SharedFields = () => {
           )}
         />
       </div>
-
-      <div className='grid grid-cols-2 gap-4'>
-        <Controller
-          name='country'
-          control={control}
-          render={({ field, fieldState }) => (
-            <Field data-invalid={fieldState.invalid}>
-              <FieldLabel htmlFor='country'>Country</FieldLabel>
-              <Input
-                {...field}
-                value={field.value ?? ''}
-                id='country'
-                placeholder='US'
-              />
-              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-            </Field>
-          )}
-        />
-        <Controller
-          name='in_level'
-          control={control}
-          render={({ field, fieldState }) => (
-            <Field data-invalid={fieldState.invalid}>
-              <FieldLabel>Customer Type</FieldLabel>
-              <Select
-                value={field.value ?? ''}
-                onValueChange={field.onChange}
-              >
-                <SelectTrigger
-                  className='w-full'
-                  aria-invalid={fieldState.invalid}
-                >
-                  <SelectValue placeholder='Select type' />
-                </SelectTrigger>
-                <SelectContent>
-                  {CUSTOMER_TYPE_OPTIONS.map(({ value, label }) => (
-                    <SelectItem
-                      key={value}
-                      value={value}
-                    >
-                      {label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-            </Field>
-          )}
-        />
-      </div>
-    </>
+    </div>
   )
 }
+
+// ── Create Form ─────────────────────────────────────────────
 
 const CreateForm = ({ onOpenChange }: { onOpenChange: (open: boolean) => void }) => {
   const form = useForm<CustomerFormValues>({
@@ -284,24 +295,23 @@ const CreateForm = ({ onOpenChange }: { onOpenChange: (open: boolean) => void })
 
   return (
     <FormProvider {...form}>
-      <DialogHeader className='bg-background sticky top-0 z-10 border-b px-6 py-4'>
-        <DialogTitle>Create Customer</DialogTitle>
+      <DialogHeader className='sticky top-0 z-10 border-b bg-background px-5 py-3.5'>
+        <DialogTitle className='text-[14px]'>New Customer</DialogTitle>
       </DialogHeader>
 
-      <DialogBody className='px-6 py-4'>
+      <DialogBody className='overflow-y-auto px-5 py-4'>
         <form
           id='customer-form'
           onSubmit={handleSubmit}
         >
-          <FieldGroup>
-            <SharedFields />
-          </FieldGroup>
+          <SharedFields />
         </form>
       </DialogBody>
 
-      <DialogFooter className='bg-background sticky bottom-0 z-10 border-t px-6 py-4'>
+      <DialogFooter className='sticky bottom-0 z-10 border-t bg-background px-5 py-3'>
         <Button
           variant='outline'
+          size='sm'
           onClick={() => onOpenChange(false)}
         >
           Cancel
@@ -309,6 +319,7 @@ const CreateForm = ({ onOpenChange }: { onOpenChange: (open: boolean) => void })
         <Button
           type='submit'
           form='customer-form'
+          size='sm'
           isPending={mutation.isPending}
           disabled={mutation.isPending}
         >
@@ -318,6 +329,8 @@ const CreateForm = ({ onOpenChange }: { onOpenChange: (open: boolean) => void })
     </FormProvider>
   )
 }
+
+// ── Edit Form ───────────────────────────────────────────────
 
 const EditForm = ({
   customer,
@@ -338,7 +351,7 @@ const EditForm = ({
       state: customer.state ?? '',
       zip: customer.zip ?? '',
       country: customer.country ?? '',
-      in_level: customer.in_level ?? '',
+      in_level: customer.in_level != null ? String(customer.in_level) : '',
       inactive: customer.inactive ?? false
     }
   })
@@ -356,17 +369,19 @@ const EditForm = ({
 
   return (
     <FormProvider {...form}>
-      <DialogHeader className='bg-background sticky top-0 z-10 border-b px-6 py-4'>
-        <DialogTitle>Edit Customer</DialogTitle>
+      <DialogHeader className='sticky top-0 z-10 border-b bg-background px-5 py-3.5'>
+        <DialogTitle className='text-[14px]'>Edit Customer</DialogTitle>
       </DialogHeader>
 
-      <DialogBody className='px-6 py-4'>
+      <DialogBody className='overflow-y-auto px-5 py-4'>
         <form
           id='customer-form'
           onSubmit={handleSubmit}
         >
-          <FieldGroup>
+          <div className='space-y-3'>
             <SharedFields />
+
+            <div className='border-t border-border-light' />
 
             <Controller
               name='inactive'
@@ -378,17 +393,18 @@ const EditForm = ({
                     checked={field.value}
                     onCheckedChange={field.onChange}
                   />
-                  <FieldLabel htmlFor='inactive'>Inactive</FieldLabel>
+                  <FieldLabel htmlFor='inactive'>Mark as inactive</FieldLabel>
                 </Field>
               )}
             />
-          </FieldGroup>
+          </div>
         </form>
       </DialogBody>
 
-      <DialogFooter className='bg-background sticky bottom-0 z-10 border-t px-6 py-4'>
+      <DialogFooter className='sticky bottom-0 z-10 border-t bg-background px-5 py-3'>
         <Button
           variant='outline'
+          size='sm'
           onClick={() => onOpenChange(false)}
         >
           Cancel
@@ -396,6 +412,7 @@ const EditForm = ({
         <Button
           type='submit'
           form='customer-form'
+          size='sm'
           isPending={mutation.isPending}
           disabled={!form.formState.isDirty || mutation.isPending}
         >

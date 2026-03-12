@@ -1,23 +1,28 @@
 import { useQuery } from '@tanstack/react-query'
 import { createFileRoute, useRouter } from '@tanstack/react-router'
-import { ChevronLeft, Pencil, Trash2 } from 'lucide-react'
+import { ChevronLeft, Pencil, Trash2, UserPlus } from 'lucide-react'
 import { useState } from 'react'
 
 import { CustomerDashboardTab } from './-components/customer-dashboard-tab'
 import { CustomerInfoPanel } from './-components/customer-info-card'
 import { CustomerOrdersTab } from './-components/customer-orders-tab'
+import { CustomerProposalsTab } from './-components/customer-proposals-tab'
 import { CustomerTasksTab } from './-components/customer-tasks-tab'
 import { getCustomerDetailQuery } from '@/api/customer/query'
 import { ICustomers, PAGE_COLORS, PageHeaderIcon } from '@/components/ds'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
+import { CustomerAssignDialog } from '@/routes/_authenticated/customers/-components/customer-assign-dialog'
 import { CustomerDeleteDialog } from '@/routes/_authenticated/customers/-components/customer-delete-dialog'
 import { CustomerModal } from '@/routes/_authenticated/customers/-components/customer-modal'
+import { SidebarTrigger } from '@/components/ui/sidebar'
 import { Skeleton } from '@/components/ui/skeleton'
 import { CUSTOMER_TABS } from '@/constants/customer'
 import { useBreakpoint } from '@/hooks/use-breakpoint'
 import { useProjectId } from '@/hooks/use-project-id'
 import { useCustomerTabParam } from '@/hooks/use-query-params'
+import { isAdmin } from '@/constants/user'
 import { cn } from '@/lib/utils'
+import { useAuth } from '@/providers/auth'
 
 // ── Page Component ───────────────────────────────────────────
 
@@ -28,9 +33,12 @@ function CustomerDetailPage() {
   const isMobile = bp === 'mobile'
   const [projectId] = useProjectId()
   const [activeTab, setActiveTab] = useCustomerTabParam()
+  const { user } = useAuth()
+  const canAssign = !!user?.role && isAdmin(user.role)
 
   const [deleteOpen, setDeleteOpen] = useState(false)
   const [editOpen, setEditOpen] = useState(false)
+  const [assignOpen, setAssignOpen] = useState(false)
 
   const { data: customer, isLoading } = useQuery(
     getCustomerDetailQuery(customerId, projectId)
@@ -41,8 +49,8 @@ function CustomerDetailPage() {
     return (
       <div className='flex h-full flex-col overflow-hidden'>
         <header className='flex h-12 shrink-0 items-center gap-2.5 border-b border-border px-6'>
+          <SidebarTrigger className='-ml-1' />
           <Skeleton className='h-4 w-16' />
-          <div className='mx-0.5 h-4 w-px bg-border' />
           <Skeleton className='size-5 rounded-[5px]' />
           <Skeleton className='h-4 w-28' />
           <Skeleton className='h-5 w-[60px] rounded-full' />
@@ -96,16 +104,15 @@ function CustomerDetailPage() {
     <div className='flex h-full flex-col overflow-hidden'>
       {/* ── Header bar ── */}
       <header className='flex h-12 shrink-0 items-center gap-2.5 border-b border-border px-6'>
+        <SidebarTrigger className='-ml-1' />
         <button
           type='button'
-          className='flex items-center gap-1 text-[13px] font-medium text-text-tertiary transition-colors duration-[80ms] hover:text-foreground'
+          className='inline-flex h-7 items-center gap-0.5 rounded-[6px] border border-border bg-bg-secondary pl-1.5 pr-2.5 text-[13px] font-medium text-text-secondary transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground'
           onClick={() => router.history.back()}
         >
-          <ChevronLeft className='size-4' />
+          <ChevronLeft className='size-3.5' />
           <span className='hidden sm:inline'>Customers</span>
         </button>
-
-        <div className='mx-0.5 h-4 w-px bg-border' />
 
         <PageHeaderIcon icon={ICustomers} color={PAGE_COLORS.customers} />
         <h1 className='text-[14px] font-semibold tracking-[-0.01em]'>
@@ -134,6 +141,35 @@ function CustomerDetailPage() {
         </span>
 
         <div className='flex-1' />
+
+        {canAssign && (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button
+                type='button'
+                className={cn(
+                  'inline-flex h-7 items-center gap-1.5 rounded-[5px] border px-2.5 text-[12px] font-medium transition-colors duration-[80ms]',
+                  customer.assigned_user
+                    ? 'border-primary/20 bg-primary/[0.06] text-primary hover:bg-primary/[0.1]'
+                    : 'border-border bg-bg-secondary text-text-secondary hover:bg-bg-active hover:text-foreground'
+                )}
+                onClick={() => setAssignOpen(true)}
+              >
+                <UserPlus className='size-3.5' />
+                <span className='hidden sm:inline'>
+                  {customer.assigned_user
+                    ? `${customer.assigned_user.first_name} ${customer.assigned_user.last_name}`
+                    : 'Assign'}
+                </span>
+              </button>
+            </TooltipTrigger>
+            <TooltipContent>
+              {customer.assigned_user
+                ? `Assigned to ${customer.assigned_user.first_name} ${customer.assigned_user.last_name} — click to change`
+                : 'Assign a sales user'}
+            </TooltipContent>
+          </Tooltip>
+        )}
 
         <Tooltip>
           <TooltipTrigger asChild>
@@ -199,8 +235,11 @@ function CustomerDetailPage() {
             {activeTab === 'orders' && (
               <CustomerOrdersTab customerId={customerId} />
             )}
+            {activeTab === 'proposals' && (
+              <CustomerProposalsTab customerId={customerId} />
+            )}
             {activeTab === 'todos' && (
-              <CustomerTasksTab customerId={customerId} />
+              <CustomerTasksTab customerId={customerId} customerName={customer?.l_name} />
             )}
             {activeTab === 'dashboard' && (
               <div className={cn('flex-1 overflow-y-auto', isMobile ? 'px-5 py-4' : 'px-6 py-5')}>
@@ -222,7 +261,7 @@ function CustomerDetailPage() {
               : 'w-[380px] border-l border-border bg-bg-secondary/50'
           )}
         >
-          <CustomerInfoPanel customer={customer} />
+          <CustomerInfoPanel customer={customer} onAssign={() => setAssignOpen(true)} />
         </div>
       </div>
 
@@ -242,6 +281,14 @@ function CustomerDetailPage() {
           setDeleteOpen(open)
           if (!open) router.history.back()
         }}
+      />
+
+      {/* Assign user */}
+      <CustomerAssignDialog
+        customer={assignOpen ? customer : null}
+        open={assignOpen}
+        onOpenChange={setAssignOpen}
+        projectId={projectId}
       />
     </div>
   )

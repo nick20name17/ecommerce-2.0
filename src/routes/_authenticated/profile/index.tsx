@@ -5,6 +5,7 @@ import { ProfileInfoCard } from './-components/profile-info-card'
 import { SecurityCard } from './-components/security-card'
 import { AUTH_REDIRECTS } from '@/api/constants'
 import { IUser, PAGE_COLORS, PageHeaderIcon } from '@/components/ds'
+import { SidebarTrigger } from '@/components/ui/sidebar'
 import { isSuperAdmin } from '@/constants/user'
 import { useAuth } from '@/providers/auth'
 
@@ -20,6 +21,7 @@ const ProfilePage = () => {
   return (
     <div className='flex h-full flex-col overflow-hidden'>
       <header className='flex h-12 shrink-0 items-center gap-2.5 border-b border-border px-6'>
+        <SidebarTrigger className='-ml-1' />
         <div className='flex items-center gap-1.5'>
           <PageHeaderIcon icon={IUser} color={PAGE_COLORS.profile} />
           <h1 className='text-[14px] font-semibold tracking-[-0.01em]'>My Profile</h1>

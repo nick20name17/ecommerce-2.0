@@ -4,6 +4,7 @@ import { addDays, format, nextFriday, nextMonday } from 'date-fns'
 import {
   CalendarDays,
   ChevronDown,
+  ChevronLeft,
   Paperclip,
   Trash2,
   X
@@ -18,7 +19,7 @@ import { TaskCustomerCombobox } from '@/components/tasks/customer-combobox'
 import { OrderCombobox } from '@/components/tasks/order-combobox'
 import { ProposalCombobox } from '@/components/tasks/proposal-combobox'
 import { UserCombobox } from '@/components/common/user-combobox/user-combobox'
-import { InitialsAvatar, StatusIcon } from '@/components/ds'
+import { StatusIcon } from '@/components/ds'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -27,6 +28,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Calendar } from '@/components/ui/calendar'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { SidebarTrigger } from '@/components/ui/sidebar'
 import { Skeleton } from '@/components/ui/skeleton'
 import { TASK_PRIORITY_COLORS, TASK_PRIORITY_LABELS } from '@/constants/task'
 import type { TaskPriority } from '@/constants/task'
@@ -225,8 +227,10 @@ function TaskDetailPage() {
   if (isLoading) {
     return (
       <div className='flex h-full flex-col overflow-hidden'>
-        <header className={cn('flex shrink-0 items-center justify-between border-b border-border py-2', isMobile ? 'px-4' : 'px-4')}>
+        <header className={cn('flex shrink-0 items-center gap-2.5 border-b border-border py-2', isMobile ? 'px-4' : 'px-4')}>
+          <SidebarTrigger className='-ml-1' />
           <Skeleton className='h-4 w-24' />
+          <div className='flex-1' />
           <Skeleton className='h-4 w-16' />
         </header>
         <div className='flex min-h-0 flex-1'>
@@ -268,14 +272,13 @@ function TaskDetailPage() {
       {/* Top bar */}
       <header className={cn('flex shrink-0 items-center justify-between border-b border-border py-2', isMobile ? 'px-4' : 'px-4')}>
         <div className='flex items-center gap-3'>
+          <SidebarTrigger className='-ml-1' />
           <button
             type='button'
-            className='flex items-center gap-1 text-[13px] font-medium text-text-secondary transition-colors duration-[80ms] hover:text-foreground'
+            className='inline-flex h-7 items-center gap-0.5 rounded-[6px] border border-border bg-bg-secondary pl-1.5 pr-2.5 text-[13px] font-medium text-text-secondary transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground'
             onClick={() => router.history.back()}
           >
-            <svg width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='2' strokeLinecap='round'>
-              <polyline points='15 18 9 12 15 6' />
-            </svg>
+            <ChevronLeft className='size-3.5' />
             Back
           </button>
           <span className='text-text-tertiary'>/</span>
@@ -382,27 +385,17 @@ function TaskDetailPage() {
 
                   {/* Activity */}
                   <div>
-                    <div className='mb-3 text-[13px] font-semibold uppercase tracking-[0.06em] text-text-tertiary'>
-                      Activity
+                    <div className='mb-3 flex items-center gap-2'>
+                      <span className='text-[13px] font-semibold uppercase tracking-[0.06em] text-text-tertiary'>
+                        Activity
+                      </span>
+                      <span className='rounded-[4px] bg-bg-secondary px-1.5 py-0.5 text-[11px] font-medium text-text-tertiary'>
+                        Coming soon
+                      </span>
                     </div>
-                    <div className='flex items-start gap-2.5'>
-                      <InitialsAvatar initials='--' size={24} />
-                      <div className='min-w-0 flex-1'>
-                        <textarea
-                          placeholder='Write a comment...'
-                          rows={2}
-                          className='w-full resize-none rounded-[6px] border border-border bg-transparent px-3 py-2 text-[13px] text-text-secondary placeholder:text-text-tertiary focus:border-primary focus:outline-none'
-                        />
-                        <div className='mt-1.5 flex justify-end'>
-                          <button
-                            type='button'
-                            className='rounded-[6px] bg-primary px-3 py-1 text-[13px] font-medium text-primary-foreground transition-colors duration-[80ms] hover:opacity-90'
-                          >
-                            Send
-                          </button>
-                        </div>
-                      </div>
-                    </div>
+                    <p className='text-[13px] text-text-tertiary'>
+                      Activity feed and comments will be available here soon.
+                    </p>
                   </div>
                 </>
               ) : (

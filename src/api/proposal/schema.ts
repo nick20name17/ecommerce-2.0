@@ -49,6 +49,7 @@ export interface ProposalParams extends PaginationParams {
   search?: string
   autoid?: string
   ordering?: string
-  status?: ProposalStatus
+  status?: string
   project_id?: number
+  b_id?: string
 }

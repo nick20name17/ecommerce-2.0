@@ -27,6 +27,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
+import { SidebarTrigger } from '@/components/ui/sidebar'
 import { Spinner } from '@/components/ui/spinner'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { cn } from '@/lib/utils'
@@ -77,16 +78,15 @@ const CreatePage = () => {
     <div className='flex h-full flex-col overflow-hidden'>
       {/* ── Header ── */}
       <header className='flex h-12 shrink-0 items-center gap-2.5 border-b border-border px-6'>
+        <SidebarTrigger className='-ml-1' />
         <button
           type='button'
-          className='flex items-center gap-1 text-[13px] font-medium text-text-tertiary transition-colors duration-[80ms] hover:text-foreground'
+          className='inline-flex h-7 items-center gap-0.5 rounded-[6px] border border-border bg-bg-secondary pl-1.5 pr-2.5 text-[13px] font-medium text-text-secondary transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground'
           onClick={() => router.history.back()}
         >
-          <ChevronLeft className='size-4' />
+          <ChevronLeft className='size-3.5' />
           <span className='hidden sm:inline'>Back</span>
         </button>
-
-        <div className='mx-0.5 h-4 w-px bg-border' />
 
         <div className='flex size-[22px] shrink-0 items-center justify-center rounded-[6px] bg-teal-500'>
           <FilePlus2 className='size-[13px] text-white' />

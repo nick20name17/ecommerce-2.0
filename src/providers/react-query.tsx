@@ -35,6 +35,8 @@ export const queryClient = new QueryClient({
   queryCache: new QueryCache({
     onError(error, query) {
       if (query.meta?.suppressErrorToast) return
+      const status = (error as { response?: { status?: number } })?.response?.status
+      if (status === 401) return
       const resource = getQueryResourceLabel(query)
       const message = getErrorMessage(error)
       toast.error(`Failed to fetch ${resource}`, {

@@ -143,7 +143,7 @@ export interface OrderParams extends PaginationParams {
   search?: string
   autoid?: string
   ordering?: string
-  status?: OrderStatus
+  status?: string
   customer_id?: string
   project_id?: number
 }

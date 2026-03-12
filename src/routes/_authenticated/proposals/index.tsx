@@ -1,6 +1,8 @@
-import { keepPreviousData, useQuery } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import {
+  ArrowDown,
+  ArrowUp,
   FileText,
   ListTodo,
   Loader2,
@@ -11,7 +13,6 @@ import {
   StickyNote,
   Trash2,
   UserPlus,
-  X,
 } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 
@@ -19,11 +20,12 @@ import { ProposalAssignDialog } from './-components/proposal-assign-dialog'
 import { ProposalDeleteDialog } from './-components/proposal-delete-dialog'
 import { getFieldConfigQuery } from '@/api/field-config/query'
 import { CommandBarCreate } from '@/components/tasks/command-bar-create'
-import { IProposals, PAGE_COLORS, PageHeaderIcon, ViewToggle, type ViewOption } from '@/components/ds'
+import { FilterChip, FilterPopover, IProposals, PAGE_COLORS, PageHeaderIcon } from '@/components/ds'
 import { getProposalsQuery } from '@/api/proposal/query'
 import { getEntityNotesQuery } from '@/api/note/query'
 import type { Proposal, ProposalParams } from '@/api/proposal/schema'
 import { PageEmpty } from '@/components/common/page-empty'
+import { SidebarTrigger } from '@/components/ui/sidebar'
 import { EntityAttachmentsDialog } from '@/components/common/entity-attachments/entity-attachments-dialog'
 import { EntityNotesSheet } from '@/components/common/entity-notes/entity-notes-sheet'
 import { Pagination } from '@/components/common/filters/pagination'
@@ -35,7 +37,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
-import { PROPOSAL_STATUS, PROPOSAL_STATUS_CLASS, getProposalStatusLabel } from '@/constants/proposal'
+import { PROPOSAL_STATUS, PROPOSAL_STATUS_CLASS, PROPOSAL_STATUS_LABELS, getProposalStatusLabel } from '@/constants/proposal'
 import type { ProposalStatus } from '@/constants/proposal'
 import { isAdmin } from '@/constants/user'
 import { useBreakpoint } from '@/hooks/use-breakpoint'
@@ -47,21 +49,10 @@ import {
   useLimitParam,
   useOffsetParam,
   useSearchParam,
-  useStatusParam,
 } from '@/hooks/use-query-params'
 import { useAuth } from '@/providers/auth'
 
 // ── Constants ────────────────────────────────────────────────
-
-const STATUS_TABS: ViewOption<string>[] = [
-  { label: 'Open', value: PROPOSAL_STATUS.open },
-  { label: 'Accepted', value: PROPOSAL_STATUS.accepted },
-  { label: 'Lost', value: PROPOSAL_STATUS.lost },
-  { label: 'Expired', value: PROPOSAL_STATUS.expired },
-  { label: 'All Proposals', value: 'all' },
-]
-
-const VALID_STATUS_VALUES = new Set<string>(Object.values(PROPOSAL_STATUS))
 
 const STATUS_DOT_COLORS: Record<string, string> = {
   O: 'bg-blue-500',
@@ -72,6 +63,18 @@ const STATUS_DOT_COLORS: Record<string, string> = {
   N: 'bg-violet-500',
   H: 'bg-slate-400',
 }
+
+type ProposalSortField = 'quote' | 'b_name' | 'qt_date' | 'total'
+type SortDir = 'asc' | 'desc'
+
+const FILTER_STATUSES: { value: ProposalStatus; label: string }[] = [
+  { value: PROPOSAL_STATUS.open, label: 'Open' },
+  { value: PROPOSAL_STATUS.accepted, label: 'Accepted' },
+  { value: PROPOSAL_STATUS.lost, label: 'Lost' },
+  { value: PROPOSAL_STATUS.expired, label: 'Expired' },
+  { value: PROPOSAL_STATUS.cancelled, label: 'Cancelled' },
+  { value: PROPOSAL_STATUS.onHold, label: 'On Hold' },
+]
 
 // ── Page Component ───────────────────────────────────────────
 
@@ -86,36 +89,54 @@ const ProposalsPage = () => {
   const [limit] = useLimitParam()
   const [projectId] = useProjectId()
   const [autoidFromUrl, setAutoidFromUrl] = useAutoidParam()
-  const [status, setStatus] = useStatusParam()
 
   const canAssign = !!user?.role && isAdmin(user.role)
 
+  const [sortField, setSortField] = useState<ProposalSortField | null>(null)
+  const [sortDir, setSortDir] = useState<SortDir>('asc')
+
+  const [activeStatus, setActiveStatus] = useState<ProposalStatus | null>(PROPOSAL_STATUS.open)
   const [proposalToDelete, setProposalToDelete] = useState<Proposal | null>(null)
   const [proposalForAttachments, setProposalForAttachments] = useState<Proposal | null>(null)
   const [proposalForNotes, setProposalForNotes] = useState<Proposal | null>(null)
   const [proposalToAssign, setProposalToAssign] = useState<Proposal | null>(null)
   const [proposalForTask, setProposalForTask] = useState<Proposal | null>(null)
 
-  const activeStatus = status ?? PROPOSAL_STATUS.open
+  const ordering = sortField ? (sortDir === 'desc' ? `-${sortField}` : sortField) : undefined
 
-  const apiStatus: ProposalStatus | undefined =
-    activeStatus !== 'all' && VALID_STATUS_VALUES.has(activeStatus)
-      ? (activeStatus as ProposalStatus)
-      : undefined
+  const handleSort = (field: ProposalSortField) => {
+    if (sortField === field) {
+      if (sortDir === 'asc') setSortDir('desc')
+      else { setSortField(null); setSortDir('asc') }
+    } else {
+      setSortField(field)
+      setSortDir('asc')
+    }
+  }
+
+  const selectStatus = (s: ProposalStatus) => {
+    setActiveStatus((prev) => (prev === s ? null : s))
+    setOffset(null)
+  }
+
+  const clearAllFilters = () => {
+    setActiveStatus(null)
+    setOffset(null)
+  }
+
+  const hasFilters = activeStatus !== null
 
   const params: ProposalParams = {
     search: search || undefined,
     autoid: autoidFromUrl ?? undefined,
     offset,
     limit,
-    status: apiStatus,
+    status: activeStatus ?? undefined,
     project_id: projectId ?? undefined,
+    ordering,
   }
 
-  const { data, refetch, isLoading, isPlaceholderData } = useQuery({
-    ...getProposalsQuery(params),
-    placeholderData: keepPreviousData,
-  })
+  const { data, refetch, isLoading } = useQuery(getProposalsQuery(params))
 
   const { data: _fieldConfig } = useQuery(getFieldConfigQuery(projectId))
 
@@ -143,21 +164,15 @@ const ProposalsPage = () => {
 
   const hasPendingAutoid = autoidFromUrl != null && autoidFromUrl !== '' && !proposalInResults
 
-  const handleStatusChange = (value: string) => {
-    setStatus(value)
-    setOffset(null)
-  }
-
   return (
     <div className='flex h-full flex-col overflow-hidden'>
       {/* Header */}
       <header className='flex h-12 shrink-0 items-center gap-2.5 border-b border-border px-6'>
+        <SidebarTrigger className='-ml-1' />
         <div className='flex items-center gap-1.5'>
           <PageHeaderIcon icon={IProposals} color={PAGE_COLORS.proposals} />
           <h1 className='text-[14px] font-semibold tracking-[-0.01em]'>Proposals</h1>
         </div>
-
-        <ViewToggle options={STATUS_TABS} value={activeStatus} onChange={handleStatusChange} />
 
         <div className='flex-1' />
 
@@ -174,53 +189,96 @@ const ProposalsPage = () => {
           />
         </div>
 
-        <button
-          type='button'
-          className='inline-flex h-7 items-center gap-1 rounded-[5px] bg-primary px-2 text-[13px] font-semibold text-primary-foreground transition-colors duration-[80ms] hover:opacity-90 sm:px-2.5'
-          onClick={() => navigate({ to: '/create' })}
-        >
-          <Plus className='size-3.5' />
-          <span className='hidden sm:inline'>Create Proposal</span>
-        </button>
+        <div className='flex items-center gap-1.5'>
+          <FilterPopover
+            label='Status'
+            active={activeStatus !== null}
+            icon={<div className={cn('size-2.5 rounded-full', activeStatus ? STATUS_DOT_COLORS[activeStatus] : 'bg-current')} />}
+          >
+            {FILTER_STATUSES.map((s) => {
+              const selected = activeStatus === s.value
+              return (
+                <button
+                  key={s.value}
+                  type='button'
+                  className={cn(
+                    'flex w-full items-center gap-2 rounded-[5px] px-2 py-[3px] text-left text-[13px] font-medium',
+                    'transition-colors duration-[80ms] hover:bg-bg-hover'
+                  )}
+                  onClick={() => selectStatus(s.value)}
+                >
+                  <div className={cn(
+                    'flex size-3.5 items-center justify-center rounded-full border transition-colors duration-[80ms]',
+                    selected ? 'border-primary bg-primary' : 'border-border'
+                  )}>
+                    {selected && <div className='size-1.5 rounded-full bg-primary-foreground' />}
+                  </div>
+                  <div className={cn('size-2.5 shrink-0 rounded-full', STATUS_DOT_COLORS[s.value] ?? 'bg-slate-400')} />
+                  <span className='flex-1'>{s.label}</span>
+                </button>
+              )
+            })}
+          </FilterPopover>
+
+          <button
+            type='button'
+            className='inline-flex h-7 items-center gap-1 rounded-[5px] bg-primary px-2 text-[13px] font-semibold text-primary-foreground transition-colors duration-[80ms] hover:opacity-90 sm:px-2.5'
+            onClick={() => navigate({ to: '/create' })}
+          >
+            <Plus className='size-3.5' />
+            <span className='hidden sm:inline'>Create Proposal</span>
+          </button>
+        </div>
       </header>
 
-      {/* Autoid filter chip */}
-      {autoidFromUrl && (
-        <div className='flex shrink-0 items-center gap-1.5 border-b border-border px-6 py-1.5'>
-          <span className='inline-flex items-center gap-1 rounded-[5px] border border-border bg-bg-secondary px-2 py-0.5 text-[13px] font-medium text-foreground'>
-            Proposal: {autoidFromUrl}
+      {/* Active filter chips */}
+      {(hasFilters || autoidFromUrl) && (
+        <div className='flex shrink-0 flex-wrap items-center gap-1.5 border-b border-border px-6 py-1.5'>
+          {hasFilters && (
             <button
               type='button'
-              className='ml-0.5 rounded-[3px] p-0.5 text-text-tertiary transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground'
-              onClick={() => setAutoidFromUrl(null)}
-              aria-label='Clear proposal filter'
+              className='text-[13px] font-medium text-text-tertiary transition-colors duration-[80ms] hover:text-foreground'
+              onClick={clearAllFilters}
             >
-              <X className='size-3' />
+              Clear
             </button>
-          </span>
+          )}
+          {activeStatus && (
+            <FilterChip onRemove={() => setActiveStatus(null)}>
+              <span className='text-text-tertiary'>Status is</span>
+              <div className={cn('size-2 rounded-full', STATUS_DOT_COLORS[activeStatus] ?? 'bg-slate-400')} />
+              {PROPOSAL_STATUS_LABELS[activeStatus]}
+            </FilterChip>
+          )}
+          {autoidFromUrl && (
+            <FilterChip onRemove={() => setAutoidFromUrl(null)}>
+              <span className='text-text-tertiary'>Proposal:</span>
+              {autoidFromUrl}
+            </FilterChip>
+          )}
         </div>
       )}
 
       {/* Proposal list */}
       <div className='flex-1 overflow-y-auto'>
         {/* Column labels */}
-        {!isMobile && (results.length > 0 || isLoading || isPlaceholderData) && (
+        {!isMobile && (results.length > 0 || isLoading) && (
           <div
             className={cn(
               'sticky top-0 z-10 flex select-none items-center border-b border-border bg-bg-secondary/60 text-[13px] font-medium text-text-tertiary backdrop-blur-sm',
               isTablet ? 'gap-4 px-5 py-1' : 'gap-6 px-6 py-1',
             )}
           >
-            <div className='min-w-0 flex-1'>Quote / Customer</div>
+            <ProposalSortableHeader field='quote' label='Quote / Customer' sortField={sortField} sortDir={sortDir} onSort={handleSort} className='min-w-0 flex-1' />
             <div className='w-[88px] shrink-0'>Status</div>
-            {!isTablet && <div className='w-[92px] shrink-0'>Date</div>}
-            <div className='w-[100px] shrink-0 text-right'>Total</div>
+            {!isTablet && <ProposalSortableHeader field='qt_date' label='Date' sortField={sortField} sortDir={sortDir} onSort={handleSort} className='w-[92px] shrink-0' />}
+            <ProposalSortableHeader field='total' label='Total' sortField={sortField} sortDir={sortDir} onSort={handleSort} className='w-[100px] shrink-0 justify-end text-right' />
             <div className='w-[62px] shrink-0' />
             <div className='w-[28px] shrink-0' />
           </div>
         )}
 
-        {isLoading || isPlaceholderData ? (
+        {isLoading ? (
           Array.from({ length: 10 }).map((_, i) => (
             <div
               key={i}
@@ -525,6 +583,46 @@ function ProposalRow({
         </DropdownMenu>
       </div>
     </div>
+  )
+}
+
+// ── Sortable Header ─────────────────────────────────────────
+
+function ProposalSortableHeader({
+  field,
+  label,
+  sortField,
+  sortDir,
+  onSort,
+  className,
+}: {
+  field: ProposalSortField
+  label: string
+  sortField: ProposalSortField | null
+  sortDir: SortDir
+  onSort: (field: ProposalSortField) => void
+  className?: string
+}) {
+  const active = sortField === field
+  return (
+    <button
+      type='button'
+      className={cn(
+        'group inline-flex items-center gap-1 text-left transition-colors duration-[80ms] hover:text-foreground',
+        active && 'text-foreground',
+        className
+      )}
+      onClick={() => onSort(field)}
+    >
+      {label}
+      {active ? (
+        sortDir === 'asc'
+          ? <ArrowUp className='size-3' />
+          : <ArrowDown className='size-3' />
+      ) : (
+        <ArrowUp className='size-3 opacity-30 group-hover:opacity-60 transition-opacity' />
+      )}
+    </button>
   )
 }
 

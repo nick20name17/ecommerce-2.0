@@ -17,6 +17,7 @@ import { CommandBarCreate } from '@/components/tasks/command-bar-create'
 import { ORDER_STATUS_CLASS, ORDER_STATUS_LABELS } from '@/constants/order'
 import type { OrderStatus } from '@/constants/order'
 import { getColumnLabel } from '@/helpers/dynamic-columns'
+import { SidebarTrigger } from '@/components/ui/sidebar'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { useBreakpoint } from '@/hooks/use-breakpoint'
@@ -154,8 +155,8 @@ function OrderDetailPage() {
       <div className='flex h-full flex-col overflow-hidden'>
         {/* Header skeleton */}
         <header className='flex h-12 shrink-0 items-center gap-2.5 border-b border-border px-6'>
+          <SidebarTrigger className='-ml-1' />
           <Skeleton className='h-4 w-12' />
-          <div className='mx-0.5 h-4 w-px bg-border' />
           <Skeleton className='size-5 rounded-[5px]' />
           <Skeleton className='h-4 w-20' />
           <Skeleton className='h-5 w-[72px] rounded-full' />
@@ -260,16 +261,15 @@ function OrderDetailPage() {
     <div className='flex h-full flex-col overflow-hidden'>
       {/* ── Header bar ── */}
       <header className='flex h-12 shrink-0 items-center gap-2.5 border-b border-border px-6'>
+        <SidebarTrigger className='-ml-1' />
         <button
           type='button'
-          className='flex items-center gap-1 text-[13px] font-medium text-text-tertiary transition-colors duration-[80ms] hover:text-foreground'
+          className='inline-flex h-7 items-center gap-0.5 rounded-[6px] border border-border bg-bg-secondary pl-1.5 pr-2.5 text-[13px] font-medium text-text-secondary transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground'
           onClick={() => router.history.back()}
         >
-          <ChevronLeft className='size-4' />
+          <ChevronLeft className='size-3.5' />
           <span className='hidden sm:inline'>Orders</span>
         </button>
-
-        <div className='mx-0.5 h-4 w-px bg-border' />
 
         <PageHeaderIcon icon={IOrders} color={PAGE_COLORS.orders} />
         <h1 className='text-[14px] font-semibold tracking-[-0.01em]'>

@@ -74,6 +74,8 @@ interface CommandBarCreateProps {
   defaultLinkedOrderAutoid?: string | null
   defaultLinkedProposalAutoid?: string | null
   defaultLinkedCustomerAutoid?: string | null
+  lockLinkedCustomer?: boolean
+  linkedCustomerLabel?: string | null
 }
 
 export function CommandBarCreate({
@@ -81,6 +83,8 @@ export function CommandBarCreate({
   defaultLinkedOrderAutoid,
   defaultLinkedProposalAutoid,
   defaultLinkedCustomerAutoid,
+  lockLinkedCustomer,
+  linkedCustomerLabel,
 }: CommandBarCreateProps) {
   const [projectId] = useProjectId()
   const { data: statusesData } = useQuery(getTaskStatusesQuery(projectId ?? null))
@@ -95,6 +99,8 @@ export function CommandBarCreate({
       defaultLinkedOrderAutoid={defaultLinkedOrderAutoid}
       defaultLinkedProposalAutoid={defaultLinkedProposalAutoid}
       defaultLinkedCustomerAutoid={defaultLinkedCustomerAutoid}
+      lockLinkedCustomer={lockLinkedCustomer}
+      linkedCustomerLabel={linkedCustomerLabel}
     />
   )
 }
@@ -105,12 +111,16 @@ function CommandBarCreateInner({
   defaultLinkedOrderAutoid,
   defaultLinkedProposalAutoid,
   defaultLinkedCustomerAutoid,
+  lockLinkedCustomer,
+  linkedCustomerLabel,
 }: {
   statuses: TaskStatus[]
   onClose: () => void
   defaultLinkedOrderAutoid?: string | null
   defaultLinkedProposalAutoid?: string | null
   defaultLinkedCustomerAutoid?: string | null
+  lockLinkedCustomer?: boolean
+  linkedCustomerLabel?: string | null
 }) {
   const [projectId] = useProjectId()
   const [title, setTitle] = useState('')
@@ -366,16 +376,22 @@ function CommandBarCreateInner({
               </div>
               <div className='flex items-center gap-2'>
                 <span className='w-[60px] shrink-0 text-[13px] font-medium text-text-tertiary'>Customer</span>
-                <TaskCustomerCombobox
-                  value={selectedCustomer}
-                  onChange={setSelectedCustomer}
-                  projectId={projectId}
-                  placeholder='None'
-                  triggerClassName={cn(
-                    'inline-flex items-center gap-1.5 rounded-[5px] px-2 py-1 text-[13px] font-medium transition-colors duration-[80ms] hover:bg-bg-hover cursor-pointer',
-                    selectedCustomer ? 'text-foreground' : 'text-text-tertiary'
-                  )}
-                />
+                {lockLinkedCustomer && selectedCustomer ? (
+                  <span className='inline-flex items-center gap-1.5 rounded-[5px] px-2 py-1 text-[13px] font-medium text-foreground'>
+                    {linkedCustomerLabel ?? selectedCustomer}
+                  </span>
+                ) : (
+                  <TaskCustomerCombobox
+                    value={selectedCustomer}
+                    onChange={setSelectedCustomer}
+                    projectId={projectId}
+                    placeholder='None'
+                    triggerClassName={cn(
+                      'inline-flex items-center gap-1.5 rounded-[5px] px-2 py-1 text-[13px] font-medium transition-colors duration-[80ms] hover:bg-bg-hover cursor-pointer',
+                      selectedCustomer ? 'text-foreground' : 'text-text-tertiary'
+                    )}
+                  />
+                )}
               </div>
             </div>
           </div>

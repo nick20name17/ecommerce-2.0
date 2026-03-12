@@ -10,6 +10,7 @@ import { CustomerCombobox } from './create/-components/customer-combobox'
 import { getCustomerDetailQuery } from '@/api/customer/query'
 import type { Customer } from '@/api/customer/schema'
 import { getDashboardQuery } from '@/api/dashboard/query'
+import { SidebarTrigger } from '@/components/ui/sidebar'
 import { Skeleton } from '@/components/ui/skeleton'
 import { isSuperAdmin } from '@/constants/user'
 import { getErrorMessage } from '@/helpers/error'
@@ -186,6 +187,7 @@ function DashboardHeader({
 }) {
   return (
     <header className='flex h-12 shrink-0 items-center gap-3 border-b border-border px-4 sm:px-6'>
+      <SidebarTrigger className='-ml-1' />
       <div className='flex items-center gap-1.5'>
         <PageHeaderIcon icon={IDashboard} color={PAGE_COLORS.dashboard} />
         <h1 className='text-[14px] font-semibold tracking-[-0.01em]'>Dashboard</h1>

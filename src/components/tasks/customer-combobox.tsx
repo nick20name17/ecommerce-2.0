@@ -104,7 +104,7 @@ export const TaskCustomerCombobox = ({ value, onChange, projectId, placeholder =
         </div>
       )}
       <PopoverContent
-        className='w-64 overflow-hidden rounded-lg border-border p-0'
+        className='w-80 overflow-hidden rounded-lg border-border p-0'
         align='start'
         style={{ boxShadow: 'var(--dropdown-shadow)' }}
       >
@@ -123,13 +123,13 @@ export const TaskCustomerCombobox = ({ value, onChange, projectId, placeholder =
           />
         </div>
         <div
-          className='max-h-64 overflow-y-auto overscroll-contain p-1'
+          className='max-h-80 overflow-y-auto overscroll-contain p-1'
           onWheel={(e) => e.stopPropagation()}
         >
           {loading && customers.length === 0 ? (
             <div className='space-y-1'>
               {Array.from({ length: 5 }).map((_, i) => (
-                <Skeleton key={i} className='h-8 w-full rounded-[6px]' />
+                <Skeleton key={i} className='h-10 w-full rounded-[6px]' />
               ))}
             </div>
           ) : customers.length === 0 ? (
@@ -151,19 +151,26 @@ export const TaskCustomerCombobox = ({ value, onChange, projectId, placeholder =
                   Remove customer
                 </button>
               )}
-              {customers.map((c) => (
-                <button
-                  key={c.autoid}
-                  type='button'
-                  className='flex w-full items-center justify-between gap-2 rounded-[6px] px-2.5 py-[7px] text-left text-[13px] font-medium transition-colors duration-[80ms] hover:bg-bg-hover'
-                  onClick={() => handleSelect(c)}
-                >
-                  <span className='truncate font-semibold'>{c.autoid}</span>
-                  {c.contact_1 && (
-                    <span className='shrink-0 text-[13px] text-text-tertiary'>{c.contact_1}</span>
-                  )}
-                </button>
-              ))}
+              {customers.map((c) => {
+                const location = [c.city, c.state].filter(Boolean).join(', ')
+                const subtitle = [c.contact_1, location].filter(Boolean).join(' · ')
+                return (
+                  <button
+                    key={c.autoid}
+                    type='button'
+                    className='flex w-full flex-col rounded-[6px] px-2.5 py-[7px] text-left transition-colors duration-[80ms] hover:bg-bg-hover'
+                    onClick={() => handleSelect(c)}
+                  >
+                    <span className='truncate text-[13px] font-medium'>
+                      <span className='font-semibold'>{c.autoid}</span>
+                      {c.l_name && <span className='text-foreground'> — {c.l_name}</span>}
+                    </span>
+                    {subtitle && (
+                      <span className='truncate text-[12px] text-text-tertiary'>{subtitle}</span>
+                    )}
+                  </button>
+                )
+              })}
             </>
           )}
         </div>

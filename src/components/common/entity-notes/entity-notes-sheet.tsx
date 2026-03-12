@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { MessageSquarePlus, StickyNote, Trash2 } from 'lucide-react'
-import { useState } from 'react'
+import { Send, StickyNote, Trash2 } from 'lucide-react'
+import { useRef, useState } from 'react'
 
 import { NOTE_QUERY_KEYS, getEntityNotesQuery } from '@/api/note/query'
 import type { EntityNoteList, EntityNoteType } from '@/api/note/schema'
@@ -15,9 +15,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle
 } from '@/components/ui/alert-dialog'
-import { Button } from '@/components/ui/button'
 import { Empty, EmptyContent, EmptyHeader, EmptyMedia, EmptyTitle } from '@/components/ui/empty'
-import { Input } from '@/components/ui/input'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Skeleton } from '@/components/ui/skeleton'
 import {
@@ -27,8 +25,8 @@ import {
   SheetHeader,
   SheetTitle
 } from '@/components/ui/sheet'
+import { InitialsAvatar } from '@/components/ds'
 import { isAdmin } from '@/constants/user'
-import { formatDate } from '@/helpers/formatters'
 import { cn } from '@/lib/utils'
 import { useAuth } from '@/providers/auth'
 
@@ -43,6 +41,29 @@ interface EntityNotesSheetProps {
 
 const NOTE_TEXT_MAX = 500
 
+function getInitials(name: string) {
+  return name
+    .split(' ')
+    .slice(0, 2)
+    .map((n) => n[0]?.toUpperCase() ?? '')
+    .join('')
+}
+
+function relativeTime(dateStr: string): string {
+  const now = Date.now()
+  const then = new Date(dateStr).getTime()
+  const diffMs = now - then
+  const diffMin = Math.floor(diffMs / 60_000)
+  if (diffMin < 1) return 'just now'
+  if (diffMin < 60) return `${diffMin}m ago`
+  const diffHr = Math.floor(diffMin / 60)
+  if (diffHr < 24) return `${diffHr}h ago`
+  const diffDay = Math.floor(diffHr / 24)
+  if (diffDay < 7) return `${diffDay}d ago`
+  const d = new Date(dateStr)
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+}
+
 export const EntityNotesSheet = ({
   open,
   onOpenChange,
@@ -55,6 +76,7 @@ export const EntityNotesSheet = ({
   const { user } = useAuth()
   const [text, setText] = useState('')
   const [noteToDelete, setNoteToDelete] = useState<EntityNoteList | null>(null)
+  const textareaRef = useRef<HTMLTextAreaElement>(null)
 
   const { data: notes = [], isLoading } = useQuery({
     ...getEntityNotesQuery(entityType, autoid, projectId),
@@ -91,7 +113,6 @@ export const EntityNotesSheet = ({
       return { previous }
     },
     onSuccess: (serverNote) => {
-      // Replace optimistic entry with real server data — no refetch needed
       const real: EntityNoteList = {
         id: serverNote.id,
         entity_type: serverNote.entity_type,
@@ -139,12 +160,23 @@ export const EntityNotesSheet = ({
   const canDeleteNote = (note: EntityNoteList) =>
     !!user && (isAdmin(user.role) || note.author === user.id)
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
+  const submitNote = () => {
     const trimmed = text.trim()
     if (!trimmed || createMutation.isPending) return
     if (trimmed.length > NOTE_TEXT_MAX) return
     createMutation.mutate({ text: trimmed })
+  }
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    submitNote()
+  }
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault()
+      submitNote()
+    }
   }
 
   const orderedNotes = [...notes].sort(
@@ -152,56 +184,51 @@ export const EntityNotesSheet = ({
   )
 
   return (
-    <Sheet
-      open={open}
-      onOpenChange={onOpenChange}
-    >
+    <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
-        className='flex w-full flex-col gap-0 overflow-hidden p-0 sm:max-w-lg'
+        className='flex w-full flex-col gap-0 overflow-hidden p-0 sm:max-w-md'
         side='right'
       >
-        <SheetHeader className='bg-bg-secondary/30 shrink-0 border-b px-5 py-4'>
-          <SheetTitle className='text-base font-semibold tracking-tight'>Notes</SheetTitle>
-          <SheetDescription className='text-text-tertiary mt-0.5 text-sm'>
+        <SheetHeader className='flex h-12 shrink-0 flex-row items-center gap-2 border-b border-border px-5'>
+          <SheetTitle className='text-[14px] font-semibold tracking-[-0.01em]'>Notes</SheetTitle>
+          <SheetDescription className='!mt-0 text-[13px] text-text-tertiary'>
             {entityLabel}
           </SheetDescription>
         </SheetHeader>
 
         <ScrollArea className='min-h-0 flex-1'>
-          <div className='flex flex-col gap-3 p-4'>
-            {isLoading ? (
-              <div className='flex flex-col gap-3'>
-                {(['skeleton-1', 'skeleton-2', 'skeleton-3'] as const).map((key) => (
-                  <NoteCardSkeleton key={key} />
-                ))}
-              </div>
-            ) : orderedNotes.length === 0 ? (
-              <Empty className='border-0 py-12'>
-                <EmptyHeader>
-                  <EmptyMedia variant='icon' className='rounded-xl'>
-                    <StickyNote className='text-text-tertiary size-5' />
-                  </EmptyMedia>
-                  <EmptyTitle className='text-foreground font-medium'>No notes yet</EmptyTitle>
-                  <EmptyContent>
-                    <p className='text-text-tertiary max-w-[240px] text-sm leading-relaxed'>
-                      Add a note below to keep context for this record.
-                    </p>
-                  </EmptyContent>
-                </EmptyHeader>
-              </Empty>
-            ) : (
-              orderedNotes.map((note) => (
-                <NoteCard
+          {isLoading ? (
+            <div className='flex flex-col'>
+              {(['sk-1', 'sk-2', 'sk-3', 'sk-4'] as const).map((key) => (
+                <NoteRowSkeleton key={key} />
+              ))}
+            </div>
+          ) : orderedNotes.length === 0 ? (
+            <Empty className='border-0 py-16'>
+              <EmptyHeader>
+                <EmptyMedia variant='icon' className='rounded-xl'>
+                  <StickyNote className='size-5 text-text-tertiary' />
+                </EmptyMedia>
+                <EmptyTitle className='font-medium text-foreground'>No notes yet</EmptyTitle>
+                <EmptyContent>
+                  <p className='max-w-[220px] text-[13px] leading-relaxed text-text-tertiary'>
+                    Add a note below to keep context for this record.
+                  </p>
+                </EmptyContent>
+              </EmptyHeader>
+            </Empty>
+          ) : (
+            <div className='flex flex-col'>
+              {orderedNotes.map((note) => (
+                <NoteRow
                   key={note.id}
                   note={note}
-                  isOwn={!!user && note.author === user.id}
                   canDelete={canDeleteNote(note)}
                   onDelete={() => setNoteToDelete(note)}
-                  isDeleting={deleteMutation.isPending && noteToDelete?.id === note.id}
                 />
-              ))
-            )}
-          </div>
+              ))}
+            </div>
+          )}
         </ScrollArea>
 
         <AlertDialog
@@ -229,112 +256,88 @@ export const EntityNotesSheet = ({
         </AlertDialog>
 
         <form
-          className='shrink-0 border-t bg-background px-4 py-4'
+          className='shrink-0 border-t border-border px-4 py-3'
           onSubmit={handleSubmit}
         >
-          <div className='flex gap-2'>
-            <Input
-              type='text'
+          <div className='relative'>
+            <textarea
+              ref={textareaRef}
               value={text}
               onChange={(e) => setText(e.target.value.slice(0, NOTE_TEXT_MAX))}
-              placeholder='Add a note…'
-              maxLength={NOTE_TEXT_MAX}
-              className='min-w-0 flex-1'
+              onKeyDown={handleKeyDown}
+              placeholder='Write a note...'
+              rows={2}
+              className='w-full resize-none rounded-[6px] border border-border bg-transparent px-3 py-2 pr-10 text-[13px] leading-relaxed placeholder:text-text-tertiary focus:border-ring focus:outline-none focus:ring-1 focus:ring-ring/50'
               disabled={createMutation.isPending}
-              aria-label='Note text'
             />
-            <Button
+            <button
               type='submit'
               disabled={!text.trim() || createMutation.isPending}
-              className='shrink-0 gap-1.5'
+              className={cn(
+                'absolute bottom-2.5 right-2.5 flex size-6 items-center justify-center rounded-[5px] transition-colors duration-[80ms]',
+                text.trim()
+                  ? 'bg-primary text-primary-foreground hover:opacity-90'
+                  : 'text-text-tertiary'
+              )}
             >
-              <MessageSquarePlus className='size-3.5' />
-              {createMutation.isPending ? 'Adding…' : 'Add'}
-            </Button>
+              <Send className='size-3' />
+            </button>
           </div>
-          <p
-            className={cn(
-              'mt-1.5 text-[13px] tabular-nums',
-              text.length > NOTE_TEXT_MAX * 0.9
-                ? 'text-destructive'
-                : 'text-text-tertiary'
-            )}
-          >
-            {text.length}/{NOTE_TEXT_MAX}
-          </p>
         </form>
       </SheetContent>
     </Sheet>
   )
 }
 
-function NoteCardSkeleton() {
+function NoteRowSkeleton() {
   return (
-    <div className='flex gap-3 rounded-lg border border-border/80 p-3'>
-      <Skeleton className='size-8 shrink-0 rounded-full' />
-      <div className='min-w-0 flex-1 space-y-2'>
-        <div className='flex items-baseline justify-between gap-2'>
-          <Skeleton className='h-4 w-24' />
-          <Skeleton className='h-3 w-16' />
+    <div className='flex gap-2.5 px-5 py-3'>
+      <Skeleton className='size-5 shrink-0 rounded-full' />
+      <div className='min-w-0 flex-1 space-y-1.5'>
+        <div className='flex items-center gap-2'>
+          <Skeleton className='h-3.5 w-20' />
+          <Skeleton className='h-3 w-12' />
         </div>
-        <Skeleton className='h-4 w-full' />
-        <Skeleton className='h-4 w-3/4' />
+        <Skeleton className='h-3.5 w-full' />
+        <Skeleton className='h-3.5 w-2/3' />
       </div>
     </div>
   )
 }
 
-interface NoteCardProps {
+function NoteRow({
+  note,
+  canDelete,
+  onDelete,
+}: {
   note: EntityNoteList
-  isOwn: boolean
   canDelete: boolean
   onDelete: () => void
-  isDeleting: boolean
-}
-
-function NoteCard({ note, isOwn, canDelete, onDelete, isDeleting }: NoteCardProps) {
-  const initial = (note.author_name || '?').charAt(0).toUpperCase()
+}) {
+  const initials = getInitials(note.author_name || '?')
   return (
-    <div
-      className={cn(
-        'group flex gap-3 rounded-lg border p-3 transition-all duration-200',
-        isOwn
-          ? 'border-primary/30 bg-primary/5 dark:border-primary/40 dark:bg-primary/10'
-          : 'border-border/80 bg-bg-secondary/40 shadow-sm hover:shadow-[0_1px_3px_rgba(0,0,0,0.06)] dark:hover:shadow-[0_1px_3px_rgba(0,0,0,0.2)]'
-      )}
-    >
-      <div
-        className='bg-primary/10 text-primary flex size-8 shrink-0 items-center justify-center rounded-full text-[13px] font-semibold'
-        aria-hidden
-      >
-        {initial}
-      </div>
+    <div className='group flex gap-2.5 border-b border-border-light px-5 py-3 last:border-b-0'>
+      <InitialsAvatar initials={initials} size={20} />
       <div className='min-w-0 flex-1'>
-        <div className='mb-1 flex items-baseline justify-between gap-2'>
-          <span className='text-foreground truncate text-sm font-medium'>{note.author_name}</span>
-          <div className='flex shrink-0 items-center gap-1'>
-            <span className='text-text-tertiary text-[13px] tabular-nums'>
-              {formatDate(note.created_at, 'dateTime')}
-            </span>
-            {canDelete && (
-              <Button
-                type='button'
-                variant='ghost'
-                size='icon-xs'
-                className='text-text-tertiary hover:bg-destructive/10 hover:text-destructive'
-                onClick={(e) => {
-                  e.stopPropagation()
-                  onDelete()
-                }}
-                disabled={isDeleting}
-                aria-label='Delete note'
-              >
-                <Trash2 className='size-3' />
-              </Button>
-            )}
-          </div>
+        <div className='flex items-center gap-2'>
+          <span className='truncate text-[13px] font-medium text-foreground'>
+            {note.author_name}
+          </span>
+          <span className='shrink-0 text-[12px] tabular-nums text-text-tertiary'>
+            {relativeTime(note.created_at)}
+          </span>
+          {canDelete && (
+            <button
+              type='button'
+              className='ml-auto shrink-0 rounded-[4px] p-0.5 text-text-tertiary opacity-0 transition-all duration-[80ms] hover:text-destructive group-hover:opacity-100'
+              onClick={onDelete}
+              aria-label='Delete note'
+            >
+              <Trash2 className='size-3' />
+            </button>
+          )}
         </div>
-        <p className='text-text-tertiary whitespace-pre-wrap wrap-break-word text-sm leading-relaxed'>
+        <p className='mt-0.5 whitespace-pre-wrap text-[13px] leading-relaxed text-text-secondary wrap-break-word'>
           {note.text}
         </p>
       </div>

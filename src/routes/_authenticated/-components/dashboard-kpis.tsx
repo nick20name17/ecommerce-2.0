@@ -25,7 +25,7 @@ const KPI_CONFIG = [
   },
   {
     key: 'pending',
-    title: 'Pending Invoices',
+    title: 'Pending',
     value: (m: DashboardMetrics) => m.pending_invoices,
     format: (n: number) => String(n),
     prev: null,
@@ -77,16 +77,16 @@ export const DashboardKpis = ({ metrics }: DashboardKpisProps) => {
             key={config.key}
             className='rounded-[8px] border border-border bg-background px-3 py-3 sm:px-4 sm:py-4'
           >
-            <div className='text-[11px] font-medium uppercase tracking-[0.04em] text-text-tertiary sm:text-[12px]'>
+            <div className='truncate text-[11px] font-medium uppercase tracking-[0.04em] text-text-tertiary sm:text-[12px]'>
               {config.title}
             </div>
             <div className='mt-1 truncate text-[16px] font-semibold tabular-nums leading-none tracking-tight sm:mt-1.5 sm:text-[20px]'>
               {isHidden ? '—' : config.format(value)}
             </div>
             {change && !isHidden && (
-              <span
+              <div
                 className={cn(
-                  'mt-1.5 inline-flex items-center gap-0.5 text-[11px] font-medium tabular-nums leading-none',
+                  'mt-1.5 flex items-center gap-0.5 whitespace-nowrap text-[11px] font-medium tabular-nums leading-none',
                   change.direction === 'up' && 'text-green-600 dark:text-green-400',
                   change.direction === 'down' && 'text-destructive',
                   change.direction === 'same' && 'text-text-tertiary'
@@ -96,8 +96,8 @@ export const DashboardKpis = ({ metrics }: DashboardKpisProps) => {
                 {change.direction === 'down' && <ArrowDownRight className='size-3' />}
                 {change.direction === 'same' && <Minus className='size-3' />}
                 {change.direction === 'same' ? '0%' : `${Math.abs(change.pct)}%`}
-                <span className='text-text-tertiary'> vs last mo</span>
-              </span>
+                <span className='text-text-quaternary'> vs prev</span>
+              </div>
             )}
           </div>
         )
