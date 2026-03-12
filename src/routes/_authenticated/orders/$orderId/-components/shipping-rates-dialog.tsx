@@ -6,7 +6,6 @@ import { toast } from 'sonner'
 import type { Order, OrderItem, OrderPatchPayload, ShippingPackagePayload, ShippingRate, ShippingRatesResponse } from '@/api/order/schema'
 import { orderService } from '@/api/order/service'
 import { getShippingAddressesQuery } from '@/api/shipping-address/query'
-import type { ShippingAddress } from '@/api/shipping-address/schema'
 import {
   Dialog,
   DialogContent,
@@ -53,7 +52,6 @@ export function ShippingRatesDialog({
   orderAutoid,
   items,
   order,
-  onPatch,
 }: ShippingRatesDialogProps) {
   const [projectId] = useProjectId()
   const [step, setStep] = useState<Step>('configure')
@@ -66,7 +64,6 @@ export function ShippingRatesDialog({
   const [address, setAddress] = useState<ShipToAddress>({
     c_name: '', c_address1: '', c_address2: '', c_city: '', c_state: '', c_zip: '',
   })
-  const [addressEditing, setAddressEditing] = useState(false)
   const [selectedAddressId, setSelectedAddressId] = useState<number | null>(null)
   const [addressPopoverOpen, setAddressPopoverOpen] = useState(false)
 
@@ -92,7 +89,6 @@ export function ShippingRatesDialog({
         c_state: order.c_state ?? '',
         c_zip: order.c_zip ?? '',
       })
-      setAddressEditing(false)
       // Auto-select default shipping address (ship from)
       const defaultAddr = shippingAddresses.find((a) => a.is_default)
       setSelectedAddressId(defaultAddr?.id ?? null)
