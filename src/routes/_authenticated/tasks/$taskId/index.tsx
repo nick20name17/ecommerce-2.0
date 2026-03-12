@@ -431,7 +431,7 @@ function TaskDetailPage() {
                   </button>
                 </PopoverTrigger>
                 <PopoverContent
-                  className='w-[170px] overflow-hidden rounded-[8px] border-border gap-0 p-[3px]'
+                  className='w-[220px] overflow-hidden rounded-[8px] border-border gap-0 p-[3px]'
                   align='start'
                   onOpenAutoFocus={(e) => e.preventDefault()}
                   style={{ boxShadow: 'var(--dropdown-shadow)' }}

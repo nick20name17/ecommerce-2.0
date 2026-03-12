@@ -7,11 +7,13 @@ export function FilterPopover({
   label,
   active,
   icon,
+  width = 'w-[180px]',
   children,
 }: {
   label: string
   active: boolean
   icon?: React.ReactNode
+  width?: string
   children: React.ReactNode
 }) {
   return (
@@ -33,7 +35,7 @@ export function FilterPopover({
         </button>
       </PopoverTrigger>
       <PopoverContent
-        className='w-[180px] overflow-hidden rounded-[8px] border-border gap-0 p-1'
+        className={cn(width, 'overflow-hidden rounded-[8px] border-border gap-0 p-1')}
         align='start'
         style={{ boxShadow: 'var(--dropdown-shadow)' }}
       >

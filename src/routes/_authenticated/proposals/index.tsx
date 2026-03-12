@@ -20,7 +20,7 @@ import { ProposalAssignDialog } from './-components/proposal-assign-dialog'
 import { ProposalDeleteDialog } from './-components/proposal-delete-dialog'
 import { getFieldConfigQuery } from '@/api/field-config/query'
 import { CommandBarCreate } from '@/components/tasks/command-bar-create'
-import { FilterChip, FilterPopover, IProposals, PAGE_COLORS, PageHeaderIcon } from '@/components/ds'
+import { FilterChip, FilterPopover, IProposals, InitialsAvatar, PAGE_COLORS, PageHeaderIcon } from '@/components/ds'
 import { getProposalsQuery } from '@/api/proposal/query'
 import { getEntityNotesQuery } from '@/api/note/query'
 import type { Proposal, ProposalParams } from '@/api/proposal/schema'
@@ -51,6 +51,16 @@ import {
   useSearchParam,
 } from '@/hooks/use-query-params'
 import { useAuth } from '@/providers/auth'
+
+// ── Helpers ──────────────────────────────────────────────────
+
+function getInitials(name: string) {
+  return name
+    .split(' ')
+    .slice(0, 2)
+    .map((n) => n[0]?.toUpperCase() ?? '')
+    .join('')
+}
 
 // ── Constants ────────────────────────────────────────────────
 
@@ -273,6 +283,7 @@ const ProposalsPage = () => {
             <div className='w-[88px] shrink-0'>Status</div>
             {!isTablet && <ProposalSortableHeader field='qt_date' label='Date' sortField={sortField} sortDir={sortDir} onSort={handleSort} className='w-[92px] shrink-0' />}
             <ProposalSortableHeader field='total' label='Total' sortField={sortField} sortDir={sortDir} onSort={handleSort} className='w-[100px] shrink-0 justify-end text-right' />
+            <div className='w-[120px] shrink-0'>Responsible</div>
             <div className='w-[62px] shrink-0' />
             <div className='w-[28px] shrink-0' />
           </div>
@@ -296,6 +307,7 @@ const ProposalsPage = () => {
                   <div className='w-[88px] shrink-0'><Skeleton className='h-[18px] w-[60px] rounded-[4px]' /></div>
                   {!isTablet && <div className='w-[92px] shrink-0'><Skeleton className='h-3.5 w-[70px] rounded' /></div>}
                   <div className='w-[100px] shrink-0'><Skeleton className='ml-auto h-3.5 w-[60px] rounded' /></div>
+                  <div className='w-[120px] shrink-0'><Skeleton className='h-3.5 w-[70px] rounded' /></div>
                   <div className='w-[62px] shrink-0' />
                   <div className='w-[28px] shrink-0' />
                 </>
@@ -503,6 +515,49 @@ function ProposalRow({
       {/* Total */}
       <div className='w-[100px] shrink-0 text-right text-[13px] font-medium tabular-nums text-foreground'>
         {formatCurrency(proposal.total, '—')}
+      </div>
+
+      {/* Responsible */}
+      <div className='w-[120px] shrink-0'>
+        {canAssign && (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button
+                type='button'
+                className={cn(
+                  'inline-flex items-center gap-1.5 rounded-[5px] px-1 py-0.5 text-[13px] transition-colors duration-75 hover:bg-bg-active',
+                  proposal.assigned_user ? 'text-text-secondary' : 'text-text-tertiary'
+                )}
+                onClick={(e) => {
+                  e.stopPropagation()
+                  onAssign(proposal)
+                }}
+              >
+                {proposal.assigned_user ? (
+                  <>
+                    <InitialsAvatar
+                      initials={getInitials(`${proposal.assigned_user.first_name} ${proposal.assigned_user.last_name}`)}
+                      size={16}
+                    />
+                    <span className='truncate'>
+                      {proposal.assigned_user.first_name} {proposal.assigned_user.last_name}
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    <UserPlus className='size-3.5' />
+                    <span>Assign</span>
+                  </>
+                )}
+              </button>
+            </TooltipTrigger>
+            <TooltipContent>
+              {proposal.assigned_user
+                ? `Assigned to ${proposal.assigned_user.first_name} ${proposal.assigned_user.last_name} — click to change`
+                : 'Assign a sales user'}
+            </TooltipContent>
+          </Tooltip>
+        )}
       </div>
 
       {/* Notes */}

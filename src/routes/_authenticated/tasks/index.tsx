@@ -330,6 +330,7 @@ function Todos2Page() {
             label='Status'
             active={activeStatuses.size > 0}
             icon={<StatusIcon status='' color='currentColor' size={12} />}
+            width='w-[220px]'
           >
             {statuses.map((s) => {
               const selected = activeStatuses.has(s.id)

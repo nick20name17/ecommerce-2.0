@@ -19,6 +19,7 @@ interface UserComboboxProps {
   role?: string
   valueLabel?: string | null
   triggerClassName?: string
+  triggerIcon?: React.ReactNode
 }
 
 export function UserCombobox({
@@ -27,7 +28,8 @@ export function UserCombobox({
   placeholder = 'Select user...',
   role,
   valueLabel,
-  triggerClassName
+  triggerClassName,
+  triggerIcon,
 }: UserComboboxProps) {
   const [open, setOpen] = useState(false)
   const [search, setSearch] = useState('')
@@ -90,13 +92,16 @@ export function UserCombobox({
           <button type='button' className={triggerClassName}>
             {displayLabel ? (
               <>
-                <InitialsAvatar initials={displayInitials!} size={18} />
+                {triggerIcon ?? <InitialsAvatar initials={displayInitials!} size={18} />}
                 <span className='truncate'>{displayLabel}</span>
               </>
             ) : (
-              <span className='text-text-tertiary'>{placeholder}</span>
+              <>
+                {triggerIcon}
+                <span>{placeholder}</span>
+              </>
             )}
-            <ChevronsUpDown className='ml-auto size-3 shrink-0 text-text-tertiary' />
+            {!triggerIcon && <ChevronsUpDown className='ml-auto size-3 shrink-0 text-text-tertiary' />}
           </button>
         ) : (
           <button

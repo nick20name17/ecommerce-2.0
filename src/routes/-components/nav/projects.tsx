@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { Check, ChevronDown } from 'lucide-react'
 import { useEffect } from 'react'
+import { useLocalStorage } from 'usehooks-ts'
 
 import { DEFAULT_LIMIT } from '@/api/constants'
 import { getProjectsQuery } from '@/api/project/query'
@@ -13,6 +14,7 @@ import {
 import { useSidebar } from '@/components/ui/sidebar'
 import { Spinner } from '@/components/ui/spinner'
 import { isSuperAdmin } from '@/constants/user'
+import { STORAGE_KEYS } from '@/constants/storage'
 import { useProjectId } from '@/hooks/use-project-id'
 import { useAuth } from '@/providers/auth'
 
@@ -56,6 +58,7 @@ export const NavProjects = () => {
   const isSuperAdminUser = !!user?.role && isSuperAdmin(user.role)
 
   const [projectId, setProjectId] = useProjectId()
+  const [cachedName, setCachedName] = useLocalStorage<string>(STORAGE_KEYS.projectName, '')
 
   const { data, isLoading } = useQuery({
     ...getProjectsQuery({ limit: DEFAULT_LIMIT, offset: 0 }),
@@ -79,7 +82,16 @@ export const NavProjects = () => {
   }, [isSuperAdminUser, user?.project, projectId, setProjectId])
 
   const selectedProject = projects.find((p) => p.id === effectiveProjectId) ?? null
-  const projectName = selectedProject?.name ?? user?.project_name ?? 'Project'
+  const resolvedName = selectedProject?.name || user?.project_name || ''
+
+  // Cache the project name so it persists across reloads
+  useEffect(() => {
+    if (resolvedName && resolvedName !== cachedName) {
+      setCachedName(resolvedName)
+    }
+  }, [resolvedName, cachedName, setCachedName])
+
+  const projectName = resolvedName || cachedName || 'Project'
   const projectInitial = projectName[0].toUpperCase()
   const selectedColor = selectedProject ? getProjectColor(selectedProject.id) : PROJECT_COLORS[0]
 

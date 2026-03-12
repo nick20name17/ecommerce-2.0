@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { createFileRoute, useRouter } from '@tanstack/react-router'
-import { Check, ChevronLeft, Copy, ListTodo, Package, Paperclip, Trash2, Truck, X } from 'lucide-react'
+import { Check, ChevronLeft, Copy, ListTodo, Package, Paperclip, Trash2, Truck, UserPlus, X } from 'lucide-react'
 
 import { PageEmpty } from '@/components/common/page-empty'
 import { EntityAttachmentsDialog } from '@/components/common/entity-attachments/entity-attachments-dialog'
@@ -315,7 +315,13 @@ function OrderDetailPage() {
             }
             role='sale'
             placeholder='Assign'
-            triggerClassName='inline-flex items-center gap-1.5 rounded-[5px] px-2 py-1 text-[13px] font-medium text-text-tertiary transition-colors duration-75 hover:bg-bg-hover cursor-pointer'
+            triggerClassName={cn(
+              'inline-flex h-7 items-center gap-1.5 rounded-[5px] border px-2.5 text-[12px] font-medium transition-colors duration-[80ms]',
+              order.assigned_user
+                ? 'border-primary/20 bg-primary/[0.06] text-primary hover:bg-primary/[0.1]'
+                : 'border-border bg-bg-secondary text-text-secondary hover:bg-bg-active hover:text-foreground'
+            )}
+            triggerIcon={<UserPlus className='size-3.5' />}
           />
         </div>
 

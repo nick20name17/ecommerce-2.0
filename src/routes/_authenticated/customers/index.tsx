@@ -21,6 +21,7 @@ import { getCustomersQuery } from '@/api/customer/query'
 import { getFieldConfigQuery } from '@/api/field-config/query'
 import type { Customer } from '@/api/customer/schema'
 import { EntityNotesSheet } from '@/components/common/entity-notes/entity-notes-sheet'
+import { getEntityNotesQuery } from '@/api/note/query'
 import { SidebarTrigger } from '@/components/ui/sidebar'
 import { Pagination } from '@/components/common/filters/pagination'
 import { PageEmpty } from '@/components/common/page-empty'
@@ -68,7 +69,7 @@ function CustomersPage() {
   const canAssign = !!user?.role && isAdmin(user.role)
 
   const [search, setSearch] = useSearchParam()
-  const [offset, setOffset] = useOffsetParam()
+  const [offset] = useOffsetParam()
   const [limit] = useLimitParam()
   const [sortField, setSortField] = useState<SortField | null>(null)
   const [sortDir, setSortDir] = useState<SortDir>('asc')
@@ -159,6 +160,7 @@ function CustomersPage() {
             <div className='w-[130px] shrink-0'>Phone</div>
             {bp !== 'tablet' && <SortableHeader field='contact_3' label='Email' sortField={sortField} sortDir={sortDir} onSort={handleSort} className='w-[160px] shrink-0' />}
             <SortableHeader field='in_level' label='Type' sortField={sortField} sortDir={sortDir} onSort={handleSort} className='w-[80px] shrink-0' />
+            <div className='w-[120px] shrink-0'>Responsible</div>
             <div className='w-[62px] shrink-0' />
             <div className='w-[28px] shrink-0' />
           </div>
@@ -183,6 +185,7 @@ function CustomersPage() {
                   <div className='w-[130px] shrink-0'><Skeleton className='h-3.5 w-[90px] rounded' /></div>
                   {bp !== 'tablet' && <div className='w-[160px] shrink-0'><Skeleton className='h-3.5 w-[120px] rounded' /></div>}
                   <div className='w-[80px] shrink-0'><Skeleton className='h-[18px] w-[50px] rounded-[4px]' /></div>
+                  <div className='w-[120px] shrink-0'><Skeleton className='h-3.5 w-[70px] rounded' /></div>
                   <div className='w-[62px] shrink-0' />
                   <div className='w-[28px] shrink-0' />
                 </>
@@ -326,6 +329,12 @@ function CustomerRow({
   const email = customer.contact_3 || null
   const typeLabel = getCustomerTypeLabel(customer.in_level)
 
+  const { data: notes } = useQuery({
+    ...getEntityNotesQuery('customer', customer.autoid, projectId),
+    staleTime: 5 * 60 * 1000,
+  })
+  const noteCount = notes?.length ?? 0
+
   if (isMobile) {
     return (
       <div
@@ -409,38 +418,59 @@ function CustomerRow({
         )}
       </div>
 
-      {/* Assign + Notes */}
-      <div className='flex w-[62px] shrink-0 items-center justify-center gap-0.5'>
+      {/* Assign */}
+      <div className='w-[120px] shrink-0'>
         {canAssign && (
           <Tooltip>
             <TooltipTrigger asChild>
               <button
                 type='button'
                 className={cn(
-                  'inline-flex size-7 items-center justify-center rounded-[6px] transition-colors duration-[80ms]',
-                  customer.assigned_user
-                    ? 'text-primary hover:bg-primary/10'
-                    : 'text-text-quaternary hover:bg-bg-hover hover:text-text-secondary'
+                  'inline-flex items-center gap-1.5 rounded-[5px] px-1 py-0.5 text-[13px] transition-colors duration-75 hover:bg-bg-active',
+                  customer.assigned_user ? 'text-text-secondary' : 'text-text-tertiary'
                 )}
-                aria-label='Assign user'
                 onClick={(e) => {
                   e.stopPropagation()
                   onAssign(customer)
                 }}
               >
-                <UserPlus className='size-3.5' />
+                {customer.assigned_user ? (
+                  <>
+                    <InitialsAvatar
+                      initials={getInitials(`${customer.assigned_user.first_name} ${customer.assigned_user.last_name}`)}
+                      size={16}
+                    />
+                    <span className='truncate'>
+                      {customer.assigned_user.first_name} {customer.assigned_user.last_name}
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    <UserPlus className='size-3.5' />
+                    <span>Assign</span>
+                  </>
+                )}
               </button>
             </TooltipTrigger>
             <TooltipContent>
               {customer.assigned_user
-                ? `Assigned to ${customer.assigned_user.first_name} ${customer.assigned_user.last_name}`
-                : 'Assign user'}
+                ? `Assigned to ${customer.assigned_user.first_name} ${customer.assigned_user.last_name} — click to change`
+                : 'Assign a sales user'}
             </TooltipContent>
           </Tooltip>
         )}
+      </div>
+
+      {/* Notes */}
+      <div className='flex w-[62px] shrink-0 justify-center'>
         <button
           type='button'
-          className='inline-flex size-7 items-center justify-center rounded-[6px] text-text-tertiary transition-colors duration-[80ms] hover:bg-bg-hover hover:text-text-secondary'
+          className={cn(
+            'inline-flex items-center gap-1.5 rounded-[6px] border px-2 py-1 text-[13px] font-medium transition-colors duration-[80ms]',
+            noteCount > 0
+              ? 'border-border bg-bg-secondary text-text-secondary hover:bg-bg-active'
+              : 'border-transparent text-text-tertiary hover:bg-bg-hover hover:text-text-secondary',
+          )}
           aria-label='Open notes'
           onClick={(e) => {
             e.stopPropagation()
@@ -448,6 +478,7 @@ function CustomerRow({
           }}
         >
           <StickyNote className='size-3.5' />
+          {noteCount > 0 && <span className='tabular-nums'>{noteCount}</span>}
         </button>
       </div>
 

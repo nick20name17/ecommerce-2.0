@@ -9,7 +9,6 @@ import {
   Trash2,
   Users,
   FileText,
-  X,
 } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
@@ -26,9 +25,8 @@ import {
 } from '@/constants/proposal'
 import {
   CUSTOMER_TYPE_LABELS,
-  type CustomerType,
 } from '@/constants/customer'
-import { USER_ROLES, USER_ROLE_LABELS, type UserRole } from '@/constants/user'
+import { USER_ROLE_LABELS, type UserRole } from '@/constants/user'
 import {
   Dialog,
   DialogContent,

@@ -23,7 +23,7 @@ import { OrderAssignDialog } from './-components/order-assign-dialog'
 import { OrderDeleteDialog } from './-components/order-delete-dialog'
 import { getFieldConfigQuery } from '@/api/field-config/query'
 import { CommandBarCreate } from '@/components/tasks/command-bar-create'
-import { FilterChip, FilterPopover, IOrders, PAGE_COLORS, PageHeaderIcon } from '@/components/ds'
+import { FilterChip, FilterPopover, IOrders, InitialsAvatar, PAGE_COLORS, PageHeaderIcon } from '@/components/ds'
 import { ORDER_QUERY_KEYS, getOrdersQuery } from '@/api/order/query'
 import type { Order, OrderParams } from '@/api/order/schema'
 import { orderService } from '@/api/order/service'
@@ -31,6 +31,7 @@ import { PageEmpty } from '@/components/common/page-empty'
 import { SidebarTrigger } from '@/components/ui/sidebar'
 import { EntityAttachmentsDialog } from '@/components/common/entity-attachments/entity-attachments-dialog'
 import { EntityNotesSheet } from '@/components/common/entity-notes/entity-notes-sheet'
+import { getEntityNotesQuery } from '@/api/note/query'
 import { Pagination } from '@/components/common/filters/pagination'
 import {
   DropdownMenu,
@@ -55,6 +56,16 @@ import {
   useSearchParam,
 } from '@/hooks/use-query-params'
 import { useAuth } from '@/providers/auth'
+
+// ── Helpers ──────────────────────────────────────────────────
+
+function getInitials(name: string) {
+  return name
+    .split(' ')
+    .slice(0, 2)
+    .map((n) => n[0]?.toUpperCase() ?? '')
+    .join('')
+}
 
 // ── Constants ────────────────────────────────────────────────
 
@@ -290,6 +301,7 @@ const OrdersPage = () => {
             <OrderSortableHeader field='total' label='Total' sortField={sortField} sortDir={sortDir} onSort={handleSort} className='w-[100px] shrink-0 justify-end text-right' />
             {!isTablet && <OrderSortableHeader field='balance' label='Balance' sortField={sortField} sortDir={sortDir} onSort={handleSort} className='w-[100px] shrink-0 justify-end text-right' />}
             {!isTablet && <div className='w-[56px] shrink-0 text-center'>Pick</div>}
+            <div className='w-[120px] shrink-0'>Responsible</div>
             <div className='w-[62px] shrink-0' />
             <div className='w-[28px] shrink-0' />
           </div>
@@ -315,6 +327,7 @@ const OrdersPage = () => {
                   <div className='w-[100px] shrink-0'><Skeleton className='ml-auto h-3.5 w-[60px] rounded' /></div>
                   {!isTablet && <div className='w-[100px] shrink-0'><Skeleton className='ml-auto h-3.5 w-[60px] rounded' /></div>}
                   {!isTablet && <div className='w-[56px] shrink-0'><Skeleton className='mx-auto h-3.5 w-[32px] rounded' /></div>}
+                  <div className='w-[120px] shrink-0'><Skeleton className='h-3.5 w-[70px] rounded' /></div>
                   <div className='w-[62px] shrink-0' />
                   <div className='w-[28px] shrink-0' />
                 </>
@@ -456,6 +469,11 @@ function OrderRow({
   const statusClass = ORDER_STATUS_CLASS[order.status] ?? ''
   const dotColor = STATUS_DOT_COLORS[order.status] ?? 'bg-slate-400'
 
+  const { data: notes } = useQuery({
+    ...getEntityNotesQuery('order', order.autoid, projectId),
+    staleTime: 5 * 60 * 1000,
+  })
+  const noteCount = notes?.length ?? 0
 
   if (isMobile) {
     return (
@@ -544,11 +562,59 @@ function OrderRow({
         </div>
       )}
 
+      {/* Responsible */}
+      <div className='w-[120px] shrink-0'>
+        {canAssign && (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button
+                type='button'
+                className={cn(
+                  'inline-flex items-center gap-1.5 rounded-[5px] px-1 py-0.5 text-[13px] transition-colors duration-75 hover:bg-bg-active',
+                  order.assigned_user ? 'text-text-secondary' : 'text-text-tertiary'
+                )}
+                onClick={(e) => {
+                  e.stopPropagation()
+                  onAssign(order)
+                }}
+              >
+                {order.assigned_user ? (
+                  <>
+                    <InitialsAvatar
+                      initials={getInitials(`${order.assigned_user.first_name} ${order.assigned_user.last_name}`)}
+                      size={16}
+                    />
+                    <span className='truncate'>
+                      {order.assigned_user.first_name} {order.assigned_user.last_name}
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    <UserPlus className='size-3.5' />
+                    <span>Assign</span>
+                  </>
+                )}
+              </button>
+            </TooltipTrigger>
+            <TooltipContent>
+              {order.assigned_user
+                ? `Assigned to ${order.assigned_user.first_name} ${order.assigned_user.last_name} — click to change`
+                : 'Assign a sales user'}
+            </TooltipContent>
+          </Tooltip>
+        )}
+      </div>
+
       {/* Notes */}
       <div className='flex w-[62px] shrink-0 justify-center'>
         <button
           type='button'
-          className='inline-flex items-center gap-1.5 rounded-[6px] border border-transparent px-2 py-1 text-[13px] font-medium text-text-tertiary transition-colors duration-[80ms] hover:bg-bg-hover hover:text-text-secondary'
+          className={cn(
+            'inline-flex items-center gap-1.5 rounded-[6px] border px-2 py-1 text-[13px] font-medium transition-colors duration-[80ms]',
+            noteCount > 0
+              ? 'border-border bg-bg-secondary text-text-secondary hover:bg-bg-active'
+              : 'border-transparent text-text-tertiary hover:bg-bg-hover hover:text-text-secondary',
+          )}
           aria-label='Open notes'
           onClick={(e) => {
             e.stopPropagation()
@@ -556,6 +622,7 @@ function OrderRow({
           }}
         >
           <StickyNote className='size-3.5' />
+          {noteCount > 0 && <span className='tabular-nums'>{noteCount}</span>}
         </button>
       </div>
 
