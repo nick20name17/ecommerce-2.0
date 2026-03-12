@@ -1,16 +1,21 @@
-import { Box, Check, ChevronRight, GripVertical, Loader2, MapPin, Package, Plus, Trash2, Truck } from 'lucide-react'
+import { useQuery } from '@tanstack/react-query'
+import { ArrowRight, Box, Check, ChevronDown, ChevronRight, GripVertical, Loader2, MapPin, Package, Plus, Trash2, Truck, Warehouse } from 'lucide-react'
 import { useCallback, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
 import type { Order, OrderItem, OrderPatchPayload, ShippingPackagePayload, ShippingRate, ShippingRatesResponse } from '@/api/order/schema'
 import { orderService } from '@/api/order/service'
+import { getShippingAddressesQuery } from '@/api/shipping-address/query'
+import type { ShippingAddress } from '@/api/shipping-address/schema'
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { getErrorMessage } from '@/helpers/error'
+import { useProjectId } from '@/hooks/use-project-id'
 import { cn } from '@/lib/utils'
 
 type Step = 'configure' | 'rates'
@@ -50,6 +55,7 @@ export function ShippingRatesDialog({
   order,
   onPatch,
 }: ShippingRatesDialogProps) {
+  const [projectId] = useProjectId()
   const [step, setStep] = useState<Step>('configure')
   const [packages, setPackages] = useState<LocalPackage[]>([])
   const [loading, setLoading] = useState(false)
@@ -61,6 +67,15 @@ export function ShippingRatesDialog({
     c_name: '', c_address1: '', c_address2: '', c_city: '', c_state: '', c_zip: '',
   })
   const [addressEditing, setAddressEditing] = useState(false)
+  const [selectedAddressId, setSelectedAddressId] = useState<number | null>(null)
+  const [addressPopoverOpen, setAddressPopoverOpen] = useState(false)
+
+  const { data: shippingAddresses = [] } = useQuery(getShippingAddressesQuery(projectId))
+
+  const selectedAddress = useMemo(
+    () => shippingAddresses.find((a) => a.id === selectedAddressId) ?? null,
+    [shippingAddresses, selectedAddressId],
+  )
 
   // Initialize: picked items go into a default package, load address from order
   const handleOpenChange = (next: boolean) => {
@@ -78,6 +93,9 @@ export function ShippingRatesDialog({
         c_zip: order.c_zip ?? '',
       })
       setAddressEditing(false)
+      // Auto-select default shipping address (ship from)
+      const defaultAddr = shippingAddresses.find((a) => a.is_default)
+      setSelectedAddressId(defaultAddr?.id ?? null)
       setRatesData(null)
       setError(null)
       setStep('configure')
@@ -86,20 +104,6 @@ export function ShippingRatesDialog({
   }
 
   const hasAddress = address.c_address1.trim() || address.c_city.trim()
-
-  const saveAddress = () => {
-    const payload: OrderPatchPayload = {
-      c_name: address.c_name || null,
-      c_address1: address.c_address1 || null,
-      c_address2: address.c_address2 || null,
-      c_city: address.c_city || null,
-      c_state: address.c_state || null,
-      c_zip: address.c_zip || null,
-    }
-    onPatch(payload)
-    setAddressEditing(false)
-    toast.success('Ship-to address saved')
-  }
 
   const itemMap = useMemo(() => {
     const map = new Map<string, OrderItem>()
@@ -194,18 +198,41 @@ export function ShippingRatesDialog({
     setDropTarget(null)
   }
 
+  // ── Validation ──
+
+  const MIN_DIMENSION = 0.01
+
+  const validatePackages = (): boolean => {
+    const errors: string[] = []
+
+    if (!selectedAddressId) {
+      errors.push('Please select a shipping address.')
+    }
+
+    const emptyPkgs = packages.filter((p) => p.items.length === 0)
+    if (emptyPkgs.length > 0) {
+      errors.push('Remove empty packages or assign items to them.')
+    }
+
+    for (let i = 0; i < packages.length; i++) {
+      const pkg = packages[i]
+      const label = `Package ${i + 1}`
+      if (pkg.length < MIN_DIMENSION) errors.push(`${label}: Length must be at least ${MIN_DIMENSION}.`)
+      if (pkg.width < MIN_DIMENSION) errors.push(`${label}: Width must be at least ${MIN_DIMENSION}.`)
+      if (pkg.height < MIN_DIMENSION) errors.push(`${label}: Height must be at least ${MIN_DIMENSION}.`)
+    }
+
+    if (errors.length > 0) {
+      errors.forEach((msg) => toast.warning(msg))
+      return false
+    }
+    return true
+  }
+
   // ── Get rates ──
 
   const getShippingRates = async () => {
-    const emptyPkgs = packages.filter((p) => p.items.length === 0)
-    if (emptyPkgs.length > 0) {
-      toast.warning('Remove empty packages or assign items to them')
-      return
-    }
-
-    if (unassignedItems.length > 0 && packages.length > 0) {
-      // Only warn, don't block — some items might intentionally not ship
-    }
+    if (!validatePackages()) return
 
     setLoading(true)
     setError(null)
@@ -219,7 +246,10 @@ export function ShippingRatesDialog({
     }))
 
     try {
-      const res = await orderService.getShippingRates(orderAutoid, { packages: payload })
+      const res = await orderService.getShippingRates(orderAutoid, {
+        shipping_address_id: selectedAddressId!,
+        packages: payload,
+      })
       setRatesData(res)
       setStep('rates')
     } catch (err) {
@@ -271,100 +301,124 @@ export function ShippingRatesDialog({
 
         {step === 'configure' ? (
           <>
-            {/* Ship-to address bar */}
-            <div className='border-b border-border px-5 py-2.5'>
-              {addressEditing ? (
-                <div>
-                  <div className='mb-2 flex items-center gap-2'>
-                    <MapPin className='size-3.5 text-text-tertiary' />
-                    <span className='text-[12px] font-semibold uppercase tracking-[0.06em] text-text-tertiary'>Ship To</span>
-                  </div>
-                  <div className='grid grid-cols-6 gap-2'>
-                    <div className='col-span-3'>
-                      <label className='mb-0.5 block text-[10px] text-text-quaternary'>Name</label>
-                      <input
-                        value={address.c_name}
-                        onChange={(e) => setAddress((a) => ({ ...a, c_name: e.target.value }))}
-                        className='h-7 w-full rounded-[5px] border border-border bg-background px-2 text-[13px] outline-none focus:border-ring focus:ring-1 focus:ring-ring/50'
-                        placeholder='Recipient name'
-                      />
-                    </div>
-                    <div className='col-span-3'>
-                      <label className='mb-0.5 block text-[10px] text-text-quaternary'>Address</label>
-                      <input
-                        value={address.c_address1}
-                        onChange={(e) => setAddress((a) => ({ ...a, c_address1: e.target.value }))}
-                        className='h-7 w-full rounded-[5px] border border-border bg-background px-2 text-[13px] outline-none focus:border-ring focus:ring-1 focus:ring-ring/50'
-                        placeholder='Street address'
-                      />
-                    </div>
-                    <div className='col-span-2'>
-                      <label className='mb-0.5 block text-[10px] text-text-quaternary'>City</label>
-                      <input
-                        value={address.c_city}
-                        onChange={(e) => setAddress((a) => ({ ...a, c_city: e.target.value }))}
-                        className='h-7 w-full rounded-[5px] border border-border bg-background px-2 text-[13px] outline-none focus:border-ring focus:ring-1 focus:ring-ring/50'
-                        placeholder='City'
-                      />
-                    </div>
-                    <div className='col-span-1'>
-                      <label className='mb-0.5 block text-[10px] text-text-quaternary'>State/Province</label>
-                      <input
-                        value={address.c_state}
-                        onChange={(e) => setAddress((a) => ({ ...a, c_state: e.target.value }))}
-                        className='h-7 w-full rounded-[5px] border border-border bg-background px-2 text-[13px] outline-none focus:border-ring focus:ring-1 focus:ring-ring/50'
-                        placeholder='ON'
-                      />
-                    </div>
-                    <div className='col-span-1'>
-                      <label className='mb-0.5 block text-[10px] text-text-quaternary'>Postal Code</label>
-                      <input
-                        value={address.c_zip}
-                        onChange={(e) => setAddress((a) => ({ ...a, c_zip: e.target.value }))}
-                        className='h-7 w-full rounded-[5px] border border-border bg-background px-2 text-[13px] outline-none focus:border-ring focus:ring-1 focus:ring-ring/50'
-                        placeholder='N0B 2S0'
-                      />
-                    </div>
-                    <div className='col-span-2 flex items-end gap-1.5'>
-                      <button
-                        type='button'
-                        className='h-7 rounded-[5px] bg-primary px-3 text-[12px] font-semibold text-primary-foreground transition-colors hover:opacity-90'
-                        onClick={saveAddress}
-                      >
-                        Save
-                      </button>
-                      <button
-                        type='button'
-                        className='h-7 rounded-[5px] border border-border px-3 text-[12px] font-medium text-text-secondary transition-colors hover:bg-bg-hover'
-                        onClick={() => setAddressEditing(false)}
-                      >
-                        Cancel
-                      </button>
-                    </div>
-                  </div>
+            {/* Ship from → Ship to */}
+            <div className='flex items-stretch border-b border-border'>
+              {/* Ship from */}
+              <div className='flex min-w-0 flex-1 flex-col px-5 py-3'>
+                <div className='mb-2 flex items-center gap-1.5'>
+                  <Warehouse className='size-3.5 text-text-tertiary' />
+                  <span className='text-[11px] font-semibold uppercase tracking-[0.06em] text-text-tertiary'>Ship from</span>
                 </div>
-              ) : (
-                <div className='flex items-center gap-2'>
-                  <MapPin className='size-3.5 shrink-0 text-text-tertiary' />
-                  <span className='text-[12px] font-medium text-text-tertiary'>Ship to:</span>
-                  {hasAddress ? (
-                    <span className='text-[13px] text-foreground'>
-                      {[address.c_name, address.c_address1, address.c_city, address.c_state, address.c_zip]
-                        .filter(Boolean)
-                        .join(', ')}
-                    </span>
-                  ) : (
-                    <span className='text-[13px] text-text-quaternary'>No address set</span>
+                <Popover open={addressPopoverOpen} onOpenChange={setAddressPopoverOpen}>
+                  <PopoverTrigger asChild>
+                    <button
+                      type='button'
+                      className={cn(
+                        'flex h-auto w-full items-center gap-2.5 rounded-[6px] border px-3 py-2 text-left transition-colors duration-75',
+                        selectedAddress
+                          ? 'border-border bg-background hover:bg-bg-hover'
+                          : 'border-dashed border-border hover:border-border-heavy hover:bg-bg-hover',
+                      )}
+                    >
+                      {selectedAddress ? (
+                        <div className='min-w-0 flex-1'>
+                          <div className='flex items-center gap-1.5'>
+                            <span className='text-[13px] font-medium text-foreground'>{selectedAddress.title}</span>
+                            {selectedAddress.is_default && (
+                              <span className='rounded bg-primary/10 px-1 py-px text-[10px] font-semibold text-primary'>Default</span>
+                            )}
+                          </div>
+                          <p className='mt-0.5 truncate text-[12px] leading-snug text-text-tertiary'>
+                            {[selectedAddress.address_line1, selectedAddress.city, selectedAddress.state, selectedAddress.postal_code].filter(Boolean).join(', ')}
+                          </p>
+                        </div>
+                      ) : (
+                        <div className='min-w-0 flex-1'>
+                          <span className='text-[13px] text-text-quaternary'>Select origin address…</span>
+                        </div>
+                      )}
+                      <ChevronDown className='size-3.5 shrink-0 text-text-quaternary' />
+                    </button>
+                  </PopoverTrigger>
+                  <PopoverContent align='start' className='w-[var(--radix-popover-trigger-width)] gap-0 p-1'>
+                    {shippingAddresses.length === 0 ? (
+                      <div className='px-3 py-4 text-center text-[13px] text-text-tertiary'>
+                        No shipping addresses configured
+                      </div>
+                    ) : (
+                      shippingAddresses.map((addr) => {
+                        const isSelected = addr.id === selectedAddressId
+                        return (
+                          <button
+                            key={addr.id}
+                            type='button'
+                            className={cn(
+                              'flex w-full items-center gap-2.5 rounded-[5px] px-2.5 py-2 text-left transition-colors duration-75',
+                              isSelected ? 'bg-primary/[0.08]' : 'hover:bg-bg-hover',
+                            )}
+                            onClick={() => {
+                              setSelectedAddressId(addr.id)
+                              setAddressPopoverOpen(false)
+                            }}
+                          >
+                            <div className='min-w-0 flex-1'>
+                              <div className='flex items-center gap-1.5'>
+                                <span className={cn('text-[13px] font-medium', isSelected ? 'text-primary' : 'text-foreground')}>
+                                  {addr.title}
+                                </span>
+                                {addr.is_default && (
+                                  <span className='rounded bg-primary/10 px-1 py-px text-[10px] font-semibold text-primary'>Default</span>
+                                )}
+                              </div>
+                              <p className='mt-0.5 text-[12px] leading-snug text-text-tertiary'>
+                                {[addr.address_line1, addr.city, addr.state, addr.postal_code].filter(Boolean).join(', ')}
+                              </p>
+                            </div>
+                            {isSelected && <Check className='size-3.5 shrink-0 text-primary' />}
+                          </button>
+                        )
+                      })
+                    )}
+                  </PopoverContent>
+                </Popover>
+              </div>
+
+              {/* Arrow separator */}
+              <div className='flex items-center px-1'>
+                <div className='flex size-7 items-center justify-center rounded-full border border-border bg-bg-secondary'>
+                  <ArrowRight className='size-3.5 text-text-tertiary' />
+                </div>
+              </div>
+
+              {/* Ship to */}
+              <div className='flex min-w-0 flex-1 flex-col px-5 py-3'>
+                <div className='mb-2 flex items-center gap-1.5'>
+                  <MapPin className='size-3.5 text-text-tertiary' />
+                  <span className='text-[11px] font-semibold uppercase tracking-[0.06em] text-text-tertiary'>Ship to</span>
+                </div>
+                <div
+                  className={cn(
+                    'flex h-auto min-h-[44px] w-full items-center rounded-[6px] border px-3 py-2',
+                    hasAddress ? 'border-border bg-background' : 'border-dashed border-border',
                   )}
-                  <button
-                    type='button'
-                    className='ml-auto text-[12px] font-medium text-primary transition-colors hover:underline'
-                    onClick={() => setAddressEditing(true)}
-                  >
-                    {hasAddress ? 'Edit' : 'Add address'}
-                  </button>
+                >
+                  {hasAddress ? (
+                    <div className='min-w-0 flex-1'>
+                      {address.c_name && (
+                        <div className='text-[13px] font-medium text-foreground'>{address.c_name}</div>
+                      )}
+                      <p className='text-[12px] leading-snug text-text-tertiary'>
+                        {[address.c_address1, address.c_address2].filter(Boolean).join(', ')}
+                        {(address.c_city || address.c_state || address.c_zip) && (
+                          <>{address.c_address1 ? ', ' : ''}{[address.c_city, address.c_state, address.c_zip].filter(Boolean).join(', ')}</>
+                        )}
+                      </p>
+                    </div>
+                  ) : (
+                    <span className='text-[13px] text-text-quaternary'>No ship-to address on order</span>
+                  )}
                 </div>
-              )}
+              </div>
             </div>
 
             {/* Two-panel layout */}
@@ -516,7 +570,7 @@ export function ShippingRatesDialog({
               <button
                 type='button'
                 className='inline-flex h-8 items-center gap-1.5 rounded-[6px] bg-primary px-3 text-[13px] font-semibold text-primary-foreground transition-colors hover:opacity-90 disabled:opacity-40'
-                disabled={loading || packages.length === 0}
+                disabled={loading || packages.length === 0 || !selectedAddressId}
                 onClick={getShippingRates}
               >
                 {loading ? (
@@ -623,20 +677,32 @@ function PackageCard({
           ['length', 'Length'],
           ['width', 'Width'],
           ['height', 'Height'],
-        ] as const).map(([field, label]) => (
-          <div key={field}>
-            <label className='mb-0.5 block text-[10px] text-text-quaternary'>{label}</label>
-            <input
-              type='number'
-              min={0}
-              step={field === 'weight' ? 0.01 : 1}
-              value={pkg[field] || ''}
-              onChange={(e) => onUpdateDimension(field, Number(e.target.value) || 0)}
-              className='h-6 w-full rounded-[4px] border border-border bg-background px-1.5 text-[12px] tabular-nums outline-none focus:border-ring focus:ring-1 focus:ring-ring/50'
-              placeholder='0'
-            />
-          </div>
-        ))}
+        ] as const).map(([field, label]) => {
+          const needsMin = field !== 'weight'
+          const isInvalid = needsMin && pkg[field] < 0.01
+          return (
+            <div key={field}>
+              <label className='mb-0.5 block text-[10px] text-text-quaternary'>{label}{needsMin && ' *'}</label>
+              <input
+                type='number'
+                min={needsMin ? 0.01 : 0}
+                step={0.01}
+                value={pkg[field] || ''}
+                onChange={(e) => onUpdateDimension(field, Number(e.target.value) || 0)}
+                className={cn(
+                  'h-6 w-full rounded-[4px] border bg-background px-1.5 text-[12px] tabular-nums outline-none focus:ring-1',
+                  isInvalid
+                    ? 'border-destructive/50 focus:border-destructive focus:ring-destructive/30'
+                    : 'border-border focus:border-ring focus:ring-ring/50',
+                )}
+                placeholder={needsMin ? '≥ 0.01' : '0'}
+              />
+              {isInvalid && (
+                <span className='mt-0.5 block text-[9px] text-destructive'>Min 0.01</span>
+              )}
+            </div>
+          )
+        })}
       </div>
 
       {/* Assigned items */}

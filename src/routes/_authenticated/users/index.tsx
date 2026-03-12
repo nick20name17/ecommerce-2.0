@@ -11,14 +11,20 @@ import { UsersDataTable } from './-components/users-data-table'
 import { getUsersQuery } from '@/api/user/query'
 import type { User, UserParams } from '@/api/user/schema'
 import { Pagination } from '@/components/common/filters/pagination'
-import { isAdmin } from '@/constants/user'
+import { isAdmin, isSuperAdmin } from '@/constants/user'
 import type { UserRole } from '@/constants/user'
 import { getSession } from '@/helpers/auth'
 import { useOrdering } from '@/hooks/use-ordering'
+import { useProjectId } from '@/hooks/use-project-id'
 import { useLimitParam, useOffsetParam, useSearchParam } from '@/hooks/use-query-params'
+import { useAuth } from '@/providers/auth'
 import { useDebouncedCallback } from 'use-debounce'
 
 const UsersPage = () => {
+  const { user } = useAuth()
+  const [projectId] = useProjectId()
+  const userIsSuperAdmin = !!user?.role && isSuperAdmin(user.role)
+
   const [search, setSearch] = useSearchParam()
   const handleSearch = useDebouncedCallback((value: string) => setSearch(value || null), 300)
   const [offset] = useOffsetParam()
@@ -32,7 +38,8 @@ const UsersPage = () => {
     search: search || undefined,
     offset,
     limit,
-    ordering
+    ordering,
+    project: userIsSuperAdmin && projectId != null ? projectId : undefined
   }
 
   const { data, isLoading, isPlaceholderData } = useQuery({

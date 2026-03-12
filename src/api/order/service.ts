@@ -2,7 +2,7 @@ import { api } from '..'
 
 import type { EntityAssignRequest, EntityAssignmentResponse, EntityAttachment } from '../schema'
 
-import type { BulkPickStatusRequest, Order, OrderParams, OrderPatchPayload, OrderResponse, PickStatusRequest, ShippingPackagePayload, ShippingRatesResponse } from './schema'
+import type { BulkPickStatusRequest, Order, OrderParams, OrderPatchPayload, OrderResponse, PickStatusRequest, ShippingRatesRequest, ShippingRatesResponse } from './schema'
 
 const orderParams = (projectId?: number | null) =>
   projectId != null ? { project_id: projectId } : {}
@@ -69,7 +69,7 @@ export const orderService = {
     })
   },
 
-  getShippingRates: async (autoid: string, payload: { packages: ShippingPackagePayload[] }) => {
+  getShippingRates: async (autoid: string, payload: ShippingRatesRequest) => {
     const { data } = await api.post<ShippingRatesResponse>(
       `/data/orders/${autoid}/shipping-rates/`,
       payload

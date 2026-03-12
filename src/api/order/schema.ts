@@ -127,6 +127,11 @@ export interface ShippingPackagePayload {
   height: number
 }
 
+export interface ShippingRatesRequest {
+  shipping_address_id: number
+  packages: ShippingPackagePayload[]
+}
+
 export interface ShippingRatesResponse {
   rates: ShippingRate[]
   packages: ShippingPackage[]
