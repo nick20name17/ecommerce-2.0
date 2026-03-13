@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { createFileRoute, useRouter } from '@tanstack/react-router'
-import { ChevronLeft, Pencil, Trash2, UserPlus } from 'lucide-react'
+import { ChevronLeft, Pencil, StickyNote, Trash2, UserPlus } from 'lucide-react'
 import { useState } from 'react'
 
 import { CustomerDashboardTab } from './-components/customer-dashboard-tab'
@@ -8,6 +8,7 @@ import { CustomerInfoPanel } from './-components/customer-info-card'
 import { CustomerOrdersTab } from './-components/customer-orders-tab'
 import { CustomerProposalsTab } from './-components/customer-proposals-tab'
 import { CustomerTasksTab } from './-components/customer-tasks-tab'
+import { EntityNotesSheet } from '@/components/common/entity-notes/entity-notes-sheet'
 import { getCustomerDetailQuery } from '@/api/customer/query'
 import { ICustomers, PAGE_COLORS, PageHeaderIcon } from '@/components/ds'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
@@ -39,6 +40,7 @@ function CustomerDetailPage() {
   const [deleteOpen, setDeleteOpen] = useState(false)
   const [editOpen, setEditOpen] = useState(false)
   const [assignOpen, setAssignOpen] = useState(false)
+  const [notesOpen, setNotesOpen] = useState(false)
 
   const { data: customer, isLoading } = useQuery(
     getCustomerDetailQuery(customerId, projectId)
@@ -48,7 +50,7 @@ function CustomerDetailPage() {
   if (isLoading) {
     return (
       <div className='flex h-full flex-col overflow-hidden'>
-        <header className='flex h-12 shrink-0 items-center gap-2.5 border-b border-border px-6'>
+        <header className={cn('flex h-12 shrink-0 items-center gap-2.5 border-b border-border', isMobile ? 'px-3.5' : 'px-6')}>
           <SidebarTrigger className='-ml-1' />
           <Skeleton className='h-4 w-16' />
           <Skeleton className='size-5 rounded-[5px]' />
@@ -60,7 +62,7 @@ function CustomerDetailPage() {
         </header>
         <div className='flex min-h-0 flex-1'>
           <div className='flex flex-1 flex-col overflow-hidden'>
-            <div className='flex gap-1 border-b border-border px-6'>
+            <div className={cn('flex gap-1 border-b border-border', isMobile ? 'px-3.5' : 'px-6')}>
               {Array.from({ length: 3 }).map((_, i) => (
                 <Skeleton key={i} className='my-2.5 h-4 w-16' />
               ))}
@@ -103,7 +105,7 @@ function CustomerDetailPage() {
   return (
     <div className='flex h-full flex-col overflow-hidden'>
       {/* ── Header bar ── */}
-      <header className='flex h-12 shrink-0 items-center gap-2.5 border-b border-border px-6'>
+      <header className={cn('flex h-12 shrink-0 items-center gap-2.5 border-b border-border', isMobile ? 'px-3.5' : 'px-6')}>
         <SidebarTrigger className='-ml-1' />
         <button
           type='button'
@@ -170,6 +172,20 @@ function CustomerDetailPage() {
             </TooltipContent>
           </Tooltip>
         )}
+
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <button
+              type='button'
+              className='inline-flex h-7 items-center gap-1.5 rounded-[5px] border border-border bg-bg-secondary px-2.5 text-[12px] font-medium text-text-secondary transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground'
+              onClick={() => setNotesOpen(true)}
+            >
+              <StickyNote className='size-3.5' />
+              <span className='hidden sm:inline'>Notes</span>
+            </button>
+          </TooltipTrigger>
+          <TooltipContent>Notes</TooltipContent>
+        </Tooltip>
 
         <Tooltip>
           <TooltipTrigger asChild>
@@ -264,6 +280,16 @@ function CustomerDetailPage() {
           <CustomerInfoPanel customer={customer} onAssign={() => setAssignOpen(true)} />
         </div>
       </div>
+
+      {/* Notes sheet */}
+      <EntityNotesSheet
+        open={notesOpen}
+        onOpenChange={setNotesOpen}
+        entityType='customer'
+        entityLabel={customer.l_name || `Customer ${customer.id}`}
+        autoid={customer.autoid}
+        projectId={projectId}
+      />
 
       {/* Edit modal */}
       <CustomerModal

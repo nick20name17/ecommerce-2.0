@@ -1,11 +1,13 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { createFileRoute, useRouter } from '@tanstack/react-router'
-import { Check, ChevronLeft, Copy, ListTodo, Package, Paperclip, Trash2, Truck, UserPlus, X } from 'lucide-react'
+import { Check, ChevronLeft, Copy, ListTodo, Package, Paperclip, StickyNote, Trash2, Truck, UserPlus } from 'lucide-react'
 
 import { PageEmpty } from '@/components/common/page-empty'
 import { EntityAttachmentsDialog } from '@/components/common/entity-attachments/entity-attachments-dialog'
+import { EntityNotesSheet } from '@/components/common/entity-notes/entity-notes-sheet'
 import { ShippingRatesDialog } from './-components/shipping-rates-dialog'
-import { useCallback, useMemo, useRef, useState } from 'react'
+import { PanelSection, PanelRow, PanelBlock, PropertyField, SummaryCell } from './-components/order-properties'
+import { useCallback, useMemo, useState } from 'react'
 
 import { getFieldConfigQuery } from '@/api/field-config/query'
 import { getOrderDetailQuery, ORDER_QUERY_KEYS } from '@/api/order/query'
@@ -70,6 +72,7 @@ function OrderDetailPage() {
   const [taskModalOpen, setTaskModalOpen] = useState(false)
   const [shippingOpen, setShippingOpen] = useState(false)
   const [attachmentsOpen, setAttachmentsOpen] = useState(false)
+  const [notesOpen, setNotesOpen] = useState(false)
 
   const { data: order, isLoading } = useQuery(getOrderDetailQuery(orderId, projectId))
   const { data: fieldConfig } = useQuery(getFieldConfigQuery(projectId))
@@ -86,7 +89,7 @@ function OrderDetailPage() {
   })
 
   const handleFieldSave = useCallback(
-    (field: keyof OrderPatchPayload, value: string) => {
+    (field: string, value: string) => {
       if (!order) return
       const current = (order[field] as string | null) ?? ''
       if (value === current) return
@@ -154,7 +157,7 @@ function OrderDetailPage() {
     return (
       <div className='flex h-full flex-col overflow-hidden'>
         {/* Header skeleton */}
-        <header className='flex h-12 shrink-0 items-center gap-2.5 border-b border-border px-6'>
+        <header className={cn('flex h-12 shrink-0 items-center gap-2.5 border-b border-border', isMobile ? 'px-3.5' : 'px-6')}>
           <SidebarTrigger className='-ml-1' />
           <Skeleton className='h-4 w-12' />
           <Skeleton className='size-5 rounded-[5px]' />
@@ -260,7 +263,7 @@ function OrderDetailPage() {
   return (
     <div className='flex h-full flex-col overflow-hidden'>
       {/* ── Header bar ── */}
-      <header className='flex h-12 shrink-0 items-center gap-2.5 border-b border-border px-6'>
+      <header className={cn('flex h-12 shrink-0 items-center gap-2.5 border-b border-border', isMobile ? 'px-3.5' : 'px-6')}>
         <SidebarTrigger className='-ml-1' />
         <button
           type='button'
@@ -353,6 +356,20 @@ function OrderDetailPage() {
             </button>
           </TooltipTrigger>
           <TooltipContent>Create Task</TooltipContent>
+        </Tooltip>
+
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <button
+              type='button'
+              className='inline-flex h-7 items-center gap-1.5 rounded-[5px] border border-border bg-bg-secondary px-2.5 text-[12px] font-medium text-text-secondary transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground'
+              onClick={() => setNotesOpen(true)}
+            >
+              <StickyNote className='size-3.5' />
+              <span className='hidden sm:inline'>Notes</span>
+            </button>
+          </TooltipTrigger>
+          <TooltipContent>Notes</TooltipContent>
         </Tooltip>
 
         <Tooltip>
@@ -514,66 +531,65 @@ function OrderDetailPage() {
           </div>
 
           {/* Panel content */}
-          <div className='flex-1 overflow-y-auto px-4 py-3'>
+          <div className='flex-1 overflow-y-auto'>
             {panelTab === 'general' ? (
               <>
                 {/* Bill To */}
-                <SectionLabel>Bill To</SectionLabel>
-                <div className='grid grid-cols-2 gap-x-4'>
+                <PanelSection title='Bill To'>
                   <PropertyField label='Name' value={order.name} field='name' onSave={handleFieldSave} />
-                  <PropertyCell label='Address'>
+                  <PanelBlock last>
+                    <span className='mb-0.5 block text-[12px] font-medium text-text-tertiary'>Address</span>
                     {billToAddress ? (
                       <span className='whitespace-pre-line text-[13px] leading-snug text-foreground'>{billToAddress}</span>
                     ) : (
                       <span className='text-[13px] text-text-quaternary'>—</span>
                     )}
-                  </PropertyCell>
-                </div>
+                  </PanelBlock>
+                </PanelSection>
 
                 {/* Ship To */}
-                <SectionLabel>Ship To</SectionLabel>
-                <div className='grid grid-cols-2 gap-x-4'>
+                <PanelSection title='Ship To'>
                   <PropertyField label='Name' value={order.c_name} field='c_name' onSave={handleFieldSave} />
-                  <PropertyCell label='Address'>
+                  <PanelBlock last>
+                    <span className='mb-0.5 block text-[12px] font-medium text-text-tertiary'>Address</span>
                     {shipToAddress ? (
                       <span className='whitespace-pre-line text-[13px] leading-snug text-foreground'>{shipToAddress}</span>
                     ) : (
                       <span className='text-[13px] text-text-quaternary'>—</span>
                     )}
-                  </PropertyCell>
-                </div>
+                  </PanelBlock>
+                </PanelSection>
 
                 {/* Contact */}
-                <SectionLabel>Contact</SectionLabel>
-                <div className='grid grid-cols-2 gap-x-4'>
+                <PanelSection title='Contact'>
                   <PropertyField label='Email' value={order.email} field='email' onSave={handleFieldSave} />
                   <PropertyField label='Phone' value={order.phone} field='phone' onSave={handleFieldSave} />
-                </div>
+                </PanelSection>
 
                 {/* Order Details */}
-                <SectionLabel>Order Details</SectionLabel>
-                <div className='grid grid-cols-2 gap-x-4'>
-                  <PropertyCell label='Invoice'>
-                    <span className='text-[13px] font-medium tabular-nums text-foreground'>{order.invoice || '—'}</span>
-                  </PropertyCell>
-                  <PropertyCell label='Date'>
-                    <span className='text-[13px] tabular-nums text-foreground'>{order.inv_date ? formatDate(order.inv_date) : '—'}</span>
-                  </PropertyCell>
-                  <PropertyCell label='Due Date'>
-                    <span className='text-[13px] tabular-nums text-foreground'>{order.due_date ? formatDate(order.due_date) : '—'}</span>
-                  </PropertyCell>
+                <PanelSection title='Order Details'>
+                  <PanelRow label='Invoice'>
+                    <span className='tabular-nums'>{order.invoice || '—'}</span>
+                  </PanelRow>
+                  <PanelRow label='Date'>
+                    <span className='tabular-nums'>{order.inv_date ? formatDate(order.inv_date) : '—'}</span>
+                  </PanelRow>
+                  <PanelRow label='Due Date'>
+                    <span className='tabular-nums'>{order.due_date ? formatDate(order.due_date) : '—'}</span>
+                  </PanelRow>
                   <PropertyField label='Sales Person' value={order.salesman} field='salesman' onSave={handleFieldSave} />
                   <PropertyField label='PO No.' value={order.po_no} field='po_no' onSave={handleFieldSave} />
                   <PropertyField label='Ship Date' value={order.ship_date} field='ship_date' onSave={handleFieldSave} />
                   <PropertyField label='Ship Via' value={order.ship_via} field='ship_via' onSave={handleFieldSave} />
                   <PropertyField label='Price Level' value={order.in_level} field='in_level' onSave={handleFieldSave} />
                   <PropertyField label='Due' value={order.charge} field='charge' onSave={handleFieldSave} />
-                </div>
+                </PanelSection>
 
                 {/* Notes */}
-                <SectionLabel>Notes</SectionLabel>
-                <PropertyField label='Memo' value={order.memo} field='memo' onSave={handleFieldSave} multiline fullWidth />
-                <PropertyField label='Internal Note' value={order.internalnt} field='internalnt' onSave={handleFieldSave} multiline fullWidth />
+                <PanelSection title='Notes' last>
+                  <PropertyField label='Memo' value={order.memo} field='memo' onSave={handleFieldSave} multiline />
+                  <PropertyField label='Internal Note' value={order.internalnt} field='internalnt' onSave={handleFieldSave} multiline />
+                </PanelSection>
               </>
             ) : (
               <>
@@ -585,25 +601,38 @@ function OrderDetailPage() {
                     </p>
                   </div>
                 ) : (
-                  <SectionLabel>Custom Fields</SectionLabel>
+                  <PanelSection title='Custom Fields' last>
+                    {customFields.map((entry) => {
+                      const label = getColumnLabel(entry.field, 'order', fieldConfig)
+                      const val = order[entry.field]
+                      const strVal = val != null ? String(val) : null
+                      return (
+                        <PropertyField
+                          key={entry.field}
+                          label={label}
+                          value={strVal}
+                          field={entry.field}
+                          onSave={handleFieldSave}
+                        />
+                      )
+                    })}
+                  </PanelSection>
                 )}
-                <div className='grid grid-cols-2 gap-x-4'>
-                  {customFields.map((entry) => {
-                    const label = getColumnLabel(entry.field, 'order', fieldConfig)
-                    const val = order[entry.field]
-                    const strVal = val != null ? String(val) : null
-                    return (
-                      <PropertyCell key={entry.field} label={label}>
-                        <span className='text-[13px] font-medium text-foreground'>{strVal ?? '—'}</span>
-                      </PropertyCell>
-                    )
-                  })}
-                </div>
               </>
             )}
           </div>
         </div>
       </div>
+
+      {/* ── Notes sheet ── */}
+      <EntityNotesSheet
+        open={notesOpen}
+        onOpenChange={setNotesOpen}
+        entityType='order'
+        entityLabel={order.invoice || `Order ${order.id}`}
+        autoid={orderId}
+        projectId={projectId}
+      />
 
       {/* ── Attachments dialog ── */}
       <EntityAttachmentsDialog
@@ -672,192 +701,3 @@ function OrderDetailPage() {
   )
 }
 
-// ── Section Label ────────────────────────────────────────────
-
-function SectionLabel({ children }: { children: React.ReactNode }) {
-  return (
-    <div className='mt-3 pb-1 text-[11px] font-semibold uppercase tracking-[0.06em] text-text-tertiary first:mt-0'>
-      {children}
-    </div>
-  )
-}
-
-// ── Property Cell (read-only, stacked) ───────────────────────
-
-function PropertyCell({
-  label,
-  children,
-}: {
-  label: string
-  children: React.ReactNode
-}) {
-  return (
-    <div className='border-b border-border-light py-2'>
-      <span className='mb-0.5 block text-[12px] font-medium text-text-tertiary'>{label}</span>
-      {children}
-    </div>
-  )
-}
-
-// ── Property Field (editable) ────────────────────────────────
-
-function PropertyField({
-  label,
-  value,
-  field,
-  onSave,
-  multiline,
-  fullWidth,
-}: {
-  label: string
-  value: string | null | undefined
-  field: keyof OrderPatchPayload
-  onSave: (field: keyof OrderPatchPayload, value: string) => void
-  multiline?: boolean
-  fullWidth?: boolean
-}) {
-  const [editing, setEditing] = useState(false)
-  const [draft, setDraft] = useState('')
-  const containerRef = useRef<HTMLDivElement>(null)
-  const displayValue = value ?? ''
-
-  const startEditing = () => {
-    setDraft(displayValue)
-    setEditing(true)
-  }
-
-  const commit = () => {
-    setEditing(false)
-    onSave(field, draft.trim())
-  }
-
-  const cancel = () => {
-    setEditing(false)
-  }
-
-  const isDirty = draft.trim() !== displayValue
-
-  const actionButtons = (
-    <div className='flex shrink-0 items-center gap-0.5'>
-      <button
-        type='button'
-        className={cn(
-          'inline-flex size-5 items-center justify-center rounded transition-colors duration-75',
-          isDirty
-            ? 'bg-primary text-primary-foreground hover:bg-primary/90'
-            : 'text-text-tertiary hover:bg-bg-hover',
-        )}
-        onMouseDown={(e) => {
-          e.preventDefault()
-          commit()
-        }}
-      >
-        <Check className='size-3' />
-      </button>
-      <button
-        type='button'
-        className='inline-flex size-5 items-center justify-center rounded text-text-tertiary transition-colors duration-75 hover:bg-bg-hover hover:text-foreground'
-        onMouseDown={(e) => {
-          e.preventDefault()
-          cancel()
-        }}
-      >
-        <X className='size-3' />
-      </button>
-    </div>
-  )
-
-  if (editing) {
-    if (multiline) {
-      return (
-        <div ref={containerRef} className={cn('border-b border-border-light py-2', fullWidth && 'col-span-2')}>
-          <div className='mb-1 flex items-center justify-between'>
-            <span className='text-[12px] font-medium text-text-tertiary'>{label}</span>
-            {actionButtons}
-          </div>
-          <textarea
-            value={draft}
-            onChange={(e) => setDraft(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Escape') cancel()
-            }}
-            autoFocus
-            rows={3}
-            className='w-full resize-none rounded border border-border bg-background px-2 py-1 text-[13px] text-foreground shadow-sm outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20'
-          />
-        </div>
-      )
-    }
-
-    return (
-      <div ref={containerRef} className='border-b border-border-light py-2'>
-        <div className='mb-1 flex items-center justify-between'>
-          <span className='text-[12px] font-medium text-text-tertiary'>{label}</span>
-          {actionButtons}
-        </div>
-        <input
-          value={draft}
-          onChange={(e) => setDraft(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter') commit()
-            if (e.key === 'Escape') cancel()
-          }}
-          autoFocus
-          className='w-full rounded border border-border bg-background px-2 py-0.5 text-[13px] text-foreground shadow-sm outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20'
-        />
-      </div>
-    )
-  }
-
-  return (
-    <div
-      className={cn(
-        'group/field cursor-pointer border-b border-border-light py-2 transition-colors duration-75 hover:bg-background/60',
-        fullWidth && 'col-span-2',
-      )}
-      onClick={startEditing}
-    >
-      <span className='mb-0.5 block text-[12px] font-medium text-text-tertiary'>{label}</span>
-      <span
-        className={cn(
-          'block truncate text-[13px]',
-          displayValue
-            ? 'font-medium text-foreground'
-            : 'text-text-quaternary',
-        )}
-      >
-        {displayValue || '—'}
-      </span>
-    </div>
-  )
-}
-
-// ── Summary Cell ─────────────────────────────────────────────
-
-function SummaryCell({
-  label,
-  value,
-  bold,
-  accent,
-}: {
-  label: string
-  value: string
-  bold?: boolean
-  accent?: 'warning' | 'success'
-}) {
-  return (
-    <div className='flex items-center gap-1.5'>
-      <span className='text-[13px] text-text-tertiary'>{label}:</span>
-      <span
-        className={cn(
-          'text-[13px] tabular-nums',
-          bold ? 'font-semibold text-foreground' : 'font-medium text-text-secondary',
-          accent === 'warning' && 'text-amber-600 dark:text-amber-400',
-          accent === 'success' && 'text-emerald-600 dark:text-emerald-400',
-        )}
-      >
-        {value}
-      </span>
-    </div>
-  )
-}

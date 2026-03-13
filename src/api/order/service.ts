@@ -2,7 +2,7 @@ import { api } from '..'
 
 import type { EntityAssignRequest, EntityAssignmentResponse, EntityAttachment } from '../schema'
 
-import type { BulkPickStatusRequest, Order, OrderParams, OrderPatchPayload, OrderResponse, PickStatusRequest, ShippingRatesRequest, ShippingRatesResponse } from './schema'
+import type { Order, OrderParams, OrderPatchPayload, OrderResponse, PickStatusRequest, ShippingRatesRequest, ShippingRatesResponse } from './schema'
 
 const orderParams = (projectId?: number | null) =>
   projectId != null ? { project_id: projectId } : {}
@@ -59,12 +59,6 @@ export const orderService = {
 
   setItemPickStatus: async (autoid: string, itemAutoid: string, payload: PickStatusRequest, projectId?: number | null) => {
     await api.patch(`/data/orders/${autoid}/items/${itemAutoid}/pick/`, payload, {
-      params: orderParams(projectId),
-    })
-  },
-
-  bulkSetPickStatus: async (autoid: string, payload: BulkPickStatusRequest, projectId?: number | null) => {
-    await api.patch(`/data/orders/${autoid}/pick-status/`, payload, {
       params: orderParams(projectId),
     })
   },

@@ -32,7 +32,8 @@ export const getTaskDetailQuery = (id: number) =>
 export const getTaskStatusesQuery = (projectId?: number | null) =>
   queryOptions({
     queryKey: TASK_QUERY_KEYS.statuses(projectId),
-    queryFn: () => taskService.getStatuses(projectId)
+    queryFn: () => taskService.getStatuses(projectId),
+    staleTime: 1000 * 60 * 30
   })
 
 export const getTaskAttachmentsQuery = (taskId: number) =>

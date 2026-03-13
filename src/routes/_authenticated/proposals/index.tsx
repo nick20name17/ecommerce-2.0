@@ -177,7 +177,7 @@ const ProposalsPage = () => {
   return (
     <div className='flex h-full flex-col overflow-hidden'>
       {/* Header */}
-      <header className='flex h-12 shrink-0 items-center gap-2.5 border-b border-border px-6'>
+      <header className={cn('flex h-12 shrink-0 items-center gap-2.5 border-b border-border', isMobile ? 'px-3.5' : 'px-6')}>
         <SidebarTrigger className='-ml-1' />
         <div className='flex items-center gap-1.5'>
           <PageHeaderIcon icon={IProposals} color={PAGE_COLORS.proposals} />
@@ -243,7 +243,7 @@ const ProposalsPage = () => {
 
       {/* Active filter chips */}
       {(hasFilters || autoidFromUrl) && (
-        <div className='flex shrink-0 flex-wrap items-center gap-1.5 border-b border-border px-6 py-1.5'>
+        <div className={cn('flex shrink-0 flex-wrap items-center gap-1.5 border-b border-border py-1.5', isMobile ? 'px-3.5' : 'px-6')}>
           {hasFilters && (
             <button
               type='button'
@@ -290,30 +290,41 @@ const ProposalsPage = () => {
         )}
 
         {isLoading ? (
-          Array.from({ length: 10 }).map((_, i) => (
-            <div
-              key={i}
-              className={cn(
-                'flex items-center border-b border-border-light',
-                isMobile ? 'gap-2 px-3.5 py-2.5' : isTablet ? 'gap-4 px-5 py-1.5' : 'gap-6 px-6 py-1.5',
-              )}
-            >
-              <div className='flex min-w-0 flex-1 items-center gap-2'>
-                <Skeleton className='h-3.5 w-16 rounded' />
-                <Skeleton className='h-3.5 w-24 rounded' />
+          Array.from({ length: 10 }).map((_, i) =>
+            isMobile ? (
+              <div key={i} className='border-b border-border-light px-3.5 py-2'>
+                <div className='mb-1 flex items-center gap-2'>
+                  <Skeleton className='size-1.5 shrink-0 rounded-full' />
+                  <Skeleton className='h-3.5 w-24 rounded' />
+                  <div className='flex-1' />
+                  <Skeleton className='h-3.5 w-16 rounded' />
+                </div>
+                <div className='flex items-center gap-2 pl-[20px]'>
+                  <Skeleton className='h-3.5 w-20 rounded' />
+                  <Skeleton className='h-3.5 w-16 rounded' />
+                </div>
               </div>
-              {!isMobile && (
-                <>
-                  <div className='w-[88px] shrink-0'><Skeleton className='h-[18px] w-[60px] rounded-[4px]' /></div>
-                  {!isTablet && <div className='w-[92px] shrink-0'><Skeleton className='h-3.5 w-[70px] rounded' /></div>}
-                  <div className='w-[100px] shrink-0'><Skeleton className='ml-auto h-3.5 w-[60px] rounded' /></div>
-                  <div className='w-[120px] shrink-0'><Skeleton className='h-3.5 w-[70px] rounded' /></div>
-                  <div className='w-[62px] shrink-0' />
-                  <div className='w-[28px] shrink-0' />
-                </>
-              )}
-            </div>
-          ))
+            ) : (
+              <div
+                key={i}
+                className={cn(
+                  'flex items-center border-b border-border-light',
+                  isTablet ? 'gap-4 px-5 py-1.5' : 'gap-6 px-6 py-1.5'
+                )}
+              >
+                <div className='flex min-w-0 flex-1 items-center gap-2'>
+                  <Skeleton className='h-3.5 w-16 rounded' />
+                  <Skeleton className='h-3.5 w-24 rounded' />
+                </div>
+                <div className='w-[88px] shrink-0'><Skeleton className='h-[18px] w-[60px] rounded-[4px]' /></div>
+                {!isTablet && <div className='w-[92px] shrink-0'><Skeleton className='h-3.5 w-[70px] rounded' /></div>}
+                <div className='w-[100px] shrink-0'><Skeleton className='ml-auto h-3.5 w-[60px] rounded' /></div>
+                <div className='w-[120px] shrink-0'><Skeleton className='h-3.5 w-[70px] rounded' /></div>
+                <div className='w-[62px] shrink-0' />
+                <div className='w-[28px] shrink-0' />
+              </div>
+            )
+          )
         ) : results.length === 0 && !hasPendingAutoid ? (
           <PageEmpty icon={FileText} title='No matching proposals' description='Try adjusting your search or filters.' />
         ) : (
@@ -342,7 +353,7 @@ const ProposalsPage = () => {
       </div>
 
       {/* Footer */}
-      <div className='shrink-0 border-t border-border px-6 py-2'>
+      <div className={cn('shrink-0 border-t border-border py-2', isMobile ? 'px-3.5' : 'px-6')}>
         <Pagination totalCount={data?.count ?? 0} />
       </div>
 
@@ -561,14 +572,14 @@ function ProposalRow({
       </div>
 
       {/* Notes */}
-      <div className='flex w-[62px] shrink-0 justify-center'>
+      <div className='flex w-[46px] shrink-0 justify-center'>
         <button
           type='button'
           className={cn(
-            'inline-flex items-center gap-1.5 rounded-[6px] border px-2 py-1 text-[13px] font-medium transition-colors duration-[80ms]',
+            'inline-flex h-[26px] w-[46px] items-center justify-center gap-1 rounded-[6px] border text-[12px] font-medium tabular-nums transition-colors duration-[80ms]',
             noteCount > 0
               ? 'border-border bg-bg-secondary text-text-secondary hover:bg-bg-active'
-              : 'border-transparent text-text-tertiary hover:bg-bg-hover hover:text-text-secondary',
+              : 'border-transparent text-text-quaternary hover:bg-bg-hover hover:text-text-tertiary',
           )}
           aria-label='Open notes'
           onClick={(e) => {
@@ -577,7 +588,7 @@ function ProposalRow({
           }}
         >
           <StickyNote className='size-3.5' />
-          <span className='tabular-nums'>{noteCount}</span>
+          {noteCount > 0 && <span>{noteCount}</span>}
         </button>
       </div>
 

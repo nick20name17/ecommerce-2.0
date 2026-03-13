@@ -5,6 +5,7 @@ import { useState } from 'react'
 
 import { getOrdersQuery } from '@/api/order/query'
 import type { Order, OrderParams } from '@/api/order/schema'
+import { Skeleton } from '@/components/ui/skeleton'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -92,7 +93,7 @@ export const CustomerOrdersTab = ({ customerId }: CustomerOrdersTabProps) => {
             Invoice
           </div>
           {!isTablet && (
-            <div className='min-w-0 text-[12px] font-medium uppercase tracking-[0.04em] text-text-tertiary'>
+            <div className='text-right text-[12px] font-medium uppercase tracking-[0.04em] text-text-tertiary'>
               Date
             </div>
           )}
@@ -112,19 +113,42 @@ export const CustomerOrdersTab = ({ customerId }: CustomerOrdersTabProps) => {
       <div className='flex-1 overflow-y-auto'>
         {isLoading ? (
           <div className='space-y-0'>
-            {Array.from({ length: 6 }).map((_, i) => (
-              <div
-                key={i}
-                className={cn(
-                  'flex items-center gap-3 border-b border-border-light py-2',
-                  isMobile ? 'px-5' : 'px-6'
-                )}
-              >
-                <div className='h-3 w-16 animate-pulse rounded bg-border' />
-                <div className='h-3 flex-1 animate-pulse rounded bg-border' />
-                <div className='h-3 w-14 animate-pulse rounded bg-border' />
-              </div>
-            ))}
+            {Array.from({ length: 6 }).map((_, i) =>
+              isMobile ? (
+                <div key={i} className='border-b border-border-light px-5 py-2'>
+                  <div className='flex items-center justify-between gap-2'>
+                    <div className='flex items-center gap-2'>
+                      <Skeleton className='h-3.5 w-20 rounded' />
+                      <Skeleton className='h-[18px] w-[52px] rounded-full' />
+                    </div>
+                    <Skeleton className='h-3.5 w-14 rounded' />
+                  </div>
+                  <div className='mt-0.5 flex items-center gap-2'>
+                    <Skeleton className='h-3.5 w-16 rounded' />
+                    <Skeleton className='h-3.5 w-10 rounded' />
+                  </div>
+                </div>
+              ) : (
+                <div
+                  key={i}
+                  className={cn(
+                    'grid items-center border-b border-border-light',
+                    isTablet
+                      ? 'grid-cols-[1fr_80px_26px] gap-3 px-5 py-1.5'
+                      : 'grid-cols-[1fr_100px_60px_80px_26px] gap-4 px-6 py-1.5'
+                  )}
+                >
+                  <div className='flex min-w-0 items-center gap-2'>
+                    <Skeleton className='h-3.5 w-20 rounded' />
+                    <Skeleton className='h-[18px] w-[52px] rounded-full' />
+                  </div>
+                  {!isTablet && <Skeleton className='h-3.5 w-16 rounded' />}
+                  {!isTablet && <Skeleton className='ml-auto h-3.5 w-8 rounded' />}
+                  <Skeleton className='ml-auto h-3.5 w-14 rounded' />
+                  <div />
+                </div>
+              )
+            )}
           </div>
         ) : orders.length === 0 ? (
           <PageEmpty icon={Package} title='No orders found' description='This customer has no orders yet.' compact />
@@ -246,7 +270,7 @@ function OrderRow({
 
       {/* Date */}
       {!isTablet && (
-        <div className='min-w-0 text-[13px] tabular-nums text-text-tertiary'>
+        <div className='text-right text-[13px] tabular-nums text-text-tertiary'>
           {invoiceDate}
         </div>
       )}

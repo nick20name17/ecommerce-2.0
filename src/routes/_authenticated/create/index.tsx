@@ -77,7 +77,7 @@ const CreatePage = () => {
   return (
     <div className='flex h-full flex-col overflow-hidden'>
       {/* ── Header ── */}
-      <header className='flex h-12 shrink-0 items-center gap-2.5 border-b border-border px-6'>
+      <header className='flex h-12 shrink-0 items-center gap-2.5 border-b border-border px-3.5 sm:px-6'>
         <SidebarTrigger className='-ml-1' />
         <button
           type='button'
@@ -246,19 +246,26 @@ const CreatePage = () => {
         </div>
       </div>
 
-      {/* ── Mobile bottom bar (visible on small screens) ── */}
+      {/* ── Mobile/tablet bottom bar (visible below lg breakpoint) ── */}
       <div className='flex shrink-0 items-center justify-between gap-2 border-t border-border px-4 py-2 lg:hidden'>
-        <div className='flex items-center gap-2'>
+        <div className='flex min-w-0 flex-1 items-center gap-2'>
+          <div className='min-w-0 flex-1'>
+            <CustomerCombobox
+              value={customer}
+              onChange={handleCustomerChange}
+              projectId={projectId}
+            />
+          </div>
           <button
             type='button'
-            className='inline-flex h-8 items-center gap-1.5 rounded-[6px] border border-border bg-background px-2.5 text-[12px] font-medium text-text-secondary'
+            className='inline-flex h-8 shrink-0 items-center gap-1.5 rounded-[6px] border border-border bg-background px-2.5 text-[12px] font-medium text-text-secondary'
             disabled={!customer}
             onClick={() => setAttachmentsOpen(true)}
           >
             <Paperclip className='size-3' />
           </button>
         </div>
-        <div className='flex items-center gap-2'>
+        <div className='flex shrink-0 items-center gap-2'>
           <button
             type='button'
             className='inline-flex h-8 items-center gap-1.5 rounded-[6px] border border-border bg-background px-3 text-[12px] font-medium text-foreground disabled:opacity-40'

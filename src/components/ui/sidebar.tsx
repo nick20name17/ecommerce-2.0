@@ -74,7 +74,7 @@ const SidebarProvider = ({
       _setOpen(openState)
     }
 
-    document.cookie = `${SIDEBAR_COOKIE_NAME}=${openState}; path=/; max-age=${SIDEBAR_COOKIE_MAX_AGE}`
+    document.cookie = `${SIDEBAR_COOKIE_NAME}=${openState}; path=/; max-age=${SIDEBAR_COOKIE_MAX_AGE}; SameSite=Strict; Secure`
   }
 
   const toggleSidebar = () => (isMobile ? setOpenMobile((open) => !open) : setOpen((open) => !open))

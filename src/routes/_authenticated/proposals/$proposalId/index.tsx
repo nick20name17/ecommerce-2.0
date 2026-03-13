@@ -1,10 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { createFileRoute, useNavigate, useRouter } from '@tanstack/react-router'
-import { ChevronLeft, Copy, FileText, ListTodo, Paperclip, Settings, ShoppingCart, Trash2, UserPlus } from 'lucide-react'
+import { ChevronLeft, Copy, FileText, ListTodo, Paperclip, Settings, ShoppingCart, StickyNote, Trash2, UserPlus } from 'lucide-react'
 import { useState } from 'react'
 
 import { PageEmpty } from '@/components/common/page-empty'
 import { EntityAttachmentsDialog } from '@/components/common/entity-attachments/entity-attachments-dialog'
+import { EntityNotesSheet } from '@/components/common/entity-notes/entity-notes-sheet'
 import { getFieldConfigQuery } from '@/api/field-config/query'
 import { ORDER_QUERY_KEYS } from '@/api/order/query'
 import { getProposalDetailQuery, PROPOSAL_QUERY_KEYS } from '@/api/proposal/query'
@@ -56,6 +57,7 @@ function ProposalDetailPage() {
   const [deleteOpen, setDeleteOpen] = useState(false)
   const [taskModalOpen, setTaskModalOpen] = useState(false)
   const [attachmentsOpen, setAttachmentsOpen] = useState(false)
+  const [notesOpen, setNotesOpen] = useState(false)
   const [panelTab, setPanelTab] = useState<'general' | 'custom'>('general')
 
   const { data: proposal, isLoading } = useQuery(getProposalDetailQuery(proposalId, projectId))
@@ -99,7 +101,7 @@ function ProposalDetailPage() {
   if (isLoading) {
     return (
       <div className='flex h-full flex-col overflow-hidden'>
-        <header className='flex h-12 shrink-0 items-center gap-2.5 border-b border-border px-6'>
+        <header className={cn('flex h-12 shrink-0 items-center gap-2.5 border-b border-border', isMobile ? 'px-3.5' : 'px-6')}>
           <SidebarTrigger className='-ml-1' />
           <Skeleton className='h-4 w-12' />
           <Skeleton className='size-5 rounded-[5px]' />
@@ -183,7 +185,7 @@ function ProposalDetailPage() {
   return (
     <div className='flex h-full flex-col overflow-hidden'>
       {/* ── Header bar ── */}
-      <header className='flex h-12 shrink-0 items-center gap-2.5 border-b border-border px-6'>
+      <header className={cn('flex h-12 shrink-0 items-center gap-2.5 border-b border-border', isMobile ? 'px-3.5' : 'px-6')}>
         <SidebarTrigger className='-ml-1' />
         <button
           type='button'
@@ -282,6 +284,20 @@ function ProposalDetailPage() {
             </button>
           </TooltipTrigger>
           <TooltipContent>Create Task</TooltipContent>
+        </Tooltip>
+
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <button
+              type='button'
+              className='inline-flex h-7 items-center gap-1.5 rounded-[5px] border border-border bg-bg-secondary px-2.5 text-[12px] font-medium text-text-secondary transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground'
+              onClick={() => setNotesOpen(true)}
+            >
+              <StickyNote className='size-3.5' />
+              <span className='hidden sm:inline'>Notes</span>
+            </button>
+          </TooltipTrigger>
+          <TooltipContent>Notes</TooltipContent>
         </Tooltip>
 
         <Tooltip>
@@ -413,34 +429,31 @@ function ProposalDetailPage() {
           </div>
 
           {/* Panel content */}
-          <div className='flex-1 overflow-y-auto px-4 py-3'>
+          <div className='flex-1 overflow-y-auto'>
             {panelTab === 'general' ? (
               <>
-                <SectionLabel>Customer</SectionLabel>
-                <div className='grid grid-cols-2 gap-x-4'>
-                  <PropertyCell label='Name'>
-                    <span className='text-[13px] font-medium text-foreground'>{proposal.b_name || '—'}</span>
-                  </PropertyCell>
-                  <PropertyCell label='Customer ID'>
-                    <span className='text-[13px] tabular-nums text-foreground'>{proposal.b_id || '—'}</span>
-                  </PropertyCell>
-                </div>
+                <PanelSection title='Customer'>
+                  <PanelRow label='Name'>
+                    <span>{proposal.b_name || '—'}</span>
+                  </PanelRow>
+                  <PanelRow label='Customer ID' last>
+                    <span className='tabular-nums'>{proposal.b_id || '—'}</span>
+                  </PanelRow>
+                </PanelSection>
 
-                <SectionLabel>Proposal Details</SectionLabel>
-                <div className='grid grid-cols-2 gap-x-4'>
-                  <PropertyCell label='Quote'>
-                    <span className='text-[13px] font-medium tabular-nums text-foreground'>{proposal.quote || '—'}</span>
-                  </PropertyCell>
-                  <PropertyCell label='Date'>
-                    <span className='text-[13px] tabular-nums text-foreground'>{proposal.qt_date ? formatDate(proposal.qt_date) : '—'}</span>
-                  </PropertyCell>
-                </div>
+                <PanelSection title='Proposal Details'>
+                  <PanelRow label='Quote'>
+                    <span className='tabular-nums'>{proposal.quote || '—'}</span>
+                  </PanelRow>
+                  <PanelRow label='Date' last>
+                    <span className='tabular-nums'>{proposal.qt_date ? formatDate(proposal.qt_date) : '—'}</span>
+                  </PanelRow>
+                </PanelSection>
 
                 {proposal.descr && (
-                  <>
-                    <SectionLabel>Description</SectionLabel>
-                    <p className='border-b border-border-light py-2 text-[13px] text-text-secondary'>{proposal.descr}</p>
-                  </>
+                  <PanelSection title='Description' last>
+                    <div className='px-4 py-3 text-[13px] text-text-secondary'>{proposal.descr}</div>
+                  </PanelSection>
                 )}
               </>
             ) : (
@@ -448,25 +461,34 @@ function ProposalDetailPage() {
                 {customFields.length === 0 ? (
                   <PageEmpty icon={Settings} title='No custom fields enabled' description='Enable fields in Settings &rarr; Data Control' compact />
                 ) : (
-                  <SectionLabel>Custom Fields</SectionLabel>
+                  <PanelSection title='Custom Fields' last>
+                    {customFields.map((entry) => {
+                      const label = getColumnLabel(entry.field, 'proposal', fieldConfig)
+                      const val = proposal[entry.field]
+                      const strVal = val != null ? String(val) : null
+                      return (
+                        <PanelRow key={entry.field} label={label}>
+                          <span>{strVal ?? '—'}</span>
+                        </PanelRow>
+                      )
+                    })}
+                  </PanelSection>
                 )}
-                <div className='grid grid-cols-2 gap-x-4'>
-                  {customFields.map((entry) => {
-                    const label = getColumnLabel(entry.field, 'proposal', fieldConfig)
-                    const val = proposal[entry.field]
-                    const strVal = val != null ? String(val) : null
-                    return (
-                      <PropertyCell key={entry.field} label={label}>
-                        <span className='text-[13px] font-medium text-foreground'>{strVal ?? '—'}</span>
-                      </PropertyCell>
-                    )
-                  })}
-                </div>
               </>
             )}
           </div>
         </div>
       </div>
+
+      {/* ── Notes sheet ── */}
+      <EntityNotesSheet
+        open={notesOpen}
+        onOpenChange={setNotesOpen}
+        entityType='proposal'
+        entityLabel={proposal.quote || `Proposal ${proposal.b_id}`}
+        autoid={proposalId}
+        projectId={projectId}
+      />
 
       {/* ── Attachments dialog ── */}
       <EntityAttachmentsDialog
@@ -525,29 +547,44 @@ function ProposalDetailPage() {
   )
 }
 
-// ── Section Label ────────────────────────────────────────────
+// ── Panel Section ────────────────────────────────────────────
 
-function SectionLabel({ children }: { children: React.ReactNode }) {
+function PanelSection({
+  title,
+  children,
+  last,
+}: {
+  title: string
+  children: React.ReactNode
+  last?: boolean
+}) {
   return (
-    <div className='mt-3 pb-1 text-[11px] font-semibold uppercase tracking-[0.06em] text-text-tertiary first:mt-0'>
-      {children}
+    <div className={cn(!last && 'border-b border-border')}>
+      <div className='bg-bg-secondary/60 px-4 py-2'>
+        <span className='text-[11px] font-semibold uppercase tracking-[0.06em] text-text-tertiary'>
+          {title}
+        </span>
+      </div>
+      <div className='bg-background text-[13px]'>{children}</div>
     </div>
   )
 }
 
-// ── Property Cell (read-only, stacked) ───────────────────────
+// ── Panel Row ────────────────────────────────────────────────
 
-function PropertyCell({
+function PanelRow({
   label,
   children,
+  last,
 }: {
   label: string
   children: React.ReactNode
+  last?: boolean
 }) {
   return (
-    <div className='border-b border-border-light py-2'>
-      <span className='mb-0.5 block text-[12px] font-medium text-text-tertiary'>{label}</span>
-      {children}
+    <div className={cn('flex items-center justify-between gap-4 px-4 py-2.5', !last && 'border-b border-border-light')}>
+      <span className='shrink-0 text-[12px] font-medium text-text-tertiary'>{label}</span>
+      <div className='min-w-0 truncate text-right text-[13px] font-medium text-foreground'>{children}</div>
     </div>
   )
 }

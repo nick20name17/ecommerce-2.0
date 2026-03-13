@@ -16,6 +16,7 @@ import {
   SelectTrigger,
   SelectValue
 } from '@/components/ui/select'
+import { useBreakpoint } from '@/hooks/use-breakpoint'
 import { useLimitParam, useOffsetParam } from '@/hooks/use-query-params'
 
 const LIMIT_OPTIONS = [10, 20, 50, 100]
@@ -51,6 +52,8 @@ interface PaginationProps {
 export const Pagination = ({ totalCount }: PaginationProps) => {
   const [offset, setOffset] = useOffsetParam()
   const [limit, setLimit] = useLimitParam()
+  const bp = useBreakpoint()
+  const isMobile = bp === 'mobile'
 
   const totalPages = Math.max(1, Math.ceil(totalCount / limit))
   const currentPage = Math.min(totalPages, Math.floor(offset / limit) + 1)
@@ -75,41 +78,45 @@ export const Pagination = ({ totalCount }: PaginationProps) => {
 
   return (
     <div className='flex items-center justify-between'>
-      <p className='text-text-tertiary text-sm'>
+      <p className='text-sm tabular-nums text-text-tertiary'>
         {rangeStart}–{rangeEnd} of {totalCount}
       </p>
 
       <div className='flex items-center gap-3'>
-        <div className='flex items-center gap-1.5'>
-          <span className='text-text-tertiary text-sm'>Rows</span>
-          <Select
-            value={String(limit)}
-            onValueChange={handleLimitChange}
-          >
-            <SelectTrigger size='sm'>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent align='end'>
-              {LIMIT_OPTIONS.map((option) => (
-                <SelectItem
-                  key={option}
-                  value={String(option)}
-                >
-                  {option}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+        {!isMobile && (
+          <div className='flex items-center gap-1.5'>
+            <span className='text-sm text-text-tertiary'>Rows</span>
+            <Select
+              value={String(limit)}
+              onValueChange={handleLimitChange}
+            >
+              <SelectTrigger size='sm'>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent align='end'>
+                {LIMIT_OPTIONS.map((option) => (
+                  <SelectItem
+                    key={option}
+                    value={String(option)}
+                  >
+                    {option}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        )}
 
         <PaginationRoot>
           <PaginationContent>
-            <PaginationItem>
-              <PaginationFirst
-                onClick={() => goToPage(1)}
-                disabled={isFirst}
-              />
-            </PaginationItem>
+            {!isMobile && (
+              <PaginationItem>
+                <PaginationFirst
+                  onClick={() => goToPage(1)}
+                  disabled={isFirst}
+                />
+              </PaginationItem>
+            )}
 
             <PaginationItem>
               <PaginationPrevious
@@ -118,22 +125,23 @@ export const Pagination = ({ totalCount }: PaginationProps) => {
               />
             </PaginationItem>
 
-            {pages.map((page, pageIndex) =>
-              page === 'ellipsis' ? (
-                <PaginationItem key={`ellipsis-${pageIndex === 1 ? 'start' : 'end'}`}>
-                  <PaginationEllipsis />
-                </PaginationItem>
-              ) : (
-                <PaginationItem key={`page-${page}`}>
-                  <PaginationButton
-                    isActive={page === currentPage}
-                    onClick={() => goToPage(page)}
-                  >
-                    {page}
-                  </PaginationButton>
-                </PaginationItem>
-              )
-            )}
+            {!isMobile &&
+              pages.map((page, pageIndex) =>
+                page === 'ellipsis' ? (
+                  <PaginationItem key={`ellipsis-${pageIndex === 1 ? 'start' : 'end'}`}>
+                    <PaginationEllipsis />
+                  </PaginationItem>
+                ) : (
+                  <PaginationItem key={`page-${page}`}>
+                    <PaginationButton
+                      isActive={page === currentPage}
+                      onClick={() => goToPage(page)}
+                    >
+                      {page}
+                    </PaginationButton>
+                  </PaginationItem>
+                )
+              )}
 
             <PaginationItem>
               <PaginationNext
@@ -142,12 +150,14 @@ export const Pagination = ({ totalCount }: PaginationProps) => {
               />
             </PaginationItem>
 
-            <PaginationItem>
-              <PaginationLast
-                onClick={() => goToPage(totalPages)}
-                disabled={isLast}
-              />
-            </PaginationItem>
+            {!isMobile && (
+              <PaginationItem>
+                <PaginationLast
+                  onClick={() => goToPage(totalPages)}
+                  disabled={isLast}
+                />
+              </PaginationItem>
+            )}
           </PaginationContent>
         </PaginationRoot>
       </div>

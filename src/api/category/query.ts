@@ -14,7 +14,8 @@ export const CATEGORY_QUERY_KEYS = {
 export const getCategoriesQuery = (params: CategoryParams = {}) =>
   queryOptions({
     queryKey: CATEGORY_QUERY_KEYS.list(params),
-    queryFn: () => categoryService.get(params)
+    queryFn: () => categoryService.get(params),
+    staleTime: 1000 * 60 * 30
   })
 
 export const getCategoryByTreeIdQuery = (treeId: string, params?: { project_id?: number }) =>

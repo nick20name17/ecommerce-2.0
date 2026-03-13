@@ -77,7 +77,7 @@ interface KanbanViewProps {
 // ── Kanban View ──────────────────────────────────────────────
 
 export function KanbanView({ tasks, statuses, onStatusChange, onCreate }: KanbanViewProps) {
-  const handleDragEnd = (event: any) => {
+  const handleDragEnd = (event: Parameters<NonNullable<React.ComponentProps<typeof DragDropProvider>['onDragEnd']>>[0]) => {
     const { source, target } = event.operation ?? {}
     if (!source || !target) return
 

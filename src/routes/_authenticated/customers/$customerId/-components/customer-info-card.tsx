@@ -37,15 +37,9 @@ export const CustomerInfoPanel = ({ customer, onAssign }: CustomerInfoPanelProps
 
   return (
     <div>
-      {/* Details section */}
-      <div className='border-b border-border px-4 py-2.5'>
-        <span className='text-[12px] font-semibold uppercase tracking-[0.06em] text-text-tertiary'>
-          Details
-        </span>
-      </div>
-
-      <div className='grid grid-cols-2 gap-x-4'>
-        <PropertyCell label='Status'>
+      {/* Details */}
+      <PanelSection title='Details'>
+        <PanelRow label='Status'>
           <div className='flex items-center gap-1.5'>
             <div
               className={cn(
@@ -53,128 +47,137 @@ export const CustomerInfoPanel = ({ customer, onAssign }: CustomerInfoPanelProps
                 isActive ? 'bg-green-500' : 'bg-slate-400'
               )}
             />
-            <span className='text-[13px] font-medium'>
+            <span className='font-medium'>
               {isActive ? 'Active' : 'Inactive'}
             </span>
           </div>
-        </PropertyCell>
-
-        <PropertyCell label='ID'>
-          <span className='text-[13px] tabular-nums'>{customer.id}</span>
-        </PropertyCell>
-
-        <PropertyCell label='Type'>
+        </PanelRow>
+        <PanelRow label='ID'>
+          <span className='tabular-nums'>{customer.id}</span>
+        </PanelRow>
+        <PanelRow label='Type'>
           {typeLabel !== '—' ? (
             <span className='inline-flex items-center rounded-[4px] bg-bg-secondary px-1.5 py-0.5 text-[12px] font-medium text-text-secondary'>
               {typeLabel}
             </span>
           ) : (
-            <span className='text-[13px] text-text-tertiary'>—</span>
+            <span className='text-text-tertiary'>—</span>
           )}
-        </PropertyCell>
+        </PanelRow>
+        <PanelRow label='Last Order' last>
+          <span>{lastOrderDate}</span>
+        </PanelRow>
+      </PanelSection>
 
-        <PropertyCell label='Last Order'>
-          <span className='text-[13px]'>{lastOrderDate}</span>
-        </PropertyCell>
-      </div>
-
-      {/* Contact section */}
-      <div className='border-b border-border px-4 py-2.5'>
-        <span className='text-[12px] font-semibold uppercase tracking-[0.06em] text-text-tertiary'>
-          Contact
-        </span>
-      </div>
-
-      <div className='grid grid-cols-2 gap-x-4'>
-        <PropertyCell label='Phone'>
-          <span className='text-[13px]'>{phone ?? '—'}</span>
-        </PropertyCell>
-
-        <PropertyCell label='Email'>
+      {/* Contact */}
+      <PanelSection title='Contact'>
+        <PanelRow label='Phone'>
+          <span>{phone ?? '—'}</span>
+        </PanelRow>
+        <PanelRow label='Email' last>
           {email ? (
             <Tooltip>
               <TooltipTrigger asChild>
-                <span className='block max-w-full truncate text-[13px]'>{email}</span>
+                <span className='block max-w-[180px] truncate'>{email}</span>
               </TooltipTrigger>
               <TooltipContent>{email}</TooltipContent>
             </Tooltip>
           ) : (
-            <span className='text-[13px] text-text-tertiary'>—</span>
+            <span className='text-text-tertiary'>—</span>
           )}
-        </PropertyCell>
-      </div>
+        </PanelRow>
+      </PanelSection>
 
-      {/* Address section */}
+      {/* Address */}
       {hasAddress && (
-        <>
-          <div className='border-b border-border px-4 py-2.5'>
-            <span className='text-[12px] font-semibold uppercase tracking-[0.06em] text-text-tertiary'>
-              Address
-            </span>
-          </div>
+        <PanelSection title='Address'>
           <div className='space-y-0.5 px-4 py-3 text-[13px] text-text-secondary'>
             {addressParts && <p>{addressParts}</p>}
             {cityStateZip && <p>{cityStateZip}</p>}
             {country && <p>{country}</p>}
           </div>
-        </>
+        </PanelSection>
       )}
 
-      {/* Assigned user */}
-      <div className='border-b border-border px-4 py-2.5'>
-        <span className='text-[12px] font-semibold uppercase tracking-[0.06em] text-text-tertiary'>
-          Assigned To
-        </span>
-      </div>
-      {customer.assigned_user ? (
-        <button
-          type='button'
-          className={cn(
-            'flex w-full items-center gap-2 px-4 py-3 text-left transition-colors duration-75',
-            canAssign && onAssign && 'hover:bg-bg-hover',
-            !(canAssign && onAssign) && 'cursor-default'
-          )}
-          onClick={canAssign && onAssign ? onAssign : undefined}
-        >
-          {assigneeInitials && <InitialsAvatar initials={assigneeInitials} size={20} />}
-          <span className='min-w-0 flex-1 truncate text-[13px] font-medium'>
-            {assigneeName}
-          </span>
-          {canAssign && onAssign && (
-            <UserPlus className='size-3.5 shrink-0 text-text-quaternary' />
-          )}
-        </button>
-      ) : canAssign && onAssign ? (
-        <button
-          type='button'
-          className='flex w-full items-center gap-2 px-4 py-3 text-left transition-colors duration-75 hover:bg-bg-hover'
-          onClick={onAssign}
-        >
-          <div className='flex size-5 items-center justify-center rounded-full border border-dashed border-border'>
-            <UserPlus className='size-3 text-text-quaternary' />
+      {/* Assigned To */}
+      <PanelSection title='Assigned To' last>
+        {customer.assigned_user ? (
+          <button
+            type='button'
+            className={cn(
+              'flex w-full items-center gap-2 px-4 py-3 text-left transition-colors duration-75',
+              canAssign && onAssign && 'hover:bg-bg-hover',
+              !(canAssign && onAssign) && 'cursor-default'
+            )}
+            onClick={canAssign && onAssign ? onAssign : undefined}
+          >
+            {assigneeInitials && <InitialsAvatar initials={assigneeInitials} size={20} />}
+            <span className='min-w-0 flex-1 truncate text-[13px] font-medium'>
+              {assigneeName}
+            </span>
+            {canAssign && onAssign && (
+              <UserPlus className='size-3.5 shrink-0 text-text-quaternary' />
+            )}
+          </button>
+        ) : canAssign && onAssign ? (
+          <button
+            type='button'
+            className='flex w-full items-center gap-2 px-4 py-3 text-left transition-colors duration-75 hover:bg-bg-hover'
+            onClick={onAssign}
+          >
+            <div className='flex size-5 items-center justify-center rounded-full border border-dashed border-border'>
+              <UserPlus className='size-3 text-text-quaternary' />
+            </div>
+            <span className='text-[13px] text-text-tertiary'>Assign a sales user</span>
+          </button>
+        ) : (
+          <div className='px-4 py-3'>
+            <span className='text-[13px] text-text-tertiary'>—</span>
           </div>
-          <span className='text-[13px] text-text-tertiary'>Assign a sales user</span>
-        </button>
-      ) : (
-        <div className='px-4 py-3'>
-          <span className='text-[13px] text-text-tertiary'>—</span>
-        </div>
-      )}
+        )}
+      </PanelSection>
     </div>
   )
 }
 
-function PropertyCell({
+// ── Panel Section ────────────────────────────────────────────
+
+function PanelSection({
+  title,
+  children,
+  last,
+}: {
+  title: string
+  children: React.ReactNode
+  last?: boolean
+}) {
+  return (
+    <div className={cn(!last && 'border-b border-border')}>
+      <div className='bg-bg-secondary/60 px-4 py-2'>
+        <span className='text-[11px] font-semibold uppercase tracking-[0.06em] text-text-tertiary'>
+          {title}
+        </span>
+      </div>
+      <div className='bg-background text-[13px]'>{children}</div>
+    </div>
+  )
+}
+
+// ── Panel Row ────────────────────────────────────────────────
+
+function PanelRow({
   label,
   children,
+  last,
 }: {
   label: string
   children: React.ReactNode
+  last?: boolean
 }) {
   return (
-    <div className='border-b border-border-light px-4 py-2.5'>
-      <div className='mb-1 text-[12px] font-medium text-text-tertiary'>{label}</div>
-      <div className='flex items-center'>{children}</div>
+    <div className={cn('flex items-center justify-between px-4 py-2.5', !last && 'border-b border-border-light')}>
+      <span className='text-[12px] font-medium text-text-tertiary'>{label}</span>
+      <div className='flex items-center text-[13px] font-medium text-foreground'>{children}</div>
     </div>
   )
 }

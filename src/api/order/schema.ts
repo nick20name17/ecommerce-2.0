@@ -80,7 +80,7 @@ export type OrderPatchPayload = Partial<
     | 'memo'
     | 'internalnt'
   >
->
+> & { [key: string]: unknown }
 
 export interface OrderItem {
   autoid: string
@@ -98,10 +98,6 @@ export interface OrderItem {
 
 export interface PickStatusRequest {
   is_picked: boolean
-}
-
-export interface BulkPickStatusRequest {
-  items: { item_autoid: string; is_picked: boolean }[]
 }
 
 export interface ShippingRate {

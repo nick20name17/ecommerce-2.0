@@ -13,6 +13,7 @@ import { toast } from 'sonner'
 
 import { PageEmpty } from '@/components/common/page-empty'
 import { IShipping, PAGE_COLORS, PageHeaderIcon } from '@/components/ds'
+import { useBreakpoint } from '@/hooks/use-breakpoint'
 import {
   Dialog,
   DialogContent,
@@ -215,6 +216,9 @@ function formatDate(d: string) {
 // ── Page Component ───────────────────────────────────────────
 
 const ShippingPage = () => {
+  const bp = useBreakpoint()
+  const isMobile = bp === 'mobile'
+  const isTablet = bp === 'tablet'
   const [search, setSearch] = useState('')
   const [selected, setSelected] = useState<ShippingRecord | null>(null)
 
@@ -233,7 +237,7 @@ const ShippingPage = () => {
   return (
     <div className='flex h-full flex-col overflow-hidden'>
       {/* Header */}
-      <header className='flex h-12 shrink-0 items-center gap-2.5 border-b border-border px-6'>
+      <header className={cn('flex h-12 shrink-0 items-center gap-2.5 border-b border-border', isMobile ? 'px-3.5' : 'px-6')}>
         <SidebarTrigger className='-ml-1' />
         <PageHeaderIcon icon={IShipping} color={PAGE_COLORS.shipping} />
         <h1 className='text-[14px] font-semibold tracking-[-0.01em]'>Shipping</h1>
@@ -244,7 +248,7 @@ const ShippingPage = () => {
 
 
       {/* Sample data banner */}
-      <div className='flex shrink-0 items-center gap-2.5 border-b border-amber-200 bg-amber-50 px-6 py-2 dark:border-amber-900/50 dark:bg-amber-950/30'>
+      <div className={cn('flex shrink-0 items-center gap-2.5 border-b border-amber-200 bg-amber-50 py-2 dark:border-amber-900/50 dark:bg-amber-950/30', isMobile ? 'px-3.5' : 'px-6')}>
         <Info className='size-4 shrink-0 text-amber-600 dark:text-amber-400' />
         <p className='text-[13px] text-amber-800 dark:text-amber-300'>
           This page displays sample data. Live shipping integration is coming soon.
@@ -252,7 +256,7 @@ const ShippingPage = () => {
       </div>
 
       {/* Search bar */}
-      <div className='flex shrink-0 items-center gap-2 border-b border-border px-6 py-2'>
+      <div className={cn('flex shrink-0 items-center gap-2 border-b border-border py-2', isMobile ? 'px-3.5' : 'px-6')}>
         <div className='flex flex-1 items-center gap-1.5 rounded-[6px] border border-border bg-background px-2.5 py-1.5'>
           <Search className='size-3.5 shrink-0 text-text-tertiary' />
           <input
@@ -265,7 +269,7 @@ const ShippingPage = () => {
       </div>
 
       {/* Table header */}
-      <div className='flex shrink-0 items-center gap-4 border-b border-border bg-bg-secondary/60 px-6 py-1.5'>
+      {!isMobile && <div className={cn('flex shrink-0 items-center gap-4 border-b border-border bg-bg-secondary/60 py-1.5', isTablet ? 'px-5' : 'px-6')}>
         <div className='w-[80px] shrink-0 text-[12px] font-medium uppercase tracking-[0.04em] text-text-tertiary'>
           ID
         </div>
@@ -288,7 +292,7 @@ const ShippingPage = () => {
           Ship Date
         </div>
         <div className='w-[20px] shrink-0' />
-      </div>
+      </div>}
 
       {/* Table body */}
       <div className='flex-1 overflow-y-auto'>
@@ -297,10 +301,46 @@ const ShippingPage = () => {
         ) : (
           filtered.map((shipment) => {
             const status = STATUS_CONFIG[shipment.status]
-            return (
+            return isMobile ? (
               <div
                 key={shipment.id}
-                className='group/row flex cursor-pointer items-center gap-4 border-b border-border-light px-6 py-2 transition-colors duration-100 hover:bg-bg-hover'
+                className='cursor-pointer border-b border-border-light px-3.5 py-2 transition-colors duration-100 hover:bg-bg-hover'
+                onClick={() => setSelected(shipment)}
+              >
+                <div className='mb-1 flex items-center gap-2'>
+                  <span className='text-[13px] font-semibold tabular-nums text-foreground'>
+                    {shipment.id}
+                  </span>
+                  <span className='min-w-0 flex-1 truncate text-[13px] font-medium text-foreground'>
+                    {shipment.customerName}
+                  </span>
+                  <span className='shrink-0 text-[13px] font-medium tabular-nums text-foreground'>
+                    ${shipment.cost}
+                  </span>
+                </div>
+                <div className='flex items-center gap-2 pl-0'>
+                  <span
+                    className={cn(
+                      'inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-[11px] font-semibold leading-none',
+                      status?.class
+                    )}
+                  >
+                    <span className={cn('size-1.5 rounded-full', status?.dot)} />
+                    {status?.label}
+                  </span>
+                  <span className='text-[13px] text-text-tertiary'>{shipment.carrier}</span>
+                  <span className='text-[13px] tabular-nums text-text-tertiary'>
+                    {formatDate(shipment.shipDate)}
+                  </span>
+                </div>
+              </div>
+            ) : (
+              <div
+                key={shipment.id}
+                className={cn(
+                  'group/row flex cursor-pointer items-center gap-4 border-b border-border-light py-2 transition-colors duration-100 hover:bg-bg-hover',
+                  isTablet ? 'px-5' : 'px-6'
+                )}
                 onClick={() => setSelected(shipment)}
               >
                 <div className='w-[80px] shrink-0'>
@@ -326,7 +366,7 @@ const ShippingPage = () => {
                   <span
                     className={cn(
                       'inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-[11px] font-semibold leading-none',
-                      status?.class,
+                      status?.class
                     )}
                   >
                     <span className={cn('size-1.5 rounded-full', status?.dot)} />
@@ -349,7 +389,7 @@ const ShippingPage = () => {
       </div>
 
       {/* Footer */}
-      <div className='shrink-0 border-t border-border px-6 py-1.5'>
+      <div className={cn('shrink-0 border-t border-border py-1.5', isMobile ? 'px-3.5' : 'px-6')}>
         <p className='text-[13px] tabular-nums text-text-tertiary'>
           {filtered.length} shipment{filtered.length !== 1 ? 's' : ''}
         </p>
