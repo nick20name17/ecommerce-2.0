@@ -382,15 +382,16 @@ function ProposalDetailPage() {
           {/* Summary footer */}
           <div
             className={cn(
-              'flex shrink-0 flex-wrap items-center gap-x-5 gap-y-1 border-t border-border bg-bg-secondary/40',
+              'flex shrink-0 items-center justify-between border-t border-border bg-bg-secondary/40',
               isMobile ? 'px-4 py-2' : 'px-6 py-2',
             )}
           >
             <SummaryCell label='Items' value={String(items.length)} />
-            <div className='flex-1' />
-            <SummaryCell label='Subtotal' value={formatCurrency(proposal.subtotal)} />
-            <SummaryCell label='Tax' value={formatCurrency(proposal.tot_tax || proposal.tax)} />
-            <SummaryCell label='Total' value={formatCurrency(proposal.total)} bold />
+            <div className='flex items-center gap-4'>
+              <SummaryCell label='Subtotal' value={formatCurrency(proposal.subtotal)} />
+              <SummaryCell label='Tax' value={formatCurrency(proposal.tot_tax || proposal.tax)} />
+              <SummaryCell label='Total' value={formatCurrency(proposal.total)} bold />
+            </div>
           </div>
         </div>
 
@@ -601,11 +602,11 @@ function SummaryCell({
   bold?: boolean
 }) {
   return (
-    <div className='flex items-center gap-1.5'>
-      <span className='text-[13px] text-text-tertiary'>{label}:</span>
+    <div className='flex items-center gap-1'>
+      <span className='text-[12px] text-text-tertiary'>{label}:</span>
       <span
         className={cn(
-          'text-[13px] tabular-nums',
+          'text-[12px] tabular-nums',
           bold ? 'font-semibold text-foreground' : 'font-medium text-text-secondary',
         )}
       >

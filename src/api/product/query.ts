@@ -21,7 +21,8 @@ export const PRODUCT_QUERY_KEYS = {
 export const getProductsQuery = (params: ProductListParams = {}) =>
   queryOptions({
     queryKey: PRODUCT_QUERY_KEYS.list(params),
-    queryFn: () => productService.get(params)
+    queryFn: () => productService.get(params),
+    staleTime: 1000 * 60 * 5,
   })
 
 export const getProductConfigurationsQuery = (

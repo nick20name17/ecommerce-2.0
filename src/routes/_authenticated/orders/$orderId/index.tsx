@@ -477,14 +477,10 @@ function OrderDetailPage() {
           {/* Summary footer */}
           <div
             className={cn(
-              'flex shrink-0 flex-wrap items-center gap-x-5 gap-y-1 border-t border-border bg-bg-secondary/40',
+              'flex shrink-0 items-center justify-end gap-4 border-t border-border bg-bg-secondary/40',
               isMobile ? 'px-4 py-2' : 'px-6 py-2',
             )}
           >
-            <SummaryCell label='Items' value={String(items.length)} />
-            <SummaryCell label='Qty' value={order.total_quan ?? '0'} />
-            <SummaryCell label='Shipped' value={order.total_ship ?? '0'} />
-            <div className='flex-1' />
             <SummaryCell label='Subtotal' value={formatCurrency(order.subtotal)} />
             <SummaryCell label='Tax' value={formatCurrency(order.tax)} />
             <SummaryCell label='Total' value={formatCurrency(order.total)} bold />
@@ -492,6 +488,7 @@ function OrderDetailPage() {
               label='Balance'
               value={formatCurrency(order.balance)}
               accent={Number(order.balance) > 0 ? 'warning' : 'success'}
+              bold
             />
           </div>
         </div>

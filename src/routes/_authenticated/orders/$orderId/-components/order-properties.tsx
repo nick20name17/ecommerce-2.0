@@ -222,14 +222,14 @@ export function SummaryCell({
   accent?: 'warning' | 'success'
 }) {
   return (
-    <div className='flex items-center gap-1.5'>
-      <span className='text-[13px] text-text-tertiary'>{label}:</span>
+    <div className='flex items-center gap-1'>
+      <span className='text-[12px] text-text-tertiary'>{label}:</span>
       <span
         className={cn(
-          'text-[13px] tabular-nums',
+          'text-[12px] tabular-nums',
           bold ? 'font-semibold text-foreground' : 'font-medium text-text-secondary',
-          accent === 'warning' && 'text-amber-600 dark:text-amber-400',
-          accent === 'success' && 'text-emerald-600 dark:text-emerald-400',
+          accent === 'warning' && 'font-semibold text-amber-600 dark:text-amber-400',
+          accent === 'success' && 'font-semibold text-emerald-600 dark:text-emerald-400',
         )}
       >
         {value}

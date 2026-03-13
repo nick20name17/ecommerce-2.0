@@ -297,12 +297,12 @@ const OrdersPage = () => {
           >
             <OrderSortableHeader field='invoice' label='Invoice / Customer' sortField={sortField} sortDir={sortDir} onSort={handleSort} className='min-w-0 flex-1' />
             <div className='w-[88px] shrink-0'>Status</div>
-            {!isTablet && <OrderSortableHeader field='inv_date' label='Date' sortField={sortField} sortDir={sortDir} onSort={handleSort} className='w-[92px] shrink-0' />}
+            {!isTablet && <OrderSortableHeader field='inv_date' label='Date' sortField={sortField} sortDir={sortDir} onSort={handleSort} className='w-[100px] shrink-0 justify-end text-right' />}
             <OrderSortableHeader field='total' label='Total' sortField={sortField} sortDir={sortDir} onSort={handleSort} className='w-[100px] shrink-0 justify-end text-right' />
             {!isTablet && <OrderSortableHeader field='balance' label='Balance' sortField={sortField} sortDir={sortDir} onSort={handleSort} className='w-[100px] shrink-0 justify-end text-right' />}
             {!isTablet && <div className='w-[56px] shrink-0 text-center'>Pick</div>}
             <div className='w-[120px] shrink-0'>Responsible</div>
-            <div className='w-[62px] shrink-0' />
+            <div className='w-[46px] shrink-0' />
             <div className='w-[28px] shrink-0' />
           </div>
         )}
@@ -335,12 +335,12 @@ const OrdersPage = () => {
                   <Skeleton className='h-3.5 w-24 rounded' />
                 </div>
                 <div className='w-[88px] shrink-0'><Skeleton className='h-[18px] w-[60px] rounded-[4px]' /></div>
-                {!isTablet && <div className='w-[92px] shrink-0'><Skeleton className='h-3.5 w-[70px] rounded' /></div>}
+                {!isTablet && <div className='w-[100px] shrink-0'><Skeleton className='ml-auto h-3.5 w-[70px] rounded' /></div>}
                 <div className='w-[100px] shrink-0'><Skeleton className='ml-auto h-3.5 w-[60px] rounded' /></div>
                 {!isTablet && <div className='w-[100px] shrink-0'><Skeleton className='ml-auto h-3.5 w-[60px] rounded' /></div>}
                 {!isTablet && <div className='w-[56px] shrink-0'><Skeleton className='mx-auto h-3.5 w-[32px] rounded' /></div>}
                 <div className='w-[120px] shrink-0'><Skeleton className='h-3.5 w-[70px] rounded' /></div>
-                <div className='w-[62px] shrink-0' />
+                <div className='w-[46px] shrink-0' />
                 <div className='w-[28px] shrink-0' />
               </div>
             ),
@@ -544,7 +544,7 @@ function OrderRow({
 
       {/* Date */}
       {!isTablet && (
-        <div className='w-[92px] shrink-0 text-[13px] tabular-nums text-text-secondary'>
+        <div className='w-[100px] shrink-0 text-right text-[13px] tabular-nums text-text-secondary'>
           {order.inv_date ? formatDate(order.inv_date) : <span className='text-text-tertiary'>&mdash;</span>}
         </div>
       )}
