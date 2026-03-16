@@ -339,7 +339,6 @@ const ProposalsPage = () => {
                 isMobile={isMobile}
                 isTablet={isTablet}
                 canAssign={canAssign}
-                projectId={projectId}
                 onDelete={setProposalToDelete}
                 onAttachments={setProposalForAttachments}
                 onNotes={setProposalForNotes}
@@ -429,7 +428,6 @@ function ProposalRow({
   isMobile,
   isTablet,
   canAssign,
-  projectId,
   onDelete,
   onAttachments,
   onNotes,
@@ -441,7 +439,6 @@ function ProposalRow({
   isMobile: boolean
   isTablet: boolean
   canAssign: boolean
-  projectId: number | null
   onDelete: (proposal: Proposal) => void
   onAttachments: (proposal: Proposal) => void
   onNotes: (proposal: Proposal) => void

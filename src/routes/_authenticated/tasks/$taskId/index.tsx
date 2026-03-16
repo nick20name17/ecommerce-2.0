@@ -6,8 +6,7 @@ import {
   ChevronDown,
   ChevronLeft,
   Paperclip,
-  Trash2,
-  X
+  Trash2
 } from 'lucide-react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 

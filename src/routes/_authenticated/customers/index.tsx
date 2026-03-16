@@ -212,7 +212,6 @@ function CustomersPage() {
                 isMobile={isMobile}
                 isTablet={bp === 'tablet'}
                 canAssign={canAssign}
-                projectId={projectId}
                 onEdit={setModalCustomer}
                 onDelete={setDeleteCustomer}
                 onNotes={setCustomerForNotes}
@@ -315,7 +314,6 @@ function CustomerRow({
   isMobile,
   isTablet,
   canAssign,
-  projectId,
   onEdit,
   onDelete,
   onNotes,
@@ -326,7 +324,6 @@ function CustomerRow({
   isMobile: boolean
   isTablet: boolean
   canAssign: boolean
-  projectId: number | null
   onEdit: (customer: Customer) => void
   onDelete: (customer: Customer) => void
   onNotes: (customer: Customer) => void

@@ -359,7 +359,6 @@ const OrdersPage = () => {
                 isMobile={isMobile}
                 isTablet={isTablet}
                 canAssign={canAssign}
-                projectId={projectId}
                 onDelete={setOrderToDelete}
                 onDeleteLinkedProposal={(o) => deleteLinkedProposalMutation.mutate(o.autoid)}
                 onAttachments={setOrderForAttachments}
@@ -453,7 +452,6 @@ function OrderRow({
   isMobile,
   isTablet,
   canAssign,
-  projectId,
   onDelete,
   onDeleteLinkedProposal,
   onAttachments,
@@ -466,7 +464,6 @@ function OrderRow({
   isMobile: boolean
   isTablet: boolean
   canAssign: boolean
-  projectId: number | null
   onDelete: (order: Order) => void
   onDeleteLinkedProposal: (order: Order) => void
   onAttachments: (order: Order) => void
