@@ -21,7 +21,6 @@ import { getCustomersQuery } from '@/api/customer/query'
 import { getFieldConfigQuery } from '@/api/field-config/query'
 import type { Customer } from '@/api/customer/schema'
 import { EntityNotesSheet } from '@/components/common/entity-notes/entity-notes-sheet'
-import { getEntityNotesQuery } from '@/api/note/query'
 import { SidebarTrigger } from '@/components/ui/sidebar'
 import { Pagination } from '@/components/common/filters/pagination'
 import { PageEmpty } from '@/components/common/page-empty'
@@ -87,6 +86,7 @@ function CustomersPage() {
     ordering,
     offset,
     limit,
+    notes: true as const,
   }
 
   const { data, isLoading } = useQuery(getCustomersQuery(params))
@@ -338,11 +338,7 @@ function CustomerRow({
   const email = customer.contact_3 || null
   const typeLabel = getCustomerTypeLabel(customer.in_level)
 
-  const { data: notes } = useQuery({
-    ...getEntityNotesQuery('customer', customer.autoid, projectId),
-    staleTime: 5 * 60 * 1000,
-  })
-  const noteCount = notes?.length ?? 0
+  const noteCount = Array.isArray(customer.notes) ? customer.notes.length : 0
 
   if (isMobile) {
     return (

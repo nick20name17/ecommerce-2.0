@@ -92,17 +92,13 @@ export function CartEditableTable({
 
     try {
       const res = await productService.get({
-        search: id,
-        limit: 10,
+        id,
+        limit: 1,
         customer_id: customerId,
         project_id: projectId ?? undefined
       })
 
-      // Prefer exact ID match, then starts-with, then first result
-      const idLower = id.toLowerCase()
-      const exact = res.results.find((p) => p.id.toLowerCase() === idLower)
-      const startsWith = !exact && res.results.find((p) => p.id.toLowerCase().startsWith(idLower))
-      const product = exact ?? startsWith ?? res.results[0]
+      const product = res.results[0]
 
       if (!product) {
         setPendingEntries((prev) => prev.filter((pe) => pe.key !== entryKey))

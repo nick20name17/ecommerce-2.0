@@ -1,4 +1,5 @@
 import { AlertCircle, Minus, Plus } from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
 
 import { cn } from '@/lib/utils'
 
@@ -38,14 +39,56 @@ export const NumberInput = ({
   const isDisabled = disabled || (max !== undefined && max <= 0)
   const s = sizeClasses[size]
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const n = parseInt(e.target.value, 10)
-    if (!isNaN(n) && n >= min) onChange(max !== undefined ? Math.min(max, n) : n)
+  const [editing, setEditing] = useState(false)
+  const [draft, setDraft] = useState('')
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  // Sync external value into draft when not editing
+  useEffect(() => {
+    if (!editing) {
+      setDraft(String(value))
+    }
+  }, [value, editing])
+
+  const clamp = (n: number) => {
+    let clamped = Math.max(min, n)
+    if (max !== undefined) clamped = Math.min(max, clamped)
+    return clamped
   }
 
-  const handleBlur = () => {
-    const clamped = Math.max(min, max !== undefined ? Math.min(max, value) : value)
-    if (value !== clamped) onChange(clamped)
+  const commit = () => {
+    setEditing(false)
+    const n = parseInt(draft, 10)
+    if (isNaN(n) || draft.trim() === '') {
+      // Restore previous value
+      setDraft(String(value))
+      return
+    }
+    const clamped = clamp(n)
+    if (clamped !== value) {
+      onChange(clamped)
+    }
+    setDraft(String(clamped))
+  }
+
+  const handleFocus = () => {
+    setEditing(true)
+    setDraft(String(value))
+    // Select all on focus so user can type a new number directly
+    requestAnimationFrame(() => inputRef.current?.select())
+  }
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      e.preventDefault()
+      commit()
+      inputRef.current?.blur()
+    }
+    if (e.key === 'Escape') {
+      setEditing(false)
+      setDraft(String(value))
+      inputRef.current?.blur()
+    }
   }
 
   const decrement = () => onChange(Math.max(min, value - step))
@@ -73,20 +116,29 @@ export const NumberInput = ({
           <Minus className='size-3.5' />
         </button>
         <input
-          type='number'
+          ref={inputRef}
+          type='text'
+          inputMode='numeric'
+          pattern='[0-9]*'
           id={id}
           name={name}
           className={cn(
-            '[appearance:textfield] border-0 bg-transparent text-center outline-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none',
+            'border-0 bg-transparent text-center outline-none',
             size === 'sm' ? 'w-10 text-sm' : 'w-14'
           )}
-          value={value}
+          value={editing ? draft : String(value)}
           min={min}
           max={max}
           step={step}
           disabled={isDisabled}
-          onChange={handleInputChange}
-          onBlur={handleBlur}
+          onChange={(e) => {
+            // Allow only digits while typing
+            const val = e.target.value.replace(/[^0-9]/g, '')
+            setDraft(val)
+          }}
+          onFocus={handleFocus}
+          onBlur={commit}
+          onKeyDown={handleKeyDown}
         />
         <button
           type='button'

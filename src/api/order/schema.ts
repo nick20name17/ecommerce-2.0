@@ -142,4 +142,5 @@ export interface OrderParams extends PaginationParams {
   status?: string
   customer_id?: string
   project_id?: number
+  notes?: boolean
 }

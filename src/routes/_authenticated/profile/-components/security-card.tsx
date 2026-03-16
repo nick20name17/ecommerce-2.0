@@ -8,7 +8,6 @@ import { type ChangePasswordFormValues, ChangePasswordSchema } from '@/api/profi
 import { profileService } from '@/api/profile/service'
 import { PasswordInput } from '@/components/common/inputs/password-input'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import {
   Dialog,
   DialogBody,
@@ -24,26 +23,28 @@ export const SecurityCard = () => {
 
   return (
     <>
-      <Card>
-        <CardHeader>
-          <CardTitle>Security</CardTitle>
-          <CardDescription>Keep your account secure by using a strong password.</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Button
-            variant='outline'
+      <div>
+        <div className='bg-bg-secondary/60 px-5 py-2'>
+          <span className='text-[11px] font-semibold uppercase tracking-[0.06em] text-text-tertiary'>
+            Security
+          </span>
+        </div>
+        <div className='px-5 py-3'>
+          <p className='mb-3 text-[13px] text-text-tertiary'>
+            Keep your account secure by using a strong password.
+          </p>
+          <button
+            type='button'
+            className='inline-flex h-7 items-center gap-1.5 rounded-[5px] border border-border bg-background px-2.5 text-[13px] font-medium text-text-secondary transition-colors duration-[80ms] hover:bg-bg-hover hover:text-foreground'
             onClick={() => setOpen(true)}
           >
-            <Lock />
+            <Lock className='size-3.5' />
             Change Password
-          </Button>
-        </CardContent>
-      </Card>
+          </button>
+        </div>
+      </div>
 
-      <ChangePasswordDialog
-        open={open}
-        onOpenChange={setOpen}
-      />
+      <ChangePasswordDialog open={open} onOpenChange={setOpen} />
     </>
   )
 }
@@ -66,9 +67,7 @@ const ChangePasswordDialog = ({
 
   const mutation = useMutation({
     mutationFn: profileService.changePassword,
-    meta: {
-      successMessage: 'Password changed successfully'
-    },
+    meta: { successMessage: 'Password changed successfully' },
     onSuccess: () => {
       form.reset()
       onOpenChange(false)
@@ -78,27 +77,19 @@ const ChangePasswordDialog = ({
   const handleSubmit = form.handleSubmit((data) => mutation.mutate(data))
 
   const handleClose = (nextOpen: boolean) => {
-    if (!nextOpen) {
-      form.reset()
-    }
+    if (!nextOpen) form.reset()
     onOpenChange(nextOpen)
   }
 
   return (
-    <Dialog
-      open={open}
-      onOpenChange={handleClose}
-    >
+    <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className='flex max-h-[90vh] flex-col overflow-hidden p-0 sm:max-w-md'>
-        <DialogHeader className='bg-background sticky top-0 z-10 border-b px-6 py-4'>
+        <DialogHeader className='sticky top-0 z-10 border-b bg-background px-6 py-4'>
           <DialogTitle>Change Password</DialogTitle>
         </DialogHeader>
 
         <DialogBody className='px-6 py-4'>
-          <form
-            id='password-form'
-            onSubmit={handleSubmit}
-          >
+          <form id='password-form' onSubmit={handleSubmit}>
             <FieldGroup>
               <Controller
                 name='old_password'
@@ -106,10 +97,7 @@ const ChangePasswordDialog = ({
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
                     <FieldLabel htmlFor='old-password'>Current Password</FieldLabel>
-                    <PasswordInput
-                      {...field}
-                      id='old-password'
-                    />
+                    <PasswordInput {...field} id='old-password' />
                     {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                   </Field>
                 )}
@@ -120,10 +108,7 @@ const ChangePasswordDialog = ({
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
                     <FieldLabel htmlFor='new-password'>New Password</FieldLabel>
-                    <PasswordInput
-                      {...field}
-                      id='new-password'
-                    />
+                    <PasswordInput {...field} id='new-password' />
                     {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                   </Field>
                 )}
@@ -134,10 +119,7 @@ const ChangePasswordDialog = ({
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
                     <FieldLabel htmlFor='new-password-confirm'>Confirm New Password</FieldLabel>
-                    <PasswordInput
-                      {...field}
-                      id='new-password-confirm'
-                    />
+                    <PasswordInput {...field} id='new-password-confirm' />
                     {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                   </Field>
                 )}
@@ -146,7 +128,7 @@ const ChangePasswordDialog = ({
           </form>
         </DialogBody>
 
-        <DialogFooter className='bg-background sticky bottom-0 z-10 border-t px-6 py-4'>
+        <DialogFooter className='sticky bottom-0 z-10 border-t bg-background px-6 py-4'>
           <Button
             variant='outline'
             onClick={() => handleClose(false)}

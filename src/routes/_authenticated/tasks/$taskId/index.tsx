@@ -330,7 +330,7 @@ function TaskDetailPage() {
               <Paperclip className='size-3.5' />
               Attachments
               {(task.attachments?.length ?? 0) > 0 && (
-                <span className='flex h-[16px] min-w-[16px] items-center justify-center rounded-full bg-bg-active px-1 text-[13px] font-medium tabular-nums text-text-secondary'>
+                <span className='text-[11px] tabular-nums text-text-tertiary'>
                   {task.attachments!.length}
                 </span>
               )}
@@ -501,15 +501,6 @@ function TaskDetailPage() {
                   value={task.due_date ?? null}
                   onChange={(date) => updateMutation.mutate({ due_date: date })}
                 />
-                {task.due_date && (
-                  <button
-                    type='button'
-                    className='ml-1 rounded-[4px] p-1 text-text-tertiary transition-colors duration-[80ms] hover:bg-bg-hover hover:text-foreground'
-                    onClick={() => updateMutation.mutate({ due_date: null })}
-                  >
-                    <X className='size-3' />
-                  </button>
-                )}
               </div>
             </PropertyRow>
 

@@ -47,6 +47,7 @@ export interface CustomerParams extends PaginationParams {
   inactive?: boolean
   project_id?: number
   fields?: string
+  notes?: boolean
 }
 
 export const CustomerSchema = z.object({

@@ -79,7 +79,7 @@ export function ShippingRatesDialog({
     if (next) {
       const pickedIds = items.filter((i) => i.is_picked).map((i) => i.autoid)
       setPackages([
-        { id: `pkg-${Date.now()}`, items: pickedIds, weight: 0, length: 0, width: 0, height: 0 },
+        { id: `pkg-${Date.now()}`, items: pickedIds, weight: 0, length: 1, width: 1, height: 1 },
       ])
       setAddress({
         c_name: order.c_name ?? '',
@@ -126,7 +126,7 @@ export function ShippingRatesDialog({
   const addPackage = () => {
     setPackages((prev) => [
       ...prev,
-      { id: `pkg-${Date.now()}`, items: [], weight: 0, length: 0, width: 0, height: 0 },
+      { id: `pkg-${Date.now()}`, items: [], weight: 0, length: 1, width: 1, height: 1 },
     ])
   }
 

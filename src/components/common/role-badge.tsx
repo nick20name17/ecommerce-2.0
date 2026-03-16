@@ -1,13 +1,19 @@
-import { Badge } from '@/components/ui/badge'
 import { USER_ROLES, getUserRoleLabel } from '@/constants/user'
 import type { UserRole } from '@/constants/user'
 import { cn } from '@/lib/utils'
 
-const roleColorClasses: Record<UserRole, string> = {
-  [USER_ROLES.superadmin]: 'bg-role-superadmin/15 text-role-superadmin dark:bg-role-superadmin/25',
-  [USER_ROLES.admin]: 'bg-role-admin/15 text-role-admin dark:bg-role-admin/25',
-  [USER_ROLES.sale]: 'bg-role-sale/15 text-role-sale dark:bg-role-sale/25',
-  [USER_ROLES.manager]: 'bg-role-manager/15 text-role-manager dark:bg-role-manager/25'
+const roleDotColors: Record<UserRole, string> = {
+  [USER_ROLES.superadmin]: 'bg-role-superadmin',
+  [USER_ROLES.admin]: 'bg-role-admin',
+  [USER_ROLES.sale]: 'bg-role-sale',
+  [USER_ROLES.manager]: 'bg-role-manager'
+}
+
+const roleTextColors: Record<UserRole, string> = {
+  [USER_ROLES.superadmin]: 'text-role-superadmin',
+  [USER_ROLES.admin]: 'text-role-admin',
+  [USER_ROLES.sale]: 'text-role-sale',
+  [USER_ROLES.manager]: 'text-role-manager'
 }
 
 interface RoleBadgeProps {
@@ -16,5 +22,10 @@ interface RoleBadgeProps {
 }
 
 export const RoleBadge = ({ role, className }: RoleBadgeProps) => {
-  return <Badge className={cn(roleColorClasses[role], className)}>{getUserRoleLabel(role)}</Badge>
+  return (
+    <span className={cn('inline-flex items-center gap-1.5 text-[12px] font-semibold', roleTextColors[role], className)}>
+      <span className={cn('size-2 rounded-full', roleDotColors[role])} />
+      {getUserRoleLabel(role)}
+    </span>
+  )
 }

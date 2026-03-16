@@ -7,10 +7,6 @@ import { profileService } from '@/api/profile/service'
 import { USER_QUERY_KEYS } from '@/api/user/query'
 import type { User } from '@/api/user/schema'
 import { RoleBadge } from '@/components/common/role-badge'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
-import { Field, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field'
-import { Input } from '@/components/ui/input'
 import { updateSessionUser } from '@/helpers/auth'
 import { formatDate } from '@/helpers/formatters'
 
@@ -31,9 +27,7 @@ export const ProfileInfoCard = ({ user }: ProfileInfoCardProps) => {
 
   const mutation = useMutation({
     mutationFn: profileService.updateProfile,
-    meta: {
-      successMessage: 'Profile updated successfully'
-    },
+    meta: { successMessage: 'Profile updated successfully' },
     onSuccess: (updatedUser) => {
       queryClient.setQueryData(USER_QUERY_KEYS.detail('me'), updatedUser)
       queryClient.invalidateQueries({ queryKey: USER_QUERY_KEYS.lists() })
@@ -47,103 +41,126 @@ export const ProfileInfoCard = ({ user }: ProfileInfoCardProps) => {
 
   const handleSubmit = form.handleSubmit((data) => mutation.mutate(data))
 
-  const handleCancel = () => {
-    form.reset({
-      first_name: user.first_name,
-      last_name: user.last_name
-    })
-  }
-
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Profile Information</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <form
-          id='profile-form'
-          onSubmit={handleSubmit}
-        >
-          <FieldGroup>
-            <div className='grid grid-cols-2 gap-4'>
-              <Field>
-                <FieldLabel className='text-text-tertiary text-[13px]'>Email</FieldLabel>
-                <p className='text-[13px]'>{user.email}</p>
-              </Field>
-              <Field>
-                <FieldLabel className='text-text-tertiary text-[13px]'>Member Since</FieldLabel>
-                <p className='text-[13px]'>{formatDate(user.date_joined)}</p>
-              </Field>
-            </div>
+    <div>
+      <div className='bg-bg-secondary/60 px-5 py-2'>
+        <span className='text-[11px] font-semibold uppercase tracking-[0.06em] text-text-tertiary'>
+          Profile Information
+        </span>
+      </div>
+      <div className='text-[13px]'>
+        {/* Read-only fields */}
+        <ProfileRow label='Email' value={user.email} />
+        <ProfileRow label='Member Since' value={formatDate(user.date_joined)} />
 
-            <Controller
-              name='first_name'
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor='first-name'>First Name</FieldLabel>
-                  <Input
-                    {...field}
-                    id='first-name'
-                    placeholder='Enter first name'
-                    aria-invalid={fieldState.invalid}
-                  />
-                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                </Field>
-              )}
-            />
-
-            <Controller
-              name='last_name'
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor='last-name'>Last Name</FieldLabel>
-                  <Input
-                    {...field}
-                    id='last-name'
-                    placeholder='Enter last name'
-                    aria-invalid={fieldState.invalid}
-                  />
-                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                </Field>
-              )}
-            />
-
-            <Field>
-              <FieldLabel className='text-text-tertiary text-[13px]'>Role</FieldLabel>
-              <div>
-                <RoleBadge role={user.role} />
-              </div>
-            </Field>
-
-            {user.project ? (
-              <Field>
-                <FieldLabel className='text-text-tertiary text-[13px]'>Project</FieldLabel>
-                <p className='text-[13px]'>{user.project_name || `Project #${user.project}`}</p>
-              </Field>
-            ) : null}
-          </FieldGroup>
+        {/* Editable fields */}
+        <form id='profile-form' onSubmit={handleSubmit}>
+          <Controller
+            name='first_name'
+            control={form.control}
+            render={({ field, fieldState }) => (
+              <FieldRow
+                label='First Name'
+                value={field.value}
+                onChange={field.onChange}
+                error={fieldState.error?.message}
+              />
+            )}
+          />
+          <Controller
+            name='last_name'
+            control={form.control}
+            render={({ field, fieldState }) => (
+              <FieldRow
+                label='Last Name'
+                value={field.value}
+                onChange={field.onChange}
+                error={fieldState.error?.message}
+              />
+            )}
+          />
         </form>
-      </CardContent>
-      <CardFooter className='justify-end gap-2'>
-        <Button
-          type='button'
-          variant='outline'
-          disabled={!form.formState.isDirty || mutation.isPending}
-          onClick={handleCancel}
-        >
-          Cancel
-        </Button>
-        <Button
-          type='submit'
-          form='profile-form'
-          isPending={mutation.isPending}
-          disabled={!form.formState.isDirty || mutation.isPending}
-        >
-          Save Changes
-        </Button>
-      </CardFooter>
-    </Card>
+
+        {/* Role */}
+        <ProfileRow label='Role'>
+          <RoleBadge role={user.role} />
+        </ProfileRow>
+
+        {/* Project */}
+        {user.project && (
+          <ProfileRow label='Project' value={user.project_name || `Project #${user.project}`} />
+        )}
+
+        {/* Save bar */}
+        {form.formState.isDirty && (
+          <div className='flex items-center justify-end gap-2 bg-bg-secondary/40 px-5 py-2.5'>
+            <button
+              type='button'
+              className='inline-flex h-7 items-center gap-1 rounded-[5px] border border-border bg-background px-2.5 text-[13px] font-medium text-text-secondary transition-colors duration-[80ms] hover:bg-bg-hover'
+              onClick={() => form.reset({ first_name: user.first_name, last_name: user.last_name })}
+              disabled={mutation.isPending}
+            >
+              Cancel
+            </button>
+            <button
+              type='submit'
+              form='profile-form'
+              className='inline-flex h-7 items-center gap-1 rounded-[5px] bg-primary px-2.5 text-[13px] font-medium text-primary-foreground transition-colors duration-[80ms] hover:opacity-90 disabled:opacity-50'
+              disabled={mutation.isPending}
+            >
+              {mutation.isPending ? 'Saving...' : 'Save Changes'}
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+// ── Read-only Row ───────────────────────────────────────────
+
+function ProfileRow({
+  label,
+  value,
+  children,
+}: {
+  label: string
+  value?: string
+  children?: React.ReactNode
+}) {
+  return (
+    <div className='flex items-center justify-between gap-4 border-b border-border-light px-5 py-2.5'>
+      <span className='shrink-0 text-[12px] font-medium text-text-tertiary'>{label}</span>
+      {children ?? (
+        <span className='min-w-0 truncate text-right font-medium text-foreground'>{value}</span>
+      )}
+    </div>
+  )
+}
+
+// ── Editable Field Row ──────────────────────────────────────
+
+function FieldRow({
+  label,
+  value,
+  onChange,
+  error,
+}: {
+  label: string
+  value: string
+  onChange: (value: string) => void
+  error?: string
+}) {
+  return (
+    <div className='border-b border-border-light px-5 py-2'>
+      <label className='mb-1 block text-[12px] font-medium text-text-tertiary'>{label}</label>
+      <input
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className='w-full rounded-[5px] border border-border bg-background px-2.5 py-1.5 text-[13px] font-medium text-foreground outline-none transition-[border-color,box-shadow] duration-75 placeholder:text-text-quaternary focus:border-primary/50 focus:ring-1 focus:ring-primary/20'
+        placeholder={`Enter ${label.toLowerCase()}`}
+      />
+      {error && <p className='mt-1 text-[11px] text-destructive'>{error}</p>}
+    </div>
   )
 }

@@ -31,7 +31,6 @@ import { PageEmpty } from '@/components/common/page-empty'
 import { SidebarTrigger } from '@/components/ui/sidebar'
 import { EntityAttachmentsDialog } from '@/components/common/entity-attachments/entity-attachments-dialog'
 import { EntityNotesSheet } from '@/components/common/entity-notes/entity-notes-sheet'
-import { getEntityNotesQuery } from '@/api/note/query'
 import { Pagination } from '@/components/common/filters/pagination'
 import {
   DropdownMenu,
@@ -160,6 +159,7 @@ const OrdersPage = () => {
     status: activeStatus ?? undefined,
     project_id: projectId ?? undefined,
     ordering,
+    notes: true,
   }
 
   const { data, refetch, isLoading } = useQuery(getOrdersQuery(params))
@@ -480,11 +480,7 @@ function OrderRow({
   const statusClass = ORDER_STATUS_CLASS[order.status] ?? ''
   const dotColor = STATUS_DOT_COLORS[order.status] ?? 'bg-slate-400'
 
-  const { data: notes } = useQuery({
-    ...getEntityNotesQuery('order', order.autoid, projectId),
-    staleTime: 5 * 60 * 1000,
-  })
-  const noteCount = notes?.length ?? 0
+  const noteCount = Array.isArray(order.notes) ? order.notes.length : 0
 
   if (isMobile) {
     return (

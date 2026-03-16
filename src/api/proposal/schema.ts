@@ -52,4 +52,5 @@ export interface ProposalParams extends PaginationParams {
   status?: string
   project_id?: number
   b_id?: string
+  notes?: boolean
 }

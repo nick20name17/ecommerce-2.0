@@ -22,7 +22,6 @@ import { getFieldConfigQuery } from '@/api/field-config/query'
 import { CommandBarCreate } from '@/components/tasks/command-bar-create'
 import { FilterChip, FilterPopover, IProposals, InitialsAvatar, PAGE_COLORS, PageHeaderIcon } from '@/components/ds'
 import { getProposalsQuery } from '@/api/proposal/query'
-import { getEntityNotesQuery } from '@/api/note/query'
 import type { Proposal, ProposalParams } from '@/api/proposal/schema'
 import { PageEmpty } from '@/components/common/page-empty'
 import { SidebarTrigger } from '@/components/ui/sidebar'
@@ -144,6 +143,7 @@ const ProposalsPage = () => {
     status: activeStatus ?? undefined,
     project_id: projectId ?? undefined,
     ordering,
+    notes: true,
   }
 
   const { data, refetch, isLoading } = useQuery(getProposalsQuery(params))
@@ -454,11 +454,7 @@ function ProposalRow({
   const statusClass = PROPOSAL_STATUS_CLASS[proposal.status] ?? ''
   const dotColor = STATUS_DOT_COLORS[proposal.status] ?? 'bg-slate-400'
 
-  const { data: notes } = useQuery({
-    ...getEntityNotesQuery('proposal', proposal.autoid, projectId),
-    staleTime: 5 * 60 * 1000,
-  })
-  const noteCount = notes?.length ?? 0
+  const noteCount = Array.isArray(proposal.notes) ? proposal.notes.length : 0
 
   if (isMobile) {
     return (

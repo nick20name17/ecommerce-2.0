@@ -133,6 +133,7 @@ export type ProductResponse = PaginatedResponse<Product>
 
 export interface ProductParams extends PaginationParams {
   search?: string
+  id?: string
   ordering?: string
   inactive?: boolean
   type?: string
