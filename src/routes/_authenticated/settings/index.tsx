@@ -67,7 +67,6 @@ import { isAdmin } from '@/constants/user'
 import type { UserRole } from '@/constants/user'
 import { getSession } from '@/helpers/auth'
 import { useProjectId } from '@/hooks/use-project-id'
-import { useSearchParam } from '@/hooks/use-query-params'
 import { cn } from '@/lib/utils'
 import { useAuth } from '@/providers/auth'
 import { UserDeleteDialog } from '../users/-components/user-delete-dialog'
@@ -954,8 +953,8 @@ const UserStatusToggle = ({
 }
 
 const UsersSection = () => {
-  const [search, setSearch] = useSearchParam()
-  const debouncedSetSearch = useDebouncedCallback((value: string) => setSearch(value || null), 300)
+  const [search, setSearch] = useState('')
+  const debouncedSetSearch = useDebouncedCallback((value: string) => setSearch(value), 300)
   const { user: currentUser } = useAuth()
 
   const [modalUser, setModalUser] = useState<User | 'create' | null>(null)
