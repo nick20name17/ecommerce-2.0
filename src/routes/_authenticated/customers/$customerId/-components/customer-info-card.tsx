@@ -1,26 +1,30 @@
 import { UserPlus } from 'lucide-react'
 
 import type { Customer } from '@/api/customer/schema'
+import type { FieldConfigResponse } from '@/api/field-config/schema'
 import { InitialsAvatar } from '@/components/ds'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { getCustomerTypeLabel } from '@/constants/customer'
 import { isAdmin } from '@/constants/user'
+import { getColumnLabel } from '@/helpers/dynamic-columns'
 import { formatDate, formatPhone } from '@/helpers/formatters'
 import { cn } from '@/lib/utils'
 import { useAuth } from '@/providers/auth'
 
 interface CustomerInfoPanelProps {
   customer: Customer
+  fieldConfig?: FieldConfigResponse | null
   onAssign?: () => void
 }
 
-export const CustomerInfoPanel = ({ customer, onAssign }: CustomerInfoPanelProps) => {
+export const CustomerInfoPanel = ({ customer, fieldConfig, onAssign }: CustomerInfoPanelProps) => {
   const { user } = useAuth()
   const canAssign = !!user?.role && isAdmin(user.role)
   const isActive = !customer.inactive
   const phone = customer.contact_1 ? formatPhone(customer.contact_1) : null
   const email = customer.contact_3 || null
   const typeLabel = getCustomerTypeLabel(customer.in_level)
+  const typeLabelName = getColumnLabel('in_level', 'customer', fieldConfig)
   const lastOrderDate = formatDate(customer.last_order_date)
 
   const addressParts = [customer.address1, customer.address2].filter(Boolean).join(', ')
@@ -55,7 +59,7 @@ export const CustomerInfoPanel = ({ customer, onAssign }: CustomerInfoPanelProps
         <PanelRow label='ID'>
           <span className='tabular-nums'>{customer.id}</span>
         </PanelRow>
-        <PanelRow label='Type'>
+        <PanelRow label={typeLabelName}>
           {typeLabel !== '—' ? (
             <span className='inline-flex items-center rounded-[4px] bg-bg-secondary px-1.5 py-0.5 text-[12px] font-medium text-text-secondary'>
               {typeLabel}

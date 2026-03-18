@@ -10,6 +10,7 @@ import { CustomerProposalsTab } from './-components/customer-proposals-tab'
 import { CustomerTasksTab } from './-components/customer-tasks-tab'
 import { EntityNotesSheet } from '@/components/common/entity-notes/entity-notes-sheet'
 import { getCustomerDetailQuery } from '@/api/customer/query'
+import { getFieldConfigQuery } from '@/api/field-config/query'
 import { ICustomers, PAGE_COLORS, PageHeaderIcon } from '@/components/ds'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { CustomerAssignDialog } from '@/routes/_authenticated/customers/-components/customer-assign-dialog'
@@ -45,6 +46,7 @@ function CustomerDetailPage() {
   const { data: customer, isLoading } = useQuery(
     getCustomerDetailQuery(customerId, projectId)
   )
+  const { data: fieldConfig } = useQuery(getFieldConfigQuery(projectId))
 
   // Loading
   if (isLoading) {
@@ -277,7 +279,7 @@ function CustomerDetailPage() {
               : 'w-[380px] border-l border-border bg-bg-secondary/50'
           )}
         >
-          <CustomerInfoPanel customer={customer} onAssign={() => setAssignOpen(true)} />
+          <CustomerInfoPanel customer={customer} fieldConfig={fieldConfig} onAssign={() => setAssignOpen(true)} />
         </div>
       </div>
 
