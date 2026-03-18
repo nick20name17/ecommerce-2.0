@@ -1,7 +1,8 @@
-import { useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { createFileRoute, useRouter } from '@tanstack/react-router'
 import { ChevronLeft, Pencil, StickyNote, Trash2, UserPlus } from 'lucide-react'
 import { useState } from 'react'
+import { toast } from 'sonner'
 
 import { CustomerDashboardTab } from './-components/customer-dashboard-tab'
 import { CustomerInfoPanel } from './-components/customer-info-card'
@@ -9,8 +10,10 @@ import { CustomerOrdersTab } from './-components/customer-orders-tab'
 import { CustomerProposalsTab } from './-components/customer-proposals-tab'
 import { CustomerTasksTab } from './-components/customer-tasks-tab'
 import { EntityNotesSheet } from '@/components/common/entity-notes/entity-notes-sheet'
-import { getCustomerDetailQuery } from '@/api/customer/query'
+import { CUSTOMER_QUERY_KEYS, getCustomerDetailQuery } from '@/api/customer/query'
+import { customerService } from '@/api/customer/service'
 import { getFieldConfigQuery } from '@/api/field-config/query'
+import { getPriceLevelsQuery } from '@/api/price-level/query'
 import { ICustomers, PAGE_COLORS, PageHeaderIcon } from '@/components/ds'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { CustomerAssignDialog } from '@/routes/_authenticated/customers/-components/customer-assign-dialog'
@@ -43,10 +46,21 @@ function CustomerDetailPage() {
   const [assignOpen, setAssignOpen] = useState(false)
   const [notesOpen, setNotesOpen] = useState(false)
 
+  const queryClient = useQueryClient()
+
   const { data: customer, isLoading } = useQuery(
     getCustomerDetailQuery(customerId, projectId)
   )
   const { data: fieldConfig } = useQuery(getFieldConfigQuery(projectId))
+  const { data: priceLevels } = useQuery(getPriceLevelsQuery(projectId))
+
+  const priceLevelMutation = useMutation({
+    mutationFn: (value: string) => customerService.update(customerId, { in_level: value }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: CUSTOMER_QUERY_KEYS.detail(customerId) })
+      toast.success('Price level updated')
+    },
+  })
 
   // Loading
   if (isLoading) {
@@ -279,7 +293,13 @@ function CustomerDetailPage() {
               : 'w-[380px] border-l border-border bg-bg-secondary/50'
           )}
         >
-          <CustomerInfoPanel customer={customer} fieldConfig={fieldConfig} onAssign={() => setAssignOpen(true)} />
+          <CustomerInfoPanel
+            customer={customer}
+            fieldConfig={fieldConfig}
+            priceLevels={priceLevels}
+            onPriceLevelChange={(value) => priceLevelMutation.mutate(value)}
+            onAssign={() => setAssignOpen(true)}
+          />
         </div>
       </div>
 

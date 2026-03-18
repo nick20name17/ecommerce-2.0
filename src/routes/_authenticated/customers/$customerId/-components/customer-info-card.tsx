@@ -1,8 +1,14 @@
-import { UserPlus } from 'lucide-react'
+import { ChevronDown, UserPlus } from 'lucide-react'
 
 import type { Customer } from '@/api/customer/schema'
 import type { FieldConfigResponse } from '@/api/field-config/schema'
 import { InitialsAvatar } from '@/components/ds'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { getCustomerTypeLabel } from '@/constants/customer'
 import { isAdmin } from '@/constants/user'
@@ -14,10 +20,12 @@ import { useAuth } from '@/providers/auth'
 interface CustomerInfoPanelProps {
   customer: Customer
   fieldConfig?: FieldConfigResponse | null
+  priceLevels?: string[]
+  onPriceLevelChange?: (value: string) => void
   onAssign?: () => void
 }
 
-export const CustomerInfoPanel = ({ customer, fieldConfig, onAssign }: CustomerInfoPanelProps) => {
+export const CustomerInfoPanel = ({ customer, fieldConfig, priceLevels, onPriceLevelChange, onAssign }: CustomerInfoPanelProps) => {
   const { user } = useAuth()
   const canAssign = !!user?.role && isAdmin(user.role)
   const isActive = !customer.inactive
@@ -38,6 +46,8 @@ export const CustomerInfoPanel = ({ customer, fieldConfig, onAssign }: CustomerI
   const assigneeInitials = assigneeName
     ? assigneeName.split(' ').slice(0, 2).map(n => n[0]?.toUpperCase() ?? '').join('')
     : null
+
+  const canEditPriceLevel = !!(priceLevels?.length && onPriceLevelChange)
 
   return (
     <div>
@@ -60,7 +70,30 @@ export const CustomerInfoPanel = ({ customer, fieldConfig, onAssign }: CustomerI
           <span className='tabular-nums'>{customer.id}</span>
         </PanelRow>
         <PanelRow label={typeLabelName}>
-          {typeLabel !== '—' ? (
+          {canEditPriceLevel ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button
+                  type='button'
+                  className='inline-flex items-center gap-1 rounded-[4px] bg-bg-secondary px-1.5 py-0.5 text-[12px] font-medium text-text-secondary transition-colors duration-75 hover:bg-bg-active'
+                >
+                  {typeLabel !== '—' ? typeLabel : 'Select…'}
+                  <ChevronDown className='size-3 text-text-quaternary' />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align='end'>
+                {priceLevels.map((level) => (
+                  <DropdownMenuItem
+                    key={level}
+                    onClick={() => onPriceLevelChange(level)}
+                    className={cn(customer.in_level === level && 'font-semibold')}
+                  >
+                    {level}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : typeLabel !== '—' ? (
             <span className='inline-flex items-center rounded-[4px] bg-bg-secondary px-1.5 py-0.5 text-[12px] font-medium text-text-secondary'>
               {typeLabel}
             </span>
