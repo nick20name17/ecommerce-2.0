@@ -37,7 +37,7 @@ export interface CreateCustomerPayload {
   inactive?: boolean
 }
 
-export type UpdateCustomerPayload = Partial<CreateCustomerPayload>
+export type UpdateCustomerPayload = Partial<CreateCustomerPayload> & { [key: string]: unknown }
 
 export type CustomerResponse = PaginatedResponse<Customer>
 

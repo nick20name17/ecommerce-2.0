@@ -30,6 +30,7 @@ export interface ProposalItem {
   unit: string
   descr: string
   amount: string
+  [key: string]: unknown
 }
 
 export interface ToOrderResponse {

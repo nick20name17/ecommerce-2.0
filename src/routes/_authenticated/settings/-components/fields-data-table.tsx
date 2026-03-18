@@ -50,9 +50,6 @@ export const FieldsDataTable = ({
             <div className='flex w-[60px] shrink-0 justify-end'>
               <Skeleton className='h-5 w-9 rounded-full' />
             </div>
-            <div className='flex w-[60px] shrink-0 justify-end'>
-              <Skeleton className='h-5 w-9 rounded-full' />
-            </div>
           </div>
         ))}
       </div>
@@ -77,9 +74,6 @@ export const FieldsDataTable = ({
         </div>
         <div className='w-[60px] shrink-0 text-right text-[11px] font-semibold uppercase tracking-[0.05em] text-text-tertiary'>
           Visible
-        </div>
-        <div className='w-[60px] shrink-0 text-right text-[11px] font-semibold uppercase tracking-[0.05em] text-text-tertiary'>
-          Editable
         </div>
       </div>
 
@@ -136,8 +130,44 @@ function FieldRow({
         !row.enabled && !isDefault && 'opacity-50'
       )}
     >
-      {/* Field name */}
-      <div className='flex w-[200px] shrink-0 items-center gap-2'>
+      {/* Field name + editable indicator */}
+      <div className='flex w-[200px] shrink-0 items-center gap-1.5'>
+        {/* Editable indicator */}
+        {isSuperAdmin ? (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button
+                type='button'
+                className={cn(
+                  'inline-flex size-5 shrink-0 items-center justify-center rounded-[4px] border transition-colors duration-75',
+                  row.editable
+                    ? 'border-primary/30 bg-primary/10 text-primary hover:bg-primary/20'
+                    : 'border-border bg-bg-secondary text-text-quaternary hover:bg-bg-active hover:text-text-tertiary',
+                  isEditablePending && 'pointer-events-none opacity-50'
+                )}
+                onClick={() => onEditableToggle(entity, row.field, !row.editable)}
+                disabled={isEditablePending}
+              >
+                <Pencil className='size-2.5' />
+              </button>
+            </TooltipTrigger>
+            <TooltipContent>
+              {row.editable ? 'Editable — click to make read-only' : 'Read-only — click to make editable'}
+            </TooltipContent>
+          </Tooltip>
+        ) : row.editable ? (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <span className='inline-flex size-5 shrink-0 items-center justify-center rounded-[4px] border border-primary/30 bg-primary/10 text-primary'>
+                <Pencil className='size-2.5' />
+              </span>
+            </TooltipTrigger>
+            <TooltipContent>This field is editable</TooltipContent>
+          </Tooltip>
+        ) : (
+          <span className='size-5 shrink-0' />
+        )}
+
         <Tooltip>
           <TooltipTrigger asChild>
             <span className='block truncate text-[13px] font-medium text-foreground'>
@@ -205,30 +235,6 @@ function FieldRow({
             aria-label={row.enabled ? 'Disable field' : 'Enable field'}
             onCheckedChange={(checked) => onFieldToggle(entity, row.field, checked)}
           />
-        )}
-      </div>
-
-      {/* Editable toggle */}
-      <div className='flex w-[60px] shrink-0 justify-end'>
-        {isSuperAdmin ? (
-          <Switch
-            checked={!!row.editable}
-            disabled={isEditablePending}
-            aria-label={row.editable ? 'Make read-only' : 'Make editable'}
-            onCheckedChange={(checked) => onEditableToggle(entity, row.field, checked)}
-          />
-        ) : row.editable ? (
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <span className='inline-flex items-center gap-0.5 rounded-[4px] bg-primary/10 px-1.5 py-0.5 text-[10px] font-medium text-primary'>
-                <Pencil className='size-2.5' />
-                Yes
-              </span>
-            </TooltipTrigger>
-            <TooltipContent>This field can be edited</TooltipContent>
-          </Tooltip>
-        ) : (
-          <span className='text-[11px] text-text-quaternary'>—</span>
         )}
       </div>
     </div>

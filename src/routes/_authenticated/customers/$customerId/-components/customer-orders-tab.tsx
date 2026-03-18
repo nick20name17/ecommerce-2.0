@@ -1,6 +1,6 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
-import { Package, Search, Trash2 } from 'lucide-react'
+import { Package, Plus, Search, Trash2 } from 'lucide-react'
 import { useState } from 'react'
 
 import { getOrdersQuery } from '@/api/order/query'
@@ -19,6 +19,7 @@ import type { OrderStatus } from '@/constants/order'
 import { useBreakpoint } from '@/hooks/use-breakpoint'
 import { useProjectId } from '@/hooks/use-project-id'
 import { formatCurrency, formatDate } from '@/helpers/formatters'
+import { STORAGE_KEYS } from '@/constants/storage'
 import { OrderDeleteDialog } from '@/routes/_authenticated/orders/-components/order-delete-dialog'
 import { cn } from '@/lib/utils'
 
@@ -77,6 +78,17 @@ export const CustomerOrdersTab = ({ customerId }: CustomerOrdersTabProps) => {
             className='flex-1 bg-transparent text-[13px] outline-none placeholder:text-text-tertiary'
           />
         </div>
+        <button
+          type='button'
+          className='inline-flex h-7 shrink-0 items-center gap-1 rounded-[5px] bg-primary px-2.5 text-[12px] font-semibold text-primary-foreground transition-colors duration-[80ms] hover:opacity-90'
+          onClick={() => {
+            localStorage.setItem(STORAGE_KEYS.selectedCustomerId, JSON.stringify(customerId))
+            navigate({ to: '/create' })
+          }}
+        >
+          <Plus className='size-3.5' />
+          <span className='hidden sm:inline'>Create Order</span>
+        </button>
       </div>
 
       {/* Table header */}

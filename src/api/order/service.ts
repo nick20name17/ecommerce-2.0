@@ -2,7 +2,7 @@ import { api } from '..'
 
 import type { EntityAssignRequest, EntityAssignmentResponse, EntityAttachment } from '../schema'
 
-import type { Order, OrderParams, OrderPatchPayload, OrderResponse, PickStatusRequest, ShippingRatesRequest, ShippingRatesResponse } from './schema'
+import type { Order, OrderParams, OrderPatchPayload, OrderResponse, PickStatusRequest, ShippingRatesRequest, ShippingRatesResponse, ShippingSelectionRequest, ShippingSelectionResponse } from './schema'
 
 const orderParams = (projectId?: number | null) =>
   projectId != null ? { project_id: projectId } : {}
@@ -69,6 +69,18 @@ export const orderService = {
       payload
     )
     return data
+  },
+
+  selectShippingRate: async (autoid: string, payload: ShippingSelectionRequest) => {
+    const { data } = await api.post<ShippingSelectionResponse>(
+      `/data/orders/${autoid}/shipping-selection/`,
+      payload
+    )
+    return data
+  },
+
+  voidShipment: async (autoid: string, shipmentId: number) => {
+    await api.post(`/data/orders/${autoid}/shipments/${shipmentId}/void/`)
   },
 
   assign: async (autoid: string, payload: EntityAssignRequest, projectId?: number | null) => {

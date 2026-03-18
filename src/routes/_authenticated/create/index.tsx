@@ -1,7 +1,7 @@
+import { useQuery } from '@tanstack/react-query'
 import { useRouter } from '@tanstack/react-router'
 import { createFileRoute } from '@tanstack/react-router'
 import {
-  ChevronDown,
   ChevronLeft,
   Eraser,
   FileCheck,
@@ -12,7 +12,7 @@ import {
   ShoppingCart,
   User,
 } from 'lucide-react'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 
 import { CartEditableTable } from './-components/cart-editable-table'
 import { CartSummary } from './-components/cart-summary'
@@ -23,6 +23,10 @@ import { useCreatePage, type AddressFields } from './-components/use-create-page
 import {
   EntityAttachments,
 } from '@/components/common/entity-attachments/entity-attachments'
+import { getFieldConfigQuery } from '@/api/field-config/query'
+import { getColumnLabel } from '@/helpers/dynamic-columns'
+import { CustomerInfoPanel } from '@/routes/_authenticated/customers/$customerId/-components/customer-info-card'
+import { PropertyField } from '@/routes/_authenticated/orders/$orderId/-components/order-properties'
 import {
   Dialog,
   DialogContent,
@@ -41,6 +45,7 @@ const CreatePage = () => {
   const {
     projectId,
     customer,
+    customerDetail,
     catalogOpen,
     setCatalogOpen,
     cart,
@@ -75,6 +80,13 @@ const CreatePage = () => {
     handleCreateOrder,
     isCartItemType,
   } = useCreatePage()
+
+  const { data: fieldConfig } = useQuery(getFieldConfigQuery(projectId))
+
+  const customerCustomFields = useMemo(() => {
+    const entries = fieldConfig?.customer ?? []
+    return entries.filter((e) => !e.default && e.enabled)
+  }, [fieldConfig])
 
   const isCreating = busy.creatingProposal || busy.creatingOrder
   const canSubmit = !!customer && cartItems.length > 0 && !isBusy && !isCreating
@@ -161,10 +173,10 @@ const CreatePage = () => {
           )}
         </div>
 
-        {/* Right: Sidebar — customer, attachments, actions */}
-        <div className='hidden w-[320px] shrink-0 flex-col border-l border-border bg-bg-secondary/30 lg:flex'>
-          {/* Customer section */}
-          <div className='border-b border-border p-4'>
+        {/* Right: Sidebar — customer, info, addresses, actions */}
+        <div className='hidden w-[320px] shrink-0 flex-col overflow-hidden border-l border-border bg-bg-secondary/30 lg:flex'>
+          {/* Customer combobox — fixed at top */}
+          <div className='shrink-0 border-b border-border p-4'>
             <div className='mb-2.5 flex items-center gap-1.5'>
               <User className='size-3.5 text-text-tertiary' />
               <span className='text-[12px] font-semibold uppercase tracking-[0.04em] text-text-tertiary'>
@@ -178,16 +190,70 @@ const CreatePage = () => {
             />
           </div>
 
-          {/* Bill To / Ship To */}
-          {customer && (
-            <div className='border-b border-border'>
-              <AddressSection title='Bill To' address={billTo} onChange={setBillTo} />
-              <AddressSection title='Ship To' address={shipTo} onChange={setShipTo} />
-            </div>
-          )}
+          {/* Scrollable middle area */}
+          <div className='min-h-0 flex-1 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]'>
+            {/* Customer details — same as customer detail page */}
+            {customer && customerDetail && (
+              <>
+                <CustomerInfoPanel
+                  customer={customerDetail}
+                  fieldConfig={fieldConfig}
+                />
 
-          {/* Actions */}
-          <div className='border-b border-border p-4'>
+                {/* Custom fields */}
+                {customerCustomFields.length > 0 && (
+                  <div className='border-b border-border'>
+                    <div className='bg-bg-secondary/60 px-4 py-2'>
+                      <span className='text-[11px] font-semibold uppercase tracking-[0.06em] text-text-tertiary'>
+                        Custom Fields
+                      </span>
+                    </div>
+                    <div className='bg-background text-[13px]'>
+                      {customerCustomFields.map((entry) => {
+                        const label = getColumnLabel(entry.field, 'customer', fieldConfig)
+                        const val = customerDetail[entry.field]
+                        const strVal = val != null ? String(val) : null
+                        return (
+                          <PropertyField
+                            key={entry.field}
+                            label={label}
+                            value={strVal}
+                            field={entry.field}
+                            onSave={() => {}}
+                            editable={false}
+                          />
+                        )
+                      })}
+                    </div>
+                  </div>
+                )}
+              </>
+            )}
+
+            {/* Bill To / Ship To */}
+            {customer && (
+              <>
+                <AddressCard title='Bill To' address={billTo} onChange={setBillTo} />
+                <AddressCard title='Ship To' address={shipTo} onChange={setShipTo} />
+              </>
+            )}
+
+            {/* Attachments */}
+            <div className='border-b border-border p-4'>
+              <button
+                type='button'
+                className='inline-flex h-8 w-full items-center justify-center gap-1.5 rounded-[6px] border border-border bg-background text-[13px] font-medium text-text-secondary transition-colors duration-[80ms] hover:bg-bg-hover hover:text-foreground disabled:pointer-events-none disabled:opacity-50'
+                disabled={!customer}
+                onClick={() => setAttachmentsOpen(true)}
+              >
+                <Paperclip className='size-3.5' />
+                Attachments
+              </button>
+            </div>
+          </div>
+
+          {/* Actions — fixed at bottom */}
+          <div className='shrink-0 border-t border-border p-4'>
             <div className='flex flex-col gap-2'>
               <Tooltip>
                 <TooltipTrigger asChild>
@@ -243,19 +309,6 @@ const CreatePage = () => {
                 )}
               </Tooltip>
             </div>
-          </div>
-
-          {/* Attachments */}
-          <div className='p-4'>
-            <button
-              type='button'
-              className='inline-flex h-8 w-full items-center justify-center gap-1.5 rounded-[6px] border border-border bg-background text-[13px] font-medium text-text-secondary transition-colors duration-[80ms] hover:bg-bg-hover hover:text-foreground disabled:pointer-events-none disabled:opacity-50'
-              disabled={!customer}
-              onClick={() => setAttachmentsOpen(true)}
-            >
-              <Paperclip className='size-3.5' />
-              Attachments
-            </button>
           </div>
         </div>
       </div>
@@ -358,9 +411,9 @@ const CreatePage = () => {
   )
 }
 
-// ── Address Section ─────────────────────────────────────────
+// ── Address Card (compact display + edit dialog) ────────────
 
-function AddressSection({
+function AddressCard({
   title,
   address,
   onChange,
@@ -370,72 +423,109 @@ function AddressSection({
   onChange: (addr: AddressFields) => void
 }) {
   const [open, setOpen] = useState(false)
+  const [draft, setDraft] = useState<AddressFields>(address)
 
-  const update = (field: keyof AddressFields, value: string) => {
-    onChange({ ...address, [field]: value })
+  const handleOpen = () => {
+    setDraft(address)
+    setOpen(true)
   }
 
-  const summary = [address.name, address.address1, [address.city, address.state, address.zip].filter(Boolean).join(', ')].filter(Boolean).join(', ')
+  const handleSave = () => {
+    onChange(draft)
+    setOpen(false)
+  }
+
+  const updateDraft = (field: keyof AddressFields, value: string) => {
+    setDraft((prev) => ({ ...prev, [field]: value }))
+  }
+
+  const hasAddress = address.name || address.address1 || address.city
+  const cityStateZip = [address.city, address.state, address.zip].filter(Boolean).join(', ')
 
   return (
-    <div>
-      <button
-        type='button'
-        className='flex w-full items-center gap-1.5 px-4 py-2 text-left transition-colors duration-75 hover:bg-bg-hover/50'
-        onClick={() => setOpen(!open)}
+    <>
+      <div
+        className='cursor-pointer border-b border-border px-4 py-2.5 transition-colors duration-75 hover:bg-bg-hover/50'
+        onClick={handleOpen}
       >
-        <MapPin className='size-3 shrink-0 text-text-tertiary' />
-        <span className='text-[12px] font-semibold uppercase tracking-[0.04em] text-text-tertiary'>
-          {title}
-        </span>
-        <div className='flex-1' />
-        <ChevronDown
-          className={cn(
-            'size-3 text-text-quaternary transition-transform duration-150',
-            open && 'rotate-180'
-          )}
-        />
-      </button>
-
-      {!open && summary && (
-        <div className='px-4 pb-2'>
-          <p className='truncate text-[12px] text-text-tertiary'>{summary}</p>
+        <div className='mb-1 flex items-center gap-1.5'>
+          <MapPin className='size-3 shrink-0 text-text-quaternary' />
+          <span className='text-[11px] font-semibold uppercase tracking-[0.04em] text-text-tertiary'>
+            {title}
+          </span>
         </div>
-      )}
-
-      {open && (
-        <div className='space-y-1.5 px-4 pb-3'>
-          <AddressInput label='Name' value={address.name} onChange={(v) => update('name', v)} />
-          <AddressInput label='Street' value={address.address1} onChange={(v) => update('address1', v)} />
-          <AddressInput label='Apt / Suite' value={address.address2} onChange={(v) => update('address2', v)} />
-          <div className='grid grid-cols-3 gap-1.5'>
-            <AddressInput label='City' value={address.city} onChange={(v) => update('city', v)} />
-            <AddressInput label='State' value={address.state} onChange={(v) => update('state', v)} />
-            <AddressInput label='ZIP' value={address.zip} onChange={(v) => update('zip', v)} />
+        {hasAddress ? (
+          <div className='pl-[18px] text-[12px] leading-relaxed text-text-secondary'>
+            {address.name && <div className='font-medium text-foreground'>{address.name}</div>}
+            {address.address1 && <div>{address.address1}</div>}
+            {address.address2 && <div>{address.address2}</div>}
+            {cityStateZip && <div>{cityStateZip}</div>}
           </div>
-        </div>
-      )}
-    </div>
+        ) : (
+          <div className='pl-[18px] text-[12px] text-text-quaternary'>No address set</div>
+        )}
+      </div>
+
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent className='gap-0 overflow-hidden p-0 sm:max-w-[380px]'>
+          <DialogHeader className='border-b border-border px-5 py-3'>
+            <DialogTitle className='flex items-center gap-2 text-[14px]'>
+              <MapPin className='size-4 text-text-tertiary' />
+              {title}
+            </DialogTitle>
+          </DialogHeader>
+          <div className='space-y-3 px-5 py-4'>
+            <AddressDialogField label='Name' value={draft.name} onChange={(v) => updateDraft('name', v)} autoFocus />
+            <AddressDialogField label='Street' value={draft.address1} onChange={(v) => updateDraft('address1', v)} />
+            <AddressDialogField label='Apt / Suite' value={draft.address2} onChange={(v) => updateDraft('address2', v)} />
+            <div className='grid grid-cols-3 gap-2'>
+              <AddressDialogField label='City' value={draft.city} onChange={(v) => updateDraft('city', v)} />
+              <AddressDialogField label='State' value={draft.state} onChange={(v) => updateDraft('state', v)} />
+              <AddressDialogField label='ZIP' value={draft.zip} onChange={(v) => updateDraft('zip', v)} />
+            </div>
+          </div>
+          <div className='flex justify-end gap-2 border-t border-border px-5 py-3'>
+            <button
+              type='button'
+              className='inline-flex h-7 items-center rounded-[6px] border border-border px-3 text-[12px] font-medium text-text-secondary transition-colors duration-[80ms] hover:bg-bg-hover hover:text-foreground'
+              onClick={() => setOpen(false)}
+            >
+              Cancel
+            </button>
+            <button
+              type='button'
+              className='inline-flex h-7 items-center rounded-[6px] bg-primary px-3 text-[12px] font-semibold text-primary-foreground transition-opacity duration-[80ms] hover:opacity-90'
+              onClick={handleSave}
+            >
+              Save
+            </button>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
   )
 }
 
-function AddressInput({
+function AddressDialogField({
   label,
   value,
   onChange,
+  autoFocus,
 }: {
   label: string
   value: string
   onChange: (value: string) => void
+  autoFocus?: boolean
 }) {
   return (
     <div>
-      <label className='mb-0.5 block text-[10px] font-medium text-text-quaternary'>{label}</label>
+      <label className='mb-1 block text-[12px] font-medium text-text-tertiary'>{label}</label>
       <input
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={label}
-        className='h-6 w-full rounded-[5px] border border-border bg-background px-2 text-[12px] text-foreground outline-none transition-colors duration-[80ms] placeholder:text-text-quaternary focus:border-primary/50 focus:ring-1 focus:ring-primary/20'
+        autoFocus={autoFocus}
+        className='h-8 w-full rounded-[6px] border border-border bg-background px-2.5 text-[13px] text-foreground outline-none transition-colors duration-[80ms] placeholder:text-text-quaternary focus:border-primary focus:ring-1 focus:ring-primary/20'
       />
     </div>
   )

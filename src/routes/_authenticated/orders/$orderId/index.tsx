@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { createFileRoute, useRouter } from '@tanstack/react-router'
-import { Check, ChevronLeft, Copy, ListTodo, Package, Paperclip, StickyNote, Trash2, Truck, UserPlus } from 'lucide-react'
+import { Check, ChevronLeft, Copy, ExternalLink, ListTodo, Package, Paperclip, StickyNote, Trash2, Truck, UserPlus, XCircle } from 'lucide-react'
 
 import { PageEmpty } from '@/components/common/page-empty'
 import { EntityAttachmentsDialog } from '@/components/common/entity-attachments/entity-attachments-dialog'
@@ -68,7 +68,7 @@ function OrderDetailPage() {
   const isMobile = bp === 'mobile'
   const [projectId] = useProjectId()
   const [deleteOpen, setDeleteOpen] = useState(false)
-  const [panelTab, setPanelTab] = useState<'general' | 'custom'>('general')
+  const [panelTab, setPanelTab] = useState<'general' | 'custom' | 'shipments'>('general')
   const [taskModalOpen, setTaskModalOpen] = useState(false)
   const [shippingOpen, setShippingOpen] = useState(false)
   const [attachmentsOpen, setAttachmentsOpen] = useState(false)
@@ -101,6 +101,12 @@ function OrderDetailPage() {
   // Custom fields: enabled non-default fields from field config
   const customFields = useMemo(() => {
     const entries = fieldConfig?.order ?? []
+    return entries.filter((e) => !e.default && e.enabled)
+  }, [fieldConfig])
+
+  // Line item custom columns from order_item field config
+  const itemCustomCols = useMemo(() => {
+    const entries = fieldConfig?.order_item ?? []
     return entries.filter((e) => !e.default && e.enabled)
   }, [fieldConfig])
 
@@ -150,6 +156,15 @@ function OrderDetailPage() {
       invalidatesQuery: ORDER_QUERY_KEYS.lists(),
     },
     onSuccess: () => router.history.back(),
+  })
+
+  const voidShipmentMutation = useMutation({
+    mutationFn: (shipmentId: number) => orderService.voidShipment(orderId, shipmentId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ORDER_QUERY_KEYS.detail(orderId) })
+      toast.success('Shipment voided')
+    },
+    onError: () => toast.error('Failed to void shipment'),
   })
 
   // Loading
@@ -417,6 +432,11 @@ function OrderDetailPage() {
                     <th className='w-[70px] px-3 py-1.5 text-right font-medium text-text-tertiary'>Qty</th>
                     <th className='w-[60px] px-3 py-1.5 text-right font-medium text-text-tertiary'>Ship</th>
                     <th className='w-[90px] px-3 py-1.5 text-right font-medium text-text-tertiary'>Price</th>
+                    {itemCustomCols.map((col) => (
+                      <th key={col.field} className='min-w-[80px] px-3 py-1.5 font-medium text-text-tertiary'>
+                        {getColumnLabel(col.field, 'order_item', fieldConfig)}
+                      </th>
+                    ))}
                     <th className='w-[100px] py-1.5 pl-3 pr-6 text-right font-medium text-text-tertiary'>Amount</th>
                   </tr>
                 </thead>
@@ -464,6 +484,16 @@ function OrderDetailPage() {
                       <td className='px-3 py-1.5 text-right tabular-nums text-text-secondary'>
                         {formatCurrency(item.price)}
                       </td>
+                      {itemCustomCols.map((col) => {
+                        const val = item[col.field]
+                        return (
+                          <td key={col.field} className='px-3 py-1.5 text-text-secondary'>
+                            <span className='block max-w-[160px] truncate'>
+                              {val != null ? String(val) : '—'}
+                            </span>
+                          </td>
+                        )
+                      })}
                       <td className='py-1.5 pl-3 pr-6 text-right font-medium tabular-nums text-foreground'>
                         {formatCurrency(item.so_amount)}
                       </td>
@@ -504,27 +534,29 @@ function OrderDetailPage() {
         >
           {/* Panel tabs */}
           <div className='flex shrink-0 items-center gap-0 border-b border-border px-1'>
-            {(['general', 'custom'] as const).map((tab) => (
-              <button
-                key={tab}
-                type='button'
-                className={cn(
-                  'relative px-3 py-2 text-[13px] font-medium capitalize transition-colors duration-75',
-                  panelTab === tab
-                    ? 'text-foreground'
-                    : 'text-text-tertiary hover:text-text-secondary',
-                )}
-                onClick={() => setPanelTab(tab)}
-              >
-                {tab}
-                {tab === 'custom' && customFields.length > 0 && (
-                  <span className='ml-1 text-[11px] text-text-quaternary'>{customFields.length}</span>
-                )}
-                {panelTab === tab && (
-                  <span className='absolute bottom-0 left-3 right-3 h-[2px] rounded-full bg-primary' />
-                )}
-              </button>
-            ))}
+            {(['general', 'custom', 'shipments'] as const).map((tab) => {
+              const label = tab === 'custom' ? `Custom${customFields.length > 0 ? ` ${customFields.length}` : ''}`
+                : tab === 'shipments' ? `Shipments${(order.shipments?.length ?? 0) > 0 ? ` ${order.shipments!.length}` : ''}`
+                : 'General'
+              return (
+                <button
+                  key={tab}
+                  type='button'
+                  className={cn(
+                    'relative px-3 py-2 text-[13px] font-medium transition-colors duration-75',
+                    panelTab === tab
+                      ? 'text-foreground'
+                      : 'text-text-tertiary hover:text-text-secondary',
+                  )}
+                  onClick={() => setPanelTab(tab)}
+                >
+                  {label}
+                  {panelTab === tab && (
+                    <span className='absolute bottom-0 left-3 right-3 h-[2px] rounded-full bg-primary' />
+                  )}
+                </button>
+              )
+            })}
           </div>
 
           {/* Panel content */}
@@ -588,7 +620,7 @@ function OrderDetailPage() {
                   <PropertyField label='Internal Note' value={order.internalnt} field='internalnt' onSave={handleFieldSave} multiline />
                 </PanelSection>
               </>
-            ) : (
+            ) : panelTab === 'custom' ? (
               <>
                 {customFields.length === 0 ? (
                   <div className='flex flex-col items-center justify-center py-12 text-center'>
@@ -610,10 +642,97 @@ function OrderDetailPage() {
                           value={strVal}
                           field={entry.field}
                           onSave={handleFieldSave}
+                          editable={!!entry.editable}
                         />
                       )
                     })}
                   </PanelSection>
+                )}
+              </>
+            ) : (
+              <>
+                {(order.shipments?.length ?? 0) === 0 ? (
+                  <div className='flex flex-col items-center justify-center py-12 text-center'>
+                    <Truck className='mx-auto mb-2 size-6 text-text-quaternary' />
+                    <p className='text-[13px] text-text-tertiary'>No shipments yet</p>
+                    <p className='mt-1 text-[12px] text-text-quaternary'>
+                      Create a shipment from the Shipping button above
+                    </p>
+                  </div>
+                ) : (
+                  <div>
+                    {order.shipments!.map((shipment) => (
+                      <div
+                        key={shipment.id}
+                        className={cn(
+                          'border-b border-border-light px-4 py-3',
+                          shipment.voided && 'opacity-50',
+                        )}
+                      >
+                        <div className='flex items-center gap-2'>
+                          <Truck className='size-3.5 shrink-0 text-text-tertiary' />
+                          <span className='min-w-0 flex-1 truncate text-[13px] font-medium text-foreground'>
+                            {shipment.service_name}
+                          </span>
+                          <span className='shrink-0 text-[13px] font-medium tabular-nums text-foreground'>
+                            ${parseFloat(shipment.cost).toFixed(2)}
+                          </span>
+                        </div>
+                        <div className='mt-1.5 flex items-center gap-2 pl-[22px]'>
+                          <span className='min-w-0 flex-1 truncate text-[12px] tabular-nums text-text-tertiary'>
+                            {shipment.tracking_number}
+                          </span>
+                          {shipment.voided ? (
+                            <span className='inline-flex shrink-0 items-center gap-1 rounded-[4px] border border-red-200 bg-red-50 px-1.5 py-0.5 text-[10px] font-semibold text-red-600 dark:border-red-800 dark:bg-red-500/10 dark:text-red-400'>
+                              <XCircle className='size-2.5' />
+                              Voided
+                            </span>
+                          ) : (
+                            <span className='inline-flex shrink-0 items-center gap-1 rounded-[4px] border border-emerald-200 bg-emerald-50 px-1.5 py-0.5 text-[10px] font-semibold text-emerald-600 dark:border-emerald-800 dark:bg-emerald-500/10 dark:text-emerald-400'>
+                              <Check className='size-2.5' />
+                              Active
+                            </span>
+                          )}
+                        </div>
+                        <div className='mt-1.5 flex items-center gap-2 pl-[22px]'>
+                          <span className='text-[11px] text-text-quaternary'>
+                            {new Date(shipment.created_at).toLocaleDateString(undefined, {
+                              month: 'short',
+                              day: 'numeric',
+                              year: 'numeric',
+                              hour: '2-digit',
+                              minute: '2-digit',
+                            })}
+                          </span>
+                          {!shipment.voided && (
+                            <>
+                              {shipment.label_url && (
+                                <a
+                                  href={shipment.label_url}
+                                  target='_blank'
+                                  rel='noopener noreferrer'
+                                  className='inline-flex items-center gap-0.5 text-[11px] font-medium text-primary hover:underline'
+                                  onClick={(e) => e.stopPropagation()}
+                                >
+                                  Label
+                                  <ExternalLink className='size-2.5' />
+                                </a>
+                              )}
+                              <button
+                                type='button'
+                                className='inline-flex items-center gap-0.5 text-[11px] font-medium text-destructive hover:underline disabled:opacity-50'
+                                onClick={() => voidShipmentMutation.mutate(shipment.id)}
+                                disabled={voidShipmentMutation.isPending}
+                              >
+                                <XCircle className='size-2.5' />
+                                Void
+                              </button>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 )}
               </>
             )}

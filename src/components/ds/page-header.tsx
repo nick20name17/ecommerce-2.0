@@ -31,4 +31,5 @@ export const PAGE_COLORS = {
   users: 'bg-indigo-500',
   profile: 'bg-zinc-500',
   testing: 'bg-gray-500',
+  dev: 'bg-sky-500',
 } as const

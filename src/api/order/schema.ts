@@ -50,6 +50,7 @@ export interface Order {
   pick_status?: string // e.g. '3/7'
 
   items?: OrderItem[]
+  shipments?: Shipment[]
   assigned_user?: AssignedUser | null
   [key: string]: unknown
 }
@@ -91,9 +92,23 @@ export interface OrderItem {
   descr: string
   price: string
   so_amount: string
+  weight: string | null
   is_picked: boolean
   picked_by: string | null
   picked_at: string | null
+  [key: string]: unknown
+}
+
+export interface Shipment {
+  id: number
+  carrier_id: string
+  service_name: string
+  cost: string
+  tracking_number: string
+  label_id: string
+  label_url: string
+  voided: boolean
+  created_at: string
 }
 
 export interface PickStatusRequest {
@@ -101,6 +116,7 @@ export interface PickStatusRequest {
 }
 
 export interface ShippingRate {
+  rate_id: string
   type: string
   cost: number
   carrier_id: string
@@ -131,6 +147,16 @@ export interface ShippingRatesRequest {
 export interface ShippingRatesResponse {
   rates: ShippingRate[]
   packages: ShippingPackage[]
+}
+
+export interface ShippingSelectionRequest {
+  shipping_address_id: number
+  packages: ShippingPackagePayload[]
+  rate_id: string
+}
+
+export interface ShippingSelectionResponse {
+  shipment: Shipment
 }
 
 export type OrderResponse = PaginatedResponse<Order>

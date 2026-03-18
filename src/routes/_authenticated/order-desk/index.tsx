@@ -1,3 +1,4 @@
+import { useQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
 import {
   Eraser,
@@ -7,7 +8,7 @@ import {
   ShoppingCart,
   User,
 } from 'lucide-react'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 
 import { CartEditableTable } from '../create/-components/cart-editable-table'
 import { CartSummary } from '../create/-components/cart-summary'
@@ -18,6 +19,10 @@ import { useCreatePage } from '../create/-components/use-create-page'
 import {
   EntityAttachments,
 } from '@/components/common/entity-attachments/entity-attachments'
+import { getFieldConfigQuery } from '@/api/field-config/query'
+import { getColumnLabel } from '@/helpers/dynamic-columns'
+import { CustomerInfoPanel } from '@/routes/_authenticated/customers/$customerId/-components/customer-info-card'
+import { PropertyField } from '@/routes/_authenticated/orders/$orderId/-components/order-properties'
 import { IOrderDesk, PAGE_COLORS, PageHeaderIcon } from '@/components/ds'
 import {
   Dialog,
@@ -36,6 +41,7 @@ const OrderDeskPage = () => {
   const {
     projectId,
     customer,
+    customerDetail,
     catalogOpen,
     setCatalogOpen,
     cart,
@@ -66,6 +72,13 @@ const OrderDeskPage = () => {
     handleCreateOrder,
     isCartItemType,
   } = useCreatePage()
+
+  const { data: fieldConfig } = useQuery(getFieldConfigQuery(projectId))
+
+  const customerCustomFields = useMemo(() => {
+    const entries = fieldConfig?.customer ?? []
+    return entries.filter((e) => !e.default && e.enabled)
+  }, [fieldConfig])
 
   const isCreating = busy.creatingProposal || busy.creatingOrder
   const canSubmit = !!customer && cartItems.length > 0 && !isBusy && !isCreating
@@ -141,10 +154,10 @@ const OrderDeskPage = () => {
           )}
         </div>
 
-        {/* Right: Sidebar — customer, attachments, actions */}
-        <div className='hidden w-[320px] shrink-0 flex-col border-l border-border bg-bg-secondary/30 lg:flex'>
-          {/* Customer section */}
-          <div className='border-b border-border p-4'>
+        {/* Right: Sidebar — customer, info, addresses, actions */}
+        <div className='hidden w-[320px] shrink-0 flex-col overflow-hidden border-l border-border bg-bg-secondary/30 lg:flex'>
+          {/* Customer combobox — fixed at top */}
+          <div className='shrink-0 border-b border-border p-4'>
             <div className='mb-2.5 flex items-center gap-1.5'>
               <User className='size-3.5 text-text-tertiary' />
               <span className='text-[12px] font-semibold uppercase tracking-[0.04em] text-text-tertiary'>
@@ -158,8 +171,62 @@ const OrderDeskPage = () => {
             />
           </div>
 
-          {/* Actions */}
-          <div className='border-b border-border p-4'>
+          {/* Scrollable middle area */}
+          <div className='min-h-0 flex-1 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]'>
+            {/* Customer details — same panel as customer detail page */}
+            {customer && customerDetail && (
+              <>
+                <CustomerInfoPanel
+                  customer={customerDetail}
+                  fieldConfig={fieldConfig}
+                />
+
+                {/* Custom fields */}
+                {customerCustomFields.length > 0 && (
+                  <div className='border-b border-border'>
+                    <div className='bg-bg-secondary/60 px-4 py-2'>
+                      <span className='text-[11px] font-semibold uppercase tracking-[0.06em] text-text-tertiary'>
+                        Custom Fields
+                      </span>
+                    </div>
+                    <div className='bg-background text-[13px]'>
+                      {customerCustomFields.map((entry) => {
+                        const label = getColumnLabel(entry.field, 'customer', fieldConfig)
+                        const val = customerDetail[entry.field]
+                        const strVal = val != null ? String(val) : null
+                        return (
+                          <PropertyField
+                            key={entry.field}
+                            label={label}
+                            value={strVal}
+                            field={entry.field}
+                            onSave={() => {}}
+                            editable={false}
+                          />
+                        )
+                      })}
+                    </div>
+                  </div>
+                )}
+              </>
+            )}
+
+            {/* Attachments */}
+            <div className='border-b border-border p-4'>
+              <button
+                type='button'
+                className='inline-flex h-8 w-full items-center justify-center gap-1.5 rounded-[6px] border border-border bg-background text-[13px] font-medium text-text-secondary transition-colors duration-[80ms] hover:bg-bg-hover hover:text-foreground disabled:pointer-events-none disabled:opacity-50'
+                disabled={!customer}
+                onClick={() => setAttachmentsOpen(true)}
+              >
+                <Paperclip className='size-3.5' />
+                Attachments
+              </button>
+            </div>
+          </div>
+
+          {/* Actions — fixed at bottom */}
+          <div className='shrink-0 border-t border-border p-4'>
             <div className='flex flex-col gap-2'>
               <Tooltip>
                 <TooltipTrigger asChild>
@@ -215,19 +282,6 @@ const OrderDeskPage = () => {
                 )}
               </Tooltip>
             </div>
-          </div>
-
-          {/* Attachments */}
-          <div className='p-4'>
-            <button
-              type='button'
-              className='inline-flex h-8 w-full items-center justify-center gap-1.5 rounded-[6px] border border-border bg-background text-[13px] font-medium text-text-secondary transition-colors duration-[80ms] hover:bg-bg-hover hover:text-foreground disabled:pointer-events-none disabled:opacity-50'
-              disabled={!customer}
-              onClick={() => setAttachmentsOpen(true)}
-            >
-              <Paperclip className='size-3.5' />
-              Attachments
-            </button>
           </div>
         </div>
       </div>

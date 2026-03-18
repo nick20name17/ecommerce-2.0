@@ -22,6 +22,7 @@ import { Route as AuthenticatedProfileIndexRouteImport } from './routes/_authent
 import { Route as AuthenticatedOrdersIndexRouteImport } from './routes/_authenticated/orders/index'
 import { Route as AuthenticatedOrderDeskIndexRouteImport } from './routes/_authenticated/order-desk/index'
 import { Route as AuthenticatedNavOptionsIndexRouteImport } from './routes/_authenticated/nav-options/index'
+import { Route as AuthenticatedDevIndexRouteImport } from './routes/_authenticated/dev/index'
 import { Route as AuthenticatedCustomersIndexRouteImport } from './routes/_authenticated/customers/index'
 import { Route as AuthenticatedCreateIndexRouteImport } from './routes/_authenticated/create/index'
 import { Route as AuthSignInIndexRouteImport } from './routes/_auth/sign-in/index'
@@ -101,6 +102,11 @@ const AuthenticatedNavOptionsIndexRoute =
     path: '/nav-options/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedDevIndexRoute = AuthenticatedDevIndexRouteImport.update({
+  id: '/dev/',
+  path: '/dev/',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedCustomersIndexRoute =
   AuthenticatedCustomersIndexRouteImport.update({
     id: '/customers/',
@@ -148,6 +154,7 @@ export interface FileRoutesByFullPath {
   '/sign-in/': typeof AuthSignInIndexRoute
   '/create/': typeof AuthenticatedCreateIndexRoute
   '/customers/': typeof AuthenticatedCustomersIndexRoute
+  '/dev/': typeof AuthenticatedDevIndexRoute
   '/nav-options/': typeof AuthenticatedNavOptionsIndexRoute
   '/order-desk/': typeof AuthenticatedOrderDeskIndexRoute
   '/orders/': typeof AuthenticatedOrdersIndexRoute
@@ -168,6 +175,7 @@ export interface FileRoutesByTo {
   '/sign-in': typeof AuthSignInIndexRoute
   '/create': typeof AuthenticatedCreateIndexRoute
   '/customers': typeof AuthenticatedCustomersIndexRoute
+  '/dev': typeof AuthenticatedDevIndexRoute
   '/nav-options': typeof AuthenticatedNavOptionsIndexRoute
   '/order-desk': typeof AuthenticatedOrderDeskIndexRoute
   '/orders': typeof AuthenticatedOrdersIndexRoute
@@ -191,6 +199,7 @@ export interface FileRoutesById {
   '/_auth/sign-in/': typeof AuthSignInIndexRoute
   '/_authenticated/create/': typeof AuthenticatedCreateIndexRoute
   '/_authenticated/customers/': typeof AuthenticatedCustomersIndexRoute
+  '/_authenticated/dev/': typeof AuthenticatedDevIndexRoute
   '/_authenticated/nav-options/': typeof AuthenticatedNavOptionsIndexRoute
   '/_authenticated/order-desk/': typeof AuthenticatedOrderDeskIndexRoute
   '/_authenticated/orders/': typeof AuthenticatedOrdersIndexRoute
@@ -213,6 +222,7 @@ export interface FileRouteTypes {
     | '/sign-in/'
     | '/create/'
     | '/customers/'
+    | '/dev/'
     | '/nav-options/'
     | '/order-desk/'
     | '/orders/'
@@ -233,6 +243,7 @@ export interface FileRouteTypes {
     | '/sign-in'
     | '/create'
     | '/customers'
+    | '/dev'
     | '/nav-options'
     | '/order-desk'
     | '/orders'
@@ -255,6 +266,7 @@ export interface FileRouteTypes {
     | '/_auth/sign-in/'
     | '/_authenticated/create/'
     | '/_authenticated/customers/'
+    | '/_authenticated/dev/'
     | '/_authenticated/nav-options/'
     | '/_authenticated/order-desk/'
     | '/_authenticated/orders/'
@@ -369,6 +381,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedNavOptionsIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/dev/': {
+      id: '/_authenticated/dev/'
+      path: '/dev'
+      fullPath: '/dev/'
+      preLoaderRoute: typeof AuthenticatedDevIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/customers/': {
       id: '/_authenticated/customers/'
       path: '/customers'
@@ -437,6 +456,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
   AuthenticatedCreateIndexRoute: typeof AuthenticatedCreateIndexRoute
   AuthenticatedCustomersIndexRoute: typeof AuthenticatedCustomersIndexRoute
+  AuthenticatedDevIndexRoute: typeof AuthenticatedDevIndexRoute
   AuthenticatedNavOptionsIndexRoute: typeof AuthenticatedNavOptionsIndexRoute
   AuthenticatedOrderDeskIndexRoute: typeof AuthenticatedOrderDeskIndexRoute
   AuthenticatedOrdersIndexRoute: typeof AuthenticatedOrdersIndexRoute
@@ -457,6 +477,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
   AuthenticatedCreateIndexRoute: AuthenticatedCreateIndexRoute,
   AuthenticatedCustomersIndexRoute: AuthenticatedCustomersIndexRoute,
+  AuthenticatedDevIndexRoute: AuthenticatedDevIndexRoute,
   AuthenticatedNavOptionsIndexRoute: AuthenticatedNavOptionsIndexRoute,
   AuthenticatedOrderDeskIndexRoute: AuthenticatedOrderDeskIndexRoute,
   AuthenticatedOrdersIndexRoute: AuthenticatedOrdersIndexRoute,

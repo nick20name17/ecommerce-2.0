@@ -1026,7 +1026,6 @@ const UsersSection = () => {
   const [deleteUser, setDeleteUser] = useState<User | null>(null)
 
   const params: UserParams = {
-    search: search || undefined,
     limit: 500,
   }
 
@@ -1035,7 +1034,14 @@ const UsersSection = () => {
     placeholderData: keepPreviousData,
   })
 
-  const users = data?.results ?? []
+  const allUsers = data?.results ?? []
+  const users = search
+    ? allUsers.filter((u) => {
+        const term = search.toLowerCase()
+        const fullName = `${u.first_name} ${u.last_name}`.toLowerCase()
+        return fullName.includes(term) || u.email.toLowerCase().includes(term)
+      })
+    : allUsers
   const editingUser = typeof modalUser === 'object' ? modalUser : null
   const loading = isLoading || isPlaceholderData
 

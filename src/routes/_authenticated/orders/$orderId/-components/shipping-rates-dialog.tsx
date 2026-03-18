@@ -1,9 +1,10 @@
-import { useQuery } from '@tanstack/react-query'
-import { Box, Check, ChevronDown, ChevronRight, GripVertical, Loader2, Package, Plus, Trash2 } from 'lucide-react'
-import { useCallback, useMemo, useState } from 'react'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { Box, Check, ChevronDown, ChevronLeft, ChevronRight, GripVertical, Loader2, Package, Pencil, Plus, Trash2 } from 'lucide-react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
-import type { Order, OrderItem, OrderPatchPayload, ShippingPackagePayload, ShippingRate, ShippingRatesResponse } from '@/api/order/schema'
+import type { Order, OrderItem, OrderPatchPayload, ShippingPackagePayload, ShippingRate, ShippingRatesResponse, ShippingSelectionRequest } from '@/api/order/schema'
+import { ORDER_QUERY_KEYS } from '@/api/order/query'
 import { orderService } from '@/api/order/service'
 import { getShippingAddressesQuery } from '@/api/shipping-address/query'
 import {
@@ -35,6 +36,8 @@ interface ShipToAddress {
   c_city: string
   c_state: string
   c_zip: string
+  c_country: string
+  c_phone: string
 }
 
 interface ShippingRatesDialogProps {
@@ -54,16 +57,20 @@ export function ShippingRatesDialog({
   order,
 }: ShippingRatesDialogProps) {
   const [projectId] = useProjectId()
+  const queryClient = useQueryClient()
   const [step, setStep] = useState<Step>('configure')
   const [packages, setPackages] = useState<LocalPackage[]>([])
   const [loading, setLoading] = useState(false)
+  const [selecting, setSelecting] = useState(false)
+  const [selectedRate, setSelectedRate] = useState<ShippingRate | null>(null)
   const [ratesData, setRatesData] = useState<ShippingRatesResponse | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [dragItem, setDragItem] = useState<string | null>(null)
   const [dropTarget, setDropTarget] = useState<string | null>(null)
   const [address, setAddress] = useState<ShipToAddress>({
-    c_name: '', c_address1: '', c_address2: '', c_city: '', c_state: '', c_zip: '',
+    c_name: '', c_address1: '', c_address2: '', c_city: '', c_state: '', c_zip: '', c_country: '', c_phone: '',
   })
+  const [shipToExpanded, setShipToExpanded] = useState(false)
   const [selectedAddressId, setSelectedAddressId] = useState<number | null>(null)
   const [addressPopoverOpen, setAddressPopoverOpen] = useState(false)
 
@@ -74,12 +81,19 @@ export function ShippingRatesDialog({
     [shippingAddresses, selectedAddressId],
   )
 
-  // Initialize: picked items go into a default package, load address from order
-  const handleOpenChange = (next: boolean) => {
-    if (next) {
+  // Initialize when dialog opens
+  const prevOpenRef = useRef(false)
+  useEffect(() => {
+    if (open && !prevOpenRef.current) {
       const pickedIds = items.filter((i) => i.is_picked).map((i) => i.autoid)
+      const rawWeight = pickedIds.reduce((sum, id) => {
+        const item = items.find((i) => i.autoid === id)
+        const w = item?.weight ? parseFloat(item.weight) : 0
+        return sum + (isNaN(w) ? 0 : w)
+      }, 0)
+      const initialWeight = Math.max(Math.round(rawWeight * 100) / 100, 0.01)
       setPackages([
-        { id: `pkg-${Date.now()}`, items: pickedIds, weight: 0, length: 1, width: 1, height: 1 },
+        { id: `pkg-${Date.now()}`, items: pickedIds, weight: initialWeight, length: 1, width: 1, height: 1 },
       ])
       setAddress({
         c_name: order.c_name ?? '',
@@ -88,16 +102,29 @@ export function ShippingRatesDialog({
         c_city: order.c_city ?? '',
         c_state: order.c_state ?? '',
         c_zip: order.c_zip ?? '',
+        c_country: String((order as Record<string, unknown>).c_country ?? ''),
+        c_phone: String((order as Record<string, unknown>).c_phone ?? ''),
       })
+      const hasShipTo = !!(order.c_address1?.trim() || order.c_city?.trim())
+      setShipToExpanded(!hasShipTo)
       // Auto-select default shipping address (ship from)
       const defaultAddr = shippingAddresses.find((a) => a.is_default)
-      setSelectedAddressId(defaultAddr?.id ?? null)
+      setSelectedAddressId(defaultAddr?.id ?? shippingAddresses[0]?.id ?? null)
       setRatesData(null)
       setError(null)
       setStep('configure')
     }
-    onOpenChange(next)
-  }
+    prevOpenRef.current = open
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open])
+
+  // Auto-select default address if not yet selected when addresses load
+  useEffect(() => {
+    if (open && selectedAddressId === null && shippingAddresses.length > 0) {
+      const defaultAddr = shippingAddresses.find((a) => a.is_default)
+      setSelectedAddressId(defaultAddr?.id ?? shippingAddresses[0]?.id ?? null)
+    }
+  }, [open, selectedAddressId, shippingAddresses])
 
   const hasAddress = address.c_address1.trim() || address.c_city.trim()
 
@@ -140,29 +167,41 @@ export function ShippingRatesDialog({
     )
   }
 
+  // Compute weight from assigned items (sum of item weights, min 0.01)
+  const computePackageWeight = useCallback((itemIds: string[]) => {
+    const total = itemIds.reduce((sum, id) => {
+      const item = itemMap.get(id)
+      const w = item?.weight ? parseFloat(item.weight) : 0
+      return sum + (isNaN(w) ? 0 : w)
+    }, 0)
+    return Math.max(Math.round(total * 100) / 100, 0.01)
+  }, [itemMap])
+
   // Move item to a package (removing from any other)
   const moveItemToPackage = useCallback((itemAutoid: string, targetPkgId: string) => {
-    setPackages((prev) =>
-      prev.map((p) => {
+    setPackages((prev) => {
+      const updated = prev.map((p) => {
         const without = p.items.filter((id) => id !== itemAutoid)
         if (p.id === targetPkgId) {
-          // Add to target if not already there
-          return p.items.includes(itemAutoid) ? p : { ...p, items: [...p.items, itemAutoid] }
+          const newItems = p.items.includes(itemAutoid) ? p.items : [...p.items, itemAutoid]
+          return { ...p, items: newItems }
         }
         return { ...p, items: without }
       })
-    )
-  }, [])
+      // Recompute weights for affected packages
+      return updated.map((p) => ({ ...p, weight: computePackageWeight(p.items) }))
+    })
+  }, [computePackageWeight])
 
   // Remove item from its package (back to unassigned)
   const unassignItem = useCallback((itemAutoid: string) => {
     setPackages((prev) =>
-      prev.map((p) => ({
-        ...p,
-        items: p.items.filter((id) => id !== itemAutoid),
-      }))
+      prev.map((p) => {
+        const newItems = p.items.filter((id) => id !== itemAutoid)
+        return { ...p, items: newItems, weight: computePackageWeight(newItems) }
+      })
     )
-  }, [])
+  }, [computePackageWeight])
 
   // ── Drag and drop ──
 
@@ -202,7 +241,11 @@ export function ShippingRatesDialog({
     const errors: string[] = []
 
     if (!selectedAddressId) {
-      errors.push('Please select a shipping address.')
+      errors.push('Please select a warehouse (ship from) address.')
+    }
+
+    if (!address.c_address1.trim() && !address.c_city.trim()) {
+      errors.push('Please enter a destination (ship to) address.')
     }
 
     const emptyPkgs = packages.filter((p) => p.items.length === 0)
@@ -247,6 +290,7 @@ export function ShippingRatesDialog({
         packages: payload,
       })
       setRatesData(res)
+      setSelectedRate(null)
       setStep('rates')
     } catch (err) {
       setError(getErrorMessage(err))
@@ -256,8 +300,43 @@ export function ShippingRatesDialog({
     }
   }
 
+  // ── Select a rate ──
+
+  const confirmRate = async () => {
+    if (!selectedAddressId || !selectedRate) return
+    setSelecting(true)
+    setError(null)
+
+    const pkgPayload: ShippingPackagePayload[] = packages.map((p) => ({
+      items: p.items,
+      weight: p.weight,
+      length: p.length,
+      width: p.width,
+      height: p.height,
+    }))
+
+    const payload: ShippingSelectionRequest = {
+      shipping_address_id: selectedAddressId,
+      packages: pkgPayload,
+      rate_id: selectedRate.rate_id,
+    }
+
+    try {
+      await orderService.selectShippingRate(orderAutoid, payload)
+      toast.success(`Shipping label created — ${selectedRate.type}`)
+      queryClient.invalidateQueries({ queryKey: ORDER_QUERY_KEYS.detail(orderAutoid) })
+      onOpenChange(false)
+    } catch (err) {
+      setError(getErrorMessage(err))
+      toast.error('Failed to create shipping label')
+    } finally {
+      setSelecting(false)
+    }
+  }
+
   return (
-    <Dialog open={open} onOpenChange={handleOpenChange}>
+    <>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className='gap-0 p-0 sm:max-w-[960px] max-sm:max-w-full max-sm:rounded-none max-sm:border-0'>
         <DialogHeader className='border-b border-border px-4 py-3 sm:px-5'>
           <div className='flex items-center gap-3'>
@@ -376,25 +455,28 @@ export function ShippingRatesDialog({
               {/* Destination */}
               <div className='min-w-0'>
                 <div className='mb-1.5 text-[12px] font-medium text-text-tertiary'>Ship to</div>
-                  <div
-                    className={cn(
-                      'flex h-9 w-full items-center rounded-[6px] border px-3',
-                      hasAddress ? 'border-border' : 'border-dashed border-border-heavy/40',
+                <button
+                  type='button'
+                  className={cn(
+                    'flex h-9 w-full items-center gap-2 rounded-[6px] border px-3 text-left transition-colors hover:bg-bg-hover',
+                    hasAddress ? 'border-border' : 'border-dashed border-border-heavy/40',
+                  )}
+                  onClick={() => setShipToExpanded(true)}
+                >
+                  <span className='min-w-0 flex-1 truncate text-[13px]'>
+                    {hasAddress ? (
+                      <>
+                        {address.c_name && <span className='font-medium text-foreground'>{address.c_name}<span className='text-text-quaternary'> · </span></span>}
+                        <span className='text-text-tertiary'>
+                          {[address.c_address1, address.c_city, address.c_state, address.c_zip].filter(Boolean).join(', ')}
+                        </span>
+                      </>
+                    ) : (
+                      <span className='text-text-quaternary'>Enter destination address…</span>
                     )}
-                  >
-                    <span className='min-w-0 flex-1 truncate text-[13px]'>
-                      {hasAddress ? (
-                        <>
-                          {address.c_name && <span className='font-medium text-foreground'>{address.c_name}<span className='text-text-quaternary'> · </span></span>}
-                          <span className='text-text-tertiary'>
-                            {[address.c_address1, address.c_city, address.c_state, address.c_zip].filter(Boolean).join(', ')}
-                          </span>
-                        </>
-                      ) : (
-                        <span className='text-text-quaternary'>No destination on order</span>
-                      )}
-                    </span>
-                  </div>
+                  </span>
+                  <Pencil className='size-3 shrink-0 text-text-quaternary' />
+                </button>
               </div>
             </div>
 
@@ -571,18 +653,42 @@ export function ShippingRatesDialog({
           <>
             {/* Rates view */}
             <div className='max-h-[60vh] overflow-y-auto'>
-              <RatesResultStep data={ratesData!} itemMap={itemMap} />
+              <RatesResultStep
+                data={ratesData!}
+                itemMap={itemMap}
+                selectedRate={selectedRate}
+                onSelectRate={setSelectedRate}
+              />
             </div>
             <div className='flex items-center justify-between border-t border-border px-4 py-3 sm:px-5'>
-              <div className='text-[12px] text-text-tertiary'>
-                {ratesData?.rates.length ?? 0} rate(s) found
+              <div className='flex items-center gap-2'>
+                <button
+                  type='button'
+                  className='inline-flex h-8 items-center gap-1.5 rounded-[6px] border border-border px-3 text-[13px] font-medium text-text-secondary transition-colors hover:bg-bg-hover'
+                  onClick={() => setStep('configure')}
+                  disabled={selecting}
+                >
+                  <ChevronLeft className='size-3.5' />
+                  Back to Packages
+                </button>
+                <span className='text-[12px] text-text-tertiary'>
+                  {ratesData?.rates.length ?? 0} rate(s) found
+                </span>
               </div>
               <button
                 type='button'
-                className='inline-flex h-8 items-center gap-1.5 rounded-[6px] border border-border px-3 text-[13px] font-medium text-text-secondary transition-colors hover:bg-bg-hover'
-                onClick={() => setStep('configure')}
+                className='inline-flex h-8 items-center gap-1.5 rounded-[6px] bg-primary px-3 text-[13px] font-semibold text-primary-foreground transition-colors hover:opacity-90 disabled:opacity-40'
+                disabled={!selectedRate || selecting}
+                onClick={confirmRate}
               >
-                Back to Packages
+                {selecting ? (
+                  <>
+                    <Loader2 className='size-3.5 animate-spin' />
+                    Creating…
+                  </>
+                ) : (
+                  'Create Label'
+                )}
               </button>
             </div>
           </>
@@ -595,6 +701,131 @@ export function ShippingRatesDialog({
         )}
       </DialogContent>
     </Dialog>
+
+    {/* Ship To edit dialog */}
+    <ShipToEditDialog
+      open={shipToExpanded}
+      onOpenChange={setShipToExpanded}
+      address={address}
+      onSave={setAddress}
+    />
+    </>
+  )
+}
+
+// ── Ship To Edit Dialog ──
+
+function ShipToEditDialog({
+  open,
+  onOpenChange,
+  address,
+  onSave,
+}: {
+  open: boolean
+  onOpenChange: (open: boolean) => void
+  address: ShipToAddress
+  onSave: (address: ShipToAddress) => void
+}) {
+  const [draft, setDraft] = useState<ShipToAddress>(address)
+
+  // Sync draft when opening
+  const prevOpen = useRef(false)
+  useEffect(() => {
+    if (open && !prevOpen.current) setDraft(address)
+    prevOpen.current = open
+  }, [open, address])
+
+  const update = (field: keyof ShipToAddress, value: string) => {
+    setDraft((d) => ({ ...d, [field]: value }))
+  }
+
+  const formatPhoneInput = (value: string) => {
+    const digits = value.replace(/\D/g, '')
+    if (digits.length <= 3) return digits
+    if (digits.length <= 6) return `(${digits.slice(0, 3)}) ${digits.slice(3)}`
+    return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6, 10)}`
+  }
+
+  const handlePhoneChange = (value: string) => {
+    update('c_phone', formatPhoneInput(value))
+  }
+
+  const formatZipInput = (value: string) => {
+    // Allow alphanumeric + spaces for Canadian/international postal codes
+    return value.toUpperCase().replace(/[^A-Z0-9 -]/g, '').slice(0, 10)
+  }
+
+  const handleZipChange = (value: string) => {
+    update('c_zip', formatZipInput(value))
+  }
+
+  const handleSave = () => {
+    onSave(draft)
+    onOpenChange(false)
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className='gap-0 p-0 sm:max-w-[400px]'>
+        <DialogHeader className='border-b border-border px-5 py-3'>
+          <DialogTitle className='text-[14px] font-semibold'>Ship To Address</DialogTitle>
+        </DialogHeader>
+        <div className='space-y-3 px-5 py-4'>
+          <ShipToField label='Name' value={draft.c_name} onChange={(v) => update('c_name', v)} />
+          <ShipToField label='Address' value={draft.c_address1} onChange={(v) => update('c_address1', v)} />
+          <div className='grid grid-cols-3 gap-2'>
+            <ShipToField label='City' value={draft.c_city} onChange={(v) => update('c_city', v)} />
+            <ShipToField label='State' value={draft.c_state} onChange={(v) => update('c_state', v)} />
+            <ShipToField label='ZIP / Postal' value={draft.c_zip} onChange={handleZipChange} />
+          </div>
+          <div className='grid grid-cols-2 gap-2'>
+            <ShipToField label='Country' value={draft.c_country} onChange={(v) => update('c_country', v)} />
+            <ShipToField label='Phone' value={draft.c_phone} onChange={handlePhoneChange} inputMode='tel' />
+          </div>
+        </div>
+        <div className='flex items-center justify-end gap-2 border-t border-border px-5 py-3'>
+          <button
+            type='button'
+            className='rounded-[6px] border border-border px-3 py-1.5 text-[13px] font-medium transition-colors hover:bg-bg-hover'
+            onClick={() => onOpenChange(false)}
+          >
+            Cancel
+          </button>
+          <button
+            type='button'
+            className='rounded-[6px] bg-primary px-3 py-1.5 text-[13px] font-semibold text-primary-foreground transition-colors hover:opacity-90'
+            onClick={handleSave}
+          >
+            Save
+          </button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
+function ShipToField({
+  label,
+  value,
+  onChange,
+  inputMode,
+}: {
+  label: string
+  value: string
+  onChange: (value: string) => void
+  inputMode?: 'tel' | 'text'
+}) {
+  return (
+    <div>
+      <label className='mb-1 block text-[12px] font-medium text-text-tertiary'>{label}</label>
+      <input
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={label}
+        inputMode={inputMode}
+        className='h-8 w-full rounded-[6px] border border-border bg-background px-2.5 text-[13px] text-foreground outline-none transition-colors duration-[80ms] placeholder:text-text-quaternary focus:border-primary/50 focus:ring-1 focus:ring-primary/20'
+      />
+    </div>
   )
 }
 
@@ -706,7 +937,7 @@ function PackageCard({
               min={0}
               step={0.01}
               value={pkg.weight || ''}
-              onChange={(e) => onUpdateDimension('weight', Number(e.target.value) || 0)}
+              onChange={(e) => onUpdateDimension('weight', Math.round((Number(e.target.value) || 0) * 100) / 100)}
               className='h-full min-w-0 flex-1 bg-background px-2 text-[12px] tabular-nums text-foreground outline-none'
               placeholder='0'
             />
@@ -765,15 +996,19 @@ function PackageCard({
 function RatesResultStep({
   data,
   itemMap,
+  selectedRate,
+  onSelectRate,
 }: {
   data: ShippingRatesResponse
   itemMap: Map<string, OrderItem>
+  selectedRate: ShippingRate | null
+  onSelectRate: (rate: ShippingRate) => void
 }) {
   return (
     <div>
       <div className='px-5 py-3'>
         <div className='mb-2 text-[11px] font-semibold uppercase tracking-[0.06em] text-text-tertiary'>
-          Available Rates
+          Select a Rate
         </div>
         <div className='space-y-1.5'>
           {data.rates.length === 0 ? (
@@ -784,7 +1019,14 @@ function RatesResultStep({
             data.rates
               .slice()
               .sort((a, b) => a.cost - b.cost)
-              .map((rate) => <RateCard key={`${rate.carrier_id}-${rate.service_id}`} rate={rate} />)
+              .map((rate) => (
+                <RateCard
+                  key={`${rate.carrier_id}-${rate.service_id}`}
+                  rate={rate}
+                  selected={selectedRate?.rate_id === rate.rate_id}
+                  onSelect={() => onSelectRate(rate)}
+                />
+              ))
           )}
         </div>
       </div>
@@ -828,11 +1070,29 @@ function RatesResultStep({
   )
 }
 
-function RateCard({ rate }: { rate: ShippingRate }) {
+function RateCard({ rate, selected, onSelect }: { rate: ShippingRate; selected: boolean; onSelect: () => void }) {
   const isFree = rate.cost === 0
   return (
-    <div className='flex items-center gap-3 rounded-[6px] border border-border px-3 py-2.5 transition-colors duration-75 hover:bg-bg-hover'>
-      <Box className='size-4 shrink-0 text-text-tertiary' />
+    <button
+      type='button'
+      className={cn(
+        'flex w-full items-center gap-3 rounded-[6px] border px-3 py-2.5 text-left transition-colors duration-75',
+        selected
+          ? 'border-primary bg-primary/[0.06]'
+          : 'border-border hover:border-primary/40 hover:bg-primary/[0.04]',
+      )}
+      onClick={onSelect}
+    >
+      <div
+        className={cn(
+          'flex size-4 shrink-0 items-center justify-center rounded-full border-2 transition-colors duration-75',
+          selected
+            ? 'border-primary bg-primary'
+            : 'border-border-heavy',
+        )}
+      >
+        {selected && <div className='size-1.5 rounded-full bg-white' />}
+      </div>
       <div className='min-w-0 flex-1'>
         <div className='text-[13px] font-medium text-foreground'>{rate.type}</div>
         <div className='text-[12px] text-text-tertiary'>{rate.service_id}</div>
@@ -845,6 +1105,7 @@ function RateCard({ rate }: { rate: ShippingRate }) {
       >
         {isFree ? 'Free' : `$${rate.cost.toFixed(2)}`}
       </span>
-    </div>
+    </button>
   )
 }
+

@@ -10,15 +10,15 @@ import {
 } from 'lucide-react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
-import { TASK_QUERY_KEYS, getTaskDetailQuery, getTaskStatusesQuery } from '@/api/task/query'
-import type { Task } from '@/api/task/schema'
+import { TASK_QUERY_KEYS, getTaskDetailQuery, getTaskNotesQuery, getTaskStatusesQuery } from '@/api/task/query'
+import type { Task, TaskNote } from '@/api/task/schema'
 import { taskService } from '@/api/task/service'
 import { TaskAttachments } from '@/components/tasks/task-attachments'
 import { TaskCustomerCombobox } from '@/components/tasks/customer-combobox'
 import { OrderCombobox } from '@/components/tasks/order-combobox'
 import { ProposalCombobox } from '@/components/tasks/proposal-combobox'
 import { UserCombobox } from '@/components/common/user-combobox/user-combobox'
-import { StatusIcon } from '@/components/ds'
+import { InitialsAvatar, StatusIcon } from '@/components/ds'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -33,7 +33,9 @@ import { TASK_PRIORITY_COLORS, TASK_PRIORITY_LABELS } from '@/constants/task'
 import type { TaskPriority } from '@/constants/task'
 import { useBreakpoint } from '@/hooks/use-breakpoint'
 import { useProjectId } from '@/hooks/use-project-id'
+import { isAdmin } from '@/constants/user'
 import { cn } from '@/lib/utils'
+import { useAuth } from '@/providers/auth'
 
 export const Route = createFileRoute('/_authenticated/tasks/$taskId/')({
   component: TaskDetailPage,
@@ -60,6 +62,18 @@ function formatDateTime(dateStr: string) {
     hour: 'numeric',
     minute: '2-digit',
   })
+}
+
+function relativeTime(dateStr: string): string {
+  const diffMs = Date.now() - new Date(dateStr).getTime()
+  const diffMin = Math.floor(diffMs / 60_000)
+  if (diffMin < 1) return 'just now'
+  if (diffMin < 60) return `${diffMin}m ago`
+  const diffHr = Math.floor(diffMin / 60)
+  if (diffHr < 24) return `${diffHr}h ago`
+  const diffDay = Math.floor(diffHr / 24)
+  if (diffDay < 7) return `${diffDay}d ago`
+  return new Date(dateStr).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
 }
 
 const PRIORITY_BARS: Record<string, number> = {
@@ -108,9 +122,12 @@ function TaskDetailPage() {
   const [projectId] = useProjectId()
   const id = Number(taskId)
 
+  const { user } = useAuth()
   const [deleteOpen, setDeleteOpen] = useState(false)
   const [statusOpen, setStatusOpen] = useState(false)
   const [activeTab, setActiveTab] = useState<'details' | 'attachments'>('details')
+  const [panelTab, setPanelTab] = useState<'properties' | 'activity'>('properties')
+  const [noteText, setNoteText] = useState('')
   const titleRef = useRef<HTMLTextAreaElement>(null)
 
   const autoResizeTitle = useCallback(() => {
@@ -131,6 +148,60 @@ function TaskDetailPage() {
   const { data: statusesData } = useQuery(getTaskStatusesQuery(projectId ?? task?.project ?? null))
   const statuses = statusesData?.results ?? []
   const currentStatus = statuses.find((s) => s.id === task?.status)
+
+  // Fetch notes / activity
+  const { data: notes = [], isLoading: notesLoading } = useQuery(getTaskNotesQuery(id))
+  const notesQueryKey = TASK_QUERY_KEYS.notes(id)
+
+  const createNoteMutation = useMutation({
+    mutationFn: (payload: { text: string }) => taskService.createNote(id, payload),
+    onMutate: async (payload) => {
+      await queryClient.cancelQueries({ queryKey: notesQueryKey, exact: true })
+      const previous = queryClient.getQueryData<TaskNote[]>(notesQueryKey)
+      const optimistic: TaskNote = {
+        id: -Date.now(),
+        task: id,
+        text: payload.text,
+        author: user?.id ?? null,
+        author_name: user ? `${user.first_name} ${user.last_name}`.trim() : '',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      }
+      queryClient.setQueryData<TaskNote[]>(notesQueryKey, (old) =>
+        old ? [optimistic, ...old] : [optimistic],
+      )
+      setNoteText('')
+      return { previous }
+    },
+    onSuccess: (serverNote) => {
+      queryClient.setQueryData<TaskNote[]>(notesQueryKey, (old) =>
+        old?.map((n) => (n.id < 0 ? serverNote : n)),
+      )
+    },
+    onError: (_err, _vars, context) => {
+      if (context?.previous) queryClient.setQueryData(notesQueryKey, context.previous)
+    },
+    meta: { errorMessage: 'Failed to add note' },
+  })
+
+  const deleteNoteMutation = useMutation({
+    mutationFn: (noteId: number) => taskService.deleteNote(id, noteId),
+    onMutate: async (noteId) => {
+      await queryClient.cancelQueries({ queryKey: notesQueryKey, exact: true })
+      const previous = queryClient.getQueryData<TaskNote[]>(notesQueryKey)
+      queryClient.setQueryData<TaskNote[]>(notesQueryKey, (old) =>
+        old ? old.filter((n) => n.id !== noteId) : old,
+      )
+      return { previous }
+    },
+    onError: (_err, _vars, context) => {
+      if (context?.previous) queryClient.setQueryData(notesQueryKey, context.previous)
+    },
+    meta: { successMessage: 'Note deleted', errorMessage: 'Failed to delete note' },
+  })
+
+  const canDeleteNote = (note: TaskNote) =>
+    !!user && (isAdmin(user.role) || note.author === user.id)
 
   // Local state for editable fields
   const [title, setTitle] = useState(task?.title ?? '')
@@ -382,20 +453,6 @@ function TaskDetailPage() {
                     )}
                   </div>
 
-                  {/* Activity */}
-                  <div>
-                    <div className='mb-3 flex items-center gap-2'>
-                      <span className='text-[13px] font-semibold uppercase tracking-[0.06em] text-text-tertiary'>
-                        Activity
-                      </span>
-                      <span className='rounded-[4px] bg-bg-secondary px-1.5 py-0.5 text-[11px] font-medium text-text-tertiary'>
-                        Coming soon
-                      </span>
-                    </div>
-                    <p className='text-[13px] text-text-tertiary'>
-                      Activity feed and comments will be available here soon.
-                    </p>
-                  </div>
                 </>
               ) : (
                 <TaskAttachments taskId={task.id} attachments={task.attachments ?? []} showDropZone />
@@ -406,179 +463,316 @@ function TaskDetailPage() {
 
         {/* Right panel — full height, border-left */}
         <div className={cn(
-          'shrink-0 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]',
+          'flex shrink-0 flex-col overflow-hidden',
           isMobile
-            ? 'border-t border-border px-4 py-4'
+            ? 'border-t border-border'
             : 'w-[320px] border-l border-border'
         )}>
-          <div className={cn(isMobile ? '' : 'p-5')}>
-            <div className='mb-4 text-[13px] font-semibold uppercase tracking-[0.06em] text-text-tertiary'>
-              Properties
-            </div>
-
-            {/* Status */}
-            <PropertyRow label='Status'>
-              <Popover open={statusOpen} onOpenChange={setStatusOpen}>
-                <PopoverTrigger asChild>
-                  <button
-                    type='button'
-                    className='inline-flex items-center gap-1.5 rounded-[5px] px-2 py-1 -mx-2 -my-1 text-[13px] font-medium transition-colors duration-[80ms] hover:bg-bg-hover cursor-pointer'
-                  >
-                    <StatusIcon status={task.status_name} color={currentStatus?.color ?? task.status_color} size={14} />
-                    <span style={{ color: currentStatus?.color ?? task.status_color }}>{currentStatus?.name ?? task.status_name}</span>
-                    <ChevronDown className='ml-0.5 size-3 text-text-tertiary' />
-                  </button>
-                </PopoverTrigger>
-                <PopoverContent
-                  className='w-[220px] overflow-hidden rounded-[8px] border-border gap-0 p-[3px]'
-                  align='start'
-                  onOpenAutoFocus={(e) => e.preventDefault()}
-                  style={{ boxShadow: 'var(--dropdown-shadow)' }}
-                >
-                  {statuses.map((s) => (
-                    <button
-                      key={s.id}
-                      type='button'
-                      className={cn(
-                        'flex w-full cursor-pointer items-center gap-2 rounded-[5px] px-2 py-[5px] text-left text-[13px] font-medium',
-                        'transition-colors duration-[80ms]',
-                        s.id === task.status ? 'bg-accent-bg' : 'hover:bg-bg-hover'
-                      )}
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        setStatusOpen(false)
-                        updateMutation.mutate({ status: s.id })
-                      }}
-                    >
-                      <StatusIcon status={s.name} color={s.color} size={14} />
-                      <span className='flex-1'>{s.name}</span>
-                    </button>
-                  ))}
-                </PopoverContent>
-              </Popover>
-            </PropertyRow>
-
-            {/* Priority */}
-            <PropertyRow label='Priority'>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <button
-                    type='button'
-                    className='inline-flex items-center gap-1.5 rounded-[5px] px-2 py-1 -mx-2 -my-1 text-[13px] font-medium transition-colors duration-[80ms] hover:bg-bg-hover cursor-pointer'
-                  >
-                    <PriorityIcon priority={task.priority} color={TASK_PRIORITY_COLORS[task.priority]} size={14} />
-                    <span>{TASK_PRIORITY_LABELS[task.priority]}</span>
-                    <ChevronDown className='ml-0.5 size-3 text-text-tertiary' />
-                  </button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent
-                  align='start'
-                  className='w-[180px] p-0.5'
-                  style={{ boxShadow: 'var(--dropdown-shadow)' }}
-                >
-                  {Object.entries(TASK_PRIORITY_LABELS).map(([key, label]) => (
-                    <DropdownMenuItem
-                      key={key}
-                      className={cn(
-                        'cursor-pointer gap-2 rounded-[6px] px-2 py-[5px] text-[13px] font-medium hover:!bg-bg-hover hover:!text-foreground',
-                        task.priority === key && 'bg-accent-bg'
-                      )}
-                      onSelect={() => updateMutation.mutate({ priority: key as TaskPriority })}
-                    >
-                      <PriorityIcon priority={key} color={TASK_PRIORITY_COLORS[key as TaskPriority]} size={14} />
-                      {label}
-                    </DropdownMenuItem>
-                  ))}
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </PropertyRow>
-
-            {/* Due date */}
-            <PropertyRow label='Due date'>
-              <div className='flex items-center'>
-                <DueDatePicker
-                  value={task.due_date ?? null}
-                  onChange={(date) => updateMutation.mutate({ due_date: date })}
-                />
-              </div>
-            </PropertyRow>
-
-            {/* Assignee */}
-            <PropertyRow label='Assignee'>
-              <UserCombobox
-                value={task.responsible_user ?? null}
-                onChange={(userId) => updateMutation.mutate({ responsible_user: userId })}
-                placeholder='Unassigned'
-                valueLabel={assigneeName ?? undefined}
-                triggerClassName={cn(
-                  'inline-flex items-center gap-1.5 rounded-[5px] px-2 py-1 -mx-2 -my-1 text-[13px] font-medium transition-colors duration-[80ms] hover:bg-bg-hover cursor-pointer',
-                  !task.responsible_user && 'text-text-tertiary'
+          {/* Panel tabs */}
+          <div className='flex shrink-0 items-center gap-0 border-b border-border px-1'>
+            {(['properties', 'activity'] as const).map((tab) => (
+              <button
+                key={tab}
+                type='button'
+                className={cn(
+                  'relative flex items-center gap-1.5 px-3 py-2 text-[13px] font-medium transition-colors duration-75',
+                  panelTab === tab
+                    ? 'text-foreground'
+                    : 'text-text-tertiary hover:text-text-secondary',
                 )}
-              />
-            </PropertyRow>
-
-            {/* Reference section */}
-            <div className='mt-4 border-t border-border-light pt-3'>
-              <div className='mb-4 text-[13px] font-semibold uppercase tracking-[0.06em] text-text-tertiary'>
-                Reference
-              </div>
-
-              <PropertyRow label='Order'>
-                <OrderCombobox
-                  value={task.linked_order_autoid ?? null}
-                  onChange={(autoid) => updateMutation.mutate({ linked_order_autoid: autoid })}
-                  projectId={task.project}
-                  placeholder='None'
-                  valueLabel={task.linked_order_details ? `Order ${task.linked_order_details.invoice}` : undefined}
-                  triggerClassName={cn(
-                    'inline-flex items-center gap-1.5 rounded-[5px] px-2 py-1 -mx-2 -my-1 text-[13px] font-medium transition-colors duration-[80ms] hover:bg-bg-hover cursor-pointer',
-                    !task.linked_order_autoid && 'text-text-tertiary'
-                  )}
-                />
-              </PropertyRow>
-
-              <PropertyRow label='Proposal'>
-                <ProposalCombobox
-                  value={task.linked_proposal_autoid ?? null}
-                  onChange={(autoid) => updateMutation.mutate({ linked_proposal_autoid: autoid })}
-                  projectId={task.project}
-                  placeholder='None'
-                  valueLabel={task.linked_proposal_details ? `Proposal ${task.linked_proposal_details.quote}` : undefined}
-                  triggerClassName={cn(
-                    'inline-flex items-center gap-1.5 rounded-[5px] px-2 py-1 -mx-2 -my-1 text-[13px] font-medium transition-colors duration-[80ms] hover:bg-bg-hover cursor-pointer',
-                    !task.linked_proposal_autoid && 'text-text-tertiary'
-                  )}
-                />
-              </PropertyRow>
-
-              <PropertyRow label='Customer'>
-                <TaskCustomerCombobox
-                  value={task.linked_customer_autoid ?? null}
-                  onChange={(autoid) => updateMutation.mutate({ linked_customer_autoid: autoid })}
-                  projectId={task.project}
-                  placeholder='None'
-                  valueLabel={task.linked_customer_details?.l_name ?? undefined}
-                  triggerClassName={cn(
-                    'inline-flex items-center gap-1.5 rounded-[5px] px-2 py-1 -mx-2 -my-1 text-[13px] font-medium transition-colors duration-[80ms] hover:bg-bg-hover cursor-pointer',
-                    !task.linked_customer_autoid && 'text-text-tertiary'
-                  )}
-                />
-              </PropertyRow>
-            </div>
-
-            {/* Created by metadata */}
-            <div className='mt-4 border-t border-border-light pt-3'>
-              <div className='text-[13px] text-text-tertiary'>
-                <span>Created by </span>
-                <span className='font-medium text-text-secondary'>
-                  {task.author_details?.full_name ?? task.author_name ?? '\u2014'}
-                </span>
-              </div>
-              <div className='mt-1 text-[13px] text-text-tertiary'>
-                {formatDateLong(task.created_at)}
-              </div>
-            </div>
+                onClick={() => setPanelTab(tab)}
+              >
+                {tab === 'properties' ? 'Properties' : 'Activity'}
+                {tab === 'activity' && notes.length > 0 && (
+                  <span className='inline-flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-bg-active px-1 text-[11px] font-semibold tabular-nums text-text-secondary'>
+                    {notes.length}
+                  </span>
+                )}
+                {panelTab === tab && (
+                  <span className='absolute bottom-0 left-3 right-3 h-[2px] rounded-full bg-primary' />
+                )}
+              </button>
+            ))}
           </div>
+
+          {/* Panel content */}
+          {panelTab === 'properties' ? (
+            <div className='flex-1 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]'>
+              <div className={cn(isMobile ? 'px-4 py-4' : 'p-5')}>
+                {/* Status */}
+                <PropertyRow label='Status'>
+                  <Popover open={statusOpen} onOpenChange={setStatusOpen}>
+                    <PopoverTrigger asChild>
+                      <button
+                        type='button'
+                        className='inline-flex items-center gap-1.5 rounded-[5px] px-2 py-1 -mx-2 -my-1 text-[13px] font-medium transition-colors duration-[80ms] hover:bg-bg-hover cursor-pointer'
+                      >
+                        <StatusIcon status={task.status_name} color={currentStatus?.color ?? task.status_color} size={14} />
+                        <span style={{ color: currentStatus?.color ?? task.status_color }}>{currentStatus?.name ?? task.status_name}</span>
+                        <ChevronDown className='ml-0.5 size-3 text-text-tertiary' />
+                      </button>
+                    </PopoverTrigger>
+                    <PopoverContent
+                      className='w-[220px] overflow-hidden rounded-[8px] border-border gap-0 p-[3px]'
+                      align='start'
+                      onOpenAutoFocus={(e) => e.preventDefault()}
+                      style={{ boxShadow: 'var(--dropdown-shadow)' }}
+                    >
+                      {statuses.map((s) => (
+                        <button
+                          key={s.id}
+                          type='button'
+                          className={cn(
+                            'flex w-full cursor-pointer items-center gap-2 rounded-[5px] px-2 py-[5px] text-left text-[13px] font-medium',
+                            'transition-colors duration-[80ms]',
+                            s.id === task.status ? 'bg-accent-bg' : 'hover:bg-bg-hover'
+                          )}
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            setStatusOpen(false)
+                            updateMutation.mutate({ status: s.id })
+                          }}
+                        >
+                          <StatusIcon status={s.name} color={s.color} size={14} />
+                          <span className='flex-1'>{s.name}</span>
+                        </button>
+                      ))}
+                    </PopoverContent>
+                  </Popover>
+                </PropertyRow>
+
+                {/* Priority */}
+                <PropertyRow label='Priority'>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <button
+                        type='button'
+                        className='inline-flex items-center gap-1.5 rounded-[5px] px-2 py-1 -mx-2 -my-1 text-[13px] font-medium transition-colors duration-[80ms] hover:bg-bg-hover cursor-pointer'
+                      >
+                        <PriorityIcon priority={task.priority} color={TASK_PRIORITY_COLORS[task.priority]} size={14} />
+                        <span>{TASK_PRIORITY_LABELS[task.priority]}</span>
+                        <ChevronDown className='ml-0.5 size-3 text-text-tertiary' />
+                      </button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent
+                      align='start'
+                      className='w-[180px] p-0.5'
+                      style={{ boxShadow: 'var(--dropdown-shadow)' }}
+                    >
+                      {Object.entries(TASK_PRIORITY_LABELS).map(([key, label]) => (
+                        <DropdownMenuItem
+                          key={key}
+                          className={cn(
+                            'cursor-pointer gap-2 rounded-[6px] px-2 py-[5px] text-[13px] font-medium hover:!bg-bg-hover hover:!text-foreground',
+                            task.priority === key && 'bg-accent-bg'
+                          )}
+                          onSelect={() => updateMutation.mutate({ priority: key as TaskPriority })}
+                        >
+                          <PriorityIcon priority={key} color={TASK_PRIORITY_COLORS[key as TaskPriority]} size={14} />
+                          {label}
+                        </DropdownMenuItem>
+                      ))}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </PropertyRow>
+
+                {/* Due date */}
+                <PropertyRow label='Due date'>
+                  <div className='flex items-center'>
+                    <DueDatePicker
+                      value={task.due_date ?? null}
+                      onChange={(date) => updateMutation.mutate({ due_date: date })}
+                    />
+                  </div>
+                </PropertyRow>
+
+                {/* Assignee */}
+                <PropertyRow label='Assignee'>
+                  <UserCombobox
+                    value={task.responsible_user ?? null}
+                    onChange={(userId) => updateMutation.mutate({ responsible_user: userId })}
+                    placeholder='Unassigned'
+                    valueLabel={assigneeName ?? undefined}
+                    triggerClassName={cn(
+                      'inline-flex items-center gap-1.5 rounded-[5px] px-2 py-1 -mx-2 -my-1 text-[13px] font-medium transition-colors duration-[80ms] hover:bg-bg-hover cursor-pointer',
+                      !task.responsible_user && 'text-text-tertiary'
+                    )}
+                  />
+                </PropertyRow>
+
+                {/* Reference section */}
+                <div className='mt-4 border-t border-border-light pt-3'>
+                  <div className='mb-4 text-[13px] font-semibold uppercase tracking-[0.06em] text-text-tertiary'>
+                    Reference
+                  </div>
+
+                  <PropertyRow label='Order'>
+                    <OrderCombobox
+                      value={task.linked_order_autoid ?? null}
+                      onChange={(autoid) => updateMutation.mutate({ linked_order_autoid: autoid })}
+                      projectId={task.project}
+                      placeholder='None'
+                      valueLabel={task.linked_order_details ? `Order ${task.linked_order_details.invoice}` : undefined}
+                      triggerClassName={cn(
+                        'inline-flex items-center gap-1.5 rounded-[5px] px-2 py-1 -mx-2 -my-1 text-[13px] font-medium transition-colors duration-[80ms] hover:bg-bg-hover cursor-pointer',
+                        !task.linked_order_autoid && 'text-text-tertiary'
+                      )}
+                    />
+                  </PropertyRow>
+
+                  <PropertyRow label='Proposal'>
+                    <ProposalCombobox
+                      value={task.linked_proposal_autoid ?? null}
+                      onChange={(autoid) => updateMutation.mutate({ linked_proposal_autoid: autoid })}
+                      projectId={task.project}
+                      placeholder='None'
+                      valueLabel={task.linked_proposal_details ? `Proposal ${task.linked_proposal_details.quote}` : undefined}
+                      triggerClassName={cn(
+                        'inline-flex items-center gap-1.5 rounded-[5px] px-2 py-1 -mx-2 -my-1 text-[13px] font-medium transition-colors duration-[80ms] hover:bg-bg-hover cursor-pointer',
+                        !task.linked_proposal_autoid && 'text-text-tertiary'
+                      )}
+                    />
+                  </PropertyRow>
+
+                  <PropertyRow label='Customer'>
+                    <TaskCustomerCombobox
+                      value={task.linked_customer_autoid ?? null}
+                      onChange={(autoid) => updateMutation.mutate({ linked_customer_autoid: autoid })}
+                      projectId={task.project}
+                      placeholder='None'
+                      valueLabel={task.linked_customer_details?.l_name ?? undefined}
+                      triggerClassName={cn(
+                        'inline-flex items-center gap-1.5 rounded-[5px] px-2 py-1 -mx-2 -my-1 text-[13px] font-medium transition-colors duration-[80ms] hover:bg-bg-hover cursor-pointer',
+                        !task.linked_customer_autoid && 'text-text-tertiary'
+                      )}
+                    />
+                  </PropertyRow>
+                </div>
+
+                {/* Created by metadata */}
+                <div className='mt-4 border-t border-border-light pt-3'>
+                  <div className='text-[13px] text-text-tertiary'>
+                    <span>Created by </span>
+                    <span className='font-medium text-text-secondary'>
+                      {task.author_details?.full_name ?? task.author_name ?? '\u2014'}
+                    </span>
+                  </div>
+                  <div className='mt-1 text-[13px] text-text-tertiary'>
+                    {formatDateLong(task.created_at)}
+                  </div>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <>
+              {/* Activity notes list */}
+              <div className='min-h-0 flex-1 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]'>
+                {notesLoading ? (
+                  <div className='flex flex-col'>
+                    {[1, 2, 3].map((k) => (
+                      <div key={k} className='flex gap-2.5 px-5 py-3'>
+                        <Skeleton className='size-5 shrink-0 rounded-full' />
+                        <div className='min-w-0 flex-1 space-y-1.5'>
+                          <div className='flex items-center gap-2'>
+                            <Skeleton className='h-3.5 w-20' />
+                            <Skeleton className='h-3 w-12' />
+                          </div>
+                          <Skeleton className='h-3.5 w-full' />
+                          <Skeleton className='h-3.5 w-2/3' />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : notes.length === 0 ? (
+                  <div className='flex flex-col items-center justify-center py-12 text-center'>
+                    <p className='text-[13px] text-text-tertiary'>No activity yet</p>
+                    <p className='mt-1 text-[12px] text-text-quaternary'>
+                      Add a comment below to start the conversation.
+                    </p>
+                  </div>
+                ) : (
+                  <div className='flex flex-col'>
+                    {[...notes]
+                      .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+                      .map((note) => {
+                        const displayName = note.author_name || 'Unknown'
+                        const initials = displayName
+                          .split(' ')
+                          .slice(0, 2)
+                          .map((n) => n[0]?.toUpperCase() ?? '')
+                          .join('')
+                        return (
+                          <div key={note.id} className='group flex gap-2.5 border-b border-border-light px-5 py-3 last:border-b-0'>
+                            <InitialsAvatar initials={initials} size={20} />
+                            <div className='min-w-0 flex-1'>
+                              <div className='flex items-center gap-2'>
+                                <span className='truncate text-[13px] font-medium text-foreground'>
+                                  {displayName}
+                                </span>
+                                <span className='shrink-0 text-[12px] tabular-nums text-text-tertiary'>
+                                  {relativeTime(note.created_at)}
+                                </span>
+                                {canDeleteNote(note) && (
+                                  <button
+                                    type='button'
+                                    className='ml-auto shrink-0 rounded-[4px] p-0.5 text-text-tertiary opacity-0 transition-all duration-[80ms] hover:text-destructive group-hover:opacity-100'
+                                    onClick={() => deleteNoteMutation.mutate(note.id)}
+                                    disabled={deleteNoteMutation.isPending}
+                                  >
+                                    <Trash2 className='size-3' />
+                                  </button>
+                                )}
+                              </div>
+                              <p className='mt-0.5 whitespace-pre-wrap text-[13px] leading-relaxed text-text-secondary wrap-break-word'>
+                                {note.text}
+                              </p>
+                            </div>
+                          </div>
+                        )
+                      })}
+                  </div>
+                )}
+              </div>
+
+              {/* Comment input — pinned to bottom */}
+              <form
+                className='shrink-0 border-t border-border px-4 py-3'
+                onSubmit={(e) => {
+                  e.preventDefault()
+                  const trimmed = noteText.trim()
+                  if (!trimmed || createNoteMutation.isPending) return
+                  createNoteMutation.mutate({ text: trimmed })
+                }}
+              >
+                <textarea
+                  value={noteText}
+                  onChange={(e) => setNoteText(e.target.value.slice(0, 500))}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                      e.preventDefault()
+                      const trimmed = noteText.trim()
+                      if (trimmed && !createNoteMutation.isPending) {
+                        createNoteMutation.mutate({ text: trimmed })
+                      }
+                    }
+                  }}
+                  placeholder='Write a comment...'
+                  rows={2}
+                  className='w-full resize-none rounded-[6px] border border-border bg-transparent px-3 py-2 text-[13px] leading-relaxed placeholder:text-text-tertiary focus:border-ring focus:outline-none focus:ring-1 focus:ring-ring/50'
+                  disabled={createNoteMutation.isPending}
+                />
+                <div className='mt-2 flex justify-end'>
+                  <button
+                    type='submit'
+                    disabled={!noteText.trim() || createNoteMutation.isPending}
+                    className='inline-flex h-7 items-center rounded-[6px] bg-primary px-3 text-[12px] font-semibold text-primary-foreground transition-colors duration-[80ms] hover:opacity-90 disabled:opacity-40'
+                  >
+                    {createNoteMutation.isPending ? 'Sending...' : 'Comment'}
+                  </button>
+                </div>
+              </form>
+            </>
+          )}
         </div>
       </div>
 

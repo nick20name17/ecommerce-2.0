@@ -161,7 +161,7 @@ function CustomersPage() {
             {bp !== 'tablet' && <SortableHeader field='contact_3' label='Email' sortField={sortField} sortDir={sortDir} onSort={handleSort} className='w-[160px] shrink-0' />}
             <SortableHeader field='in_level' label='Type' sortField={sortField} sortDir={sortDir} onSort={handleSort} className='w-[80px] shrink-0' />
             <div className='w-[120px] shrink-0'>Responsible</div>
-            <div className='w-[62px] shrink-0' />
+            <div className='w-[46px] shrink-0' />
             <div className='w-[28px] shrink-0' />
           </div>
         )}
@@ -196,7 +196,7 @@ function CustomersPage() {
                 {bp !== 'tablet' && <div className='w-[160px] shrink-0'><Skeleton className='h-3.5 w-[120px] rounded' /></div>}
                 <div className='w-[80px] shrink-0'><Skeleton className='h-[18px] w-[50px] rounded-[4px]' /></div>
                 <div className='w-[120px] shrink-0'><Skeleton className='h-3.5 w-[70px] rounded' /></div>
-                <div className='w-[62px] shrink-0' />
+                <div className='w-[46px] shrink-0' />
                 <div className='w-[28px] shrink-0' />
               </div>
             )

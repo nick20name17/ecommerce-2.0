@@ -61,6 +61,33 @@ export function PanelBlock({
   )
 }
 
+// ── Boolean value detection ──────────────────────────────────
+
+const BOOLEAN_VALUES = new Set(['true', 'false', 'yes', 'no', '0', '1'])
+
+function isBooleanLike(value: string | null | undefined): boolean {
+  if (!value) return false
+  return BOOLEAN_VALUES.has(value.toLowerCase().trim())
+}
+
+function getBooleanDisplay(value: string): string {
+  const v = value.toLowerCase().trim()
+  if (v === 'true' || v === 'yes' || v === '1') return 'true'
+  return 'false'
+}
+
+function toggleBooleanValue(value: string): string {
+  const v = value.toLowerCase().trim()
+  // Preserve the original format
+  if (v === 'true') return 'false'
+  if (v === 'false') return 'true'
+  if (v === 'yes') return 'no'
+  if (v === 'no') return 'yes'
+  if (v === '1') return '0'
+  if (v === '0') return '1'
+  return value
+}
+
 // ── Property Field (editable, horizontal row) ────────────────
 
 export function PropertyField({
@@ -69,19 +96,29 @@ export function PropertyField({
   field,
   onSave,
   multiline,
+  editable = true,
 }: {
   label: string
   value: string | null | undefined
   field: string
   onSave: (field: string, value: string) => void
   multiline?: boolean
+  editable?: boolean
 }) {
   const [editing, setEditing] = useState(false)
   const [draft, setDraft] = useState('')
   const containerRef = useRef<HTMLDivElement>(null)
   const displayValue = value ?? ''
+  const isBool = isBooleanLike(displayValue)
 
   const startEditing = () => {
+    if (!editable) return
+    // For boolean fields, toggle directly instead of opening editor
+    if (isBool) {
+      const newValue = toggleBooleanValue(displayValue)
+      onSave(field, newValue)
+      return
+    }
     setDraft(displayValue)
     setEditing(true)
   }
@@ -169,11 +206,35 @@ export function PropertyField({
     )
   }
 
+  // Read mode — boolean toggle
+  if (isBool && editable) {
+    const isTrue = getBooleanDisplay(displayValue) === 'true'
+    return (
+      <div
+        className='flex cursor-pointer items-center justify-between gap-4 border-b border-border-light px-4 py-2.5 transition-colors duration-75 hover:bg-bg-hover/50'
+        onClick={startEditing}
+      >
+        <span className='shrink-0 text-[12px] font-medium text-text-tertiary'>{label}</span>
+        <span className={cn(
+          'inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold leading-none',
+          isTrue
+            ? 'border border-emerald-200 bg-emerald-500/10 text-emerald-700 dark:border-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300'
+            : 'border border-border bg-bg-secondary text-text-tertiary',
+        )}>
+          {displayValue}
+        </span>
+      </div>
+    )
+  }
+
   // Read mode — multiline (full-width block)
   if (multiline) {
     return (
       <div
-        className='cursor-pointer border-b border-border-light px-4 py-2.5 transition-colors duration-75 hover:bg-bg-hover/50'
+        className={cn(
+          'border-b border-border-light px-4 py-2.5 transition-colors duration-75',
+          editable && 'cursor-pointer hover:bg-bg-hover/50',
+        )}
         onClick={startEditing}
       >
         <span className='mb-0.5 block text-[12px] font-medium text-text-tertiary'>{label}</span>
@@ -192,7 +253,10 @@ export function PropertyField({
   // Read mode — horizontal row
   return (
     <div
-      className='flex cursor-pointer items-center justify-between gap-4 border-b border-border-light px-4 py-2.5 transition-colors duration-75 hover:bg-bg-hover/50'
+      className={cn(
+        'flex items-center justify-between gap-4 border-b border-border-light px-4 py-2.5 transition-colors duration-75',
+        editable && 'cursor-pointer hover:bg-bg-hover/50',
+      )}
       onClick={startEditing}
     >
       <span className='shrink-0 text-[12px] font-medium text-text-tertiary'>{label}</span>

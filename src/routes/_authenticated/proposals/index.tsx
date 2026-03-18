@@ -284,7 +284,7 @@ const ProposalsPage = () => {
             {!isTablet && <ProposalSortableHeader field='qt_date' label='Date' sortField={sortField} sortDir={sortDir} onSort={handleSort} className='w-[92px] shrink-0' />}
             <ProposalSortableHeader field='total' label='Total' sortField={sortField} sortDir={sortDir} onSort={handleSort} className='w-[100px] shrink-0 justify-end text-right' />
             <div className='w-[120px] shrink-0'>Responsible</div>
-            <div className='w-[62px] shrink-0' />
+            <div className='w-[46px] shrink-0' />
             <div className='w-[28px] shrink-0' />
           </div>
         )}
@@ -320,7 +320,7 @@ const ProposalsPage = () => {
                 {!isTablet && <div className='w-[92px] shrink-0'><Skeleton className='h-3.5 w-[70px] rounded' /></div>}
                 <div className='w-[100px] shrink-0'><Skeleton className='ml-auto h-3.5 w-[60px] rounded' /></div>
                 <div className='w-[120px] shrink-0'><Skeleton className='h-3.5 w-[70px] rounded' /></div>
-                <div className='w-[62px] shrink-0' />
+                <div className='w-[46px] shrink-0' />
                 <div className='w-[28px] shrink-0' />
               </div>
             )

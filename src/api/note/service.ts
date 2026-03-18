@@ -9,12 +9,6 @@ import type {
   PaginatedEntityNoteListList
 } from './schema'
 
-const ENTITY_PATHS: Record<EntityNoteType, string> = {
-  customer: 'customers',
-  order: 'orders',
-  proposal: 'proposals'
-}
-
 const projectParam = (projectId?: number | null) =>
   projectId != null ? { project_id: projectId } : {}
 
@@ -24,11 +18,15 @@ export const noteService = {
     autoid: string,
     projectId?: number | null
   ): Promise<EntityNoteList[]> => {
-    const path = ENTITY_PATHS[entityType]
-    const { data } = await api.get<EntityNoteList[]>(`/data/${path}/${autoid}/notes/`, {
-      params: projectParam(projectId)
+    const { data } = await api.get<PaginatedEntityNoteListList>('/notes/', {
+      params: {
+        entity_type: entityType,
+        entity_autoid: autoid,
+        ordering: '-created_at',
+        ...projectParam(projectId),
+      }
     })
-    return data
+    return data.results
   },
 
   createEntityNote: async (
@@ -37,9 +35,11 @@ export const noteService = {
     payload: EntityNoteRequest,
     projectId?: number | null
   ): Promise<EntityNote> => {
-    const path = ENTITY_PATHS[entityType]
-    const { data } = await api.post<EntityNote>(`/data/${path}/${autoid}/notes/`, payload, {
-      params: projectParam(projectId)
+    const { data } = await api.post<EntityNote>('/notes/', {
+      ...payload,
+      entity_type: entityType,
+      entity_autoid: autoid,
+      ...projectParam(projectId),
     })
     return data
   },

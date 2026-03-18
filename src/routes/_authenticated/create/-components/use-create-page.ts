@@ -120,21 +120,24 @@ export function useCreatePage() {
     open: false
   })
 
-  const { data: savedCustomer, isLoading: customerLoading } = useQuery({
-    ...getCustomerDetailQuery(savedCustomerId ?? '', projectId),
-    enabled: !!savedCustomerId && !customer
+  // Fetch full customer detail whenever we have a customer ID
+  const customerId = customer?.id ?? savedCustomerId ?? ''
+  const { data: customerDetail, isLoading: customerLoading } = useQuery({
+    ...getCustomerDetailQuery(customerId, projectId),
+    enabled: !!customerId
   })
 
+  // Restore saved customer on page load
   useEffect(() => {
-    if (savedCustomer && !customer) {
+    if (customerDetail && !customer && savedCustomerId) {
       queueMicrotask(() => {
-        setCustomer(savedCustomer)
-        const addr = addressFromCustomer(savedCustomer)
+        setCustomer(customerDetail)
+        const addr = addressFromCustomer(customerDetail)
         setBillTo(addr)
         setShipTo(addr)
       })
     }
-  }, [savedCustomer, customer])
+  }, [customerDetail, customer, savedCustomerId])
 
   const { data: cart, isLoading: cartLoading, fetchStatus: cartFetchStatus } = useQuery({
     ...getCartQuery(customer?.id ?? '', projectId)
@@ -415,6 +418,7 @@ export function useCreatePage() {
   return {
     projectId,
     customer,
+    customerDetail: customerDetail ?? customer,
     catalogOpen,
     setCatalogOpen,
     cart,

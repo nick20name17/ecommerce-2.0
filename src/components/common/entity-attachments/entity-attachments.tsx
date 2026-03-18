@@ -341,38 +341,41 @@ export const EntityAttachments = forwardRef<EntityAttachmentsRef, EntityAttachme
           {isLoading && (
             <div>
               {[1, 2].map((i) => (
-                <div key={i} className='flex items-center gap-3 border-b border-border-light px-5 py-2.5'>
-                  <Skeleton className='size-8 shrink-0 rounded-[6px]' />
-                  <div className='min-w-0 flex-1'>
-                    <Skeleton className='mb-1 h-3.5 w-40' />
-                    <Skeleton className='h-3 w-20' />
-                  </div>
+                <div key={i} className='flex items-center gap-2.5 border-b border-border-light px-5 py-2'>
+                  <Skeleton className='size-7 shrink-0 rounded-[5px]' />
+                  <Skeleton className='h-3.5 w-36 flex-1' />
+                  <Skeleton className='h-4 w-10 rounded-full' />
+                  <Skeleton className='h-3 w-14' />
                 </div>
               ))}
             </div>
           )}
 
           {/* Uploading files */}
-          {uploadingFiles.map((file) => (
-            <div
-              key={file.id}
-              className='flex items-center gap-3 border-b border-border-light px-5 py-2.5'
-            >
-              <div className='flex size-8 shrink-0 items-center justify-center rounded-[6px] bg-bg-secondary text-text-tertiary'>
-                {getFileIcon(file.type)}
-              </div>
-              <div className='min-w-0 flex-1'>
-                <div className='flex items-center gap-2'>
-                  <span className='truncate text-[13px] font-medium text-text-secondary'>{file.name}</span>
-                  <span className='inline-flex shrink-0 items-center gap-1 rounded-full bg-bg-secondary px-1.5 py-px text-[10px] font-medium text-text-tertiary'>
-                    <Loader2 className='size-2.5 animate-spin' />
-                    Uploading
-                  </span>
+          {uploadingFiles.map((file) => {
+            const typeInfo = getFileTypeInfo(file.type)
+            return (
+              <div
+                key={file.id}
+                className='flex items-center gap-2.5 border-b border-border-light px-5 py-2'
+              >
+                <div className='flex size-7 shrink-0 items-center justify-center rounded-[5px] bg-bg-secondary text-text-tertiary'>
+                  {getFileIcon(file.type)}
                 </div>
-                <div className='text-[11px] text-text-quaternary'>{formatBytes(file.size)}</div>
+                <span className='min-w-0 flex-1 truncate text-[13px] font-medium text-text-secondary'>{file.name}</span>
+                <Loader2 className='size-3 shrink-0 animate-spin text-text-tertiary' />
+                <span className={cn(
+                  'shrink-0 rounded-full border px-1.5 py-0.5 text-[10px] font-semibold leading-none',
+                  typeInfo.className
+                )}>
+                  {typeInfo.label}
+                </span>
+                <span className='shrink-0 text-[11px] tabular-nums text-text-quaternary'>
+                  {formatBytes(file.size)}
+                </span>
               </div>
-            </div>
-          ))}
+            )
+          })}
 
           {/* Pending files (deferred mode) */}
           {showPendingFiles &&
@@ -386,30 +389,28 @@ export const EntityAttachments = forwardRef<EntityAttachmentsRef, EntityAttachme
               return (
                 <div
                   key={fileItem.id}
-                  className='group/file flex items-center gap-3 border-b border-border-light px-5 py-2.5 transition-colors hover:bg-bg-hover'
+                  className='group/file flex items-center gap-2.5 border-b border-border-light px-5 py-2 transition-colors hover:bg-bg-hover/50'
                 >
-                  <div className='flex size-8 shrink-0 items-center justify-center rounded-[6px] bg-bg-secondary text-text-tertiary'>
+                  <div className='flex size-7 shrink-0 items-center justify-center rounded-[5px] bg-bg-secondary text-text-tertiary'>
                     {getFileIcon(fileType)}
                   </div>
-                  <div className='min-w-0 flex-1'>
-                    <div className='flex items-center gap-2'>
-                      <span className='truncate text-[13px] font-medium text-foreground'>{fileName}</span>
-                      <span className={cn(
-                        'shrink-0 rounded px-1.5 py-px text-[10px] font-semibold',
-                        typeInfo.className
-                      )}>
-                        {typeInfo.label}
-                      </span>
-                      <span className='shrink-0 rounded border border-primary/30 bg-primary/5 px-1.5 py-px text-[10px] font-semibold text-primary'>
-                        New
-                      </span>
-                    </div>
-                    <div className='text-[11px] text-text-quaternary'>{formatBytes(fileSize)}</div>
-                  </div>
+                  <span className='min-w-0 flex-1 truncate text-[13px] font-medium text-foreground'>{fileName}</span>
+                  <span className={cn(
+                    'shrink-0 rounded-full border px-1.5 py-0.5 text-[10px] font-semibold leading-none',
+                    typeInfo.className
+                  )}>
+                    {typeInfo.label}
+                  </span>
+                  <span className='shrink-0 rounded-full border border-primary/30 bg-primary/5 px-1.5 py-0.5 text-[10px] font-semibold leading-none text-primary'>
+                    New
+                  </span>
+                  <span className='shrink-0 text-[11px] tabular-nums text-text-quaternary'>
+                    {formatBytes(fileSize)}
+                  </span>
                   <button
                     type='button'
                     onClick={() => removeFile(fileItem.id)}
-                    className='hidden size-6 shrink-0 items-center justify-center rounded-[4px] text-text-quaternary transition-colors hover:bg-bg-active hover:text-destructive group-hover/file:inline-flex'
+                    className='shrink-0 rounded-[4px] p-1 text-text-quaternary opacity-0 transition-all duration-75 hover:bg-bg-active hover:text-destructive group-hover/file:opacity-100'
                   >
                     <Trash2Icon className='size-3' />
                   </button>
@@ -428,29 +429,26 @@ export const EntityAttachments = forwardRef<EntityAttachmentsRef, EntityAttachme
                 <div
                   key={attachment.id}
                   className={cn(
-                    'group/file flex items-center gap-3 border-b border-border-light px-5 py-2.5 transition-colors hover:bg-bg-hover',
+                    'group/file flex items-center gap-2.5 border-b border-border-light px-5 py-2 transition-colors hover:bg-bg-hover/50',
                     isDeleting && 'opacity-40 pointer-events-none',
                   )}
                 >
-                  <div className='flex size-8 shrink-0 items-center justify-center rounded-[6px] bg-bg-secondary text-text-tertiary'>
+                  <div className='flex size-7 shrink-0 items-center justify-center rounded-[5px] bg-bg-secondary text-text-tertiary'>
                     {getFileIcon(attachment.file_type)}
                   </div>
-                  <div className='min-w-0 flex-1'>
-                    <div className='flex items-center gap-2'>
-                      <span className='truncate text-[13px] font-medium text-foreground' title={attachment.file_name}>
-                        {attachment.file_name}
-                      </span>
-                      <span className={cn(
-                        'shrink-0 rounded px-1.5 py-px text-[10px] font-semibold',
-                        typeInfo.className
-                      )}>
-                        {typeInfo.label}
-                      </span>
-                    </div>
-                    <div className='text-[11px] text-text-quaternary'>{formatBytes(attachment.file_size)}</div>
-                  </div>
-
-                  <div className='hidden shrink-0 items-center gap-0.5 group-hover/file:flex'>
+                  <span className='min-w-0 flex-1 truncate text-[13px] font-medium text-foreground' title={attachment.file_name}>
+                    {attachment.file_name}
+                  </span>
+                  <span className={cn(
+                    'shrink-0 rounded-full border px-1.5 py-0.5 text-[10px] font-semibold leading-none',
+                    typeInfo.className
+                  )}>
+                    {typeInfo.label}
+                  </span>
+                  <span className='shrink-0 text-[11px] tabular-nums text-text-quaternary'>
+                    {formatBytes(attachment.file_size)}
+                  </span>
+                  <div className='flex shrink-0 items-center gap-0.5 opacity-0 transition-opacity duration-75 group-hover/file:opacity-100'>
                     <a
                       href={attachment.download_url}
                       download={attachment.file_name}

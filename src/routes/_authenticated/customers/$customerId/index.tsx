@@ -1,9 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { createFileRoute, useRouter } from '@tanstack/react-router'
 import { ChevronLeft, Pencil, StickyNote, Trash2, UserPlus } from 'lucide-react'
-import { useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
+import { PropertyField } from '@/routes/_authenticated/orders/$orderId/-components/order-properties'
 import { CustomerDashboardTab } from './-components/customer-dashboard-tab'
 import { CustomerInfoPanel } from './-components/customer-info-card'
 import { CustomerOrdersTab } from './-components/customer-orders-tab'
@@ -14,6 +15,7 @@ import { CUSTOMER_QUERY_KEYS, getCustomerDetailQuery } from '@/api/customer/quer
 import { customerService } from '@/api/customer/service'
 import { getFieldConfigQuery } from '@/api/field-config/query'
 import { getPriceLevelsQuery } from '@/api/price-level/query'
+import { getColumnLabel } from '@/helpers/dynamic-columns'
 import { ICustomers, PAGE_COLORS, PageHeaderIcon } from '@/components/ds'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { CustomerAssignDialog } from '@/routes/_authenticated/customers/-components/customer-assign-dialog'
@@ -45,6 +47,7 @@ function CustomerDetailPage() {
   const [editOpen, setEditOpen] = useState(false)
   const [assignOpen, setAssignOpen] = useState(false)
   const [notesOpen, setNotesOpen] = useState(false)
+  const [panelTab, setPanelTab] = useState<'general' | 'custom'>('general')
 
   const queryClient = useQueryClient()
 
@@ -54,6 +57,11 @@ function CustomerDetailPage() {
   const { data: fieldConfig } = useQuery(getFieldConfigQuery(projectId))
   const { data: priceLevels } = useQuery(getPriceLevelsQuery(projectId))
 
+  const customFields = useMemo(() => {
+    const entries = fieldConfig?.customer ?? []
+    return entries.filter((e) => !e.default && e.enabled)
+  }, [fieldConfig])
+
   const priceLevelMutation = useMutation({
     mutationFn: (value: string) => customerService.update(customerId, { in_level: value }),
     onSuccess: () => {
@@ -61,6 +69,25 @@ function CustomerDetailPage() {
       toast.success('Price level updated')
     },
   })
+
+  const patchMutation = useMutation({
+    mutationFn: (payload: Record<string, unknown>) =>
+      customerService.update(customerId, payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: CUSTOMER_QUERY_KEYS.detail(customerId) })
+    },
+    meta: { errorMessage: 'Failed to update customer' },
+  })
+
+  const handleFieldSave = useCallback(
+    (field: string, value: string) => {
+      if (!customer) return
+      const current = (customer[field] as string | null) ?? ''
+      if (value === current) return
+      patchMutation.mutate({ [field]: value || null })
+    },
+    [customer, patchMutation],
+  )
 
   // Loading
   if (isLoading) {
@@ -287,19 +314,87 @@ function CustomerDetailPage() {
         {/* Right panel — properties */}
         <div
           className={cn(
-            'shrink-0 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]',
+            'flex shrink-0 flex-col overflow-hidden bg-bg-secondary/50',
             isMobile
-              ? 'border-t border-border px-5 py-4'
-              : 'w-[380px] border-l border-border bg-bg-secondary/50'
+              ? 'border-t border-border'
+              : 'w-[380px] border-l border-border'
           )}
         >
-          <CustomerInfoPanel
-            customer={customer}
-            fieldConfig={fieldConfig}
-            priceLevels={priceLevels}
-            onPriceLevelChange={(value) => priceLevelMutation.mutate(value)}
-            onAssign={() => setAssignOpen(true)}
-          />
+          {/* Panel tabs */}
+          <div className='flex shrink-0 items-center gap-0 border-b border-border px-1'>
+            {(['general', 'custom'] as const).map((tab) => {
+              const label = tab === 'custom'
+                ? `Custom${customFields.length > 0 ? ` ${customFields.length}` : ''}`
+                : 'General'
+              return (
+                <button
+                  key={tab}
+                  type='button'
+                  className={cn(
+                    'relative px-3 py-2 text-[13px] font-medium transition-colors duration-75',
+                    panelTab === tab
+                      ? 'text-foreground'
+                      : 'text-text-tertiary hover:text-text-secondary',
+                  )}
+                  onClick={() => setPanelTab(tab)}
+                >
+                  {label}
+                  {panelTab === tab && (
+                    <span className='absolute bottom-0 left-3 right-3 h-[2px] rounded-full bg-primary' />
+                  )}
+                </button>
+              )
+            })}
+          </div>
+
+          {/* Panel content */}
+          <div className='flex-1 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]'>
+            {panelTab === 'general' ? (
+              <CustomerInfoPanel
+                customer={customer}
+                fieldConfig={fieldConfig}
+                priceLevels={priceLevels}
+                onPriceLevelChange={(value) => priceLevelMutation.mutate(value)}
+                onAssign={() => setAssignOpen(true)}
+              />
+            ) : (
+              <>
+                {customFields.length === 0 ? (
+                  <div className='flex flex-col items-center justify-center py-12 text-center'>
+                    <p className='text-[13px] text-text-tertiary'>No custom fields enabled</p>
+                    <p className='mt-1 text-[12px] text-text-quaternary'>
+                      Enable fields in Settings &rarr; Data Control
+                    </p>
+                  </div>
+                ) : (
+                  <div className='border-b border-border'>
+                    <div className='bg-bg-secondary/60 px-4 py-2'>
+                      <span className='text-[11px] font-semibold uppercase tracking-[0.06em] text-text-tertiary'>
+                        Custom Fields
+                      </span>
+                    </div>
+                    <div className='bg-background text-[13px]'>
+                      {customFields.map((entry) => {
+                        const label = getColumnLabel(entry.field, 'customer', fieldConfig)
+                        const val = customer[entry.field]
+                        const strVal = val != null ? String(val) : null
+                        return (
+                          <PropertyField
+                            key={entry.field}
+                            label={label}
+                            value={strVal}
+                            field={entry.field}
+                            onSave={handleFieldSave}
+                            editable={!!entry.editable}
+                          />
+                        )
+                      })}
+                    </div>
+                  </div>
+                )}
+              </>
+            )}
+          </div>
         </div>
       </div>
 

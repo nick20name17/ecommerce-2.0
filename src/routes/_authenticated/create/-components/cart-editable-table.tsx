@@ -1,9 +1,8 @@
-import { AlertCircle, Image, Loader2, Package, Settings2, Trash2 } from 'lucide-react'
+import { AlertCircle, Image, Loader2, Settings2, Trash2 } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 
 import type { CartItem, Product } from '@/api/product/schema'
 import { productService } from '@/api/product/service'
-import { PageEmpty } from '@/components/common/page-empty'
 import { NumberInput } from '@/components/ui/number-input'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
@@ -351,10 +350,6 @@ export function CartEditableTable({
           </tbody>
         </table>
 
-        {/* Empty state — only when no items and not loading */}
-        {!loading && items.length === 0 && pendingEntries.length === 0 && !inputValue && (
-          <PageEmpty icon={Package} title='No products added yet' description='Type a product ID above or browse the catalog.' compact />
-        )}
       </div>
 
       {/* Error message */}

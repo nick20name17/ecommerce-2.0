@@ -5,6 +5,7 @@ import { getTasksQuery, getTaskStatusesQuery } from '@/api/task/query'
 import {
   ICustomers,
   IDashboard,
+  IDev,
   IOrderDesk,
   IOrders,
   IProjects,
@@ -84,6 +85,13 @@ const WORKSPACE_ITEMS: NavItem[] = [
     url: '/tasks',
     icon: ITodos,
     iconBg: 'bg-violet-500',
+    iconColor: 'text-white',
+  },
+  {
+    title: 'Development',
+    url: '/dev',
+    icon: IDev,
+    iconBg: 'bg-sky-500',
     iconColor: 'text-white',
   },
   {

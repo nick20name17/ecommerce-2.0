@@ -73,6 +73,16 @@ export interface LinkedCustomerSummary {
   phone?: string
 }
 
+export interface TaskNote {
+  id: number
+  task: number
+  text: string
+  author: number | null
+  author_name: string
+  created_at: string
+  updated_at: string
+}
+
 export interface Task extends TaskListItem {
   description: string | null
   status_details: TaskStatus

@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { createFileRoute, useNavigate, useRouter } from '@tanstack/react-router'
 import { ChevronLeft, Copy, FileText, ListTodo, Paperclip, Settings, ShoppingCart, StickyNote, Trash2, UserPlus } from 'lucide-react'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 
 import { PageEmpty } from '@/components/common/page-empty'
 import { EntityAttachmentsDialog } from '@/components/common/entity-attachments/entity-attachments-dialog'
@@ -96,6 +96,12 @@ function ProposalDetailPage() {
 
   // Custom fields
   const customFields = (fieldConfig?.proposal ?? []).filter((e) => !e.default && e.enabled)
+
+  // Line item custom columns from proposal_item field config
+  const itemCustomCols = useMemo(() => {
+    const entries = fieldConfig?.proposal_item ?? []
+    return entries.filter((e: { default: boolean; enabled: boolean }) => !e.default && e.enabled)
+  }, [fieldConfig])
 
   // Loading
   if (isLoading) {
@@ -343,6 +349,11 @@ function ProposalDetailPage() {
                     <th className='min-w-[200px] px-3 py-1.5 font-medium text-text-tertiary'>Description</th>
                     <th className='w-[70px] px-3 py-1.5 text-right font-medium text-text-tertiary'>Qty</th>
                     <th className='w-[60px] px-3 py-1.5 text-right font-medium text-text-tertiary'>Unit</th>
+                    {itemCustomCols.map((col) => (
+                      <th key={col.field} className='min-w-[80px] px-3 py-1.5 font-medium text-text-tertiary'>
+                        {getColumnLabel(col.field, 'proposal_item', fieldConfig)}
+                      </th>
+                    ))}
                     <th className='w-[100px] py-1.5 pl-3 pr-6 text-right font-medium text-text-tertiary'>Amount</th>
                   </tr>
                 </thead>
@@ -369,6 +380,16 @@ function ProposalDetailPage() {
                       <td className='px-3 py-1.5 text-right text-text-tertiary'>
                         {item.unit || '—'}
                       </td>
+                      {itemCustomCols.map((col) => {
+                        const val = item[col.field]
+                        return (
+                          <td key={col.field} className='px-3 py-1.5 text-text-secondary'>
+                            <span className='block max-w-[160px] truncate'>
+                              {val != null ? String(val) : '—'}
+                            </span>
+                          </td>
+                        )
+                      })}
                       <td className='py-1.5 pl-3 pr-6 text-right font-medium tabular-nums text-foreground'>
                         {formatCurrency(item.amount)}
                       </td>

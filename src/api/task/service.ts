@@ -7,6 +7,7 @@ import type {
   TaskAttachment,
   TaskListItem,
   TaskListResponse,
+  TaskNote,
   TaskParams,
   TaskStatus,
   UpdateTaskPayload,
@@ -84,5 +85,19 @@ export const taskService = {
 
   deleteAttachment: async (taskId: number, attachmentId: number) => {
     await api.delete(`/tasks/${taskId}/attachments/${attachmentId}/`)
+  },
+
+  getNotes: async (taskId: number) => {
+    const { data } = await api.get<TaskNote[]>(`/tasks/${taskId}/notes/`)
+    return data
+  },
+
+  createNote: async (taskId: number, payload: { text: string }) => {
+    const { data } = await api.post<TaskNote>(`/tasks/${taskId}/notes/`, payload)
+    return data
+  },
+
+  deleteNote: async (taskId: number, noteId: number) => {
+    await api.delete(`/tasks/${taskId}/notes/${noteId}/`)
   }
 }

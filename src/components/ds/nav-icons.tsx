@@ -11,6 +11,7 @@ import {
   Package,
   PlusSquare,
   FileText,
+  RocketLaunch,
   Stack,
   Truck,
   UserCircle,
@@ -30,3 +31,4 @@ export const IOrderDesk: IC = ({ className }) => <PlusSquare className={classNam
 export const IShipping: IC = ({ className }) => <Truck className={className} weight="fill" />
 export const ISettings: IC = ({ className }) => <GearSix className={className} weight="fill" />
 export const ITesting: IC = ({ className }) => <Flask className={className} weight="fill" />
+export const IDev: IC = ({ className }) => <RocketLaunch className={className} weight="fill" />
