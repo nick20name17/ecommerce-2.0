@@ -1,6 +1,6 @@
 'use no memo'
 
-import { Check, Lock, Settings } from 'lucide-react'
+import { Check, Lock, Pencil, Settings } from 'lucide-react'
 import { useState } from 'react'
 
 import type { FieldConfigRow } from '@/api/field-config/schema'
@@ -17,8 +17,11 @@ export interface FieldsDataTableProps {
   projectId: number
   onFieldToggle: (entity: string, fieldName: string, enabled: boolean) => void
   onAliasSubmit: (entity: string, fieldName: string, alias: string) => void
+  onEditableToggle: (entity: string, fieldName: string, editable: boolean) => void
   isPending: boolean
   isAliasPending: boolean
+  isEditablePending: boolean
+  isSuperAdmin: boolean
 }
 
 export const FieldsDataTable = ({
@@ -27,8 +30,11 @@ export const FieldsDataTable = ({
   entity,
   onFieldToggle,
   onAliasSubmit,
+  onEditableToggle,
   isPending,
-  isAliasPending
+  isAliasPending,
+  isEditablePending,
+  isSuperAdmin
 }: FieldsDataTableProps) => {
   if (isLoading) {
     return (
@@ -40,6 +46,9 @@ export const FieldsDataTable = ({
             </div>
             <div className='min-w-0 flex-1'>
               <Skeleton className='h-6 w-40 rounded-[5px]' />
+            </div>
+            <div className='flex w-[60px] shrink-0 justify-end'>
+              <Skeleton className='h-5 w-9 rounded-full' />
             </div>
             <div className='flex w-[60px] shrink-0 justify-end'>
               <Skeleton className='h-5 w-9 rounded-full' />
@@ -69,6 +78,9 @@ export const FieldsDataTable = ({
         <div className='w-[60px] shrink-0 text-right text-[11px] font-semibold uppercase tracking-[0.05em] text-text-tertiary'>
           Visible
         </div>
+        <div className='w-[60px] shrink-0 text-right text-[11px] font-semibold uppercase tracking-[0.05em] text-text-tertiary'>
+          Editable
+        </div>
       </div>
 
       {/* Rows */}
@@ -79,8 +91,11 @@ export const FieldsDataTable = ({
           entity={entity}
           onFieldToggle={onFieldToggle}
           onAliasSubmit={onAliasSubmit}
+          onEditableToggle={onEditableToggle}
           isPending={isPending}
           isAliasPending={isAliasPending}
+          isEditablePending={isEditablePending}
+          isSuperAdmin={isSuperAdmin}
         />
       ))}
     </div>
@@ -94,15 +109,21 @@ function FieldRow({
   entity,
   onFieldToggle,
   onAliasSubmit,
+  onEditableToggle,
   isPending,
-  isAliasPending
+  isAliasPending,
+  isEditablePending,
+  isSuperAdmin
 }: {
   row: FieldConfigRow
   entity: string
   onFieldToggle: (entity: string, fieldName: string, enabled: boolean) => void
   onAliasSubmit: (entity: string, fieldName: string, alias: string) => void
+  onEditableToggle: (entity: string, fieldName: string, editable: boolean) => void
   isPending: boolean
   isAliasPending: boolean
+  isEditablePending: boolean
+  isSuperAdmin: boolean
 }) {
   const [aliasValue, setAliasValue] = useState(row.alias ?? '')
   const isDirty = aliasValue !== (row.alias ?? '')
@@ -166,7 +187,7 @@ function FieldRow({
         )}
       </div>
 
-      {/* Toggle */}
+      {/* Visible toggle */}
       <div className='flex w-[60px] shrink-0 justify-end'>
         {isDefault ? (
           <Tooltip>
@@ -184,6 +205,30 @@ function FieldRow({
             aria-label={row.enabled ? 'Disable field' : 'Enable field'}
             onCheckedChange={(checked) => onFieldToggle(entity, row.field, checked)}
           />
+        )}
+      </div>
+
+      {/* Editable toggle */}
+      <div className='flex w-[60px] shrink-0 justify-end'>
+        {isSuperAdmin ? (
+          <Switch
+            checked={!!row.editable}
+            disabled={isEditablePending}
+            aria-label={row.editable ? 'Make read-only' : 'Make editable'}
+            onCheckedChange={(checked) => onEditableToggle(entity, row.field, checked)}
+          />
+        ) : row.editable ? (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <span className='inline-flex items-center gap-0.5 rounded-[4px] bg-primary/10 px-1.5 py-0.5 text-[10px] font-medium text-primary'>
+                <Pencil className='size-2.5' />
+                Yes
+              </span>
+            </TooltipTrigger>
+            <TooltipContent>This field can be edited</TooltipContent>
+          </Tooltip>
+        ) : (
+          <span className='text-[11px] text-text-quaternary'>—</span>
         )}
       </div>
     </div>

@@ -63,7 +63,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { Switch } from '@/components/ui/switch'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
-import { isAdmin } from '@/constants/user'
+import { isAdmin, isSuperAdmin } from '@/constants/user'
 import type { UserRole } from '@/constants/user'
 import { getSession } from '@/helpers/auth'
 import { useProjectId } from '@/hooks/use-project-id'
@@ -130,6 +130,21 @@ const applyFieldToggle = (
     ...prev,
     [entity]: prev[entity].map((entry) =>
       entry.field === fieldName ? { ...entry, enabled } : entry
+    )
+  }
+}
+
+const applyEditableToggle = (
+  prev: FieldConfigResponse | undefined,
+  entity: string,
+  fieldName: string,
+  editable: boolean
+): FieldConfigResponse | undefined => {
+  if (!prev?.[entity]) return prev
+  return {
+    ...prev,
+    [entity]: prev[entity].map((entry) =>
+      entry.field === fieldName ? { ...entry, editable } : entry
     )
   }
 }
@@ -207,6 +222,8 @@ const SettingsPage = () => {
 const DataControlSection = ({ projectId }: { projectId: number }) => {
   const [activeTab, setActiveTab] = useQueryState('tab', parseAsString)
   const client = useQueryClient()
+  const { user } = useAuth()
+  const userIsSuperAdmin = !!user?.role && isSuperAdmin(user.role)
 
   const { data, isLoading } = useQuery({
     ...getFieldConfigQuery(projectId),
@@ -255,9 +272,51 @@ const DataControlSection = ({ projectId }: { projectId: number }) => {
       alias: entry.alias,
       default: entry.default,
       enabled: entry.enabled,
+      editable: entry.editable,
       entity: currentTab
     }))
   }, [data, currentTab])
+
+  const editableMutation = useMutation({
+    mutationFn: ({
+      payload
+    }: {
+      payload: Record<string, unknown>
+      entity: string
+      fieldName: string
+      editable: boolean
+    }) => fieldConfigService.patchFieldConfig(projectId, payload as unknown as Record<string, string[]>),
+    onMutate: async ({ entity, fieldName, editable }) => {
+      const key = FIELD_CONFIG_QUERY_KEYS.fieldConfig(projectId)
+      await client.cancelQueries({ queryKey: key })
+      const prev = client.getQueryData<FieldConfigResponse>(key)
+      const next = applyEditableToggle(prev, entity, fieldName, editable)
+      if (next) client.setQueryData(key, next)
+      return { prev }
+    },
+    onError: (_err, _variables, context) => {
+      if (context?.prev)
+        client.setQueryData(FIELD_CONFIG_QUERY_KEYS.fieldConfig(projectId), context.prev)
+    },
+    meta: {
+      invalidatesQuery: FIELD_CONFIG_QUERY_KEYS.fieldConfig(projectId),
+      successMessage: 'Editable fields updated'
+    }
+  })
+
+  const handleEditableToggle = (entity: string, fieldName: string, editable: boolean) => {
+    if (!data?.[entity]) return
+    const entityFields = data[entity]
+    const newEditable = entityFields
+      .filter((e) => (e.field === fieldName ? editable : !!e.editable))
+      .map((e) => e.field)
+    editableMutation.mutate({
+      payload: { _editable: { [entity]: newEditable } },
+      entity,
+      fieldName,
+      editable
+    })
+  }
 
   const handleAliasSubmit = (entity: string, fieldName: string, alias: string) => {
     patchMutation.mutate({
@@ -314,8 +373,11 @@ const DataControlSection = ({ projectId }: { projectId: number }) => {
             projectId={projectId}
             onFieldToggle={handleFieldToggle}
             onAliasSubmit={handleAliasSubmit}
+            onEditableToggle={handleEditableToggle}
             isPending={patchMutation.isPending}
             isAliasPending={patchMutation.isPending}
+            isEditablePending={editableMutation.isPending}
+            isSuperAdmin={userIsSuperAdmin}
           />
         ) : entities.length === 0 ? (
           <PageEmpty icon={TriangleAlert} title='No field configuration' description='No field configuration is available for this project.' />
@@ -329,8 +391,11 @@ const DataControlSection = ({ projectId }: { projectId: number }) => {
                 projectId={projectId}
                 onFieldToggle={handleFieldToggle}
                 onAliasSubmit={handleAliasSubmit}
+                onEditableToggle={handleEditableToggle}
                 isPending={patchMutation.isPending}
                 isAliasPending={patchMutation.isPending}
+                isEditablePending={editableMutation.isPending}
+                isSuperAdmin={userIsSuperAdmin}
               />
             </TabsContent>
           ))

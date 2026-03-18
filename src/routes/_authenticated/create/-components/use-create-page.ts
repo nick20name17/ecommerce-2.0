@@ -9,6 +9,8 @@ import { cartService } from '@/api/cart/service'
 import type { Cart } from '@/api/product/schema'
 import { getCustomerDetailQuery } from '@/api/customer/query'
 import type { Customer } from '@/api/customer/schema'
+import { orderService } from '@/api/order/service'
+import type { OrderPatchPayload } from '@/api/order/schema'
 import type { CartItem, Product } from '@/api/product/schema'
 import type { EntityAttachmentsRef } from '@/components/common/entity-attachments/entity-attachments'
 import { getErrorMessage } from '@/helpers/error'
@@ -77,6 +79,26 @@ const isCartItemType = (p: Product | CartItem): p is CartItem => {
   return 'product_autoid' in p
 }
 
+export interface AddressFields {
+  name: string
+  address1: string
+  address2: string
+  city: string
+  state: string
+  zip: string
+}
+
+const emptyAddress: AddressFields = { name: '', address1: '', address2: '', city: '', state: '', zip: '' }
+
+const addressFromCustomer = (c: Customer): AddressFields => ({
+  name: c.l_name ?? '',
+  address1: c.address1 ?? '',
+  address2: c.address2 ?? '',
+  city: c.city ?? '',
+  state: c.state ?? '',
+  zip: c.zip ?? '',
+})
+
 export function useCreatePage() {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
@@ -84,6 +106,8 @@ export function useCreatePage() {
   const [savedCustomerId, setSavedCustomerId] = useSelectedCustomerId()
 
   const [customer, setCustomer] = useState<Customer | null>(null)
+  const [billTo, setBillTo] = useState<AddressFields>(emptyAddress)
+  const [shipTo, setShipTo] = useState<AddressFields>(emptyAddress)
   const [catalogOpen, setCatalogOpen] = useState(false)
   const [addingProductAutoid, setAddingProductAutoid] = useState<string | null>(null)
   const [updatingQuantityItemId, setUpdatingQuantityItemId] = useState<number | null>(null)
@@ -103,7 +127,12 @@ export function useCreatePage() {
 
   useEffect(() => {
     if (savedCustomer && !customer) {
-      queueMicrotask(() => setCustomer(savedCustomer))
+      queueMicrotask(() => {
+        setCustomer(savedCustomer)
+        const addr = addressFromCustomer(savedCustomer)
+        setBillTo(addr)
+        setShipTo(addr)
+      })
     }
   }, [savedCustomer, customer])
 
@@ -144,6 +173,14 @@ export function useCreatePage() {
   const handleCustomerChange = (c: Customer | null) => {
     setCustomer(c)
     setSavedCustomerId(c?.id ?? null)
+    if (c) {
+      const addr = addressFromCustomer(c)
+      setBillTo(addr)
+      setShipTo(addr)
+    } else {
+      setBillTo(emptyAddress)
+      setShipTo(emptyAddress)
+    }
   }
 
   const handleProductSelect = async (product: Product) => {
@@ -310,6 +347,28 @@ export function useCreatePage() {
     busyDispatch({ type: 'CREATING_PROPOSAL', value: false })
   }
 
+  const patchAddresses = async (autoid: string) => {
+    const payload: OrderPatchPayload = {
+      name: billTo.name,
+      address1: billTo.address1,
+      address2: billTo.address2,
+      city: billTo.city,
+      state: billTo.state,
+      zip: billTo.zip,
+      c_name: shipTo.name,
+      c_address1: shipTo.address1,
+      c_address2: shipTo.address2,
+      c_city: shipTo.city,
+      c_state: shipTo.state,
+      c_zip: shipTo.zip,
+    }
+    try {
+      await orderService.patch(autoid, payload)
+    } catch {
+      // Non-blocking — order is already created
+    }
+  }
+
   const handleCreateOrder = async () => {
     if (!customer) {
       toast.warning('Please select a customer for this order')
@@ -330,9 +389,12 @@ export function useCreatePage() {
           throw e
         }
         const autoid = await autoidPromise
-        if (attachmentsRef.current?.hasPendingFiles()) {
-          await attachmentsRef.current.uploadPendingFiles(autoid, 'order')
-        }
+        await Promise.all([
+          patchAddresses(autoid),
+          attachmentsRef.current?.hasPendingFiles()
+            ? attachmentsRef.current.uploadPendingFiles(autoid, 'order')
+            : Promise.resolve(),
+        ])
         return { autoid }
       })(),
       {
@@ -373,6 +435,10 @@ export function useCreatePage() {
     configData,
     configLoading,
     invalidateCart,
+    billTo,
+    setBillTo,
+    shipTo,
+    setShipTo,
     handleCustomerChange,
     handleProductSelect,
     handleEditItem,

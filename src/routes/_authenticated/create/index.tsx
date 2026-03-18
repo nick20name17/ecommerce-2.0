@@ -1,11 +1,13 @@
 import { useRouter } from '@tanstack/react-router'
 import { createFileRoute } from '@tanstack/react-router'
 import {
+  ChevronDown,
   ChevronLeft,
   Eraser,
   FileCheck,
   FilePlus2,
   LayoutGrid,
+  MapPin,
   Paperclip,
   ShoppingCart,
   User,
@@ -17,7 +19,7 @@ import { CartSummary } from './-components/cart-summary'
 import { CustomerCombobox } from './-components/customer-combobox'
 import { ProductCatalogDialog } from './-components/product-catalog-dialog'
 import { ProductEditSheet } from './-components/product-edit-sheet'
-import { useCreatePage } from './-components/use-create-page'
+import { useCreatePage, type AddressFields } from './-components/use-create-page'
 import {
   EntityAttachments,
 } from '@/components/common/entity-attachments/entity-attachments'
@@ -59,6 +61,10 @@ const CreatePage = () => {
     configData,
     configLoading,
     invalidateCart,
+    billTo,
+    setBillTo,
+    shipTo,
+    setShipTo,
     handleCustomerChange,
     handleProductSelect,
     handleEditItem,
@@ -171,6 +177,14 @@ const CreatePage = () => {
               projectId={projectId}
             />
           </div>
+
+          {/* Bill To / Ship To */}
+          {customer && (
+            <div className='border-b border-border'>
+              <AddressSection title='Bill To' address={billTo} onChange={setBillTo} />
+              <AddressSection title='Ship To' address={shipTo} onChange={setShipTo} />
+            </div>
+          )}
 
           {/* Actions */}
           <div className='border-b border-border p-4'>
@@ -340,6 +354,89 @@ const CreatePage = () => {
           </div>
         </DialogContent>
       </Dialog>
+    </div>
+  )
+}
+
+// ── Address Section ─────────────────────────────────────────
+
+function AddressSection({
+  title,
+  address,
+  onChange,
+}: {
+  title: string
+  address: AddressFields
+  onChange: (addr: AddressFields) => void
+}) {
+  const [open, setOpen] = useState(false)
+
+  const update = (field: keyof AddressFields, value: string) => {
+    onChange({ ...address, [field]: value })
+  }
+
+  const summary = [address.name, address.address1, [address.city, address.state, address.zip].filter(Boolean).join(', ')].filter(Boolean).join(', ')
+
+  return (
+    <div>
+      <button
+        type='button'
+        className='flex w-full items-center gap-1.5 px-4 py-2 text-left transition-colors duration-75 hover:bg-bg-hover/50'
+        onClick={() => setOpen(!open)}
+      >
+        <MapPin className='size-3 shrink-0 text-text-tertiary' />
+        <span className='text-[12px] font-semibold uppercase tracking-[0.04em] text-text-tertiary'>
+          {title}
+        </span>
+        <div className='flex-1' />
+        <ChevronDown
+          className={cn(
+            'size-3 text-text-quaternary transition-transform duration-150',
+            open && 'rotate-180'
+          )}
+        />
+      </button>
+
+      {!open && summary && (
+        <div className='px-4 pb-2'>
+          <p className='truncate text-[12px] text-text-tertiary'>{summary}</p>
+        </div>
+      )}
+
+      {open && (
+        <div className='space-y-1.5 px-4 pb-3'>
+          <AddressInput label='Name' value={address.name} onChange={(v) => update('name', v)} />
+          <AddressInput label='Street' value={address.address1} onChange={(v) => update('address1', v)} />
+          <AddressInput label='Apt / Suite' value={address.address2} onChange={(v) => update('address2', v)} />
+          <div className='grid grid-cols-3 gap-1.5'>
+            <AddressInput label='City' value={address.city} onChange={(v) => update('city', v)} />
+            <AddressInput label='State' value={address.state} onChange={(v) => update('state', v)} />
+            <AddressInput label='ZIP' value={address.zip} onChange={(v) => update('zip', v)} />
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
+function AddressInput({
+  label,
+  value,
+  onChange,
+}: {
+  label: string
+  value: string
+  onChange: (value: string) => void
+}) {
+  return (
+    <div>
+      <label className='mb-0.5 block text-[10px] font-medium text-text-quaternary'>{label}</label>
+      <input
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={label}
+        className='h-6 w-full rounded-[5px] border border-border bg-background px-2 text-[12px] text-foreground outline-none transition-colors duration-[80ms] placeholder:text-text-quaternary focus:border-primary/50 focus:ring-1 focus:ring-primary/20'
+      />
     </div>
   )
 }
