@@ -1,5 +1,4 @@
-import type { AssignedUser } from '@/api/schema'
-import type { PaginatedResponse, PaginationParams } from '@/api/schema'
+import type { AssignedUser, PaginatedResponse, PaginationParams } from '@/api/schema'
 import type { OrderStatus } from '@/constants/order'
 
 export type { OrderStatus } from '@/constants/order'
@@ -48,6 +47,7 @@ export interface Order {
 
   // Pick progress
   pick_status?: string // e.g. '3/7'
+  packed_status?: string // e.g. '3/7'
 
   items?: OrderItem[]
   shipments?: Shipment[]
@@ -94,6 +94,8 @@ export interface OrderItem {
   so_amount: string
   weight: string | null
   is_picked: boolean
+  packed: boolean
+  shipment_id: null | number
   picked_by: string | null
   picked_at: string | null
   [key: string]: unknown
@@ -103,6 +105,7 @@ export interface Shipment {
   id: number
   carrier_id: string
   service_name: string
+
   cost: string
   tracking_number: string
   label_id: string

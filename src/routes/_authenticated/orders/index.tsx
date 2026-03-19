@@ -300,7 +300,7 @@ const OrdersPage = () => {
             {!isTablet && <OrderSortableHeader field='inv_date' label='Date' sortField={sortField} sortDir={sortDir} onSort={handleSort} className='w-[100px] shrink-0 justify-end text-right' />}
             <OrderSortableHeader field='total' label='Total' sortField={sortField} sortDir={sortDir} onSort={handleSort} className='w-[100px] shrink-0 justify-end text-right' />
             {!isTablet && <OrderSortableHeader field='balance' label='Balance' sortField={sortField} sortDir={sortDir} onSort={handleSort} className='w-[100px] shrink-0 justify-end text-right' />}
-            {!isTablet && <div className='w-[56px] shrink-0 text-center'>Pick</div>}
+            {!isTablet && <div className='w-27.5 shrink-0 text-center'>Pick / Pack</div>}
             <div className='w-[120px] shrink-0'>Responsible</div>
             <div className='w-[46px] shrink-0' />
             <div className='w-[28px] shrink-0' />
@@ -338,7 +338,7 @@ const OrdersPage = () => {
                 {!isTablet && <div className='w-[100px] shrink-0'><Skeleton className='ml-auto h-3.5 w-[70px] rounded' /></div>}
                 <div className='w-[100px] shrink-0'><Skeleton className='ml-auto h-3.5 w-[60px] rounded' /></div>
                 {!isTablet && <div className='w-[100px] shrink-0'><Skeleton className='ml-auto h-3.5 w-[60px] rounded' /></div>}
-                {!isTablet && <div className='w-[56px] shrink-0'><Skeleton className='mx-auto h-3.5 w-[32px] rounded' /></div>}
+                {!isTablet && <div className='w-27.5 shrink-0'><Skeleton className='mx-auto h-3.5 w-15 rounded' /></div>}
                 <div className='w-[120px] shrink-0'><Skeleton className='h-3.5 w-[70px] rounded' /></div>
                 <div className='w-[46px] shrink-0' />
                 <div className='w-[28px] shrink-0' />
@@ -559,10 +559,11 @@ function OrderRow({
         </div>
       )}
 
-      {/* Pick status */}
+      {/* Pick / Packed status */}
       {!isTablet && (
-        <div className='w-[56px] shrink-0 text-center'>
+        <div className='flex w-27.5 shrink-0 items-center justify-center gap-1'>
           <PickBadge pickStatus={order.pick_status} />
+          <PackedBadge packedStatus={order.packed_status} />
         </div>
       )}
 
@@ -735,6 +736,39 @@ function PickBadge({ pickStatus }: { pickStatus?: string }) {
         </span>
       </TooltipTrigger>
       <TooltipContent>{allPicked ? 'All items picked' : `${picked} of ${total} items picked`}</TooltipContent>
+    </Tooltip>
+  )
+}
+
+// ── Packed Badge ────────────────────────────────────────────
+
+function PackedBadge({ packedStatus }: { packedStatus?: string }) {
+  if (!packedStatus) return null
+  const match = packedStatus.match(/^(\d+)\/(\d+)$/)
+  if (!match) return <span className='text-[11px] tabular-nums text-text-tertiary'>{packedStatus}</span>
+
+  const packed = Number(match[1])
+  const total = Number(match[2])
+  if (total === 0 || packed === 0) return null
+
+  const allPacked = packed === total
+
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <span
+          className={cn(
+            'inline-flex items-center gap-1 rounded-[4px] px-1.5 py-0.5 text-[11px] font-semibold tabular-nums leading-none',
+            allPacked
+              ? 'bg-violet-500/10 text-violet-700 dark:text-violet-400'
+              : 'bg-violet-500/10 text-violet-600 dark:text-violet-400',
+          )}
+        >
+          <Package className='size-3' />
+          {packedStatus}
+        </span>
+      </TooltipTrigger>
+      <TooltipContent>{allPacked ? 'All items packed' : `${packed} of ${total} items packed`}</TooltipContent>
     </Tooltip>
   )
 }

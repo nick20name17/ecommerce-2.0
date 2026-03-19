@@ -427,6 +427,7 @@ function OrderDetailPage() {
                 <thead className='sticky top-0 z-10 select-none bg-bg-secondary/60 backdrop-blur-sm'>
                   <tr className='border-b border-border text-left'>
                     <th className='w-[36px] py-1.5 pl-6 pr-0 font-medium text-text-tertiary'>Picked</th>
+                    <th className='w-[50px] px-3 py-1.5 font-medium text-text-tertiary'>Packed</th>
                     <th className='min-w-[100px] px-3 py-1.5 font-medium text-text-tertiary'>Inventory</th>
                     <th className='min-w-[200px] px-3 py-1.5 font-medium text-text-tertiary'>Description</th>
                     <th className='w-[70px] px-3 py-1.5 text-right font-medium text-text-tertiary'>Qty</th>
@@ -463,6 +464,15 @@ function OrderDetailPage() {
                         >
                           {item.is_picked && <Check className='size-3' />}
                         </button>
+                      </td>
+                      <td className='px-3 py-1.5'>
+                        {item.packed ? (
+                          <span className='inline-flex items-center gap-1 rounded-[4px] bg-violet-500/10 px-1.5 py-0.5 text-[11px] font-medium text-violet-600 dark:text-violet-400'>
+                            <Package className='size-3' /> Packed
+                          </span>
+                        ) : (
+                          <span className='text-[11px] text-text-quaternary'>—</span>
+                        )}
                       </td>
                       <td className={cn('px-3 py-1.5 font-medium', item.is_picked ? 'text-text-tertiary line-through' : 'text-foreground')}>
                         {item.inven || '—'}

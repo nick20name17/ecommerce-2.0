@@ -85,7 +85,7 @@ export function ShippingRatesDialog({
   const prevOpenRef = useRef(false)
   useEffect(() => {
     if (open && !prevOpenRef.current) {
-      const pickedIds = items.filter((i) => i.is_picked).map((i) => i.autoid)
+      const pickedIds = items.filter((i) => i.is_picked && !i.packed).map((i) => i.autoid)
       const rawWeight = pickedIds.reduce((sum, id) => {
         const item = items.find((i) => i.autoid === id)
         const w = item?.weight ? parseFloat(item.weight) : 0
@@ -206,6 +206,8 @@ export function ShippingRatesDialog({
   // ── Drag and drop ──
 
   const handleDragStart = (itemAutoid: string) => {
+    const item = itemMap.get(itemAutoid)
+    if (item?.packed) return
     setDragItem(itemAutoid)
   }
 
@@ -576,12 +578,13 @@ export function ShippingRatesDialog({
                         return (
                           <tr
                             key={item.autoid}
-                            draggable
+                            draggable={!item.packed}
                             onDragStart={() => handleDragStart(item.autoid)}
                             onDragEnd={handleDragEnd}
                             className={cn(
-                              'border-b border-border-light transition-colors duration-75 cursor-grab active:cursor-grabbing',
-                              isDragging ? 'opacity-40' : 'hover:bg-bg-hover',
+                              'border-b border-border-light transition-colors duration-75',
+                              item.packed ? 'opacity-50 cursor-not-allowed' : 'cursor-grab active:cursor-grabbing',
+                              isDragging ? 'opacity-40' : !item.packed && 'hover:bg-bg-hover',
                               pkgId && 'bg-primary/[0.02]',
                             )}
                           >
@@ -594,13 +597,20 @@ export function ShippingRatesDialog({
                             </td>
                             <td className='px-3 py-1.5 text-right tabular-nums text-text-secondary'>{parseFloat(String(item.quan))}</td>
                             <td className='py-1.5 pl-3 pr-3 max-sm:hidden'>
-                              {item.is_picked ? (
-                                <span className='inline-flex items-center gap-1 text-[11px] font-medium text-emerald-600'>
-                                  <Check className='size-3' /> Picked
-                                </span>
-                              ) : (
-                                <span className='text-[11px] text-text-quaternary'>—</span>
-                              )}
+                              <div className='flex items-center gap-1.5'>
+                                {item.is_picked ? (
+                                  <span className='inline-flex items-center gap-1 text-[11px] font-medium text-emerald-600'>
+                                    <Check className='size-3' /> Picked
+                                  </span>
+                                ) : (
+                                  <span className='text-[11px] text-text-quaternary'>—</span>
+                                )}
+                                {item.packed && (
+                                  <span className='inline-flex items-center gap-1 rounded-[4px] bg-violet-500/10 px-1.5 py-0.5 text-[11px] font-medium text-violet-600 dark:text-violet-400'>
+                                    Packed
+                                  </span>
+                                )}
+                              </div>
                             </td>
                             <td className='py-1.5 pl-3 pr-4'>
                               {pkgIndex >= 0 ? (
