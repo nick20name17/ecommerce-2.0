@@ -14,6 +14,13 @@ export const getErrorMessage = (error: unknown): string => {
       return data.non_field_errors.join(', ')
     }
 
+    if (typeof data === 'object' && data !== null) {
+      const messages = Object.entries(data)
+        .filter(([, v]) => Array.isArray(v))
+        .map(([key, v]) => `${key}: ${(v as string[]).join(', ')}`)
+      if (messages.length) return messages.join('; ')
+    }
+
     if (error.message) return error.message
   }
 
