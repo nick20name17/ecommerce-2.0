@@ -7,4 +7,7 @@ export const shipmentService = {
     const { data } = await api.get<ShipmentRecord[]>('/data/shipments/', { params })
     return Array.isArray(data) ? data : []
   },
+  void: async (orderAutoid: string, shipmentId: number) => {
+    await api.post(`/data/orders/${orderAutoid}/shipments/${shipmentId}/void/`)
+  },
 }

@@ -1,20 +1,35 @@
-import { useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
 import {
+  Ban,
   Check,
   ChevronRight,
   ExternalLink,
   Package,
   Search,
+  TriangleAlert,
   Truck,
   XCircle,
 } from 'lucide-react'
 import { useState } from 'react'
 
+import { SHIPMENT_QUERY_KEYS } from '@/api/shipment/query'
 import { getShipmentsQuery } from '@/api/shipment/query'
 import type { ShipmentRecord } from '@/api/shipment/schema'
+import { shipmentService } from '@/api/shipment/service'
 import { PageEmpty } from '@/components/common/page-empty'
 import { FilterChip, FilterPopover, IShipping, PAGE_COLORS, PageHeaderIcon } from '@/components/ds'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogMedia,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
 import {
   Dialog,
   DialogContent,
@@ -353,6 +368,22 @@ function ShipmentDetailDialog({
   open: boolean
   onOpenChange: (open: boolean) => void
 }) {
+  const queryClient = useQueryClient()
+  const [voidConfirmOpen, setVoidConfirmOpen] = useState(false)
+
+  const voidMutation = useMutation({
+    mutationFn: () => shipmentService.void(shipment.order_autoid, shipment.id),
+    meta: {
+      successMessage: 'Shipment voided',
+      invalidatesQuery: SHIPMENT_QUERY_KEYS.lists(),
+    },
+    onSuccess: () => {
+      setVoidConfirmOpen(false)
+      onOpenChange(false)
+      queryClient.invalidateQueries({ queryKey: SHIPMENT_QUERY_KEYS.lists() })
+    },
+  })
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className='flex max-h-[85vh] flex-col gap-0 overflow-hidden p-0 sm:max-w-[560px]'>
@@ -379,15 +410,27 @@ function ShipmentDetailDialog({
                   </p>
                 </div>
               </div>
-              <a
-                href={shipment.label_url}
-                target='_blank'
-                rel='noopener noreferrer'
-                className='inline-flex h-7 items-center gap-1.5 rounded-[6px] border border-border bg-background px-3 text-[12px] font-medium text-text-secondary shadow-xs transition-colors duration-[80ms] hover:bg-bg-hover hover:text-foreground'
-              >
-                <ExternalLink className='size-3' />
-                View Label
-              </a>
+              <div className='flex items-center gap-1.5'>
+                {!shipment.voided && (
+                  <button
+                    type='button'
+                    onClick={() => setVoidConfirmOpen(true)}
+                    className='inline-flex h-7 items-center gap-1.5 rounded-[6px] border border-red-300 bg-red-500/10 px-3 text-[12px] font-medium text-red-700 shadow-xs transition-colors duration-[80ms] hover:bg-red-500/20 dark:border-red-600 dark:text-red-400'
+                  >
+                    <Ban className='size-3' />
+                    Void
+                  </button>
+                )}
+                <a
+                  href={shipment.label_url}
+                  target='_blank'
+                  rel='noopener noreferrer'
+                  className='inline-flex h-7 items-center gap-1.5 rounded-[6px] border border-border bg-background px-3 text-[12px] font-medium text-text-secondary shadow-xs transition-colors duration-[80ms] hover:bg-bg-hover hover:text-foreground'
+                >
+                  <ExternalLink className='size-3' />
+                  View Label
+                </a>
+              </div>
             </div>
           )}
 
@@ -412,7 +455,32 @@ function ShipmentDetailDialog({
             <PropertyCell label='Label ID' value={shipment.label_id || '—'} />
           </div>
         </div>
+
       </DialogContent>
+
+      <AlertDialog open={voidConfirmOpen} onOpenChange={setVoidConfirmOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogMedia className='bg-destructive/10 text-destructive'>
+              <TriangleAlert />
+            </AlertDialogMedia>
+            <AlertDialogTitle>Void Shipment</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to void shipment #{shipment.id}? This will cancel the shipping label and cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              variant='destructive'
+              onClick={() => voidMutation.mutate()}
+              isPending={voidMutation.isPending}
+            >
+              Void Shipment
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Dialog>
   )
 }
