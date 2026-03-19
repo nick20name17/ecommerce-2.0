@@ -20,6 +20,7 @@ interface UserComboboxProps {
   valueLabel?: string | null
   triggerClassName?: string
   triggerIcon?: React.ReactNode
+  excludeRoles?: string[]
 }
 
 export function UserCombobox({
@@ -30,6 +31,7 @@ export function UserCombobox({
   valueLabel,
   triggerClassName,
   triggerIcon,
+  excludeRoles,
 }: UserComboboxProps) {
   const [open, setOpen] = useState(false)
   const [search, setSearch] = useState('')
@@ -57,7 +59,8 @@ export function UserCombobox({
     ...getUsersQuery(params),
     enabled: open
   })
-  const users = data?.results ?? []
+  const allUsers = data?.results ?? []
+  const users = excludeRoles ? allUsers.filter((u) => !excludeRoles.includes(u.role)) : allUsers
   const loading = isLoading || (search !== debouncedSearch && isFetching)
   const selectedUser =
     value != null && users.length > 0 ? (users.find((x) => x.id === value) ?? null) : null

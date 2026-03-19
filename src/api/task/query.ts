@@ -14,7 +14,7 @@ export const TASK_QUERY_KEYS = {
   attachments: (taskId: number) => [...TASK_QUERY_KEYS.all(), 'attachments', taskId] as const,
   attachment: (taskId: number, attachmentId: number) =>
     [...TASK_QUERY_KEYS.attachments(taskId), attachmentId] as const,
-  notes: (taskId: number) => [...TASK_QUERY_KEYS.all(), 'notes', taskId] as const
+  notes: (taskId: number, projectId?: number | null) => [...TASK_QUERY_KEYS.all(), 'notes', taskId, projectId] as const
 }
 
 export const getTasksQuery = (params: TaskParams = {}) =>
@@ -51,9 +51,9 @@ export const getTaskAttachmentQuery = (taskId: number, attachmentId: number) =>
     enabled: !!taskId && !!attachmentId
   })
 
-export const getTaskNotesQuery = (taskId: number) =>
+export const getTaskNotesQuery = (taskId: number, projectId?: number | null) =>
   queryOptions({
-    queryKey: TASK_QUERY_KEYS.notes(taskId),
-    queryFn: () => taskService.getNotes(taskId),
+    queryKey: TASK_QUERY_KEYS.notes(taskId, projectId),
+    queryFn: () => taskService.getNotes(taskId, projectId),
     enabled: !!taskId
   })

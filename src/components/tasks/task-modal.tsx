@@ -22,6 +22,7 @@ import { taskService } from '@/api/task/service'
 import { TaskPrioritySelect } from '@/components/common/task-priority-select'
 import { TaskStatusSelect } from '@/components/common/task-status-select'
 import { UserCombobox } from '@/components/common/user-combobox/user-combobox'
+import { USER_ROLES } from '@/constants/user'
 import { Button } from '@/components/ui/button'
 import { DatePicker } from '@/components/ui/date-picker'
 import {
@@ -205,6 +206,7 @@ const SharedFields = ({
               value={field.value ?? null}
               onChange={field.onChange}
               valueLabel={responsibleUserLabel}
+              excludeRoles={[USER_ROLES.superadmin]}
             />
             {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
           </Field>
@@ -374,8 +376,7 @@ const CreateFormInner = ({
         responsible_user: payload.responsible_user ?? null,
         linked_order_autoid: payload.linked_order_autoid ?? null,
         linked_proposal_autoid: payload.linked_proposal_autoid ?? null,
-        linked_customer_autoid: payload.linked_customer_autoid ?? null,
-        project: projectId
+        linked_customer_autoid: payload.linked_customer_autoid ?? null
       })
 
       if (attachmentsRef.current?.hasPendingFiles()) {

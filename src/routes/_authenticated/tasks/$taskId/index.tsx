@@ -33,7 +33,7 @@ import { TASK_PRIORITY_COLORS, TASK_PRIORITY_LABELS } from '@/constants/task'
 import type { TaskPriority } from '@/constants/task'
 import { useBreakpoint } from '@/hooks/use-breakpoint'
 import { useProjectId } from '@/hooks/use-project-id'
-import { isAdmin } from '@/constants/user'
+import { isAdmin, USER_ROLES } from '@/constants/user'
 import { cn } from '@/lib/utils'
 import { useAuth } from '@/providers/auth'
 
@@ -150,11 +150,12 @@ function TaskDetailPage() {
   const currentStatus = statuses.find((s) => s.id === task?.status)
 
   // Fetch notes / activity
-  const { data: notes = [], isLoading: notesLoading } = useQuery(getTaskNotesQuery(id))
-  const notesQueryKey = TASK_QUERY_KEYS.notes(id)
+  const taskProjectId = projectId ?? task?.project ?? null
+  const { data: notes = [], isLoading: notesLoading } = useQuery(getTaskNotesQuery(id, taskProjectId))
+  const notesQueryKey = TASK_QUERY_KEYS.notes(id, taskProjectId)
 
   const createNoteMutation = useMutation({
-    mutationFn: (payload: { text: string }) => taskService.createNote(id, payload),
+    mutationFn: (payload: { text: string }) => taskService.createNote(id, payload, taskProjectId),
     onMutate: async (payload) => {
       await queryClient.cancelQueries({ queryKey: notesQueryKey, exact: true })
       const previous = queryClient.getQueryData<TaskNote[]>(notesQueryKey)
@@ -185,7 +186,7 @@ function TaskDetailPage() {
   })
 
   const deleteNoteMutation = useMutation({
-    mutationFn: (noteId: number) => taskService.deleteNote(id, noteId),
+    mutationFn: (noteId: number) => taskService.deleteNote(id, noteId, taskProjectId),
     onMutate: async (noteId) => {
       await queryClient.cancelQueries({ queryKey: notesQueryKey, exact: true })
       const previous = queryClient.getQueryData<TaskNote[]>(notesQueryKey)
@@ -593,6 +594,7 @@ function TaskDetailPage() {
                     onChange={(userId) => updateMutation.mutate({ responsible_user: userId })}
                     placeholder='Unassigned'
                     valueLabel={assigneeName ?? undefined}
+                    excludeRoles={[USER_ROLES.superadmin]}
                     triggerClassName={cn(
                       'inline-flex items-center gap-1.5 rounded-[5px] px-2 py-1 -mx-2 -my-1 text-[13px] font-medium transition-colors duration-[80ms] hover:bg-bg-hover cursor-pointer',
                       !task.responsible_user && 'text-text-tertiary'

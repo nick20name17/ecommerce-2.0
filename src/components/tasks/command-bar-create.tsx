@@ -14,6 +14,7 @@ import { TASK_QUERY_KEYS, getTaskStatusesQuery } from '@/api/task/query'
 import type { TaskStatus } from '@/api/task/schema'
 import { taskService } from '@/api/task/service'
 import { UserCombobox } from '@/components/common/user-combobox/user-combobox'
+import { USER_ROLES } from '@/constants/user'
 import { StatusIcon } from '@/components/ds'
 import { Calendar as CalendarComponent } from '@/components/ui/calendar'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
@@ -146,7 +147,6 @@ function CommandBarCreateInner({
         description: description.trim() || undefined,
         status: selectedStatus!.id,
         priority: selectedPriority,
-        project: projectId ?? undefined,
         responsible_user: selectedAssignee,
         due_date: selectedDueDate,
         linked_order_autoid: selectedOrder,
@@ -291,6 +291,7 @@ function CommandBarCreateInner({
               value={selectedAssignee}
               onChange={setSelectedAssignee}
               placeholder='Assignee'
+              excludeRoles={[USER_ROLES.superadmin]}
               triggerClassName='inline-flex items-center gap-1.5 rounded-[6px] bg-bg-secondary px-2.5 py-1.5 text-[13px] font-medium text-text-tertiary transition-colors duration-[80ms] hover:bg-bg-hover cursor-pointer'
             />
 

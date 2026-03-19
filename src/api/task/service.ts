@@ -87,17 +87,20 @@ export const taskService = {
     await api.delete(`/tasks/${taskId}/attachments/${attachmentId}/`)
   },
 
-  getNotes: async (taskId: number) => {
-    const { data } = await api.get<TaskNote[]>(`/tasks/${taskId}/notes/`)
+  getNotes: async (taskId: number, projectId?: number | null) => {
+    const params = projectId != null ? { project_id: projectId } : {}
+    const { data } = await api.get<TaskNote[]>(`/tasks/${taskId}/notes/`, { params })
     return data
   },
 
-  createNote: async (taskId: number, payload: { text: string }) => {
-    const { data } = await api.post<TaskNote>(`/tasks/${taskId}/notes/`, payload)
+  createNote: async (taskId: number, payload: { text: string }, projectId?: number | null) => {
+    const params = projectId != null ? { project_id: projectId } : {}
+    const { data } = await api.post<TaskNote>(`/tasks/${taskId}/notes/`, payload, { params })
     return data
   },
 
-  deleteNote: async (taskId: number, noteId: number) => {
-    await api.delete(`/tasks/${taskId}/notes/${noteId}/`)
+  deleteNote: async (taskId: number, noteId: number, projectId?: number | null) => {
+    const params = projectId != null ? { project_id: projectId } : {}
+    await api.delete(`/tasks/${taskId}/notes/${noteId}/`, { params })
   }
 }

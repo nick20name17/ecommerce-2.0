@@ -9,6 +9,7 @@ import { useState } from 'react'
 import type { TaskListItem, TaskStatus } from '@/api/task/schema'
 import { PriorityIcon } from '@/components/tasks/command-bar-create'
 import { UserCombobox } from '@/components/common/user-combobox/user-combobox'
+import { USER_ROLES } from '@/constants/user'
 import { InitialsAvatar, StatusIcon } from '@/components/ds'
 import { Calendar as CalendarComponent } from '@/components/ui/calendar'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
@@ -228,6 +229,7 @@ export function TaskRow({
             onChange={(userId) => onUpdate(task, { responsible_user: userId, responsible_user_name: null })}
             valueLabel={assigneeName ?? undefined}
             placeholder='Assignee'
+            excludeRoles={[USER_ROLES.superadmin]}
             triggerClassName={cn(
               'flex w-full items-center gap-1.5 rounded-[5px] px-1 py-0.5 text-[13px] transition-colors duration-75 hover:bg-bg-active cursor-pointer',
               assigneeName ? 'text-text-secondary' : 'text-text-tertiary'
