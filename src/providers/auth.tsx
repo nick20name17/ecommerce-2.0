@@ -14,6 +14,7 @@ import { AUTH_REDIRECTS } from '@/api/constants'
 import { USER_QUERY_KEYS } from '@/api/user/query'
 import type { User } from '@/api/user/schema'
 import { userService } from '@/api/user/service'
+import { STORAGE_KEYS } from '@/constants/storage'
 import { clearSession, getSession, setSession } from '@/helpers/auth'
 
 interface AuthContextValue {
@@ -57,6 +58,10 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
     mutationFn: authService.signIn,
     onSuccess: async (response) => {
       setSession(response)
+
+      if (response.user.project_id) {
+        localStorage.setItem(STORAGE_KEYS.projectId, JSON.stringify(response.user.project_id))
+      }
 
       queryClient.setQueryData(USER_QUERY_KEYS.detail('me'), response.user)
 

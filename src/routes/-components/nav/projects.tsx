@@ -76,10 +76,10 @@ export const NavProjects = () => {
   }, [projectId, firstProjectId, setProjectId])
 
   useEffect(() => {
-    if (!isSuperAdminUser && user?.project != null && projectId !== user.project) {
-      setProjectId(user.project)
+    if (!isSuperAdminUser && user?.project_id != null && projectId !== user.project_id) {
+      setProjectId(user.project_id)
     }
-  }, [isSuperAdminUser, user?.project, projectId, setProjectId])
+  }, [isSuperAdminUser, user?.project_id, projectId, setProjectId])
 
   const selectedProject = projects.find((p) => p.id === effectiveProjectId) ?? null
   const resolvedName = selectedProject?.name || user?.project_name || ''

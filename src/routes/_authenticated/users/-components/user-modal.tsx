@@ -225,7 +225,7 @@ const CreateForm = ({ onOpenChange }: { onOpenChange: (open: boolean) => void })
       last_name: '',
       email: '',
       role: 'sale',
-      project: currentUser?.project ?? 0,
+      project: currentUser?.project_id ?? 0,
       password: '',
       password_confirm: ''
     }
@@ -330,7 +330,7 @@ const EditForm = ({ user, onOpenChange }: { user: User; onOpenChange: (open: boo
       last_name: user.last_name,
       email: user.email,
       role: user.role,
-      project: user.project,
+      project: user.project_id,
       is_active: user.is_active
     }
   })
@@ -346,7 +346,7 @@ const EditForm = ({ user, onOpenChange }: { user: User; onOpenChange: (open: boo
 
   const handleSubmit = form.handleSubmit((data) => {
     const { project, ...rest } = data
-    const payload = isCurrentUserSuperAdmin ? { ...rest, project: project ?? user.project } : rest
+    const payload = isCurrentUserSuperAdmin ? { ...rest, project: project ?? user.project_id } : rest
     mutation.mutate({ id: user.id, payload })
   })
 

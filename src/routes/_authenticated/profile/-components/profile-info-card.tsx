@@ -87,8 +87,8 @@ export const ProfileInfoCard = ({ user }: ProfileInfoCardProps) => {
         </ProfileRow>
 
         {/* Project */}
-        {user.project && (
-          <ProfileRow label='Project' value={user.project_name || `Project #${user.project}`} />
+        {user.project_id && (
+          <ProfileRow label='Project' value={user.project_name || `Project #${user.project_id}`} />
         )}
 
         {/* Save bar */}
