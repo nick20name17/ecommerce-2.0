@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { createFileRoute, useRouter } from '@tanstack/react-router'
-import { Check, ChevronLeft, Copy, ExternalLink, ListTodo, Package, Paperclip, StickyNote, Trash2, Truck, UserPlus, XCircle } from 'lucide-react'
+import { Check, ChevronLeft, Copy, ExternalLink, ListTodo, Package, PackageCheck, Paperclip, StickyNote, Trash2, Truck, UserPlus, XCircle } from 'lucide-react'
 
 import { PageEmpty } from '@/components/common/page-empty'
 import { EntityAttachmentsDialog } from '@/components/common/entity-attachments/entity-attachments-dialog'
@@ -543,30 +543,68 @@ function OrderDetailPage() {
           )}
         >
           {/* Panel tabs */}
-          <div className='flex shrink-0 items-center gap-0 border-b border-border px-1'>
-            {(['general', 'custom', 'shipments'] as const).map((tab) => {
-              const label = tab === 'custom' ? `Custom${customFields.length > 0 ? ` ${customFields.length}` : ''}`
-                : tab === 'shipments' ? `Shipments${(order.shipments?.length ?? 0) > 0 ? ` ${order.shipments!.length}` : ''}`
-                : 'General'
-              return (
-                <button
-                  key={tab}
-                  type='button'
-                  className={cn(
-                    'relative px-3 py-2 text-[13px] font-medium transition-colors duration-75',
-                    panelTab === tab
-                      ? 'text-foreground'
-                      : 'text-text-tertiary hover:text-text-secondary',
-                  )}
-                  onClick={() => setPanelTab(tab)}
-                >
-                  {label}
-                  {panelTab === tab && (
-                    <span className='absolute bottom-0 left-3 right-3 h-[2px] rounded-full bg-primary' />
-                  )}
-                </button>
-              )
-            })}
+          <div className='flex shrink-0 items-center justify-between border-b border-border px-1'>
+            <div className='flex items-center gap-0'>
+              {(['general', 'custom', 'shipments'] as const).map((tab) => {
+                const label = tab === 'custom' ? `Line Items${customFields.length > 0 ? ` ${customFields.length}` : ''}`
+                  : tab === 'shipments' ? `Shipments${(order.shipments?.length ?? 0) > 0 ? ` ${order.shipments!.length}` : ''}`
+                  : 'General'
+                return (
+                  <button
+                    key={tab}
+                    type='button'
+                    className={cn(
+                      'relative px-3 py-2 text-[13px] font-medium transition-colors duration-75',
+                      panelTab === tab
+                        ? 'text-foreground'
+                        : 'text-text-tertiary hover:text-text-secondary',
+                    )}
+                    onClick={() => setPanelTab(tab)}
+                  >
+                    {label}
+                    {panelTab === tab && (
+                      <span className='absolute bottom-0 left-3 right-3 h-[2px] rounded-full bg-primary' />
+                    )}
+                  </button>
+                )
+              })}
+            </div>
+            <div className='flex items-center gap-1 pr-2'>
+              {(() => {
+                const pickedCount = items.filter((i) => i.is_picked).length
+                const packedCount = items.filter((i) => i.packed).length
+                return (
+                  <>
+                    {pickedCount > 0 && (
+                      <span
+                        className={cn(
+                          'inline-flex items-center gap-1 rounded-[4px] px-1.5 py-0.5 text-[10px] font-semibold tabular-nums leading-none',
+                          pickedCount === items.length
+                            ? 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400'
+                            : 'bg-primary/10 text-primary',
+                        )}
+                      >
+                        {pickedCount === items.length ? <Check className='size-2.5' /> : <PackageCheck className='size-2.5' />}
+                        {pickedCount}/{items.length}
+                      </span>
+                    )}
+                    {packedCount > 0 && (
+                      <span
+                        className={cn(
+                          'inline-flex items-center gap-1 rounded-[4px] px-1.5 py-0.5 text-[10px] font-semibold tabular-nums leading-none',
+                          packedCount === items.length
+                            ? 'bg-violet-500/10 text-violet-700 dark:text-violet-400'
+                            : 'bg-violet-500/10 text-violet-600 dark:text-violet-400',
+                        )}
+                      >
+                        <Package className='size-2.5' />
+                        {packedCount}/{items.length}
+                      </span>
+                    )}
+                  </>
+                )
+              })()}
+            </div>
           </div>
 
           {/* Panel content */}
@@ -609,6 +647,12 @@ function OrderDetailPage() {
                 <PanelSection title='Order Details'>
                   <PanelRow label='Invoice'>
                     <span className='tabular-nums'>{order.invoice || '—'}</span>
+                  </PanelRow>
+                  <PanelRow label='Picked'>
+                    <span className='tabular-nums'>{order.pick_status || '—'}</span>
+                  </PanelRow>
+                  <PanelRow label='Packed'>
+                    <span className='tabular-nums'>{order.packed_status || '—'}</span>
                   </PanelRow>
                   <PanelRow label='Date'>
                     <span className='tabular-nums'>{order.inv_date ? formatDate(order.inv_date) : '—'}</span>
