@@ -23,8 +23,10 @@ import { FilterChip, FilterPopover, ITodos, PAGE_COLORS, PageHeaderIcon, StatusI
 import { TASK_PRIORITY, TASK_PRIORITY_COLORS, TASK_PRIORITY_LABELS } from '@/constants/task'
 import type { TaskPriority } from '@/constants/task'
 import { useBreakpoint } from '@/hooks/use-breakpoint'
+import { isSuperAdmin } from '@/constants/user'
 import { useProjectId } from '@/hooks/use-project-id'
 import { cn } from '@/lib/utils'
+import { useAuth } from '@/providers/auth'
 
 export const Route = createFileRoute('/_authenticated/tasks/')({
   component: Todos2Page,
@@ -43,6 +45,8 @@ const TASK_VIEW_OPTIONS: ViewOption<'list' | 'board'>[] = [
 function Todos2Page() {
   const bp = useBreakpoint()
   const isMobile = bp === 'mobile'
+  const { user } = useAuth()
+  const userIsSuperAdmin = !!user?.role && isSuperAdmin(user.role)
   const [projectId] = useProjectId()
 
   const [search, setSearch] = useState('')
@@ -152,7 +156,10 @@ function Todos2Page() {
   // Generic field update mutation with optimistic update
   const updateTaskMutation = useMutation({
     mutationFn: ({ taskId, payload }: { taskId: number; payload: Record<string, unknown> }) =>
-      taskService.update(taskId, payload),
+      taskService.update(taskId, {
+        ...payload,
+        ...(userIsSuperAdmin && projectId != null ? { project: projectId } : {})
+      }),
     onMutate: async ({ taskId, payload }) => {
       await queryClient.cancelQueries({ queryKey: TASK_QUERY_KEYS.lists() })
       const previous = queryClient.getQueryData(queryKey)

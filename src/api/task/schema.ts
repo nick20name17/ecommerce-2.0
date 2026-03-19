@@ -98,6 +98,7 @@ export interface Task extends TaskListItem {
 }
 
 export interface CreateTaskPayload {
+  project?: number
   title: string
   description?: string | null
   status: number

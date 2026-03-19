@@ -33,7 +33,7 @@ import { TASK_PRIORITY_COLORS, TASK_PRIORITY_LABELS } from '@/constants/task'
 import type { TaskPriority } from '@/constants/task'
 import { useBreakpoint } from '@/hooks/use-breakpoint'
 import { useProjectId } from '@/hooks/use-project-id'
-import { isAdmin, USER_ROLES } from '@/constants/user'
+import { isAdmin, isSuperAdmin, USER_ROLES } from '@/constants/user'
 import { cn } from '@/lib/utils'
 import { useAuth } from '@/providers/auth'
 
@@ -123,6 +123,7 @@ function TaskDetailPage() {
   const id = Number(taskId)
 
   const { user } = useAuth()
+  const userIsSuperAdmin = !!user?.role && isSuperAdmin(user.role)
   const [deleteOpen, setDeleteOpen] = useState(false)
   const [statusOpen, setStatusOpen] = useState(false)
   const [activeTab, setActiveTab] = useState<'details' | 'attachments'>('details')
@@ -223,7 +224,10 @@ function TaskDetailPage() {
   // Update mutation with optimistic updates
   const updateMutation = useMutation({
     mutationFn: (payload: Parameters<typeof taskService.update>[1]) =>
-      taskService.update(id, payload),
+      taskService.update(id, {
+        ...payload,
+        ...(userIsSuperAdmin && taskProjectId != null ? { project: taskProjectId } : {})
+      }),
     onMutate: async (payload) => {
       await queryClient.cancelQueries({ queryKey: TASK_QUERY_KEYS.detail(id) })
       const previous = queryClient.getQueryData(TASK_QUERY_KEYS.detail(id))

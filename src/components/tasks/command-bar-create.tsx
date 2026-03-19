@@ -14,7 +14,8 @@ import { TASK_QUERY_KEYS, getTaskStatusesQuery } from '@/api/task/query'
 import type { TaskStatus } from '@/api/task/schema'
 import { taskService } from '@/api/task/service'
 import { UserCombobox } from '@/components/common/user-combobox/user-combobox'
-import { USER_ROLES } from '@/constants/user'
+import { isSuperAdmin, USER_ROLES } from '@/constants/user'
+import { useAuth } from '@/providers/auth'
 import { StatusIcon } from '@/components/ds'
 import { Calendar as CalendarComponent } from '@/components/ui/calendar'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
@@ -123,6 +124,8 @@ function CommandBarCreateInner({
   lockLinkedCustomer?: boolean
   linkedCustomerLabel?: string | null
 }) {
+  const { user } = useAuth()
+  const userIsSuperAdmin = !!user?.role && isSuperAdmin(user.role)
   const [projectId] = useProjectId()
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
@@ -147,6 +150,7 @@ function CommandBarCreateInner({
         description: description.trim() || undefined,
         status: selectedStatus!.id,
         priority: selectedPriority,
+        ...(userIsSuperAdmin && projectId != null ? { project: projectId } : {}),
         responsible_user: selectedAssignee,
         due_date: selectedDueDate,
         linked_order_autoid: selectedOrder,

@@ -22,7 +22,8 @@ import { taskService } from '@/api/task/service'
 import { TaskPrioritySelect } from '@/components/common/task-priority-select'
 import { TaskStatusSelect } from '@/components/common/task-status-select'
 import { UserCombobox } from '@/components/common/user-combobox/user-combobox'
-import { USER_ROLES } from '@/constants/user'
+import { isSuperAdmin, USER_ROLES } from '@/constants/user'
+import { useAuth } from '@/providers/auth'
 import { Button } from '@/components/ui/button'
 import { DatePicker } from '@/components/ui/date-picker'
 import {
@@ -348,6 +349,8 @@ const CreateFormInner = ({
   defaultLinkedOrderAutoid?: string | null
   defaultLinkedProposalAutoid?: string | null
 }) => {
+  const { user } = useAuth()
+  const userIsSuperAdmin = !!user?.role && isSuperAdmin(user.role)
   const attachmentsRef = useRef<TaskAttachmentsRef>(null)
 
   const form = useForm<CreateTaskFormValues>({
@@ -376,7 +379,8 @@ const CreateFormInner = ({
         responsible_user: payload.responsible_user ?? null,
         linked_order_autoid: payload.linked_order_autoid ?? null,
         linked_proposal_autoid: payload.linked_proposal_autoid ?? null,
-        linked_customer_autoid: payload.linked_customer_autoid ?? null
+        linked_customer_autoid: payload.linked_customer_autoid ?? null,
+        ...(userIsSuperAdmin && projectId != null ? { project: projectId } : {})
       })
 
       if (attachmentsRef.current?.hasPendingFiles()) {
@@ -461,6 +465,8 @@ const EditForm = ({
   onOpenChange: (open: boolean) => void
   projectId?: number
 }) => {
+  const { user } = useAuth()
+  const userIsSuperAdmin = !!user?.role && isSuperAdmin(user.role)
   const { data: statusesData } = useQuery(getTaskStatusesQuery(projectId ?? task.project))
   const { data: taskDetails, isLoading: isLoadingTask } = useQuery(getTaskDetailQuery(task.id))
   const statuses = statusesData?.results ?? []
@@ -499,7 +505,8 @@ const EditForm = ({
         responsible_user: payload.responsible_user ?? null,
         linked_order_autoid: payload.linked_order_autoid ?? null,
         linked_proposal_autoid: payload.linked_proposal_autoid ?? null,
-        linked_customer_autoid: payload.linked_customer_autoid ?? null
+        linked_customer_autoid: payload.linked_customer_autoid ?? null,
+        ...(userIsSuperAdmin && projectId != null ? { project: projectId } : {})
       })
 
       if (attachmentsRef.current?.hasPendingFiles()) {
