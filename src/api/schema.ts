@@ -16,7 +16,7 @@ export const EmailSchema = z
   .check(z.minLength(1, { error: VALIDATION_MESSAGES.required }), z.trim())
 
 export const NameSchema = RequiredStringSchema.check(
-  z.maxLength(100, { error: 'max 100 characters' })
+  z.maxLength(64, { error: 'max 64 characters' })
 )
 
 export const OptionalStringSchema = z.optional(z.string().check(z.trim()))
