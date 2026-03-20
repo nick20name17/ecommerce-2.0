@@ -26,22 +26,6 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src')
     }
   },
-  build: {
-    rollupOptions: {
-      output: {
-        manualChunks(id) {
-          if (id.includes('node_modules/react-dom') || id.includes('node_modules/react/'))
-            return 'vendor-react'
-          if (id.includes('node_modules/@tanstack/react-router'))
-            return 'vendor-router'
-          if (id.includes('node_modules/@tanstack/react-query'))
-            return 'vendor-query'
-          if (id.includes('node_modules/radix-ui') || id.includes('node_modules/recharts'))
-            return 'vendor-ui'
-        }
-      }
-    }
-  },
   server: {
     port: 3000,
     watch: {
