@@ -15,6 +15,7 @@ import {
   AlertDialogMedia,
   AlertDialogTitle
 } from '@/components/ui/alert-dialog'
+import { getUserDisplayName } from '@/helpers/formatters'
 import { useAuth } from '@/providers/auth'
 
 interface UserDeleteDialogProps {
@@ -57,7 +58,7 @@ export const UserDeleteDialog = ({ user, open, onOpenChange }: UserDeleteDialogP
           <AlertDialogDescription>
             {isSelf
               ? 'You cannot delete your own account.'
-              : `Are you sure you want to delete ${user?.first_name} ${user?.last_name}? This action cannot be undone.`}
+              : `Are you sure you want to delete ${getUserDisplayName(user)}? This action cannot be undone.`}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>

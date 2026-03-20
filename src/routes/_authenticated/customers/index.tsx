@@ -39,7 +39,7 @@ import {
 import { isAdmin } from '@/constants/user'
 import { useBreakpoint } from '@/hooks/use-breakpoint'
 import { useProjectId } from '@/hooks/use-project-id'
-import { formatPhone } from '@/helpers/formatters'
+import { formatPhone, getUserDisplayName } from '@/helpers/formatters'
 import { useLimitParam, useOffsetParam, useSearchParam } from '@/hooks/use-query-params'
 import { cn } from '@/lib/utils'
 import { useAuth } from '@/providers/auth'
@@ -439,12 +439,10 @@ function CustomerRow({
                 {customer.assigned_user ? (
                   <>
                     <InitialsAvatar
-                      initials={getInitials(`${customer.assigned_user.first_name} ${customer.assigned_user.last_name}`)}
+                      initials={getInitials(getUserDisplayName(customer.assigned_user))}
                       size={16}
                     />
-                    <span className='truncate'>
-                      {customer.assigned_user.first_name} {customer.assigned_user.last_name}
-                    </span>
+                    <span className='truncate'>{getUserDisplayName(customer.assigned_user)}</span>
                   </>
                 ) : (
                   <>
@@ -456,7 +454,7 @@ function CustomerRow({
             </TooltipTrigger>
             <TooltipContent>
               {customer.assigned_user
-                ? `Assigned to ${customer.assigned_user.first_name} ${customer.assigned_user.last_name} — click to change`
+                ? `Assigned to ${getUserDisplayName(customer.assigned_user)} — click to change`
                 : 'Assign a sales user'}
             </TooltipContent>
           </Tooltip>

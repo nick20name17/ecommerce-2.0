@@ -19,7 +19,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Switch } from '@/components/ui/switch'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
-import { formatDate } from '@/helpers/formatters'
+import { formatDate, getUserDisplayName } from '@/helpers/formatters'
 
 interface UserColumnsOptions {
   currentUserId: number | undefined
@@ -91,7 +91,7 @@ export const getUserColumns = ({
   return [
     {
       id: 'user',
-      accessorFn: (row) => `${row.first_name} ${row.last_name}`,
+      accessorFn: (row) => getUserDisplayName(row, 'User'),
       header: ({ column }) => (
         <ColumnHeader
           column={column}
@@ -100,8 +100,7 @@ export const getUserColumns = ({
       ),
       cell: ({ row }) => {
         const user = row.original
-        const fullName =
-          [user.first_name, user.last_name].filter(Boolean).join(' ').trim() || user.email || 'User'
+        const fullName = getUserDisplayName(user, 'User')
 
         return (
           <div className='flex min-w-0 items-center gap-3'>

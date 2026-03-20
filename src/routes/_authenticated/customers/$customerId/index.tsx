@@ -16,6 +16,7 @@ import { customerService } from '@/api/customer/service'
 import { getFieldConfigQuery } from '@/api/field-config/query'
 import { getPriceLevelsQuery } from '@/api/price-level/query'
 import { getColumnLabel } from '@/helpers/dynamic-columns'
+import { getUserDisplayName } from '@/helpers/formatters'
 import { ICustomers, PAGE_COLORS, PageHeaderIcon } from '@/components/ds'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { CustomerAssignDialog } from '@/routes/_authenticated/customers/-components/customer-assign-dialog'
@@ -203,14 +204,14 @@ function CustomerDetailPage() {
                 <UserPlus className='size-3.5' />
                 <span className='hidden sm:inline'>
                   {customer.assigned_user
-                    ? `${customer.assigned_user.first_name} ${customer.assigned_user.last_name}`
+                    ? getUserDisplayName(customer.assigned_user)
                     : 'Assign'}
                 </span>
               </button>
             </TooltipTrigger>
             <TooltipContent>
               {customer.assigned_user
-                ? `Assigned to ${customer.assigned_user.first_name} ${customer.assigned_user.last_name} — click to change`
+                ? `Assigned to ${getUserDisplayName(customer.assigned_user)} — click to change`
                 : 'Assign a sales user'}
             </TooltipContent>
           </Tooltip>

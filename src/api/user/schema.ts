@@ -1,9 +1,9 @@
 import { z } from 'zod'
 
-import type { ApiResponse, PaginationParams } from '@/api/schema'
 import { EmailSchema, NameSchema, PasswordSchema } from '@/api/schema'
-import type { UserRole } from '@/constants/user'
+import type { ApiResponse, PaginationParams } from '@/api/schema'
 import { USER_ROLES, isSuperAdmin } from '@/constants/user'
+import type { UserRole } from '@/constants/user'
 
 export type { UserRole } from '@/constants/user'
 
@@ -14,6 +14,7 @@ export interface User {
   last_name: string
   role: UserRole
   project_id: number
+
   project_name: string
   is_active: boolean
   date_joined: string

@@ -7,6 +7,7 @@ import type { Customer } from '@/api/customer/schema'
 import { customerService } from '@/api/customer/service'
 import { UserCombobox } from '@/components/common/user-combobox/user-combobox'
 import { Button } from '@/components/ui/button'
+import { getUserDisplayName } from '@/helpers/formatters'
 import {
   Dialog,
   DialogBody,
@@ -81,9 +82,7 @@ export const CustomerAssignDialog = ({
             onChange={setSelectedUserId}
             placeholder='Select user...'
             valueLabel={
-              customer.assigned_user
-                ? `${customer.assigned_user.first_name} ${customer.assigned_user.last_name}`
-                : null
+              customer.assigned_user ? getUserDisplayName(customer.assigned_user) : null
             }
           />
         </DialogBody>

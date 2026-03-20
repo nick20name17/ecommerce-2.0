@@ -8,6 +8,7 @@ import type { User as UserType } from '@/api/user/schema'
 import { InitialsAvatar } from '@/components/ds'
 import { USER_ROLE_LABELS } from '@/constants/user'
 import type { UserRole } from '@/constants/user'
+import { getUserDisplayName } from '@/helpers/formatters'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Spinner } from '@/components/ui/spinner'
@@ -76,7 +77,7 @@ export function UserCombobox({
   }
 
   const displayLabel = selectedUser
-    ? `${selectedUser.first_name} ${selectedUser.last_name}`
+    ? getUserDisplayName(selectedUser, `User #${selectedUser.id}`)
     : value != null
       ? (valueLabel ?? `User #${value}`)
       : null
@@ -179,7 +180,7 @@ export function UserCombobox({
               )}
               {users.map((u) => {
                 const selected = u.id === value
-                const fullName = `${u.first_name} ${u.last_name}`.trim()
+                const fullName = getUserDisplayName(u)
                 const initials = fullName
                   ? fullName.split(' ').slice(0, 2).map((n) => n[0]?.toUpperCase() ?? '').join('')
                   : '\u2014'

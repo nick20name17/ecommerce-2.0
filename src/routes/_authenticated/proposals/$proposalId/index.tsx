@@ -21,7 +21,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { useBreakpoint } from '@/hooks/use-breakpoint'
 import { useProjectId } from '@/hooks/use-project-id'
-import { formatCurrency, formatDate } from '@/helpers/formatters'
+import { formatCurrency, formatDate, getUserDisplayName } from '@/helpers/formatters'
 import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
 
@@ -241,7 +241,7 @@ function ProposalDetailPage() {
             onChange={(userId) => assignMutation.mutate(userId)}
             valueLabel={
               proposal.assigned_user
-                ? `${proposal.assigned_user.first_name} ${proposal.assigned_user.last_name}`
+                ? getUserDisplayName(proposal.assigned_user)
                 : undefined
             }
             role='sale'

@@ -40,6 +40,7 @@ import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { TASK_PRIORITY } from '@/constants/task'
 import { dateToLocalDateString, localDateStringToDate } from '@/helpers/date'
+import { getUserDisplayName } from '@/helpers/formatters'
 
 interface TaskModalProps {
   task?: Task | TaskListItem | null
@@ -542,7 +543,7 @@ const EditForm = ({
               responsibleUserLabel={(() => {
                 const details = (fullTask as Task).responsible_user_details
                 return details
-                  ? `${details.first_name} ${details.last_name}`.trim()
+                  ? getUserDisplayName(details)
                   : ((fullTask as TaskListItem).responsible_user_name ?? undefined)
               })()}
             />

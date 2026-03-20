@@ -10,6 +10,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { useSidebar } from '@/components/ui/sidebar'
+import { getUserDisplayName } from '@/helpers/formatters'
 import { cn } from '@/lib/utils'
 import { useAuth } from '@/providers/auth'
 import { useTheme } from '@/providers/theme'
@@ -20,7 +21,7 @@ export const NavUser = () => {
   const { theme, setTheme } = useTheme()
 
   const namePart = [user?.first_name, user?.last_name].filter(Boolean).join(' ').trim()
-  const userName = namePart || user?.email || 'User'
+  const userName = getUserDisplayName(user, 'User')
   const userInitials = namePart
     ? namePart
         .split(' ')

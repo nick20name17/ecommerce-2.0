@@ -33,6 +33,7 @@ import { TASK_PRIORITY_COLORS, TASK_PRIORITY_LABELS } from '@/constants/task'
 import type { TaskPriority } from '@/constants/task'
 import { useBreakpoint } from '@/hooks/use-breakpoint'
 import { useProjectId } from '@/hooks/use-project-id'
+import { getUserDisplayName } from '@/helpers/formatters'
 import { isAdmin, isSuperAdmin, USER_ROLES } from '@/constants/user'
 import { cn } from '@/lib/utils'
 import { useAuth } from '@/providers/auth'
@@ -165,7 +166,7 @@ function TaskDetailPage() {
         task: id,
         text: payload.text,
         author: user?.id ?? null,
-        author_name: user ? `${user.first_name} ${user.last_name}`.trim() : '',
+        author_name: getUserDisplayName(user, ''),
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       }
@@ -339,7 +340,7 @@ function TaskDetailPage() {
   }
 
   const assigneeName = task.responsible_user_details
-    ? `${task.responsible_user_details.first_name} ${task.responsible_user_details.last_name}`.trim()
+    ? getUserDisplayName(task.responsible_user_details)
     : task.responsible_user_name
 
   return (

@@ -7,6 +7,7 @@ import type { Order } from '@/api/order/schema'
 import { orderService } from '@/api/order/service'
 import { UserCombobox } from '@/components/common/user-combobox/user-combobox'
 import { Button } from '@/components/ui/button'
+import { getUserDisplayName } from '@/helpers/formatters'
 import {
   Dialog,
   DialogBody,
@@ -81,9 +82,7 @@ export const OrderAssignDialog = ({
             onChange={setSelectedUserId}
             placeholder='Select user...'
             valueLabel={
-              order.assigned_user
-                ? `${order.assigned_user.first_name} ${order.assigned_user.last_name}`
-                : null
+              order.assigned_user ? getUserDisplayName(order.assigned_user) : null
             }
           />
         </DialogBody>

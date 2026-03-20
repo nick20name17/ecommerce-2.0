@@ -55,7 +55,7 @@ import {
   getOrderStatusLabel
 } from '@/constants/order'
 import { isAdmin } from '@/constants/user'
-import { formatCurrency, formatDate } from '@/helpers/formatters'
+import { formatCurrency, formatDate, getUserDisplayName } from '@/helpers/formatters'
 import { useBreakpoint } from '@/hooks/use-breakpoint'
 import { useProjectId } from '@/hooks/use-project-id'
 import {
@@ -699,14 +699,10 @@ function OrderRow({
                 {order.assigned_user ? (
                   <>
                     <InitialsAvatar
-                      initials={getInitials(
-                        `${order.assigned_user.first_name} ${order.assigned_user.last_name}`
-                      )}
+                      initials={getInitials(getUserDisplayName(order.assigned_user))}
                       size={16}
                     />
-                    <span className='truncate'>
-                      {order.assigned_user.first_name} {order.assigned_user.last_name}
-                    </span>
+                    <span className='truncate'>{getUserDisplayName(order.assigned_user)}</span>
                   </>
                 ) : (
                   <>
@@ -718,7 +714,7 @@ function OrderRow({
             </TooltipTrigger>
             <TooltipContent>
               {order.assigned_user
-                ? `Assigned to ${order.assigned_user.first_name} ${order.assigned_user.last_name} — click to change`
+                ? `Assigned to ${getUserDisplayName(order.assigned_user)} — click to change`
                 : 'Assign a sales user'}
             </TooltipContent>
           </Tooltip>

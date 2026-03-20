@@ -7,6 +7,7 @@ import type { Proposal } from '@/api/proposal/schema'
 import { proposalService } from '@/api/proposal/service'
 import { UserCombobox } from '@/components/common/user-combobox/user-combobox'
 import { Button } from '@/components/ui/button'
+import { getUserDisplayName } from '@/helpers/formatters'
 import {
   Dialog,
   DialogBody,
@@ -82,9 +83,7 @@ export const ProposalAssignDialog = ({
             onChange={setSelectedUserId}
             placeholder='Select user...'
             valueLabel={
-              proposal.assigned_user
-                ? `${proposal.assigned_user.first_name} ${proposal.assigned_user.last_name}`
-                : null
+              proposal.assigned_user ? getUserDisplayName(proposal.assigned_user) : null
             }
           />
         </DialogBody>

@@ -13,7 +13,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 import { getCustomerTypeLabel } from '@/constants/customer'
 import { isAdmin } from '@/constants/user'
 import { getColumnLabel } from '@/helpers/dynamic-columns'
-import { formatDate, formatPhone } from '@/helpers/formatters'
+import { formatDate, formatPhone, getUserDisplayName } from '@/helpers/formatters'
 import { cn } from '@/lib/utils'
 import { useAuth } from '@/providers/auth'
 
@@ -40,9 +40,7 @@ export const CustomerInfoPanel = ({ customer, fieldConfig, priceLevels, onPriceL
   const country = customer.country || null
   const hasAddress = addressParts || cityStateZip || country
 
-  const assigneeName = customer.assigned_user
-    ? `${customer.assigned_user.first_name} ${customer.assigned_user.last_name}`.trim()
-    : null
+  const assigneeName = customer.assigned_user ? getUserDisplayName(customer.assigned_user) : null
   const assigneeInitials = assigneeName
     ? assigneeName.split(' ').slice(0, 2).map(n => n[0]?.toUpperCase() ?? '').join('')
     : null

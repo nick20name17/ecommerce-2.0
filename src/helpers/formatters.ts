@@ -116,3 +116,21 @@ export const formatBytes = (bytes: number, decimals: number = 2): string => {
 
   return Number.parseFloat((bytes / k ** i).toFixed(dm)) + ' ' + sizes[i]
 }
+
+export const getUserDisplayName = (
+  user: {
+    first_name?: string | null
+    last_name?: string | null
+    email?: string | null
+    full_name?: string | null
+  } | null | undefined,
+  fallback: string = '—'
+): string => {
+  const fullName = user?.full_name?.trim()
+  if (fullName) return fullName
+
+  const name = [user?.first_name, user?.last_name].filter(Boolean).join(' ').trim()
+  if (name) return name
+
+  return user?.email?.trim() || fallback
+}

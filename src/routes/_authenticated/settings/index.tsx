@@ -67,6 +67,7 @@ import { isAdmin, isSuperAdmin } from '@/constants/user'
 import type { UserRole } from '@/constants/user'
 import { getSession } from '@/helpers/auth'
 import { useProjectId } from '@/hooks/use-project-id'
+import { getUserDisplayName } from '@/helpers/formatters'
 import { cn } from '@/lib/utils'
 import { useAuth } from '@/providers/auth'
 import { UserDeleteDialog } from '../users/-components/user-delete-dialog'
@@ -1038,7 +1039,7 @@ const UsersSection = () => {
   const users = search
     ? allUsers.filter((u) => {
         const term = search.toLowerCase()
-        const fullName = `${u.first_name} ${u.last_name}`.toLowerCase()
+      const fullName = getUserDisplayName(u).toLowerCase()
         return fullName.includes(term) || u.email.toLowerCase().includes(term)
       })
     : allUsers
@@ -1113,7 +1114,7 @@ const UsersSection = () => {
           <PageEmpty icon={Search} title='No users found' description={search ? 'Try a different search term.' : 'Add your first user to get started.'} />
         ) : (
           users.map((user) => {
-            const fullName = [user.first_name, user.last_name].filter(Boolean).join(' ').trim() || user.email
+            const fullName = getUserDisplayName(user)
             const initials = getInitials(user.first_name, user.last_name, user.email)
             const isSelf = user.id === currentUser?.id
 

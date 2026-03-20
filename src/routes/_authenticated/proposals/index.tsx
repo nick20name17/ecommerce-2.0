@@ -41,7 +41,7 @@ import type { ProposalStatus } from '@/constants/proposal'
 import { isAdmin } from '@/constants/user'
 import { useBreakpoint } from '@/hooks/use-breakpoint'
 import { useProjectId } from '@/hooks/use-project-id'
-import { formatCurrency, formatDate } from '@/helpers/formatters'
+import { formatCurrency, formatDate, getUserDisplayName } from '@/helpers/formatters'
 import { cn } from '@/lib/utils'
 import {
   useAutoidParam,
@@ -540,12 +540,10 @@ function ProposalRow({
                 {proposal.assigned_user ? (
                   <>
                     <InitialsAvatar
-                      initials={getInitials(`${proposal.assigned_user.first_name} ${proposal.assigned_user.last_name}`)}
+                      initials={getInitials(getUserDisplayName(proposal.assigned_user))}
                       size={16}
                     />
-                    <span className='truncate'>
-                      {proposal.assigned_user.first_name} {proposal.assigned_user.last_name}
-                    </span>
+                    <span className='truncate'>{getUserDisplayName(proposal.assigned_user)}</span>
                   </>
                 ) : (
                   <>
@@ -557,7 +555,7 @@ function ProposalRow({
             </TooltipTrigger>
             <TooltipContent>
               {proposal.assigned_user
-                ? `Assigned to ${proposal.assigned_user.first_name} ${proposal.assigned_user.last_name} — click to change`
+                ? `Assigned to ${getUserDisplayName(proposal.assigned_user)} — click to change`
                 : 'Assign a sales user'}
             </TooltipContent>
           </Tooltip>

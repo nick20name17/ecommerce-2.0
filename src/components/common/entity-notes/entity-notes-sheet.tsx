@@ -27,6 +27,7 @@ import {
 } from '@/components/ui/sheet'
 import { InitialsAvatar } from '@/components/ds'
 import { isAdmin } from '@/constants/user'
+import { getUserDisplayName } from '@/helpers/formatters'
 import { cn } from '@/lib/utils'
 import { useAuth } from '@/providers/auth'
 
@@ -102,7 +103,7 @@ export const EntityNotesSheet = ({
         project: projectId ?? 0,
         text: payload.text,
         author: user?.id ?? null,
-        author_name: user ? `${user.first_name} ${user.last_name}`.trim() : '',
+        author_name: getUserDisplayName(user, ''),
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
       }
@@ -120,7 +121,7 @@ export const EntityNotesSheet = ({
         project: serverNote.project,
         text: serverNote.text,
         author: serverNote.author,
-        author_name: serverNote.author_details?.full_name ?? (user ? `${user.first_name} ${user.last_name}`.trim() : ''),
+        author_name: serverNote.author_details?.full_name ?? getUserDisplayName(user, ''),
         created_at: serverNote.created_at,
         updated_at: serverNote.updated_at
       }

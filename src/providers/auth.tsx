@@ -47,6 +47,8 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
 
   const logout = async () => {
     clearSession()
+    localStorage.removeItem(STORAGE_KEYS.projectId)
+    localStorage.removeItem(STORAGE_KEYS.projectName)
 
     await navigate({ to: AUTH_REDIRECTS.logout, replace: true })
 
@@ -61,6 +63,14 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
 
       if (response.user.project_id) {
         localStorage.setItem(STORAGE_KEYS.projectId, JSON.stringify(response.user.project_id))
+      } else {
+        localStorage.removeItem(STORAGE_KEYS.projectId)
+      }
+
+      if (response.user.project_name) {
+        localStorage.setItem(STORAGE_KEYS.projectName, JSON.stringify(response.user.project_name))
+      } else {
+        localStorage.removeItem(STORAGE_KEYS.projectName)
       }
 
       queryClient.setQueryData(USER_QUERY_KEYS.detail('me'), response.user)
