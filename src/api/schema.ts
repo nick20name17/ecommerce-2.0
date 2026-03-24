@@ -47,6 +47,7 @@ export interface AssignedUser {
 
 export interface EntityAssignRequest {
   user_id: number | null
+  remove?: boolean
 }
 
 export interface EntityAssignmentResponse {

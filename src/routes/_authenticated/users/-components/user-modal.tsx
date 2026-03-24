@@ -144,6 +144,22 @@ const SharedFields = ({ editingUser }: { editingUser?: User | null }) => {
       />
 
       <Controller
+        name='salesman'
+        control={control}
+        render={({ field, fieldState }) => (
+          <Field data-invalid={fieldState.invalid}>
+            <FieldLabel htmlFor='salesman'>Salesman</FieldLabel>
+            <Input
+              {...field}
+              id='salesman'
+              placeholder='e.g. AARON'
+            />
+            {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+          </Field>
+        )}
+      />
+
+      <Controller
         name='role'
         control={control}
         render={({ field, fieldState }) => (
@@ -225,6 +241,7 @@ const CreateForm = ({ onOpenChange }: { onOpenChange: (open: boolean) => void })
       last_name: '',
       email: '',
       role: 'sale',
+      salesman: '',
       project: currentUser?.project_id ?? 0,
       password: '',
       password_confirm: ''
@@ -330,6 +347,7 @@ const EditForm = ({ user, onOpenChange }: { user: User; onOpenChange: (open: boo
       last_name: user.last_name,
       email: user.email,
       role: user.role,
+      salesman: user.salesman ?? '',
       project: user.project_id,
       is_active: user.is_active
     }

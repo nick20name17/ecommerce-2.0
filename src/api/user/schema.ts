@@ -14,6 +14,7 @@ export interface User {
   last_name: string
   role: UserRole
   project_id: number
+  salesman: string
 
   project_name: string
   is_active: boolean
@@ -37,6 +38,7 @@ export interface CreateUserPayload {
   first_name: string
   last_name: string
   role: string
+  salesman?: string
   project?: number
 }
 
@@ -48,6 +50,7 @@ export interface UpdateUserPayload {
     last_name?: string
     email?: string
     role?: string
+    salesman?: string
     project?: number
   }
 }
@@ -70,6 +73,7 @@ const createUserSchemaBase = (isCurrentUserSuperAdmin: boolean) => {
     last_name: NameSchema,
     email: EmailSchema,
     role: z.enum(roleValues),
+    salesman: z.string(),
     project: projectSchema,
     password: PasswordSchema,
     password_confirm: PasswordSchema
@@ -108,6 +112,7 @@ const updateUserSchemaBase = (isCurrentUserSuperAdmin: boolean) => {
       last_name: NameSchema,
       email: EmailSchema,
       role: z.enum(roleValues),
+      salesman: z.string(),
       project: projectSchema,
       is_active: z.boolean()
     })

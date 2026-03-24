@@ -13,6 +13,7 @@ import {
   StickyNote,
   Trash2,
   UserPlus,
+  UserRound,
 } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 
@@ -24,6 +25,7 @@ import { FilterChip, FilterPopover, IProposals, InitialsAvatar, PAGE_COLORS, Pag
 import { getProposalsQuery } from '@/api/proposal/query'
 import type { Proposal, ProposalParams } from '@/api/proposal/schema'
 import { PageEmpty } from '@/components/common/page-empty'
+import { PresetPicker } from '@/components/common/filters/preset-picker'
 import { SidebarTrigger } from '@/components/ui/sidebar'
 import { EntityAttachmentsDialog } from '@/components/common/entity-attachments/entity-attachments-dialog'
 import { EntityNotesSheet } from '@/components/common/entity-notes/entity-notes-sheet'
@@ -105,6 +107,8 @@ const ProposalsPage = () => {
   const [sortDir, setSortDir] = useState<SortDir>('asc')
 
   const [activeStatus, setActiveStatus] = useState<ProposalStatus | null>(PROPOSAL_STATUS.open)
+  const [assignedToMe, setAssignedToMe] = useState(false)
+  const [activePresetId, setActivePresetId] = useState<number | null>(null)
   const [proposalToDelete, setProposalToDelete] = useState<Proposal | null>(null)
   const [proposalForAttachments, setProposalForAttachments] = useState<Proposal | null>(null)
   const [proposalForNotes, setProposalForNotes] = useState<Proposal | null>(null)
@@ -125,15 +129,33 @@ const ProposalsPage = () => {
 
   const selectStatus = (s: ProposalStatus) => {
     setActiveStatus((prev) => (prev === s ? null : s))
+    setActivePresetId(null)
+    setOffset(null)
+  }
+
+  const toggleAssignedToMe = () => {
+    setAssignedToMe((v) => !v)
+    setActivePresetId(null)
+    setOffset(null)
+  }
+
+  const selectPreset = (id: number | null) => {
+    setActivePresetId(id)
+    if (id != null) {
+      setActiveStatus(null)
+      setAssignedToMe(false)
+    }
     setOffset(null)
   }
 
   const clearAllFilters = () => {
     setActiveStatus(null)
+    setAssignedToMe(false)
+    setActivePresetId(null)
     setOffset(null)
   }
 
-  const hasFilters = activeStatus !== null
+  const hasFilters = activeStatus !== null || assignedToMe || activePresetId !== null
 
   const params: ProposalParams = {
     search: search || undefined,
@@ -144,6 +166,8 @@ const ProposalsPage = () => {
     project_id: projectId ?? undefined,
     ordering,
     notes: true,
+    assigned_to: assignedToMe ? 'me' : undefined,
+    preset_id: activePresetId ?? undefined,
   }
 
   const { data, refetch, isLoading } = useQuery(getProposalsQuery(params))
@@ -183,6 +207,12 @@ const ProposalsPage = () => {
           <PageHeaderIcon icon={IProposals} color={PAGE_COLORS.proposals} />
           <h1 className='text-[14px] font-semibold tracking-[-0.01em]'>Proposals</h1>
         </div>
+
+        <PresetPicker
+          entityType='proposal'
+          value={activePresetId}
+          onChange={selectPreset}
+        />
 
         <div className='flex-1' />
 
@@ -232,6 +262,21 @@ const ProposalsPage = () => {
 
           <button
             type='button'
+            className={cn(
+              'inline-flex h-7 items-center gap-1 rounded-[5px] border px-2 text-[13px] font-medium',
+              'transition-colors duration-[80ms] hover:bg-bg-hover',
+              assignedToMe
+                ? 'border-primary/30 bg-primary/5 text-foreground'
+                : 'border-border bg-background text-text-secondary'
+            )}
+            onClick={toggleAssignedToMe}
+          >
+            <UserRound className='size-3' />
+            Assigned to me
+          </button>
+
+          <button
+            type='button'
             className='inline-flex h-7 items-center gap-1 rounded-[5px] bg-primary px-2 text-[13px] font-semibold text-primary-foreground transition-colors duration-[80ms] hover:opacity-90 sm:px-2.5'
             onClick={() => navigate({ to: '/create' })}
           >
@@ -258,6 +303,12 @@ const ProposalsPage = () => {
               <span className='text-text-tertiary'>Status is</span>
               <div className={cn('size-2 rounded-full', STATUS_DOT_COLORS[activeStatus] ?? 'bg-slate-400')} />
               {PROPOSAL_STATUS_LABELS[activeStatus]}
+            </FilterChip>
+          )}
+          {assignedToMe && (
+            <FilterChip onRemove={() => setAssignedToMe(false)}>
+              <UserRound className='size-3 text-text-tertiary' />
+              Assigned to me
             </FilterChip>
           )}
           {autoidFromUrl && (

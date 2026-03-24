@@ -10,6 +10,7 @@ import {
   StickyNote,
   Trash2,
   UserPlus,
+  UserRound,
   Users,
 } from 'lucide-react'
 import { useState } from 'react'
@@ -24,7 +25,8 @@ import { EntityNotesSheet } from '@/components/common/entity-notes/entity-notes-
 import { SidebarTrigger } from '@/components/ui/sidebar'
 import { Pagination } from '@/components/common/filters/pagination'
 import { PageEmpty } from '@/components/common/page-empty'
-import { ICustomers, InitialsAvatar, PAGE_COLORS, PageHeaderIcon } from '@/components/ds'
+import { FilterChip, ICustomers, InitialsAvatar, PAGE_COLORS, PageHeaderIcon } from '@/components/ds'
+import { PresetPicker } from '@/components/common/filters/preset-picker'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -73,6 +75,20 @@ function CustomersPage() {
   const [sortField, setSortField] = useState<SortField | null>(null)
   const [sortDir, setSortDir] = useState<SortDir>('asc')
 
+  const [assignedToMe, setAssignedToMe] = useState(false)
+  const [activePresetId, setActivePresetId] = useState<number | null>(null)
+
+  const toggleAssignedToMe = () => {
+    setAssignedToMe((v) => !v)
+    setActivePresetId(null)
+  }
+
+  const selectPreset = (id: number | null) => {
+    setActivePresetId(id)
+    if (id != null) {
+      setAssignedToMe(false)
+    }
+  }
   const [modalCustomer, setModalCustomer] = useState<Customer | 'create' | null>(null)
   const [deleteCustomer, setDeleteCustomer] = useState<Customer | null>(null)
   const [customerForNotes, setCustomerForNotes] = useState<Customer | null>(null)
@@ -87,6 +103,8 @@ function CustomersPage() {
     offset,
     limit,
     notes: true as const,
+    assigned_to: assignedToMe ? 'me' : undefined,
+    preset_id: activePresetId ?? undefined,
   }
 
   const { data, isLoading } = useQuery(getCustomersQuery(params))
@@ -121,6 +139,12 @@ function CustomersPage() {
           <h1 className='text-[14px] font-semibold tracking-[-0.01em]'>Customers</h1>
         </div>
 
+        <PresetPicker
+          entityType='customer'
+          value={activePresetId}
+          onChange={selectPreset}
+        />
+
         <div className='flex-1' />
 
         {/* Search */}
@@ -137,6 +161,21 @@ function CustomersPage() {
         <div className='flex items-center gap-1.5'>
           <button
             type='button'
+            className={cn(
+              'inline-flex h-7 items-center gap-1 rounded-[5px] border px-2 text-[13px] font-medium',
+              'transition-colors duration-[80ms] hover:bg-bg-hover',
+              assignedToMe
+                ? 'border-primary/30 bg-primary/5 text-foreground'
+                : 'border-border bg-background text-text-secondary'
+            )}
+            onClick={toggleAssignedToMe}
+          >
+            <UserRound className='size-3' />
+            Assigned to me
+          </button>
+
+          <button
+            type='button'
             className='inline-flex h-7 items-center gap-1 rounded-[5px] bg-primary px-2 text-[13px] font-semibold text-primary-foreground transition-colors duration-[80ms] hover:opacity-90 sm:px-2.5'
             onClick={() => setModalCustomer('create')}
           >
@@ -145,6 +184,28 @@ function CustomersPage() {
           </button>
         </div>
       </header>
+
+      {/* Active filter chips */}
+      {(assignedToMe || activePresetId !== null) && (
+        <div className={cn('flex shrink-0 flex-wrap items-center gap-1.5 border-b border-border py-1.5', isMobile ? 'px-3.5' : 'px-6')}>
+          <button
+            type='button'
+            className='text-[13px] font-medium text-text-tertiary transition-colors duration-[80ms] hover:text-foreground'
+            onClick={() => {
+              setAssignedToMe(false)
+              setActivePresetId(null)
+            }}
+          >
+            Clear
+          </button>
+          {assignedToMe && (
+            <FilterChip onRemove={() => setAssignedToMe(false)}>
+              <UserRound className='size-3 text-text-tertiary' />
+              Assigned to me
+            </FilterChip>
+          )}
+        </div>
+      )}
 
       {/* Customer list */}
       <div className='flex-1 overflow-y-auto'>

@@ -48,6 +48,8 @@ export interface CustomerParams extends PaginationParams {
   project_id?: number
   fields?: string
   notes?: boolean
+  assigned_to?: string
+  preset_id?: number
 }
 
 export const CustomerSchema = z.object({

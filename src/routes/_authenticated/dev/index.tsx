@@ -28,14 +28,20 @@ interface ChangelogEntry {
 const CHANGELOG: ChangelogEntry[] = [
   // ── In Progress ──
   {
+    title: 'EBMS shipment sync',
+    description: 'Push shipment data (tracking, carrier, cost) to EBMS via OData API.',
+    status: 'in-progress',
+    category: 'feature',
+  },
+  {
     title: 'Editable fields & EBMS interactions',
     description: 'Add editable fields and sync changes with EBMS backend.',
     status: 'in-progress',
     category: 'feature',
   },
   {
-    title: 'Filter groups',
-    description: 'Saved filter presets for quick access to common views.',
+    title: 'Filter presets',
+    description: 'Saved filter presets with CRUD API, preset picker on list pages, and settings management.',
     status: 'in-progress',
     category: 'feature',
   },
@@ -53,6 +59,18 @@ const CHANGELOG: ChangelogEntry[] = [
   },
 
   // ── Done ──
+  {
+    title: 'Assigned to me filter',
+    description: 'Filter orders, proposals, and customers by current user assignment.',
+    status: 'done',
+    category: 'feature',
+  },
+  {
+    title: 'Assign API — filter & multi-assign endpoints',
+    description: 'Backend ?assigned_to=me filter and assign/unassign/unassign-all endpoints.',
+    status: 'done',
+    category: 'feature',
+  },
   {
     title: 'Custom fields not displaying on orders page',
     description: 'Fixed missing custom field values in order detail view.',

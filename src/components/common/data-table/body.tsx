@@ -22,7 +22,7 @@ const TableBodyCell = <TData,>({
   const style =
     fitWidth && widthPercent
       ? { width: widthPercent, minWidth: 0 }
-      : { width: size, minWidth: size, maxWidth: size }
+      : { width: size, minWidth: size }
 
   return (
     <TableCell

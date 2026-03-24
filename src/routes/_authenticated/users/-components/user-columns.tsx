@@ -116,12 +116,7 @@ export const getUserColumns = ({
                 </TooltipTrigger>
                 <TooltipContent>{fullName}</TooltipContent>
               </Tooltip>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <p className='text-text-tertiary truncate text-[13px]'>{user.email}</p>
-                </TooltipTrigger>
-                <TooltipContent>{user.email}</TooltipContent>
-              </Tooltip>
+              <p className='text-text-tertiary text-[13px]'>{user.email}</p>
             </div>
           </div>
         )

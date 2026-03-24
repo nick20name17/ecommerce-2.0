@@ -1075,7 +1075,7 @@ const UsersSection = () => {
         <div className='min-w-0 flex-1 text-[11px] font-semibold uppercase tracking-[0.05em] text-text-tertiary'>
           User
         </div>
-        <div className='hidden w-[180px] shrink-0 text-[11px] font-semibold uppercase tracking-[0.05em] text-text-tertiary sm:block'>
+        <div className='hidden min-w-0 flex-1 text-[11px] font-semibold uppercase tracking-[0.05em] text-text-tertiary sm:block'>
           Email
         </div>
         <div className='w-[80px] shrink-0 text-[11px] font-semibold uppercase tracking-[0.05em] text-text-tertiary'>
@@ -1097,7 +1097,7 @@ const UsersSection = () => {
                   <Skeleton className='size-7 rounded-full' />
                   <Skeleton className='h-3.5 w-28' />
                 </div>
-                <div className='hidden w-[180px] shrink-0 sm:block'>
+                <div className='hidden min-w-0 flex-1 sm:block'>
                   <Skeleton className='h-3.5 w-36' />
                 </div>
                 <div className='w-[80px] shrink-0'>
@@ -1138,8 +1138,8 @@ const UsersSection = () => {
                 </div>
 
                 {/* Email */}
-                <div className='hidden w-[180px] shrink-0 sm:block'>
-                  <span className='block truncate text-[13px] text-text-tertiary'>{user.email}</span>
+                <div className='hidden min-w-0 flex-1 sm:block'>
+                  <span className='block text-[13px] text-text-tertiary'>{user.email}</span>
                 </div>
 
                 {/* Role */}

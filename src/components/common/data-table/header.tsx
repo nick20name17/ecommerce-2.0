@@ -32,7 +32,7 @@ export const DataTableHeader = <TData,>({
                 : 'auto'
             const style = fitWidth
               ? { width: size, minWidth: 0 }
-              : { width: size, minWidth: size, maxWidth: size }
+              : { width: size, minWidth: size }
 
             return (
               <TableHead

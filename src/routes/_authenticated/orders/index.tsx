@@ -15,7 +15,8 @@ import {
   Search,
   StickyNote,
   Trash2,
-  UserPlus
+  UserPlus,
+  UserRound,
 } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 
@@ -28,6 +29,7 @@ import { orderService } from '@/api/order/service'
 import { EntityAttachmentsDialog } from '@/components/common/entity-attachments/entity-attachments-dialog'
 import { EntityNotesSheet } from '@/components/common/entity-notes/entity-notes-sheet'
 import { Pagination } from '@/components/common/filters/pagination'
+import { PresetPicker } from '@/components/common/filters/preset-picker'
 import { PageEmpty } from '@/components/common/page-empty'
 import {
   FilterChip,
@@ -124,6 +126,8 @@ const OrdersPage = () => {
   const [sortDir, setSortDir] = useState<SortDir>('asc')
 
   const [activeStatus, setActiveStatus] = useState<OrderStatus | null>(ORDER_STATUS.unprocessed)
+  const [assignedToMe, setAssignedToMe] = useState(false)
+  const [activePresetId, setActivePresetId] = useState<number | null>(null)
   const [orderToDelete, setOrderToDelete] = useState<Order | null>(null)
   const [orderForAttachments, setOrderForAttachments] = useState<Order | null>(null)
   const [orderForNotes, setOrderForNotes] = useState<Order | null>(null)
@@ -156,15 +160,34 @@ const OrdersPage = () => {
 
   const selectStatus = (s: OrderStatus) => {
     setActiveStatus((prev) => (prev === s ? null : s))
+    setActivePresetId(null) // manual filter clears preset
+    setOffset(null)
+  }
+
+  const toggleAssignedToMe = () => {
+    setAssignedToMe((v) => !v)
+    setActivePresetId(null) // manual filter clears preset
+    setOffset(null)
+  }
+
+  const selectPreset = (id: number | null) => {
+    setActivePresetId(id)
+    // preset overrides manual filters
+    if (id != null) {
+      setActiveStatus(null)
+      setAssignedToMe(false)
+    }
     setOffset(null)
   }
 
   const clearAllFilters = () => {
     setActiveStatus(null)
+    setAssignedToMe(false)
+    setActivePresetId(null)
     setOffset(null)
   }
 
-  const hasFilters = activeStatus !== null
+  const hasFilters = activeStatus !== null || assignedToMe || activePresetId !== null
 
   const params: OrderParams = {
     search: search || undefined,
@@ -174,7 +197,10 @@ const OrdersPage = () => {
     status: activeStatus ?? undefined,
     project_id: projectId ?? undefined,
     ordering,
-    notes: true
+    notes: true,
+    assigned_to: assignedToMe ? 'me' : undefined,
+    preset_id: activePresetId ?? undefined,
+    fields: 'salesman',
   }
 
   const { data, refetch, isLoading } = useQuery(getOrdersQuery(params))
@@ -222,6 +248,12 @@ const OrdersPage = () => {
           />
           <h1 className='text-[14px] font-semibold tracking-[-0.01em]'>Orders</h1>
         </div>
+
+        <PresetPicker
+          entityType='order'
+          value={activePresetId}
+          onChange={selectPreset}
+        />
 
         <div className='flex-1' />
 
@@ -285,6 +317,21 @@ const OrdersPage = () => {
 
           <button
             type='button'
+            className={cn(
+              'inline-flex h-7 items-center gap-1 rounded-[5px] border px-2 text-[13px] font-medium',
+              'transition-colors duration-[80ms] hover:bg-bg-hover',
+              assignedToMe
+                ? 'border-primary/30 bg-primary/5 text-foreground'
+                : 'border-border bg-background text-text-secondary'
+            )}
+            onClick={toggleAssignedToMe}
+          >
+            <UserRound className='size-3' />
+            Assigned to me
+          </button>
+
+          <button
+            type='button'
             className='bg-primary text-primary-foreground inline-flex h-7 items-center gap-1 rounded-[5px] px-2 text-[13px] font-semibold transition-colors duration-[80ms] hover:opacity-90 sm:px-2.5'
             onClick={() => navigate({ to: '/create' })}
           >
@@ -321,6 +368,12 @@ const OrdersPage = () => {
                 )}
               />
               {ORDER_STATUS_LABELS[activeStatus]}
+            </FilterChip>
+          )}
+          {assignedToMe && (
+            <FilterChip onRemove={() => setAssignedToMe(false)}>
+              <UserRound className='size-3 text-text-tertiary' />
+              Assigned to me
             </FilterChip>
           )}
           {autoidFromUrl && (
@@ -380,6 +433,7 @@ const OrdersPage = () => {
               />
             )}
             <div className='w-27.5 shrink-0 text-center'>Picked</div>
+            {!isTablet && <div className='w-[90px] shrink-0'>Salesman</div>}
             <div className='w-[120px] shrink-0'>Responsible</div>
             <div className='w-[46px] shrink-0' />
             <div className='w-[28px] shrink-0' />
@@ -435,6 +489,11 @@ const OrdersPage = () => {
                 <div className='w-27.5 shrink-0'>
                   <Skeleton className='mx-auto h-3.5 w-15 rounded' />
                 </div>
+                {!isTablet && (
+                  <div className='w-[90px] shrink-0'>
+                    <Skeleton className='h-3.5 w-[50px] rounded' />
+                  </div>
+                )}
                 <div className='w-[120px] shrink-0'>
                   <Skeleton className='h-3.5 w-[70px] rounded' />
                 </div>
@@ -679,6 +738,13 @@ function OrderRow({
         <PickBadge pickStatus={order.pick_status} />
         <PackedBadge packedStatus={order.packed_status} />
       </div>
+
+      {/* Salesman */}
+      {!isTablet && (
+        <div className='w-[90px] shrink-0 truncate text-[13px] text-text-secondary'>
+          {order.salesman || <span className='text-text-tertiary'>&mdash;</span>}
+        </div>
+      )}
 
       {/* Responsible */}
       <div className='w-[120px] shrink-0'>
