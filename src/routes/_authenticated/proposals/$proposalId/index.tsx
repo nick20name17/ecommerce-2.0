@@ -11,7 +11,7 @@ import { ORDER_QUERY_KEYS } from '@/api/order/query'
 import { getProposalDetailQuery, PROPOSAL_QUERY_KEYS } from '@/api/proposal/query'
 import { proposalService } from '@/api/proposal/service'
 import { IProposals, PAGE_COLORS, PageHeaderIcon } from '@/components/ds'
-import { UserCombobox } from '@/components/common/user-combobox/user-combobox'
+import { ProposalAssignDialog } from '@/routes/_authenticated/proposals/-components/proposal-assign-dialog'
 import { CommandBarCreate } from '@/components/tasks/command-bar-create'
 import { PROPOSAL_STATUS_CLASS, PROPOSAL_STATUS_LABELS } from '@/constants/proposal'
 import type { ProposalStatus } from '@/constants/proposal'
@@ -63,14 +63,7 @@ function ProposalDetailPage() {
   const { data: proposal, isLoading } = useQuery(getProposalDetailQuery(proposalId, projectId))
   const { data: fieldConfig } = useQuery(getFieldConfigQuery(projectId))
 
-  const assignMutation = useMutation({
-    mutationFn: (userId: number | null) =>
-      proposalService.assign(proposalId, { user_id: userId }, projectId),
-    meta: {
-      successMessage: 'Assignee updated',
-      invalidatesQuery: PROPOSAL_QUERY_KEYS.all(),
-    },
-  })
+  const [assignOpen, setAssignOpen] = useState(false)
 
   const toOrderMutation = useMutation({
     mutationFn: () => proposalService.toOrder(proposalId, projectId!),
@@ -187,6 +180,7 @@ function ProposalDetailPage() {
   const dotColor = STATUS_DOT_COLORS[proposal.status] ?? 'bg-slate-400'
   const statusClass = PROPOSAL_STATUS_CLASS[proposal.status as ProposalStatus] ?? ''
   const items = proposal.items ?? []
+  const assignedUsers = proposal.assigned_users ?? (proposal.assigned_user ? [proposal.assigned_user] : [])
 
   return (
     <div className='flex h-full flex-col overflow-hidden'>
@@ -236,24 +230,21 @@ function ProposalDetailPage() {
 
         {/* Assignee */}
         <div className='hidden items-center gap-1.5 sm:flex'>
-          <UserCombobox
-            value={proposal.assigned_user?.id ?? null}
-            onChange={(userId) => assignMutation.mutate(userId)}
-            valueLabel={
-              proposal.assigned_user
-                ? getUserDisplayName(proposal.assigned_user)
-                : undefined
-            }
-            role='sale'
-            placeholder='Assign'
-            triggerClassName={cn(
+          <button
+            type='button'
+            className={cn(
               'inline-flex h-7 items-center gap-1.5 rounded-[5px] border px-2.5 text-[12px] font-medium transition-colors duration-[80ms]',
-              proposal.assigned_user
+              assignedUsers.length > 0
                 ? 'border-primary/20 bg-primary/[0.06] text-primary hover:bg-primary/[0.1]'
                 : 'border-border bg-bg-secondary text-text-secondary hover:bg-bg-active hover:text-foreground'
             )}
-            triggerIcon={<UserPlus className='size-3.5' />}
-          />
+            onClick={() => setAssignOpen(true)}
+          >
+            <UserPlus className='size-3.5' />
+            {assignedUsers.length > 0
+              ? assignedUsers.map((u) => getUserDisplayName(u)).join(', ')
+              : 'Assign'}
+          </button>
         </div>
 
         <div className='flex-1' />
@@ -501,6 +492,14 @@ function ProposalDetailPage() {
           </div>
         </div>
       </div>
+
+      {/* ── Assign dialog ── */}
+      <ProposalAssignDialog
+        proposal={proposal}
+        open={assignOpen}
+        onOpenChange={setAssignOpen}
+        projectId={projectId}
+      />
 
       {/* ── Notes sheet ── */}
       <EntityNotesSheet

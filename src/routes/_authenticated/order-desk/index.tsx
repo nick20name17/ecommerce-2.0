@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
 import {
   Eraser,
@@ -7,8 +7,10 @@ import {
   Paperclip,
   ShoppingCart,
   User,
+  XIcon,
 } from 'lucide-react'
-import { useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
+import { toast } from 'sonner'
 
 import { CartEditableTable } from '../create/-components/cart-editable-table'
 import { CartSummary } from '../create/-components/cart-summary'
@@ -19,23 +21,23 @@ import { useCreatePage } from '../create/-components/use-create-page'
 import {
   EntityAttachments,
 } from '@/components/common/entity-attachments/entity-attachments'
+import { CUSTOMER_QUERY_KEYS } from '@/api/customer/query'
+import { customerService } from '@/api/customer/service'
+import { getEditableFieldsQuery } from '@/api/data/query'
 import { getFieldConfigQuery } from '@/api/field-config/query'
+import { getPriceLevelsQuery } from '@/api/price-level/query'
+import { getSalespersonsQuery } from '@/api/salesperson/query'
 import { getColumnLabel } from '@/helpers/dynamic-columns'
 import { CustomerInfoPanel } from '@/routes/_authenticated/customers/$customerId/-components/customer-info-card'
 import { PropertyField } from '@/routes/_authenticated/orders/$orderId/-components/order-properties'
 import { IOrderDesk, PAGE_COLORS, PageHeaderIcon } from '@/components/ds'
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
 import { Spinner } from '@/components/ui/spinner'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { SidebarTrigger } from '@/components/ui/sidebar'
 import { cn } from '@/lib/utils'
 
 const OrderDeskPage = () => {
+  const queryClient = useQueryClient()
   const [attachmentsOpen, setAttachmentsOpen] = useState(false)
 
   const {
@@ -74,10 +76,64 @@ const OrderDeskPage = () => {
   } = useCreatePage()
 
   const { data: fieldConfig } = useQuery(getFieldConfigQuery(projectId))
+  const { data: priceLevels } = useQuery(getPriceLevelsQuery(projectId))
+  const { data: editableFields } = useQuery(getEditableFieldsQuery(projectId))
+  const { data: salespersons } = useQuery(getSalespersonsQuery())
+
+  const customerId = customer?.id ?? ''
+  const editableCustomerFields = editableFields?.customer ?? []
+
+  const invalidateCustomerDelayed = () => {
+    // Delay invalidation to allow mirror DB to sync before refetch
+    setTimeout(() => {
+      queryClient.invalidateQueries({ queryKey: CUSTOMER_QUERY_KEYS.detail(customerId) })
+      queryClient.invalidateQueries({ queryKey: CUSTOMER_QUERY_KEYS.lists() })
+    }, 3000)
+  }
+
+  const priceLevelMutation = useMutation({
+    mutationFn: (value: string) => customerService.update(customerId, { in_level: value }),
+    onSuccess: (updatedCustomer) => {
+      queryClient.setQueryData(
+        [...CUSTOMER_QUERY_KEYS.detail(customerId), projectId],
+        updatedCustomer,
+      )
+      invalidateCustomerDelayed()
+      toast.success('Price level updated')
+    },
+  })
+
+  const patchMutation = useMutation({
+    mutationFn: (payload: Record<string, unknown>) =>
+      customerService.update(customerId, payload),
+    onSuccess: (updatedCustomer) => {
+      queryClient.setQueryData(
+        [...CUSTOMER_QUERY_KEYS.detail(customerId), projectId],
+        updatedCustomer,
+      )
+      invalidateCustomerDelayed()
+      toast.success('Customer updated')
+    },
+    meta: { errorMessage: 'Failed to update customer' },
+  })
+
+  const handleFieldSave = useCallback(
+    (field: string, value: string) => {
+      if (!customerDetail) return
+      const current = (customerDetail[field] as string | null) ?? ''
+      if (value === current) return
+      patchMutation.mutate({ [field]: value || null })
+    },
+    [customerDetail, patchMutation],
+  )
+
+  const savingField = patchMutation.isPending
+    ? Object.keys(patchMutation.variables ?? {})[0] ?? null
+    : null
 
   const customerCustomFields = useMemo(() => {
     const entries = fieldConfig?.customer ?? []
-    return entries.filter((e) => !e.default && e.enabled)
+    return entries.filter((e) => !e.default && e.enabled && e.field !== 'salesman')
   }, [fieldConfig])
 
   const isCreating = busy.creatingProposal || busy.creatingOrder
@@ -179,6 +235,13 @@ const OrderDeskPage = () => {
                 <CustomerInfoPanel
                   customer={customerDetail}
                   fieldConfig={fieldConfig}
+                  priceLevels={priceLevels}
+                  onPriceLevelChange={(value) => priceLevelMutation.mutate(value)}
+                  editableFields={editableCustomerFields}
+                  onFieldSave={handleFieldSave}
+                  salespersons={salespersons}
+                  savingField={savingField}
+                  savingPriceLevel={priceLevelMutation.isPending}
                 />
 
                 {/* Custom fields */}
@@ -194,14 +257,16 @@ const OrderDeskPage = () => {
                         const label = getColumnLabel(entry.field, 'customer', fieldConfig)
                         const val = customerDetail[entry.field]
                         const strVal = val != null ? String(val) : null
+                        const isEditable = !!entry.editable || editableCustomerFields.includes(entry.field)
                         return (
                           <PropertyField
                             key={entry.field}
                             label={label}
                             value={strVal}
                             field={entry.field}
-                            onSave={() => {}}
-                            editable={false}
+                            onSave={handleFieldSave}
+                            editable={isEditable}
+                            saving={savingField === entry.field}
                           />
                         )
                       })}
@@ -354,25 +419,44 @@ const OrderDeskPage = () => {
         removingItemId={removingItemId}
       />
 
-      {/* Attachments dialog */}
-      <Dialog open={attachmentsOpen} onOpenChange={setAttachmentsOpen}>
-        <DialogContent className='flex max-h-[85vh] flex-col gap-0 overflow-hidden p-0 sm:max-w-md'>
-          <DialogHeader className='border-b border-border px-5 py-3'>
-            <DialogTitle className='flex items-center gap-2 text-[14px]'>
-              <Paperclip className='size-4 text-text-tertiary' />
-              Attachments
-            </DialogTitle>
-          </DialogHeader>
-          <div className='min-h-0 flex-1 overflow-y-auto'>
-            <EntityAttachments
-              ref={attachmentsRef}
-              entityType='proposal'
-              projectId={projectId}
-              mode='deferred'
-            />
+      {/* Attachments panel — always mounted to preserve pending files */}
+      {attachmentsOpen && (
+        <div
+          className='fixed inset-0 z-50 bg-black/10 supports-backdrop-filter:backdrop-blur-xs'
+          onClick={() => setAttachmentsOpen(false)}
+        />
+      )}
+      <div
+        className={cn(
+          'fixed top-1/2 left-1/2 z-50 flex w-full max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 flex-col rounded-xl bg-background text-sm ring-1 ring-foreground/10 sm:max-w-md',
+          'max-h-[85vh] gap-0 overflow-hidden p-0 transition-all duration-100',
+          attachmentsOpen
+            ? 'visible scale-100 opacity-100'
+            : 'pointer-events-none invisible scale-95 opacity-0',
+        )}
+      >
+        <div className='flex shrink-0 items-center justify-between border-b border-border px-5 py-3'>
+          <div className='flex items-center gap-2 text-[14px] font-medium'>
+            <Paperclip className='size-4 text-text-tertiary' />
+            Attachments
           </div>
-        </DialogContent>
-      </Dialog>
+          <button
+            type='button'
+            onClick={() => setAttachmentsOpen(false)}
+            className='inline-flex size-7 items-center justify-center rounded-md text-text-tertiary transition-colors hover:bg-bg-hover hover:text-foreground'
+          >
+            <XIcon className='size-4' />
+          </button>
+        </div>
+        <div className='min-h-0 flex-1 overflow-y-auto'>
+          <EntityAttachments
+            ref={attachmentsRef}
+            entityType='proposal'
+            projectId={projectId}
+            mode='deferred'
+          />
+        </div>
+      </div>
     </div>
   )
 }

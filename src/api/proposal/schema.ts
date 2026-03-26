@@ -18,6 +18,7 @@ export interface Proposal {
   total: string
   items?: ProposalItem[]
   assigned_user?: AssignedUser | null
+  assigned_users?: AssignedUser[]
   [key: string]: unknown
 }
 

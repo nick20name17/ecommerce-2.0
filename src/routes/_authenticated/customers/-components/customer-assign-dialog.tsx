@@ -1,21 +1,7 @@
-import { useMutation } from '@tanstack/react-query'
-import { UserPlus } from 'lucide-react'
-import { useEffect, useState } from 'react'
-
 import { CUSTOMER_QUERY_KEYS } from '@/api/customer/query'
 import type { Customer } from '@/api/customer/schema'
 import { customerService } from '@/api/customer/service'
-import { UserCombobox } from '@/components/common/user-combobox/user-combobox'
-import { Button } from '@/components/ui/button'
-import { getUserDisplayName } from '@/helpers/formatters'
-import {
-  Dialog,
-  DialogBody,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle
-} from '@/components/ui/dialog'
+import { MultiAssignDialog } from '@/components/common/multi-assign-dialog'
 
 interface CustomerAssignDialogProps {
   customer: Customer | null
@@ -28,79 +14,19 @@ export const CustomerAssignDialog = ({
   customer,
   open,
   onOpenChange,
-  projectId
+  projectId,
 }: CustomerAssignDialogProps) => {
-  const currentUserId = customer?.assigned_user?.id ?? null
-  const [selectedUserId, setSelectedUserId] = useState<number | null>(currentUserId)
-
-  useEffect(() => {
-    if (open && customer) setSelectedUserId(currentUserId)
-  }, [open, customer, currentUserId])
-
-  const assignMutation = useMutation({
-    mutationFn: ({ autoid, userId }: { autoid: string; userId: number | null }) =>
-      customerService.assign(autoid, { user_id: userId }, projectId ?? undefined),
-    meta: {
-      successMessage: 'Customer assigned successfully',
-      invalidatesQuery: CUSTOMER_QUERY_KEYS.all()
-    },
-    onSuccess: () => {
-      onOpenChange(false)
-    }
-  })
-
-  const handleConfirm = () => {
-    if (!customer) return
-    assignMutation.mutate({ autoid: customer.autoid, userId: selectedUserId })
-  }
-
   if (!customer) return null
 
   return (
-    <Dialog
+    <MultiAssignDialog
       open={open}
-      onOpenChange={(next) => {
-        if (!next) setSelectedUserId(currentUserId)
-        onOpenChange(next)
-      }}
-    >
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle className='flex items-center gap-2'>
-            <UserPlus className='size-5' />
-            Assign user
-          </DialogTitle>
-        </DialogHeader>
-        <DialogBody className='flex flex-col gap-4'>
-          <p className='text-text-tertiary text-[13px]'>
-            Assign a responsible user for{' '}
-            <span className='text-foreground font-medium'>{customer.l_name}</span>.
-          </p>
-          <UserCombobox
-            role='sale'
-            value={selectedUserId}
-            onChange={setSelectedUserId}
-            placeholder='Select user...'
-            valueLabel={
-              customer.assigned_user ? getUserDisplayName(customer.assigned_user) : null
-            }
-          />
-        </DialogBody>
-        <DialogFooter>
-          <Button
-            variant='outline'
-            onClick={() => onOpenChange(false)}
-          >
-            Cancel
-          </Button>
-          <Button
-            onClick={handleConfirm}
-            isPending={assignMutation.isPending}
-          >
-            Assign
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+      onOpenChange={onOpenChange}
+      entityLabel={customer.l_name}
+      assignedUsers={customer.assigned_users ?? (customer.assigned_user ? [customer.assigned_user] : [])}
+      assignFn={(payload) => customerService.assign(customer.autoid, payload, projectId)}
+      invalidateQueryKey={CUSTOMER_QUERY_KEYS.all()}
+      projectId={projectId}
+    />
   )
 }

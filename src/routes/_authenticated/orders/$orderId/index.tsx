@@ -14,7 +14,7 @@ import { getOrderDetailQuery, ORDER_QUERY_KEYS } from '@/api/order/query'
 import type { Order, OrderPatchPayload } from '@/api/order/schema'
 import { orderService } from '@/api/order/service'
 import { IOrders, PAGE_COLORS, PageHeaderIcon } from '@/components/ds'
-import { UserCombobox } from '@/components/common/user-combobox/user-combobox'
+import { OrderAssignDialog } from '@/routes/_authenticated/orders/-components/order-assign-dialog'
 import { CommandBarCreate } from '@/components/tasks/command-bar-create'
 import { ORDER_STATUS_CLASS, ORDER_STATUS_LABELS } from '@/constants/order'
 import type { OrderStatus } from '@/constants/order'
@@ -110,14 +110,7 @@ function OrderDetailPage() {
     return entries.filter((e) => !e.default && e.enabled)
   }, [fieldConfig])
 
-  const assignMutation = useMutation({
-    mutationFn: (userId: number | null) =>
-      orderService.assign(orderId, { user_id: userId }, projectId),
-    meta: {
-      successMessage: 'Assignee updated',
-      invalidatesQuery: ORDER_QUERY_KEYS.all(),
-    },
-  })
+  const [assignOpen, setAssignOpen] = useState(false)
 
   const pickMutation = useMutation({
     mutationFn: ({ itemAutoid, isPicked }: { itemAutoid: string; isPicked: boolean }) =>
@@ -272,6 +265,7 @@ function OrderDetailPage() {
   const dotColor = STATUS_DOT_COLORS[order.status] ?? 'bg-slate-400'
   const statusClass = ORDER_STATUS_CLASS[order.status as OrderStatus] ?? ''
   const items = order.items ?? []
+  const assignedUsers = order.assigned_users ?? (order.assigned_user ? [order.assigned_user] : [])
   const billToAddress = formatAddress(order.address1, order.address2, order.city, order.state, order.zip)
   const shipToAddress = formatAddress(order.c_address1, order.c_address2, order.c_city, order.c_state, order.c_zip)
 
@@ -323,24 +317,21 @@ function OrderDetailPage() {
 
         {/* Assignee */}
         <div className='hidden items-center gap-1.5 sm:flex'>
-          <UserCombobox
-            value={order.assigned_user?.id ?? null}
-            onChange={(userId) => assignMutation.mutate(userId)}
-            valueLabel={
-              order.assigned_user
-                ? getUserDisplayName(order.assigned_user)
-                : undefined
-            }
-            role='sale'
-            placeholder='Assign'
-            triggerClassName={cn(
+          <button
+            type='button'
+            className={cn(
               'inline-flex h-7 items-center gap-1.5 rounded-[5px] border px-2.5 text-[12px] font-medium transition-colors duration-[80ms]',
-              order.assigned_user
+              assignedUsers.length > 0
                 ? 'border-primary/20 bg-primary/[0.06] text-primary hover:bg-primary/[0.1]'
                 : 'border-border bg-bg-secondary text-text-secondary hover:bg-bg-active hover:text-foreground'
             )}
-            triggerIcon={<UserPlus className='size-3.5' />}
-          />
+            onClick={() => setAssignOpen(true)}
+          >
+            <UserPlus className='size-3.5' />
+            {assignedUsers.length > 0
+              ? assignedUsers.map((u) => getUserDisplayName(u)).join(', ')
+              : 'Assign'}
+          </button>
         </div>
 
         <div className='flex-1' />
@@ -428,7 +419,7 @@ function OrderDetailPage() {
                   <tr className='border-b border-border text-left'>
                     <th className='w-[36px] py-1.5 pl-6 pr-0 font-medium text-text-tertiary'>Picked</th>
                     <th className='w-[50px] px-3 py-1.5 font-medium text-text-tertiary'>Packed</th>
-                    <th className='min-w-[100px] px-3 py-1.5 font-medium text-text-tertiary'>Inventory</th>
+                    <th className='min-w-[130px] px-3 py-1.5 font-medium text-text-tertiary'>Inventory</th>
                     <th className='min-w-[200px] px-3 py-1.5 font-medium text-text-tertiary'>Description</th>
                     <th className='w-[70px] px-3 py-1.5 text-right font-medium text-text-tertiary'>Qty</th>
                     <th className='w-[60px] px-3 py-1.5 text-right font-medium text-text-tertiary'>Ship</th>
@@ -812,6 +803,14 @@ function OrderDetailPage() {
         projectId={projectId}
         open={attachmentsOpen}
         onOpenChange={setAttachmentsOpen}
+      />
+
+      {/* ── Assign dialog ── */}
+      <OrderAssignDialog
+        order={order}
+        open={assignOpen}
+        onOpenChange={setAssignOpen}
+        projectId={projectId}
       />
 
       {/* ── Shipping rates dialog ── */}

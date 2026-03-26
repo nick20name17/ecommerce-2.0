@@ -226,7 +226,8 @@ export function CartEditableTable({
                         <div className='flex items-center gap-1'>
                           <button
                             type='button'
-                            className='inline-flex h-6 items-center gap-1 rounded-[5px] border border-border bg-bg-secondary px-1.5 text-[11px] font-medium text-text-tertiary transition-colors duration-75 hover:bg-bg-active hover:text-foreground'
+                            disabled={!item.configurations?.length}
+                            className='inline-flex h-6 items-center gap-1 rounded-[5px] border border-border bg-bg-secondary px-1.5 text-[11px] font-medium text-text-tertiary transition-colors duration-75 hover:bg-bg-active hover:text-foreground disabled:pointer-events-none disabled:opacity-40'
                             onClick={() => onEdit(item)}
                           >
                             <Settings2 className='size-3' />

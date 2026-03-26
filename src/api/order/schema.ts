@@ -52,6 +52,7 @@ export interface Order {
   items?: OrderItem[]
   shipments?: Shipment[]
   assigned_user?: AssignedUser | null
+  assigned_users?: AssignedUser[]
   [key: string]: unknown
 }
 

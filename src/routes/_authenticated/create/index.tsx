@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useRouter } from '@tanstack/react-router'
 import { createFileRoute } from '@tanstack/react-router'
 import {
@@ -12,7 +12,8 @@ import {
   ShoppingCart,
   User,
 } from 'lucide-react'
-import { useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
+import { toast } from 'sonner'
 
 import { CartEditableTable } from './-components/cart-editable-table'
 import { CartSummary } from './-components/cart-summary'
@@ -23,7 +24,12 @@ import { useCreatePage, type AddressFields } from './-components/use-create-page
 import {
   EntityAttachments,
 } from '@/components/common/entity-attachments/entity-attachments'
+import { CUSTOMER_QUERY_KEYS } from '@/api/customer/query'
+import { customerService } from '@/api/customer/service'
+import { getEditableFieldsQuery } from '@/api/data/query'
 import { getFieldConfigQuery } from '@/api/field-config/query'
+import { getPriceLevelsQuery } from '@/api/price-level/query'
+import { getSalespersonsQuery } from '@/api/salesperson/query'
 import { getColumnLabel } from '@/helpers/dynamic-columns'
 import { CustomerInfoPanel } from '@/routes/_authenticated/customers/$customerId/-components/customer-info-card'
 import { PropertyField } from '@/routes/_authenticated/orders/$orderId/-components/order-properties'
@@ -40,6 +46,7 @@ import { cn } from '@/lib/utils'
 
 const CreatePage = () => {
   const router = useRouter()
+  const queryClient = useQueryClient()
   const [attachmentsOpen, setAttachmentsOpen] = useState(false)
 
   const {
@@ -82,10 +89,63 @@ const CreatePage = () => {
   } = useCreatePage()
 
   const { data: fieldConfig } = useQuery(getFieldConfigQuery(projectId))
+  const { data: priceLevels } = useQuery(getPriceLevelsQuery(projectId))
+  const { data: editableFields } = useQuery(getEditableFieldsQuery(projectId))
+  const { data: salespersons } = useQuery(getSalespersonsQuery())
+
+  const customerId = customer?.id ?? ''
+  const editableCustomerFields = editableFields?.customer ?? []
+
+  const invalidateCustomerDelayed = () => {
+    setTimeout(() => {
+      queryClient.invalidateQueries({ queryKey: CUSTOMER_QUERY_KEYS.detail(customerId) })
+      queryClient.invalidateQueries({ queryKey: CUSTOMER_QUERY_KEYS.lists() })
+    }, 3000)
+  }
+
+  const priceLevelMutation = useMutation({
+    mutationFn: (value: string) => customerService.update(customerId, { in_level: value }),
+    onSuccess: (updatedCustomer) => {
+      queryClient.setQueryData(
+        [...CUSTOMER_QUERY_KEYS.detail(customerId), projectId],
+        updatedCustomer,
+      )
+      invalidateCustomerDelayed()
+      toast.success('Price level updated')
+    },
+  })
+
+  const patchMutation = useMutation({
+    mutationFn: (payload: Record<string, unknown>) =>
+      customerService.update(customerId, payload),
+    onSuccess: (updatedCustomer) => {
+      queryClient.setQueryData(
+        [...CUSTOMER_QUERY_KEYS.detail(customerId), projectId],
+        updatedCustomer,
+      )
+      invalidateCustomerDelayed()
+      toast.success('Customer updated')
+    },
+    meta: { errorMessage: 'Failed to update customer' },
+  })
+
+  const handleFieldSave = useCallback(
+    (field: string, value: string) => {
+      if (!customerDetail) return
+      const current = (customerDetail[field] as string | null) ?? ''
+      if (value === current) return
+      patchMutation.mutate({ [field]: value || null })
+    },
+    [customerDetail, patchMutation],
+  )
+
+  const savingField = patchMutation.isPending
+    ? Object.keys(patchMutation.variables ?? {})[0] ?? null
+    : null
 
   const customerCustomFields = useMemo(() => {
     const entries = fieldConfig?.customer ?? []
-    return entries.filter((e) => !e.default && e.enabled)
+    return entries.filter((e) => !e.default && e.enabled && e.field !== 'salesman')
   }, [fieldConfig])
 
   const isCreating = busy.creatingProposal || busy.creatingOrder
@@ -198,6 +258,13 @@ const CreatePage = () => {
                 <CustomerInfoPanel
                   customer={customerDetail}
                   fieldConfig={fieldConfig}
+                  priceLevels={priceLevels}
+                  onPriceLevelChange={(value) => priceLevelMutation.mutate(value)}
+                  editableFields={editableCustomerFields}
+                  onFieldSave={handleFieldSave}
+                  salespersons={salespersons}
+                  savingField={savingField}
+                  savingPriceLevel={priceLevelMutation.isPending}
                 />
 
                 {/* Custom fields */}
@@ -213,14 +280,16 @@ const CreatePage = () => {
                         const label = getColumnLabel(entry.field, 'customer', fieldConfig)
                         const val = customerDetail[entry.field]
                         const strVal = val != null ? String(val) : null
+                        const isEditable = !!entry.editable || editableCustomerFields.includes(entry.field)
                         return (
                           <PropertyField
                             key={entry.field}
                             label={label}
                             value={strVal}
                             field={entry.field}
-                            onSave={() => {}}
-                            editable={false}
+                            onSave={handleFieldSave}
+                            editable={isEditable}
+                            saving={savingField === entry.field}
                           />
                         )
                       })}

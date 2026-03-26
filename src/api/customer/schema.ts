@@ -20,6 +20,7 @@ export interface Customer {
   inactive?: boolean
   last_order_date?: string | null
   assigned_user?: AssignedUser | null
+  assigned_users?: AssignedUser[]
   [key: string]: unknown
 }
 
