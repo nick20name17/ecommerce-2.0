@@ -8,14 +8,12 @@ import { Skeleton } from '@/components/ui/skeleton'
 
 const STATUS_COLORS: Record<string, string> = {
   [ORDER_STATUS.unprocessed]: '#f59e0b',
-  [ORDER_STATUS.open]: '#3b82f6',
-  [ORDER_STATUS.onHold]: '#94a3b8',
+  [ORDER_STATUS.outstandingInvoice]: '#3b82f6',
 }
 
 const TRACKED_STATUSES: OrderStatus[] = [
   ORDER_STATUS.unprocessed,
-  ORDER_STATUS.open,
-  ORDER_STATUS.onHold,
+  ORDER_STATUS.outstandingInvoice,
 ]
 
 interface DashboardOrdersTableProps {

@@ -8,6 +8,7 @@ export interface Order {
   id: string
   invoice: string
   name: string
+  c_id?: string
   inv_date: string | null
   due_date: string | null
   status: OrderStatus

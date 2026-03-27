@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { createFileRoute, useRouter } from '@tanstack/react-router'
-import { Check, ChevronLeft, Copy, ExternalLink, ListTodo, Package, PackageCheck, Paperclip, StickyNote, Trash2, Truck, UserPlus, XCircle } from 'lucide-react'
+import { Check, ChevronLeft, ClipboardList, Copy, ExternalLink, ListTodo, Package, PackageCheck, Paperclip, StickyNote, Trash2, Truck, UserPlus, XCircle } from 'lucide-react'
 
 import { PageEmpty } from '@/components/common/page-empty'
 import { EntityAttachmentsDialog } from '@/components/common/entity-attachments/entity-attachments-dialog'
@@ -15,6 +15,7 @@ import type { Order, OrderPatchPayload } from '@/api/order/schema'
 import { orderService } from '@/api/order/service'
 import { IOrders, PAGE_COLORS, PageHeaderIcon } from '@/components/ds'
 import { OrderAssignDialog } from '@/routes/_authenticated/orders/-components/order-assign-dialog'
+import { StartPickingDialog } from '@/components/common/start-picking-dialog'
 import { CommandBarCreate } from '@/components/tasks/command-bar-create'
 import { ORDER_STATUS_CLASS, ORDER_STATUS_LABELS } from '@/constants/order'
 import type { OrderStatus } from '@/constants/order'
@@ -111,6 +112,7 @@ function OrderDetailPage() {
   }, [fieldConfig])
 
   const [assignOpen, setAssignOpen] = useState(false)
+  const [pickingOpen, setPickingOpen] = useState(false)
 
   const pickMutation = useMutation({
     mutationFn: ({ itemAutoid, isPicked }: { itemAutoid: string; isPicked: boolean }) =>
@@ -348,6 +350,20 @@ function OrderDetailPage() {
             </button>
           </TooltipTrigger>
           <TooltipContent>Manage Shipping</TooltipContent>
+        </Tooltip>
+
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <button
+              type='button'
+              className='inline-flex h-7 items-center gap-1.5 rounded-[5px] border border-border bg-bg-secondary px-2.5 text-[12px] font-medium text-text-secondary transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground'
+              onClick={() => setPickingOpen(true)}
+            >
+              <ClipboardList className='size-3.5' />
+              <span className='hidden sm:inline'>Start Picking</span>
+            </button>
+          </TooltipTrigger>
+          <TooltipContent>Start picking for this customer</TooltipContent>
         </Tooltip>
 
         <Tooltip>
@@ -811,6 +827,14 @@ function OrderDetailPage() {
         open={assignOpen}
         onOpenChange={setAssignOpen}
         projectId={projectId}
+      />
+
+      {/* ── Picking dialog ── */}
+      <StartPickingDialog
+        open={pickingOpen}
+        onOpenChange={setPickingOpen}
+        customerId={String(order.c_id ?? order.id ?? '')}
+        customerName={order.name}
       />
 
       {/* ── Shipping rates dialog ── */}

@@ -19,12 +19,10 @@ const PING_INTERVAL_MS = 30000
 const getWsOrigin = (): string => API_ORIGIN.replace(/^http/, 'ws')
 
 export interface WSNotificationPayload {
-  type: string
+  event_type: string
   entity: string
-  action?: string
   autoid: string
   user?: string
-  timestamp?: string
   data?: Record<string, unknown>
 }
 
@@ -62,26 +60,21 @@ const getInvalidationKeys = (entity: string): readonly (readonly unknown[])[] =>
 }
 
 const getToastMessage = (payload: WSNotificationPayload): string => {
-  const { entity, action, autoid, type } = payload
+  const { entity, event_type, autoid } = payload
   const entityLabel = entity === 'order' ? 'Order' : entity === 'proposal' ? 'Proposal' : entity
-  const actionLabel =
-    action ||
-    (typeof type === 'string' && type.includes('_')
-      ? type.split('_').slice(1).join('_')
-      : 'updated')
-  return `${entityLabel} ${autoid} ${actionLabel}`
+  return `${entityLabel} ${autoid} ${event_type}`
 }
 
-const isNotificationPayload = (
-  msg: unknown
-): msg is WSNotificationPayload & { entity: string; autoid: string } => {
+const isNotificationPayload = (msg: unknown): msg is WSNotificationPayload => {
   return (
     typeof msg === 'object' &&
     msg !== null &&
     'entity' in msg &&
     'autoid' in msg &&
+    'event_type' in msg &&
     typeof (msg as WSNotificationPayload).entity === 'string' &&
     typeof (msg as WSNotificationPayload).autoid === 'string' &&
+    typeof (msg as WSNotificationPayload).event_type === 'string' &&
     (msg as WSNotificationPayload).entity !== ''
   )
 }
@@ -133,24 +126,21 @@ export const useNotificationsWebSocket = ({
         return
 
       if (isNotificationPayload(msg)) {
-        const payload = msg as WSNotificationPayload
-        const action =
-          payload.action ??
-          (payload.type?.includes('_') ? payload.type.split('_').slice(1).join('_') : '')
-        if (action === 'created' && (payload.entity === 'order' || payload.entity === 'proposal')) {
-          resolvePendingCreatedAutoid(payload.entity, payload.autoid)
+        const { event_type, entity, autoid } = msg
+        if (event_type === 'created' && (entity === 'order' || entity === 'proposal')) {
+          resolvePendingCreatedAutoid(entity, autoid)
         }
-        const keys = getInvalidationKeys(payload.entity)
+        const keys = getInvalidationKeys(entity)
         for (const queryKey of keys) {
           queryClient.invalidateQueries({ queryKey })
         }
         if (showToasts) {
           const isCreateOrDeleteOrderProposal =
-            (payload.entity === 'order' || payload.entity === 'proposal') &&
-            (action === 'created' || action === 'deleted')
-          const isNote = payload.entity === 'note'
+            (entity === 'order' || entity === 'proposal') &&
+            (event_type === 'created' || event_type === 'deleted')
+          const isNote = entity === 'note'
           if (!isCreateOrDeleteOrderProposal && !isNote) {
-            toast.info(getToastMessage(payload))
+            toast.info(getToastMessage(msg))
           }
         }
       }

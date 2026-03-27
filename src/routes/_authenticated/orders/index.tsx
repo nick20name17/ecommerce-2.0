@@ -4,6 +4,7 @@ import {
   ArrowDown,
   ArrowUp,
   Check,
+  ClipboardList,
   Link2Off,
   ListTodo,
   Loader2,
@@ -21,6 +22,7 @@ import {
 import { useEffect, useRef, useState } from 'react'
 
 import { OrderAssignDialog } from './-components/order-assign-dialog'
+import { StartPickingDialog } from '@/components/common/start-picking-dialog'
 import { OrderDeleteDialog } from './-components/order-delete-dialog'
 import { getFieldConfigQuery } from '@/api/field-config/query'
 import { ORDER_QUERY_KEYS, getOrdersQuery } from '@/api/order/query'
@@ -85,11 +87,7 @@ function getInitials(name: string) {
 const STATUS_DOT_COLORS: Record<string, string> = {
   U: 'bg-amber-500',
   O: 'bg-blue-500',
-  X: 'bg-emerald-500',
-  P: 'bg-green-500',
-  V: 'bg-red-500',
-  H: 'bg-slate-400',
-  A: 'bg-purple-500'
+  X: 'bg-emerald-500'
 }
 
 type OrderSortField = 'invoice' | 'name' | 'inv_date' | 'total' | 'balance'
@@ -97,11 +95,8 @@ type SortDir = 'asc' | 'desc'
 
 const FILTER_STATUSES: { value: OrderStatus; label: string }[] = [
   { value: ORDER_STATUS.unprocessed, label: 'Unprocessed' },
-  { value: ORDER_STATUS.open, label: 'Open' },
-  { value: ORDER_STATUS.closed, label: 'Closed' },
-  { value: ORDER_STATUS.paid, label: 'Paid' },
-  { value: ORDER_STATUS.voided, label: 'Voided' },
-  { value: ORDER_STATUS.onHold, label: 'On Hold' }
+  { value: ORDER_STATUS.outstandingInvoice, label: 'Outstanding' },
+  { value: ORDER_STATUS.paidInvoice, label: 'Paid Invoice' }
 ]
 
 // ── Page Component ───────────────────────────────────────────
@@ -133,6 +128,7 @@ const OrdersPage = () => {
   const [orderForNotes, setOrderForNotes] = useState<Order | null>(null)
   const [orderToAssign, setOrderToAssign] = useState<Order | null>(null)
   const [orderForTask, setOrderForTask] = useState<Order | null>(null)
+  const [orderForPicking, setOrderForPicking] = useState<Order | null>(null)
 
   const ordering = sortField ? (sortDir === 'desc' ? `-${sortField}` : sortField) : undefined
 
@@ -200,7 +196,7 @@ const OrdersPage = () => {
     notes: true,
     assigned_to: assignedToMe ? 'me' : undefined,
     preset_id: activePresetId ?? undefined,
-    fields: 'salesman',
+    fields: 'salesman,notes_count',
   }
 
   const { data, refetch, isLoading } = useQuery(getOrdersQuery(params))
@@ -290,14 +286,14 @@ const OrdersPage = () => {
                   key={s.value}
                   type='button'
                   className={cn(
-                    'flex w-full items-center gap-2 rounded-[5px] px-2 py-[3px] text-left text-[13px] font-medium',
+                    'flex w-full items-center gap-2 whitespace-nowrap rounded-[5px] px-2 py-[3px] text-left text-[13px] font-medium',
                     'hover:bg-bg-hover transition-colors duration-[80ms]'
                   )}
                   onClick={() => selectStatus(s.value)}
                 >
                   <div
                     className={cn(
-                      'flex size-3.5 items-center justify-center rounded-full border transition-colors duration-[80ms]',
+                      'flex size-3.5 shrink-0 items-center justify-center rounded-full border transition-colors duration-[80ms]',
                       selected ? 'border-primary bg-primary' : 'border-border'
                     )}
                   >
@@ -529,6 +525,7 @@ const OrdersPage = () => {
                 onNotes={setOrderForNotes}
                 onAssign={setOrderToAssign}
                 onCreateTask={setOrderForTask}
+                onPick={setOrderForPicking}
                 onClick={() =>
                   navigate({
                     to: '/orders/$orderId',
@@ -585,6 +582,12 @@ const OrdersPage = () => {
           defaultLinkedOrderAutoid={orderForTask.autoid}
         />
       )}
+      <StartPickingDialog
+        open={!!orderForPicking}
+        onOpenChange={(open) => !open && setOrderForPicking(null)}
+        customerId={String(orderForPicking?.c_id ?? orderForPicking?.id ?? '')}
+        customerName={orderForPicking?.name ?? ''}
+      />
     </div>
   )
 }
@@ -618,6 +621,7 @@ function OrderRow({
   onNotes,
   onAssign,
   onCreateTask,
+  onPick,
   onClick
 }: {
   order: Order
@@ -630,6 +634,7 @@ function OrderRow({
   onNotes: (order: Order) => void
   onAssign: (order: Order) => void
   onCreateTask: (order: Order) => void
+  onPick: (order: Order) => void
   onClick: () => void
 }) {
   const invoice = order.invoice?.trim() || `#${order.id}`
@@ -637,7 +642,7 @@ function OrderRow({
   const statusClass = ORDER_STATUS_CLASS[order.status] ?? ''
   const dotColor = STATUS_DOT_COLORS[order.status] ?? 'bg-slate-400'
 
-  const noteCount = Array.isArray(order.notes) ? order.notes.length : 0
+  const noteCount = typeof order.notes_count === 'number' ? order.notes_count : Array.isArray(order.notes) ? order.notes.length : 0
 
   if (isMobile) {
     return (
@@ -748,43 +753,50 @@ function OrderRow({
 
       {/* Responsible */}
       <div className='w-[120px] shrink-0'>
-        {canAssign && (
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <button
-                type='button'
-                className={cn(
-                  'hover:bg-bg-active inline-flex items-center gap-1.5 rounded-[5px] px-1 py-0.5 text-[13px] transition-colors duration-75',
-                  order.assigned_user ? 'text-text-secondary' : 'text-text-tertiary'
-                )}
-                onClick={(e) => {
-                  e.stopPropagation()
-                  onAssign(order)
-                }}
-              >
-                {order.assigned_user ? (
-                  <>
-                    <InitialsAvatar
-                      initials={getInitials(getUserDisplayName(order.assigned_user))}
-                      size={16}
-                    />
-                    <span className='truncate'>{getUserDisplayName(order.assigned_user)}</span>
-                  </>
-                ) : (
-                  <>
-                    <UserPlus className='size-3.5' />
-                    <span>Assign</span>
-                  </>
-                )}
-              </button>
-            </TooltipTrigger>
-            <TooltipContent>
-              {order.assigned_user
-                ? `Assigned to ${getUserDisplayName(order.assigned_user)} — click to change`
-                : 'Assign a sales user'}
-            </TooltipContent>
-          </Tooltip>
-        )}
+        {canAssign && (() => {
+          const assigned = order.assigned_users?.length ? order.assigned_users : order.assigned_user ? [order.assigned_user] : []
+          const first = assigned[0]
+          return (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  type='button'
+                  className={cn(
+                    'hover:bg-bg-active inline-flex items-center gap-1.5 rounded-[5px] px-1 py-0.5 text-[13px] transition-colors duration-75',
+                    first ? 'text-text-secondary' : 'text-text-tertiary'
+                  )}
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    onAssign(order)
+                  }}
+                >
+                  {first ? (
+                    <>
+                      <InitialsAvatar
+                        initials={getInitials(getUserDisplayName(first))}
+                        size={16}
+                      />
+                      <span className='truncate'>{getUserDisplayName(first)}</span>
+                      {assigned.length > 1 && (
+                        <span className='text-[11px] text-text-tertiary'>+{assigned.length - 1}</span>
+                      )}
+                    </>
+                  ) : (
+                    <>
+                      <UserPlus className='size-3.5' />
+                      <span>Assign</span>
+                    </>
+                  )}
+                </button>
+              </TooltipTrigger>
+              <TooltipContent>
+                {first
+                  ? `Assigned to ${assigned.map((u) => getUserDisplayName(u)).join(', ')} — click to change`
+                  : 'Assign a sales user'}
+              </TooltipContent>
+            </Tooltip>
+          )
+        })()}
       </div>
 
       {/* Notes */}
@@ -839,6 +851,13 @@ function OrderRow({
                 Assign
               </DropdownMenuItem>
             )}
+            <DropdownMenuItem
+              className='cursor-pointer gap-2 rounded-[6px] px-2 py-1 text-[13px]'
+              onClick={() => onPick(order)}
+            >
+              <ClipboardList className='size-3.5' />
+              Start Picking
+            </DropdownMenuItem>
             <DropdownMenuItem
               className='cursor-pointer gap-2 rounded-[6px] px-2 py-1 text-[13px]'
               onClick={() => onCreateTask(order)}

@@ -3,6 +3,7 @@ import { useMutation, useQuery } from '@tanstack/react-query'
 import { Controller, FormProvider, useForm, useFormContext, useWatch } from 'react-hook-form'
 
 import { getProjectsQuery } from '@/api/project/query'
+import { getSalespersonsQuery } from '@/api/salesperson/query'
 import { USER_QUERY_KEYS } from '@/api/user/query'
 import {
   type CreateUserFormValues,
@@ -61,6 +62,45 @@ export const UserModal = ({ user, open, onOpenChange }: UserModalProps) => {
         )}
       </DialogContent>
     </Dialog>
+  )
+}
+
+const SalesmanField = () => {
+  const { control } = useFormContext()
+  const { data: salespersons = [] } = useQuery(getSalespersonsQuery())
+
+  return (
+    <Controller
+      name='salesman'
+      control={control}
+      render={({ field, fieldState }) => (
+        <Field data-invalid={fieldState.invalid}>
+          <FieldLabel>Salesman</FieldLabel>
+          <Select
+            value={field.value || ''}
+            onValueChange={field.onChange}
+          >
+            <SelectTrigger
+              className='w-full'
+              aria-invalid={fieldState.invalid}
+            >
+              <SelectValue placeholder='Select salesman' />
+            </SelectTrigger>
+            <SelectContent>
+              {salespersons.map((sp) => (
+                <SelectItem
+                  key={sp.autoid}
+                  value={sp.id}
+                >
+                  {sp.id}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+        </Field>
+      )}
+    />
   )
 }
 
@@ -143,21 +183,7 @@ const SharedFields = ({ editingUser }: { editingUser?: User | null }) => {
         )}
       />
 
-      <Controller
-        name='salesman'
-        control={control}
-        render={({ field, fieldState }) => (
-          <Field data-invalid={fieldState.invalid}>
-            <FieldLabel htmlFor='salesman'>Salesman</FieldLabel>
-            <Input
-              {...field}
-              id='salesman'
-              placeholder='e.g. AARON'
-            />
-            {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-          </Field>
-        )}
-      />
+      <SalesmanField />
 
       <Controller
         name='role'

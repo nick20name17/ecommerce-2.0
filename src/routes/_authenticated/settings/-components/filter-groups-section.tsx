@@ -93,12 +93,13 @@ const ENTITY_META: Record<
 }
 
 /** Known dropdown options for specific fields */
-const KNOWN_OPTIONS: Record<string, Record<string, { value: string; label: string; className?: string }[]>> = {
+const KNOWN_OPTIONS: Record<string, Record<string, { value: string; label: string; className?: string; dotClass?: string }[]>> = {
   order: {
     status: Object.entries(ORDER_STATUS_LABELS).map(([value, label]) => ({
       value,
       label,
       className: ORDER_STATUS_CLASS[value as OrderStatus],
+      dotClass: { U: 'bg-amber-500', O: 'bg-blue-500', X: 'bg-emerald-500' }[value],
     })),
   },
   proposal: {
@@ -106,6 +107,7 @@ const KNOWN_OPTIONS: Record<string, Record<string, { value: string; label: strin
       value,
       label,
       className: PROPOSAL_STATUS_CLASS[value as ProposalStatus],
+      dotClass: { O: 'bg-blue-500', A: 'bg-green-500', L: 'bg-red-500', C: 'bg-slate-400', E: 'bg-amber-500', N: 'bg-violet-500', H: 'bg-slate-400' }[value],
     })),
   },
   customer: {
@@ -585,7 +587,7 @@ function FilterPresetDialog({
                         value={row.field}
                         onValueChange={(v) => updateRow(row.id, { field: v, value: '' })}
                       >
-                        <SelectTrigger size='sm' className='min-w-0 flex-1'>
+                        <SelectTrigger size='sm' className='w-[130px] shrink-0'>
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -624,7 +626,12 @@ function FilterPresetDialog({
                             </SelectTrigger>
                             <SelectContent>
                               {knownOpts.map((opt) => (
-                                <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+                                <SelectItem key={opt.value} value={opt.value}>
+                                  <span className='flex items-center gap-2'>
+                                    {opt.dotClass && <span className={cn('size-2 shrink-0 rounded-full', opt.dotClass)} />}
+                                    {opt.label}
+                                  </span>
+                                </SelectItem>
                               ))}
                             </SelectContent>
                           </Select>

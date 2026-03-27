@@ -19,6 +19,7 @@ import { Route as AuthenticatedSettingsIndexRouteImport } from './routes/_authen
 import { Route as AuthenticatedProposalsIndexRouteImport } from './routes/_authenticated/proposals/index'
 import { Route as AuthenticatedProjectsIndexRouteImport } from './routes/_authenticated/projects/index'
 import { Route as AuthenticatedProfileIndexRouteImport } from './routes/_authenticated/profile/index'
+import { Route as AuthenticatedPickListsIndexRouteImport } from './routes/_authenticated/pick-lists/index'
 import { Route as AuthenticatedOrdersIndexRouteImport } from './routes/_authenticated/orders/index'
 import { Route as AuthenticatedOrderDeskIndexRouteImport } from './routes/_authenticated/order-desk/index'
 import { Route as AuthenticatedNavOptionsIndexRouteImport } from './routes/_authenticated/nav-options/index'
@@ -28,6 +29,7 @@ import { Route as AuthenticatedCreateIndexRouteImport } from './routes/_authenti
 import { Route as AuthSignInIndexRouteImport } from './routes/_auth/sign-in/index'
 import { Route as AuthenticatedTasksTaskIdIndexRouteImport } from './routes/_authenticated/tasks/$taskId/index'
 import { Route as AuthenticatedProposalsProposalIdIndexRouteImport } from './routes/_authenticated/proposals/$proposalId/index'
+import { Route as AuthenticatedPickListsPickListIdIndexRouteImport } from './routes/_authenticated/pick-lists/$pickListId/index'
 import { Route as AuthenticatedOrdersOrderIdIndexRouteImport } from './routes/_authenticated/orders/$orderId/index'
 import { Route as AuthenticatedCustomersCustomerIdIndexRouteImport } from './routes/_authenticated/customers/$customerId/index'
 
@@ -84,6 +86,12 @@ const AuthenticatedProfileIndexRoute =
     path: '/profile/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedPickListsIndexRoute =
+  AuthenticatedPickListsIndexRouteImport.update({
+    id: '/pick-lists/',
+    path: '/pick-lists/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedOrdersIndexRoute =
   AuthenticatedOrdersIndexRouteImport.update({
     id: '/orders/',
@@ -136,6 +144,12 @@ const AuthenticatedProposalsProposalIdIndexRoute =
     path: '/proposals/$proposalId/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedPickListsPickListIdIndexRoute =
+  AuthenticatedPickListsPickListIdIndexRouteImport.update({
+    id: '/pick-lists/$pickListId/',
+    path: '/pick-lists/$pickListId/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedOrdersOrderIdIndexRoute =
   AuthenticatedOrdersOrderIdIndexRouteImport.update({
     id: '/orders/$orderId/',
@@ -158,6 +172,7 @@ export interface FileRoutesByFullPath {
   '/nav-options/': typeof AuthenticatedNavOptionsIndexRoute
   '/order-desk/': typeof AuthenticatedOrderDeskIndexRoute
   '/orders/': typeof AuthenticatedOrdersIndexRoute
+  '/pick-lists/': typeof AuthenticatedPickListsIndexRoute
   '/profile/': typeof AuthenticatedProfileIndexRoute
   '/projects/': typeof AuthenticatedProjectsIndexRoute
   '/proposals/': typeof AuthenticatedProposalsIndexRoute
@@ -167,6 +182,7 @@ export interface FileRoutesByFullPath {
   '/users/': typeof AuthenticatedUsersIndexRoute
   '/customers/$customerId/': typeof AuthenticatedCustomersCustomerIdIndexRoute
   '/orders/$orderId/': typeof AuthenticatedOrdersOrderIdIndexRoute
+  '/pick-lists/$pickListId/': typeof AuthenticatedPickListsPickListIdIndexRoute
   '/proposals/$proposalId/': typeof AuthenticatedProposalsProposalIdIndexRoute
   '/tasks/$taskId/': typeof AuthenticatedTasksTaskIdIndexRoute
 }
@@ -179,6 +195,7 @@ export interface FileRoutesByTo {
   '/nav-options': typeof AuthenticatedNavOptionsIndexRoute
   '/order-desk': typeof AuthenticatedOrderDeskIndexRoute
   '/orders': typeof AuthenticatedOrdersIndexRoute
+  '/pick-lists': typeof AuthenticatedPickListsIndexRoute
   '/profile': typeof AuthenticatedProfileIndexRoute
   '/projects': typeof AuthenticatedProjectsIndexRoute
   '/proposals': typeof AuthenticatedProposalsIndexRoute
@@ -188,6 +205,7 @@ export interface FileRoutesByTo {
   '/users': typeof AuthenticatedUsersIndexRoute
   '/customers/$customerId': typeof AuthenticatedCustomersCustomerIdIndexRoute
   '/orders/$orderId': typeof AuthenticatedOrdersOrderIdIndexRoute
+  '/pick-lists/$pickListId': typeof AuthenticatedPickListsPickListIdIndexRoute
   '/proposals/$proposalId': typeof AuthenticatedProposalsProposalIdIndexRoute
   '/tasks/$taskId': typeof AuthenticatedTasksTaskIdIndexRoute
 }
@@ -203,6 +221,7 @@ export interface FileRoutesById {
   '/_authenticated/nav-options/': typeof AuthenticatedNavOptionsIndexRoute
   '/_authenticated/order-desk/': typeof AuthenticatedOrderDeskIndexRoute
   '/_authenticated/orders/': typeof AuthenticatedOrdersIndexRoute
+  '/_authenticated/pick-lists/': typeof AuthenticatedPickListsIndexRoute
   '/_authenticated/profile/': typeof AuthenticatedProfileIndexRoute
   '/_authenticated/projects/': typeof AuthenticatedProjectsIndexRoute
   '/_authenticated/proposals/': typeof AuthenticatedProposalsIndexRoute
@@ -212,6 +231,7 @@ export interface FileRoutesById {
   '/_authenticated/users/': typeof AuthenticatedUsersIndexRoute
   '/_authenticated/customers/$customerId/': typeof AuthenticatedCustomersCustomerIdIndexRoute
   '/_authenticated/orders/$orderId/': typeof AuthenticatedOrdersOrderIdIndexRoute
+  '/_authenticated/pick-lists/$pickListId/': typeof AuthenticatedPickListsPickListIdIndexRoute
   '/_authenticated/proposals/$proposalId/': typeof AuthenticatedProposalsProposalIdIndexRoute
   '/_authenticated/tasks/$taskId/': typeof AuthenticatedTasksTaskIdIndexRoute
 }
@@ -226,6 +246,7 @@ export interface FileRouteTypes {
     | '/nav-options/'
     | '/order-desk/'
     | '/orders/'
+    | '/pick-lists/'
     | '/profile/'
     | '/projects/'
     | '/proposals/'
@@ -235,6 +256,7 @@ export interface FileRouteTypes {
     | '/users/'
     | '/customers/$customerId/'
     | '/orders/$orderId/'
+    | '/pick-lists/$pickListId/'
     | '/proposals/$proposalId/'
     | '/tasks/$taskId/'
   fileRoutesByTo: FileRoutesByTo
@@ -247,6 +269,7 @@ export interface FileRouteTypes {
     | '/nav-options'
     | '/order-desk'
     | '/orders'
+    | '/pick-lists'
     | '/profile'
     | '/projects'
     | '/proposals'
@@ -256,6 +279,7 @@ export interface FileRouteTypes {
     | '/users'
     | '/customers/$customerId'
     | '/orders/$orderId'
+    | '/pick-lists/$pickListId'
     | '/proposals/$proposalId'
     | '/tasks/$taskId'
   id:
@@ -270,6 +294,7 @@ export interface FileRouteTypes {
     | '/_authenticated/nav-options/'
     | '/_authenticated/order-desk/'
     | '/_authenticated/orders/'
+    | '/_authenticated/pick-lists/'
     | '/_authenticated/profile/'
     | '/_authenticated/projects/'
     | '/_authenticated/proposals/'
@@ -279,6 +304,7 @@ export interface FileRouteTypes {
     | '/_authenticated/users/'
     | '/_authenticated/customers/$customerId/'
     | '/_authenticated/orders/$orderId/'
+    | '/_authenticated/pick-lists/$pickListId/'
     | '/_authenticated/proposals/$proposalId/'
     | '/_authenticated/tasks/$taskId/'
   fileRoutesById: FileRoutesById
@@ -360,6 +386,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedProfileIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/pick-lists/': {
+      id: '/_authenticated/pick-lists/'
+      path: '/pick-lists'
+      fullPath: '/pick-lists/'
+      preLoaderRoute: typeof AuthenticatedPickListsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/orders/': {
       id: '/_authenticated/orders/'
       path: '/orders'
@@ -423,6 +456,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedProposalsProposalIdIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/pick-lists/$pickListId/': {
+      id: '/_authenticated/pick-lists/$pickListId/'
+      path: '/pick-lists/$pickListId'
+      fullPath: '/pick-lists/$pickListId/'
+      preLoaderRoute: typeof AuthenticatedPickListsPickListIdIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/orders/$orderId/': {
       id: '/_authenticated/orders/$orderId/'
       path: '/orders/$orderId'
@@ -460,6 +500,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedNavOptionsIndexRoute: typeof AuthenticatedNavOptionsIndexRoute
   AuthenticatedOrderDeskIndexRoute: typeof AuthenticatedOrderDeskIndexRoute
   AuthenticatedOrdersIndexRoute: typeof AuthenticatedOrdersIndexRoute
+  AuthenticatedPickListsIndexRoute: typeof AuthenticatedPickListsIndexRoute
   AuthenticatedProfileIndexRoute: typeof AuthenticatedProfileIndexRoute
   AuthenticatedProjectsIndexRoute: typeof AuthenticatedProjectsIndexRoute
   AuthenticatedProposalsIndexRoute: typeof AuthenticatedProposalsIndexRoute
@@ -469,6 +510,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedUsersIndexRoute: typeof AuthenticatedUsersIndexRoute
   AuthenticatedCustomersCustomerIdIndexRoute: typeof AuthenticatedCustomersCustomerIdIndexRoute
   AuthenticatedOrdersOrderIdIndexRoute: typeof AuthenticatedOrdersOrderIdIndexRoute
+  AuthenticatedPickListsPickListIdIndexRoute: typeof AuthenticatedPickListsPickListIdIndexRoute
   AuthenticatedProposalsProposalIdIndexRoute: typeof AuthenticatedProposalsProposalIdIndexRoute
   AuthenticatedTasksTaskIdIndexRoute: typeof AuthenticatedTasksTaskIdIndexRoute
 }
@@ -481,6 +523,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedNavOptionsIndexRoute: AuthenticatedNavOptionsIndexRoute,
   AuthenticatedOrderDeskIndexRoute: AuthenticatedOrderDeskIndexRoute,
   AuthenticatedOrdersIndexRoute: AuthenticatedOrdersIndexRoute,
+  AuthenticatedPickListsIndexRoute: AuthenticatedPickListsIndexRoute,
   AuthenticatedProfileIndexRoute: AuthenticatedProfileIndexRoute,
   AuthenticatedProjectsIndexRoute: AuthenticatedProjectsIndexRoute,
   AuthenticatedProposalsIndexRoute: AuthenticatedProposalsIndexRoute,
@@ -491,6 +534,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedCustomersCustomerIdIndexRoute:
     AuthenticatedCustomersCustomerIdIndexRoute,
   AuthenticatedOrdersOrderIdIndexRoute: AuthenticatedOrdersOrderIdIndexRoute,
+  AuthenticatedPickListsPickListIdIndexRoute:
+    AuthenticatedPickListsPickListIdIndexRoute,
   AuthenticatedProposalsProposalIdIndexRoute:
     AuthenticatedProposalsProposalIdIndexRoute,
   AuthenticatedTasksTaskIdIndexRoute: AuthenticatedTasksTaskIdIndexRoute,

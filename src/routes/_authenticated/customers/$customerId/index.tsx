@@ -195,7 +195,7 @@ function CustomerDetailPage() {
                 type='button'
                 className={cn(
                   'inline-flex h-7 items-center gap-1.5 rounded-[5px] border px-2.5 text-[12px] font-medium transition-colors duration-[80ms]',
-                  customer.assigned_user
+                  (customer.assigned_users?.length || customer.assigned_user)
                     ? 'border-primary/20 bg-primary/[0.06] text-primary hover:bg-primary/[0.1]'
                     : 'border-border bg-bg-secondary text-text-secondary hover:bg-bg-active hover:text-foreground'
                 )}
@@ -203,15 +203,15 @@ function CustomerDetailPage() {
               >
                 <UserPlus className='size-3.5' />
                 <span className='hidden sm:inline'>
-                  {customer.assigned_user
-                    ? getUserDisplayName(customer.assigned_user)
+                  {(customer.assigned_users?.length ? customer.assigned_users[0] : customer.assigned_user)
+                    ? getUserDisplayName(customer.assigned_users?.length ? customer.assigned_users[0] : customer.assigned_user!)
                     : 'Assign'}
                 </span>
               </button>
             </TooltipTrigger>
             <TooltipContent>
-              {customer.assigned_user
-                ? `Assigned to ${getUserDisplayName(customer.assigned_user)} — click to change`
+              {(customer.assigned_users?.length || customer.assigned_user)
+                ? `Assigned to ${(customer.assigned_users?.length ? customer.assigned_users : customer.assigned_user ? [customer.assigned_user] : []).map((u) => getUserDisplayName(u)).join(', ')} — click to change`
                 : 'Assign a sales user'}
             </TooltipContent>
           </Tooltip>

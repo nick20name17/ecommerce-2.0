@@ -396,7 +396,7 @@ function CustomerRow({
   const email = customer.contact_3 || null
   const typeLabel = getCustomerTypeLabel(customer.in_level)
 
-  const noteCount = Array.isArray(customer.notes) ? customer.notes.length : 0
+  const noteCount = typeof customer.notes_count === 'number' ? customer.notes_count : Array.isArray(customer.notes) ? customer.notes.length : 0
 
   if (isMobile) {
     return (
@@ -483,43 +483,51 @@ function CustomerRow({
 
       {/* Assign */}
       <div className='w-[120px] shrink-0'>
-        {canAssign && (
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <button
-                type='button'
-                className={cn(
-                  'inline-flex items-center gap-1.5 rounded-[5px] px-1 py-0.5 text-[13px] transition-colors duration-75 hover:bg-bg-active',
-                  customer.assigned_user ? 'text-text-secondary' : 'text-text-tertiary'
-                )}
-                onClick={(e) => {
-                  e.stopPropagation()
-                  onAssign(customer)
-                }}
-              >
-                {customer.assigned_user ? (
-                  <>
-                    <InitialsAvatar
-                      initials={getInitials(getUserDisplayName(customer.assigned_user))}
-                      size={16}
-                    />
-                    <span className='truncate'>{getUserDisplayName(customer.assigned_user)}</span>
-                  </>
-                ) : (
-                  <>
-                    <UserPlus className='size-3.5' />
-                    <span>Assign</span>
-                  </>
-                )}
-              </button>
-            </TooltipTrigger>
-            <TooltipContent>
-              {customer.assigned_user
-                ? `Assigned to ${getUserDisplayName(customer.assigned_user)} — click to change`
-                : 'Assign a sales user'}
-            </TooltipContent>
-          </Tooltip>
-        )}
+        {canAssign &&
+          (() => {
+            const assigned = customer.assigned_users?.length ? customer.assigned_users : customer.assigned_user ? [customer.assigned_user] : []
+            const first = assigned[0]
+            return (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    type='button'
+                    className={cn(
+                      'inline-flex items-center gap-1.5 rounded-[5px] px-1 py-0.5 text-[13px] transition-colors duration-75 hover:bg-bg-active',
+                      first ? 'text-text-secondary' : 'text-text-tertiary'
+                    )}
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      onAssign(customer)
+                    }}
+                  >
+                    {first ? (
+                      <>
+                        <InitialsAvatar
+                          initials={getInitials(getUserDisplayName(first))}
+                          size={16}
+                        />
+                        <span className='truncate'>{getUserDisplayName(first)}</span>
+                        {assigned.length > 1 && (
+                          <span className='text-[11px] text-text-tertiary'>+{assigned.length - 1}</span>
+                        )}
+                      </>
+                    ) : (
+                      <>
+                        <UserPlus className='size-3.5' />
+                        <span>Assign</span>
+                      </>
+                    )}
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  {first
+                    ? `Assigned to ${assigned.map((u) => getUserDisplayName(u)).join(', ')} — click to change`
+                    : 'Assign a sales user'}
+                </TooltipContent>
+              </Tooltip>
+            )
+          })()}
       </div>
 
       {/* Notes */}

@@ -5,6 +5,8 @@
 
 import {
   CheckCircle,
+  ClipboardText,
+  Crosshair,
   Flask,
   GearSix,
   House,
@@ -31,4 +33,6 @@ export const IOrderDesk: IC = ({ className }) => <PlusSquare className={classNam
 export const IShipping: IC = ({ className }) => <Truck className={className} weight="fill" />
 export const ISettings: IC = ({ className }) => <GearSix className={className} weight="fill" />
 export const ITesting: IC = ({ className }) => <Flask className={className} weight="fill" />
+export const IPickLists: IC = ({ className }) => <ClipboardText className={className} weight="fill" />
 export const IDev: IC = ({ className }) => <RocketLaunch className={className} weight="fill" />
+export const IPicking: IC = ({ className }) => <Crosshair className={className} weight="fill" />

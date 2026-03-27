@@ -47,7 +47,8 @@ export const CustomerInfoPanel = ({ customer, fieldConfig, priceLevels, onPriceL
   const country = customer.country || null
   const hasAddress = addressParts || cityStateZip || country
 
-  const assigneeName = customer.assigned_user ? getUserDisplayName(customer.assigned_user) : null
+  const firstAssigned = customer.assigned_users?.length ? customer.assigned_users[0] : customer.assigned_user ?? null
+  const assigneeName = firstAssigned ? getUserDisplayName(firstAssigned) : null
   const assigneeInitials = assigneeName
     ? assigneeName.split(' ').slice(0, 2).map(n => n[0]?.toUpperCase() ?? '').join('')
     : null
@@ -212,7 +213,7 @@ export const CustomerInfoPanel = ({ customer, fieldConfig, priceLevels, onPriceL
 
       {/* Assigned To */}
       <PanelSection title='Assigned To' last>
-        {customer.assigned_user ? (
+        {firstAssigned ? (
           <button
             type='button'
             className={cn(

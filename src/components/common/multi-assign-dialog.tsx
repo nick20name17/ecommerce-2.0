@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Search, UserPlus, X } from 'lucide-react'
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useDebouncedCallback } from 'use-debounce'
 
 import type { AssignedUser, EntityAssignRequest } from '@/api/schema'
@@ -45,6 +45,12 @@ export function MultiAssignDialog({
   const [search, setSearch] = useState('')
   const [debouncedSearch, setDebouncedSearch] = useState('')
   const inputRef = useRef<HTMLInputElement>(null)
+  const [localAssigned, setLocalAssigned] = useState<AssignedUser[]>(assignedUsers)
+
+  // Sync local state when prop changes (e.g. after query refetch on detail pages)
+  useEffect(() => {
+    setLocalAssigned(assignedUsers)
+  }, [assignedUsers])
 
   const updateDebouncedSearch = useDebouncedCallback((q: string) => setDebouncedSearch(q), 300)
 
@@ -61,25 +67,35 @@ export function MultiAssignDialog({
   const users = data?.results ?? []
   const loading = isLoading || (search !== debouncedSearch && isFetching)
 
-  const assignedIds = new Set(assignedUsers.map((u) => u.id))
+  const assignedIds = new Set(localAssigned.map((u) => u.id))
 
   const assignMutation = useMutation({
     mutationFn: assignFn,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: invalidateQueryKey })
     },
+    onError: () => {
+      // Revert optimistic update on failure
+      setLocalAssigned(assignedUsers)
+    },
     meta: { errorMessage: 'Failed to update assignment' },
   })
 
   const handleAssign = (userId: number) => {
+    const user = users.find((u) => u.id === userId)
+    if (user) {
+      setLocalAssigned((prev) => [...prev, { id: user.id, email: user.email, first_name: user.first_name, last_name: user.last_name }])
+    }
     assignMutation.mutate({ user_id: userId })
   }
 
   const handleUnassign = (userId: number) => {
+    setLocalAssigned((prev) => prev.filter((u) => u.id !== userId))
     assignMutation.mutate({ user_id: userId, remove: true })
   }
 
   const handleUnassignAll = () => {
+    setLocalAssigned([])
     assignMutation.mutate({ user_id: null })
   }
 
@@ -108,13 +124,13 @@ export function MultiAssignDialog({
           </p>
 
           {/* Currently assigned */}
-          {assignedUsers.length > 0 && (
+          {localAssigned.length > 0 && (
             <div className='flex flex-col gap-1.5'>
               <span className='text-[11px] font-medium uppercase tracking-wider text-text-quaternary'>
-                Assigned ({assignedUsers.length})
+                Assigned ({localAssigned.length})
               </span>
               <div className='flex flex-wrap gap-1.5'>
-                {assignedUsers.map((user) => {
+                {localAssigned.map((user) => {
                   const name = getUserDisplayName(user)
                   const initials = name
                     .split(' ')
@@ -201,7 +217,7 @@ export function MultiAssignDialog({
           </div>
         </DialogBody>
         <DialogFooter>
-          {assignedUsers.length > 0 && (
+          {localAssigned.length > 0 && (
             <Button
               variant='outline'
               className='mr-auto text-destructive hover:bg-destructive/10 hover:text-destructive'

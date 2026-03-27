@@ -702,7 +702,10 @@ function TaskDetailPage() {
                     {[...notes]
                       .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
                       .map((note) => {
-                        const displayName = note.author_name || 'Unknown'
+                        const displayName = note.author_name
+                          || (note.author === user?.id
+                            ? [user.first_name, user.last_name].filter(Boolean).join(' ') || user.email
+                            : 'Unknown')
                         const initials = displayName
                           .split(' ')
                           .slice(0, 2)

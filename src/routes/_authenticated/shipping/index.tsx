@@ -70,7 +70,7 @@ const STATUS_DOT_COLORS: Record<VoidedFilter, string> = {
 }
 
 function getCustomerDisplay(shipment: ShipmentRecord): string {
-  return shipment.order_name || shipment.order_invoice || `#${shipment.order_autoid.slice(0, 8)}`
+  return shipment.order_name || shipment.order_invoice || `#${shipment.order_autoid?.slice(0, 8) ?? '—'}`
 }
 
 // ── Page Component ───────────────────────────────────────────
@@ -191,22 +191,22 @@ const ShippingPage = () => {
       {/* Table header */}
       {!isMobile && (
         <div className={cn('flex shrink-0 items-center gap-4 border-b border-border bg-bg-secondary/60 py-1.5', isTablet ? 'px-5' : 'px-6')}>
-          <div className='w-[80px] shrink-0 text-[12px] font-medium uppercase tracking-[0.04em] text-text-tertiary'>
+          <div className='w-[80px] shrink-0 text-[13px] font-medium text-text-tertiary'>
             Order
           </div>
-          <div className='min-w-0 flex-1 text-[12px] font-medium uppercase tracking-[0.04em] text-text-tertiary'>
+          <div className='min-w-0 flex-1 text-[13px] font-medium text-text-tertiary'>
             Customer
           </div>
-          <div className='hidden w-[120px] shrink-0 text-[12px] font-medium uppercase tracking-[0.04em] text-text-tertiary lg:block'>
+          <div className='hidden w-[120px] shrink-0 text-[13px] font-medium text-text-tertiary lg:block'>
             Service
           </div>
-          <div className='w-[110px] shrink-0 text-[12px] font-medium uppercase tracking-[0.04em] text-text-tertiary'>
+          <div className='w-[110px] shrink-0 text-[13px] font-medium text-text-tertiary'>
             Status
           </div>
-          <div className='hidden w-[80px] shrink-0 text-right text-[12px] font-medium uppercase tracking-[0.04em] text-text-tertiary sm:block'>
+          <div className='hidden w-[80px] shrink-0 text-right text-[13px] font-medium text-text-tertiary sm:block'>
             Cost
           </div>
-          <div className='hidden w-[100px] shrink-0 text-[12px] font-medium uppercase tracking-[0.04em] text-text-tertiary lg:block'>
+          <div className='hidden w-[100px] shrink-0 text-[13px] font-medium text-text-tertiary lg:block'>
             Date
           </div>
           <div className='w-[20px] shrink-0' />
@@ -283,7 +283,7 @@ function ShipmentRow({
       >
         <div className='mb-1 flex items-center gap-2'>
           <span className='text-[13px] font-semibold tabular-nums text-foreground'>
-            {shipment.order_invoice || `#${shipment.order_autoid.slice(0, 8)}`}
+            {shipment.order_invoice || `#${shipment.order_autoid?.slice(0, 8) ?? '—'}`}
           </span>
           <span className='min-w-0 flex-1 truncate text-[13px] font-medium text-foreground'>
             {customerName}
@@ -313,7 +313,7 @@ function ShipmentRow({
     >
       <div className='w-[80px] shrink-0'>
         <span className='text-[13px] font-semibold tabular-nums text-foreground'>
-          {shipment.order_invoice || `#${shipment.order_autoid.slice(0, 8)}`}
+          {shipment.order_invoice || `#${shipment.order_autoid?.slice(0, 8) ?? '—'}`}
         </span>
       </div>
       <div className='min-w-0 flex-1 truncate text-[13px] font-medium text-foreground'>

@@ -8,6 +8,7 @@ import {
   IDev,
   IOrderDesk,
   IOrders,
+  IPickLists,
   IProjects,
   IProposals,
   ISettings,
@@ -47,6 +48,13 @@ const TOP_ITEMS: NavItem[] = [
     url: '/order-desk',
     icon: IOrderDesk,
     iconBg: 'bg-orange-500',
+    iconColor: 'text-white',
+  },
+  {
+    title: 'Pick Lists',
+    url: '/pick-lists',
+    icon: IPickLists,
+    iconBg: 'bg-teal-500',
     iconColor: 'text-white',
   },
   {

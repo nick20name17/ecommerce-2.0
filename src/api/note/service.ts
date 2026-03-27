@@ -35,11 +35,9 @@ export const noteService = {
     payload: EntityNoteRequest,
     projectId?: number | null
   ): Promise<EntityNote> => {
-    const { data } = await api.post<EntityNote>('/notes/', {
-      ...payload,
-      entity_type: entityType,
-      entity_autoid: autoid,
-      ...projectParam(projectId),
+    const entityPath = entityType === 'order' ? 'orders' : entityType === 'proposal' ? 'proposals' : 'customers'
+    const { data } = await api.post<EntityNote>(`/data/${entityPath}/${autoid}/notes/`, payload, {
+      params: projectParam(projectId),
     })
     return data
   },

@@ -502,7 +502,7 @@ function ProposalRow({
   const statusClass = PROPOSAL_STATUS_CLASS[proposal.status] ?? ''
   const dotColor = STATUS_DOT_COLORS[proposal.status] ?? 'bg-slate-400'
 
-  const noteCount = Array.isArray(proposal.notes) ? proposal.notes.length : 0
+  const noteCount = typeof proposal.notes_count === 'number' ? proposal.notes_count : Array.isArray(proposal.notes) ? proposal.notes.length : 0
 
   if (isMobile) {
     return (
@@ -574,43 +574,51 @@ function ProposalRow({
 
       {/* Responsible */}
       <div className='w-[120px] shrink-0'>
-        {canAssign && (
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <button
-                type='button'
-                className={cn(
-                  'inline-flex items-center gap-1.5 rounded-[5px] px-1 py-0.5 text-[13px] transition-colors duration-75 hover:bg-bg-active',
-                  proposal.assigned_user ? 'text-text-secondary' : 'text-text-tertiary'
-                )}
-                onClick={(e) => {
-                  e.stopPropagation()
-                  onAssign(proposal)
-                }}
-              >
-                {proposal.assigned_user ? (
-                  <>
-                    <InitialsAvatar
-                      initials={getInitials(getUserDisplayName(proposal.assigned_user))}
-                      size={16}
-                    />
-                    <span className='truncate'>{getUserDisplayName(proposal.assigned_user)}</span>
-                  </>
-                ) : (
-                  <>
-                    <UserPlus className='size-3.5' />
-                    <span>Assign</span>
-                  </>
-                )}
-              </button>
-            </TooltipTrigger>
-            <TooltipContent>
-              {proposal.assigned_user
-                ? `Assigned to ${getUserDisplayName(proposal.assigned_user)} — click to change`
-                : 'Assign a sales user'}
-            </TooltipContent>
-          </Tooltip>
-        )}
+        {canAssign &&
+          (() => {
+            const assigned = proposal.assigned_users?.length ? proposal.assigned_users : proposal.assigned_user ? [proposal.assigned_user] : []
+            const first = assigned[0]
+            return (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    type='button'
+                    className={cn(
+                      'inline-flex items-center gap-1.5 rounded-[5px] px-1 py-0.5 text-[13px] transition-colors duration-75 hover:bg-bg-active',
+                      first ? 'text-text-secondary' : 'text-text-tertiary'
+                    )}
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      onAssign(proposal)
+                    }}
+                  >
+                    {first ? (
+                      <>
+                        <InitialsAvatar
+                          initials={getInitials(getUserDisplayName(first))}
+                          size={16}
+                        />
+                        <span className='truncate'>{getUserDisplayName(first)}</span>
+                        {assigned.length > 1 && (
+                          <span className='text-[11px] text-text-tertiary'>+{assigned.length - 1}</span>
+                        )}
+                      </>
+                    ) : (
+                      <>
+                        <UserPlus className='size-3.5' />
+                        <span>Assign</span>
+                      </>
+                    )}
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  {first
+                    ? `Assigned to ${assigned.map((u) => getUserDisplayName(u)).join(', ')} — click to change`
+                    : 'Assign a sales user'}
+                </TooltipContent>
+              </Tooltip>
+            )
+          })()}
       </div>
 
       {/* Notes */}
