@@ -434,8 +434,7 @@ function OrderDetailPage() {
               <table className='w-full text-[13px]'>
                 <thead className='sticky top-0 z-10 select-none bg-bg-secondary/60 backdrop-blur-sm'>
                   <tr className='border-b border-border text-left'>
-                    <th className='w-[36px] py-1.5 pl-6 pr-0 font-medium text-text-tertiary'>Picked</th>
-                    <th className='w-[50px] px-3 py-1.5 font-medium text-text-tertiary'>Packed</th>
+                    <th className='w-[50px] py-1.5 pl-6 pr-3 font-medium text-text-tertiary'>Packed</th>
                     <th className='min-w-[130px] px-3 py-1.5 font-medium text-text-tertiary'>Inventory</th>
                     <th className='min-w-[200px] px-3 py-1.5 font-medium text-text-tertiary'>Description</th>
                     <th className='w-[70px] px-3 py-1.5 text-right font-medium text-text-tertiary'>Qty</th>
@@ -453,27 +452,9 @@ function OrderDetailPage() {
                   {items.map((item, i) => (
                     <tr
                       key={item.autoid ?? i}
-                      className={cn(
-                        'border-b border-border-light transition-colors duration-100 hover:bg-bg-hover',
-                        item.is_picked && 'bg-emerald-500/[0.03]',
-                      )}
+                      className='border-b border-border-light transition-colors duration-100 hover:bg-bg-hover'
                     >
-                      <td className='py-1.5 pl-6 pr-0'>
-                        <button
-                          type='button'
-                          className={cn(
-                            'flex size-[18px] items-center justify-center rounded-[4px] border transition-colors duration-75',
-                            item.is_picked
-                              ? 'border-emerald-500 bg-emerald-500 text-white'
-                              : 'border-border-heavy hover:border-primary/50 hover:bg-primary/5',
-                          )}
-                          onClick={() => pickMutation.mutate({ itemAutoid: item.autoid, isPicked: !item.is_picked })}
-                          disabled={pickMutation.isPending}
-                        >
-                          {item.is_picked && <Check className='size-3' />}
-                        </button>
-                      </td>
-                      <td className='px-3 py-1.5'>
+                      <td className='py-1.5 pl-6 pr-3'>
                         {item.packed ? (
                           <span className='inline-flex items-center gap-1 rounded-[4px] bg-violet-500/10 px-1.5 py-0.5 text-[11px] font-medium text-violet-600 dark:text-violet-400'>
                             <Package className='size-3' /> Packed
@@ -482,10 +463,10 @@ function OrderDetailPage() {
                           <span className='text-[11px] text-text-quaternary'>—</span>
                         )}
                       </td>
-                      <td className={cn('px-3 py-1.5 font-medium', item.is_picked ? 'text-text-tertiary line-through' : 'text-foreground')}>
+                      <td className='px-3 py-1.5 font-medium text-foreground'>
                         {item.inven || '—'}
                       </td>
-                      <td className={cn('max-w-[400px] px-3 py-1.5', item.is_picked ? 'text-text-tertiary line-through' : 'text-text-secondary')}>
+                      <td className='max-w-[400px] px-3 py-1.5 text-text-secondary'>
                         <Tooltip>
                           <TooltipTrigger asChild>
                             <span className='block truncate'>{item.descr || '—'}</span>

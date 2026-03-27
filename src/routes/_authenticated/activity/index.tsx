@@ -210,12 +210,12 @@ const ActivityPage = () => {
       {/* Column headers */}
       {!isMobile && (results.length > 0 || isLoading) && (
         <div className={cn('flex shrink-0 items-center gap-4 border-b border-border bg-bg-secondary/60 py-1.5', isTablet ? 'px-5' : 'px-6')}>
-          <div className='w-[60px] shrink-0 text-[13px] font-medium text-text-tertiary'>Method</div>
+          <div className='w-[70px] shrink-0 text-[13px] font-medium text-text-tertiary'>Method</div>
           <div className='min-w-0 flex-1 text-[13px] font-medium text-text-tertiary'>URL</div>
-          <div className='hidden w-[80px] shrink-0 text-[13px] font-medium text-text-tertiary lg:block'>Entity</div>
-          <div className='w-[55px] shrink-0 text-[13px] font-medium text-text-tertiary'>Status</div>
+          <div className='hidden w-[90px] shrink-0 text-[13px] font-medium text-text-tertiary lg:block'>Entity</div>
+          <div className='w-[50px] shrink-0 text-[13px] font-medium text-text-tertiary'>Status</div>
           <div className='hidden w-[70px] shrink-0 text-right text-[13px] font-medium text-text-tertiary sm:block'>Duration</div>
-          <div className='hidden w-[110px] shrink-0 text-[13px] font-medium text-text-tertiary lg:block'>Time</div>
+          <div className='hidden w-[130px] shrink-0 text-[13px] font-medium text-text-tertiary lg:block'>Time</div>
           <div className='w-[20px] shrink-0' />
         </div>
       )}
@@ -317,7 +317,7 @@ function LogRow({
       )}
       onClick={onClick}
     >
-      <div className='w-[60px] shrink-0'>
+      <div className='w-[70px] shrink-0'>
         <span className={cn('rounded border px-1.5 py-0.5 font-mono text-[11px] font-semibold', methodColor)}>
           {log.method}
         </span>
@@ -326,10 +326,10 @@ function LogRow({
         {log.is_error && <AlertCircle className='size-3 shrink-0 text-red-500' />}
         <span className='truncate font-mono text-[12px] text-foreground'>{log.url}</span>
       </div>
-      <div className='hidden w-[80px] shrink-0 truncate text-[13px] text-text-tertiary lg:block'>
+      <div className='hidden w-[90px] shrink-0 truncate text-[13px] text-text-tertiary lg:block'>
         {log.entity || '—'}
       </div>
-      <div className='w-[55px] shrink-0'>
+      <div className='w-[50px] shrink-0'>
         <span className={cn('font-mono text-[12px] font-semibold tabular-nums', statusColor)}>
           {log.status_code}
         </span>
@@ -337,7 +337,7 @@ function LogRow({
       <div className='hidden w-[70px] shrink-0 text-right text-[12px] tabular-nums text-text-tertiary sm:block'>
         {formatDuration(log.duration_ms)}
       </div>
-      <div className='hidden w-[110px] shrink-0 text-[12px] tabular-nums text-text-tertiary lg:block'>
+      <div className='hidden w-[130px] shrink-0 text-[12px] tabular-nums text-text-tertiary lg:block'>
         {formatDateTime(log.created_at)}
       </div>
       <div className='w-[20px] shrink-0 text-text-tertiary opacity-0 transition-opacity group-hover/row:opacity-100'>
