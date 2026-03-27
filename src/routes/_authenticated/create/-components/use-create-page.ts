@@ -400,7 +400,10 @@ export function useCreatePage() {
 
     // Fire-and-forget: entire flow runs in background
     cartService.submitOrder(custId, projId)
-      .then(() => waitForCreatedAutoid('order', 60_000))
+      .then(() => {
+        removePendingOrder()
+        return waitForCreatedAutoid('order', 60_000)
+      })
       .then(async (autoid) => {
         await Promise.all([
           patchAddresses(autoid),
@@ -410,11 +413,9 @@ export function useCreatePage() {
         ])
       })
       .catch((e) => {
+        removePendingOrder()
         cancelPendingCreatedAutoid('order')
         toast.error(getErrorMessage(e))
-      })
-      .finally(() => {
-        removePendingOrder()
       })
   }
 
