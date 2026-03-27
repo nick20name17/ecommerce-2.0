@@ -66,7 +66,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 import { isAdmin, isSuperAdmin } from '@/constants/user'
 import type { UserRole } from '@/constants/user'
 import { getSession } from '@/helpers/auth'
-import { PROJECT_QUERY_KEYS, getProjectByIdQuery } from '@/api/project/query'
+import { getProjectByIdQuery } from '@/api/project/query'
 import { projectService } from '@/api/project/service'
 import { useProjectId } from '@/hooks/use-project-id'
 import { getUserDisplayName } from '@/helpers/formatters'
