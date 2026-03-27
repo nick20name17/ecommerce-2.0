@@ -3,8 +3,10 @@ import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import {
   ChevronRight,
   ClipboardList,
+  Package,
   Plus,
   Search,
+  ShoppingCart,
 } from 'lucide-react'
 import { useState } from 'react'
 
@@ -203,8 +205,7 @@ const PickListsPage = () => {
           <div className='w-[60px] shrink-0'>ID</div>
           <div className='min-w-0 flex-1'>Name / Ship To</div>
           <div className='w-[130px] shrink-0'>Status</div>
-          {!isTablet && <div className='w-[70px] shrink-0 text-right'>Items</div>}
-          <div className='w-[70px] shrink-0 text-right'>Orders</div>
+          <div className='w-[160px] shrink-0'>Contents</div>
           {!isTablet && <div className='w-[100px] shrink-0'>Created</div>}
           <div className='w-[20px] shrink-0' />
         </div>
@@ -301,7 +302,8 @@ function PickListRow({
           <span className='min-w-0 flex-1 truncate text-[13px] font-medium text-foreground'>
             {displayName}
           </span>
-          <span className='shrink-0 text-[13px] tabular-nums text-text-tertiary'>
+          <span className='inline-flex shrink-0 items-center gap-1 rounded-md bg-bg-secondary px-1.5 py-0.5 text-[11px] font-medium text-text-secondary'>
+            <Package className='size-3 text-text-quaternary' />
             {pickList.item_count} item{pickList.item_count !== 1 ? 's' : ''}
           </span>
         </div>
@@ -351,13 +353,15 @@ function PickListRow({
           {statusLabel}
         </span>
       </div>
-      {!isTablet && (
-        <div className='w-[70px] shrink-0 text-right text-[13px] tabular-nums text-text-tertiary'>
-          {pickList.item_count}
-        </div>
-      )}
-      <div className='w-[70px] shrink-0 text-right text-[13px] tabular-nums text-text-tertiary'>
-        {pickList.order_count}
+      <div className='flex w-[160px] shrink-0 items-center gap-1.5'>
+        <span className='inline-flex items-center gap-1 rounded-md bg-bg-secondary px-1.5 py-0.5 text-[11px] font-medium text-text-secondary'>
+          <Package className='size-3 text-text-quaternary' />
+          {pickList.item_count} item{pickList.item_count !== 1 ? 's' : ''}
+        </span>
+        <span className='inline-flex items-center gap-1 rounded-md bg-bg-secondary px-1.5 py-0.5 text-[11px] font-medium text-text-secondary'>
+          <ShoppingCart className='size-3 text-text-quaternary' />
+          {pickList.order_count}
+        </span>
       </div>
       {!isTablet && (
         <div className='w-[100px] shrink-0 text-[13px] tabular-nums text-text-tertiary'>

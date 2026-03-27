@@ -39,6 +39,10 @@ export interface Project {
   overall_status?: 'healthy' | 'unhealthy'
   has_ebms_config?: boolean
   has_sync_config?: boolean
+  unit_system?: string
+  oos_field?: string
+  category_show_web_filter?: boolean
+  product_show_web_filter?: boolean
   created_at: string
   updated_at: string
 }

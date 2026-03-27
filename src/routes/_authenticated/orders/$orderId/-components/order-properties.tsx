@@ -271,11 +271,11 @@ export function PropertyField({
       onClick={startEditing}
     >
       <span className='shrink-0 text-[12px] font-medium text-text-tertiary'>{label}</span>
-      <div className='flex items-center gap-1.5'>
+      <div className='flex min-w-0 items-center gap-1.5'>
         {saving && <Loader2 className='size-3 animate-spin text-text-tertiary' />}
         <span
           className={cn(
-            'truncate text-[13px]',
+            'min-w-0 truncate text-[13px]',
             displayValue ? 'font-medium text-foreground' : 'text-text-quaternary',
           )}
         >

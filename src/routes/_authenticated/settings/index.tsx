@@ -66,6 +66,8 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 import { isAdmin, isSuperAdmin } from '@/constants/user'
 import type { UserRole } from '@/constants/user'
 import { getSession } from '@/helpers/auth'
+import { PROJECT_QUERY_KEYS, getProjectByIdQuery } from '@/api/project/query'
+import { projectService } from '@/api/project/service'
 import { useProjectId } from '@/hooks/use-project-id'
 import { getUserDisplayName } from '@/helpers/formatters'
 import { cn } from '@/lib/utils'
@@ -75,9 +77,10 @@ import { UserModal } from '../users/-components/user-modal'
 
 // ── Section definitions ─────────────────────────────────────
 
-type SettingsSection = 'data-control' | 'filters' | 'tasks' | 'shipping' | 'users'
+type SettingsSection = 'general' | 'data-control' | 'filters' | 'tasks' | 'shipping' | 'users'
 
 const SECTIONS: { value: SettingsSection; label: string }[] = [
+  { value: 'general', label: 'General' },
   { value: 'data-control', label: 'Data Control' },
   { value: 'filters', label: 'Filters' },
   { value: 'tasks', label: 'Statuses' },
@@ -156,7 +159,7 @@ const SettingsPage = () => {
   const [projectId] = useProjectId()
   const [section, setSection] = useQueryState('section', parseAsString)
 
-  const currentSection = (section ?? 'data-control') as SettingsSection
+  const currentSection = (section ?? 'general') as SettingsSection
 
   if (!projectId) {
     return (
@@ -197,7 +200,7 @@ const SettingsPage = () => {
                     ? 'bg-bg-active text-foreground'
                     : 'text-text-tertiary hover:bg-bg-hover hover:text-foreground'
                 )}
-                onClick={() => setSection(s.value === 'data-control' ? null : s.value)}
+                onClick={() => setSection(s.value === 'general' ? null : s.value)}
               >
                 {s.label}
               </button>
@@ -207,11 +210,143 @@ const SettingsPage = () => {
 
         {/* Content */}
         <div className='flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden'>
+          {currentSection === 'general' && <GeneralSection projectId={projectId} />}
           {currentSection === 'data-control' && <DataControlSection projectId={projectId} />}
           {currentSection === 'filters' && <FilterGroupsSection />}
           {currentSection === 'tasks' && <TasksSection projectId={projectId} />}
           {currentSection === 'shipping' && <ShippingSection projectId={projectId} />}
           {currentSection === 'users' && <UsersSection />}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ── General Section ─────────────────────────────────────────
+
+const GeneralSection = ({ projectId }: { projectId: number }) => {
+  const [unitSystem, setUnitSystem] = useState<string>('metric')
+  const [oosField, setOosField] = useState('')
+  const [categoryWebFilter, setCategoryWebFilter] = useState(true)
+  const [productWebFilter, setProductWebFilter] = useState(true)
+  const [loaded, setLoaded] = useState(false)
+
+  // Fetch settings via project detail — only for superadmins
+  const { user } = useAuth()
+  const isSuperAdminUser = !!user?.role && isSuperAdmin(user.role)
+  const { data: project } = useQuery({
+    ...getProjectByIdQuery(projectId),
+    enabled: isSuperAdminUser,
+    retry: false,
+  })
+
+  useEffect(() => {
+    if (project && !loaded) {
+      setUnitSystem(project.unit_system ?? 'metric')
+      setOosField(project.oos_field ?? '')
+      setCategoryWebFilter(project.category_show_web_filter ?? true)
+      setProductWebFilter(project.product_show_web_filter ?? true)
+      setLoaded(true)
+    }
+  }, [project, loaded])
+
+  const updateMutation = useMutation({
+    mutationFn: (payload: Record<string, unknown>) =>
+      projectService.update({ id: projectId, payload }),
+    onSuccess: () => {
+      toast.success('Settings updated')
+    },
+    meta: { errorMessage: 'Failed to update settings' },
+  })
+
+  const save = (payload: Record<string, unknown>) => {
+    updateMutation.mutate(payload)
+  }
+
+  return (
+    <div className='flex-1 overflow-y-auto p-6'>
+      <div className='max-w-xl space-y-6'>
+        <div>
+          <h3 className='text-[14px] font-semibold text-foreground'>General Settings</h3>
+          <p className='mt-0.5 text-[13px] text-text-tertiary'>Configure project-wide preferences.</p>
+        </div>
+
+        {/* Unit System */}
+        <div>
+          <label className='mb-1.5 block text-[12px] font-medium text-text-tertiary'>Unit System</label>
+          <div className='flex gap-2'>
+            {(['metric', 'imperial'] as const).map((unit) => (
+              <button
+                key={unit}
+                type='button'
+                disabled={updateMutation.isPending}
+                className={cn(
+                  'inline-flex h-8 items-center rounded-[6px] border px-3 text-[13px] font-medium transition-colors duration-[80ms]',
+                  unitSystem === unit
+                    ? 'border-primary bg-primary/[0.06] text-primary'
+                    : 'border-border text-text-secondary hover:bg-bg-hover',
+                )}
+                onClick={() => { setUnitSystem(unit); save({ unit_system: unit }) }}
+              >
+                {unit.charAt(0).toUpperCase() + unit.slice(1)}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* OOS Field */}
+        <div>
+          <label className='mb-1.5 block text-[12px] font-medium text-text-tertiary'>Out of Stock Field</label>
+          <p className='mb-1 text-[11px] text-text-quaternary'>Database field name used for out-of-stock detection. Leave empty to disable.</p>
+          <input
+            value={oosField}
+            onChange={(e) => setOosField(e.target.value)}
+            onBlur={() => save({ oos_field: oosField.trim() })}
+            onKeyDown={(e) => { if (e.key === 'Enter') (e.target as HTMLInputElement).blur() }}
+            placeholder='e.g. oos_flag'
+            className='h-8 w-64 rounded-[6px] border border-border bg-background px-2.5 text-[13px] text-foreground outline-none transition-colors placeholder:text-text-quaternary focus:border-primary focus:ring-1 focus:ring-primary/20'
+          />
+        </div>
+
+        {/* Toggle switches */}
+        <div className='space-y-3'>
+          <label className='mb-1.5 block text-[12px] font-medium text-text-tertiary'>Web Filters</label>
+
+          <div className='flex items-center justify-between rounded-[8px] border border-border px-3.5 py-2.5'>
+            <div>
+              <span className='text-[13px] font-medium text-foreground'>Category Web Filter</span>
+              <p className='text-[12px] text-text-tertiary'>Show web filter option on categories</p>
+            </div>
+            <button
+              type='button'
+              disabled={updateMutation.isPending}
+              className={cn(
+                'relative inline-flex h-5 w-9 shrink-0 cursor-pointer items-center rounded-full transition-colors duration-200',
+                categoryWebFilter ? 'bg-primary' : 'bg-border',
+              )}
+              onClick={() => { setCategoryWebFilter(!categoryWebFilter); save({ category_show_web_filter: !categoryWebFilter }) }}
+            >
+              <span className={cn('inline-block size-3.5 rounded-full bg-white shadow-sm transition-transform duration-200', categoryWebFilter ? 'translate-x-[18px]' : 'translate-x-[3px]')} />
+            </button>
+          </div>
+
+          <div className='flex items-center justify-between rounded-[8px] border border-border px-3.5 py-2.5'>
+            <div>
+              <span className='text-[13px] font-medium text-foreground'>Product Web Filter</span>
+              <p className='text-[12px] text-text-tertiary'>Show web filter option on products</p>
+            </div>
+            <button
+              type='button'
+              disabled={updateMutation.isPending}
+              className={cn(
+                'relative inline-flex h-5 w-9 shrink-0 cursor-pointer items-center rounded-full transition-colors duration-200',
+                productWebFilter ? 'bg-primary' : 'bg-border',
+              )}
+              onClick={() => { setProductWebFilter(!productWebFilter); save({ product_show_web_filter: !productWebFilter }) }}
+            >
+              <span className={cn('inline-block size-3.5 rounded-full bg-white shadow-sm transition-transform duration-200', productWebFilter ? 'translate-x-[18px]' : 'translate-x-[3px]')} />
+            </button>
+          </div>
         </div>
       </div>
     </div>

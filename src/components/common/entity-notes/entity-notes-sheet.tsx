@@ -2,9 +2,12 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Send, StickyNote, Trash2 } from 'lucide-react'
 import { useRef, useState } from 'react'
 
+import { CUSTOMER_QUERY_KEYS } from '@/api/customer/query'
 import { NOTE_QUERY_KEYS, getEntityNotesQuery } from '@/api/note/query'
 import type { EntityNoteList, EntityNoteType } from '@/api/note/schema'
 import { noteService } from '@/api/note/service'
+import { ORDER_QUERY_KEYS } from '@/api/order/query'
+import { PROPOSAL_QUERY_KEYS } from '@/api/proposal/query'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -86,6 +89,12 @@ export const EntityNotesSheet = ({
 
   const notesQueryKey = NOTE_QUERY_KEYS.entityNotes(entityType, autoid, projectId)
 
+  const invalidateEntityList = () => {
+    if (entityType === 'order') queryClient.invalidateQueries({ queryKey: ORDER_QUERY_KEYS.lists() })
+    else if (entityType === 'proposal') queryClient.invalidateQueries({ queryKey: PROPOSAL_QUERY_KEYS.lists() })
+    else if (entityType === 'customer') queryClient.invalidateQueries({ queryKey: CUSTOMER_QUERY_KEYS.lists() })
+  }
+
   const createMutation = useMutation({
     mutationFn: (payload: { text: string }) =>
       noteService.createEntityNote(entityType, autoid, payload, projectId),
@@ -128,6 +137,7 @@ export const EntityNotesSheet = ({
       queryClient.setQueryData<EntityNoteList[]>(notesQueryKey, (old) =>
         old?.map((n) => (n.id < 0 ? real : n))
       )
+      invalidateEntityList()
     },
     onError: (_err, _vars, context) => {
       if (context?.previous) {
@@ -150,6 +160,9 @@ export const EntityNotesSheet = ({
       )
       setNoteToDelete(null)
       return { previous }
+    },
+    onSuccess: () => {
+      invalidateEntityList()
     },
     onError: (_err, _vars, context) => {
       if (context?.previous) {

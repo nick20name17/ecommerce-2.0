@@ -291,11 +291,11 @@ export function StartPickingDialog({
                       <span className='text-[13px] font-semibold text-foreground'>
                         #{order.invoice || order.id}
                       </span>
-                      {order.po_no && (
+                      {order.po_no ? (
                         <span className='rounded bg-bg-secondary px-1.5 py-0.5 text-[11px] font-medium text-text-tertiary'>
-                          PO: {order.po_no as string}
+                          PO: {String(order.po_no)}
                         </span>
-                      )}
+                      ) : null}
                       <div className='flex-1' />
                       <button
                         type='button'
@@ -491,11 +491,11 @@ function OrderSelectCard({
         <span className='text-[13px] font-semibold text-foreground'>
           #{order.invoice || order.id}
         </span>
-        {order.po_no && (
+        {order.po_no ? (
           <span className='rounded bg-bg-secondary px-1.5 py-0.5 text-[11px] font-medium text-text-tertiary'>
-            PO: {order.po_no as string}
+            PO: {String(order.po_no)}
           </span>
-        )}
+        ) : null}
         <div className='flex-1' />
         <span className='text-[12px] tabular-nums text-text-tertiary'>
           {items.length} item{items.length !== 1 && 's'}

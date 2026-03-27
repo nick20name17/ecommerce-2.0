@@ -8,18 +8,18 @@ import {
   ClipboardList,
   MapPin,
   Package,
-  Pencil,
   RefreshCw,
   Trash2,
   Truck,
   TriangleAlert,
 } from 'lucide-react'
 import { useMemo, useState } from 'react'
-import { toast } from 'sonner'
+
 
 import { PICK_LIST_QUERY_KEYS, getPickListDetailQuery } from '@/api/pick-list/query'
 import { pickListService } from '@/api/pick-list/service'
-import type { PickListShippingRate } from '@/api/pick-list/schema'
+import { getShipmentsQuery } from '@/api/shipment/query'
+import { ShippingDialog } from './-components/shipping-dialog'
 import { IPickLists, PAGE_COLORS, PageHeaderIcon } from '@/components/ds'
 import {
   AlertDialog,
@@ -33,10 +33,9 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { SidebarTrigger } from '@/components/ui/sidebar'
 import { Skeleton } from '@/components/ui/skeleton'
-import { Spinner } from '@/components/ui/spinner'
+
 import {
   PICK_LIST_STATUS,
   PICK_LIST_STATUS_CLASS,
@@ -75,15 +74,7 @@ const PickListDetailPage = () => {
 
   const [deleteOpen, setDeleteOpen] = useState(false)
   const [voidOpen, setVoidOpen] = useState(false)
-  const [editingName, setEditingName] = useState(false)
-  const [nameValue, setNameValue] = useState('')
-
-  // Package form
-  const [pkgWeight, setPkgWeight] = useState('')
-  const [pkgLength, setPkgLength] = useState('')
-  const [pkgWidth, setPkgWidth] = useState('')
-  const [pkgHeight, setPkgHeight] = useState('')
-  const [rates, setRates] = useState<PickListShippingRate[] | null>(null)
+  const [shippingOpen, setShippingOpen] = useState(false)
 
   const isPartiallyFailed = pickList?.status === PICK_LIST_STATUS.partiallyFailed
   const isPushed = pickList?.status === PICK_LIST_STATUS.pushed
@@ -104,17 +95,10 @@ const PickListDetailPage = () => {
     return Array.from(map.entries())
   }, [items])
 
-  // ── Mutations ──────────────────────────────────────────
+  // Fetch shipments related to this pick list
+  const { data: allShipments = [] } = useQuery(getShipmentsQuery({}))
 
-  const updateMutation = useMutation({
-    mutationFn: (payload: { name?: string; notes?: string }) =>
-      pickListService.update(id, payload),
-    meta: { successMessage: 'Pick list updated' },
-    onSuccess: (updated) => {
-      queryClient.setQueryData(PICK_LIST_QUERY_KEYS.detail(id), updated)
-      setEditingName(false)
-    },
-  })
+  // ── Mutations ──────────────────────────────────────────
 
   const deleteMutation = useMutation({
     mutationFn: () => pickListService.delete(id),
@@ -127,36 +111,6 @@ const PickListDetailPage = () => {
     meta: { successMessage: 'Pushed to EBMS' },
     onSuccess: (updated) => {
       queryClient.setQueryData(PICK_LIST_QUERY_KEYS.detail(id), updated)
-    },
-  })
-
-  const ratesMutation = useMutation({
-    mutationFn: () => {
-      const allItemIds = items.map((i) => String(i.id))
-      return pickListService.getShippingRates(id, {
-        shipping_address_id: 0,
-        packages: [{
-          items: allItemIds,
-          length: pkgLength,
-          width: pkgWidth,
-          height: pkgHeight,
-          weight: pkgWeight || undefined,
-        }],
-      })
-    },
-    onSuccess: (data) => {
-      setRates(data.rates)
-      queryClient.invalidateQueries({ queryKey: PICK_LIST_QUERY_KEYS.detail(id) })
-      toast.success(`${data.rates.length} shipping rate${data.rates.length !== 1 ? 's' : ''} fetched`)
-    },
-  })
-
-  const selectRateMutation = useMutation({
-    mutationFn: (rateId: string) => pickListService.selectShippingRate(id, rateId),
-    meta: { successMessage: 'Label purchased' },
-    onSuccess: () => {
-      setRates(null)
-      queryClient.invalidateQueries({ queryKey: PICK_LIST_QUERY_KEYS.detail(id) })
     },
   })
 
@@ -201,8 +155,6 @@ const PickListDetailPage = () => {
 
   const statusLabel = getPickListStatusLabel(pickList.status)
   const statusClass = PICK_LIST_STATUS_CLASS[pickList.status] ?? ''
-  const canGetRates = isPushed && pkgLength && pkgWidth && pkgHeight
-
   return (
     <div className='flex h-full flex-col overflow-hidden'>
       {/* Header */}
@@ -231,6 +183,18 @@ const PickListDetailPage = () => {
 
         {/* Actions */}
         <div className='flex items-center gap-1.5'>
+          {isPushed && (
+            <Button size='sm' onClick={() => setShippingOpen(true)}>
+              <Box className='size-3.5' />
+              {!isMobile && 'Create Package'}
+            </Button>
+          )}
+          {isRatesFetched && (
+            <Button size='sm' onClick={() => setShippingOpen(true)}>
+              <Truck className='size-3.5' />
+              {!isMobile && 'Purchase Label'}
+            </Button>
+          )}
           {isPartiallyFailed && (
             <Button size='sm' onClick={() => pushMutation.mutate()} isPending={pushMutation.isPending}>
               <RefreshCw className='size-3.5' />
@@ -258,69 +222,49 @@ const PickListDetailPage = () => {
       <div className='flex-1 overflow-y-auto'>
         <div className={cn(isMobile ? 'px-3.5 py-4' : 'px-6 py-5')}>
 
-          {/* Top section: Info + Ship To */}
-          <div className='mb-6 grid gap-5 md:grid-cols-[1fr_280px]'>
-            {/* Info */}
-            <div className='space-y-3'>
-              {/* Name */}
-              <div className='group flex items-center gap-2'>
-                {editingName ? (
-                  <div className='flex flex-1 items-center gap-1.5'>
-                    <Input
-                      value={nameValue}
-                      onChange={(e) => setNameValue(e.target.value)}
-                      className='h-8 text-[15px] font-semibold'
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter') updateMutation.mutate({ name: nameValue || undefined })
-                        if (e.key === 'Escape') setEditingName(false)
-                      }}
-                      autoFocus
-                    />
-                    <Button size='icon-xs' variant='ghost' onClick={() => updateMutation.mutate({ name: nameValue || undefined })} isPending={updateMutation.isPending}>
-                      <Check className='size-3' />
-                    </Button>
-                  </div>
-                ) : (
+          {/* Summary card */}
+          <div className='mb-6 overflow-hidden rounded-lg border border-border'>
+            <div className='grid md:grid-cols-2'>
+              {/* Left: Details */}
+              <div className='p-4'>
+                <h2 className='text-[15px] font-semibold text-foreground'>
+                  {pickList.name || `Pick List #${pickList.id}`}
+                </h2>
+                <div className='mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-[12px] text-text-tertiary'>
+                  <span className='inline-flex items-center gap-1'>
+                    <Package className='size-3' />
+                    {items.length} item{items.length !== 1 && 's'}
+                  </span>
+                  <span>·</span>
+                  <span>{orderGroups.length} order{orderGroups.length !== 1 && 's'}</span>
+                  <span>·</span>
+                  <span>{formatDateTime(pickList.created_at)}</span>
+                </div>
+                <div className='mt-3'>
+                  <StatusLifecycle currentStatus={pickList.status} />
+                </div>
+              </div>
+
+              {/* Right: Ship To */}
+              <div className='border-t border-border p-4 md:border-l md:border-t-0'>
+                <div className='mb-1.5 flex items-center gap-1.5'>
+                  <MapPin className='size-3 text-text-quaternary' />
+                  <span className='text-[11px] font-semibold uppercase tracking-wider text-text-quaternary'>Ship To</span>
+                </div>
+                {pickList.ship_to ? (
                   <>
-                    <h2 className='text-[16px] font-semibold text-foreground'>
-                      {pickList.name || `Pick List #${pickList.id}`}
-                    </h2>
-                    <button
-                      type='button'
-                      className='text-text-tertiary opacity-0 transition-opacity group-hover:opacity-100'
-                      onClick={() => { setNameValue(pickList.name ?? ''); setEditingName(true) }}
-                    >
-                      <Pencil className='size-3' />
-                    </button>
+                    <p className='text-[13px] font-medium text-foreground'>{pickList.ship_to.name}</p>
+                    <p className='text-[12px] text-text-tertiary'>{pickList.ship_to.address1}</p>
+                    {pickList.ship_to.address2 && (
+                      <p className='text-[12px] text-text-tertiary'>{pickList.ship_to.address2}</p>
+                    )}
+                    <p className='text-[12px] text-text-tertiary'>
+                      {[pickList.ship_to.city, pickList.ship_to.state].filter(Boolean).join(', ')} {pickList.ship_to.postal}
+                    </p>
                   </>
+                ) : (
+                  <p className='text-[12px] text-text-quaternary'>No address set</p>
                 )}
-              </div>
-
-              {/* Meta row */}
-              <div className='flex flex-wrap items-center gap-x-4 gap-y-1 text-[12px] text-text-tertiary'>
-                <span>{items.length} item{items.length !== 1 && 's'}</span>
-                <span>{orderGroups.length} order{orderGroups.length !== 1 && 's'}</span>
-                <span>Created {formatDateTime(pickList.created_at)}</span>
-              </div>
-
-              {/* Status lifecycle */}
-              <StatusLifecycle currentStatus={pickList.status} />
-            </div>
-
-            {/* Ship To card */}
-            <div className='rounded-lg border border-border'>
-              <div className='flex items-center gap-1.5 border-b border-border-light px-3 py-2'>
-                <MapPin className='size-3.5 text-text-tertiary' />
-                <span className='text-[11px] font-semibold uppercase tracking-wider text-text-quaternary'>Ship To</span>
-              </div>
-              <div className='px-3 py-2.5 text-[13px]'>
-                <p className='font-semibold text-foreground'>{pickList.ship_to.name}</p>
-                <p className='text-text-secondary'>{pickList.ship_to.address1}</p>
-                {pickList.ship_to.address2 && <p className='text-text-secondary'>{pickList.ship_to.address2}</p>}
-                <p className='text-text-secondary'>
-                  {pickList.ship_to.city}, {pickList.ship_to.state} {pickList.ship_to.postal}
-                </p>
-                <p className='text-text-tertiary'>{pickList.ship_to.country}</p>
               </div>
             </div>
           </div>
@@ -381,92 +325,52 @@ const PickListDetailPage = () => {
             </div>
           </div>
 
-          {/* Package & Shipping */}
-          {(isPushed || isRatesFetched) && (
+          {/* Shipments */}
+          {allShipments.length > 0 && (
             <div className='mb-6'>
               <div className='mb-3 flex items-center gap-2'>
-                <Box className='size-4 text-text-tertiary' />
-                <span className='text-[13px] font-semibold text-foreground'>Package</span>
+                <Truck className='size-4 text-text-tertiary' />
+                <span className='text-[13px] font-semibold text-foreground'>
+                  Shipments ({allShipments.length})
+                </span>
               </div>
-
-              <div className='rounded-lg border border-border p-4'>
-                <p className='mb-3 text-[12px] text-text-tertiary'>
-                  Define package dimensions to get shipping rates. This package covers all {items.length} item{items.length !== 1 && 's'} across {orderGroups.length} order{orderGroups.length !== 1 && 's'}.
-                </p>
-                <div className='grid grid-cols-4 gap-3'>
-                  <div>
-                    <label className='mb-1 block text-[11px] font-medium text-text-tertiary'>Length (in)</label>
-                    <Input value={pkgLength} onChange={(e) => setPkgLength(e.target.value)} type='number' min='0' step='any' className='h-8 text-[13px]' placeholder='0' />
-                  </div>
-                  <div>
-                    <label className='mb-1 block text-[11px] font-medium text-text-tertiary'>Width (in)</label>
-                    <Input value={pkgWidth} onChange={(e) => setPkgWidth(e.target.value)} type='number' min='0' step='any' className='h-8 text-[13px]' placeholder='0' />
-                  </div>
-                  <div>
-                    <label className='mb-1 block text-[11px] font-medium text-text-tertiary'>Height (in)</label>
-                    <Input value={pkgHeight} onChange={(e) => setPkgHeight(e.target.value)} type='number' min='0' step='any' className='h-8 text-[13px]' placeholder='0' />
-                  </div>
-                  <div>
-                    <label className='mb-1 block text-[11px] font-medium text-text-tertiary'>Weight (lbs)</label>
-                    <Input value={pkgWeight} onChange={(e) => setPkgWeight(e.target.value)} type='number' min='0' step='any' className='h-8 text-[13px]' placeholder='Auto' />
-                  </div>
-                </div>
-                <div className='mt-3'>
-                  <Button
-                    size='sm'
-                    disabled={!canGetRates}
-                    onClick={() => ratesMutation.mutate()}
-                    isPending={ratesMutation.isPending}
+              <div className='space-y-2'>
+                {allShipments.map((shipment) => (
+                  <div
+                    key={shipment.id}
+                    className={cn(
+                      'flex items-center gap-3 rounded-lg border px-3.5 py-2.5',
+                      shipment.voided
+                        ? 'border-border bg-bg-secondary/30 opacity-60'
+                        : 'border-border',
+                    )}
                   >
-                    <Truck className='size-3.5' />
-                    Get Shipping Rates
-                  </Button>
-                </div>
-              </div>
-
-              {/* Rates list */}
-              {rates && rates.length > 0 && (
-                <div className='mt-3 rounded-lg border border-border'>
-                  <div className='border-b border-border-light px-3.5 py-2'>
-                    <span className='text-[12px] font-semibold text-foreground'>{rates.length} Rate{rates.length !== 1 && 's'} Available</span>
-                  </div>
-                  <div>
-                    {rates.map((rate) => (
-                      <div key={rate.rate_id} className='flex items-center gap-3 border-b border-border-light/50 px-3.5 py-2 last:border-0'>
-                        <div className='min-w-0 flex-1'>
-                          <span className='text-[13px] font-medium text-foreground'>{rate.carrier_id}</span>
-                          <span className='ml-2 text-[12px] text-text-tertiary'>{rate.type}</span>
-                        </div>
-                        <span className='text-[14px] font-semibold tabular-nums text-foreground'>
-                          ${rate.cost.toFixed(2)}
+                    <Truck className={cn('size-4 shrink-0', shipment.voided ? 'text-text-quaternary' : 'text-emerald-500')} />
+                    <div className='min-w-0 flex-1'>
+                      <div className='flex items-center gap-2'>
+                        <span className='text-[13px] font-medium text-foreground'>
+                          {shipment.service_name || shipment.carrier_id}
                         </span>
-                        <Button
-                          size='sm'
-                          variant='outline'
-                          onClick={() => selectRateMutation.mutate(rate.rate_id)}
-                          isPending={selectRateMutation.isPending}
-                        >
-                          Select
-                        </Button>
+                        {shipment.voided && (
+                          <span className='rounded bg-red-500/10 px-1.5 py-0.5 text-[10px] font-semibold text-red-600 dark:text-red-400'>
+                            Voided
+                          </span>
+                        )}
                       </div>
-                    ))}
+                      {shipment.tracking_number && (
+                        <span className='text-[12px] font-mono text-text-tertiary'>
+                          {shipment.tracking_number}
+                        </span>
+                      )}
+                    </div>
+                    <span className='text-[13px] font-medium tabular-nums text-foreground'>
+                      ${parseFloat(shipment.cost || '0').toFixed(2)}
+                    </span>
+                    <span className='text-[11px] text-text-quaternary'>
+                      {new Date(shipment.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                    </span>
                   </div>
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Label info */}
-          {isLabelPurchased && (
-            <div className='mb-6'>
-              <div className='mb-3 flex items-center gap-2'>
-                <Truck className='size-4 text-emerald-500' />
-                <span className='text-[13px] font-semibold text-foreground'>Shipping Label</span>
-              </div>
-              <div className='rounded-lg border border-emerald-200 bg-emerald-500/[0.03] p-4 dark:border-emerald-800'>
-                <p className='text-[13px] text-emerald-700 dark:text-emerald-400'>
-                  Label purchased successfully. Check the Shipping page for tracking details.
-                </p>
+                ))}
               </div>
             </div>
           )}
@@ -474,6 +378,8 @@ const PickListDetailPage = () => {
       </div>
 
       {/* Dialogs */}
+      <ShippingDialog pickList={pickList} open={shippingOpen} onOpenChange={setShippingOpen} />
+
       <AlertDialog open={deleteOpen} onOpenChange={setDeleteOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>

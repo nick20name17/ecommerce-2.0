@@ -29,6 +29,8 @@ import type {
 } from '@/api/filter-preset/schema'
 import { isConditionGroup } from '@/api/filter-preset/schema'
 import { filterPresetService } from '@/api/filter-preset/service'
+import { getFieldTypesQuery } from '@/api/data/query'
+import type { FieldTypesResponse } from '@/api/data/schema'
 import { getFieldConfigQuery } from '@/api/field-config/query'
 import type { FieldConfigEntry, FieldConfigResponse } from '@/api/field-config/schema'
 import {
@@ -51,6 +53,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
+import { DatePicker } from '@/components/ui/date-picker'
 import { Input } from '@/components/ui/input'
 import {
   Select,
@@ -155,6 +158,24 @@ function getOpLabel(op: FilterOp): string {
   return FILTER_OPS.find((o) => o.value === op)?.label ?? op
 }
 
+function getFieldType(field: string, entityType: string, fieldTypes?: FieldTypesResponse | null): string {
+  return fieldTypes?.[entityType]?.[field] ?? 'string'
+}
+
+const BOOLEAN_OPS: FilterOp[] = ['eq', 'neq', 'is_empty', 'is_not_empty']
+const NUMERIC_OPS: FilterOp[] = ['eq', 'neq', 'gt', 'gte', 'lt', 'lte', 'is_empty', 'is_not_empty']
+const DATE_OPS: FilterOp[] = ['eq', 'neq', 'gt', 'gte', 'lt', 'lte', 'is_empty', 'is_not_empty']
+
+function getOpsForType(type: string): { value: FilterOp; label: string }[] {
+  switch (type) {
+    case 'boolean': return FILTER_OPS.filter((o) => BOOLEAN_OPS.includes(o.value))
+    case 'integer':
+    case 'number': return FILTER_OPS.filter((o) => NUMERIC_OPS.includes(o.value))
+    case 'date': return FILTER_OPS.filter((o) => DATE_OPS.includes(o.value))
+    default: return FILTER_OPS
+  }
+}
+
 function flattenLeaves(group: FilterConditionGroup): FilterConditionLeaf[] {
   const leaves: FilterConditionLeaf[] = []
   for (const c of group.conditions) {
@@ -180,6 +201,7 @@ export const FilterGroupsSection = () => {
   const [projectId] = useProjectId()
   const { data: presets, isLoading } = useQuery(getFilterPresetsQuery())
   const { data: fieldConfig } = useQuery(getFieldConfigQuery(projectId))
+  const { data: fieldTypes } = useQuery(getFieldTypesQuery(projectId))
   const [expandedId, setExpandedId] = useState<number | null>(null)
   const [editingPreset, setEditingPreset] = useState<FilterPreset | 'create' | null>(null)
 
@@ -371,6 +393,7 @@ export const FilterGroupsSection = () => {
         <FilterPresetDialog
           preset={editingPreset === 'create' ? null : editingPreset}
           fieldConfig={fieldConfig}
+          fieldTypes={fieldTypes}
           open
           onOpenChange={(open) => !open && setEditingPreset(null)}
           onSaved={() => {
@@ -388,12 +411,14 @@ export const FilterGroupsSection = () => {
 function FilterPresetDialog({
   preset,
   fieldConfig,
+  fieldTypes,
   open,
   onOpenChange,
   onSaved,
 }: {
   preset: FilterPreset | null
   fieldConfig: FieldConfigResponse | null | undefined
+  fieldTypes: FieldTypesResponse | null | undefined
   open: boolean
   onOpenChange: (open: boolean) => void
   onSaved: () => void
@@ -572,6 +597,8 @@ function FilterPresetDialog({
               <div className='space-y-2'>
                 {rows.map((row, i) => {
                   const knownOpts = KNOWN_OPTIONS[entityType]?.[row.field]
+                  const fType = getFieldType(row.field, entityType, fieldTypes)
+                  const availableOps = knownOpts ? FILTER_OPS : getOpsForType(fType)
                   const hasValue = !NO_VALUE_OPS.includes(row.op)
                   return (
                     <div key={row.id} className='flex items-center gap-1.5'>
@@ -585,7 +612,14 @@ function FilterPresetDialog({
                       {/* Field */}
                       <Select
                         value={row.field}
-                        onValueChange={(v) => updateRow(row.id, { field: v, value: '' })}
+                        onValueChange={(v) => {
+                          const newType = getFieldType(v, entityType, fieldTypes)
+                          updateRow(row.id, {
+                            field: v,
+                            value: newType === 'boolean' ? 'true' : '',
+                            op: newType === 'boolean' ? 'eq' : row.op,
+                          })
+                        }}
                       >
                         <SelectTrigger size='sm' className='w-[130px] shrink-0'>
                           <SelectValue />
@@ -608,13 +642,13 @@ function FilterPresetDialog({
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          {FILTER_OPS.map((op) => (
+                          {availableOps.map((op) => (
                             <SelectItem key={op.value} value={op.value}>{op.label}</SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
 
-                      {/* Value */}
+                      {/* Value — type-aware */}
                       {hasValue && (
                         knownOpts ? (
                           <Select
@@ -635,6 +669,40 @@ function FilterPresetDialog({
                               ))}
                             </SelectContent>
                           </Select>
+                        ) : fType === 'boolean' ? (
+                          <button
+                            type='button'
+                            className={cn(
+                              'relative inline-flex h-7 w-[52px] shrink-0 items-center rounded-full border transition-colors duration-200',
+                              row.value === 'true'
+                                ? 'border-emerald-300 bg-emerald-500 dark:border-emerald-600'
+                                : 'border-border bg-bg-active',
+                            )}
+                            onClick={() => updateRow(row.id, { value: row.value === 'true' ? 'false' : 'true' })}
+                          >
+                            <span
+                              className={cn(
+                                'inline-block size-5 rounded-full bg-white shadow-sm transition-transform duration-200',
+                                row.value === 'true' ? 'translate-x-[27px]' : 'translate-x-[3px]',
+                              )}
+                            />
+                          </button>
+                        ) : fType === 'integer' || fType === 'number' ? (
+                          <Input
+                            type='number'
+                            value={row.value}
+                            onChange={(e) => updateRow(row.id, { value: e.target.value })}
+                            placeholder='0'
+                            step={fType === 'integer' ? '1' : 'any'}
+                            className='h-7 w-[100px] shrink-0 text-[13px] tabular-nums'
+                          />
+                        ) : fType === 'date' ? (
+                          <DatePicker
+                            value={row.value ? new Date(row.value) : undefined}
+                            onChange={(d) => updateRow(row.id, { value: d ? d.toISOString().split('T')[0] : '' })}
+                            placeholder='Pick date...'
+                            className='h-7 min-w-0 flex-1 text-[13px]'
+                          />
                         ) : (
                           <Input
                             value={row.value}
