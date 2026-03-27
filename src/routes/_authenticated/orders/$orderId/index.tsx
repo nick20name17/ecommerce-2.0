@@ -11,7 +11,7 @@ import { useCallback, useMemo, useState } from 'react'
 
 import { getFieldConfigQuery } from '@/api/field-config/query'
 import { getOrderDetailQuery, ORDER_QUERY_KEYS } from '@/api/order/query'
-import type { Order, OrderPatchPayload } from '@/api/order/schema'
+import type { OrderPatchPayload } from '@/api/order/schema'
 import { orderService } from '@/api/order/service'
 import { IOrders, PAGE_COLORS, PageHeaderIcon } from '@/components/ds'
 import { OrderAssignDialog } from '@/routes/_authenticated/orders/-components/order-assign-dialog'
