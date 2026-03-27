@@ -161,11 +161,15 @@ export const useNotificationsWebSocket = ({
         if (!isNote) {
           addNotification(entity, event_type, autoid, user)
         }
-        if (showToasts) {
-          const isCreateOrDeleteOrderProposal =
-            (entity === 'order' || entity === 'proposal') &&
-            (event_type === 'created' || event_type === 'deleted')
-          if (!isCreateOrDeleteOrderProposal && !isNote) {
+        if (showToasts && !isNote) {
+          const isCreateOrderProposal =
+            (entity === 'order' || entity === 'proposal') && event_type === 'created'
+          const isDeleteOrderProposal =
+            (entity === 'order' || entity === 'proposal') && event_type === 'deleted'
+          if (isCreateOrderProposal) {
+            const label = ENTITY_LABELS[entity] ?? entity
+            toast.success(`${label} ${autoid} created successfully`)
+          } else if (!isDeleteOrderProposal) {
             toast.info(getToastMessage(msg))
           }
         }

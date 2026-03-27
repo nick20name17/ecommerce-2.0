@@ -344,10 +344,9 @@ export function useCreatePage() {
           await pendingAttachments.uploadPendingFiles(autoid, 'proposal')
         }
       })
-      .catch((e) => {
+      .catch(() => {
+        // POST already succeeded — timeout on autoid wait or attachment upload is non-blocking
         removePendingProposal()
-        cancelPendingCreatedAutoid('proposal')
-        toast.error(getErrorMessage(e))
       })
   }
 
@@ -412,10 +411,9 @@ export function useCreatePage() {
             : Promise.resolve(),
         ])
       })
-      .catch((e) => {
+      .catch(() => {
+        // POST already succeeded — timeout on autoid wait or patch is non-blocking
         removePendingOrder()
-        cancelPendingCreatedAutoid('order')
-        toast.error(getErrorMessage(e))
       })
   }
 
