@@ -226,7 +226,6 @@ const SettingsPage = () => {
 
 const GeneralSection = ({ projectId }: { projectId: number }) => {
   const [unitSystem, setUnitSystem] = useState<string>('metric')
-  const [oosField, setOosField] = useState('')
   const [categoryWebFilter, setCategoryWebFilter] = useState(true)
   const [productWebFilter, setProductWebFilter] = useState(true)
   const [loaded, setLoaded] = useState(false)
@@ -243,7 +242,6 @@ const GeneralSection = ({ projectId }: { projectId: number }) => {
   useEffect(() => {
     if (project && !loaded) {
       setUnitSystem(project.unit_system ?? 'metric')
-      setOosField(project.oos_field ?? '')
       setCategoryWebFilter(project.category_show_web_filter ?? true)
       setProductWebFilter(project.product_show_web_filter ?? true)
       setLoaded(true)
@@ -294,19 +292,6 @@ const GeneralSection = ({ projectId }: { projectId: number }) => {
           </div>
         </div>
 
-        {/* OOS Field */}
-        <div>
-          <label className='mb-1.5 block text-[12px] font-medium text-text-tertiary'>Out of Stock Field</label>
-          <p className='mb-1 text-[11px] text-text-quaternary'>Database field name used for out-of-stock detection. Leave empty to disable.</p>
-          <input
-            value={oosField}
-            onChange={(e) => setOosField(e.target.value)}
-            onBlur={() => save({ oos_field: oosField.trim() })}
-            onKeyDown={(e) => { if (e.key === 'Enter') (e.target as HTMLInputElement).blur() }}
-            placeholder='e.g. oos_flag'
-            className='h-8 w-64 rounded-[6px] border border-border bg-background px-2.5 text-[13px] text-foreground outline-none transition-colors placeholder:text-text-quaternary focus:border-primary focus:ring-1 focus:ring-primary/20'
-          />
-        </div>
 
         {/* Toggle switches */}
         <div className='space-y-3'>
