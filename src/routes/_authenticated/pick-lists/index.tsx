@@ -4,7 +4,7 @@ import {
   ChevronRight,
   ClipboardList,
   Package,
-  Plus,
+
   Search,
   ShoppingCart,
 } from 'lucide-react'
@@ -15,7 +15,7 @@ import type { PickList, PickListParams } from '@/api/pick-list/schema'
 import { PageEmpty } from '@/components/common/page-empty'
 import { Pagination } from '@/components/common/filters/pagination'
 import { FilterChip, FilterPopover, IPickLists, PAGE_COLORS, PageHeaderIcon } from '@/components/ds'
-import { Button } from '@/components/ui/button'
+
 import { SidebarTrigger } from '@/components/ui/sidebar'
 import { Skeleton } from '@/components/ui/skeleton'
 import {
@@ -29,7 +29,6 @@ import { useBreakpoint } from '@/hooks/use-breakpoint'
 import { useLimitParam, useOffsetParam, useSearchParam } from '@/hooks/use-query-params'
 import { cn } from '@/lib/utils'
 
-import { CreatePickListModal } from './-components/create-pick-list-modal'
 
 // ── Helpers ──────────────────────────────────────────────────
 
@@ -64,7 +63,7 @@ const PickListsPage = () => {
   const [limit] = useLimitParam()
 
   const [activeStatus, setActiveStatus] = useState<PickListStatus | null>(null)
-  const [createOpen, setCreateOpen] = useState(false)
+
 
   const params: PickListParams = {
     search: search || undefined,
@@ -162,11 +161,7 @@ const PickListsPage = () => {
           })}
         </FilterPopover>
 
-        {/* Create button */}
-        <Button size='sm' onClick={() => setCreateOpen(true)}>
-          <Plus className='size-3.5' />
-          {!isMobile && 'New'}
-        </Button>
+
       </header>
 
       {/* Active filters */}
@@ -234,15 +229,7 @@ const PickListsPage = () => {
           <PageEmpty
             icon={ClipboardList}
             title='No pick lists found'
-            description={hasFilters ? 'Try adjusting your filters.' : 'Create a pick list to get started.'}
-            action={
-              !hasFilters ? (
-                <Button size='sm' onClick={() => setCreateOpen(true)}>
-                  <Plus className='size-3.5' />
-                  New Pick List
-                </Button>
-              ) : undefined
-            }
+            description={hasFilters ? 'Try adjusting your filters.' : 'No pick lists yet.'}
           />
         ) : (
           results.map((pickList) => (
@@ -267,8 +254,6 @@ const PickListsPage = () => {
         <Pagination totalCount={data?.count ?? 0} />
       </div>
 
-      {/* Create modal */}
-      <CreatePickListModal open={createOpen} onOpenChange={setCreateOpen} />
     </div>
   )
 }
