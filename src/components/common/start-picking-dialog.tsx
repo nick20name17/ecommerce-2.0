@@ -156,14 +156,17 @@ export function StartPickingDialog({
         name: `${customerName} picking`,
       })
 
-      // 2. Add items
+      // 2. Add items (exclude items with 0 quantity)
       const payload: AddItemsPayload = {
-        items: allItems.map((item) => ({
-          order_autoid: item.orderAutoid,
-          detail_autoid: item.autoid,
-          picked_quantity: pickQuantities.get(item.autoid) || item.quan,
-        })),
+        items: allItems
+          .map((item) => ({
+            order_autoid: item.orderAutoid,
+            detail_autoid: item.autoid,
+            picked_quantity: pickQuantities.get(item.autoid) || item.quan,
+          }))
+          .filter((item) => parseFloat(item.picked_quantity) > 0),
       }
+      if (payload.items.length === 0) throw new Error('No items with quantity > 0')
       await pickListService.addItems(pickList.id, payload)
 
       // 3. Push to EBMS
