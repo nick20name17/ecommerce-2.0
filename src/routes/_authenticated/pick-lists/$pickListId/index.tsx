@@ -96,7 +96,7 @@ const PickListDetailPage = () => {
   }, [items])
 
   // Fetch shipments related to this pick list
-  const { data: allShipments = [] } = useQuery(getShipmentsQuery({}))
+  const { data: allShipments = [] } = useQuery(getShipmentsQuery({ pick_list_id: id }))
 
   // ── Mutations ──────────────────────────────────────────
 

@@ -26,6 +26,7 @@ import { Route as AuthenticatedNavOptionsIndexRouteImport } from './routes/_auth
 import { Route as AuthenticatedDevIndexRouteImport } from './routes/_authenticated/dev/index'
 import { Route as AuthenticatedCustomersIndexRouteImport } from './routes/_authenticated/customers/index'
 import { Route as AuthenticatedCreateIndexRouteImport } from './routes/_authenticated/create/index'
+import { Route as AuthenticatedActivityIndexRouteImport } from './routes/_authenticated/activity/index'
 import { Route as AuthSignInIndexRouteImport } from './routes/_auth/sign-in/index'
 import { Route as AuthenticatedTasksTaskIdIndexRouteImport } from './routes/_authenticated/tasks/$taskId/index'
 import { Route as AuthenticatedProposalsProposalIdIndexRouteImport } from './routes/_authenticated/proposals/$proposalId/index'
@@ -127,6 +128,12 @@ const AuthenticatedCreateIndexRoute =
     path: '/create/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedActivityIndexRoute =
+  AuthenticatedActivityIndexRouteImport.update({
+    id: '/activity/',
+    path: '/activity/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthSignInIndexRoute = AuthSignInIndexRouteImport.update({
   id: '/sign-in/',
   path: '/sign-in/',
@@ -166,6 +173,7 @@ const AuthenticatedCustomersCustomerIdIndexRoute =
 export interface FileRoutesByFullPath {
   '/': typeof AuthenticatedIndexRoute
   '/sign-in/': typeof AuthSignInIndexRoute
+  '/activity/': typeof AuthenticatedActivityIndexRoute
   '/create/': typeof AuthenticatedCreateIndexRoute
   '/customers/': typeof AuthenticatedCustomersIndexRoute
   '/dev/': typeof AuthenticatedDevIndexRoute
@@ -189,6 +197,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof AuthenticatedIndexRoute
   '/sign-in': typeof AuthSignInIndexRoute
+  '/activity': typeof AuthenticatedActivityIndexRoute
   '/create': typeof AuthenticatedCreateIndexRoute
   '/customers': typeof AuthenticatedCustomersIndexRoute
   '/dev': typeof AuthenticatedDevIndexRoute
@@ -215,6 +224,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/_authenticated/': typeof AuthenticatedIndexRoute
   '/_auth/sign-in/': typeof AuthSignInIndexRoute
+  '/_authenticated/activity/': typeof AuthenticatedActivityIndexRoute
   '/_authenticated/create/': typeof AuthenticatedCreateIndexRoute
   '/_authenticated/customers/': typeof AuthenticatedCustomersIndexRoute
   '/_authenticated/dev/': typeof AuthenticatedDevIndexRoute
@@ -240,6 +250,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/sign-in/'
+    | '/activity/'
     | '/create/'
     | '/customers/'
     | '/dev/'
@@ -263,6 +274,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/sign-in'
+    | '/activity'
     | '/create'
     | '/customers'
     | '/dev'
@@ -288,6 +300,7 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/_authenticated/'
     | '/_auth/sign-in/'
+    | '/_authenticated/activity/'
     | '/_authenticated/create/'
     | '/_authenticated/customers/'
     | '/_authenticated/dev/'
@@ -435,6 +448,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCreateIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/activity/': {
+      id: '/_authenticated/activity/'
+      path: '/activity'
+      fullPath: '/activity/'
+      preLoaderRoute: typeof AuthenticatedActivityIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_auth/sign-in/': {
       id: '/_auth/sign-in/'
       path: '/sign-in'
@@ -494,6 +514,7 @@ const AuthRouteRouteWithChildren = AuthRouteRoute._addFileChildren(
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
+  AuthenticatedActivityIndexRoute: typeof AuthenticatedActivityIndexRoute
   AuthenticatedCreateIndexRoute: typeof AuthenticatedCreateIndexRoute
   AuthenticatedCustomersIndexRoute: typeof AuthenticatedCustomersIndexRoute
   AuthenticatedDevIndexRoute: typeof AuthenticatedDevIndexRoute
@@ -517,6 +538,7 @@ interface AuthenticatedRouteRouteChildren {
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
+  AuthenticatedActivityIndexRoute: AuthenticatedActivityIndexRoute,
   AuthenticatedCreateIndexRoute: AuthenticatedCreateIndexRoute,
   AuthenticatedCustomersIndexRoute: AuthenticatedCustomersIndexRoute,
   AuthenticatedDevIndexRoute: AuthenticatedDevIndexRoute,

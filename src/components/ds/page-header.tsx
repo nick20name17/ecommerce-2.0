@@ -34,4 +34,5 @@ export const PAGE_COLORS = {
   pickLists: 'bg-teal-500',
   picking: 'bg-lime-500',
   dev: 'bg-sky-500',
+  activity: 'bg-slate-500',
 } as const

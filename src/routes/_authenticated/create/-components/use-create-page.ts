@@ -15,6 +15,7 @@ import type { CartItem, Product } from '@/api/product/schema'
 import type { EntityAttachmentsRef } from '@/components/common/entity-attachments/entity-attachments'
 import { getErrorMessage } from '@/helpers/error'
 import { cancelPendingCreatedAutoid, waitForCreatedAutoid } from '@/helpers/pending-created-autoid'
+import { addPendingOrder, removePendingOrder } from '@/hooks/use-pending-orders'
 import { useProjectId } from '@/hooks/use-project-id'
 import { useSelectedCustomerId } from '@/hooks/use-selected-customer'
 
@@ -372,7 +373,7 @@ export function useCreatePage() {
     }
   }
 
-  const handleCreateOrder = async () => {
+  const handleCreateOrder = () => {
     if (!customer) {
       toast.warning('Please select a customer for this order')
       return
@@ -381,38 +382,40 @@ export function useCreatePage() {
       toast.warning('Please add at least one product to the order')
       return
     }
-    busyDispatch({ type: 'CREATING_ORDER', value: true })
-    const autoidPromise = waitForCreatedAutoid('order')
-    await toast.promise(
-      (async () => {
-        try {
-          await cartService.submitOrder(customer.id, projectId)
-        } catch (e) {
-          cancelPendingCreatedAutoid('order')
-          throw e
-        }
-        const autoid = await autoidPromise
+
+    // Capture refs before navigating (component will unmount)
+    const custId = customer.id
+    const projId = projectId
+    const pendingAttachments = attachmentsRef.current?.hasPendingFiles()
+      ? attachmentsRef.current
+      : null
+
+    // Navigate immediately — don't wait for the API
+    addPendingOrder()
+    invalidateCart()
+    setCustomer(null)
+    setSavedCustomerId(null)
+    toast.success('Order submitted — processing in background')
+    navigate({ to: '/orders', search: { status: 'all' } })
+
+    // Fire-and-forget: entire flow runs in background
+    cartService.submitOrder(custId, projId)
+      .then(() => waitForCreatedAutoid('order', 60_000))
+      .then(async (autoid) => {
         await Promise.all([
           patchAddresses(autoid),
-          attachmentsRef.current?.hasPendingFiles()
-            ? attachmentsRef.current.uploadPendingFiles(autoid, 'order')
+          pendingAttachments
+            ? pendingAttachments.uploadPendingFiles(autoid, 'order')
             : Promise.resolve(),
         ])
-        return { autoid }
-      })(),
-      {
-        loading: 'Creating order...',
-        success: ({ autoid }) => {
-          invalidateCart()
-          setCustomer(null)
-          setSavedCustomerId(null)
-          navigate({ to: '/orders', search: { autoid, status: 'all' } })
-          return 'Order created successfully'
-        },
-        error: (error) => getErrorMessage(error)
-      }
-    )
-    busyDispatch({ type: 'CREATING_ORDER', value: false })
+      })
+      .catch((e) => {
+        cancelPendingCreatedAutoid('order')
+        toast.error(getErrorMessage(e))
+      })
+      .finally(() => {
+        removePendingOrder()
+      })
   }
 
   return {

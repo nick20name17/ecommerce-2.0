@@ -10,6 +10,7 @@ import {
   Flask,
   GearSix,
   House,
+  ListBullets,
   Package,
   PlusSquare,
   FileText,
@@ -36,3 +37,4 @@ export const ITesting: IC = ({ className }) => <Flask className={className} weig
 export const IPickLists: IC = ({ className }) => <ClipboardText className={className} weight="fill" />
 export const IDev: IC = ({ className }) => <RocketLaunch className={className} weight="fill" />
 export const IPicking: IC = ({ className }) => <Crosshair className={className} weight="fill" />
+export const IActivity: IC = ({ className }) => <ListBullets className={className} weight="fill" />

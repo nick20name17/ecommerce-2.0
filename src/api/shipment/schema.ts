@@ -5,6 +5,9 @@ export interface ShipmentRecord {
   order_autoid: string
   order_invoice: string
   order_name: string
+  pick_list_id: number | null
+  pick_list_name: string | null
+  ship_to_name: string | null
   carrier_id: string
   service_name: string
   cost: string
@@ -22,5 +25,6 @@ export interface ShipmentParams extends PaginationParams {
   ordering?: string
   voided?: boolean
   order_autoid?: string
+  pick_list_id?: number
   project_id?: number
 }

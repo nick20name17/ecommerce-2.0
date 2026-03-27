@@ -70,7 +70,14 @@ const STATUS_DOT_COLORS: Record<VoidedFilter, string> = {
 }
 
 function getCustomerDisplay(shipment: ShipmentRecord): string {
-  return shipment.order_name || shipment.order_invoice || `#${shipment.order_autoid?.slice(0, 8) ?? '—'}`
+  return shipment.order_name || shipment.ship_to_name || shipment.order_invoice || `#${shipment.order_autoid?.slice(0, 8) ?? '—'}`
+}
+
+function getOrderDisplay(shipment: ShipmentRecord): string {
+  if (shipment.order_invoice) return shipment.order_invoice
+  if (shipment.order_autoid) return `#${shipment.order_autoid.slice(0, 8)}`
+  if (shipment.pick_list_id) return `PL #${shipment.pick_list_id}`
+  return '—'
 }
 
 // ── Page Component ───────────────────────────────────────────
@@ -102,7 +109,9 @@ const ShippingPage = () => {
           s.order_autoid.toLowerCase().includes(term) ||
           s.tracking_number.toLowerCase().includes(term) ||
           s.service_name.toLowerCase().includes(term) ||
-          s.carrier_id.toLowerCase().includes(term)
+          s.carrier_id.toLowerCase().includes(term) ||
+          (s.ship_to_name ?? '').toLowerCase().includes(term) ||
+          (s.pick_list_id != null && String(s.pick_list_id).includes(term))
         )
       })
     : allShipments
@@ -283,7 +292,7 @@ function ShipmentRow({
       >
         <div className='mb-1 flex items-center gap-2'>
           <span className='text-[13px] font-semibold tabular-nums text-foreground'>
-            {shipment.order_invoice || `#${shipment.order_autoid?.slice(0, 8) ?? '—'}`}
+            {getOrderDisplay(shipment)}
           </span>
           <span className='min-w-0 flex-1 truncate text-[13px] font-medium text-foreground'>
             {customerName}
@@ -313,7 +322,7 @@ function ShipmentRow({
     >
       <div className='w-[80px] shrink-0'>
         <span className='text-[13px] font-semibold tabular-nums text-foreground'>
-          {shipment.order_invoice || `#${shipment.order_autoid?.slice(0, 8) ?? '—'}`}
+          {getOrderDisplay(shipment)}
         </span>
       </div>
       <div className='min-w-0 flex-1 truncate text-[13px] font-medium text-foreground'>
@@ -436,8 +445,8 @@ function ShipmentDetailDialog({
 
           {/* Info grid */}
           <div className='grid grid-cols-2 gap-x-4'>
-            <PropertyCell label='Order' value={shipment.order_invoice || shipment.order_autoid} />
-            <PropertyCell label='Customer' value={shipment.order_name || '—'} />
+            <PropertyCell label='Order' value={getOrderDisplay(shipment)} />
+            <PropertyCell label='Customer' value={getCustomerDisplay(shipment)} />
             <PropertyCell label='Carrier' value={shipment.carrier_id} />
             <PropertyCell label='Service' value={shipment.service_name} />
             <PropertyCell label='Cost' value={`$${parseFloat(shipment.cost).toFixed(2)}`} />

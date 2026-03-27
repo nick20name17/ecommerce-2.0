@@ -3,6 +3,7 @@ import { Link } from '@tanstack/react-router'
 
 import { getTasksQuery, getTaskStatusesQuery } from '@/api/task/query'
 import {
+  IActivity,
   ICustomers,
   IDashboard,
   IDev,
@@ -16,6 +17,7 @@ import {
   ITodos,
 } from '@/components/ds'
 import { isAdmin, isSuperAdmin } from '@/constants/user'
+import { usePendingOrders } from '@/hooks/use-pending-orders'
 import { useProjectId } from '@/hooks/use-project-id'
 import { cn } from '@/lib/utils'
 import { useAuth } from '@/providers/auth'
@@ -96,6 +98,14 @@ const WORKSPACE_ITEMS: NavItem[] = [
     iconColor: 'text-white',
   },
   {
+    title: 'Activity',
+    url: '/activity',
+    icon: IActivity,
+    iconBg: 'bg-slate-500',
+    iconColor: 'text-white',
+    adminOnly: true,
+  },
+  {
     title: 'Development',
     url: '/dev',
     icon: IDev,
@@ -140,9 +150,11 @@ function useTaskCounts() {
 const ColoredNavLink = ({
   item,
   badge,
+  loading,
 }: {
   item: NavItem
   badge?: number
+  loading?: boolean
 }) => (
   <Link
     to={item.url}
@@ -166,7 +178,12 @@ const ColoredNavLink = ({
       <item.icon className='size-[13px]' />
     </div>
     <span className='flex-1 truncate'>{item.title}</span>
-    {badge != null && badge > 0 && (
+    {loading && (
+      <span className='flex size-[20px] items-center justify-center'>
+        <span className='size-3 animate-spin rounded-full border-2 border-orange-500/30 border-t-orange-500' />
+      </span>
+    )}
+    {badge != null && badge > 0 && !loading && (
       <span className='min-w-[20px] rounded-full bg-violet-500/15 px-1.5 text-center text-[13px] font-semibold tabular-nums text-violet-600 dark:bg-violet-500/20 dark:text-violet-400'>
         {badge}
       </span>
@@ -203,6 +220,7 @@ export const NavMain = () => {
   const userIsSuperAdmin = !!user?.role && isSuperAdmin(user.role)
   const userIsAdmin = !!user?.role && isAdmin(user.role)
   const { pendingCount } = useTaskCounts()
+  const pendingOrders = usePendingOrders()
 
   const filterItems = (items: NavItem[]) =>
     items.filter((item) => {
@@ -237,6 +255,7 @@ export const NavMain = () => {
             key={item.title}
             item={item}
             badge={item.url === '/tasks' ? pendingCount : undefined}
+            loading={item.url === '/orders' ? pendingOrders > 0 : undefined}
           />
         ))}
       </div>
