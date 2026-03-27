@@ -12,9 +12,12 @@ import {
   XCircle,
 } from 'lucide-react'
 import { useState } from 'react'
+import { toast } from 'sonner'
 
 import { SHIPMENT_QUERY_KEYS } from '@/api/shipment/query'
 import { getShipmentsQuery } from '@/api/shipment/query'
+import { PICK_LIST_QUERY_KEYS } from '@/api/pick-list/query'
+import { pickListService } from '@/api/pick-list/service'
 import type { ShipmentRecord } from '@/api/shipment/schema'
 import { shipmentService } from '@/api/shipment/service'
 import { PageEmpty } from '@/components/common/page-empty'
@@ -381,15 +384,21 @@ function ShipmentDetailDialog({
   const [voidConfirmOpen, setVoidConfirmOpen] = useState(false)
 
   const voidMutation = useMutation({
-    mutationFn: () => shipmentService.void(shipment.order_autoid, shipment.id),
-    meta: {
-      successMessage: 'Shipment voided',
-      invalidatesQuery: SHIPMENT_QUERY_KEYS.lists(),
+    mutationFn: async () => {
+      if (shipment.pick_list_id) {
+        await pickListService.voidLabel(shipment.pick_list_id)
+        return
+      }
+      await shipmentService.void(shipment.order_autoid, shipment.id)
     },
     onSuccess: () => {
       setVoidConfirmOpen(false)
       onOpenChange(false)
       queryClient.invalidateQueries({ queryKey: SHIPMENT_QUERY_KEYS.lists() })
+      if (shipment.pick_list_id) {
+        queryClient.invalidateQueries({ queryKey: PICK_LIST_QUERY_KEYS.lists() })
+      }
+      toast.success('Shipment voided')
     },
   })
 
