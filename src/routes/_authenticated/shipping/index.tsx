@@ -16,6 +16,7 @@ import { toast } from 'sonner'
 
 import { SHIPMENT_QUERY_KEYS } from '@/api/shipment/query'
 import { getShipmentsQuery } from '@/api/shipment/query'
+import { getPickListDetailQuery } from '@/api/pick-list/query'
 import { PICK_LIST_QUERY_KEYS } from '@/api/pick-list/query'
 import { pickListService } from '@/api/pick-list/service'
 import type { ShipmentRecord } from '@/api/shipment/schema'
@@ -383,6 +384,13 @@ function ShipmentDetailDialog({
   const queryClient = useQueryClient()
   const [voidConfirmOpen, setVoidConfirmOpen] = useState(false)
 
+  // Fetch pick list items when shipment is from a pick list
+  const { data: pickListData } = useQuery({
+    ...getPickListDetailQuery(shipment.pick_list_id!),
+    enabled: open && shipment.pick_list_id != null,
+  })
+  const pickListItems = pickListData?.items ?? []
+
   const voidMutation = useMutation({
     mutationFn: async () => {
       if (shipment.pick_list_id) {
@@ -484,28 +492,41 @@ function ShipmentDetailDialog({
             )}
           </div>
 
-          {/* Package contents */}
-          {(shipment.items?.length ?? 0) > 0 && (
+          {/* Package contents — from shipment items or pick list items */}
+          {((shipment.items?.length ?? 0) > 0 || pickListItems.length > 0) && (
             <div className='border-t border-border px-5 py-3'>
-              <div className='mb-2 text-[12px] font-medium text-text-tertiary'>Package Contents</div>
+              <div className='mb-2 text-[12px] font-medium text-text-tertiary'>
+                Package Contents ({shipment.items?.length || pickListItems.length})
+              </div>
               <div className='divide-y divide-border-light rounded-[6px] border border-border'>
-                {shipment.items!.map((item, i) => (
-                  <div key={i} className='flex items-center gap-3 px-3 py-2'>
-                    <span className='min-w-0 flex-1 truncate font-mono text-[12px] font-medium text-foreground'>
-                      {item.product_id || item.detail_autoid}
-                    </span>
-                    {item.description && (
-                      <span className='hidden truncate text-[12px] text-text-tertiary sm:block'>
-                        {item.description}
-                      </span>
-                    )}
-                    {item.quantity && (
-                      <span className='shrink-0 rounded bg-bg-secondary px-1.5 py-0.5 text-[12px] font-medium tabular-nums text-text-secondary'>
-                        {item.quantity}
-                      </span>
-                    )}
-                  </div>
-                ))}
+                {(shipment.items?.length ?? 0) > 0
+                  ? shipment.items!.map((item, i) => (
+                      <div key={i} className='flex items-center gap-3 px-3 py-2'>
+                        <span className='min-w-0 flex-1 truncate font-mono text-[12px] font-medium text-foreground'>
+                          {item.product_id || item.detail_autoid}
+                        </span>
+                        {item.description && (
+                          <span className='hidden truncate text-[12px] text-text-tertiary sm:block'>
+                            {item.description}
+                          </span>
+                        )}
+                        {item.quantity && (
+                          <span className='shrink-0 rounded bg-bg-secondary px-1.5 py-0.5 text-[12px] font-medium tabular-nums text-text-secondary'>
+                            {item.quantity}
+                          </span>
+                        )}
+                      </div>
+                    ))
+                  : pickListItems.map((item) => (
+                      <div key={item.id} className='flex items-center gap-3 px-3 py-2'>
+                        <span className='min-w-0 flex-1 truncate font-mono text-[12px] font-medium text-foreground'>
+                          {item.detail_autoid}
+                        </span>
+                        <span className='shrink-0 rounded bg-bg-secondary px-1.5 py-0.5 text-[12px] font-medium tabular-nums text-text-secondary'>
+                          {parseFloat(item.picked_quantity) % 1 === 0 ? parseInt(item.picked_quantity) : item.picked_quantity}
+                        </span>
+                      </div>
+                    ))}
               </div>
             </div>
           )}
