@@ -422,7 +422,7 @@ const OrderDeskPage = () => {
       {/* Attachments panel — always mounted to preserve pending files */}
       {attachmentsOpen && (
         <div
-          className='fixed inset-0 z-50 bg-black/10 supports-backdrop-filter:backdrop-blur-xs'
+          className='fixed inset-0 z-50 bg-black/10'
           onClick={() => setAttachmentsOpen(false)}
         />
       )}
