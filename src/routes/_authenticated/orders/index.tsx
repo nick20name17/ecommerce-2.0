@@ -851,13 +851,15 @@ function OrderRow({
                 Assign
               </DropdownMenuItem>
             )}
-            <DropdownMenuItem
-              className='cursor-pointer gap-2 rounded-[6px] px-2 py-1 text-[13px]'
-              onClick={() => onPick(order)}
-            >
-              <ClipboardList className='size-3.5' />
-              Start Picking
-            </DropdownMenuItem>
+            {order.status === ORDER_STATUS.unprocessed && (
+              <DropdownMenuItem
+                className='cursor-pointer gap-2 rounded-[6px] px-2 py-1 text-[13px]'
+                onClick={() => onPick(order)}
+              >
+                <ClipboardList className='size-3.5' />
+                Start Picking
+              </DropdownMenuItem>
+            )}
             <DropdownMenuItem
               className='cursor-pointer gap-2 rounded-[6px] px-2 py-1 text-[13px]'
               onClick={() => onCreateTask(order)}
