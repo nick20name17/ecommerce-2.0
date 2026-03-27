@@ -80,7 +80,7 @@ export const useEditSheetData = (
 
   return {
     configData,
-    configLoading: configQuery.isLoading,
+    configLoading: needConfig && configQuery.isLoading && configQuery.fetchStatus !== 'idle',
     editProductWithPhotos
   }
 }
