@@ -154,7 +154,8 @@ function OrderDetailPage() {
   })
 
   const voidShipmentMutation = useMutation({
-    mutationFn: (shipmentId: number) => orderService.voidShipment(orderId, shipmentId),
+    mutationFn: ({ shipmentId, shipmentOrderAutoid }: { shipmentId: number; shipmentOrderAutoid?: string }) =>
+      orderService.voidShipment(shipmentOrderAutoid || orderId, shipmentId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ORDER_QUERY_KEYS.detail(orderId) })
       toast.success('Shipment voided')
@@ -782,7 +783,7 @@ function OrderDetailPage() {
                               <button
                                 type='button'
                                 className='inline-flex items-center gap-0.5 text-[11px] font-medium text-destructive hover:underline disabled:opacity-50'
-                                onClick={() => voidShipmentMutation.mutate(shipment.id)}
+                                onClick={() => voidShipmentMutation.mutate({ shipmentId: shipment.id, shipmentOrderAutoid: shipment.order_autoid })}
                                 disabled={voidShipmentMutation.isPending}
                               >
                                 <XCircle className='size-2.5' />

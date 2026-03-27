@@ -1,5 +1,12 @@
 import type { PaginationParams } from '@/api/schema'
 
+export interface ShipmentItem {
+  detail_autoid: string
+  product_id?: string
+  description?: string
+  quantity?: string
+}
+
 export interface ShipmentRecord {
   id: number
   order_autoid: string
@@ -15,6 +22,7 @@ export interface ShipmentRecord {
   label_id: string
   label_url: string
   voided: boolean
+  items?: ShipmentItem[]
   created_at: string
 }
 

@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, Link } from '@tanstack/react-router'
 import {
   Ban,
   Check,
@@ -462,7 +462,44 @@ function ShipmentDetailDialog({
               </div>
             </PropertyCell>
             <PropertyCell label='Label ID' value={shipment.label_id || '—'} />
+            {shipment.pick_list_id && (
+              <PropertyCell label='Pick List'>
+                <Link
+                  to='/pick-lists/$pickListId'
+                  params={{ pickListId: String(shipment.pick_list_id) }}
+                  className='text-[13px] font-medium text-primary hover:underline'
+                >
+                  #{shipment.pick_list_id}
+                </Link>
+              </PropertyCell>
+            )}
           </div>
+
+          {/* Package contents */}
+          {(shipment.items?.length ?? 0) > 0 && (
+            <div className='border-t border-border px-5 py-3'>
+              <div className='mb-2 text-[12px] font-medium text-text-tertiary'>Package Contents</div>
+              <div className='divide-y divide-border-light rounded-[6px] border border-border'>
+                {shipment.items!.map((item, i) => (
+                  <div key={i} className='flex items-center gap-3 px-3 py-2'>
+                    <span className='min-w-0 flex-1 truncate font-mono text-[12px] font-medium text-foreground'>
+                      {item.product_id || item.detail_autoid}
+                    </span>
+                    {item.description && (
+                      <span className='hidden truncate text-[12px] text-text-tertiary sm:block'>
+                        {item.description}
+                      </span>
+                    )}
+                    {item.quantity && (
+                      <span className='shrink-0 rounded bg-bg-secondary px-1.5 py-0.5 text-[12px] font-medium tabular-nums text-text-secondary'>
+                        {item.quantity}
+                      </span>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
       </DialogContent>

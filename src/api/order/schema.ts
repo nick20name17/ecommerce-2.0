@@ -105,9 +105,10 @@ export interface OrderItem {
 
 export interface Shipment {
   id: number
+  order_autoid?: string
+  pick_list_id?: number | null
   carrier_id: string
   service_name: string
-
   cost: string
   tracking_number: string
   label_id: string
