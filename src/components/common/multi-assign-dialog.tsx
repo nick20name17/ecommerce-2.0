@@ -140,7 +140,7 @@ export function MultiAssignDialog({
                   return (
                     <span
                       key={user.id}
-                      className='inline-flex items-center gap-1.5 rounded-full border border-border bg-bg-secondary py-0.5 pl-1 pr-1.5 text-[12px] font-medium text-foreground'
+                      className='inline-flex items-center gap-1.5 rounded-full border border-border bg-bg-secondary py-0.5 pl-0.5 pr-1.5 text-[12px] font-medium text-foreground'
                     >
                       <InitialsAvatar initials={initials} size={18} />
                       <span className='max-w-[120px] truncate'>{name}</span>
