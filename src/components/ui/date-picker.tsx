@@ -88,31 +88,33 @@ export function DatePicker({
       onOpenChange={setOpen}
     >
       <PopoverTrigger asChild>
-        <Button
-          variant={className ? 'ghost' : 'outline'}
-          data-empty={!value}
+        <button
+          type='button'
           className={cn(
-            'data-[empty=true]:text-muted-foreground justify-start text-left font-normal',
-            showTime ? 'w-full justify-between' : '',
+            'inline-flex items-center gap-1.5 rounded-[5px] border border-border bg-background px-2 text-[13px] font-medium transition-colors duration-[80ms] hover:bg-bg-hover',
+            !value && 'text-text-tertiary',
+            showTime ? 'h-8 justify-between' : 'h-7',
             className
           )}
         >
           {showTime ? (
             <>
-              {value ? format(value, displayFormat) : <span>{placeholder}</span>}
-              <ChevronDownIcon />
+              <CalendarIcon className='size-3.5 shrink-0 text-text-tertiary' />
+              {value ? format(value, displayFormat) : <span>{placeholder ?? 'Pick date...'}</span>}
+              <ChevronDownIcon className='size-3 shrink-0 text-text-tertiary' />
             </>
           ) : (
             <>
-              <CalendarIcon />
-              {value ? format(value, displayFormat) : <span>{placeholder}</span>}
+              <CalendarIcon className='size-3.5 shrink-0 text-text-tertiary' />
+              {value ? format(value, displayFormat) : <span>{placeholder ?? 'Pick date...'}</span>}
             </>
           )}
-        </Button>
+        </button>
       </PopoverTrigger>
       <PopoverContent
-        className={cn('w-auto p-0', showTime && 'overflow-hidden')}
-        align={showTime ? 'start' : undefined}
+        className={cn('w-auto overflow-hidden rounded-[10px] p-0', showTime && 'overflow-hidden')}
+        align='start'
+        style={{ boxShadow: 'var(--dropdown-shadow)' }}
       >
         {showTime ? (
           <div className='flex'>
