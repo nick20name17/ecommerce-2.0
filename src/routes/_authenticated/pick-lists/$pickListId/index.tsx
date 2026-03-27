@@ -115,8 +115,9 @@ const PickListDetailPage = () => {
   const voidMutation = useMutation({
     mutationFn: () => pickListService.voidLabel(id),
     meta: { successMessage: 'Label voided' },
-    onSuccess: (updated) => {
-      queryClient.setQueryData(PICK_LIST_QUERY_KEYS.detail(id), updated)
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: PICK_LIST_QUERY_KEYS.detail(id) })
+      queryClient.invalidateQueries({ queryKey: PICK_LIST_QUERY_KEYS.lists() })
       setVoidOpen(false)
     },
   })
