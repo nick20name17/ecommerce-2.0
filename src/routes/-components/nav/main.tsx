@@ -44,6 +44,7 @@ const TOP_ITEMS: NavItem[] = [
     icon: IDashboard,
     iconBg: 'bg-emerald-500',
     iconColor: 'text-white',
+    adminOnly: true,
   },
   {
     title: 'Order Desk',

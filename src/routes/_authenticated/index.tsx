@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, redirect } from '@tanstack/react-router'
 import { LayoutDashboard, TriangleAlert } from 'lucide-react'
 
 import { DashboardKpis } from './-components/dashboard-kpis'
@@ -12,8 +12,9 @@ import type { Customer } from '@/api/customer/schema'
 import { getDashboardQuery } from '@/api/dashboard/query'
 import { SidebarTrigger } from '@/components/ui/sidebar'
 import { Skeleton } from '@/components/ui/skeleton'
-import { isSuperAdmin } from '@/constants/user'
+import { isAdmin, isSuperAdmin } from '@/constants/user'
 import { getErrorMessage } from '@/helpers/error'
+import { getSession } from '@/helpers/auth'
 import { useProjectId } from '@/hooks/use-project-id'
 import { useDashboardCustomerIdParam } from '@/hooks/use-query-params'
 import { useAuth } from '@/providers/auth'
@@ -207,6 +208,12 @@ function DashboardHeader({
 
 export const Route = createFileRoute('/_authenticated/')({
   component: DashboardPage,
+  beforeLoad: () => {
+    const session = getSession()
+    if (session?.user?.role && !isAdmin(session.user.role)) {
+      throw redirect({ to: '/orders', replace: true })
+    }
+  },
   head: () => ({
     meta: [{ title: 'Dashboard' }]
   })
