@@ -56,7 +56,7 @@ const getInvalidationKeys = (entity: string): readonly (readonly unknown[])[] =>
     case 'note':
       return [NOTE_QUERY_KEYS.all()]
     case 'order':
-      return [ORDER_QUERY_KEYS.lists()]
+      return [ORDER_QUERY_KEYS.lists(), PICK_LIST_QUERY_KEYS.all(), SHIPMENT_QUERY_KEYS.all()]
     case 'proposal':
       return [PROPOSAL_QUERY_KEYS.lists()]
     case 'customer':
@@ -64,11 +64,11 @@ const getInvalidationKeys = (entity: string): readonly (readonly unknown[])[] =>
     case 'task':
       return [TASK_QUERY_KEYS.lists()]
     case 'pick_list':
-      return [PICK_LIST_QUERY_KEYS.lists()]
+      return [PICK_LIST_QUERY_KEYS.all(), SHIPMENT_QUERY_KEYS.all()]
     case 'shipment':
-      return [SHIPMENT_QUERY_KEYS.lists()]
+      return [SHIPMENT_QUERY_KEYS.all(), PICK_LIST_QUERY_KEYS.all()]
     default:
-      return [ORDER_QUERY_KEYS.lists(), PROPOSAL_QUERY_KEYS.lists()]
+      return [ORDER_QUERY_KEYS.lists(), PROPOSAL_QUERY_KEYS.lists(), PICK_LIST_QUERY_KEYS.all(), SHIPMENT_QUERY_KEYS.all()]
   }
 }
 
