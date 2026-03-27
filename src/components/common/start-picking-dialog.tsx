@@ -9,6 +9,7 @@ import type { PickingCustomerGroup, PickingOrder, PickingOrderItem } from '@/api
 import { PICK_LIST_QUERY_KEYS } from '@/api/pick-list/query'
 import { pickListService } from '@/api/pick-list/service'
 import type { AddItemsPayload } from '@/api/pick-list/schema'
+import { getShippingAddressesQuery } from '@/api/shipping-address/query'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -19,6 +20,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { Skeleton } from '@/components/ui/skeleton'
+import { useProjectId } from '@/hooks/use-project-id'
 import { cn } from '@/lib/utils'
 
 interface StartPickingDialogProps {
@@ -40,6 +42,7 @@ export function StartPickingDialog({
 }: StartPickingDialogProps) {
   const queryClient = useQueryClient()
   const navigate = useNavigate()
+  const [projectId] = useProjectId()
   const [step, setStep] = useState<Step>('select-orders')
   const [selectedOrderIds, setSelectedOrderIds] = useState<Set<string>>(new Set())
   const [pickQuantities, setPickQuantities] = useState<Map<string, string>>(new Map())
@@ -53,6 +56,17 @@ export function StartPickingDialog({
     }),
     enabled: open,
   })
+
+  // Fetch default shipping (ship-from) address
+  const { data: shippingAddresses } = useQuery({
+    ...getShippingAddressesQuery(projectId),
+    enabled: open,
+  })
+  const defaultShippingAddressId = useMemo(() => {
+    const list = Array.isArray(shippingAddresses) ? shippingAddresses : []
+    const def = list.find((a) => a.is_default) ?? list[0]
+    return def?.id ?? null
+  }, [shippingAddresses])
 
   // Find the matching customer group
   const groups = data?.results ?? []
@@ -126,17 +140,19 @@ export function StartPickingDialog({
       city: (o.c_city as string) || '',
       state: (o.c_state as string) || '',
       postal: (o.c_zip as string) || '',
-      country: 'US',
+      country: (o.c_country as string) || (o.country as string) || '',
     }
   }, [selectedOrders])
 
   const createMutation = useMutation({
     mutationFn: async () => {
       if (!shipTo) throw new Error('No ship-to address')
+      if (!defaultShippingAddressId) throw new Error('No shipping address configured. Add one in Settings.')
 
       // 1. Create pick list
       const pickList = await pickListService.create({
         ship_to: shipTo,
+        shipping_address_id: defaultShippingAddressId,
         name: `${customerName} picking`,
       })
 

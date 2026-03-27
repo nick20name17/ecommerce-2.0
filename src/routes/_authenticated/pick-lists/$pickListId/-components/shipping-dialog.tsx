@@ -6,6 +6,7 @@ import { toast } from 'sonner'
 import { PICK_LIST_QUERY_KEYS } from '@/api/pick-list/query'
 import { pickListService } from '@/api/pick-list/service'
 import type { PickList, PickListShippingRate } from '@/api/pick-list/schema'
+import { getProjectByIdQuery } from '@/api/project/query'
 import { getShippingAddressesQuery } from '@/api/shipping-address/query'
 import type { ShippingAddress } from '@/api/shipping-address/schema'
 import { Button } from '@/components/ui/button'
@@ -54,6 +55,15 @@ export function ShippingDialog({ pickList, open, onOpenChange }: ShippingDialogP
     country: pickList.ship_to?.country ?? '',
     phone: pickList.ship_to?.phone ?? '',
   })
+
+  // Fetch project settings for unit system
+  const { data: project } = useQuery({
+    ...getProjectByIdQuery(projectId!),
+    enabled: open && projectId != null,
+  })
+  const isMetric = project?.unit_system === 'metric'
+  const dimLabel = isMetric ? 'cm' : 'in'
+  const weightLabel = isMetric ? 'kg' : 'lbs'
 
   // Fetch ship-from addresses
   const shippingQuery = getShippingAddressesQuery(projectId)
@@ -263,19 +273,19 @@ export function ShippingDialog({ pickList, open, onOpenChange }: ShippingDialogP
                 </span>
                 <div className='grid grid-cols-4 gap-3'>
                   <div>
-                    <label className='mb-1 block text-[11px] font-medium text-text-tertiary'>Length (in)</label>
+                    <label className='mb-1 block text-[11px] font-medium text-text-tertiary'>Length ({dimLabel})</label>
                     <Input value={length} onChange={(e) => setLength(e.target.value)} type='number' min='0' step='any' className='h-8 text-[13px]' placeholder='0' />
                   </div>
                   <div>
-                    <label className='mb-1 block text-[11px] font-medium text-text-tertiary'>Width (in)</label>
+                    <label className='mb-1 block text-[11px] font-medium text-text-tertiary'>Width ({dimLabel})</label>
                     <Input value={width} onChange={(e) => setWidth(e.target.value)} type='number' min='0' step='any' className='h-8 text-[13px]' placeholder='0' />
                   </div>
                   <div>
-                    <label className='mb-1 block text-[11px] font-medium text-text-tertiary'>Height (in)</label>
+                    <label className='mb-1 block text-[11px] font-medium text-text-tertiary'>Height ({dimLabel})</label>
                     <Input value={height} onChange={(e) => setHeight(e.target.value)} type='number' min='0' step='any' className='h-8 text-[13px]' placeholder='0' />
                   </div>
                   <div>
-                    <label className='mb-1 block text-[11px] font-medium text-text-tertiary'>Weight (lbs)</label>
+                    <label className='mb-1 block text-[11px] font-medium text-text-tertiary'>Weight ({weightLabel})</label>
                     <Input value={weight} onChange={(e) => setWeight(e.target.value)} type='number' min='0' step='any' className='h-8 text-[13px]' placeholder='Auto' />
                   </div>
                 </div>
@@ -292,7 +302,7 @@ export function ShippingDialog({ pickList, open, onOpenChange }: ShippingDialogP
             <>
               {selectedAddress && (
                 <div className='rounded-lg bg-bg-secondary/50 px-3 py-2 text-[12px] text-text-tertiary'>
-                  Ship from <span className='font-medium text-foreground'>{selectedAddress.title}</span> · Package {length}×{width}×{height} in{weight && ` · ${weight} lbs`}
+                  Ship from <span className='font-medium text-foreground'>{selectedAddress.title}</span> · Package {length}×{width}×{height} {dimLabel}{weight && ` · ${weight} ${weightLabel}`}
                 </div>
               )}
 
@@ -319,8 +329,8 @@ export function ShippingDialog({ pickList, open, onOpenChange }: ShippingDialogP
                       <Button
                         size='sm'
                         onClick={() => selectMutation.mutate(rateId)}
-                        isPending={selectMutation.isPending}
-                        disabled={!rateId}
+                        isPending={selectMutation.isPending && selectMutation.variables === rateId}
+                        disabled={selectMutation.isPending || !rateId}
                       >
                         <Check className='size-3.5' />
                         Buy

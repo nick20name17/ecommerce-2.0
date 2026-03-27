@@ -18,7 +18,6 @@ import { useMemo, useState } from 'react'
 
 import { PICK_LIST_QUERY_KEYS, getPickListDetailQuery } from '@/api/pick-list/query'
 import { pickListService } from '@/api/pick-list/service'
-import { getShipmentsQuery } from '@/api/shipment/query'
 import { ShippingDialog } from './-components/shipping-dialog'
 import { IPickLists, PAGE_COLORS, PageHeaderIcon } from '@/components/ds'
 import {
@@ -95,8 +94,7 @@ const PickListDetailPage = () => {
     return Array.from(map.entries())
   }, [items])
 
-  // Fetch shipments related to this pick list
-  const { data: allShipments = [] } = useQuery(getShipmentsQuery({ pick_list_id: id }))
+  const allShipments = pickList?.shipments ?? []
 
   // ── Mutations ──────────────────────────────────────────
 

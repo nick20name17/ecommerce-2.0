@@ -220,7 +220,7 @@ function CustomersPage() {
             <SortableHeader field='l_name' label='Customer' sortField={sortField} sortDir={sortDir} onSort={handleSort} className='min-w-0 flex-1' />
             <div className='w-[130px] shrink-0'>Phone</div>
             {bp !== 'tablet' && <SortableHeader field='contact_3' label='Email' sortField={sortField} sortDir={sortDir} onSort={handleSort} className='w-[160px] shrink-0' />}
-            <SortableHeader field='in_level' label='Type' sortField={sortField} sortDir={sortDir} onSort={handleSort} className='w-[80px] shrink-0' />
+            <SortableHeader field='in_level' label='Type' sortField={sortField} sortDir={sortDir} onSort={handleSort} className='w-[100px] shrink-0' />
             <div className='w-[120px] shrink-0'>Responsible</div>
             <div className='w-[46px] shrink-0' />
             <div className='w-[28px] shrink-0' />
@@ -255,7 +255,7 @@ function CustomersPage() {
                 </div>
                 <div className='w-[130px] shrink-0'><Skeleton className='h-3.5 w-[90px] rounded' /></div>
                 {bp !== 'tablet' && <div className='w-[160px] shrink-0'><Skeleton className='h-3.5 w-[120px] rounded' /></div>}
-                <div className='w-[80px] shrink-0'><Skeleton className='h-[18px] w-[50px] rounded-[4px]' /></div>
+                <div className='w-[100px] shrink-0'><Skeleton className='h-[18px] w-[50px] rounded-[4px]' /></div>
                 <div className='w-[120px] shrink-0'><Skeleton className='h-3.5 w-[70px] rounded' /></div>
                 <div className='w-[46px] shrink-0' />
                 <div className='w-[28px] shrink-0' />
@@ -471,7 +471,7 @@ function CustomerRow({
       )}
 
       {/* Type */}
-      <div className='w-[80px] shrink-0'>
+      <div className='w-[100px] shrink-0'>
         {typeLabel !== '—' ? (
           <span className='inline-flex items-center rounded-[4px] bg-bg-secondary px-1.5 py-0.5 text-[13px] font-medium text-text-secondary'>
             {typeLabel}

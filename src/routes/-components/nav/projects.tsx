@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { useSidebar } from '@/components/ui/sidebar'
 import { Spinner } from '@/components/ui/spinner'
+import { NotificationBell } from './notifications'
 import { isSuperAdmin } from '@/constants/user'
 import { STORAGE_KEYS } from '@/constants/storage'
 import { useProjectId } from '@/hooks/use-project-id'
@@ -104,26 +105,28 @@ export const NavProjects = () => {
         <span className='min-w-0 flex-1 truncate text-[13px] font-semibold text-foreground'>
           {projectName}
         </span>
+        <NotificationBell />
       </div>
     )
   }
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <button
-          type='button'
-          className='mx-3 mt-3 flex h-[36px] items-center gap-2.5 rounded-[8px] bg-white/70 px-2.5 text-left shadow-[0_0_0_1px_rgba(0,0,0,0.04)] transition-all duration-100 hover:bg-white hover:shadow-[0_0_0_1px_rgba(0,0,0,0.06),0_1px_3px_rgba(0,0,0,0.04)] active:scale-[0.98] focus-visible:outline-none dark:bg-white/[0.06] dark:shadow-[0_0_0_1px_rgba(255,255,255,0.06)] dark:hover:bg-white/[0.08]'
-        >
-          <div className={`flex size-[20px] shrink-0 items-center justify-center rounded-[5px] text-[10px] font-bold ${selectedColor.bg} ${selectedColor.text}`}>
-            {isLoading ? <Spinner className='size-3' /> : projectInitial}
-          </div>
-          <span className='min-w-0 flex-1 truncate text-[13px] font-semibold text-foreground'>
-            {projectName}
-          </span>
-          <ChevronDown className='size-3 shrink-0 text-text-tertiary' />
-        </button>
-      </DropdownMenuTrigger>
+    <div className='mx-3 mt-3 flex h-[36px] items-center gap-1.5'>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <button
+            type='button'
+            className='flex h-[36px] min-w-0 flex-1 items-center gap-2.5 rounded-[8px] bg-white/70 px-2.5 text-left shadow-[0_0_0_1px_rgba(0,0,0,0.04)] transition-all duration-100 hover:bg-white hover:shadow-[0_0_0_1px_rgba(0,0,0,0.06),0_1px_3px_rgba(0,0,0,0.04)] active:scale-[0.98] focus-visible:outline-none dark:bg-white/[0.06] dark:shadow-[0_0_0_1px_rgba(255,255,255,0.06)] dark:hover:bg-white/[0.08]'
+          >
+            <div className={`flex size-[20px] shrink-0 items-center justify-center rounded-[5px] text-[10px] font-bold ${selectedColor.bg} ${selectedColor.text}`}>
+              {isLoading ? <Spinner className='size-3' /> : projectInitial}
+            </div>
+            <span className='min-w-0 flex-1 truncate text-[13px] font-semibold text-foreground'>
+              {projectName}
+            </span>
+            <ChevronDown className='size-3 shrink-0 text-text-tertiary' />
+          </button>
+        </DropdownMenuTrigger>
       <DropdownMenuContent
         className='w-[200px] rounded-[10px] p-1'
         align='start'
@@ -162,6 +165,8 @@ export const NavProjects = () => {
           })
         )}
       </DropdownMenuContent>
-    </DropdownMenu>
+      </DropdownMenu>
+      <NotificationBell />
+    </div>
   )
 }

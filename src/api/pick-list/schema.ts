@@ -1,6 +1,7 @@
 import * as z from 'zod/mini'
 
 import type { PaginatedResponse, PaginationParams } from '@/api/schema'
+import type { ShipmentRecord } from '@/api/shipment/schema'
 import { RequiredStringSchema, OptionalStringSchema } from '@/api/schema'
 import type { PickListStatus } from '@/constants/pick-list'
 
@@ -41,6 +42,7 @@ export interface PickList {
   item_count: number
   order_count: number
   items?: PickListItem[]
+  shipments?: ShipmentRecord[]
   created_at: string
   updated_at: string
 }
@@ -83,6 +85,7 @@ export interface ShippingSelectionResponse {
 
 export interface CreatePickListPayload {
   ship_to: ShipTo
+  shipping_address_id: number
   name?: string
   notes?: string
 }

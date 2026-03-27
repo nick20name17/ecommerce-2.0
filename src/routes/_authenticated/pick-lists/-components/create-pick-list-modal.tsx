@@ -1,11 +1,13 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQuery } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
+import { useMemo } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 
 import { PICK_LIST_QUERY_KEYS } from '@/api/pick-list/query'
 import { type CreatePickListFormValues, CreatePickListSchema } from '@/api/pick-list/schema'
 import { pickListService } from '@/api/pick-list/service'
+import { getShippingAddressesQuery } from '@/api/shipping-address/query'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -17,6 +19,7 @@ import {
 } from '@/components/ui/dialog'
 import { Field, FieldError, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
+import { useProjectId } from '@/hooks/use-project-id'
 
 interface Props {
   open: boolean
@@ -25,6 +28,17 @@ interface Props {
 
 export function CreatePickListModal({ open, onOpenChange }: Props) {
   const navigate = useNavigate()
+  const [projectId] = useProjectId()
+
+  const { data: shippingAddresses } = useQuery({
+    ...getShippingAddressesQuery(projectId),
+    enabled: open,
+  })
+  const defaultShippingAddressId = useMemo(() => {
+    const list = Array.isArray(shippingAddresses) ? shippingAddresses : []
+    const def = list.find((a) => a.is_default) ?? list[0]
+    return def?.id ?? null
+  }, [shippingAddresses])
 
   const form = useForm<CreatePickListFormValues>({
     resolver: zodResolver(CreatePickListSchema),
@@ -60,8 +74,12 @@ export function CreatePickListModal({ open, onOpenChange }: Props) {
   })
 
   const onSubmit = handleSubmit((values) => {
+    if (!defaultShippingAddressId) {
+      return
+    }
     mutation.mutate({
       ship_to: values.ship_to,
+      shipping_address_id: defaultShippingAddressId,
       name: values.name || undefined,
       notes: values.notes || undefined,
     })

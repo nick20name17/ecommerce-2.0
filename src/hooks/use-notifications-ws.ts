@@ -4,11 +4,16 @@ import ReconnectingWebSocket from 'reconnecting-websocket'
 import { toast } from 'sonner'
 
 import { API_ORIGIN } from '@/api/constants'
+import { CUSTOMER_QUERY_KEYS } from '@/api/customer/query'
 import { NOTE_QUERY_KEYS } from '@/api/note/query'
 import { ORDER_QUERY_KEYS } from '@/api/order/query'
+import { PICK_LIST_QUERY_KEYS } from '@/api/pick-list/query'
 import { PROPOSAL_QUERY_KEYS } from '@/api/proposal/query'
+import { SHIPMENT_QUERY_KEYS } from '@/api/shipment/query'
+import { TASK_QUERY_KEYS } from '@/api/task/query'
 import { isSuperAdmin } from '@/constants/user'
 import { getSession } from '@/helpers/auth'
+import { addNotification } from '@/hooks/use-notifications'
 import { resolvePendingCreatedAutoid } from '@/helpers/pending-created-autoid'
 
 const RECONNECT_MIN_MS = 1000
@@ -54,14 +59,31 @@ const getInvalidationKeys = (entity: string): readonly (readonly unknown[])[] =>
       return [ORDER_QUERY_KEYS.lists()]
     case 'proposal':
       return [PROPOSAL_QUERY_KEYS.lists()]
+    case 'customer':
+      return [CUSTOMER_QUERY_KEYS.lists()]
+    case 'task':
+      return [TASK_QUERY_KEYS.lists()]
+    case 'pick_list':
+      return [PICK_LIST_QUERY_KEYS.lists()]
+    case 'shipment':
+      return [SHIPMENT_QUERY_KEYS.lists()]
     default:
       return [ORDER_QUERY_KEYS.lists(), PROPOSAL_QUERY_KEYS.lists()]
   }
 }
 
+const ENTITY_LABELS: Record<string, string> = {
+  order: 'Order',
+  proposal: 'Proposal',
+  customer: 'Customer',
+  task: 'Task',
+  pick_list: 'Pick List',
+  shipment: 'Shipment',
+}
+
 const getToastMessage = (payload: WSNotificationPayload): string => {
   const { entity, event_type, autoid } = payload
-  const entityLabel = entity === 'order' ? 'Order' : entity === 'proposal' ? 'Proposal' : entity
+  const entityLabel = ENTITY_LABELS[entity] ?? entity
   return `${entityLabel} ${autoid} ${event_type}`
 }
 
@@ -126,7 +148,7 @@ export const useNotificationsWebSocket = ({
         return
 
       if (isNotificationPayload(msg)) {
-        const { event_type, entity, autoid } = msg
+        const { event_type, entity, autoid, user } = msg
         if (event_type === 'created' && (entity === 'order' || entity === 'proposal')) {
           resolvePendingCreatedAutoid(entity, autoid)
         }
@@ -134,11 +156,15 @@ export const useNotificationsWebSocket = ({
         for (const queryKey of keys) {
           queryClient.invalidateQueries({ queryKey })
         }
+        // Store notification
+        const isNote = entity === 'note'
+        if (!isNote) {
+          addNotification(entity, event_type, autoid, user)
+        }
         if (showToasts) {
           const isCreateOrDeleteOrderProposal =
             (entity === 'order' || entity === 'proposal') &&
             (event_type === 'created' || event_type === 'deleted')
-          const isNote = entity === 'note'
           if (!isCreateOrDeleteOrderProposal && !isNote) {
             toast.info(getToastMessage(msg))
           }
