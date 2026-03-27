@@ -15,7 +15,7 @@ import type { CartItem, Product } from '@/api/product/schema'
 import type { EntityAttachmentsRef } from '@/components/common/entity-attachments/entity-attachments'
 import { getErrorMessage } from '@/helpers/error'
 import { cancelPendingCreatedAutoid, waitForCreatedAutoid } from '@/helpers/pending-created-autoid'
-import { addPendingOrder, removePendingOrder } from '@/hooks/use-pending-orders'
+import { addPendingOrder, addPendingProposal, removePendingOrder, removePendingProposal } from '@/hooks/use-pending-orders'
 import { useProjectId } from '@/hooks/use-project-id'
 import { useSelectedCustomerId } from '@/hooks/use-selected-customer'
 
@@ -311,7 +311,7 @@ export function useCreatePage() {
     busyDispatch({ type: 'CART_UPDATING', value: false })
   }
 
-  const handleCreateProposal = async () => {
+  const handleCreateProposal = () => {
     if (!customer) {
       toast.warning('Please select a customer for this proposal')
       return
@@ -320,35 +320,35 @@ export function useCreatePage() {
       toast.warning('Please add at least one product to the proposal')
       return
     }
-    busyDispatch({ type: 'CREATING_PROPOSAL', value: true })
-    const autoidPromise = waitForCreatedAutoid('proposal')
-    await toast.promise(
-      (async () => {
-        try {
-          await cartService.submitProposal(customer.id, projectId)
-        } catch (e) {
-          cancelPendingCreatedAutoid('proposal')
-          throw e
+
+    const custId = customer.id
+    const projId = projectId
+    const pendingAttachments = attachmentsRef.current?.hasPendingFiles()
+      ? attachmentsRef.current
+      : null
+
+    addPendingProposal()
+    invalidateCart()
+    setCustomer(null)
+    setSavedCustomerId(null)
+    toast.success('Proposal submitted — processing in background')
+    navigate({ to: '/proposals', search: { status: 'all' } })
+
+    cartService.submitProposal(custId, projId)
+      .then(() => {
+        removePendingProposal()
+        return waitForCreatedAutoid('proposal', 60_000)
+      })
+      .then(async (autoid) => {
+        if (pendingAttachments) {
+          await pendingAttachments.uploadPendingFiles(autoid, 'proposal')
         }
-        const autoid = await autoidPromise
-        if (attachmentsRef.current?.hasPendingFiles()) {
-          await attachmentsRef.current.uploadPendingFiles(autoid, 'proposal')
-        }
-        return { autoid }
-      })(),
-      {
-        loading: 'Creating proposal...',
-        success: ({ autoid }) => {
-          invalidateCart()
-          setCustomer(null)
-          setSavedCustomerId(null)
-          navigate({ to: '/proposals', search: { autoid, status: 'all' } })
-          return 'Proposal created successfully'
-        },
-        error: (error) => getErrorMessage(error)
-      }
-    )
-    busyDispatch({ type: 'CREATING_PROPOSAL', value: false })
+      })
+      .catch((e) => {
+        removePendingProposal()
+        cancelPendingCreatedAutoid('proposal')
+        toast.error(getErrorMessage(e))
+      })
   }
 
   const patchAddresses = async (autoid: string) => {

@@ -17,7 +17,7 @@ import {
   ITodos,
 } from '@/components/ds'
 import { isAdmin, isSuperAdmin } from '@/constants/user'
-import { usePendingOrders } from '@/hooks/use-pending-orders'
+import { usePendingOrders, usePendingProposals } from '@/hooks/use-pending-orders'
 import { useProjectId } from '@/hooks/use-project-id'
 import { cn } from '@/lib/utils'
 import { useAuth } from '@/providers/auth'
@@ -222,6 +222,7 @@ export const NavMain = () => {
   const userIsAdmin = !!user?.role && isAdmin(user.role)
   const { pendingCount } = useTaskCounts()
   const pendingOrders = usePendingOrders()
+  const pendingProposals = usePendingProposals()
 
   const filterItems = (items: NavItem[]) =>
     items.filter((item) => {
@@ -256,7 +257,11 @@ export const NavMain = () => {
             key={item.title}
             item={item}
             badge={item.url === '/tasks' ? pendingCount : undefined}
-            loading={item.url === '/orders' ? pendingOrders > 0 : undefined}
+            loading={
+              (item.url === '/orders' && pendingOrders > 0) ||
+              (item.url === '/proposals' && pendingProposals > 0) ||
+              undefined
+            }
           />
         ))}
       </div>
