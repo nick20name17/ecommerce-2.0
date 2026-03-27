@@ -47,11 +47,11 @@ export const CustomerInfoPanel = ({ customer, fieldConfig, priceLevels, onPriceL
   const country = customer.country || null
   const hasAddress = addressParts || cityStateZip || country
 
-  const firstAssigned = customer.assigned_users?.length ? customer.assigned_users[0] : customer.assigned_user ?? null
-  const assigneeName = firstAssigned ? getUserDisplayName(firstAssigned) : null
-  const assigneeInitials = assigneeName
-    ? assigneeName.split(' ').slice(0, 2).map(n => n[0]?.toUpperCase() ?? '').join('')
-    : null
+  const allAssigned = customer.assigned_users?.length
+    ? customer.assigned_users
+    : customer.assigned_user
+      ? [customer.assigned_user]
+      : []
 
   const canEditPriceLevel = !!(priceLevels?.length && onPriceLevelChange)
   const salesman = (customer.salesman as string) ?? ''
@@ -213,22 +213,30 @@ export const CustomerInfoPanel = ({ customer, fieldConfig, priceLevels, onPriceL
 
       {/* Assigned To */}
       <PanelSection title='Assigned To' last>
-        {firstAssigned ? (
+        {allAssigned.length > 0 ? (
           <button
             type='button'
             className={cn(
-              'flex w-full items-center gap-2 px-4 py-3 text-left transition-colors duration-75',
+              'flex w-full flex-col gap-1 px-4 py-3 text-left transition-colors duration-75',
               canAssign && onAssign && 'hover:bg-bg-hover',
               !(canAssign && onAssign) && 'cursor-default'
             )}
             onClick={canAssign && onAssign ? onAssign : undefined}
           >
-            {assigneeInitials && <InitialsAvatar initials={assigneeInitials} size={20} />}
-            <span className='min-w-0 flex-1 truncate text-[13px] font-medium'>
-              {assigneeName}
-            </span>
+            {allAssigned.map((user, i) => {
+              const name = getUserDisplayName(user)
+              const initials = name.split(' ').slice(0, 2).map(n => n[0]?.toUpperCase() ?? '').join('')
+              return (
+                <div key={i} className='flex items-center gap-2'>
+                  <InitialsAvatar initials={initials} size={20} />
+                  <span className='min-w-0 flex-1 truncate text-[13px] font-medium'>{name}</span>
+                </div>
+              )
+            })}
             {canAssign && onAssign && (
-              <UserPlus className='size-3.5 shrink-0 text-text-quaternary' />
+              <div className='flex justify-end'>
+                <UserPlus className='size-3.5 shrink-0 text-text-quaternary' />
+              </div>
             )}
           </button>
         ) : canAssign && onAssign ? (
