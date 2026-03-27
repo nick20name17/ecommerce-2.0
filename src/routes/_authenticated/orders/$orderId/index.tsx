@@ -114,36 +114,6 @@ function OrderDetailPage() {
   const [assignOpen, setAssignOpen] = useState(false)
   const [pickingOpen, setPickingOpen] = useState(false)
 
-  const pickMutation = useMutation({
-    mutationFn: ({ itemAutoid, isPicked }: { itemAutoid: string; isPicked: boolean }) =>
-      orderService.setItemPickStatus(orderId, itemAutoid, { is_picked: isPicked }, projectId),
-    onMutate: async ({ itemAutoid, isPicked }) => {
-      // Optimistic update
-      await queryClient.cancelQueries({ queryKey: ORDER_QUERY_KEYS.detail(orderId) })
-      const prev = queryClient.getQueryData<Order>(ORDER_QUERY_KEYS.detail(orderId))
-      if (prev?.items) {
-        const updatedItems = prev.items.map((item) =>
-          item.autoid === itemAutoid ? { ...item, is_picked: isPicked } : item,
-        )
-        const pickedCount = updatedItems.filter((i) => i.is_picked).length
-        queryClient.setQueryData(ORDER_QUERY_KEYS.detail(orderId), {
-          ...prev,
-          items: updatedItems,
-          pick_status: `${pickedCount}/${updatedItems.length}`,
-        })
-      }
-      return { prev }
-    },
-    onError: (_err, _vars, ctx) => {
-      if (ctx?.prev) queryClient.setQueryData(ORDER_QUERY_KEYS.detail(orderId), ctx.prev)
-    },
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ORDER_QUERY_KEYS.detail(orderId) })
-      queryClient.invalidateQueries({ queryKey: ORDER_QUERY_KEYS.lists() })
-    },
-    meta: { errorMessage: 'Failed to update pick status' },
-  })
-
   const deleteMutation = useMutation({
     mutationFn: () => orderService.delete(orderId, projectId!),
     meta: {
