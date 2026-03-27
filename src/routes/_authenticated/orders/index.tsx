@@ -753,49 +753,63 @@ function OrderRow({
 
       {/* Responsible */}
       <div className='w-[120px] shrink-0'>
-        {canAssign && (() => {
+        {(() => {
           const assigned = order.assigned_users?.length ? order.assigned_users : order.assigned_user ? [order.assigned_user] : []
           const first = assigned[0]
-          return (
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <button
-                  type='button'
-                  className={cn(
-                    'hover:bg-bg-active inline-flex items-center gap-1.5 rounded-[5px] px-1 py-0.5 text-[13px] transition-colors duration-75',
-                    first ? 'text-text-secondary' : 'text-text-tertiary'
-                  )}
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    onAssign(order)
-                  }}
-                >
-                  {first ? (
-                    <>
-                      <InitialsAvatar
-                        initials={getInitials(getUserDisplayName(first))}
-                        size={16}
-                      />
-                      <span className='truncate'>{getUserDisplayName(first)}</span>
-                      {assigned.length > 1 && (
-                        <span className='text-[11px] text-text-tertiary'>+{assigned.length - 1}</span>
-                      )}
-                    </>
-                  ) : (
-                    <>
-                      <UserPlus className='size-3.5' />
-                      <span>Assign</span>
-                    </>
-                  )}
-                </button>
-              </TooltipTrigger>
-              <TooltipContent>
-                {first
-                  ? `Assigned to ${assigned.map((u) => getUserDisplayName(u)).join(', ')} — click to change`
-                  : 'Assign a sales user'}
-              </TooltipContent>
-            </Tooltip>
-          )
+          if (canAssign) {
+            return (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    type='button'
+                    className={cn(
+                      'hover:bg-bg-active inline-flex items-center gap-1.5 rounded-[5px] px-1 py-0.5 text-[13px] transition-colors duration-75',
+                      first ? 'text-text-secondary' : 'text-text-tertiary'
+                    )}
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      onAssign(order)
+                    }}
+                  >
+                    {first ? (
+                      <>
+                        <InitialsAvatar
+                          initials={getInitials(getUserDisplayName(first))}
+                          size={16}
+                        />
+                        <span className='truncate'>{getUserDisplayName(first)}</span>
+                        {assigned.length > 1 && (
+                          <span className='text-[11px] text-text-tertiary'>+{assigned.length - 1}</span>
+                        )}
+                      </>
+                    ) : (
+                      <>
+                        <UserPlus className='size-3.5' />
+                        <span>Assign</span>
+                      </>
+                    )}
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  {first
+                    ? `Assigned to ${assigned.map((u) => getUserDisplayName(u)).join(', ')} — click to change`
+                    : 'Assign a sales user'}
+                </TooltipContent>
+              </Tooltip>
+            )
+          }
+          if (first) {
+            return (
+              <span className='inline-flex items-center gap-1.5 px-1 py-0.5 text-[13px] text-text-secondary'>
+                <InitialsAvatar initials={getInitials(getUserDisplayName(first))} size={16} />
+                <span className='truncate'>{getUserDisplayName(first)}</span>
+                {assigned.length > 1 && (
+                  <span className='text-[11px] text-text-tertiary'>+{assigned.length - 1}</span>
+                )}
+              </span>
+            )
+          }
+          return <span className='px-1 text-[13px] text-text-tertiary'>&mdash;</span>
         })()}
       </div>
 

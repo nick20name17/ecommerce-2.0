@@ -483,10 +483,10 @@ function CustomerRow({
 
       {/* Assign */}
       <div className='w-[120px] shrink-0'>
-        {canAssign &&
-          (() => {
-            const assigned = customer.assigned_users?.length ? customer.assigned_users : customer.assigned_user ? [customer.assigned_user] : []
-            const first = assigned[0]
+        {(() => {
+          const assigned = customer.assigned_users?.length ? customer.assigned_users : customer.assigned_user ? [customer.assigned_user] : []
+          const first = assigned[0]
+          if (canAssign) {
             return (
               <Tooltip>
                 <TooltipTrigger asChild>
@@ -503,14 +503,9 @@ function CustomerRow({
                   >
                     {first ? (
                       <>
-                        <InitialsAvatar
-                          initials={getInitials(getUserDisplayName(first))}
-                          size={16}
-                        />
+                        <InitialsAvatar initials={getInitials(getUserDisplayName(first))} size={16} />
                         <span className='truncate'>{getUserDisplayName(first)}</span>
-                        {assigned.length > 1 && (
-                          <span className='text-[11px] text-text-tertiary'>+{assigned.length - 1}</span>
-                        )}
+                        {assigned.length > 1 && <span className='text-[11px] text-text-tertiary'>+{assigned.length - 1}</span>}
                       </>
                     ) : (
                       <>
@@ -521,13 +516,22 @@ function CustomerRow({
                   </button>
                 </TooltipTrigger>
                 <TooltipContent>
-                  {first
-                    ? `Assigned to ${assigned.map((u) => getUserDisplayName(u)).join(', ')} — click to change`
-                    : 'Assign a sales user'}
+                  {first ? `Assigned to ${assigned.map((u) => getUserDisplayName(u)).join(', ')} — click to change` : 'Assign a sales user'}
                 </TooltipContent>
               </Tooltip>
             )
-          })()}
+          }
+          if (first) {
+            return (
+              <span className='inline-flex items-center gap-1.5 px-1 py-0.5 text-[13px] text-text-secondary'>
+                <InitialsAvatar initials={getInitials(getUserDisplayName(first))} size={16} />
+                <span className='truncate'>{getUserDisplayName(first)}</span>
+                {assigned.length > 1 && <span className='text-[11px] text-text-tertiary'>+{assigned.length - 1}</span>}
+              </span>
+            )
+          }
+          return <span className='px-1 text-[13px] text-text-tertiary'>&mdash;</span>
+        })()}
       </div>
 
       {/* Notes */}
