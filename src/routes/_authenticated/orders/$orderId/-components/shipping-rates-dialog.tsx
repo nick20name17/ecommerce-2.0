@@ -559,7 +559,7 @@ export function ShippingRatesDialog({
 
                 <div className='flex-1 overflow-x-auto overflow-y-auto'>
                   <table className='w-full text-[13px]'>
-                    <thead className='sticky top-0 z-10 bg-bg-secondary/80 backdrop-blur-sm'>
+                    <thead className='sticky top-0 z-10 bg-bg-secondary'>
                       <tr className='border-b border-border text-left'>
                         <th className='w-[28px] py-1.5 pl-2 pr-0'></th>
                         <th className='min-w-[90px] px-3 py-1.5 font-medium text-text-tertiary'>Inventory</th>

@@ -387,7 +387,7 @@ const OrdersPage = () => {
         {!isMobile && (results.length > 0 || isLoading) && (
           <div
             className={cn(
-              'border-border bg-bg-secondary/60 text-text-tertiary sticky top-0 z-10 flex items-center border-b text-[13px] font-medium backdrop-blur-sm select-none',
+              'border-border bg-bg-secondary text-text-tertiary sticky top-0 z-10 flex items-center border-b text-[13px] font-medium select-none',
               isTablet ? 'gap-4 px-5 py-1' : 'gap-6 px-6 py-1'
             )}
           >

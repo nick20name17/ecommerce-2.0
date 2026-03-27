@@ -133,7 +133,7 @@ export function CartEditableTable({
     <div className='flex h-full flex-col'>
       <div className='min-h-0 flex-1 overflow-auto'>
         <table className='w-full text-[13px]'>
-          <thead className='sticky top-0 z-10 select-none bg-bg-secondary/60 backdrop-blur-sm'>
+          <thead className='sticky top-0 z-10 select-none bg-bg-secondary'>
             <tr className='border-b border-border text-left'>
               <th className='w-[36px] py-1.5 pl-5 pr-0 font-medium text-text-tertiary'></th>
               <th className='min-w-[110px] px-3 py-1.5 font-medium text-text-tertiary'>Inventory</th>

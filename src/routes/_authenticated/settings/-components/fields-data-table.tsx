@@ -65,7 +65,7 @@ export const FieldsDataTable = ({
   return (
     <div>
       {/* Table header */}
-      <div className='sticky top-0 z-10 flex items-center gap-4 border-b border-border bg-bg-secondary/60 px-6 py-1.5 backdrop-blur-sm'>
+      <div className='sticky top-0 z-10 flex items-center gap-4 border-b border-border bg-bg-secondary px-6 py-1.5'>
         <div className='w-[200px] shrink-0 text-[11px] font-semibold uppercase tracking-[0.05em] text-text-tertiary'>
           Field
         </div>

@@ -928,7 +928,7 @@ const ShippingSection = ({ projectId }: { projectId: number }) => {
     <div className='flex min-h-0 flex-1 flex-col'>
       {/* Column labels + Add button */}
       <div
-        className='sticky top-0 z-10 flex select-none items-center gap-6 border-b border-border bg-bg-secondary/60 px-6 py-1 backdrop-blur-sm'
+        className='sticky top-0 z-10 flex select-none items-center gap-6 border-b border-border bg-bg-secondary px-6 py-1'
       >
         <div className='min-w-0 flex-1 text-[11px] font-semibold uppercase tracking-[0.05em] text-text-tertiary'>
           Address
@@ -1191,7 +1191,7 @@ const UsersSection = () => {
       </div>
 
       {/* Table header */}
-      <div className='sticky top-0 z-10 flex shrink-0 items-center gap-4 border-b border-border bg-bg-secondary/60 px-6 py-1.5 backdrop-blur-sm'>
+      <div className='sticky top-0 z-10 flex shrink-0 items-center gap-4 border-b border-border bg-bg-secondary px-6 py-1.5'>
         <div className='min-w-0 flex-1 text-[11px] font-semibold uppercase tracking-[0.05em] text-text-tertiary'>
           User
         </div>

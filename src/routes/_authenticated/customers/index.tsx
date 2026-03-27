@@ -213,7 +213,7 @@ function CustomersPage() {
         {!isMobile && (customers.length > 0 || isLoading) && (
           <div
             className={cn(
-              'sticky top-0 z-10 flex select-none items-center border-b border-border bg-bg-secondary/60 text-[13px] font-medium text-text-tertiary backdrop-blur-sm',
+              'sticky top-0 z-10 flex select-none items-center border-b border-border bg-bg-secondary text-[13px] font-medium text-text-tertiary',
               bp === 'tablet' ? 'gap-4 px-5 py-1' : 'gap-6 px-6 py-1',
             )}
           >
