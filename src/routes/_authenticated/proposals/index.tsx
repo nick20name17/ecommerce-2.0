@@ -95,7 +95,7 @@ const ProposalsPage = () => {
 
   const canAssign = !!user?.role && isAdmin(user.role)
 
-  const [sortField, setSortField] = useState<ProposalSortField | null>(null)
+  const [sortField, setSortField] = useState<ProposalSortField | null>('quote')
   const [sortDir, setSortDir] = useState<SortDir>('asc')
 
   const [activeStatus, setActiveStatus] = useState<ProposalStatus | null>(PROPOSAL_STATUS.open)

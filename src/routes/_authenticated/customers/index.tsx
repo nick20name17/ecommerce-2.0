@@ -64,7 +64,7 @@ function CustomersPage() {
   const [search, setSearch] = useSearchParam()
   const [offset] = useOffsetParam()
   const [limit] = useLimitParam()
-  const [sortField, setSortField] = useState<SortField | null>(null)
+  const [sortField, setSortField] = useState<SortField | null>('l_name')
   const [sortDir, setSortDir] = useState<SortDir>('asc')
 
   const [assignedToMe, setAssignedToMe] = useState(false)

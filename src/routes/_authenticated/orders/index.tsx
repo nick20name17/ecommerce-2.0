@@ -109,7 +109,7 @@ const OrdersPage = () => {
 
   const canAssign = !!user?.role && isAdmin(user.role)
 
-  const [sortField, setSortField] = useState<OrderSortField | null>(null)
+  const [sortField, setSortField] = useState<OrderSortField | null>('invoice')
   const [sortDir, setSortDir] = useState<SortDir>('asc')
 
   const [activeStatus, setActiveStatus] = useState<OrderStatus | null>(ORDER_STATUS.unprocessed)
