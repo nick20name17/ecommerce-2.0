@@ -1,6 +1,7 @@
 import { useMutation } from '@tanstack/react-query'
 import { Check, Copy, TriangleAlert } from 'lucide-react'
 import { useState } from 'react'
+import { toast } from 'sonner'
 
 import { PROPOSAL_QUERY_KEYS } from '@/api/proposal/query'
 import type { Proposal } from '@/api/proposal/schema'
@@ -48,9 +49,13 @@ export const ProposalDeleteDialog = ({
   }
 
   const handleCopy = async () => {
-    await navigator.clipboard.writeText(CONFIRMATION_TEXT)
-    setCopied(true)
-    setTimeout(() => setCopied(false), 2000)
+    try {
+      await navigator.clipboard.writeText(CONFIRMATION_TEXT)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    } catch {
+      toast.error('Failed to copy to clipboard')
+    }
   }
 
   const deleteMutation = useMutation({

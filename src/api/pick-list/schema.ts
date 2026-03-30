@@ -26,6 +26,8 @@ export interface PickListItem {
   id: number
   order_autoid: string
   detail_autoid: string
+  inven?: string
+  descr?: string
   picked_quantity: string
   push_status?: 'success' | 'failed' | null
   push_error?: string | null

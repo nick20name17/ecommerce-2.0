@@ -107,8 +107,8 @@ export function CreatePickListModal({ open, onOpenChange }: Props) {
                 control={control}
                 render={({ field }) => (
                   <Field>
-                    <FieldLabel>Name (optional)</FieldLabel>
-                    <Input {...field} placeholder='Batch #1' />
+                    <FieldLabel htmlFor='pick-list-name'>Name (optional)</FieldLabel>
+                    <Input {...field} id='pick-list-name' placeholder='Batch #1' />
                   </Field>
                 )}
               />
@@ -117,8 +117,8 @@ export function CreatePickListModal({ open, onOpenChange }: Props) {
                 control={control}
                 render={({ field }) => (
                   <Field>
-                    <FieldLabel>Notes (optional)</FieldLabel>
-                    <Input {...field} placeholder='Rush order' />
+                    <FieldLabel htmlFor='pick-list-notes'>Notes (optional)</FieldLabel>
+                    <Input {...field} id='pick-list-notes' placeholder='Rush order' />
                   </Field>
                 )}
               />
@@ -135,8 +135,8 @@ export function CreatePickListModal({ open, onOpenChange }: Props) {
                     control={control}
                     render={({ field, fieldState }) => (
                       <Field data-invalid={fieldState.invalid}>
-                        <FieldLabel>Name *</FieldLabel>
-                        <Input {...field} placeholder='John Smith' aria-invalid={fieldState.invalid} />
+                        <FieldLabel htmlFor='ship-to-name'>Name *</FieldLabel>
+                        <Input {...field} id='ship-to-name' placeholder='John Smith' aria-invalid={fieldState.invalid} />
                         {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                       </Field>
                     )}
@@ -146,8 +146,8 @@ export function CreatePickListModal({ open, onOpenChange }: Props) {
                     control={control}
                     render={({ field }) => (
                       <Field>
-                        <FieldLabel>Phone</FieldLabel>
-                        <Input {...field} placeholder='555-1234' />
+                        <FieldLabel htmlFor='ship-to-phone'>Phone</FieldLabel>
+                        <Input {...field} id='ship-to-phone' placeholder='555-1234' />
                       </Field>
                     )}
                   />
@@ -158,8 +158,8 @@ export function CreatePickListModal({ open, onOpenChange }: Props) {
                   control={control}
                   render={({ field, fieldState }) => (
                     <Field data-invalid={fieldState.invalid}>
-                      <FieldLabel>Address 1 *</FieldLabel>
-                      <Input {...field} placeholder='123 Main St' aria-invalid={fieldState.invalid} />
+                      <FieldLabel htmlFor='ship-to-address1'>Address 1 *</FieldLabel>
+                      <Input {...field} id='ship-to-address1' placeholder='123 Main St' aria-invalid={fieldState.invalid} />
                       {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                     </Field>
                   )}
@@ -170,8 +170,8 @@ export function CreatePickListModal({ open, onOpenChange }: Props) {
                   control={control}
                   render={({ field }) => (
                     <Field>
-                      <FieldLabel>Address 2</FieldLabel>
-                      <Input {...field} placeholder='Suite 100' />
+                      <FieldLabel htmlFor='ship-to-address2'>Address 2</FieldLabel>
+                      <Input {...field} id='ship-to-address2' placeholder='Suite 100' />
                     </Field>
                   )}
                 />
@@ -182,8 +182,8 @@ export function CreatePickListModal({ open, onOpenChange }: Props) {
                     control={control}
                     render={({ field, fieldState }) => (
                       <Field data-invalid={fieldState.invalid}>
-                        <FieldLabel>City *</FieldLabel>
-                        <Input {...field} placeholder='Toronto' aria-invalid={fieldState.invalid} />
+                        <FieldLabel htmlFor='ship-to-city'>City *</FieldLabel>
+                        <Input {...field} id='ship-to-city' placeholder='Toronto' aria-invalid={fieldState.invalid} />
                         {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                       </Field>
                     )}
@@ -193,8 +193,8 @@ export function CreatePickListModal({ open, onOpenChange }: Props) {
                     control={control}
                     render={({ field, fieldState }) => (
                       <Field data-invalid={fieldState.invalid}>
-                        <FieldLabel>State *</FieldLabel>
-                        <Input {...field} placeholder='ON' aria-invalid={fieldState.invalid} />
+                        <FieldLabel htmlFor='ship-to-state'>State *</FieldLabel>
+                        <Input {...field} id='ship-to-state' placeholder='ON' aria-invalid={fieldState.invalid} />
                         {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                       </Field>
                     )}
@@ -204,8 +204,8 @@ export function CreatePickListModal({ open, onOpenChange }: Props) {
                     control={control}
                     render={({ field, fieldState }) => (
                       <Field data-invalid={fieldState.invalid}>
-                        <FieldLabel>Postal *</FieldLabel>
-                        <Input {...field} placeholder='M5V1A1' aria-invalid={fieldState.invalid} />
+                        <FieldLabel htmlFor='ship-to-postal'>Postal *</FieldLabel>
+                        <Input {...field} id='ship-to-postal' placeholder='M5V1A1' aria-invalid={fieldState.invalid} />
                         {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                       </Field>
                     )}
@@ -217,8 +217,8 @@ export function CreatePickListModal({ open, onOpenChange }: Props) {
                   control={control}
                   render={({ field, fieldState }) => (
                     <Field data-invalid={fieldState.invalid}>
-                      <FieldLabel>Country *</FieldLabel>
-                      <Input {...field} placeholder='CA' aria-invalid={fieldState.invalid} />
+                      <FieldLabel htmlFor='ship-to-country'>Country *</FieldLabel>
+                      <Input {...field} id='ship-to-country' placeholder='CA' aria-invalid={fieldState.invalid} />
                       {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                     </Field>
                   )}

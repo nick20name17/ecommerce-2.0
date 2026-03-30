@@ -41,19 +41,8 @@ import {
   getPickListStatusLabel,
 } from '@/constants/pick-list'
 import { useBreakpoint } from '@/hooks/use-breakpoint'
+import { formatDateTimeMedium } from '@/helpers/formatters'
 import { cn } from '@/lib/utils'
-
-// ── Helpers ──────────────────────────────────────────────────
-
-function formatDateTime(d: string) {
-  return new Date(d).toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  })
-}
 
 function formatQty(v: string) {
   const n = parseFloat(v)
@@ -237,7 +226,7 @@ const PickListDetailPage = () => {
                   <span>·</span>
                   <span>{orderGroups.length} order{orderGroups.length !== 1 && 's'}</span>
                   <span>·</span>
-                  <span>{formatDateTime(pickList.created_at)}</span>
+                  <span>{formatDateTimeMedium(pickList.created_at)}</span>
                 </div>
                 <div className='mt-3'>
                   <StatusLifecycle currentStatus={pickList.status} />
@@ -469,5 +458,5 @@ function StatusLifecycle({ currentStatus }: { currentStatus: string }) {
 
 export const Route = createFileRoute('/_authenticated/pick-lists/$pickListId/')({
   component: PickListDetailPage,
-  head: () => ({ meta: [{ title: 'Pick List' }] }),
+  head: ({ params }) => ({ meta: [{ title: `Pick List ${params.pickListId}` }] }),
 })

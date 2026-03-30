@@ -69,7 +69,7 @@ import { getSession } from '@/helpers/auth'
 import { getProjectByIdQuery } from '@/api/project/query'
 import { projectService } from '@/api/project/service'
 import { useProjectId } from '@/hooks/use-project-id'
-import { getUserDisplayName } from '@/helpers/formatters'
+import { getInitialsFromParts, getUserDisplayName } from '@/helpers/formatters'
 import { cn } from '@/lib/utils'
 import { useAuth } from '@/providers/auth'
 import { UserDeleteDialog } from '../users/-components/user-delete-dialog'
@@ -1092,14 +1092,6 @@ const ShippingSection = ({ projectId }: { projectId: number }) => {
 
 // ── Users Section ───────────────────────────────────────────
 
-const getInitials = (firstName?: string, lastName?: string, email?: string): string => {
-  const first = firstName?.trim()
-  const last = lastName?.trim()
-  if (first && last) return `${first.charAt(0)}${last.charAt(0)}`.toUpperCase()
-  if (first || last) return (first || last)!.charAt(0).toUpperCase()
-  return (email?.charAt(0) ?? '?').toUpperCase()
-}
-
 const UserStatusToggle = ({
   user,
   currentUserId,
@@ -1235,7 +1227,7 @@ const UsersSection = () => {
         ) : (
           users.map((user) => {
             const fullName = getUserDisplayName(user)
-            const initials = getInitials(user.first_name, user.last_name, user.email)
+            const initials = getInitialsFromParts(user.first_name, user.last_name, user.email)
             const isSelf = user.id === currentUser?.id
 
             return (

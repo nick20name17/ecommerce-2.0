@@ -14,6 +14,8 @@ import {
 import { useState } from 'react'
 import { toast } from 'sonner'
 
+import { formatDateMedium, formatDateTimeMedium } from '@/helpers/formatters'
+
 import { SHIPMENT_QUERY_KEYS } from '@/api/shipment/query'
 import { getShipmentsQuery } from '@/api/shipment/query'
 import { getPickListDetailQuery } from '@/api/pick-list/query'
@@ -47,17 +49,6 @@ import { useProjectId } from '@/hooks/use-project-id'
 import { cn } from '@/lib/utils'
 
 // ── Helpers ──────────────────────────────────────────────────
-
-function formatDate(d: string) {
-  return new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
-}
-
-function formatDateTime(d: string) {
-  return new Date(d).toLocaleDateString('en-US', {
-    month: 'short', day: 'numeric', year: 'numeric',
-    hour: '2-digit', minute: '2-digit',
-  })
-}
 
 type VoidedFilter = 'all' | 'active' | 'voided'
 
@@ -309,7 +300,7 @@ function ShipmentRow({
           <StatusBadge voided={shipment.voided} />
           <span className='text-[13px] text-text-tertiary'>{shipment.service_name}</span>
           <span className='text-[13px] tabular-nums text-text-tertiary'>
-            {formatDate(shipment.created_at)}
+            {formatDateMedium(shipment.created_at)}
           </span>
         </div>
       </div>
@@ -342,7 +333,7 @@ function ShipmentRow({
         ${parseFloat(shipment.cost).toFixed(2)}
       </div>
       <div className='hidden w-[100px] shrink-0 text-[13px] tabular-nums text-text-tertiary lg:block'>
-        {formatDate(shipment.created_at)}
+        {formatDateMedium(shipment.created_at)}
       </div>
       <div className='w-[20px] shrink-0 text-text-tertiary opacity-0 transition-opacity group-hover/row:opacity-100'>
         <ChevronRight className='size-3.5' />
@@ -385,11 +376,12 @@ function ShipmentDetailDialog({
   const [voidConfirmOpen, setVoidConfirmOpen] = useState(false)
 
   // Fetch pick list items when shipment is from a pick list
-  const { data: pickListData } = useQuery({
+  const { data: pickListData, isLoading: isPickListLoading } = useQuery({
     ...getPickListDetailQuery(shipment.pick_list_id!),
     enabled: open && shipment.pick_list_id != null,
   })
   const pickListItems = pickListData?.items ?? []
+  const showPackageLoading = shipment.pick_list_id != null && isPickListLoading
 
   const voidMutation = useMutation({
     mutationFn: async () => {
@@ -467,7 +459,7 @@ function ShipmentDetailDialog({
             <PropertyCell label='Carrier' value={shipment.carrier_id} />
             <PropertyCell label='Service' value={shipment.service_name} />
             <PropertyCell label='Cost' value={`$${parseFloat(shipment.cost).toFixed(2)}`} />
-            <PropertyCell label='Created' value={formatDateTime(shipment.created_at)} />
+            <PropertyCell label='Created' value={formatDateTimeMedium(shipment.created_at)} />
             <PropertyCell label='Tracking'>
               <div className='flex items-center gap-1.5'>
                 <span className='truncate text-[13px] font-mono tabular-nums'>
@@ -493,7 +485,20 @@ function ShipmentDetailDialog({
           </div>
 
           {/* Package contents — from shipment items or pick list items */}
-          {((shipment.items?.length ?? 0) > 0 || pickListItems.length > 0) && (
+          {showPackageLoading && (
+            <div className='border-t border-border px-5 py-3'>
+              <div className='mb-2 text-[12px] font-medium text-text-tertiary'>Package Contents</div>
+              <div className='divide-y divide-border-light rounded-[6px] border border-border'>
+                {Array.from({ length: 3 }).map((_, i) => (
+                  <div key={i} className='flex items-center gap-3 px-3 py-2'>
+                    <Skeleton className='h-4 flex-1' />
+                    <Skeleton className='h-4 w-8' />
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+          {!showPackageLoading && ((shipment.items?.length ?? 0) > 0 || pickListItems.length > 0) && (
             <div className='border-t border-border px-5 py-3'>
               <div className='mb-2 text-[12px] font-medium text-text-tertiary'>
                 Package Contents ({shipment.items?.length || pickListItems.length})
@@ -502,14 +507,9 @@ function ShipmentDetailDialog({
                 {(shipment.items?.length ?? 0) > 0
                   ? shipment.items!.map((item, i) => (
                       <div key={i} className='flex items-center gap-3 px-3 py-2'>
-                        <span className='min-w-0 flex-1 truncate font-mono text-[12px] font-medium text-foreground'>
-                          {item.product_id || item.detail_autoid}
+                        <span className='min-w-0 flex-1 truncate text-[12px] font-medium text-foreground'>
+                          {item.description || item.product_id || item.detail_autoid}
                         </span>
-                        {item.description && (
-                          <span className='hidden truncate text-[12px] text-text-tertiary sm:block'>
-                            {item.description}
-                          </span>
-                        )}
                         {item.quantity && (
                           <span className='shrink-0 rounded bg-bg-secondary px-1.5 py-0.5 text-[12px] font-medium tabular-nums text-text-secondary'>
                             {item.quantity}
@@ -519,8 +519,8 @@ function ShipmentDetailDialog({
                     ))
                   : pickListItems.map((item) => (
                       <div key={item.id} className='flex items-center gap-3 px-3 py-2'>
-                        <span className='min-w-0 flex-1 truncate font-mono text-[12px] font-medium text-foreground'>
-                          {item.detail_autoid}
+                        <span className='min-w-0 flex-1 truncate text-[12px] font-medium text-foreground'>
+                          {item.descr || item.inven || item.detail_autoid}
                         </span>
                         <span className='shrink-0 rounded bg-bg-secondary px-1.5 py-0.5 text-[12px] font-medium tabular-nums text-text-secondary'>
                           {parseFloat(item.picked_quantity) % 1 === 0 ? parseInt(item.picked_quantity) : item.picked_quantity}

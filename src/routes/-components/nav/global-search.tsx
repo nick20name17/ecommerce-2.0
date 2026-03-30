@@ -157,8 +157,8 @@ export const GlobalSearch = () => {
             onClick={() => setOpen(false)}
           >
             <div
-              className='flex w-full max-w-[520px] flex-col overflow-hidden rounded-[12px] border border-border bg-popover shadow-[0_16px_70px_rgba(0,0,0,0.15)]'
-              style={{ animation: 'dropIn 120ms ease-out' }}
+              className='flex w-full max-w-[520px] flex-col overflow-hidden rounded-[12px] border border-border bg-popover'
+              style={{ boxShadow: 'var(--dropdown-shadow)', animation: 'dropIn 120ms ease-out' }}
               onClick={(e) => e.stopPropagation()}
             >
               {/* Search input */}

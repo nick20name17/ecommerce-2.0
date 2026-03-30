@@ -13,19 +13,23 @@ export const DataTableSkeleton = <T,>({
   headers,
   rowsCount = DEFAULT_LIMIT
 }: DataTableSkeletonProps<T>) => {
-  return Array.from({ length: rowsCount }).map((_, index) => (
-    <TableRow key={`skeleton_${index}`}>
-      {headers.map((header, headerIndex) => (
-        <TableCell
-          className='py-1'
-          key={`skeleton_${index}_${header.id || headerIndex}`}
-          style={{
-            width: header.getSize()
-          }}
-        >
-          <Skeleton className='size-full' />
-        </TableCell>
+  return (
+    <>
+      {Array.from({ length: rowsCount }).map((_, index) => (
+        <TableRow key={`skeleton_${index}`}>
+          {headers.map((header, headerIndex) => (
+            <TableCell
+              className='py-1'
+              key={`skeleton_${index}_${header.id || headerIndex}`}
+              style={{
+                width: header.getSize()
+              }}
+            >
+              <Skeleton className='size-full' />
+            </TableCell>
+          ))}
+        </TableRow>
       ))}
-    </TableRow>
-  ))
+    </>
+  )
 }

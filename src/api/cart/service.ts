@@ -54,6 +54,20 @@ export const cartService = {
     })
   },
 
+  loadOrder: async (orderAutoid: string, customerId: string, projectId?: number | null) => {
+    const { data } = await api.post<Cart>('/cart/load-order/', { autoid: orderAutoid }, {
+      params: buildParams(customerId, projectId)
+    })
+    return data
+  },
+
+  loadProposal: async (proposalAutoid: string, customerId: string, projectId?: number | null) => {
+    const { data } = await api.post<Cart>('/cart/load-proposal/', { autoid: proposalAutoid }, {
+      params: buildParams(customerId, projectId)
+    })
+    return data
+  },
+
   submitProposal: async (
     customerId: string,
     projectId?: number | null

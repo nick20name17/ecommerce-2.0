@@ -440,7 +440,7 @@ function CustomerDetailPage() {
 
 export const Route = createFileRoute('/_authenticated/customers/$customerId/')({
   component: CustomerDetailPage,
-  head: () => ({
-    meta: [{ title: 'Customer' }],
+  head: ({ params }) => ({
+    meta: [{ title: `Customer ${params.customerId}` }],
   }),
 })

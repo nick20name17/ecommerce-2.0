@@ -117,6 +117,72 @@ export const formatBytes = (bytes: number, decimals: number = 2): string => {
   return Number.parseFloat((bytes / k ** i).toFixed(dm)) + ' ' + sizes[i]
 }
 
+// ── Initials helpers ────────────────────────────────────────
+
+/** Extract initials from a full name string (e.g. "John Doe" → "JD") */
+export function getInitials(name: string): string {
+  return name
+    .split(' ')
+    .slice(0, 2)
+    .map((n) => n[0]?.toUpperCase() ?? '')
+    .join('')
+}
+
+/** Extract initials from separate first/last name with email fallback */
+export function getInitialsFromParts(
+  firstName?: string,
+  lastName?: string,
+  email?: string
+): string {
+  const first = firstName?.trim()
+  const last = lastName?.trim()
+  if (first && last) return `${first.charAt(0)}${last.charAt(0)}`.toUpperCase()
+  if (first || last) return (first || last)!.charAt(0).toUpperCase()
+  return (email?.charAt(0) ?? '?').toUpperCase()
+}
+
+// ── Simple date formatting ──────────────────────────────────
+
+/** Format as "Mar 28" */
+export function formatDateShort(dateStr: string): string {
+  return new Date(dateStr).toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+  })
+}
+
+/** Format as "Mar 28, 2026" */
+export function formatDateMedium(dateStr: string): string {
+  return new Date(dateStr).toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  })
+}
+
+/** Format as "Mar 28, 02:30 PM" */
+export function formatDateTimeShort(dateStr: string): string {
+  return new Date(dateStr).toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  })
+}
+
+/** Format as "Mar 28, 2026, 02:30 PM" */
+export function formatDateTimeMedium(dateStr: string): string {
+  return new Date(dateStr).toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  })
+}
+
+// ── Display name ────────────────────────────────────────────
+
 export const getUserDisplayName = (
   user: {
     first_name?: string | null

@@ -135,10 +135,9 @@ export const getOrderColumns = ({
     cell: ({ row }) => {
       if (row.original._pending || !onNotes) return null
       return (
-        <div
-          className='max-w-[140px] min-w-0'
-          role='button'
-          tabIndex={0}
+        <button
+          type='button'
+          className='max-w-[140px] min-w-0 appearance-none border-0 bg-transparent p-0 text-left'
           onClick={(e) => e.stopPropagation()}
           onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && e.stopPropagation()}
         >
@@ -147,7 +146,7 @@ export const getOrderColumns = ({
             autoid={row.original.autoid}
             onClick={() => onNotes(row.original)}
           />
-        </div>
+        </button>
       )
     },
     size: 140,

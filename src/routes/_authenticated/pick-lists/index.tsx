@@ -27,18 +27,11 @@ import {
 } from '@/constants/pick-list'
 import { useBreakpoint } from '@/hooks/use-breakpoint'
 import { useLimitParam, useOffsetParam, useSearchParam } from '@/hooks/use-query-params'
+import { formatDateMedium } from '@/helpers/formatters'
 import { cn } from '@/lib/utils'
 
 
 // ── Helpers ──────────────────────────────────────────────────
-
-function formatDate(d: string) {
-  return new Date(d).toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-  })
-}
 
 const STATUS_DOT_COLORS: Record<PickListStatus, string> = {
   [PICK_LIST_STATUS.draft]: 'bg-slate-400',
@@ -302,7 +295,7 @@ function PickListRow({
             {statusLabel}
           </span>
           <span className='text-[13px] tabular-nums text-text-tertiary'>
-            {formatDate(pickList.created_at)}
+            {formatDateMedium(pickList.created_at)}
           </span>
         </div>
       </div>
@@ -350,7 +343,7 @@ function PickListRow({
       </div>
       {!isTablet && (
         <div className='w-[100px] shrink-0 text-[13px] tabular-nums text-text-tertiary'>
-          {formatDate(pickList.created_at)}
+          {formatDateMedium(pickList.created_at)}
         </div>
       )}
       <div className='w-[20px] shrink-0 text-text-tertiary opacity-0 transition-opacity group-hover/row:opacity-100'>

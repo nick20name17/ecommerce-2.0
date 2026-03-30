@@ -6,7 +6,7 @@ import {
 } from '@tanstack/react-query'
 import { useNavigate, useRouter } from '@tanstack/react-router'
 import { parseAsString, useQueryState } from 'nuqs'
-import { type PropsWithChildren, createContext, useContext } from 'react'
+import { type PropsWithChildren, createContext, useContext, useMemo } from 'react'
 
 import type { SignInPayload, SignInResponse } from '@/api/auth/schema'
 import { authService } from '@/api/auth/service'
@@ -75,20 +75,26 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
 
       queryClient.setQueryData(USER_QUERY_KEYS.detail('me'), response.user)
 
+      const isValidRedirect =
+        typeof redirect === 'string' && redirect.startsWith('/') && !redirect.startsWith('//')
+
       await navigate({
-        to: (typeof redirect === 'string' ? redirect : null) ?? AUTH_REDIRECTS.signInSuccess,
+        to: isValidRedirect ? redirect : AUTH_REDIRECTS.signInSuccess,
         replace: true
       })
       router.invalidate()
     }
   })
 
-  const value = {
-    user: user ?? null,
-    signInMutation,
-    logout,
-    isUserLoading
-  }
+  const value = useMemo(
+    () => ({
+      user: user ?? null,
+      signInMutation,
+      logout,
+      isUserLoading
+    }),
+    [user, signInMutation, logout, isUserLoading]
+  )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }

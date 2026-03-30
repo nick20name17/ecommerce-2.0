@@ -312,7 +312,7 @@ export function ShippingDialog({ pickList, open, onOpenChange }: ShippingDialogP
                 )}
                 {rates.map((rate, i) => {
                   // rate_id may come as rate_id, id, or be derived from carrier_id+service_id
-                  const rateId = rate.rate_id || (rate as unknown as Record<string, unknown>).id as string || `${rate.carrier_id}-${rate.service_id}`
+                  const rateId = rate.rate_id || `${rate.carrier_id}-${rate.service_id}`
                   return (
                     <div
                       key={rateId || i}

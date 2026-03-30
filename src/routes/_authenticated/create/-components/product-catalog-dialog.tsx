@@ -1,5 +1,4 @@
-import { Package as PackageFill } from '@phosphor-icons/react'
-import { ChevronRight, X } from 'lucide-react'
+import { ChevronRight, Package as PackageFill, X } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
 import { CatalogCategorySidebar } from './catalog-category-sidebar'
@@ -76,7 +75,7 @@ export const ProductCatalogDialog = ({
         <div className='shrink-0 border-b border-border'>
           <div className='flex h-12 items-center gap-2.5 px-5'>
             <div className='flex size-6 items-center justify-center rounded-[6px] bg-primary text-white'>
-              <PackageFill className='size-3.5' weight='fill' />
+              <PackageFill className='size-3.5' />
             </div>
             <h2 className='text-[14px] font-semibold tracking-[-0.01em]'>Product Catalog</h2>
 

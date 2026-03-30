@@ -64,7 +64,7 @@ export const CartTable = ({
               {/* Thumbnail */}
               <div className='flex size-9 shrink-0 items-center justify-center overflow-hidden rounded-[5px] bg-bg-secondary'>
                 {item.photo ? (
-                  <img src={item.photo} alt={item.name} className='size-full object-cover' />
+                  <img src={item.photo} alt={item.name} className='size-full object-cover' loading='lazy' />
                 ) : (
                   <Image className='size-3.5 text-text-quaternary' />
                 )}

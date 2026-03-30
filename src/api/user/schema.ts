@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import { EmailSchema, NameSchema, PasswordSchema } from '@/api/schema'
+import { EmailSchema, NameSchema, NewPasswordSchema } from '@/api/schema'
 import type { ApiResponse, PaginationParams } from '@/api/schema'
 import { USER_ROLES, isSuperAdmin } from '@/constants/user'
 import type { UserRole } from '@/constants/user'
@@ -75,8 +75,8 @@ const createUserSchemaBase = (isCurrentUserSuperAdmin: boolean) => {
     role: z.enum(roleValues),
     salesman: z.string(),
     project: projectSchema,
-    password: PasswordSchema,
-    password_confirm: PasswordSchema
+    password: NewPasswordSchema,
+    password_confirm: NewPasswordSchema
   })
 }
 

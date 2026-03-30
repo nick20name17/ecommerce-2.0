@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import { NameSchema, PasswordSchema } from '@/api/schema'
+import { NameSchema, NewPasswordSchema, PasswordSchema } from '@/api/schema'
 
 export interface UpdateProfilePayload {
   first_name?: string
@@ -23,8 +23,8 @@ export type UpdateProfileFormValues = z.infer<typeof UpdateProfileSchema>
 export const ChangePasswordSchema = z
   .object({
     old_password: PasswordSchema,
-    new_password: PasswordSchema,
-    new_password_confirm: PasswordSchema
+    new_password: NewPasswordSchema,
+    new_password_confirm: NewPasswordSchema
   })
   .refine((data) => data.new_password !== data.old_password, {
     message: 'new password must be different from current password',

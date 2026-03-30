@@ -6,7 +6,7 @@ import {
   Clock,
   Search,
 } from 'lucide-react'
-import { useState } from 'react'
+import { useState, useDeferredValue } from 'react'
 
 import { getPayloadLogsQuery } from '@/api/payload-log/query'
 import type { PayloadLog, PayloadLogParams } from '@/api/payload-log/schema'
@@ -19,16 +19,10 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { useBreakpoint } from '@/hooks/use-breakpoint'
 import { useProjectId } from '@/hooks/use-project-id'
 import { useLimitParam, useOffsetParam } from '@/hooks/use-query-params'
+import { formatDateTimeShort } from '@/helpers/formatters'
 import { cn } from '@/lib/utils'
 
 // ── Helpers ──────────────────────────────────────────────────
-
-function formatDateTime(d: string) {
-  return new Date(d).toLocaleDateString('en-US', {
-    month: 'short', day: 'numeric',
-    hour: '2-digit', minute: '2-digit',
-  })
-}
 
 function formatDuration(ms: number) {
   if (ms < 1000) return `${ms}ms`
@@ -65,17 +59,21 @@ const ActivityPage = () => {
   const [limit] = useLimitParam()
 
   const [search, setSearch] = useState('')
+  const deferredSearch = useDeferredValue(search)
   const [errorFilter, setErrorFilter] = useState<ErrorFilter>('all')
   const [methodFilter, setMethodFilter] = useState<MethodFilter>(null)
   const [selectedLog, setSelectedLog] = useState<PayloadLog | null>(null)
+
+  const searchUpper = deferredSearch.toUpperCase()
+  const isMethodSearch = (['GET', 'POST', 'PATCH', 'PUT', 'DELETE'] as const).includes(searchUpper as typeof METHOD_OPTIONS[number])
 
   const params: PayloadLogParams = {
     offset,
     limit,
     ordering: '-created_at',
-    search: search || undefined,
+    search: isMethodSearch ? undefined : (deferredSearch || undefined),
     is_error: errorFilter === 'errors' ? true : errorFilter === 'success' ? false : undefined,
-    method: methodFilter ?? undefined,
+    method: isMethodSearch ? searchUpper : (methodFilter ?? undefined),
     project_id: projectId ?? undefined,
   }
 
@@ -115,7 +113,7 @@ const ActivityPage = () => {
           <input
             value={search}
             onChange={(e) => { setSearch(e.target.value); setOffset(null) }}
-            placeholder='Search logs...'
+            placeholder='Search URL or method...'
             className='w-[140px] bg-transparent text-[13px] outline-none placeholder:text-text-tertiary sm:w-[200px]'
           />
         </div>
@@ -286,23 +284,26 @@ function LogRow({
   if (isMobile) {
     return (
       <div
-        className='cursor-pointer border-b border-border-light px-3.5 py-2 transition-colors duration-100 hover:bg-bg-hover'
+        className='cursor-pointer border-b border-border-light px-3.5 py-2.5 transition-colors duration-100 hover:bg-bg-hover'
         onClick={onClick}
       >
-        <div className='mb-1 flex items-center gap-2'>
-          <span className={cn('rounded border px-1.5 py-0.5 font-mono text-[11px] font-semibold', methodColor)}>
+        <div className='mb-1.5 flex items-center gap-2'>
+          <span className={cn('shrink-0 rounded border px-1.5 py-0.5 font-mono text-[11px] font-semibold', methodColor)}>
             {log.method}
           </span>
-          <span className='min-w-0 flex-1 truncate font-mono text-[12px] text-foreground'>
-            {log.url}
+          <span className={cn('shrink-0 font-mono text-[12px] font-semibold tabular-nums', statusColor)}>
+            {log.status_code}
           </span>
+          {log.is_error && <AlertCircle className='size-3 shrink-0 text-red-500' />}
+          <span className='ml-auto shrink-0 text-[11px] text-text-tertiary'>{log.entity}</span>
         </div>
-        <div className='flex items-center gap-2'>
-          <span className={cn('font-mono text-[12px] font-semibold', statusColor)}>{log.status_code}</span>
-          {log.is_error && <AlertCircle className='size-3 text-red-500' />}
-          <span className='text-[12px] text-text-tertiary'>{log.entity}</span>
-          <span className='text-[12px] tabular-nums text-text-tertiary'>{formatDuration(log.duration_ms)}</span>
-          <span className='text-[12px] tabular-nums text-text-tertiary'>{formatDateTime(log.created_at)}</span>
+        <div className='mb-1 truncate font-mono text-[12px] text-foreground'>
+          {log.url}
+        </div>
+        <div className='flex items-center gap-2 text-[11px] tabular-nums text-text-tertiary'>
+          <span>{formatDuration(log.duration_ms)}</span>
+          <span className='text-text-quaternary'>·</span>
+          <span>{formatDateTimeShort(log.created_at)}</span>
         </div>
       </div>
     )
@@ -338,7 +339,7 @@ function LogRow({
         {formatDuration(log.duration_ms)}
       </div>
       <div className='hidden w-[130px] shrink-0 text-[12px] tabular-nums text-text-tertiary lg:block'>
-        {formatDateTime(log.created_at)}
+        {formatDateTimeShort(log.created_at)}
       </div>
       <div className='w-[20px] shrink-0 text-text-tertiary opacity-0 transition-opacity group-hover/row:opacity-100'>
         <ChevronRight className='size-3.5' />

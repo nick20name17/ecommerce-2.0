@@ -173,7 +173,7 @@ export function CartEditableTable({
                       <td className='w-[36px] py-1.5 pl-5 pr-0'>
                         <div className='flex h-7 w-7 items-center justify-center overflow-hidden rounded-[4px] bg-bg-secondary'>
                           {item.photo ? (
-                            <img src={item.photo} alt={item.name} className='h-7 w-7 object-cover' />
+                            <img src={item.photo} alt={item.name} className='h-7 w-7 object-cover' loading='lazy' />
                           ) : (
                             <Image className='size-3 text-text-quaternary' />
                           )}

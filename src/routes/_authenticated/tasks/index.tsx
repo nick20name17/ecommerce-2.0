@@ -295,7 +295,7 @@ function Todos2Page() {
 
         <div className='flex-1' />
 
-        <div className='hidden h-7 w-[260px] items-center gap-1.5 rounded-[5px] border border-border bg-background px-2 transition-[border-color,box-shadow] focus-within:border-ring focus-within:ring-2 focus-within:ring-ring/50 sm:flex'>
+        <div className='flex h-7 w-full max-w-[140px] items-center gap-1.5 rounded-[5px] border border-border bg-background px-2 transition-[border-color,box-shadow] focus-within:border-ring focus-within:ring-2 focus-within:ring-ring/50 sm:max-w-[260px]'>
           <Search className='size-3 shrink-0 text-text-tertiary' />
           <input
             value={search}
@@ -520,7 +520,7 @@ function Todos2Page() {
         <>
           <div className='fixed inset-0 z-40 bg-black/40' onClick={() => setTaskToDelete(null)} />
           <div className='fixed inset-0 z-50 flex items-center justify-center px-4'>
-            <div className='w-full max-w-[400px] rounded-[12px] border border-border bg-background p-6' style={{ boxShadow: '0 16px 70px rgba(0,0,0,.2)' }}>
+            <div className='w-full max-w-[400px] rounded-[12px] border border-border bg-background p-6' style={{ boxShadow: 'var(--dropdown-shadow)' }}>
               <h3 className='mb-2 text-[15px] font-semibold'>Delete task</h3>
               <p className='mb-5 text-[13px] text-text-secondary'>
                 Are you sure you want to delete &ldquo;{taskToDelete.title}&rdquo;? This action cannot be undone.

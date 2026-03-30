@@ -31,8 +31,10 @@ export const customerService = {
     return data
   },
 
-  delete: async (id: string) => {
-    await api.delete(`/data/customers/${id}/`)
+  delete: async (id: string, projectId?: number | null) => {
+    await api.delete(`/data/customers/${id}/`, {
+      params: projectId != null ? { project_id: projectId } : {}
+    })
   },
 
   assign: async (autoid: string, payload: EntityAssignRequest, projectId?: number | null) => {

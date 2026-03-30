@@ -59,7 +59,7 @@ import {
   getOrderStatusLabel
 } from '@/constants/order'
 import { isAdmin } from '@/constants/user'
-import { formatCurrency, formatDate, getUserDisplayName } from '@/helpers/formatters'
+import { formatCurrency, formatDate, getInitials, getUserDisplayName } from '@/helpers/formatters'
 import { useBreakpoint } from '@/hooks/use-breakpoint'
 import { useProjectId } from '@/hooks/use-project-id'
 import {
@@ -73,14 +73,6 @@ import { cn } from '@/lib/utils'
 import { useAuth } from '@/providers/auth'
 
 // ── Helpers ──────────────────────────────────────────────────
-
-function getInitials(name: string) {
-  return name
-    .split(' ')
-    .slice(0, 2)
-    .map((n) => n[0]?.toUpperCase() ?? '')
-    .join('')
-}
 
 // ── Constants ────────────────────────────────────────────────
 
@@ -253,7 +245,7 @@ const OrdersPage = () => {
 
         <div className='flex-1' />
 
-        <div className='border-border bg-background focus-within:border-ring focus-within:ring-ring/50 hidden h-7 w-[260px] items-center gap-1.5 rounded-[5px] border px-2 transition-[border-color,box-shadow] focus-within:ring-2 sm:flex'>
+        <div className='border-border bg-background focus-within:border-ring focus-within:ring-ring/50 hidden h-7 w-full max-w-[260px] items-center gap-1.5 rounded-[5px] border px-2 transition-[border-color,box-shadow] focus-within:ring-2 sm:flex'>
           <Search className='text-text-tertiary size-3 shrink-0' />
           <input
             value={search}

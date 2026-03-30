@@ -2,7 +2,7 @@ import { api } from '..'
 
 import type { EntityAssignRequest, EntityAssignmentResponse, EntityAttachment } from '../schema'
 
-import type { Proposal, ProposalParams, ProposalResponse, ToOrderResponse } from './schema'
+import type { Proposal, ProposalPatchPayload, ProposalParams, ProposalResponse, ToOrderResponse } from './schema'
 
 const proposalParams = (projectId?: number | null) =>
   projectId != null ? { project_id: projectId } : {}
@@ -14,6 +14,12 @@ export const proposalService = {
   },
   getById: async (autoid: string, projectId?: number | null) => {
     const { data } = await api.get<Proposal>(`/data/proposals/${autoid}/`, {
+      params: proposalParams(projectId)
+    })
+    return data
+  },
+  patch: async (autoid: string, payload: ProposalPatchPayload, projectId?: number | null) => {
+    const { data } = await api.patch<Proposal>(`/data/proposals/${autoid}/`, payload, {
       params: proposalParams(projectId)
     })
     return data

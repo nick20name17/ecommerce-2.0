@@ -40,7 +40,7 @@ const SheetOverlay = ({
   <SheetPrimitive.Overlay
       data-slot='sheet-overlay'
       className={cn(
-        'data-open:animate-in data-closed:animate-out data-closed:fade-out-0 data-open:fade-in-0 fixed inset-0 z-50 bg-black/10 duration-100 data-ending-style:opacity-0 data-starting-style:opacity-0',
+        'data-open:animate-in data-closed:animate-out data-closed:fade-out-0 data-open:fade-in-0 fixed inset-0 z-50 bg-black/40 backdrop-blur-[2px] duration-100 data-ending-style:opacity-0 data-starting-style:opacity-0',
         className
       )}
       {...props}

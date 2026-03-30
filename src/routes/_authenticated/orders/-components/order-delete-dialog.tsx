@@ -1,6 +1,7 @@
 import { useMutation } from '@tanstack/react-query'
 import { Check, Copy, TriangleAlert } from 'lucide-react'
 import { useState } from 'react'
+import { toast } from 'sonner'
 
 import { ORDER_QUERY_KEYS } from '@/api/order/query'
 import type { Order } from '@/api/order/schema'
@@ -48,9 +49,13 @@ export const OrderDeleteDialog = ({
   }
 
   const handleCopy = async () => {
-    await navigator.clipboard.writeText(CONFIRMATION_TEXT)
-    setCopied(true)
-    setTimeout(() => setCopied(false), 2000)
+    try {
+      await navigator.clipboard.writeText(CONFIRMATION_TEXT)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    } catch {
+      toast.error('Failed to copy to clipboard')
+    }
   }
 
   const deleteMutation = useMutation({

@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { useRouter } from '@tanstack/react-router'
+import { useBlocker, useRouter } from '@tanstack/react-router'
 import { createFileRoute } from '@tanstack/react-router'
 import {
   ChevronLeft,
@@ -87,6 +87,13 @@ const CreatePage = () => {
     handleCreateOrder,
     isCartItemType,
   } = useCreatePage()
+
+  const hasCartItems = cartItems.length > 0
+
+  useBlocker({
+    shouldBlockFn: () => hasCartItems,
+    withResolver: true,
+  })
 
   const { data: fieldConfig } = useQuery(getFieldConfigQuery(projectId))
   const { data: priceLevels } = useQuery(getPriceLevelsQuery(projectId))

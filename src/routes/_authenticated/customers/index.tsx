@@ -41,20 +41,12 @@ import {
 import { isAdmin } from '@/constants/user'
 import { useBreakpoint } from '@/hooks/use-breakpoint'
 import { useProjectId } from '@/hooks/use-project-id'
-import { formatPhone, getUserDisplayName } from '@/helpers/formatters'
+import { formatPhone, getInitials, getUserDisplayName } from '@/helpers/formatters'
 import { useLimitParam, useOffsetParam, useSearchParam } from '@/hooks/use-query-params'
 import { cn } from '@/lib/utils'
 import { useAuth } from '@/providers/auth'
 
 // ── Helpers ──────────────────────────────────────────────────
-
-function getInitials(name: string) {
-  return name
-    .split(' ')
-    .slice(0, 2)
-    .map((n) => n[0]?.toUpperCase() ?? '')
-    .join('')
-}
 
 type SortField = 'l_name' | 'contact_3' | 'in_level'
 type SortDir = 'asc' | 'desc'
@@ -148,7 +140,7 @@ function CustomersPage() {
         <div className='flex-1' />
 
         {/* Search */}
-        <div className='hidden h-7 w-[260px] items-center gap-1.5 rounded-[5px] border border-border bg-background px-2 transition-[border-color,box-shadow] focus-within:border-ring focus-within:ring-2 focus-within:ring-ring/50 sm:flex'>
+        <div className='hidden h-7 w-full max-w-[260px] items-center gap-1.5 rounded-[5px] border border-border bg-background px-2 transition-[border-color,box-shadow] focus-within:border-ring focus-within:ring-2 focus-within:ring-ring/50 sm:flex'>
           <Search className='size-3 shrink-0 text-text-tertiary' />
           <input
             value={search}

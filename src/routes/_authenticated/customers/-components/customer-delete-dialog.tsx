@@ -28,7 +28,7 @@ export const CustomerDeleteDialog = ({
   onOpenChange
 }: CustomerDeleteDialogProps) => {
   const deleteMutation = useMutation({
-    mutationFn: customerService.delete,
+    mutationFn: (id: string) => customerService.delete(id),
     meta: {
       successMessage: 'Customer deleted successfully',
       invalidatesQuery: CUSTOMER_QUERY_KEYS.lists()

@@ -98,7 +98,7 @@ export const NavProjects = () => {
 
   if (!isSuperAdminUser) {
     return (
-      <div className='mx-3 mt-3 flex h-[36px] items-center gap-2.5 rounded-[8px] bg-white/70 px-2.5 shadow-[0_0_0_1px_rgba(0,0,0,0.04)] dark:bg-white/[0.06] dark:shadow-[0_0_0_1px_rgba(255,255,255,0.06)]'>
+      <div className='mx-3 mt-3 flex h-[36px] items-center gap-2.5 rounded-[8px] bg-background/70 px-2.5 shadow-[0_0_0_1px_rgba(0,0,0,0.04)] dark:shadow-[0_0_0_1px_rgba(255,255,255,0.06)]'>
         <div className={`flex size-[20px] shrink-0 items-center justify-center rounded-[5px] text-[10px] font-bold ${selectedColor.bg} ${selectedColor.text}`}>
           {projectInitial}
         </div>
@@ -116,7 +116,7 @@ export const NavProjects = () => {
         <DropdownMenuTrigger asChild>
           <button
             type='button'
-            className='flex h-[36px] min-w-0 flex-1 items-center gap-2.5 rounded-[8px] bg-white/70 px-2.5 text-left shadow-[0_0_0_1px_rgba(0,0,0,0.04)] transition-all duration-100 hover:bg-white hover:shadow-[0_0_0_1px_rgba(0,0,0,0.06),0_1px_3px_rgba(0,0,0,0.04)] active:scale-[0.98] focus-visible:outline-none dark:bg-white/[0.06] dark:shadow-[0_0_0_1px_rgba(255,255,255,0.06)] dark:hover:bg-white/[0.08]'
+            className='flex h-[36px] min-w-0 flex-1 items-center gap-2.5 rounded-[8px] bg-background/70 px-2.5 text-left shadow-[0_0_0_1px_rgba(0,0,0,0.04)] transition-all duration-100 hover:bg-background hover:shadow-[0_0_0_1px_rgba(0,0,0,0.06),0_1px_3px_rgba(0,0,0,0.04)] active:scale-[0.98] focus-visible:outline-none dark:shadow-[0_0_0_1px_rgba(255,255,255,0.06)] dark:hover:bg-background/90'
           >
             <div className={`flex size-[20px] shrink-0 items-center justify-center rounded-[5px] text-[10px] font-bold ${selectedColor.bg} ${selectedColor.text}`}>
               {isLoading ? <Spinner className='size-3' /> : projectInitial}

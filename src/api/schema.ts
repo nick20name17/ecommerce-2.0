@@ -7,8 +7,15 @@ export const RequiredStringSchema = z
   .check(z.minLength(1, { error: VALIDATION_MESSAGES.required }), z.trim())
 
 export const PasswordSchema = RequiredStringSchema.check(
-  z.minLength(6, { error: 'min 6 characters' }),
+  z.minLength(1, { error: VALIDATION_MESSAGES.required }),
   z.maxLength(64, { error: 'max 64 characters' })
+)
+
+export const NewPasswordSchema = RequiredStringSchema.check(
+  z.minLength(8, { error: 'min 8 characters' }),
+  z.maxLength(64, { error: 'max 64 characters' }),
+  z.regex(/[A-Z]/, { error: 'must contain an uppercase letter' }),
+  z.regex(/[0-9]/, { error: 'must contain a number' })
 )
 
 export const EmailSchema = z

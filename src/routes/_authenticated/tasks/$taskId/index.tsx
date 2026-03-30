@@ -33,27 +33,19 @@ import { TASK_PRIORITY_COLORS, TASK_PRIORITY_LABELS } from '@/constants/task'
 import type { TaskPriority } from '@/constants/task'
 import { useBreakpoint } from '@/hooks/use-breakpoint'
 import { useProjectId } from '@/hooks/use-project-id'
-import { getUserDisplayName } from '@/helpers/formatters'
+import { formatDateMedium, getUserDisplayName } from '@/helpers/formatters'
 import { isAdmin, isSuperAdmin, USER_ROLES } from '@/constants/user'
 import { cn } from '@/lib/utils'
 import { useAuth } from '@/providers/auth'
 
 export const Route = createFileRoute('/_authenticated/tasks/$taskId/')({
   component: TaskDetailPage,
-  head: () => ({
-    meta: [{ title: 'Task Detail' }]
+  head: ({ params }) => ({
+    meta: [{ title: `Task ${params.taskId}` }]
   })
 })
 
 // ── Helpers ──────────────────────────────────────────────────
-
-function formatDateLong(dateStr: string) {
-  return new Date(dateStr).toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-  })
-}
 
 function formatDateTime(dateStr: string) {
   return new Date(dateStr).toLocaleDateString('en-US', {
@@ -665,7 +657,7 @@ function TaskDetailPage() {
                     </span>
                   </div>
                   <div className='mt-1 text-[13px] text-text-tertiary'>
-                    {formatDateLong(task.created_at)}
+                    {formatDateMedium(task.created_at)}
                   </div>
                 </div>
               </div>
@@ -791,7 +783,7 @@ function TaskDetailPage() {
         <>
           <div className='fixed inset-0 z-40 bg-black/40' onClick={() => setDeleteOpen(false)} />
           <div className='fixed inset-0 z-50 flex items-center justify-center px-4'>
-            <div className='w-full max-w-[400px] rounded-[12px] border border-border bg-background p-6' style={{ boxShadow: '0 16px 70px rgba(0,0,0,.2)' }}>
+            <div className='w-full max-w-[400px] rounded-[12px] border border-border bg-background p-6' style={{ boxShadow: 'var(--dropdown-shadow)' }}>
               <h3 className='mb-2 text-[15px] font-semibold'>Delete task</h3>
               <p className='mb-5 text-[13px] text-text-secondary'>
                 Are you sure you want to delete &ldquo;{task.title}&rdquo;? This action cannot be undone.
@@ -878,7 +870,7 @@ function DueDatePicker({
           )}
         >
           <CalendarDays className='size-3.5 shrink-0 text-text-tertiary' />
-          <span>{value ? formatDateLong(value) : 'Not set'}</span>
+          <span>{value ? formatDateMedium(value) : 'Not set'}</span>
         </button>
       </PopoverTrigger>
       <PopoverContent

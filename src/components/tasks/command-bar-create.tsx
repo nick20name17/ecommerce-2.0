@@ -185,7 +185,7 @@ function CommandBarCreateInner({
       <div className='fixed inset-x-0 top-[20%] z-50 mx-auto w-full max-w-[580px] px-4'>
         <div
           className='overflow-hidden rounded-[12px] border border-border bg-background animate-in zoom-in-95 fade-in duration-150'
-          style={{ boxShadow: '0 16px 70px rgba(0,0,0,.2)' }}
+          style={{ boxShadow: 'var(--dropdown-shadow)' }}
           onKeyDown={(e) => {
             if (e.key === 'Escape') { e.stopPropagation(); onClose() }
             if (e.key === 'Enter' && !e.shiftKey && e.target instanceof HTMLInputElement) {

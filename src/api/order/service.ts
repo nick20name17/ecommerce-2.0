@@ -63,24 +63,28 @@ export const orderService = {
     })
   },
 
-  getShippingRates: async (autoid: string, payload: ShippingRatesRequest) => {
+  getShippingRates: async (autoid: string, payload: ShippingRatesRequest, projectId?: number | null) => {
     const { data } = await api.post<ShippingRatesResponse>(
       `/data/orders/${autoid}/shipping-rates/`,
-      payload
+      payload,
+      { params: orderParams(projectId) }
     )
     return data
   },
 
-  selectShippingRate: async (autoid: string, payload: ShippingSelectionRequest) => {
+  selectShippingRate: async (autoid: string, payload: ShippingSelectionRequest, projectId?: number | null) => {
     const { data } = await api.post<ShippingSelectionResponse>(
       `/data/orders/${autoid}/shipping-selection/`,
-      payload
+      payload,
+      { params: orderParams(projectId) }
     )
     return data
   },
 
-  voidShipment: async (autoid: string, shipmentId: number) => {
-    await api.post(`/data/orders/${autoid}/shipments/${shipmentId}/void/`)
+  voidShipment: async (autoid: string, shipmentId: number, projectId?: number | null) => {
+    await api.post(`/data/orders/${autoid}/shipments/${shipmentId}/void/`, null, {
+      params: orderParams(projectId)
+    })
   },
 
   assign: async (autoid: string, payload: EntityAssignRequest, projectId?: number | null) => {

@@ -105,10 +105,10 @@ export const DataTableBody = <TData,>({
     return <DataTableSkeleton headers={table.getHeaderGroups()[0].headers} />
   }
 
-  const columntsLength = table.getAllColumns().length
+  const columnsLength = table.getAllColumns().length
 
   if (!table.getRowModel().rows?.length) {
-    return <DataTableEmpty columnsCount={columntsLength} />
+    return <DataTableEmpty columnsCount={columnsLength} />
   }
 
   return (

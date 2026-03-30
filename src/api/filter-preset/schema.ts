@@ -8,6 +8,7 @@ export type FilterOp =
   | 'lt'
   | 'lte'
   | 'contains'
+  | 'not_contains'
   | 'startswith'
   | 'in'
   | 'is_empty'

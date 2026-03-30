@@ -30,7 +30,7 @@ import {
 } from '@/components/ui/sheet'
 import { InitialsAvatar } from '@/components/ds'
 import { isAdmin } from '@/constants/user'
-import { getUserDisplayName } from '@/helpers/formatters'
+import { getInitials, getUserDisplayName } from '@/helpers/formatters'
 import { cn } from '@/lib/utils'
 import { useAuth } from '@/providers/auth'
 
@@ -44,14 +44,6 @@ interface EntityNotesSheetProps {
 }
 
 const NOTE_TEXT_MAX = 500
-
-function getInitials(name: string) {
-  return name
-    .split(' ')
-    .slice(0, 2)
-    .map((n) => n[0]?.toUpperCase() ?? '')
-    .join('')
-}
 
 function relativeTime(dateStr: string): string {
   const now = Date.now()
@@ -351,7 +343,7 @@ function NoteRow({
             </button>
           )}
         </div>
-        <p className='mt-0.5 whitespace-pre-wrap text-[13px] leading-relaxed text-text-secondary wrap-break-word'>
+        <p className='mt-0.5 whitespace-pre-wrap text-[13px] leading-relaxed text-text-secondary break-words'>
           {note.text}
         </p>
       </div>

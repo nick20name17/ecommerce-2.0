@@ -34,6 +34,7 @@ export function ViewToggle<T extends string>({
               ? 'bg-bg-active text-foreground'
               : 'text-text-tertiary hover:text-text-secondary'
           )}
+          aria-label={`Switch to ${opt.label.toLowerCase()} view`}
           onClick={() => onChange(opt.value)}
         >
           {opt.icon && <opt.icon className='size-3' />}

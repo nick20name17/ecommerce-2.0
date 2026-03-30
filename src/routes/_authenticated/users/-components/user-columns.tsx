@@ -19,28 +19,12 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Switch } from '@/components/ui/switch'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
-import { formatDate, getUserDisplayName } from '@/helpers/formatters'
+import { formatDate, getInitialsFromParts, getUserDisplayName } from '@/helpers/formatters'
 
 interface UserColumnsOptions {
   currentUserId: number | undefined
   onEdit: (user: User) => void
   onDelete: (user: User) => void
-}
-
-const getInitials = (
-  firstName: string | undefined,
-  lastName: string | undefined,
-  email?: string
-): string => {
-  const first = firstName?.trim()
-  const last = lastName?.trim()
-  if (first && last) {
-    return `${first.charAt(0)}${last.charAt(0)}`.toUpperCase()
-  }
-  if (first || last) {
-    return (first || last)!.charAt(0).toUpperCase()
-  }
-  return (email?.charAt(0) ?? '?').toUpperCase()
 }
 
 const StatusToggle = ({
@@ -106,7 +90,7 @@ export const getUserColumns = ({
           <div className='flex min-w-0 items-center gap-3'>
             <Avatar className='size-8 shrink-0'>
               <AvatarFallback className='bg-primary/10 text-primary text-[13px] font-medium'>
-                {getInitials(user.first_name, user.last_name, user.email)}
+                {getInitialsFromParts(user.first_name, user.last_name, user.email)}
               </AvatarFallback>
             </Avatar>
             <div className='min-w-0'>

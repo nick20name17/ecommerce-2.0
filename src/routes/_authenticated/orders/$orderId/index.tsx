@@ -31,8 +31,8 @@ import { toast } from 'sonner'
 
 export const Route = createFileRoute('/_authenticated/orders/$orderId/')({
   component: OrderDetailPage,
-  head: () => ({
-    meta: [{ title: 'Order Detail' }],
+  head: ({ params }) => ({
+    meta: [{ title: `Order ${params.orderId}` }],
   }),
 })
 
@@ -806,7 +806,7 @@ function OrderDetailPage() {
           <div className='fixed inset-0 z-50 flex items-center justify-center px-4'>
             <div
               className='w-full max-w-[400px] rounded-[12px] border border-border bg-background p-6'
-              style={{ boxShadow: '0 16px 70px rgba(0,0,0,.2)' }}
+              style={{ boxShadow: 'var(--dropdown-shadow)' }}
             >
               <h3 className='mb-2 text-[15px] font-semibold'>Delete order</h3>
               <p className='mb-5 text-[13px] text-text-secondary'>

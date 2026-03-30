@@ -125,6 +125,7 @@ const FILTER_OPS: { value: FilterOp; label: string }[] = [
   { value: 'eq', label: 'equals' },
   { value: 'neq', label: 'not equals' },
   { value: 'contains', label: 'contains' },
+  { value: 'not_contains', label: 'does not contain' },
   { value: 'startswith', label: 'starts with' },
   { value: 'in', label: 'in' },
   { value: 'gt', label: '>' },

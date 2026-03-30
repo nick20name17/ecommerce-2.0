@@ -7,6 +7,7 @@ import { InitialsAvatar } from '@/components/ds'
 import { TASK_PRIORITY_COLORS, TASK_PRIORITY_LABELS } from '@/constants/task'
 import type { TaskListItem, TaskStatus } from '@/api/task/schema'
 import { useBreakpoint } from '@/hooks/use-breakpoint'
+import { formatDateShort, getInitials } from '@/helpers/formatters'
 import { cn } from '@/lib/utils'
 
 // ── Priority Icon (shared with list view) ───────────────────
@@ -48,15 +49,6 @@ function PriorityIcon({ priority, color, size = 12 }: { priority: string; color:
 
 // ── Helpers ──────────────────────────────────────────────────
 
-function getInitials(name: string) {
-  return name.split(' ').slice(0, 2).map((n) => n[0]?.toUpperCase() ?? '').join('')
-}
-
-function formatDate(dateStr: string) {
-  const d = new Date(dateStr)
-  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
-}
-
 function isOverdue(dateStr: string) {
   const d = new Date(dateStr)
   const today = new Date()
@@ -94,7 +86,7 @@ export function KanbanView({ tasks, statuses, onStatusChange, onCreate }: Kanban
 
   return (
     <DragDropProvider onDragEnd={handleDragEnd}>
-      <div className='flex h-full gap-4 overflow-x-auto px-6 py-4'>
+      <div className='flex h-full gap-4 overflow-x-auto px-3.5 py-4 sm:px-6'>
         {statuses.map((status) => {
           const columnTasks = tasks.filter((t) => t.status === status.id)
           return (
@@ -278,7 +270,7 @@ function KanbanCardContent({ task, isDragging }: { task: TaskListItem; isDraggin
   const priorityLabel = TASK_PRIORITY_LABELS[task.priority]
   const assigneeName = task.responsible_user_name
   const assigneeInitials = assigneeName ? getInitials(assigneeName) : null
-  const dueDateLabel = task.due_date ? formatDate(task.due_date) : null
+  const dueDateLabel = task.due_date ? formatDateShort(task.due_date) : null
   const overdue = task.due_date ? isOverdue(task.due_date) : false
 
   return (

@@ -23,6 +23,7 @@ import { useBreakpoint } from '@/hooks/use-breakpoint'
 import { useProjectId } from '@/hooks/use-project-id'
 import { TaskDeleteDialog } from '@/components/tasks/task-delete-dialog'
 import { CommandBarCreate } from '@/components/tasks/command-bar-create'
+import { formatDateShort, getInitials } from '@/helpers/formatters'
 import { cn } from '@/lib/utils'
 
 interface CustomerTasksTabProps {
@@ -31,19 +32,6 @@ interface CustomerTasksTabProps {
 }
 
 // ── Helpers ──────────────────────────────────────────────────
-
-function getInitials(name: string) {
-  return name
-    .split(' ')
-    .slice(0, 2)
-    .map((n) => n[0]?.toUpperCase() ?? '')
-    .join('')
-}
-
-function formatDate(dateStr: string) {
-  const d = new Date(dateStr)
-  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
-}
 
 function isOverdue(dateStr: string) {
   const d = new Date(dateStr)
@@ -240,7 +228,7 @@ function TaskRow({
   const assigneeName = task.responsible_user_name
   const assigneeInitials = assigneeName ? getInitials(assigneeName) : null
   const assigneeFirst = assigneeName?.split(' ')[0]
-  const dueDateLabel = task.due_date ? formatDate(task.due_date) : null
+  const dueDateLabel = task.due_date ? formatDateShort(task.due_date) : null
   const overdue = task.due_date ? isOverdue(task.due_date) : false
 
   if (isMobile) {

@@ -34,6 +34,10 @@ export interface ProposalItem {
   [key: string]: unknown
 }
 
+export type ProposalPatchPayload = Partial<
+  Pick<Proposal, 'descr' | 'status' | 'tax'> & Record<string, unknown>
+>
+
 export interface ToOrderResponse {
   AUTOID: string
   INVOICE: string

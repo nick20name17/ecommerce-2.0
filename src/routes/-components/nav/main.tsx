@@ -250,7 +250,7 @@ export const NavMain = () => {
       </div>
 
       {/* Workspace section — colored square icons */}
-      <div className='my-2 border-t border-black/[0.06] dark:border-white/[0.06]' />
+      <div className='my-2 border-t border-border' />
       <div className='flex flex-col gap-px'>
         {filteredWorkspace.map((item) => (
           <ColoredNavLink
