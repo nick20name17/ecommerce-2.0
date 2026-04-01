@@ -208,12 +208,12 @@ const ActivityPage = () => {
       {/* Column headers */}
       {!isMobile && (results.length > 0 || isLoading) && (
         <div className={cn('flex shrink-0 items-center gap-4 border-b border-border bg-bg-secondary/60 py-1.5', isTablet ? 'px-5' : 'px-6')}>
-          <div className='w-[70px] shrink-0 text-[13px] font-medium text-text-tertiary'>Method</div>
-          <div className='min-w-0 flex-1 text-[13px] font-medium text-text-tertiary'>URL</div>
-          <div className='hidden w-[90px] shrink-0 text-[13px] font-medium text-text-tertiary lg:block'>Entity</div>
-          <div className='w-[50px] shrink-0 text-[13px] font-medium text-text-tertiary'>Status</div>
-          <div className='hidden w-[70px] shrink-0 text-right text-[13px] font-medium text-text-tertiary sm:block'>Duration</div>
-          <div className='hidden w-[130px] shrink-0 text-[13px] font-medium text-text-tertiary lg:block'>Time</div>
+          <div className='w-[70px] shrink-0 text-[12px] font-medium text-text-tertiary'>Method</div>
+          <div className='min-w-0 flex-1 text-[12px] font-medium text-text-tertiary'>URL</div>
+          {!isTablet && <div className='w-[100px] shrink-0 text-[12px] font-medium text-text-tertiary'>Entity</div>}
+          <div className='w-[50px] shrink-0 text-[12px] font-medium text-text-tertiary'>Status</div>
+          {!isTablet && <div className='w-[70px] shrink-0 text-right text-[12px] font-medium text-text-tertiary'>Duration</div>}
+          {!isTablet && <div className='w-[140px] shrink-0 text-[12px] font-medium text-text-tertiary'>Time</div>}
           <div className='w-[20px] shrink-0' />
         </div>
       )}
@@ -225,10 +225,10 @@ const ActivityPage = () => {
             <div key={i} className={cn('flex items-center gap-4 border-b border-border-light py-2.5', isMobile ? 'px-3.5' : 'px-6')}>
               <Skeleton className='h-5 w-12' />
               <Skeleton className='h-4 w-48 flex-1' />
-              {!isMobile && <Skeleton className='hidden h-4 w-16 lg:block' />}
+              {!isTablet && <Skeleton className='h-4 w-16' />}
               <Skeleton className='h-5 w-10' />
-              {!isMobile && <Skeleton className='hidden h-4 w-14 sm:block' />}
-              {!isMobile && <Skeleton className='hidden h-4 w-20 lg:block' />}
+              {!isTablet && <Skeleton className='h-4 w-14' />}
+              {!isTablet && <Skeleton className='h-4 w-24' />}
             </div>
           ))
         ) : results.length === 0 ? (
@@ -327,20 +327,26 @@ function LogRow({
         {log.is_error && <AlertCircle className='size-3 shrink-0 text-red-500' />}
         <span className='truncate font-mono text-[12px] text-foreground'>{log.url}</span>
       </div>
-      <div className='hidden w-[90px] shrink-0 truncate text-[13px] text-text-tertiary lg:block'>
-        {log.entity || '—'}
-      </div>
+      {!isTablet && (
+        <div className='w-[100px] shrink-0 truncate text-[13px] text-text-tertiary'>
+          {log.entity || '—'}
+        </div>
+      )}
       <div className='w-[50px] shrink-0'>
         <span className={cn('font-mono text-[12px] font-semibold tabular-nums', statusColor)}>
           {log.status_code}
         </span>
       </div>
-      <div className='hidden w-[70px] shrink-0 text-right text-[12px] tabular-nums text-text-tertiary sm:block'>
-        {formatDuration(log.duration_ms)}
-      </div>
-      <div className='hidden w-[130px] shrink-0 text-[12px] tabular-nums text-text-tertiary lg:block'>
-        {formatDateTimeShort(log.created_at)}
-      </div>
+      {!isTablet && (
+        <div className='w-[70px] shrink-0 text-right text-[12px] tabular-nums text-text-tertiary'>
+          {formatDuration(log.duration_ms)}
+        </div>
+      )}
+      {!isTablet && (
+        <div className='w-[140px] shrink-0 text-[12px] tabular-nums text-text-tertiary'>
+          {formatDateTimeShort(log.created_at)}
+        </div>
+      )}
       <div className='w-[20px] shrink-0 text-text-tertiary opacity-0 transition-opacity group-hover/row:opacity-100'>
         <ChevronRight className='size-3.5' />
       </div>

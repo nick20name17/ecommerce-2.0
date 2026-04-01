@@ -11,7 +11,7 @@ import {
   Truck,
   XCircle,
 } from 'lucide-react'
-import { useState } from 'react'
+import { useDeferredValue, useState } from 'react'
 import { toast } from 'sonner'
 
 import { formatDateMedium, formatDateTimeMedium } from '@/helpers/formatters'
@@ -44,8 +44,10 @@ import {
 } from '@/components/ui/dialog'
 import { SidebarTrigger } from '@/components/ui/sidebar'
 import { Skeleton } from '@/components/ui/skeleton'
+import { Pagination } from '@/components/common/filters/pagination'
 import { useBreakpoint } from '@/hooks/use-breakpoint'
 import { useProjectId } from '@/hooks/use-project-id'
+import { useLimitParam, useOffsetParam } from '@/hooks/use-query-params'
 import { cn } from '@/lib/utils'
 
 // ── Helpers ──────────────────────────────────────────────────
@@ -83,6 +85,9 @@ const ShippingPage = () => {
   const isTablet = bp === 'tablet'
   const [projectId] = useProjectId()
   const [search, setSearch] = useState('')
+  const deferredSearch = useDeferredValue(search)
+  const [offset, setOffset] = useOffsetParam()
+  const [limit] = useLimitParam()
   const [voidedFilter, setVoidedFilter] = useState<VoidedFilter>('all')
   const [selected, setSelected] = useState<ShipmentRecord | null>(null)
 
@@ -90,32 +95,20 @@ const ShippingPage = () => {
     voided: voidedFilter === 'active' ? false : voidedFilter === 'voided' ? true : undefined,
     project_id: projectId ?? undefined,
     ordering: '-created_at',
-    limit: 100,
+    search: deferredSearch || undefined,
+    limit,
+    offset,
   }
 
   const { data, isLoading } = useQuery(getShipmentsQuery(queryParams))
-  const allShipments = data ?? []
-  const shipments = search
-    ? allShipments.filter((s) => {
-        const term = search.toLowerCase()
-        return (
-          s.order_name.toLowerCase().includes(term) ||
-          s.order_invoice.toLowerCase().includes(term) ||
-          s.order_autoid.toLowerCase().includes(term) ||
-          s.tracking_number.toLowerCase().includes(term) ||
-          s.service_name.toLowerCase().includes(term) ||
-          s.carrier_id.toLowerCase().includes(term) ||
-          (s.ship_to_name ?? '').toLowerCase().includes(term) ||
-          (s.pick_list_id != null && String(s.pick_list_id).includes(term))
-        )
-      })
-    : allShipments
-  const totalCount = shipments.length
+  const shipments = data?.results ?? []
+  const totalCount = data?.count ?? 0
 
   const hasFilters = voidedFilter !== 'all'
 
   const selectStatus = (value: VoidedFilter) => {
     setVoidedFilter(value === voidedFilter ? 'all' : value)
+    setOffset(null)
   }
 
   return (
@@ -137,7 +130,7 @@ const ShippingPage = () => {
           <Search className='size-3.5 shrink-0 text-text-tertiary' />
           <input
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) => { setSearch(e.target.value); setOffset(null) }}
             placeholder='Search shipments...'
             className='w-[140px] bg-transparent text-[13px] outline-none placeholder:text-text-tertiary sm:w-[200px]'
           />
@@ -247,9 +240,7 @@ const ShippingPage = () => {
 
       {/* Footer */}
       <div className={cn('shrink-0 border-t border-border py-1.5', isMobile ? 'px-3.5' : 'px-6')}>
-        <p className='text-[13px] tabular-nums text-text-tertiary'>
-          {isLoading ? '...' : `${totalCount} shipment${totalCount !== 1 ? 's' : ''}`}
-        </p>
+        <Pagination totalCount={totalCount} />
       </div>
 
       {/* Detail dialog */}
