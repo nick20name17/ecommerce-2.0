@@ -33,6 +33,20 @@ export interface PickListItem {
   push_error?: string | null
 }
 
+// ── Pick list order (grouped items by order) ────────────────
+
+export interface PickListOrderItem {
+  autoid: string
+  descr: string
+}
+
+export interface PickListOrder {
+  autoid: string
+  invoice: string
+  descr: string
+  items: PickListOrderItem[]
+}
+
 // ── Pick list ───────────────────────────────────────────────
 
 export interface PickList {
@@ -44,6 +58,7 @@ export interface PickList {
   item_count: number
   order_count: number
   items?: PickListItem[]
+  orders?: PickListOrder[]
   shipments?: ShipmentRecord[]
   created_at: string
   updated_at: string

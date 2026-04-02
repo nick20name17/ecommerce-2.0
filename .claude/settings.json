@@ -1,0 +1,17 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if jq -r '.tool_input.command' | grep -q 'git push'; then sleep 30 && railway logs --service front --limit 50 2>&1 | tail -20; fi",
+            "timeout": 60,
+            "statusMessage": "Checking Railway deployment..."
+          }
+        ]
+      }
+    ]
+  }
+}

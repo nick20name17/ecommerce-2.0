@@ -29,9 +29,10 @@ interface Props {
   items: PickListItem[]
   isDraft: boolean
   isMobile: boolean
+  descrMap?: Map<string, string>
 }
 
-export function PickListItemsTable({ pickListId, items, isDraft, isMobile }: Props) {
+export function PickListItemsTable({ pickListId, items, isDraft, isMobile, descrMap }: Props) {
   const queryClient = useQueryClient()
   const [editingItem, setEditingItem] = useState<number | null>(null)
   const [editQty, setEditQty] = useState('')
@@ -108,7 +109,7 @@ export function PickListItemsTable({ pickListId, items, isDraft, isMobile }: Pro
                 </span>
               </div>
               <div className='flex items-center justify-between'>
-                <span className='text-[13px] text-text-tertiary'>{item.detail_autoid}</span>
+                <span className='text-[13px] text-text-tertiary'>{descrMap?.get(item.detail_autoid) || item.descr || item.detail_autoid}</span>
                 {item.push_status && <PushStatusBadge status={item.push_status} error={item.push_error} />}
               </div>
               {isDraft && (
@@ -141,8 +142,8 @@ export function PickListItemsTable({ pickListId, items, isDraft, isMobile }: Pro
             <div className='w-[120px] shrink-0 text-[13px] font-semibold tabular-nums text-foreground'>
               {item.order_autoid}
             </div>
-            <div className='min-w-0 flex-1 truncate text-[13px] font-mono text-text-secondary'>
-              {item.detail_autoid}
+            <div className='min-w-0 flex-1 truncate text-[13px] text-text-secondary'>
+              {descrMap?.get(item.detail_autoid) || item.descr || item.detail_autoid}
             </div>
             <div className='w-[100px] shrink-0 text-right'>
               {isEditing && isDraft ? (
@@ -208,7 +209,7 @@ export function PickListItemsTable({ pickListId, items, isDraft, isMobile }: Pro
             </AlertDialogMedia>
             <AlertDialogTitle>Remove Item</AlertDialogTitle>
             <AlertDialogDescription>
-              Remove {itemToRemove?.detail_autoid} from this pick list?
+              Remove {itemToRemove ? (descrMap?.get(itemToRemove.detail_autoid) || itemToRemove.descr || itemToRemove.detail_autoid) : ''} from this pick list?
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

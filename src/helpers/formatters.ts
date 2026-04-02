@@ -122,7 +122,9 @@ export const formatBytes = (bytes: number, decimals: number = 2): string => {
 /** Extract initials from a full name string (e.g. "John Doe" → "JD") */
 export function getInitials(name: string): string {
   return name
-    .split(' ')
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean)
     .slice(0, 2)
     .map((n) => n[0]?.toUpperCase() ?? '')
     .join('')

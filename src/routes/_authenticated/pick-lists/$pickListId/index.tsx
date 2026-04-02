@@ -71,6 +71,26 @@ const PickListDetailPage = () => {
 
   const items = pickList?.items ?? []
 
+  // Build description lookup from orders data
+  const descrMap = useMemo(() => {
+    const map = new Map<string, string>()
+    for (const order of pickList?.orders ?? []) {
+      for (const oi of order.items) {
+        if (oi.descr) map.set(oi.autoid, oi.descr)
+      }
+    }
+    return map
+  }, [pickList?.orders])
+
+  // Build order invoice lookup
+  const orderInvoiceMap = useMemo(() => {
+    const map = new Map<string, string>()
+    for (const order of pickList?.orders ?? []) {
+      if (order.invoice) map.set(order.autoid, order.invoice)
+    }
+    return map
+  }, [pickList?.orders])
+
   // Group items by order
   const orderGroups = useMemo(() => {
     const map = new Map<string, typeof items>()
@@ -271,7 +291,7 @@ const PickListDetailPage = () => {
                 <div key={orderAutoid} className='overflow-hidden rounded-lg border border-border'>
                   <div className='flex items-center gap-2 bg-bg-secondary/50 px-3.5 py-2'>
                     <span className='text-[12px] font-semibold text-foreground'>
-                      Order {orderAutoid.slice(0, 12)}...
+                      Order {orderInvoiceMap.get(orderAutoid) || orderAutoid.slice(0, 12)}
                     </span>
                     <div className='flex-1' />
                     <span className='text-[11px] text-text-quaternary'>
@@ -287,10 +307,9 @@ const PickListDetailPage = () => {
                           i < orderItems.length - 1 && 'border-b border-border-light/50',
                         )}
                       >
-                        <span className='w-[160px] shrink-0 truncate font-mono text-[12px] font-medium text-foreground'>
-                          {item.detail_autoid.slice(0, 16)}
+                        <span className='min-w-0 flex-1 truncate text-[12px] font-medium text-foreground'>
+                          {descrMap.get(item.detail_autoid) || item.descr || item.detail_autoid}
                         </span>
-                        <div className='flex-1' />
                         <span className='rounded bg-bg-secondary px-1.5 py-0.5 text-[12px] font-medium tabular-nums text-text-secondary'>
                           {formatQty(item.picked_quantity)}
                         </span>
