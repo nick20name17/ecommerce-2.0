@@ -26,7 +26,7 @@ export function InitialsAvatar({ initials, size = 24, className }: InitialsAvata
         height: size,
         borderRadius: '50%',
         backgroundColor: bg,
-        display: 'inline-flex',
+        display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
         color: '#fff',

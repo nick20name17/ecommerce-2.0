@@ -356,7 +356,7 @@ function TaskDetailPage() {
         </div>
         <button
           type='button'
-          className='inline-flex items-center gap-1.5 rounded-[6px] px-2.5 py-1.5 text-[13px] font-medium text-text-tertiary transition-colors duration-[80ms] hover:bg-bg-hover hover:text-destructive'
+          className='inline-flex items-center gap-1.5 rounded-[6px] px-2.5 py-1.5 text-[13px] leading-none font-medium text-text-tertiary transition-colors duration-[80ms] hover:bg-bg-hover hover:text-destructive'
           onClick={() => setDeleteOpen(true)}
         >
           <Trash2 className='size-3.5' />
