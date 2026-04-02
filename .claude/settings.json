@@ -1,14 +1,14 @@
 {
   "hooks": {
-    "PostToolUse": [
+    "PreToolUse": [
       {
         "matcher": "Bash",
         "hooks": [
           {
             "type": "command",
-            "command": "if jq -r '.tool_input.command' | grep -q 'git push'; then sleep 30 && railway logs --service front --build 2>&1 | tail -20; fi",
-            "timeout": 60,
-            "statusMessage": "Checking Railway deployment..."
+            "command": "if jq -r '.tool_input.command' | grep -q 'git push'; then cd /Users/alex/Documents/projects/ecommerce-2.0 && bun run build 2>&1 | tail -5; EXIT=$?; if [ $EXIT -ne 0 ]; then echo '{\"decision\":\"block\",\"reason\":\"Build failed — fix TypeScript errors before pushing\"}'; fi; fi",
+            "timeout": 120,
+            "statusMessage": "Running build check before push..."
           }
         ]
       }

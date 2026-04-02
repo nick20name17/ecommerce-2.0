@@ -16,10 +16,14 @@
 
 ## After Push
 
-After every `git push`, check Railway deployment:
-1. Wait ~30s for the build to start
-2. Run `railway logs --service front` to check if the deploy succeeded or failed
-3. If it failed, read the error logs and fix before moving on
+After every `git push`, you MUST verify the Railway build:
+1. Run `bun run build` locally BEFORE pushing — if tsc fails, Railway will fail too
+2. After pushing, wait ~60s then run `railway logs --service front --build 2>&1 | tail -20`
+3. If `railway logs --build` still shows old build, the new one likely failed — check the Railway dashboard URL
+4. NEVER move on to the next task until you've confirmed the build passed
+5. If build fails, fix the error and push again immediately
+
+**IMPORTANT**: `railway logs --build` only shows the LAST SUCCESSFUL build. Failed builds are only visible in the Railway dashboard. So always run `bun run build` locally first as the source of truth.
 
 ## Dev
 
