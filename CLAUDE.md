@@ -25,6 +25,8 @@ After every `git push`, you MUST verify the Railway build:
 
 **IMPORTANT**: `railway logs --build` only shows the LAST SUCCESSFUL build. Failed builds are only visible in the Railway dashboard. So always run `bun run build` locally first as the source of truth.
 
+**NEVER run `railway up`** — deployments are triggered automatically via GitHub push. Running `railway up` creates a separate CLI deployment that blocks the queue.
+
 ## Dev
 
 - `bun run dev` — start dev server on port 3000

@@ -26,7 +26,10 @@ export interface ShipmentRecord {
   created_at: string
 }
 
-export type ShipmentResponse = ShipmentRecord[]
+export interface ShipmentResponse {
+  count: number
+  results: ShipmentRecord[]
+}
 
 export interface ShipmentParams extends PaginationParams {
   search?: string
