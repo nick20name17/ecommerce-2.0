@@ -1,5 +1,12 @@
 import type { PaginatedResponse, PaginationParams } from '@/api/schema'
 
+export interface ProductUnit {
+  unit: string
+  multiplier: string
+  price: string | null
+  old_price: string | null
+}
+
 export interface Product {
   autoid: string
   id: string
@@ -18,7 +25,7 @@ export interface Product {
   inactive: boolean
   ignoreCount: boolean
   product_specs: unknown[]
-  units: unknown[]
+  units: ProductUnit[]
   def_unit: string
   unit: string
   photo: string

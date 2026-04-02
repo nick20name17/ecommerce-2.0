@@ -579,6 +579,7 @@ const OrdersPage = () => {
         onOpenChange={(open) => !open && setOrderForPicking(null)}
         customerId={String(orderForPicking?.c_id ?? orderForPicking?.id ?? '')}
         customerName={orderForPicking?.name ?? ''}
+        orderAutoid={orderForPicking?.autoid}
       />
     </div>
   )

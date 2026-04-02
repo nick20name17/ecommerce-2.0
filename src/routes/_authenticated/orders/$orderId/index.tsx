@@ -446,6 +446,9 @@ function OrderDetailPage() {
                       </td>
                       <td className='px-3 py-1.5 text-right tabular-nums text-text-secondary'>
                         {item.quan ?? '—'}
+                        {item.unit_meas && item.unit_meas !== 'EA' && (
+                          <span className='ml-1 text-[11px] text-text-quaternary'>{item.unit_meas}</span>
+                        )}
                       </td>
                       <td className='px-3 py-1.5 text-right tabular-nums text-text-tertiary'>
                         {item.ship ?? '0'}
@@ -787,6 +790,7 @@ function OrderDetailPage() {
         onOpenChange={setPickingOpen}
         customerId={String(order.c_id ?? order.id ?? '')}
         customerName={order.name}
+        orderAutoid={order.autoid}
       />
 
       {/* ── Shipping rates dialog ── */}

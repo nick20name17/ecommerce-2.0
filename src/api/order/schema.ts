@@ -91,6 +91,7 @@ export interface OrderItem {
   doc_aid: string
   quan: string
   ship: string
+  unit_meas?: string
   descr: string
   price: string
   so_amount: string

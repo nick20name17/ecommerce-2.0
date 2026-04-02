@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { ArrowLeft, ArrowRight, Check, ChevronDown, Loader2, Package } from 'lucide-react'
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { useNavigate } from '@tanstack/react-router'
 
@@ -30,6 +30,8 @@ interface StartPickingDialogProps {
   customerId: string
   /** Customer display name */
   customerName: string
+  /** If provided, auto-select this order when dialog opens */
+  orderAutoid?: string
 }
 
 type Step = 'select-orders' | 'set-quantities' | 'saving'
@@ -39,12 +41,15 @@ export function StartPickingDialog({
   onOpenChange,
   customerId,
   customerName,
+  orderAutoid,
 }: StartPickingDialogProps) {
   const queryClient = useQueryClient()
   const navigate = useNavigate()
   const [projectId] = useProjectId()
   const [step, setStep] = useState<Step>('select-orders')
-  const [selectedOrderIds, setSelectedOrderIds] = useState<Set<string>>(new Set())
+  const [selectedOrderIds, setSelectedOrderIds] = useState<Set<string>>(
+    () => orderAutoid ? new Set([orderAutoid]) : new Set()
+  )
   const [pickQuantities, setPickQuantities] = useState<Map<string, string>>(new Map())
 
   // Try customer_id first, fall back to fetching all and matching by name
@@ -74,6 +79,19 @@ export function StartPickingDialog({
     ? groups[0]
     : groups.find((g) => g.customer_name === customerName) ?? groups[0]
   const orders = group?.orders ?? []
+
+  // Auto-select order when opened from a specific order
+  const autoSelectedRef = useRef(false)
+  useEffect(() => {
+    if (!open) {
+      autoSelectedRef.current = false
+      return
+    }
+    if (orderAutoid && orders.length > 0 && !autoSelectedRef.current) {
+      autoSelectedRef.current = true
+      setSelectedOrderIds(new Set([orderAutoid]))
+    }
+  }, [open, orderAutoid, orders])
 
   const selectedOrders = useMemo(
     () => orders.filter((o) => selectedOrderIds.has(o.autoid)),
@@ -197,7 +215,7 @@ export function StartPickingDialog({
 
   const resetState = () => {
     setStep('select-orders')
-    setSelectedOrderIds(new Set())
+    setSelectedOrderIds(orderAutoid ? new Set([orderAutoid]) : new Set())
     setPickQuantities(new Map())
   }
 
@@ -303,12 +321,26 @@ export function StartPickingDialog({
 
               {selectedOrders.map((order) => {
                 const items = order.items ?? []
+
+                // Group items into parent → components hierarchy
+                const parentItems = items.filter((it) => !it.par_time)
+                const componentsByParent = new Map<string, typeof items>()
+                for (const it of items) {
+                  if (it.par_time) {
+                    const arr = componentsByParent.get(it.par_time) ?? []
+                    arr.push(it)
+                    componentsByParent.set(it.par_time, arr)
+                  }
+                }
+                // If no parent/child structure, show flat
+                const hasHierarchy = parentItems.length > 0 && parentItems.length < items.length
+
                 return (
                   <div key={order.autoid} className='overflow-hidden rounded-lg border border-border'>
                     {/* Order header */}
                     <div className='flex items-center gap-2 bg-bg-secondary/50 px-3.5 py-2'>
                       <span className='text-[13px] font-semibold text-foreground'>
-                        #{order.invoice || order.id}
+                        #{(order.invoice || order.id).trim()}
                       </span>
                       {order.po_no ? (
                         <span className='rounded bg-bg-secondary px-1.5 py-0.5 text-[11px] font-medium text-text-tertiary'>
@@ -335,65 +367,41 @@ export function StartPickingDialog({
                     </div>
 
                     {/* Column header */}
-                    <div className='grid grid-cols-[20px_1fr_60px_60px] items-center gap-2 border-b border-border-light px-3.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-text-quaternary'>
+                    <div className='grid grid-cols-[20px_1fr_52px_32px_52px] items-center gap-2 border-b border-border-light bg-bg-secondary/40 px-3.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-text-quaternary'>
                       <span />
                       <span>Item</span>
-                      <span className='text-center'>Ordered</span>
-                      <span className='text-center'>Picking</span>
+                      <span className='text-center'>Qty</span>
+                      <span className='text-center'>UOM</span>
+                      <span className='text-center'>Pick</span>
                     </div>
 
-                    {/* Items */}
-                    {items.map((item, i) => {
-                      const orderedStr = formatQty(item.quan)
-                      const ordered = parseFloat(item.quan)
-                      const pickVal = pickQuantities.get(item.autoid) || '0'
-                      const picking = parseFloat(pickVal) || 0
-                      const isPartial = picking < ordered && picking > 0
+                    {/* Items with parent/component hierarchy */}
+                    {(hasHierarchy ? parentItems : items).map((pItem) => {
+                      const comps = hasHierarchy ? (componentsByParent.get(pItem.timestamp!) ?? []) : []
+                      const isParent = hasHierarchy && comps.length > 0
+
                       return (
-                        <div
-                          key={item.autoid}
-                          className={cn(
-                            'grid grid-cols-[20px_1fr_60px_60px] items-center gap-2 px-3.5 py-1.5',
-                            i < items.length - 1 && 'border-b border-border-light/50',
-                          )}
-                        >
-                          <button
-                            type='button'
-                            className='flex size-5 items-center justify-center rounded transition-colors hover:bg-bg-active'
-                            onClick={() => {
-                              const newVal = picking > 0 ? '0' : formatQty(item.quan)
-                              updatePickQty(item.autoid, newVal, item.quan)
-                            }}
-                          >
-                            <Package className={cn('size-4', picking > 0 ? 'text-emerald-500' : 'text-text-quaternary/40')} />
-                          </button>
-                          <div className='flex min-w-0 items-center gap-2'>
-                            <span className='w-[90px] shrink-0 font-mono text-[12px] font-medium text-foreground'>
-                              {item.inven}
-                            </span>
-                            <span className='min-w-0 truncate text-[11px] text-text-tertiary'>
-                              {item.descr}
-                            </span>
-                          </div>
-                          <button
-                            type='button'
-                            onClick={() => updatePickQty(item.autoid, formatQty(item.quan), item.quan)}
-                            className='flex h-7 cursor-pointer items-center justify-center rounded-[5px] bg-bg-secondary/60 text-[13px] tabular-nums text-text-tertiary transition-colors hover:bg-primary/10 hover:text-primary'
-                            title='Pick full quantity'
-                          >
-                            {orderedStr}
-                          </button>
-                          <input
-                            type='number'
-                            value={pickVal}
-                            onChange={(e) => updatePickQty(item.autoid, e.target.value, item.quan)}
-                            min='0'
-                            step='any'
-                            className={cn(
-                              'h-7 w-full rounded-[5px] border bg-background text-center text-[13px] tabular-nums text-foreground outline-none focus:border-primary focus:ring-1 focus:ring-primary/20',
-                              isPartial ? 'border-amber-400' : 'border-border',
-                            )}
+                        <div key={pItem.autoid}>
+                          <PickItemRow
+                            item={pItem}
+                            pickQuantities={pickQuantities}
+                            updatePickQty={updatePickQty}
+                            formatQty={formatQty}
+                            isParent={isParent}
                           />
+                          {comps.length > 0 && comps.map((comp, ci) => (
+                            <PickItemRow
+                              key={comp.autoid}
+                              item={comp}
+                              pickQuantities={pickQuantities}
+                              updatePickQty={updatePickQty}
+                              formatQty={formatQty}
+                              isComponent
+                              isLastComponent={ci === comps.length - 1}
+                              totalComponents={comps.length}
+                              componentIndex={ci}
+                            />
+                          ))}
                         </div>
                       )
                     })}
@@ -570,7 +578,7 @@ function OrderSelectCard({
                     {item.descr}
                   </span>
                   <span className='shrink-0 rounded bg-bg-secondary px-1.5 py-0.5 text-[11px] font-medium tabular-nums text-text-secondary'>
-                    {parseFloat(item.quan).toFixed(0)}
+                    {parseFloat(item.quan).toFixed(0)}{item.unit_meas && item.unit_meas !== 'EA' ? ` ${item.unit_meas}` : ''}
                   </span>
                 </div>
               ))}
@@ -578,6 +586,157 @@ function OrderSelectCard({
           )}
         </>
       )}
+    </div>
+  )
+}
+
+// ── Pick Item Row ─────────────────────────────────────────
+
+function PickItemRow({
+  item,
+  pickQuantities,
+  updatePickQty,
+  formatQty,
+  isLast: _isLast,
+  isParent,
+  isComponent,
+  isLastComponent,
+  totalComponents: _totalComponents,
+  componentIndex: _componentIndex,
+}: {
+  item: PickingOrderItem
+  pickQuantities: Map<string, string>
+  updatePickQty: (autoid: string, value: string, maxQuan: string) => void
+  formatQty: (raw: string) => string
+  isLast?: boolean
+  isParent?: boolean
+  isComponent?: boolean
+  isLastComponent?: boolean
+  totalComponents?: number
+  componentIndex?: number
+}) {
+  const orderedStr = formatQty(item.quan)
+  const unitLabel = item.unit_meas && item.unit_meas !== 'EA' ? item.unit_meas : ''
+  const ordered = parseFloat(item.quan)
+  const pickVal = pickQuantities.get(item.autoid) || '0'
+  const picking = parseFloat(pickVal) || 0
+  const isPartial = picking < ordered && picking > 0
+
+  if (isParent) {
+    return (
+      <div className='grid grid-cols-[20px_1fr_52px_32px_52px] items-center gap-2 px-3.5 py-1.5'>
+        <div className='flex size-5 items-center justify-center'>
+          <Package className='size-4 text-foreground' />
+        </div>
+        <div className='flex min-w-0 items-center gap-2'>
+          <span className='w-[90px] shrink-0 font-mono text-[12px] font-bold leading-none text-foreground'>{item.inven}</span>
+          <span className='min-w-0 truncate text-[12px] font-semibold leading-none text-foreground'>{item.descr}</span>
+        </div>
+        <button
+          type='button'
+          onClick={() => updatePickQty(item.autoid, formatQty(item.quan), item.quan)}
+          className='flex h-7 cursor-pointer items-center justify-center rounded-[5px] bg-bg-secondary/60 text-[13px] tabular-nums text-text-tertiary transition-colors hover:bg-primary/10 hover:text-primary'
+          title='Pick full quantity'
+        >
+          {orderedStr}
+        </button>
+        <span className='text-center text-[10px] font-medium text-text-quaternary'>{unitLabel || 'EA'}</span>
+        <input
+          type='number'
+          value={pickVal}
+          onChange={(e) => updatePickQty(item.autoid, e.target.value, item.quan)}
+          min='0'
+          step='any'
+          className={cn(
+            'h-7 w-full rounded-[5px] border bg-background text-center text-[13px] tabular-nums text-foreground outline-none focus:border-primary focus:ring-1 focus:ring-primary/20',
+            isPartial ? 'border-amber-400' : 'border-border',
+          )}
+        />
+      </div>
+    )
+  }
+
+  if (isComponent) {
+    return (
+      <div className='grid grid-cols-[20px_1fr_52px_32px_52px] items-center gap-2 px-3.5 py-0.5'>
+        {/* Tree connector in col 1 — vertical + horizontal lines */}
+        <div className='relative flex items-center justify-center self-stretch'>
+          <div className={cn(
+            'absolute left-1/2 w-px -translate-x-1/2 bg-border',
+            isLastComponent ? 'top-0 h-1/2' : 'top-0 h-full',
+          )} />
+          <div className='absolute left-1/2 top-1/2 h-px w-[calc(50%+4px)] bg-border' />
+        </div>
+
+        <div className='flex min-w-0 items-center gap-1.5'>
+          <Package className={cn('size-3.5 shrink-0', picking > 0 ? 'text-emerald-500' : 'text-text-quaternary/30')} />
+          <span className='w-[80px] shrink-0 font-mono text-[11px] text-text-secondary'>{item.inven}</span>
+          <span className='min-w-0 truncate text-[11px] text-text-quaternary'>{item.descr}</span>
+        </div>
+
+        <button
+          type='button'
+          onClick={() => {
+            const newVal = picking > 0 ? '0' : formatQty(item.quan)
+            updatePickQty(item.autoid, newVal, item.quan)
+          }}
+          className='flex h-7 cursor-pointer items-center justify-center rounded-[5px] bg-bg-secondary/60 text-[13px] tabular-nums text-text-tertiary transition-colors hover:bg-primary/10 hover:text-primary'
+          title='Pick full quantity'
+        >
+          {orderedStr}
+        </button>
+        <span className='text-center text-[10px] font-medium text-text-quaternary'>{unitLabel || 'EA'}</span>
+        <input
+          type='number'
+          value={pickVal}
+          onChange={(e) => updatePickQty(item.autoid, e.target.value, item.quan)}
+          min='0'
+          step='any'
+          className={cn(
+            'h-7 w-full rounded-[5px] border bg-background text-center text-[13px] tabular-nums text-foreground outline-none focus:border-primary focus:ring-1 focus:ring-primary/20',
+            isPartial ? 'border-amber-400' : 'border-border',
+          )}
+        />
+      </div>
+    )
+  }
+
+  // Normal row (no hierarchy)
+  return (
+    <div className='grid grid-cols-[20px_1fr_52px_32px_52px] items-center gap-2 px-3.5 py-1'>
+      <button
+        type='button'
+        className='flex size-5 items-center justify-center rounded transition-colors hover:bg-bg-active'
+        onClick={() => {
+          const newVal = picking > 0 ? '0' : formatQty(item.quan)
+          updatePickQty(item.autoid, newVal, item.quan)
+        }}
+      >
+        <Package className={cn('size-4', picking > 0 ? 'text-emerald-500' : 'text-text-quaternary/40')} />
+      </button>
+      <div className='flex min-w-0 items-center gap-2'>
+        <span className='w-[90px] shrink-0 font-mono text-[12px] font-medium text-foreground'>{item.inven}</span>
+        <span className='min-w-0 truncate text-[11px] text-text-tertiary'>{item.descr}</span>
+      </div>
+      <button
+        type='button'
+        onClick={() => updatePickQty(item.autoid, formatQty(item.quan), item.quan)}
+        className='flex h-7 cursor-pointer items-center justify-center rounded-[5px] bg-bg-secondary/60 text-[13px] tabular-nums text-text-tertiary transition-colors hover:bg-primary/10 hover:text-primary'
+        title='Pick full quantity'
+      >
+        {orderedStr}
+      </button>
+      <input
+        type='number'
+        value={pickVal}
+        onChange={(e) => updatePickQty(item.autoid, e.target.value, item.quan)}
+        min='0'
+        step='any'
+        className={cn(
+          'h-7 w-full rounded-[5px] border bg-background text-center text-[13px] tabular-nums text-foreground outline-none focus:border-primary focus:ring-1 focus:ring-primary/20',
+          isPartial ? 'border-amber-400' : 'border-border',
+        )}
+      />
     </div>
   )
 }

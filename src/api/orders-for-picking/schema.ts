@@ -4,9 +4,13 @@ export interface PickingOrderItem {
   doc_aid: string
   quan: string
   ship: string
+  unit_meas?: string
   descr: string
   price: string
   so_amount: string
+  timestamp?: string
+  par_time?: string
+  gpar_time?: string
   weight: string | null
   is_picked: boolean
   packed: boolean
