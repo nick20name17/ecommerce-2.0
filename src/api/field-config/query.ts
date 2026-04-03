@@ -17,5 +17,5 @@ export const getFieldConfigQuery = (projectId: number | null) =>
       const session = getSession()
       return !!session?.user?.role && isAdmin(session.user.role)
     })(),
-    staleTime: 1000 * 60 * 30
+    staleTime: Infinity
   })

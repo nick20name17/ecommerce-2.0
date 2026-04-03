@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query'
+import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import {
   ArrowDown,
@@ -162,7 +162,10 @@ const ProposalsPage = () => {
     preset_id: activePresetId ?? undefined,
   }
 
-  const { data, refetch, isLoading } = useQuery(getProposalsQuery(params))
+  const { data, refetch, isLoading } = useQuery({
+    ...getProposalsQuery(params),
+    placeholderData: keepPreviousData,
+  })
 
   const { data: _fieldConfig } = useQuery(getFieldConfigQuery(projectId))
 
@@ -179,8 +182,7 @@ const ProposalsPage = () => {
       return
     }
     refetchTimersRef.current = [
-      setTimeout(() => refetch(), 3000),
-      setTimeout(() => refetch(), 6000),
+      setTimeout(() => refetch(), 4000),
     ]
     return () => {
       refetchTimersRef.current.forEach(clearTimeout)

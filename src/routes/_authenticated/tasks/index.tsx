@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
 import {
   Check,
@@ -67,7 +67,10 @@ function Todos2Page() {
     project_id: projectId ?? undefined,
     limit: 200,
   }
-  const { data: tasksData, isLoading } = useQuery(getTasksQuery(params))
+  const { data: tasksData, isLoading } = useQuery({
+    ...getTasksQuery(params),
+    placeholderData: keepPreviousData,
+  })
   const allTasks = tasksData?.results ?? []
 
   // Client-side multi-select filtering

@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from '@tanstack/react-query'
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import {
   ArrowDown,
@@ -25,7 +25,7 @@ import { OrderAssignDialog } from './-components/order-assign-dialog'
 import { StartPickingDialog } from '@/components/common/start-picking-dialog'
 import { OrderDeleteDialog } from './-components/order-delete-dialog'
 import { getFieldConfigQuery } from '@/api/field-config/query'
-import { ORDER_QUERY_KEYS, getOrdersQuery } from '@/api/order/query'
+import { ORDER_QUERY_KEYS, getOrderDetailQuery, getOrdersQuery } from '@/api/order/query'
 import type { Order, OrderParams } from '@/api/order/schema'
 import { orderService } from '@/api/order/service'
 import { EntityAttachmentsDialog } from '@/components/common/entity-attachments/entity-attachments-dialog'
@@ -95,6 +95,7 @@ const FILTER_STATUSES: { value: OrderStatus; label: string }[] = [
 
 const OrdersPage = () => {
   const navigate = useNavigate()
+  const queryClient = useQueryClient()
   const { user } = useAuth()
   const bp = useBreakpoint()
   const isMobile = bp === 'mobile'
@@ -191,7 +192,10 @@ const OrdersPage = () => {
     fields: 'salesman,notes_count',
   }
 
-  const { data, refetch, isLoading } = useQuery(getOrdersQuery(params))
+  const { data, refetch, isLoading } = useQuery({
+    ...getOrdersQuery(params),
+    placeholderData: keepPreviousData,
+  })
 
   const { data: _fieldConfig } = useQuery(getFieldConfigQuery(projectId))
 
@@ -208,8 +212,7 @@ const OrdersPage = () => {
       return
     }
     refetchTimersRef.current = [
-      setTimeout(() => refetch(), 3000),
-      setTimeout(() => refetch(), 6000)
+      setTimeout(() => refetch(), 4000),
     ]
     return () => {
       refetchTimersRef.current.forEach(clearTimeout)
@@ -518,6 +521,9 @@ const OrdersPage = () => {
                 onAssign={setOrderToAssign}
                 onCreateTask={setOrderForTask}
                 onPick={setOrderForPicking}
+                onMouseEnter={() =>
+                  queryClient.prefetchQuery(getOrderDetailQuery(order.autoid, projectId))
+                }
                 onClick={() =>
                   navigate({
                     to: '/orders/$orderId',
@@ -615,6 +621,7 @@ function OrderRow({
   onAssign,
   onCreateTask,
   onPick,
+  onMouseEnter,
   onClick
 }: {
   order: Order
@@ -628,6 +635,7 @@ function OrderRow({
   onAssign: (order: Order) => void
   onCreateTask: (order: Order) => void
   onPick: (order: Order) => void
+  onMouseEnter?: () => void
   onClick: () => void
 }) {
   const invoice = order.invoice?.trim() || `#${order.id}`
@@ -642,6 +650,7 @@ function OrderRow({
       <div
         className='border-border-light hover:bg-bg-hover cursor-pointer border-b px-3.5 py-2 transition-colors duration-100'
         onClick={onClick}
+        onMouseEnter={onMouseEnter}
       >
         <div className='mb-1 flex items-center gap-2'>
           <div className={cn('size-1.5 shrink-0 rounded-full', dotColor)} />
@@ -674,6 +683,7 @@ function OrderRow({
         isTablet ? 'gap-4 px-5 py-1.5' : 'gap-6 px-6 py-1.5'
       )}
       onClick={onClick}
+      onMouseEnter={onMouseEnter}
     >
       {/* Invoice + customer */}
       <div className='flex min-w-0 flex-1 items-center gap-2'>

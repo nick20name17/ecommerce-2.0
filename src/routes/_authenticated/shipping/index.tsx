@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { createFileRoute, Link } from '@tanstack/react-router'
 import {
   Ban,
@@ -100,7 +100,10 @@ const ShippingPage = () => {
     offset,
   }
 
-  const { data, isLoading } = useQuery(getShipmentsQuery(queryParams))
+  const { data, isLoading } = useQuery({
+    ...getShipmentsQuery(queryParams),
+    placeholderData: keepPreviousData,
+  })
   const shipments = data?.results ?? []
   const totalCount = data?.count ?? 0
 

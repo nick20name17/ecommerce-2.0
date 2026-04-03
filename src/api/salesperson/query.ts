@@ -10,5 +10,5 @@ export const getSalespersonsQuery = () =>
   queryOptions({
     queryKey: SALESPERSON_QUERY_KEYS.all(),
     queryFn: salespersonService.getAll,
-    staleTime: 30 * 60 * 1000
+    staleTime: Infinity
   })

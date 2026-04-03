@@ -132,18 +132,25 @@ const BOTTOM_ITEMS: NavItem[] = [
 function useTaskCounts() {
   const [projectId] = useProjectId()
   const { data: statusesData } = useQuery(getTaskStatusesQuery(projectId ?? null))
-  const { data: tasksData } = useQuery(getTasksQuery({ project_id: projectId ?? undefined, limit: 200 }))
 
   const statuses = statusesData?.results ?? []
-  const tasks = tasksData?.results ?? []
-
   const doneStatusIds = new Set(
     statuses.filter((s) => /done|completed|finished/i.test(s.name)).map((s) => s.id),
   )
+  const activeStatusIds = statuses.filter((s) => !doneStatusIds.has(s.id)).map((s) => s.id)
 
-  const pendingCount = tasks.filter((t) => !doneStatusIds.has(t.status)).length
+  // Fetch only count (limit: 0) for active (non-done) statuses
+  const { data: tasksData } = useQuery({
+    ...getTasksQuery({
+      project_id: projectId ?? undefined,
+      limit: 0,
+      status: activeStatusIds.join(','),
+    }),
+    enabled: activeStatusIds.length > 0,
+    staleTime: 1000 * 60 * 5,
+  })
 
-  return { pendingCount }
+  return { pendingCount: tasksData?.count ?? 0 }
 }
 
 // ── Colored icon link (top + workspace items) ───────────────

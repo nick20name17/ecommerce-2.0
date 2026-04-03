@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Search, UserPlus, X } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { useDebouncedCallback } from 'use-debounce'
@@ -69,34 +69,39 @@ export function MultiAssignDialog({
 
   const assignedIds = new Set(localAssigned.map((u) => u.id))
 
-  const assignMutation = useMutation({
-    mutationFn: assignFn,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: invalidateQueryKey })
-    },
-    onError: () => {
-      // Revert optimistic update on failure
-      setLocalAssigned(assignedUsers)
-    },
-    meta: { errorMessage: 'Failed to update assignment' },
-  })
+  const pendingRef = useRef(0)
+
+  // Fire-and-forget: call API directly, don't queue through useMutation
+  const fireAssign = (payload: EntityAssignRequest) => {
+    pendingRef.current++
+    assignFn(payload)
+      .catch(() => {
+        setLocalAssigned(assignedUsers)
+      })
+      .finally(() => {
+        pendingRef.current--
+        if (pendingRef.current === 0) {
+          queryClient.invalidateQueries({ queryKey: invalidateQueryKey })
+        }
+      })
+  }
 
   const handleAssign = (userId: number) => {
     const user = users.find((u) => u.id === userId)
     if (user) {
       setLocalAssigned((prev) => [...prev, { id: user.id, email: user.email, first_name: user.first_name, last_name: user.last_name }])
     }
-    assignMutation.mutate({ user_id: userId })
+    fireAssign({ user_id: userId })
   }
 
   const handleUnassign = (userId: number) => {
     setLocalAssigned((prev) => prev.filter((u) => u.id !== userId))
-    assignMutation.mutate({ user_id: userId, remove: true })
+    fireAssign({ user_id: userId, remove: true })
   }
 
   const handleUnassignAll = () => {
     setLocalAssigned([])
-    assignMutation.mutate({ user_id: null })
+    fireAssign({ user_id: null })
   }
 
   return (
@@ -148,7 +153,6 @@ export function MultiAssignDialog({
                         type='button'
                         className='inline-flex size-4 items-center justify-center rounded-full text-text-tertiary transition-colors hover:bg-destructive/10 hover:text-destructive'
                         onClick={() => handleUnassign(user.id)}
-                        disabled={assignMutation.isPending}
                       >
                         <X className='size-3' />
                       </button>
@@ -200,7 +204,7 @@ export function MultiAssignDialog({
                     <button
                       key={u.id}
                       type='button'
-                      disabled={isAssigned || assignMutation.isPending}
+                      disabled={isAssigned}
                       className='flex w-full items-center gap-2 rounded-[6px] px-2.5 py-[7px] text-left text-[13px] font-medium transition-colors duration-[80ms] hover:bg-bg-hover disabled:opacity-50'
                       onClick={() => handleAssign(u.id)}
                     >
@@ -222,7 +226,6 @@ export function MultiAssignDialog({
               variant='outline'
               className='mr-auto text-destructive hover:bg-destructive/10 hover:text-destructive'
               onClick={handleUnassignAll}
-              isPending={assignMutation.isPending}
             >
               Remove all
             </Button>

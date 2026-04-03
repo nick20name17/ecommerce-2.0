@@ -12,19 +12,19 @@ export const getEditableFieldsQuery = (projectId?: number | null) =>
   queryOptions({
     queryKey: DATA_QUERY_KEYS.editableFields(projectId),
     queryFn: () => dataService.getEditableFields(projectId),
-    staleTime: 30 * 60 * 1000,
+    staleTime: Infinity,
   })
 
 export const getFieldTypesQuery = (projectId?: number | null) =>
   queryOptions({
     queryKey: DATA_QUERY_KEYS.fieldTypes(projectId),
     queryFn: () => dataService.getFieldTypes(projectId),
-    staleTime: 30 * 60 * 1000,
+    staleTime: Infinity,
   })
 
 export const getFieldAliasesQuery = (projectId?: number | null) =>
   queryOptions({
     queryKey: DATA_QUERY_KEYS.fieldAliases(projectId),
     queryFn: () => dataService.getFieldAliases(projectId),
-    staleTime: 30 * 60 * 1000,
+    staleTime: Infinity,
   })

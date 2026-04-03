@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query'
+import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import {
   ChevronRight,
@@ -65,7 +65,10 @@ const PickListsPage = () => {
     status: activeStatus ?? undefined,
   }
 
-  const { data, isLoading } = useQuery(getPickListsQuery(params))
+  const { data, isLoading } = useQuery({
+    ...getPickListsQuery(params),
+    placeholderData: keepPreviousData,
+  })
   const results = data?.results ?? []
 
   const hasFilters = activeStatus !== null

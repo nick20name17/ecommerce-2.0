@@ -302,6 +302,16 @@ input:-webkit-autofill:focus {
   to   { opacity: 1; transform: translateY(0) scale(1); }
 }
 
+@keyframes contentShow {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes skeletonPulse {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 0.2; }
+}
+
 /* ─── Base ─── */
 
 @layer base {
@@ -311,6 +321,7 @@ input:-webkit-autofill:focus {
 
   html {
     @apply font-sans;
+    scroll-behavior: smooth;
   }
 
   body {
@@ -327,6 +338,17 @@ input:-webkit-autofill:focus {
 
   button {
     @apply cursor-pointer;
+  }
+
+  /* Subtle press feedback on interactive buttons */
+  button:not(:disabled):active,
+  [role='button']:not(:disabled):active {
+    transform: scale(0.98);
+  }
+
+  /* Page content fade-in */
+  [data-slot='page-content'] {
+    animation: contentShow 150ms ease-out;
   }
 
   input[type='number']::-webkit-inner-spin-button,

@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query'
+import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import {
   ArrowDown,
@@ -99,7 +99,10 @@ function CustomersPage() {
     preset_id: activePresetId ?? undefined,
   }
 
-  const { data, isLoading } = useQuery(getCustomersQuery(params))
+  const { data, isLoading } = useQuery({
+    ...getCustomersQuery(params),
+    placeholderData: keepPreviousData,
+  })
 
   const { data: _fieldConfig } = useQuery(getFieldConfigQuery(projectId))
 

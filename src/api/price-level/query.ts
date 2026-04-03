@@ -11,5 +11,5 @@ export const getPriceLevelsQuery = (projectId?: number | null) =>
   queryOptions({
     queryKey: PRICE_LEVEL_QUERY_KEYS.list(projectId),
     queryFn: () => priceLevelService.get(projectId),
-    staleTime: 30 * 60 * 1000
+    staleTime: Infinity
   })

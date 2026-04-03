@@ -146,7 +146,13 @@ function getFieldLabel(field: string, entityType: FilterPresetEntityType, fieldC
   return field.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
 }
 
+const DYNAMIC_DATE_LABELS: Record<string, string> = {
+  '$today': 'Today',
+  '$tomorrow': 'Tomorrow',
+}
+
 function getValueLabel(field: string, value: string, entityType: FilterPresetEntityType): string {
+  if (value in DYNAMIC_DATE_LABELS) return DYNAMIC_DATE_LABELS[value]
   const opts = KNOWN_OPTIONS[entityType]?.[field]
   if (opts) {
     const opt = opts.find((o) => o.value === value)
@@ -698,12 +704,49 @@ function FilterPresetDialog({
                             className='h-7 w-[100px] shrink-0 text-[13px] tabular-nums'
                           />
                         ) : fType === 'date' ? (
-                          <DatePicker
-                            value={row.value ? new Date(row.value) : undefined}
-                            onChange={(d) => updateRow(row.id, { value: d ? d.toISOString().split('T')[0] : '' })}
-                            placeholder='Pick date...'
-                            className='h-7 min-w-0 flex-1 text-[13px]'
-                          />
+                          <div className='flex min-w-0 flex-1 items-center gap-1.5'>
+                            {row.value === '$today' || row.value === '$tomorrow' ? (
+                              <button
+                                type='button'
+                                className='flex h-7 items-center gap-1.5 rounded-[6px] border border-primary/30 bg-primary/5 px-2.5 text-[12px] font-medium text-primary'
+                                onClick={() => updateRow(row.id, { value: '' })}
+                              >
+                                {row.value === '$today' ? 'Today' : 'Tomorrow'}
+                                <X className='size-3' />
+                              </button>
+                            ) : (
+                              <DatePicker
+                                value={row.value ? new Date(row.value) : undefined}
+                                onChange={(d) => updateRow(row.id, { value: d ? d.toISOString().split('T')[0] : '' })}
+                                placeholder='Pick date...'
+                                className='h-7 min-w-0 flex-1 text-[13px]'
+                              />
+                            )}
+                            <button
+                              type='button'
+                              className={cn(
+                                'h-7 shrink-0 rounded-[5px] border px-2 text-[11px] font-medium transition-colors',
+                                row.value === '$today'
+                                  ? 'border-primary bg-primary text-primary-foreground'
+                                  : 'border-border text-text-tertiary hover:border-primary/50 hover:text-primary',
+                              )}
+                              onClick={() => updateRow(row.id, { value: row.value === '$today' ? '' : '$today' })}
+                            >
+                              Today
+                            </button>
+                            <button
+                              type='button'
+                              className={cn(
+                                'h-7 shrink-0 rounded-[5px] border px-2 text-[11px] font-medium transition-colors',
+                                row.value === '$tomorrow'
+                                  ? 'border-primary bg-primary text-primary-foreground'
+                                  : 'border-border text-text-tertiary hover:border-primary/50 hover:text-primary',
+                              )}
+                              onClick={() => updateRow(row.id, { value: row.value === '$tomorrow' ? '' : '$tomorrow' })}
+                            >
+                              Tmrw
+                            </button>
+                          </div>
                         ) : (
                           <Input
                             value={row.value}
