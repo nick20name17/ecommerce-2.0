@@ -1,4 +1,4 @@
-import { keepPreviousData, useQuery } from '@tanstack/react-query'
+import { keepPreviousData, useQuery, useQueryClient } from '@tanstack/react-query'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import {
   ArrowDown,
@@ -22,7 +22,7 @@ import { ProposalDeleteDialog } from './-components/proposal-delete-dialog'
 import { getFieldConfigQuery } from '@/api/field-config/query'
 import { CommandBarCreate } from '@/components/tasks/command-bar-create'
 import { FilterChip, FilterPopover, IProposals, InitialsAvatar, PAGE_COLORS, PageHeaderIcon } from '@/components/ds'
-import { getProposalsQuery } from '@/api/proposal/query'
+import { getProposalDetailQuery, getProposalsQuery } from '@/api/proposal/query'
 import type { Proposal, ProposalParams } from '@/api/proposal/schema'
 import { PageEmpty } from '@/components/common/page-empty'
 import { PresetPicker } from '@/components/common/filters/preset-picker'
@@ -83,6 +83,7 @@ const FILTER_STATUSES: { value: ProposalStatus; label: string }[] = [
 
 const ProposalsPage = () => {
   const navigate = useNavigate()
+  const queryClient = useQueryClient()
   const { user } = useAuth()
   const bp = useBreakpoint()
   const isMobile = bp === 'mobile'
@@ -390,6 +391,7 @@ const ProposalsPage = () => {
                 onAssign={setProposalToAssign}
                 onCreateTask={setProposalForTask}
                 onClick={() => navigate({ to: '/proposals/$proposalId', params: { proposalId: proposal.autoid } })}
+                onMouseEnter={() => queryClient.prefetchQuery(getProposalDetailQuery(proposal.autoid, projectId))}
               />
             ))}
           </>
@@ -479,6 +481,7 @@ function ProposalRow({
   onAssign,
   onCreateTask,
   onClick,
+  onMouseEnter,
 }: {
   proposal: Proposal
   isMobile: boolean
@@ -490,6 +493,7 @@ function ProposalRow({
   onAssign: (proposal: Proposal) => void
   onCreateTask: (proposal: Proposal) => void
   onClick: () => void
+  onMouseEnter?: () => void
 }) {
   const quote = proposal.quote?.trim() || `#${proposal.b_id}`
   const statusLabel = getProposalStatusLabel(proposal.status)
@@ -503,6 +507,7 @@ function ProposalRow({
       <div
         className='cursor-pointer border-b border-border-light px-3.5 py-2 transition-colors duration-100 hover:bg-bg-hover'
         onClick={onClick}
+        onMouseEnter={onMouseEnter}
       >
         <div className='mb-1 flex items-center gap-2'>
           <div className={cn('size-1.5 shrink-0 rounded-full', dotColor)} />
@@ -533,6 +538,7 @@ function ProposalRow({
         isTablet ? 'gap-4 px-5 py-1.5' : 'gap-6 px-6 py-1.5',
       )}
       onClick={onClick}
+      onMouseEnter={onMouseEnter}
     >
       {/* Quote + customer */}
       <div className='flex min-w-0 flex-1 items-center gap-2'>

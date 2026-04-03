@@ -452,6 +452,7 @@ export const TaskAttachments = forwardRef<TaskAttachmentsRef, TaskAttachmentsPro
                       alt={attachment.file_name}
                       className='size-7 shrink-0 cursor-pointer rounded-[4px] object-cover'
                       onClick={() => openPreview(attachment)}
+                      loading='lazy'
                     />
                   ) : (
                     <span className='shrink-0 text-text-tertiary'>

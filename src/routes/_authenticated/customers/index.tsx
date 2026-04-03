@@ -1,4 +1,4 @@
-import { keepPreviousData, useQuery } from '@tanstack/react-query'
+import { keepPreviousData, useQuery, useQueryClient } from '@tanstack/react-query'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import {
   ArrowDown,
@@ -18,7 +18,7 @@ import { useState } from 'react'
 import { CustomerAssignDialog } from './-components/customer-assign-dialog'
 import { CustomerDeleteDialog } from './-components/customer-delete-dialog'
 import { CustomerModal } from './-components/customer-modal'
-import { getCustomersQuery } from '@/api/customer/query'
+import { getCustomerDetailQuery, getCustomersQuery } from '@/api/customer/query'
 import { getFieldConfigQuery } from '@/api/field-config/query'
 import type { Customer } from '@/api/customer/schema'
 import { EntityNotesSheet } from '@/components/common/entity-notes/entity-notes-sheet'
@@ -55,6 +55,7 @@ type SortDir = 'asc' | 'desc'
 
 function CustomersPage() {
   const navigate = useNavigate()
+  const queryClient = useQueryClient()
   const bp = useBreakpoint()
   const isMobile = bp === 'mobile'
   const [projectId] = useProjectId()
@@ -278,6 +279,7 @@ function CustomersPage() {
                     params: { customerId: customer.id },
                   })
                 }
+                onMouseEnter={() => queryClient.prefetchQuery(getCustomerDetailQuery(customer.id, projectId))}
               />
             ))}
           </>
@@ -375,6 +377,7 @@ function CustomerRow({
   onNotes,
   onAssign,
   onClick,
+  onMouseEnter,
 }: {
   customer: Customer
   isMobile: boolean
@@ -385,6 +388,7 @@ function CustomerRow({
   onNotes: (customer: Customer) => void
   onAssign: (customer: Customer) => void
   onClick: () => void
+  onMouseEnter?: () => void
 }) {
   const initials = getInitials(customer.l_name || '?')
   const phone = customer.contact_1 ? formatPhone(customer.contact_1) : null
@@ -398,6 +402,7 @@ function CustomerRow({
       <div
         className='cursor-pointer border-b border-border-light px-3.5 py-2 transition-colors duration-100 hover:bg-bg-hover'
         onClick={onClick}
+        onMouseEnter={onMouseEnter}
       >
         <div className='mb-1 flex items-center gap-2'>
           <InitialsAvatar initials={initials} size={20} />
@@ -429,6 +434,7 @@ function CustomerRow({
         isTablet ? 'gap-4 px-5 py-1.5' : 'gap-6 px-6 py-1.5'
       )}
       onClick={onClick}
+      onMouseEnter={onMouseEnter}
     >
       {/* Customer: avatar + name + ID */}
       <div className='flex min-w-0 flex-1 items-center gap-2'>

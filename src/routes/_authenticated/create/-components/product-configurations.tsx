@@ -157,6 +157,7 @@ function ConfigGroup({
                       src={photo}
                       alt={item.descr_1}
                       className='size-full object-contain p-0.5'
+                      loading='lazy'
                     />
                   ) : (
                     <ImageIcon className='size-3.5 text-text-tertiary/40' />

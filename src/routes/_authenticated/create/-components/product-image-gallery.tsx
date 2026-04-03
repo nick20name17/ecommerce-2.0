@@ -25,6 +25,7 @@ export const ProductImageGallery = ({
               src={photos[photoIndex]}
               alt={displayName}
               className='size-full object-contain p-3'
+              loading='lazy'
             />
             {photos.length > 1 && (
               <>
@@ -77,6 +78,7 @@ export const ProductImageGallery = ({
                 src={photo}
                 alt={`${displayName} - ${i + 1}`}
                 className='size-full object-cover'
+                loading='lazy'
               />
             </button>
           ))}

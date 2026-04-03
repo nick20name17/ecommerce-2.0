@@ -262,6 +262,7 @@ export const ProductEditSheet = ({
                       src={photos[0]}
                       alt={displayName}
                       className='size-full object-contain'
+                      loading='lazy'
                     />
                   </div>
                 )}
