@@ -101,6 +101,30 @@ const isNotificationPayload = (msg: unknown): msg is WSNotificationPayload => {
   )
 }
 
+interface TaskNotificationPayload {
+  type: 'task_notification'
+  data: {
+    id: number
+    task_id: number
+    task_title: string
+    notification_type: string
+    message: string
+    is_read: boolean
+    created_at: string
+  }
+  timestamp: string
+}
+
+const isTaskNotification = (msg: unknown): msg is TaskNotificationPayload => {
+  return (
+    typeof msg === 'object' &&
+    msg !== null &&
+    'type' in msg &&
+    (msg as { type: string }).type === 'task_notification' &&
+    'data' in msg
+  )
+}
+
 export const useNotificationsWebSocket = ({
   projectId,
   enabled = true,
@@ -147,7 +171,17 @@ export const useNotificationsWebSocket = ({
       )
         return
 
-      if (isNotificationPayload(msg)) {
+      if (isTaskNotification(msg)) {
+        // Personal task notification — invalidate tasks and show notification
+        for (const queryKey of getInvalidationKeys('task')) {
+          queryClient.invalidateQueries({ queryKey })
+        }
+        const { data } = msg
+        addNotification('task', data.notification_type, String(data.task_id))
+        if (showToasts) {
+          toast.info(data.message)
+        }
+      } else if (isNotificationPayload(msg)) {
         const { event_type, entity, autoid, user } = msg
         if (event_type === 'created' && (entity === 'order' || entity === 'proposal')) {
           resolvePendingCreatedAutoid(entity, autoid)
