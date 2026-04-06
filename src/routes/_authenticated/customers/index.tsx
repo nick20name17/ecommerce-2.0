@@ -42,7 +42,7 @@ import { isAdmin } from '@/constants/user'
 import { useBreakpoint } from '@/hooks/use-breakpoint'
 import { useProjectId } from '@/hooks/use-project-id'
 import { formatPhone, getInitials, getUserDisplayName } from '@/helpers/formatters'
-import { useLimitParam, useOffsetParam, useSearchParam } from '@/hooks/use-query-params'
+import { useLimitParam, useOffsetParam, usePresetParam, useSearchParam } from '@/hooks/use-query-params'
 import { cn } from '@/lib/utils'
 import { useAuth } from '@/providers/auth'
 
@@ -69,7 +69,7 @@ function CustomersPage() {
   const [sortDir, setSortDir] = useState<SortDir>('asc')
 
   const [assignedToMe, setAssignedToMe] = useState(false)
-  const [activePresetId, setActivePresetId] = useState<number | null>(null)
+  const [activePresetId, setActivePresetId] = usePresetParam()
 
   const toggleAssignedToMe = () => {
     setAssignedToMe((v) => !v)

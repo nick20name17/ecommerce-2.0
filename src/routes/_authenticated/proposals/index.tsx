@@ -49,6 +49,7 @@ import {
   useAutoidParam,
   useLimitParam,
   useOffsetParam,
+  usePresetParam,
   useSearchParam,
 } from '@/hooks/use-query-params'
 import { useAuth } from '@/providers/auth'
@@ -101,7 +102,7 @@ const ProposalsPage = () => {
 
   const [activeStatus, setActiveStatus] = useState<ProposalStatus | null>(PROPOSAL_STATUS.open)
   const [assignedToMe, setAssignedToMe] = useState(false)
-  const [activePresetId, setActivePresetId] = useState<number | null>(null)
+  const [activePresetId, setActivePresetId] = usePresetParam()
   const [proposalToDelete, setProposalToDelete] = useState<Proposal | null>(null)
   const [proposalForAttachments, setProposalForAttachments] = useState<Proposal | null>(null)
   const [proposalForNotes, setProposalForNotes] = useState<Proposal | null>(null)

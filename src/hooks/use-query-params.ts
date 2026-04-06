@@ -118,3 +118,5 @@ export const useOrderProjectIdParam = () =>
 
 export const useDashboardCustomerIdParam = () =>
   useQueryState('customer_id', parseAsString.withDefault(''))
+
+export const usePresetParam = () => useQueryState('preset', parseAsInteger)

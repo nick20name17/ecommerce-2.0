@@ -333,7 +333,7 @@ export function ShippingDialog({ pickList, open, onOpenChange }: ShippingDialogP
                         disabled={selectMutation.isPending || !rateId}
                       >
                         <Check className='size-3.5' />
-                        Buy
+                        Select
                       </Button>
                     </div>
                   )

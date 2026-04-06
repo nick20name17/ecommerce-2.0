@@ -67,6 +67,7 @@ import {
   useLimitParam,
   useOffsetParam,
   useOrderProjectIdParam,
+  usePresetParam,
   useSearchParam
 } from '@/hooks/use-query-params'
 import { cn } from '@/lib/utils'
@@ -115,7 +116,7 @@ const OrdersPage = () => {
 
   const [activeStatus, setActiveStatus] = useState<OrderStatus | null>(ORDER_STATUS.unprocessed)
   const [assignedToMe, setAssignedToMe] = useState(false)
-  const [activePresetId, setActivePresetId] = useState<number | null>(null)
+  const [activePresetId, setActivePresetId] = usePresetParam()
   const [orderToDelete, setOrderToDelete] = useState<Order | null>(null)
   const [orderForAttachments, setOrderForAttachments] = useState<Order | null>(null)
   const [orderForNotes, setOrderForNotes] = useState<Order | null>(null)
@@ -687,18 +688,10 @@ function OrderRow({
     >
       {/* Invoice + customer */}
       <div className='flex min-w-0 flex-1 items-center gap-2'>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <span
-              className='shrink-0 truncate text-[13px] font-medium'
-              style={{ maxWidth: '40%' }}
-            >
-              {invoice}
-            </span>
-          </TooltipTrigger>
-          <TooltipContent side='top'>{invoice}</TooltipContent>
-        </Tooltip>
-        <span className='text-text-tertiary min-w-0 truncate text-[13px]'>{order.name || '—'}</span>
+        <span className='shrink-0 text-[13px] font-medium tabular-nums'>
+          {invoice}
+        </span>
+        <span className='text-text-tertiary min-w-0 flex-1 truncate text-[13px]'>{order.name || '—'}</span>
       </div>
 
       {/* Status */}
@@ -725,7 +718,7 @@ function OrderRow({
       )}
 
       {/* Total */}
-      <div className='text-foreground w-[100px] shrink-0 text-right text-[13px] font-medium tabular-nums'>
+      <div className={cn('text-foreground shrink-0 text-right text-[13px] font-medium tabular-nums', isTablet ? 'w-[80px]' : 'w-[100px]')}>
         {formatCurrency(order.total, '—')}
       </div>
 
@@ -742,10 +735,12 @@ function OrderRow({
       )}
 
       {/* Pick / Packed status */}
-      <div className='flex w-27.5 shrink-0 items-center justify-center gap-1'>
-        <PickBadge pickStatus={order.pick_status} />
-        <PackedBadge packedStatus={order.packed_status} />
-      </div>
+      {!isTablet && (
+        <div className='flex w-27.5 shrink-0 items-center justify-center gap-1'>
+          <PickBadge pickStatus={order.pick_status} />
+          <PackedBadge packedStatus={order.packed_status} />
+        </div>
+      )}
 
       {/* Salesman */}
       {!isTablet && (
@@ -755,7 +750,7 @@ function OrderRow({
       )}
 
       {/* Responsible */}
-      <div className='w-[120px] shrink-0'>
+      <div className={cn('shrink-0', isTablet ? 'w-[46px]' : 'w-[120px]')}>
         {(() => {
           const assigned = order.assigned_users?.length ? order.assigned_users : order.assigned_user ? [order.assigned_user] : []
           const first = assigned[0]

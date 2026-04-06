@@ -110,9 +110,9 @@ export function useCreatePage() {
   const [billTo, setBillTo] = useState<AddressFields>(emptyAddress)
   const [shipTo, setShipTo] = useState<AddressFields>(emptyAddress)
   const [catalogOpen, setCatalogOpen] = useState(false)
-  const [addingProductAutoid, setAddingProductAutoid] = useState<string | null>(null)
+  const [addingProductAutoid] = useState<string | null>(null)
   const [updatingQuantityItemId, setUpdatingQuantityItemId] = useState<number | null>(null)
-  const [removingItemId, setRemovingItemId] = useState<number | null>(null)
+  const [removingItemId] = useState<number | null>(null)
   const attachmentsRef = useRef<EntityAttachmentsRef>(null)
   const [busy, busyDispatch] = useReducer(busyReducer, initialBusy)
   const [editState, editDispatch] = useReducer(editReducer, {
@@ -168,6 +168,18 @@ export function useCreatePage() {
     [customer?.id, projectId, queryClient]
   )
 
+  const updateCartOptimistic = useCallback(
+    (updater: (prev: Cart) => Cart) => {
+      if (customer?.id != null) {
+        queryClient.setQueryData<Cart>(
+          CART_QUERY_KEYS.detail(customer.id, projectId),
+          (prev) => prev ? updater(prev) : prev
+        )
+      }
+    },
+    [customer?.id, projectId, queryClient]
+  )
+
   const invalidateCart = () => {
     if (customer?.id != null) {
       queryClient.invalidateQueries({ queryKey: CART_QUERY_KEYS.detail(customer.id, projectId) })
@@ -197,21 +209,37 @@ export function useCreatePage() {
       editDispatch({ type: 'OPEN_ADD', product })
     } else {
       const customerId = customer.id
+      const unit = product.unit || product.def_unit || ''
       const payload = {
         product_autoid: product.autoid,
         quantity: 1,
-        unit: product.unit || product.def_unit || ''
+        unit,
       }
-      setAddingProductAutoid(product.autoid)
-      try {
-        const updatedCart = await cartService.addItem(payload, customerId, projectId)
-        setCart(updatedCart)
-        toast.success(`${product.id} added to cart`)
-      } catch (error) {
-        toast.error(getErrorMessage(error))
-      } finally {
-        setAddingProductAutoid(null)
-      }
+
+      // Optimistic: add to cart UI immediately
+      updateCartOptimistic((prev) => ({
+        ...prev,
+        items: [...prev.items, {
+          id: -Date.now(),
+          product_autoid: product.autoid,
+          product_id: product.id,
+          name: product.descr_1,
+          quantity: 1,
+          unit,
+          price: product.price,
+          total: product.price,
+          photo: product.photo,
+        } as unknown as Cart['items'][number]],
+      }))
+      toast.success(`${product.id} added to cart`)
+
+      // Fire API in background — replace optimistic with real data
+      cartService.addItem(payload, customerId, projectId)
+        .then((updatedCart) => setCart(updatedCart))
+        .catch((error) => {
+          invalidateCart()
+          toast.error(getErrorMessage(error))
+        })
     }
   }
 
@@ -220,21 +248,24 @@ export function useCreatePage() {
     editDispatch({ type: 'OPEN_EDIT', item })
   }
 
-  const handleRemoveItem = async (itemId: number) => {
+  const handleRemoveItem = (itemId: number) => {
     if (!customer) return
     const item = cartItems.find((i) => i.id === itemId)
-    setRemovingItemId(itemId)
-    busyDispatch({ type: 'CART_UPDATING', value: true })
-    try {
-      const updatedCart = await cartService.deleteItem(itemId, customer.id, projectId)
-      setCart(updatedCart)
-      if (item) toast.success(`${item.product_id} removed`)
-    } catch (error) {
-      toast.error(getErrorMessage(error))
-    } finally {
-      busyDispatch({ type: 'CART_UPDATING', value: false })
-      setRemovingItemId(null)
-    }
+
+    // Optimistic: remove from UI immediately
+    updateCartOptimistic((prev) => ({
+      ...prev,
+      items: prev.items.filter((i) => i.id !== itemId),
+    }))
+    if (item) toast.success(`${item.product_id} removed`)
+
+    // Fire API in background
+    cartService.deleteItem(itemId, customer.id, projectId)
+      .then((updatedCart) => setCart(updatedCart))
+      .catch((error) => {
+        invalidateCart() // revert on failure
+        toast.error(getErrorMessage(error))
+      })
   }
 
   // Debounced quantity update — optimistically updates local cart, debounces API call
@@ -296,19 +327,19 @@ export function useCreatePage() {
     [customer, projectId, queryClient, setCart, invalidateCart]
   )
 
-  const handleClearAll = async () => {
+  const handleClearAll = () => {
     if (!customer || cartItems.length === 0) return
-    busyDispatch({ type: 'CLEARING', value: true })
-    busyDispatch({ type: 'CART_UPDATING', value: true })
-    try {
-      await cartService.flush(customer.id, projectId)
-      invalidateCart()
-      toast.success('All items cleared')
-    } catch (error) {
-      toast.error(getErrorMessage(error))
-    }
-    busyDispatch({ type: 'CLEARING', value: false })
-    busyDispatch({ type: 'CART_UPDATING', value: false })
+
+    // Optimistic: clear cart UI immediately
+    updateCartOptimistic((prev) => ({ ...prev, items: [] }))
+    toast.success('All items cleared')
+
+    // Fire API in background
+    cartService.flush(customer.id, projectId)
+      .catch((error) => {
+        invalidateCart()
+        toast.error(getErrorMessage(error))
+      })
   }
 
   const handleCreateProposal = () => {
