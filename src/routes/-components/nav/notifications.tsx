@@ -1,4 +1,6 @@
+import { useNavigate } from '@tanstack/react-router'
 import { Bell, Check, CheckCircle, ClipboardList, Package, FileText, Trash2, Truck, Users } from 'lucide-react'
+import { useState } from 'react'
 
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import {
@@ -36,16 +38,35 @@ const EVENT_COLORS: Record<string, string> = {
   updated: 'text-amber-500',
 }
 
-function NotificationItem({ notification }: { notification: AppNotification }) {
+const getNotificationLink = (notification: AppNotification): string | null => {
+  if (notification.entity === 'task' && notification.autoid) {
+    return `/tasks/${notification.autoid}`
+  }
+  return null
+}
+
+function NotificationItem({ notification, onNavigate }: { notification: AppNotification; onNavigate?: () => void }) {
+  const navigate = useNavigate()
   const Icon = ENTITY_ICONS[notification.entity] ?? Package
   const eventColor = EVENT_COLORS[notification.eventType] ?? 'text-text-tertiary'
+  const link = getNotificationLink(notification)
+
+  const handleClick = () => {
+    if (link) {
+      navigate({ to: link })
+      onNavigate?.()
+    }
+  }
 
   return (
     <div
       className={cn(
         'flex items-start gap-2.5 px-3 py-2 transition-colors duration-[80ms]',
         !notification.read && 'bg-primary/[0.03]',
+        link && 'cursor-pointer hover:bg-black/[0.03] dark:hover:bg-white/[0.03]',
       )}
+      onClick={handleClick}
+      role={link ? 'button' : undefined}
     >
       <div className={cn('mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-[5px]', eventColor)}>
         <Icon className='size-3.5' />
@@ -75,9 +96,10 @@ function NotificationItem({ notification }: { notification: AppNotification }) {
 export const NotificationBell = () => {
   const notifications = useNotifications()
   const unreadCount = useUnreadCount()
+  const [open, setOpen] = useState(false)
 
   return (
-    <Popover>
+    <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <button
           type='button'
@@ -136,7 +158,7 @@ export const NotificationBell = () => {
           ) : (
             <div className='divide-y divide-border-light'>
               {notifications.map((n) => (
-                <NotificationItem key={n.id} notification={n} />
+                <NotificationItem key={n.id} notification={n} onNavigate={() => setOpen(false)} />
               ))}
             </div>
           )}
