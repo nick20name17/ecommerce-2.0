@@ -689,7 +689,7 @@ function FilterPresetDialog({
                           >
                             <span
                               className={cn(
-                                'inline-block size-5 rounded-full bg-white shadow-sm transition-transform duration-200',
+                                'inline-block size-5 rounded-full bg-background shadow-sm transition-transform duration-200',
                                 row.value === 'true' ? 'translate-x-[27px]' : 'translate-x-[3px]',
                               )}
                             />
@@ -801,7 +801,7 @@ function FilterPresetDialog({
                   >
                     <span
                       className={cn(
-                        'inline-block size-3.5 rounded-full bg-white shadow-sm transition-transform duration-150',
+                        'inline-block size-3.5 rounded-full bg-background shadow-sm transition-transform duration-150',
                         shared ? 'translate-x-[14px]' : 'translate-x-[2px]'
                       )}
                     />

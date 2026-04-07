@@ -217,26 +217,26 @@ export const CustomerInfoPanel = ({ customer, fieldConfig, priceLevels, onPriceL
           <button
             type='button'
             className={cn(
-              'flex w-full flex-col gap-1 px-4 py-3 text-left transition-colors duration-75',
+              'flex w-full items-center gap-2 px-4 py-3 text-left transition-colors duration-75',
               canAssign && onAssign && 'hover:bg-bg-hover',
               !(canAssign && onAssign) && 'cursor-default'
             )}
             onClick={canAssign && onAssign ? onAssign : undefined}
           >
-            {allAssigned.map((user, i) => {
-              const name = getUserDisplayName(user)
-              const initials = name.split(' ').slice(0, 2).map(n => n[0]?.toUpperCase() ?? '').join('')
-              return (
-                <div key={i} className='flex items-center gap-2'>
-                  <InitialsAvatar initials={initials} size={20} />
-                  <span className='min-w-0 flex-1 truncate text-[13px] font-medium'>{name}</span>
-                </div>
-              )
-            })}
+            <div className='flex min-w-0 flex-1 flex-wrap gap-1.5'>
+              {allAssigned.map((user, i) => {
+                const name = getUserDisplayName(user)
+                const initials = name.split(' ').slice(0, 2).map(n => n[0]?.toUpperCase() ?? '').join('')
+                return (
+                  <span key={i} className='inline-flex items-center gap-1.5 rounded-full border border-border bg-bg-secondary py-0.5 pl-0.5 pr-2 text-[12px] font-medium'>
+                    <InitialsAvatar initials={initials} size={18} />
+                    {name}
+                  </span>
+                )
+              })}
+            </div>
             {canAssign && onAssign && (
-              <div className='flex justify-end'>
-                <UserPlus className='size-3.5 shrink-0 text-text-quaternary' />
-              </div>
+              <UserPlus className='size-3.5 shrink-0 text-text-quaternary' />
             )}
           </button>
         ) : canAssign && onAssign ? (

@@ -311,7 +311,7 @@ const GeneralSection = ({ projectId }: { projectId: number }) => {
               )}
               onClick={() => { setCategoryWebFilter(!categoryWebFilter); save({ category_show_web_filter: !categoryWebFilter }) }}
             >
-              <span className={cn('inline-block size-3.5 rounded-full bg-white shadow-sm transition-transform duration-200', categoryWebFilter ? 'translate-x-[18px]' : 'translate-x-[3px]')} />
+              <span className={cn('inline-block size-3.5 rounded-full bg-background shadow-sm transition-transform duration-200', categoryWebFilter ? 'translate-x-[18px]' : 'translate-x-[3px]')} />
             </button>
           </div>
 
@@ -329,7 +329,7 @@ const GeneralSection = ({ projectId }: { projectId: number }) => {
               )}
               onClick={() => { setProductWebFilter(!productWebFilter); save({ product_show_web_filter: !productWebFilter }) }}
             >
-              <span className={cn('inline-block size-3.5 rounded-full bg-white shadow-sm transition-transform duration-200', productWebFilter ? 'translate-x-[18px]' : 'translate-x-[3px]')} />
+              <span className={cn('inline-block size-3.5 rounded-full bg-background shadow-sm transition-transform duration-200', productWebFilter ? 'translate-x-[18px]' : 'translate-x-[3px]')} />
             </button>
           </div>
         </div>

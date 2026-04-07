@@ -9,6 +9,7 @@ import { ShippingRatesDialog } from './-components/shipping-rates-dialog'
 import { PanelSection, PanelRow, PanelBlock, PropertyField, SummaryCell } from './-components/order-properties'
 import { useCallback, useMemo, useState } from 'react'
 
+import { getEditableFieldsQuery } from '@/api/data/query'
 import { getFieldConfigQuery } from '@/api/field-config/query'
 import { getOrderDetailQuery, ORDER_QUERY_KEYS } from '@/api/order/query'
 import type { OrderPatchPayload } from '@/api/order/schema'
@@ -77,6 +78,8 @@ function OrderDetailPage() {
 
   const { data: order, isLoading } = useQuery(getOrderDetailQuery(orderId, projectId))
   const { data: fieldConfig } = useQuery(getFieldConfigQuery(projectId))
+  const { data: editableFields } = useQuery(getEditableFieldsQuery(projectId))
+  const editableOrderFields = editableFields?.order ?? []
 
   const patchMutation = useMutation({
     mutationFn: (payload: OrderPatchPayload) =>
@@ -575,7 +578,7 @@ function OrderDetailPage() {
               <>
                 {/* Bill To */}
                 <PanelSection title='Bill To'>
-                  <PropertyField label='Name' value={order.name} field='name' onSave={handleFieldSave} />
+                  <PropertyField label='Name' value={order.name} field='name' onSave={handleFieldSave} editable={editableOrderFields.includes('name')} />
                   <PanelBlock last>
                     <span className='mb-0.5 block text-[12px] font-medium text-text-tertiary'>Address</span>
                     {billToAddress ? (
@@ -588,7 +591,7 @@ function OrderDetailPage() {
 
                 {/* Ship To */}
                 <PanelSection title='Ship To'>
-                  <PropertyField label='Name' value={order.c_name} field='c_name' onSave={handleFieldSave} />
+                  <PropertyField label='Name' value={order.c_name} field='c_name' onSave={handleFieldSave} editable={editableOrderFields.includes('c_name')} />
                   <PanelBlock last>
                     <span className='mb-0.5 block text-[12px] font-medium text-text-tertiary'>Address</span>
                     {shipToAddress ? (
@@ -601,8 +604,8 @@ function OrderDetailPage() {
 
                 {/* Contact */}
                 <PanelSection title='Contact'>
-                  <PropertyField label='Email' value={order.email} field='email' onSave={handleFieldSave} />
-                  <PropertyField label='Phone' value={order.phone} field='phone' onSave={handleFieldSave} />
+                  <PropertyField label='Email' value={order.email} field='email' onSave={handleFieldSave} editable={editableOrderFields.includes('email')} />
+                  <PropertyField label='Phone' value={order.phone} field='phone' onSave={handleFieldSave} editable={editableOrderFields.includes('phone')} />
                 </PanelSection>
 
                 {/* Order Details */}
@@ -622,18 +625,18 @@ function OrderDetailPage() {
                   <PanelRow label='Due Date'>
                     <span className='tabular-nums'>{order.due_date ? formatDate(order.due_date) : '—'}</span>
                   </PanelRow>
-                  <PropertyField label='Sales Person' value={order.salesman} field='salesman' onSave={handleFieldSave} />
-                  <PropertyField label='PO No.' value={order.po_no} field='po_no' onSave={handleFieldSave} />
-                  <PropertyField label='Ship Date' value={order.ship_date} field='ship_date' onSave={handleFieldSave} />
-                  <PropertyField label='Ship Via' value={order.ship_via} field='ship_via' onSave={handleFieldSave} />
-                  <PropertyField label='Price Level' value={order.in_level} field='in_level' onSave={handleFieldSave} />
-                  <PropertyField label='Due' value={order.charge} field='charge' onSave={handleFieldSave} />
+                  <PropertyField label='Sales Person' value={order.salesman} field='salesman' onSave={handleFieldSave} editable={editableOrderFields.includes('salesman')} />
+                  <PropertyField label='PO No.' value={order.po_no} field='po_no' onSave={handleFieldSave} editable={editableOrderFields.includes('po_no')} />
+                  <PropertyField label='Ship Date' value={order.ship_date} field='ship_date' onSave={handleFieldSave} editable={editableOrderFields.includes('ship_date')} />
+                  <PropertyField label='Ship Via' value={order.ship_via} field='ship_via' onSave={handleFieldSave} editable={editableOrderFields.includes('ship_via')} />
+                  <PropertyField label='Price Level' value={order.in_level} field='in_level' onSave={handleFieldSave} editable={editableOrderFields.includes('in_level')} />
+                  <PropertyField label='Due' value={order.charge} field='charge' onSave={handleFieldSave} editable={editableOrderFields.includes('charge')} />
                 </PanelSection>
 
                 {/* Notes */}
                 <PanelSection title='Notes' last>
-                  <PropertyField label='Memo' value={order.memo} field='memo' onSave={handleFieldSave} multiline />
-                  <PropertyField label='Internal Note' value={order.internalnt} field='internalnt' onSave={handleFieldSave} multiline />
+                  <PropertyField label='Memo' value={order.memo} field='memo' onSave={handleFieldSave} editable={editableOrderFields.includes('memo')} multiline />
+                  <PropertyField label='Internal Note' value={order.internalnt} field='internalnt' onSave={handleFieldSave} editable={editableOrderFields.includes('internalnt')} multiline />
                 </PanelSection>
               </>
             ) : panelTab === 'custom' ? (
@@ -658,7 +661,7 @@ function OrderDetailPage() {
                           value={strVal}
                           field={entry.field}
                           onSave={handleFieldSave}
-                          editable={!!entry.editable}
+                          editable={!!entry.editable || editableOrderFields.includes(entry.field)}
                         />
                       )
                     })}

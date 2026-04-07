@@ -257,7 +257,7 @@ export const ProductEditSheet = ({
               <div className='flex gap-4 p-4'>
                 {/* Small thumbnail */}
                 {photos && photos.length > 0 && (
-                  <div className='size-[80px] shrink-0 overflow-hidden rounded-[8px] border border-border bg-white'>
+                  <div className='size-[80px] shrink-0 overflow-hidden rounded-[8px] border border-border bg-background'>
                     <img
                       src={photos[0]}
                       alt={displayName}

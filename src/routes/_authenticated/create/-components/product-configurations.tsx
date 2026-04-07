@@ -155,7 +155,7 @@ function ConfigGroup({
                   ) : photo ? (
                     <img
                       src={photo}
-                      alt={item.descr_1}
+                      alt={item.descr_1 || 'Configuration option'}
                       className='size-full object-contain p-0.5'
                       loading='lazy'
                     />

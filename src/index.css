@@ -340,11 +340,6 @@ input:-webkit-autofill:focus {
     @apply cursor-pointer;
   }
 
-  /* Subtle press feedback on interactive buttons */
-  button:not(:disabled):active,
-  [role='button']:not(:disabled):active {
-    transform: scale(0.98);
-  }
 
   /* Page content fade-in */
   [data-slot='page-content'] {
@@ -355,6 +350,16 @@ input:-webkit-autofill:focus {
   input[type='number']::-webkit-outer-spin-button {
     @apply m-0 appearance-none;
   }
+
+  /* Thin scrollbars globally */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-border) transparent;
+  }
+  *::-webkit-scrollbar { width: 6px; height: 6px; }
+  *::-webkit-scrollbar-track { background: transparent; }
+  *::-webkit-scrollbar-thumb { background: var(--color-border); border-radius: 3px; }
+  *::-webkit-scrollbar-thumb:hover { background: var(--color-text-tertiary); }
 
   /* Selection */
   ::selection {

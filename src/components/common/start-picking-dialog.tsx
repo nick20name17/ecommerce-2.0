@@ -19,6 +19,16 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useProjectId } from '@/hooks/use-project-id'
 import { cn } from '@/lib/utils'
@@ -51,6 +61,8 @@ export function StartPickingDialog({
     () => orderAutoid ? new Set([orderAutoid]) : new Set()
   )
   const [pickQuantities, setPickQuantities] = useState<Map<string, string>>(new Map())
+  const [confirmOpen, setConfirmOpen] = useState(false)
+  const [closeConfirmOpen, setCloseConfirmOpen] = useState(false)
 
   // Try customer_id first, fall back to fetching all and matching by name
   const hasCustomerId = !!customerId
@@ -165,7 +177,7 @@ export function StartPickingDialog({
   const createMutation = useMutation({
     mutationFn: async () => {
       if (!shipTo) throw new Error('No ship-to address')
-      if (!defaultShippingAddressId) throw new Error('No shipping address configured. Add one in Settings.')
+      if (!defaultShippingAddressId) throw new Error('No shipping address configured. Add one in Settings → Shipping.')
 
       // 1. Create pick list
       const pickList = await pickListService.create({
@@ -208,9 +220,29 @@ export function StartPickingDialog({
     },
   })
 
+  const hasAnyPicked = Array.from(pickQuantities.values()).some((v) => parseFloat(v) > 0)
+
   const handleCreate = () => {
+    setConfirmOpen(false)
     setStep('saving')
     createMutation.mutate()
+  }
+
+  const handleClose = () => {
+    if (step === 'set-quantities' && hasAnyPicked) {
+      setCloseConfirmOpen(true)
+      return
+    }
+    resetState()
+    setConfirmOpen(false)
+    onOpenChange(false)
+  }
+
+  const confirmClose = () => {
+    setCloseConfirmOpen(false)
+    resetState()
+    setConfirmOpen(false)
+    onOpenChange(false)
   }
 
   const resetState = () => {
@@ -223,7 +255,7 @@ export function StartPickingDialog({
     <Dialog
       open={open}
       onOpenChange={(next) => {
-        if (!next) resetState()
+        if (!next) { handleClose(); return }
         onOpenChange(next)
       }}
     >
@@ -288,6 +320,12 @@ export function StartPickingDialog({
           {/* Step 2: Set pick quantities — grouped by order */}
           {step === 'set-quantities' && (
             <div className='min-h-0 flex-1 space-y-3 overflow-y-auto'>
+              {!defaultShippingAddressId && (
+                <div className='flex items-center gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-[12px] text-amber-800 dark:border-amber-800 dark:bg-amber-500/10 dark:text-amber-300'>
+                  <span className='font-medium'>No shipping address configured.</span>
+                  <span className='text-amber-600 dark:text-amber-400'>Add one in Settings → Shipping to create pick lists.</span>
+                </div>
+              )}
               {/* Global actions */}
               <div className='flex items-center gap-3'>
                 <button
@@ -367,7 +405,7 @@ export function StartPickingDialog({
                     </div>
 
                     {/* Column header */}
-                    <div className='grid grid-cols-[20px_1fr_52px_32px_52px] items-center gap-2 border-b border-border-light bg-bg-secondary/40 px-3.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-text-quaternary'>
+                    <div className='grid grid-cols-[20px_1fr_52px_40px_52px] items-center gap-2 border-b border-border-light bg-bg-secondary/40 px-3.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-text-quaternary'>
                       <span />
                       <span>Item</span>
                       <span className='text-center'>Qty</span>
@@ -398,8 +436,6 @@ export function StartPickingDialog({
                               formatQty={formatQty}
                               isComponent
                               isLastComponent={ci === comps.length - 1}
-                              totalComponents={comps.length}
-                              componentIndex={ci}
                             />
                           ))}
                         </div>
@@ -455,15 +491,49 @@ export function StartPickingDialog({
                 <ArrowLeft className='size-3.5' />
                 Back
               </Button>
-              <Button onClick={handleCreate}>
+              <Button onClick={() => setConfirmOpen(true)} disabled={!hasAnyPicked || !defaultShippingAddressId}>
                 <Check className='size-3.5' />
-                Create & Push
+                Create Pick List
               </Button>
             </>
           )}
 
         </DialogFooter>
       </DialogContent>
+
+      <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Create Pick List?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will create a pick list and push it to EBMS. Items will be marked as picked.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleCreate}>
+              Create Pick List
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={closeConfirmOpen} onOpenChange={setCloseConfirmOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Discard pick quantities?</AlertDialogTitle>
+            <AlertDialogDescription>
+              You have pick quantities set. Closing will discard your changes.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Keep editing</AlertDialogCancel>
+            <AlertDialogAction variant='destructive' onClick={confirmClose}>
+              Discard
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Dialog>
   )
 }
@@ -597,26 +667,20 @@ function PickItemRow({
   pickQuantities,
   updatePickQty,
   formatQty,
-  isLast: _isLast,
   isParent,
   isComponent,
   isLastComponent,
-  totalComponents: _totalComponents,
-  componentIndex: _componentIndex,
 }: {
   item: PickingOrderItem
   pickQuantities: Map<string, string>
   updatePickQty: (autoid: string, value: string, maxQuan: string) => void
   formatQty: (raw: string) => string
-  isLast?: boolean
   isParent?: boolean
   isComponent?: boolean
   isLastComponent?: boolean
-  totalComponents?: number
-  componentIndex?: number
 }) {
   const orderedStr = formatQty(item.quan)
-  const unitLabel = item.unit_meas && item.unit_meas !== 'EA' ? item.unit_meas : ''
+  const unitLabel = (item.unit_meas || 'EA').toUpperCase()
   const ordered = parseFloat(item.quan)
   const pickVal = pickQuantities.get(item.autoid) || '0'
   const picking = parseFloat(pickVal) || 0
@@ -624,7 +688,7 @@ function PickItemRow({
 
   if (isParent) {
     return (
-      <div className='grid grid-cols-[20px_1fr_52px_32px_52px] items-center gap-2 px-3.5 py-1.5'>
+      <div className='grid grid-cols-[20px_1fr_52px_40px_52px] items-center gap-2 px-3.5 py-1.5'>
         <div className='flex size-5 items-center justify-center'>
           <Package className='size-4 text-foreground' />
         </div>
@@ -640,7 +704,7 @@ function PickItemRow({
         >
           {orderedStr}
         </button>
-        <span className='text-center text-[10px] font-medium text-text-quaternary'>{unitLabel || 'EA'}</span>
+        <span className='text-center text-[11px] font-medium text-text-tertiary'>{unitLabel}</span>
         <input
           type='number'
           value={pickVal}
@@ -658,7 +722,7 @@ function PickItemRow({
 
   if (isComponent) {
     return (
-      <div className='grid grid-cols-[20px_1fr_52px_32px_52px] items-center gap-2 px-3.5 py-0.5'>
+      <div className='grid grid-cols-[20px_1fr_52px_40px_52px] items-center gap-2 px-3.5 py-0.5'>
         {/* Tree connector in col 1 — vertical + horizontal lines */}
         <div className='relative flex items-center justify-center self-stretch'>
           <div className={cn(
@@ -685,7 +749,7 @@ function PickItemRow({
         >
           {orderedStr}
         </button>
-        <span className='text-center text-[10px] font-medium text-text-quaternary'>{unitLabel || 'EA'}</span>
+        <span className='text-center text-[11px] font-medium text-text-tertiary'>{unitLabel}</span>
         <input
           type='number'
           value={pickVal}
@@ -703,7 +767,7 @@ function PickItemRow({
 
   // Normal row (no hierarchy)
   return (
-    <div className='grid grid-cols-[20px_1fr_52px_32px_52px] items-center gap-2 px-3.5 py-1'>
+    <div className='grid grid-cols-[20px_1fr_52px_40px_52px] items-center gap-2 px-3.5 py-1'>
       <button
         type='button'
         className='flex size-5 items-center justify-center rounded transition-colors hover:bg-bg-active'
@@ -726,6 +790,7 @@ function PickItemRow({
       >
         {orderedStr}
       </button>
+      <span className='text-center text-[11px] font-medium text-text-tertiary'>{unitLabel}</span>
       <input
         type='number'
         value={pickVal}

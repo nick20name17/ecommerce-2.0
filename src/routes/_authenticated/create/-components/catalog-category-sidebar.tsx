@@ -157,7 +157,7 @@ export const CatalogCategorySidebar = ({
                   {category.photo ? (
                     <img
                       src={category.photo}
-                      alt={category.tree_descr}
+                      alt={category.tree_descr || 'Category'}
                       className='size-full object-cover'
                       loading='lazy'
                     />

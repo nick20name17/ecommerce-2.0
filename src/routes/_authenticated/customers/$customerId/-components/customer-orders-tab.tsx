@@ -1,6 +1,6 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
-import { Package, Plus, Search, Trash2 } from 'lucide-react'
+import { Package, PackageCheck, Plus, Search, Trash2 } from 'lucide-react'
 import { useState } from 'react'
 
 import { getOrdersQuery } from '@/api/order/query'
@@ -20,6 +20,7 @@ import { useBreakpoint } from '@/hooks/use-breakpoint'
 import { useProjectId } from '@/hooks/use-project-id'
 import { formatCurrency, formatDate } from '@/helpers/formatters'
 import { STORAGE_KEYS } from '@/constants/storage'
+import { StartPickingDialog } from '@/components/common/start-picking-dialog'
 import { OrderDeleteDialog } from '@/routes/_authenticated/orders/-components/order-delete-dialog'
 import { cn } from '@/lib/utils'
 
@@ -35,9 +36,10 @@ const STATUS_DOT_COLORS: Record<string, string> = {
 
 interface CustomerOrdersTabProps {
   customerId: string
+  customerName: string
 }
 
-export const CustomerOrdersTab = ({ customerId }: CustomerOrdersTabProps) => {
+export const CustomerOrdersTab = ({ customerId, customerName }: CustomerOrdersTabProps) => {
   const navigate = useNavigate()
   const bp = useBreakpoint()
   const isMobile = bp === 'mobile'
@@ -45,6 +47,7 @@ export const CustomerOrdersTab = ({ customerId }: CustomerOrdersTabProps) => {
   const [projectId] = useProjectId()
   const [search, setSearch] = useState('')
   const [orderToDelete, setOrderToDelete] = useState<Order | null>(null)
+  const [orderForPicking, setOrderForPicking] = useState<Order | null>(null)
 
   const params: OrderParams = {
     customer_id: customerId,
@@ -172,6 +175,7 @@ export const CustomerOrdersTab = ({ customerId }: CustomerOrdersTabProps) => {
               isMobile={isMobile}
               isTablet={isTablet}
               onDelete={setOrderToDelete}
+              onPick={setOrderForPicking}
               onClick={() =>
                 navigate({
                   to: '/orders/$orderId',
@@ -203,6 +207,13 @@ export const CustomerOrdersTab = ({ customerId }: CustomerOrdersTabProps) => {
         open={!!orderToDelete}
         onOpenChange={(open) => !open && setOrderToDelete(null)}
       />
+      <StartPickingDialog
+        open={!!orderForPicking}
+        onOpenChange={(open) => !open && setOrderForPicking(null)}
+        customerId={customerId}
+        customerName={customerName}
+        orderAutoid={orderForPicking?.autoid}
+      />
     </div>
   )
 }
@@ -214,12 +225,14 @@ function OrderRow({
   isMobile,
   isTablet,
   onDelete,
+  onPick,
   onClick,
 }: {
   order: Order
   isMobile: boolean
   isTablet: boolean
   onDelete: (order: Order) => void
+  onPick: (order: Order) => void
   onClick: () => void
 }) {
   const statusLabel = ORDER_STATUS_LABELS[order.status as OrderStatus] ?? order.status ?? '—'
@@ -325,6 +338,15 @@ function OrderRow({
             className='w-[180px] rounded-[8px] p-1'
             style={{ boxShadow: 'var(--dropdown-shadow)' }}
           >
+            {order.status === 'U' && (
+              <DropdownMenuItem
+                className='cursor-pointer gap-2 rounded-[6px] px-2 py-1 text-[13px]'
+                onClick={() => onPick(order)}
+              >
+                <PackageCheck className='size-3.5' />
+                Start Picking
+              </DropdownMenuItem>
+            )}
             <DropdownMenuItem
               variant='destructive'
               className='cursor-pointer gap-2 rounded-[6px] px-2 py-1 text-[13px]'

@@ -125,7 +125,7 @@ export function TaskRow({
 
   if (isMobile) {
     return (
-      <div className='cursor-pointer border-b border-border-light px-3.5 py-3 transition-colors duration-100 hover:bg-bg-hover' onClick={goToDetail}>
+      <div className='cursor-pointer border-b border-border-light px-3.5 py-3 transition-colors duration-100 hover:bg-bg-hover' role='button' tabIndex={0} onClick={goToDetail} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); goToDetail() } }}>
         <div className='mb-2 flex items-start gap-2.5'>
           <StatusChangeButton task={task} statuses={statuses} size={14} onStatusChange={onStatusChange} />
           <span className='min-w-0 flex-1 text-sm font-medium leading-snug text-foreground'>
@@ -162,7 +162,10 @@ export function TaskRow({
         'group/row flex cursor-pointer items-center border-b border-border-light text-sm text-foreground transition-colors duration-100 hover:bg-bg-hover',
         isTablet ? 'gap-4 px-5 py-2' : 'gap-6 px-6 py-2'
       )}
+      role='button'
+      tabIndex={0}
       onClick={goToDetail}
+      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); goToDetail() } }}
     >
       {/* Task: status icon (clickable) + ID + title */}
       <div className='flex min-w-0 flex-1 items-center gap-2'>

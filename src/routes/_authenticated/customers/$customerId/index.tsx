@@ -13,6 +13,7 @@ import { CustomerTasksTab } from './-components/customer-tasks-tab'
 import { EntityNotesSheet } from '@/components/common/entity-notes/entity-notes-sheet'
 import { CUSTOMER_QUERY_KEYS, getCustomerDetailQuery } from '@/api/customer/query'
 import { customerService } from '@/api/customer/service'
+import { getEditableFieldsQuery } from '@/api/data/query'
 import { getFieldConfigQuery } from '@/api/field-config/query'
 import { getPriceLevelsQuery } from '@/api/price-level/query'
 import { getColumnLabel } from '@/helpers/dynamic-columns'
@@ -56,6 +57,8 @@ function CustomerDetailPage() {
     getCustomerDetailQuery(customerId, projectId)
   )
   const { data: fieldConfig } = useQuery(getFieldConfigQuery(projectId))
+  const { data: editableFields } = useQuery(getEditableFieldsQuery(projectId))
+  const editableCustomerFields = editableFields?.customer ?? []
   const { data: priceLevels } = useQuery(getPriceLevelsQuery(projectId))
 
   const customFields = useMemo(() => {
@@ -63,19 +66,43 @@ function CustomerDetailPage() {
     return entries.filter((e) => !e.default && e.enabled)
   }, [fieldConfig])
 
+  const detailKey = [...CUSTOMER_QUERY_KEYS.detail(customerId), projectId] as const
+
   const priceLevelMutation = useMutation({
     mutationFn: (value: string) => customerService.update(customerId, { in_level: value }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: CUSTOMER_QUERY_KEYS.detail(customerId) })
+    onMutate: async (value) => {
+      await queryClient.cancelQueries({ queryKey: detailKey })
+      const prev = queryClient.getQueryData(detailKey)
+      queryClient.setQueryData(detailKey, (old: typeof prev) =>
+        old ? { ...old, in_level: value } : old
+      )
       toast.success('Price level updated')
+      return { prev }
+    },
+    onError: (_err, _val, context) => {
+      if (context?.prev) queryClient.setQueryData(detailKey, context.prev)
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: detailKey })
     },
   })
 
   const patchMutation = useMutation({
     mutationFn: (payload: Record<string, unknown>) =>
       customerService.update(customerId, payload),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: CUSTOMER_QUERY_KEYS.detail(customerId) })
+    onMutate: async (payload) => {
+      await queryClient.cancelQueries({ queryKey: detailKey })
+      const prev = queryClient.getQueryData(detailKey)
+      queryClient.setQueryData(detailKey, (old: typeof prev) =>
+        old ? { ...old, ...payload } : old
+      )
+      return { prev }
+    },
+    onError: (_err, _val, context) => {
+      if (context?.prev) queryClient.setQueryData(detailKey, context.prev)
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: detailKey })
     },
     meta: { errorMessage: 'Failed to update customer' },
   })
@@ -293,7 +320,7 @@ function CustomerDetailPage() {
           {/* Tab content */}
           <div className='flex min-h-0 flex-1 flex-col overflow-hidden'>
             {activeTab === 'orders' && (
-              <CustomerOrdersTab customerId={customerId} />
+              <CustomerOrdersTab customerId={customerId} customerName={customer.l_name ?? ''} />
             )}
             {activeTab === 'proposals' && (
               <CustomerProposalsTab customerId={customerId} />
@@ -355,6 +382,7 @@ function CustomerDetailPage() {
                 customer={customer}
                 fieldConfig={fieldConfig}
                 priceLevels={priceLevels}
+                editableFields={editableCustomerFields}
                 onPriceLevelChange={(value) => priceLevelMutation.mutate(value)}
                 onAssign={() => setAssignOpen(true)}
               />
@@ -386,7 +414,7 @@ function CustomerDetailPage() {
                             value={strVal}
                             field={entry.field}
                             onSave={handleFieldSave}
-                            editable={!!entry.editable}
+                            editable={!!entry.editable || editableCustomerFields.includes(entry.field)}
                           />
                         )
                       })}

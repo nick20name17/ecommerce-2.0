@@ -489,8 +489,11 @@ function Todos2Page() {
                   </button>
 
                   {/* Tasks in this group */}
-                  {!collapsed && (
-                    <div>
+                  <div
+                    className='grid transition-[grid-template-rows] duration-200 ease-in-out'
+                    style={{ gridTemplateRows: collapsed ? '0fr' : '1fr' }}
+                  >
+                    <div className='overflow-hidden'>
                       {groupTasks.map((task) => (
                         <TaskRow
                           key={task.id}
@@ -503,7 +506,7 @@ function Todos2Page() {
                         />
                       ))}
                     </div>
-                  )}
+                  </div>
                 </div>
               )
             })

@@ -77,7 +77,7 @@ const IcPen: IC = ({ className }) => (
 
 function Panel1() {
   return (
-    <div className='flex h-full w-full flex-col bg-white'>
+    <div className='flex h-full w-full flex-col bg-background'>
       {/* ── Header ── */}
       <div className='flex items-center gap-2.5 px-5 pt-5 pb-4'>
         <div className='flex size-9 items-center justify-center rounded-xl bg-emerald-100 text-[13px] font-bold text-emerald-700'>C</div>
@@ -191,7 +191,7 @@ function Panel1() {
 
 function Panel2() {
   return (
-    <div className='flex h-full w-full flex-col bg-white'>
+    <div className='flex h-full w-full flex-col bg-background'>
       {/* ── Header ── */}
       <div className='flex items-center gap-3.5 px-5 pt-5 pb-3'>
         <div className='flex size-9 items-center justify-center rounded-full bg-gradient-to-br from-red-400 to-orange-400'>
@@ -297,7 +297,7 @@ function Panel3() {
   ]
 
   return (
-    <div className='flex h-full w-full flex-col bg-white'>
+    <div className='flex h-full w-full flex-col bg-background'>
       {/* ── Header ── */}
       <div className='flex items-center gap-3 px-5 pt-5 pb-4'>
         <div className='flex size-10 items-center justify-center rounded-2xl bg-emerald-100 text-[15px] font-bold text-emerald-700'>A</div>
@@ -351,7 +351,7 @@ function Panel4() {
   const downloadsSubs = ['Discounts', 'Orders', 'Customers', 'Reports', 'Settings', 'Sheed Editor', 'Commissions', 'Subscriptions']
 
   return (
-    <div className='flex h-full w-full flex-col bg-white'>
+    <div className='flex h-full w-full flex-col bg-background'>
       {/* ── Header ── */}
       <div className='flex items-center gap-2.5 px-5 pt-5 pb-3'>
         <div className='flex size-8 items-center justify-center rounded-xl bg-violet-100 text-[12px] font-bold text-violet-600'>C</div>
