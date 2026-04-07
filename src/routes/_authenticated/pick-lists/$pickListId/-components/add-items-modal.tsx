@@ -16,12 +16,15 @@ import {
 import { Input } from '@/components/ui/input'
 
 interface ItemRow {
+  _id: string
   order_autoid: string
   detail_autoid: string
   picked_quantity: string
 }
 
+let _rowId = 0
 const emptyRow = (): ItemRow => ({
+  _id: `row-${++_rowId}`,
   order_autoid: '',
   detail_autoid: '',
   picked_quantity: '1.00',
@@ -88,7 +91,7 @@ export function AddItemsModal({ pickListId, open, onOpenChange }: Props) {
             </div>
 
             {rows.map((row, i) => (
-              <div key={i} className='grid grid-cols-[1fr_1fr_100px_32px] items-center gap-2'>
+              <div key={row._id} className='grid grid-cols-[1fr_1fr_100px_32px] items-center gap-2'>
                 <Input
                   value={row.order_autoid}
                   onChange={(e) => updateRow(i, 'order_autoid', e.target.value)}

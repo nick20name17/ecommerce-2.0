@@ -27,6 +27,9 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src')
     }
   },
+  build: {
+    sourcemap: 'hidden',
+  },
   test: {
     globals: true,
     environment: 'jsdom',

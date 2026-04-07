@@ -499,8 +499,8 @@ function ShipmentDetailDialog({
               </div>
               <div className='divide-y divide-border-light rounded-[6px] border border-border'>
                 {(shipment.items?.length ?? 0) > 0
-                  ? shipment.items!.map((item, i) => (
-                      <div key={i} className='flex items-center gap-3 px-3 py-2'>
+                  ? shipment.items!.map((item) => (
+                      <div key={item.detail_autoid} className='flex items-center gap-3 px-3 py-2'>
                         <span className='min-w-0 flex-1 truncate text-[12px] font-medium text-foreground'>
                           {item.description || item.product_id || item.detail_autoid}
                         </span>

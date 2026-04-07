@@ -224,11 +224,11 @@ export const CustomerInfoPanel = ({ customer, fieldConfig, priceLevels, onPriceL
             onClick={canAssign && onAssign ? onAssign : undefined}
           >
             <div className='flex min-w-0 flex-1 flex-wrap gap-1.5'>
-              {allAssigned.map((user, i) => {
+              {allAssigned.map((user) => {
                 const name = getUserDisplayName(user)
                 const initials = name.split(' ').slice(0, 2).map(n => n[0]?.toUpperCase() ?? '').join('')
                 return (
-                  <span key={i} className='inline-flex items-center gap-1.5 rounded-full border border-border bg-bg-secondary py-0.5 pl-0.5 pr-2 text-[12px] font-medium'>
+                  <span key={user.id} className='inline-flex items-center gap-1.5 rounded-full border border-border bg-bg-secondary py-0.5 pl-0.5 pr-2 text-[12px] font-medium'>
                     <InitialsAvatar initials={initials} size={18} />
                     {name}
                   </span>
