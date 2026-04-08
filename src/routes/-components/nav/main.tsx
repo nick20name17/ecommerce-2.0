@@ -60,7 +60,6 @@ const TOP_ITEMS: NavItem[] = [
     icon: IPickLists,
     iconBg: 'bg-teal-500',
     iconColor: 'text-white',
-    shippingOnly: true,
   },
   {
     title: 'Shipping',
