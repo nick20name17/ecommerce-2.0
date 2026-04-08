@@ -316,36 +316,34 @@ function OrderDetailPage() {
         <div className='flex-1' />
 
         {shippingEnabled && (
-          <>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <button
-                  type='button'
-                  className='inline-flex h-7 items-center gap-1.5 rounded-[5px] border border-border bg-bg-secondary px-2.5 text-[12px] font-medium text-text-secondary transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground'
-                  onClick={() => setShippingOpen(true)}
-                >
-                  <Truck className='size-3.5' />
-                  <span className='hidden sm:inline'>Shipping</span>
-                </button>
-              </TooltipTrigger>
-              <TooltipContent>Manage Shipping</TooltipContent>
-            </Tooltip>
-
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <button
-                  type='button'
-                  className='inline-flex h-7 items-center gap-1.5 rounded-[5px] border border-border bg-bg-secondary px-2.5 text-[12px] font-medium text-text-secondary transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground'
-                  onClick={() => setPickingOpen(true)}
-                >
-                  <ClipboardList className='size-3.5' />
-                  <span className='hidden sm:inline'>Start Picking</span>
-                </button>
-              </TooltipTrigger>
-              <TooltipContent>Start picking for this customer</TooltipContent>
-            </Tooltip>
-          </>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button
+                type='button'
+                className='inline-flex h-7 items-center gap-1.5 rounded-[5px] border border-border bg-bg-secondary px-2.5 text-[12px] font-medium text-text-secondary transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground'
+                onClick={() => setShippingOpen(true)}
+              >
+                <Truck className='size-3.5' />
+                <span className='hidden sm:inline'>Shipping</span>
+              </button>
+            </TooltipTrigger>
+            <TooltipContent>Manage Shipping</TooltipContent>
+          </Tooltip>
         )}
+
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <button
+              type='button'
+              className='inline-flex h-7 items-center gap-1.5 rounded-[5px] border border-border bg-bg-secondary px-2.5 text-[12px] font-medium text-text-secondary transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground'
+              onClick={() => setPickingOpen(true)}
+            >
+              <ClipboardList className='size-3.5' />
+              <span className='hidden sm:inline'>Start Picking</span>
+            </button>
+          </TooltipTrigger>
+          <TooltipContent>Start picking for this customer</TooltipContent>
+        </Tooltip>
 
         <Tooltip>
           <TooltipTrigger asChild>

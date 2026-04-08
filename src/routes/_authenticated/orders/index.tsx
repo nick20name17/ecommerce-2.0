@@ -71,7 +71,6 @@ const OrdersPage = () => {
   const projectId = projectIdFromUrl ?? projectIdFromStorage
 
   const canAssign = !!user?.role && isAdmin(user.role)
-  const shippingEnabled = user?.shipping_enabled !== false
 
   const [sortField, setSortField] = useState<OrderSortField | null>('invoice')
   const [sortDir, setSortDir] = useState<SortDir>('asc')
@@ -483,7 +482,7 @@ const OrdersPage = () => {
                 onNotes={setOrderForNotes}
                 onAssign={setOrderToAssign}
                 onCreateTask={setOrderForTask}
-                onPick={shippingEnabled ? setOrderForPicking : undefined}
+                onPick={setOrderForPicking}
                 onMouseEnter={() =>
                   queryClient.prefetchQuery(getOrderDetailQuery(order.autoid, projectId))
                 }
