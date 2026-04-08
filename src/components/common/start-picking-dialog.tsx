@@ -191,7 +191,7 @@ export function StartPickingDialog({
           .map((item) => ({
             order_autoid: item.orderAutoid,
             detail_autoid: item.autoid,
-            picked_quantity: pickQuantities.get(item.autoid) || item.quan,
+            picked_quantity: pickQuantities.get(item.autoid) || (item.qty_in_uom || item.quan),
           }))
           .filter((item) => parseFloat(item.picked_quantity) > 0),
       }
@@ -327,7 +327,7 @@ export function StartPickingDialog({
                   onClick={() => {
                     const qty = new Map(pickQuantities)
                     for (const item of allItems) {
-                      qty.set(item.autoid, formatQty(item.quan))
+                      qty.set(item.autoid, formatQty((item.qty_in_uom || item.quan)))
                     }
                     setPickQuantities(qty)
                   }}
@@ -400,7 +400,7 @@ export function StartPickingDialog({
                         onClick={() => {
                           const qty = new Map(pickQuantities)
                           for (const item of items) {
-                            qty.set(item.autoid, formatQty(item.quan))
+                            qty.set(item.autoid, formatQty((item.qty_in_uom || item.quan)))
                           }
                           setPickQuantities(qty)
                         }}
@@ -656,7 +656,7 @@ function OrderSelectCard({
                     {item.descr}
                   </span>
                   <span className='shrink-0 rounded bg-bg-secondary px-1.5 py-0.5 text-[11px] font-medium tabular-nums text-text-secondary'>
-                    {parseFloat(item.quan).toFixed(0)}{item.unit_meas && item.unit_meas !== 'EA' ? ` ${item.unit_meas}` : ''}
+                    {parseFloat((item.qty_in_uom || item.quan)).toFixed(0)}{item.unit_meas && item.unit_meas !== 'EA' ? ` ${item.unit_meas}` : ''}
                   </span>
                 </div>
               ))}
@@ -687,9 +687,10 @@ function PickItemRow({
   isComponent?: boolean
   isLastComponent?: boolean
 }) {
-  const orderedStr = formatQty(item.quan)
+  const qty = item.qty_in_uom || item.quan
+  const orderedStr = formatQty(qty)
   const unitLabel = (item.unit_meas || 'EA').toUpperCase()
-  const ordered = parseFloat(item.quan)
+  const ordered = parseFloat(qty)
   const pickVal = pickQuantities.get(item.autoid) || '0'
   const picking = parseFloat(pickVal) || 0
   const isPartial = picking < ordered && picking > 0
@@ -706,7 +707,7 @@ function PickItemRow({
         </div>
         <button
           type='button'
-          onClick={() => updatePickQty(item.autoid, formatQty(item.quan), item.quan)}
+          onClick={() => updatePickQty(item.autoid, formatQty(qty), qty)}
           className='flex h-7 cursor-pointer items-center justify-center rounded-[5px] bg-bg-secondary/60 text-[13px] tabular-nums text-text-tertiary transition-colors hover:bg-primary/10 hover:text-primary'
           title='Pick full quantity'
         >
@@ -716,7 +717,7 @@ function PickItemRow({
         <input
           type='number'
           value={pickVal}
-          onChange={(e) => updatePickQty(item.autoid, e.target.value, item.quan)}
+          onChange={(e) => updatePickQty(item.autoid, e.target.value, qty)}
           min='0'
           step='any'
           className={cn(
@@ -749,8 +750,8 @@ function PickItemRow({
         <button
           type='button'
           onClick={() => {
-            const newVal = picking > 0 ? '0' : formatQty(item.quan)
-            updatePickQty(item.autoid, newVal, item.quan)
+            const newVal = picking > 0 ? '0' : formatQty(qty)
+            updatePickQty(item.autoid, newVal, qty)
           }}
           className='flex h-7 cursor-pointer items-center justify-center rounded-[5px] bg-bg-secondary/60 text-[13px] tabular-nums text-text-tertiary transition-colors hover:bg-primary/10 hover:text-primary'
           title='Pick full quantity'
@@ -761,7 +762,7 @@ function PickItemRow({
         <input
           type='number'
           value={pickVal}
-          onChange={(e) => updatePickQty(item.autoid, e.target.value, item.quan)}
+          onChange={(e) => updatePickQty(item.autoid, e.target.value, qty)}
           min='0'
           step='any'
           className={cn(
@@ -780,8 +781,8 @@ function PickItemRow({
         type='button'
         className='flex size-5 items-center justify-center rounded transition-colors hover:bg-bg-active'
         onClick={() => {
-          const newVal = picking > 0 ? '0' : formatQty(item.quan)
-          updatePickQty(item.autoid, newVal, item.quan)
+          const newVal = picking > 0 ? '0' : formatQty(qty)
+          updatePickQty(item.autoid, newVal, qty)
         }}
       >
         <Package className={cn('size-4', picking > 0 ? 'text-emerald-500' : 'text-text-quaternary/40')} />
@@ -792,7 +793,7 @@ function PickItemRow({
       </div>
       <button
         type='button'
-        onClick={() => updatePickQty(item.autoid, formatQty(item.quan), item.quan)}
+        onClick={() => updatePickQty(item.autoid, formatQty(qty), qty)}
         className='flex h-7 cursor-pointer items-center justify-center rounded-[5px] bg-bg-secondary/60 text-[13px] tabular-nums text-text-tertiary transition-colors hover:bg-primary/10 hover:text-primary'
         title='Pick full quantity'
       >
@@ -802,7 +803,7 @@ function PickItemRow({
       <input
         type='number'
         value={pickVal}
-        onChange={(e) => updatePickQty(item.autoid, e.target.value, item.quan)}
+        onChange={(e) => updatePickQty(item.autoid, e.target.value, qty)}
         min='0'
         step='any'
         className={cn(
