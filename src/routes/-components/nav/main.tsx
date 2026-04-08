@@ -33,6 +33,7 @@ interface NavItem {
   iconColor?: string
   superAdminOnly?: boolean
   adminOnly?: boolean
+  shippingOnly?: boolean
 }
 
 // ── Nav config ──────────────────────────────────────────────
@@ -59,6 +60,7 @@ const TOP_ITEMS: NavItem[] = [
     icon: IPickLists,
     iconBg: 'bg-teal-500',
     iconColor: 'text-white',
+    shippingOnly: true,
   },
   {
     title: 'Shipping',
@@ -66,6 +68,7 @@ const TOP_ITEMS: NavItem[] = [
     icon: IShipping,
     iconBg: 'bg-cyan-500',
     iconColor: 'text-white',
+    shippingOnly: true,
   },
 ]
 
@@ -231,10 +234,13 @@ export const NavMain = () => {
   const pendingOrders = usePendingOrders()
   const pendingProposals = usePendingProposals()
 
+  const shippingEnabled = user?.shipping_enabled !== false
+
   const filterItems = (items: NavItem[]) =>
     items.filter((item) => {
       if (item.superAdminOnly && !userIsSuperAdmin) return false
       if (item.adminOnly && !userIsAdmin) return false
+      if (item.shippingOnly && !shippingEnabled) return false
       return true
     })
 

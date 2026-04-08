@@ -28,6 +28,7 @@ import { useBreakpoint } from '@/hooks/use-breakpoint'
 import { useProjectId } from '@/hooks/use-project-id'
 import { formatCurrency, formatDate, getUserDisplayName } from '@/helpers/formatters'
 import { cn } from '@/lib/utils'
+import { useAuth } from '@/providers/auth'
 import { toast } from 'sonner'
 
 export const Route = createFileRoute('/_authenticated/orders/$orderId/')({
@@ -66,6 +67,8 @@ function OrderDetailPage() {
   const { orderId } = Route.useParams()
   const router = useRouter()
   const queryClient = useQueryClient()
+  const { user } = useAuth()
+  const shippingEnabled = user?.shipping_enabled !== false
   const bp = useBreakpoint()
   const isMobile = bp === 'mobile'
   const [projectId] = useProjectId()
@@ -312,33 +315,37 @@ function OrderDetailPage() {
 
         <div className='flex-1' />
 
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <button
-              type='button'
-              className='inline-flex h-7 items-center gap-1.5 rounded-[5px] border border-border bg-bg-secondary px-2.5 text-[12px] font-medium text-text-secondary transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground'
-              onClick={() => setShippingOpen(true)}
-            >
-              <Truck className='size-3.5' />
-              <span className='hidden sm:inline'>Shipping</span>
-            </button>
-          </TooltipTrigger>
-          <TooltipContent>Manage Shipping</TooltipContent>
-        </Tooltip>
+        {shippingEnabled && (
+          <>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  type='button'
+                  className='inline-flex h-7 items-center gap-1.5 rounded-[5px] border border-border bg-bg-secondary px-2.5 text-[12px] font-medium text-text-secondary transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground'
+                  onClick={() => setShippingOpen(true)}
+                >
+                  <Truck className='size-3.5' />
+                  <span className='hidden sm:inline'>Shipping</span>
+                </button>
+              </TooltipTrigger>
+              <TooltipContent>Manage Shipping</TooltipContent>
+            </Tooltip>
 
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <button
-              type='button'
-              className='inline-flex h-7 items-center gap-1.5 rounded-[5px] border border-border bg-bg-secondary px-2.5 text-[12px] font-medium text-text-secondary transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground'
-              onClick={() => setPickingOpen(true)}
-            >
-              <ClipboardList className='size-3.5' />
-              <span className='hidden sm:inline'>Start Picking</span>
-            </button>
-          </TooltipTrigger>
-          <TooltipContent>Start picking for this customer</TooltipContent>
-        </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  type='button'
+                  className='inline-flex h-7 items-center gap-1.5 rounded-[5px] border border-border bg-bg-secondary px-2.5 text-[12px] font-medium text-text-secondary transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground'
+                  onClick={() => setPickingOpen(true)}
+                >
+                  <ClipboardList className='size-3.5' />
+                  <span className='hidden sm:inline'>Start Picking</span>
+                </button>
+              </TooltipTrigger>
+              <TooltipContent>Start picking for this customer</TooltipContent>
+            </Tooltip>
+          </>
+        )}
 
         <Tooltip>
           <TooltipTrigger asChild>

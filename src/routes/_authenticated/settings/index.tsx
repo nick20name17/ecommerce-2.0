@@ -14,6 +14,7 @@ import type { UserRole } from '@/constants/user'
 import { getSession } from '@/helpers/auth'
 import { useProjectId } from '@/hooks/use-project-id'
 import { cn } from '@/lib/utils'
+import { useAuth } from '@/providers/auth'
 
 // ── Section definitions ─────────────────────────────────────
 
@@ -32,8 +33,11 @@ const SECTIONS: { value: SettingsSection; label: string }[] = [
 
 const SettingsPage = () => {
   const [projectId] = useProjectId()
+  const { user } = useAuth()
+  const shippingEnabled = user?.shipping_enabled !== false
   const [section, setSection] = useQueryState('section', parseAsString)
 
+  const visibleSections = shippingEnabled ? SECTIONS : SECTIONS.filter(s => s.value !== 'shipping')
   const currentSection = (section ?? 'general') as SettingsSection
 
   if (!projectId) {
@@ -63,7 +67,7 @@ const SettingsPage = () => {
       <div className='flex min-h-0 flex-1 overflow-hidden'>
         {/* Vertical sidebar tabs */}
         <nav className='flex w-[180px] shrink-0 flex-col gap-px border-r border-border bg-bg-secondary/40 px-3 py-3'>
-          {SECTIONS.map((s) => {
+          {visibleSections.map((s) => {
             const isActive = currentSection === s.value
             return (
               <button

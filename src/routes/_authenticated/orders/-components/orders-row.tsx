@@ -38,7 +38,7 @@ export interface OrderRowProps {
   onNotes: (order: Order) => void
   onAssign: (order: Order) => void
   onCreateTask: (order: Order) => void
-  onPick: (order: Order) => void
+  onPick?: (order: Order) => void
   onMouseEnter?: () => void
   onClick: () => void
 }
@@ -300,7 +300,7 @@ export function OrderRow({
                 Assign
               </DropdownMenuItem>
             )}
-            {order.status === ORDER_STATUS.unprocessed && (
+            {order.status === ORDER_STATUS.unprocessed && onPick && (
               <DropdownMenuItem
                 className='cursor-pointer gap-2 rounded-[6px] px-2 py-1 text-[13px]'
                 onClick={() => onPick(order)}

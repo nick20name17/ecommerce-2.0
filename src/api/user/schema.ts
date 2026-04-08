@@ -17,6 +17,7 @@ export interface User {
   salesman: string
 
   project_name: string
+  shipping_enabled: boolean
   is_active: boolean
   date_joined: string
   updated_at: string
