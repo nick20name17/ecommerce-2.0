@@ -244,6 +244,7 @@ function OrderDetailPage() {
   const dotColor = STATUS_DOT_COLORS[order.status] ?? 'bg-slate-400'
   const statusClass = ORDER_STATUS_CLASS[order.status as OrderStatus] ?? ''
   const items = order.items ?? []
+  const allPicked = items.length > 0 && items.every((it) => it.picked_quantity != null && parseFloat(it.picked_quantity) > 0)
   const assignedUsers = order.assigned_users ?? (order.assigned_user ? [order.assigned_user] : [])
   const billToAddress = formatAddress(order.address1, order.address2, order.city, order.state, order.zip)
   const shipToAddress = formatAddress(order.c_address1, order.c_address2, order.c_city, order.c_state, order.c_zip)
@@ -335,14 +336,15 @@ function OrderDetailPage() {
           <TooltipTrigger asChild>
             <button
               type='button'
-              className='inline-flex h-7 items-center gap-1.5 rounded-[5px] border border-border bg-bg-secondary px-2.5 text-[12px] font-medium text-text-secondary transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground'
+              className='inline-flex h-7 items-center gap-1.5 rounded-[5px] border border-border bg-bg-secondary px-2.5 text-[12px] font-medium text-text-secondary transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground disabled:pointer-events-none disabled:opacity-50'
               onClick={() => setPickingOpen(true)}
+              disabled={allPicked}
             >
               <ClipboardList className='size-3.5' />
-              <span className='hidden sm:inline'>Start Picking</span>
+              <span className='hidden sm:inline'>{allPicked ? 'All Picked' : 'Start Picking'}</span>
             </button>
           </TooltipTrigger>
-          <TooltipContent>Start picking for this customer</TooltipContent>
+          <TooltipContent>{allPicked ? 'All items have been picked' : 'Start picking for this customer'}</TooltipContent>
         </Tooltip>
 
         <Tooltip>
