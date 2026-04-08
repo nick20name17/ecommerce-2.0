@@ -97,6 +97,8 @@ export interface OrderItem {
   so_amount: string
   weight: string | null
   is_picked: boolean
+  picked: boolean
+  picked_quantity: string | null
   packed: boolean
   shipment_id: null | number
   picked_by: string | null

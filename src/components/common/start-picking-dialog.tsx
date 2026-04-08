@@ -70,6 +70,7 @@ export function StartPickingDialog({
     ...getOrdersForPickingQuery({
       ...(hasCustomerId ? { customer_id: customerId } : {}),
       include_items: true,
+      project_id: projectId ?? undefined,
     }),
     enabled: open,
   })
@@ -347,6 +348,21 @@ export function StartPickingDialog({
                 >
                   Reset
                 </button>
+
+                <div className='ml-auto flex items-center gap-2 text-[12px] tabular-nums'>
+                  {(() => {
+                    const total = allItems.length
+                    const picked = allItems.filter((it) => parseFloat(pickQuantities.get(it.autoid) || '0') > 0).length
+                    const left = total - picked
+                    return left === 0 ? (
+                      <span className='font-medium text-emerald-600 dark:text-emerald-400'>All {total} picked</span>
+                    ) : (
+                      <span className='text-text-tertiary'>
+                        <span className='font-medium text-foreground'>{picked}/{total}</span> picked · <span className='font-medium text-amber-600 dark:text-amber-400'>{left} left</span>
+                      </span>
+                    )
+                  })()}
+                </div>
               </div>
 
               {selectedOrders.map((order) => {

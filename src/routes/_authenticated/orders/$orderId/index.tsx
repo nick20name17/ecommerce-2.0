@@ -412,7 +412,7 @@ function OrderDetailPage() {
               <table className='w-full text-[13px]'>
                 <thead className='sticky top-0 z-10 select-none bg-bg-secondary'>
                   <tr className='border-b border-border text-left'>
-                    <th className='w-[50px] py-1.5 pl-6 pr-3 font-medium text-text-tertiary'>Packed</th>
+                    <th className='w-[60px] py-1.5 pl-6 pr-3 font-medium text-text-tertiary'>Picked</th>
                     <th className='min-w-[130px] px-3 py-1.5 font-medium text-text-tertiary'>Inventory</th>
                     <th className='min-w-[200px] px-3 py-1.5 font-medium text-text-tertiary'>Description</th>
                     <th className='w-[70px] px-3 py-1.5 text-right font-medium text-text-tertiary'>Qty</th>
@@ -433,10 +433,18 @@ function OrderDetailPage() {
                       className='border-b border-border-light transition-colors duration-100 hover:bg-bg-hover'
                     >
                       <td className='py-1.5 pl-6 pr-3'>
-                        {item.packed ? (
-                          <span className='inline-flex items-center gap-1 rounded-[4px] bg-violet-500/10 px-1.5 py-0.5 text-[11px] font-medium text-violet-600 dark:text-violet-400'>
-                            <Package className='size-3' /> Packed
-                          </span>
+                        {item.picked_quantity != null && parseFloat(item.picked_quantity) > 0 ? (
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <span className='inline-flex items-center gap-1 rounded-[4px] bg-emerald-500/10 px-1.5 py-0.5 text-[11px] font-medium tabular-nums text-emerald-600 dark:text-emerald-400'>
+                                <Check className='size-3' /> {parseFloat(item.picked_quantity) % 1 === 0 ? parseInt(item.picked_quantity) : item.picked_quantity}
+                              </span>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              {item.picked_by ? `Picked by ${item.picked_by}` : 'Picked'}
+                              {item.picked_at && ` · ${formatDate(item.picked_at)}`}
+                            </TooltipContent>
+                          </Tooltip>
                         ) : (
                           <span className='text-[11px] text-text-quaternary'>—</span>
                         )}

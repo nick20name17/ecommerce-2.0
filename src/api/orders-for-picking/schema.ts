@@ -52,4 +52,5 @@ export interface PickingOrdersParams {
   include_items?: boolean
   customer_id?: string
   search?: string
+  project_id?: number
 }
