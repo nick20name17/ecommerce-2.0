@@ -5,55 +5,82 @@ import { VideoSlot } from '@/components/video-slot'
 export function TasksOverview() {
   return (
     <Article
-      title="Tasks Overview"
-      subtitle="Track work items across your team with list and Kanban views."
+      title="Web Tasks"
+      subtitle="Centralized task management tied directly to your EBMS records."
     >
-      <h2>List View and Kanban Board</h2>
+      <Callout type="warning">
+        Web Tasks are <strong>not the same as EBMS Tasks</strong>. This is a
+        separate, web-based task management system built into EBMS Online. It
+        does not replace or sync with the task system in EBMS desktop.
+      </Callout>
+
       <p>
-        Tasks can be viewed in two layouts. The <strong>list view</strong> presents tasks in a
-        sortable, filterable table where each row shows the task title, status, priority,
-        assignee, due date, and any linked records. The <strong>Kanban board</strong> organizes
-        tasks into columns by status, letting you see workflow progress at a glance and move
-        tasks between stages by dragging and dropping.
+        Web Tasks is one of the highest-value features in EBMS Online — and one
+        of the most underutilized. The goal is simple: because your data already
+        lives in your ERP, your task management should too.
+      </p>
+      <p>
+        Instead of tracking follow-ups in email threads, sticky notes, or
+        spreadsheets, Web Tasks gives your team a centralized place to manage
+        work — tied directly to the records that matter.
       </p>
 
       <VideoSlot
-        title="Tasks list and Kanban views"
-        description="See both task views in action and learn when to use each one."
+        title="Web Tasks overview"
+        description="See how Web Tasks connects your task management to your EBMS records."
       />
 
-      <h2>Task Statuses and Priorities</h2>
+      <h2>Why Use Web Tasks</h2>
       <p>
-        Every task has a status and a priority. Statuses track where the task sits in your
-        workflow:
+        Every task can be <strong>linked to an EBMS record</strong>:
       </p>
       <ul>
-        <li><strong>Backlog</strong> — acknowledged but not yet started.</li>
-        <li><strong>To Do</strong> — ready to be worked on.</li>
-        <li><strong>In Progress</strong> — actively being worked on.</li>
-        <li><strong>Done</strong> — completed.</li>
-        <li><strong>Canceled</strong> — no longer needed.</li>
+        <li>
+          <strong>An order</strong> — track fulfillment steps, exceptions, or
+          special handling
+        </li>
+        <li>
+          <strong>A proposal</strong> — follow up on quotes, track approval
+          status
+        </li>
+        <li>
+          <strong>A customer</strong> — warranty tracking, scheduled check-ins,
+          account management
+        </li>
       </ul>
       <p>
-        Priorities range from <strong>Urgent</strong> to <strong>No Priority</strong> and help
-        your team focus on the most important work first. Priority icons appear as color-coded
-        badges in both the list and Kanban views.
+        This means tasks aren't floating in a vacuum. They have context. When
+        someone opens a customer or order, they see every task associated with
+        it.
       </p>
 
-      <h2>Filtering and Search</h2>
-      <p>
-        Use the filter bar to narrow tasks by status, priority, assignee, due date, or linked
-        entity (order, proposal, or customer). The search bar matches against task titles and
-        descriptions. Filters persist across sessions so your preferred view is ready when you
-        return.
-      </p>
-
-      <Callout type="tip">
-        <p>
-          Combine the Kanban view with an assignee filter to create a personal task board that
-          shows only your work.
-        </p>
-      </Callout>
+      <h2>Key Benefits</h2>
+      <ul>
+        <li>
+          <strong>Visibility</strong> — no more "I thought you were handling
+          that." Tasks are visible to the whole team.
+        </li>
+        <li>
+          <strong>Multiple assignees</strong> — assign a task to more than one
+          person when work is shared
+        </li>
+        <li>
+          <strong>Accountability</strong> — everything is tracked, timestamped,
+          and tied to a record
+        </li>
+        <li>
+          <strong>Due dates & priorities</strong> — set deadlines and priority
+          levels to keep work on track
+        </li>
+        <li>
+          <strong>Custom statuses</strong> — track tasks through your workflow
+          stages
+        </li>
+        <li>
+          <strong>Email notifications</strong> — custom email notifications can
+          be configured so assignees know when tasks are created or updated
+        </li>
+      </ul>
     </Article>
   )
 }

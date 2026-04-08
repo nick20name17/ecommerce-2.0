@@ -8,7 +8,7 @@ export function CreatingTasks() {
   return (
     <Article
       title="Creating Tasks"
-      subtitle="Create tasks from the command bar or any linked entity page."
+      subtitle="Create a task from anywhere in EBMS Online — from an order, a proposal, a customer record, or the task board itself."
     >
       <h2>Using the Command Bar</h2>
       <p>
@@ -54,24 +54,19 @@ export function CreatingTasks() {
         description="Watch how to create and link a task using the command bar."
       />
 
-      <h2>Setting Priority and Assignee</h2>
-      <p>
-        Choose a priority level from Urgent, High, Medium, Low, or No Priority. Assign the task
-        to a team member so it appears on their personal board. Both fields can be updated after
-        creation if plans change.
-      </p>
-
-      <h2>Due Dates</h2>
-      <p>
-        Set a due date to keep the task on track. Tasks with passed due dates are highlighted in
-        the list and board views so overdue work is immediately visible to the team.
-      </p>
+      <h2>What a Task Includes</h2>
+      <p>Each task can include:</p>
+      <ul>
+        <li>A description</li>
+        <li>One or more assignees</li>
+        <li>A linked record (order, proposal, or customer)</li>
+        <li>A due date</li>
+        <li>A priority level</li>
+      </ul>
 
       <Callout type="tip">
-        <p>
-          You can also create tasks directly from a customer, order, or proposal detail page. The
-          link to that entity is set automatically.
-        </p>
+        You can also create tasks directly from a customer, order, or proposal
+        detail page. The link to that entity is set automatically.
       </Callout>
     </Article>
   )

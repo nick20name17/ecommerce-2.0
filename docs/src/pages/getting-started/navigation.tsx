@@ -104,23 +104,6 @@ export function Navigation() {
         fields. Type at least two characters to trigger results.
       </Callout>
 
-      <h2>Project switcher</h2>
-
-      <p>
-        If your organization manages multiple EBMS projects, the project switcher
-        appears in the sidebar header. Click it to switch between projects. All
-        data in the application — orders, customers, products, tasks — is scoped
-        to the active project. Switching projects reloads the relevant data
-        automatically.
-      </p>
-
-      <p>
-        A health indicator next to the project name shows the status of the EBMS
-        connection, backend services, and sync process. Green means everything is
-        healthy. If you see a warning indicator, hover over it for details about
-        which service is affected.
-      </p>
-
       <h2>Notifications</h2>
 
       <p>

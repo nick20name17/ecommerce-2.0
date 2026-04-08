@@ -4,6 +4,7 @@ export interface PickingOrderItem {
   doc_aid: string
   quan: string
   ship: string
+  qty_in_uom?: string
   unit_meas?: string
   descr: string
   price: string

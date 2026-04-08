@@ -5,15 +5,15 @@ import { VideoSlot } from '@/components/video-slot'
 export function ProductsOverview() {
   return (
     <Article
-      title="Product Catalog"
-      subtitle="Browse, search, and explore your product inventory."
+      title="Products & Catalog"
+      subtitle="Browse your EBMS inventory items from any device."
     >
-      <h2>Browsing by Category</h2>
       <p>
-        The product catalog organizes items into categories that mirror your EBMS inventory
-        structure. Use the category tree on the left to drill down into specific groups, or
-        expand all categories to browse the full catalog. Selecting a category filters the
-        product list to show only items in that group and its sub-categories.
+        EBMS Online gives users full access to their EBMS inventory items in a
+        clean, <strong>read-only</strong> web-based format. Browse your entire
+        product catalog from any device, structured the same way you're used to
+        in EBMS. All product information is synced from EBMS — edits are made in
+        the desktop application.
       </p>
 
       <VideoSlot
@@ -21,40 +21,17 @@ export function ProductsOverview() {
         description="See how to navigate the catalog by category and search for products."
       />
 
-      <h2>Searching Products</h2>
+      <h2>Image Sync</h2>
       <p>
-        The search bar supports multiple lookup methods. You can search by:
-      </p>
-      <ul>
-        <li><strong>Item ID</strong> — the unique product identifier from EBMS.</li>
-        <li><strong>UPC</strong> — the barcode number for scanning workflows.</li>
-        <li><strong>Description</strong> — partial text matches against the product name.</li>
-      </ul>
-      <p>
-        Results update in real time as you type. Combine search with a category selection to
-        narrow results further.
-      </p>
-
-      <h2>Product Pricing</h2>
-      <p>
-        Each product row in the catalog displays its list price. When you are working within an
-        order or proposal for a specific customer, the catalog automatically adjusts to show
-        customer-specific pricing based on the customer's assigned price level. This ensures
-        that the price you see is the price the customer will pay.
+        Optionally, an <strong>image sync tool</strong> can be set up on your
+        server to pull product images into the catalog — so your team can see
+        what they're looking at, not just a part number. This is configured by
+        the EBMS Online team during setup.
       </p>
 
       <Callout type="info">
-        <p>
-          Customer-specific pricing only appears when browsing products in the context of an
-          order or proposal. The standalone catalog view shows standard list prices.
-        </p>
-      </Callout>
-
-      <Callout type="tip">
-        <p>
-          Use the UPC search to quickly add products during order creation if you have a barcode
-          scanner connected. The search field accepts scanned input directly.
-        </p>
+        All product information is synced from EBMS. To update product details,
+        make changes in your EBMS desktop application.
       </Callout>
     </Article>
   )

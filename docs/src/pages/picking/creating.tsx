@@ -11,9 +11,10 @@ export function StartPicking() {
     >
       <h2>Creating a Pick List</h2>
       <p>
-        Pick lists are created from the order detail page or from the picking section directly.
-        The creation flow lets you choose which line items to include, set the exact quantities
-        to pick, and specify where the package should be shipped.
+        To create a pick list, select an order — then EBMS Online gives you the
+        option to pull in any other open orders from that same customer. From
+        there, the picker works through one consolidated list instead of bouncing
+        between orders.
       </p>
 
       <Steps>

@@ -65,6 +65,7 @@ const sections: SidebarSection[] = [
       { label: 'Creating Proposals', href: '/proposals/creating' },
       { label: 'Proposal Workflow', href: '/proposals/workflow' },
       { label: 'Converting to Orders', href: '/proposals/converting' },
+      { label: 'Assign & Collaborate', href: '/proposals/assign' },
     ],
   },
   {
@@ -98,7 +99,7 @@ const sections: SidebarSection[] = [
     ],
   },
   {
-    title: 'Tasks',
+    title: 'Web Tasks',
     icon: CheckSquare,
     links: [
       { label: 'Overview', href: '/tasks' },
