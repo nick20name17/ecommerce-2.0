@@ -1,5 +1,4 @@
 import { Article } from '@/components/article'
-import { Step, Steps } from '@/components/step'
 import { Callout } from '@/components/callout'
 import { VideoSlot } from '@/components/video-slot'
 
@@ -7,64 +6,59 @@ export function ConvertingProposals() {
   return (
     <Article
       title="Converting to Orders"
-      subtitle="Turn an approved proposal into a live order with one click."
+      subtitle="Turn an approved proposal into a live order — one of the most powerful features in EBMS Online."
     >
-      <h2>When to Convert</h2>
       <p>
-        Once your customer has reviewed and approved a proposal, you can convert it into a full
-        order. Conversion copies all line items, pricing, and customer information into a new
-        order record that enters the standard order lifecycle. This is the bridge between quoting
-        and fulfillment.
+        One of the most powerful features in EBMS Online is the ability to{' '}
+        <strong>convert a proposal into a sales order</strong>.
       </p>
-
-      <h2>How to Convert</h2>
-      <Steps>
-        <Step number={1} title="Open the proposal">
-          <p>
-            Navigate to the proposal detail page by clicking the proposal row in the list view.
-          </p>
-        </Step>
-        <Step number={2} title="Click Convert to Order">
-          <p>
-            In the proposal header, click the <strong>Convert to Order</strong> button. A
-            confirmation dialog appears showing the line items and totals that will be carried
-            over.
-          </p>
-        </Step>
-        <Step number={3} title="Confirm the conversion">
-          <p>
-            Review the summary and click <strong>Confirm</strong>. EBMS creates the new order
-            and redirects you to the order detail page automatically.
-          </p>
-        </Step>
-      </Steps>
 
       <VideoSlot
         title="Converting a proposal to an order"
         description="See the one-click conversion flow in action."
       />
 
-      <h2>What Happens to the Original Proposal</h2>
+      <h2>How It Works</h2>
       <p>
-        After conversion, the original proposal is updated with a <strong>Converted</strong> status.
-        It becomes read-only and displays a link to the newly created order. All line items and
-        pricing remain visible for reference, but they cannot be edited.
+        A proposal can be created at any time — on the road, in a meeting, or
+        from the office. When the proposal is ready to move forward, it can be
+        converted directly into an order. The conversion is handled through EBMS
+        — the proposal is replaced by a sales order. This is an all-or-nothing
+        action; partial conversions are not supported.
       </p>
 
-      <Callout type="info">
-        <p>
-          The proposal and its resulting order share the same line item data. If you need to make
-          changes after conversion, edit the order directly. Changes to the order do not flow
-          back to the proposal.
-        </p>
-      </Callout>
+      <h2>When to Use This</h2>
+      <p>
+        This feature is built for workflows where proposals need{' '}
+        <strong>review before becoming orders</strong>:
+      </p>
+      <ul>
+        <li>
+          <strong>Sales reps on the road</strong> — create proposals on-site with
+          a customer, submit them back to the office for review, and the office
+          converts approved proposals into orders
+        </li>
+        <li>
+          <strong>Approval workflows</strong> — any time a quote or estimate
+          needs sign-off before it becomes a committed order
+        </li>
+        <li>
+          <strong>Separation of duties</strong> — let field teams sell and office
+          teams process, with a clean handoff point
+        </li>
+      </ul>
+
+      <h2>Why It Matters</h2>
+      <p>
+        Converting proposals to orders keeps your pipeline visible and your data
+        clean. Every order has a traceable origin — you know who created the
+        proposal and when it was approved.
+      </p>
 
       <Callout type="warning">
-        <p>
-          Conversion is a one-way action. Once a proposal has been converted, it cannot be
-          reverted back to an open proposal. Make sure the customer has fully approved before
-          proceeding.
-        </p>
+        Conversion is a one-way action. Once a proposal has been converted, it
+        cannot be reverted back to an open proposal. Make sure the customer has
+        fully approved before proceeding.
       </Callout>
     </Article>
   )

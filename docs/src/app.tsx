@@ -8,20 +8,27 @@ const GettingStarted = lazy(() => import('./pages/getting-started/index').then(m
 const SigningIn = lazy(() => import('./pages/getting-started/signing-in').then(m => ({ default: m.SigningIn })))
 const Navigation = lazy(() => import('./pages/getting-started/navigation').then(m => ({ default: m.Navigation })))
 const Dashboard = lazy(() => import('./pages/dashboard/index').then(m => ({ default: m.Dashboard })))
+const WidgetsAndMetrics = lazy(() => import('./pages/dashboard/widgets').then(m => ({ default: m.WidgetsAndMetrics })))
 const OrdersOverview = lazy(() => import('./pages/orders/index').then(m => ({ default: m.OrdersOverview })))
 const CreatingOrders = lazy(() => import('./pages/orders/creating').then(m => ({ default: m.CreatingOrders })))
 const OrderDetails = lazy(() => import('./pages/orders/details').then(m => ({ default: m.OrderDetails })))
 const OrderFiltering = lazy(() => import('./pages/orders/filtering').then(m => ({ default: m.OrderFiltering })))
 const AssigningUsers = lazy(() => import('./pages/orders/assigning').then(m => ({ default: m.AssigningUsers })))
+const LineItems = lazy(() => import('./pages/orders/line-items').then(m => ({ default: m.LineItems })))
+const OrderAssignAndCollaborate = lazy(() => import('./pages/orders/assign').then(m => ({ default: m.OrderAssignAndCollaborate })))
 const ProposalsOverview = lazy(() => import('./pages/proposals/index').then(m => ({ default: m.ProposalsOverview })))
 const CreatingProposals = lazy(() => import('./pages/proposals/creating').then(m => ({ default: m.CreatingProposals })))
 const ConvertingProposals = lazy(() => import('./pages/proposals/converting').then(m => ({ default: m.ConvertingProposals })))
+const ProposalAssignAndCollaborate = lazy(() => import('./pages/proposals/assign').then(m => ({ default: m.ProposalAssignAndCollaborate })))
 const CustomersOverview = lazy(() => import('./pages/customers/index').then(m => ({ default: m.CustomersOverview })))
 const CustomerDetails = lazy(() => import('./pages/customers/details').then(m => ({ default: m.CustomerDetails })))
 const ManagingCustomers = lazy(() => import('./pages/customers/managing').then(m => ({ default: m.ManagingCustomers })))
+const AddressesAndContacts = lazy(() => import('./pages/customers/addresses').then(m => ({ default: m.AddressesAndContacts })))
 const ProductsOverview = lazy(() => import('./pages/products/index').then(m => ({ default: m.ProductsOverview })))
 const ProductConfigurations = lazy(() => import('./pages/products/configurations').then(m => ({ default: m.ProductConfigurations })))
 const CartAndCheckout = lazy(() => import('./pages/products/cart').then(m => ({ default: m.CartAndCheckout })))
+const ProductCategories = lazy(() => import('./pages/products/categories').then(m => ({ default: m.ProductCategories })))
+const ProductPricing = lazy(() => import('./pages/products/pricing').then(m => ({ default: m.ProductPricing })))
 const PickListsOverview = lazy(() => import('./pages/picking/index').then(m => ({ default: m.PickListsOverview })))
 const StartPicking = lazy(() => import('./pages/picking/creating').then(m => ({ default: m.StartPicking })))
 const ShippingRatesAndLabels = lazy(() => import('./pages/picking/shipping').then(m => ({ default: m.ShippingRatesAndLabels })))
@@ -29,6 +36,7 @@ const ManagingPickLists = lazy(() => import('./pages/picking/managing').then(m =
 const TasksOverview = lazy(() => import('./pages/tasks/index').then(m => ({ default: m.TasksOverview })))
 const CreatingTasks = lazy(() => import('./pages/tasks/creating').then(m => ({ default: m.CreatingTasks })))
 const ManagingTasks = lazy(() => import('./pages/tasks/managing').then(m => ({ default: m.ManagingTasks })))
+const TaskBoard = lazy(() => import('./pages/tasks/board').then(m => ({ default: m.TaskBoard })))
 const SettingsOverview = lazy(() => import('./pages/settings/index').then(m => ({ default: m.SettingsOverview })))
 const FieldConfiguration = lazy(() => import('./pages/settings/fields').then(m => ({ default: m.FieldConfiguration })))
 const FilterPresets = lazy(() => import('./pages/settings/filters').then(m => ({ default: m.FilterPresets })))
@@ -120,7 +128,7 @@ export function App() {
 
       {/* Main content */}
       <main className="pt-14 lg:pl-[260px]">
-        <div className="mx-auto max-w-[720px] px-6 py-10 lg:px-8">
+        <div className="mx-auto max-w-[960px] px-6 py-10 lg:px-8">
           <Suspense fallback={<div className="py-20 text-center text-sm text-muted-foreground">Loading...</div>}>
             <Routes>
               <Route path="/" element={<Navigate to="/getting-started" replace />} />
@@ -128,20 +136,27 @@ export function App() {
               <Route path="/getting-started/signing-in" element={<SigningIn />} />
               <Route path="/getting-started/navigation" element={<Navigation />} />
               <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/dashboard/widgets" element={<WidgetsAndMetrics />} />
               <Route path="/orders" element={<OrdersOverview />} />
               <Route path="/orders/creating" element={<CreatingOrders />} />
               <Route path="/orders/details" element={<OrderDetails />} />
               <Route path="/orders/filtering" element={<OrderFiltering />} />
               <Route path="/orders/assigning" element={<AssigningUsers />} />
+              <Route path="/orders/line-items" element={<LineItems />} />
+              <Route path="/orders/assign" element={<OrderAssignAndCollaborate />} />
               <Route path="/proposals" element={<ProposalsOverview />} />
               <Route path="/proposals/creating" element={<CreatingProposals />} />
               <Route path="/proposals/converting" element={<ConvertingProposals />} />
+              <Route path="/proposals/assign" element={<ProposalAssignAndCollaborate />} />
               <Route path="/customers" element={<CustomersOverview />} />
               <Route path="/customers/details" element={<CustomerDetails />} />
               <Route path="/customers/managing" element={<ManagingCustomers />} />
+              <Route path="/customers/addresses" element={<AddressesAndContacts />} />
               <Route path="/products" element={<ProductsOverview />} />
               <Route path="/products/configurations" element={<ProductConfigurations />} />
               <Route path="/products/cart" element={<CartAndCheckout />} />
+              <Route path="/products/categories" element={<ProductCategories />} />
+              <Route path="/products/pricing" element={<ProductPricing />} />
               <Route path="/picking" element={<PickListsOverview />} />
               <Route path="/picking/creating" element={<StartPicking />} />
               <Route path="/picking/shipping" element={<ShippingRatesAndLabels />} />
@@ -149,6 +164,7 @@ export function App() {
               <Route path="/tasks" element={<TasksOverview />} />
               <Route path="/tasks/creating" element={<CreatingTasks />} />
               <Route path="/tasks/managing" element={<ManagingTasks />} />
+              <Route path="/tasks/board" element={<TaskBoard />} />
               <Route path="/settings" element={<SettingsOverview />} />
               <Route path="/settings/fields" element={<FieldConfiguration />} />
               <Route path="/settings/filters" element={<FilterPresets />} />

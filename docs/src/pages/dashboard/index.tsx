@@ -90,11 +90,6 @@ export function Dashboard() {
         the rest of the order book.
       </p>
 
-      <Callout type="info">
-        Dashboard data is scoped to the currently active project. If you manage
-        multiple projects, make sure you have selected the correct one in the
-        project switcher before drawing conclusions from the numbers.
-      </Callout>
     </Article>
   )
 }
