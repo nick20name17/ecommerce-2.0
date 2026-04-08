@@ -34,7 +34,7 @@ const SECTIONS: { value: SettingsSection; label: string }[] = [
 const SettingsPage = () => {
   const [projectId] = useProjectId()
   const { user } = useAuth()
-  const shippingEnabled = user?.shipping_enabled !== false
+  const shippingEnabled = user?.shipping_enabled === true
   const [section, setSection] = useQueryState('section', parseAsString)
 
   const visibleSections = shippingEnabled ? SECTIONS : SECTIONS.filter(s => s.value !== 'shipping')

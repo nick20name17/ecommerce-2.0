@@ -233,7 +233,7 @@ export const NavMain = () => {
   const pendingOrders = usePendingOrders()
   const pendingProposals = usePendingProposals()
 
-  const shippingEnabled = user?.shipping_enabled !== false
+  const shippingEnabled = user?.shipping_enabled === true
 
   const filterItems = (items: NavItem[]) =>
     items.filter((item) => {

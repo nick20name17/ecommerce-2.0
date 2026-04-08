@@ -82,7 +82,7 @@ function getOrderDisplay(shipment: ShipmentRecord): string {
 
 const ShippingPage = () => {
   const { user } = useAuth()
-  const shippingEnabled = user?.shipping_enabled !== false
+  const shippingEnabled = user?.shipping_enabled === true
   const bp = useBreakpoint()
   const isMobile = bp === 'mobile'
   const isTablet = bp === 'tablet'

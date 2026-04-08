@@ -55,7 +55,7 @@ const PickListDetailPage = () => {
   const { pickListId } = Route.useParams()
   const id = Number(pickListId)
   const { user } = useAuth()
-  const shippingEnabled = user?.shipping_enabled !== false
+  const shippingEnabled = user?.shipping_enabled === true
   const bp = useBreakpoint()
   const isMobile = bp === 'mobile'
   const queryClient = useQueryClient()
