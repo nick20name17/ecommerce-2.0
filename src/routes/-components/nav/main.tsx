@@ -4,6 +4,7 @@ import { Link } from '@tanstack/react-router'
 import { getTasksQuery, getTaskStatusesQuery } from '@/api/task/query'
 import {
   IActivity,
+  ICatalog,
   ICustomers,
   IDashboard,
   IDev,
@@ -15,6 +16,7 @@ import {
   ISettings,
   IShipping,
   ITodos,
+  IVariableProducts,
 } from '@/components/ds'
 import { isAdmin, isSuperAdmin } from '@/constants/user'
 import { usePendingOrders, usePendingProposals } from '@/hooks/use-pending-orders'
@@ -105,6 +107,22 @@ const WORKSPACE_ITEMS: NavItem[] = [
     url: '/activity',
     icon: IActivity,
     iconBg: 'bg-slate-500',
+    iconColor: 'text-white',
+    adminOnly: true,
+  },
+  {
+    title: 'Catalog',
+    url: '/catalog',
+    icon: ICatalog,
+    iconBg: 'bg-green-500',
+    iconColor: 'text-white',
+    adminOnly: true,
+  },
+  {
+    title: 'Variable Products',
+    url: '/variable-products',
+    icon: IVariableProducts,
+    iconBg: 'bg-purple-500',
     iconColor: 'text-white',
     adminOnly: true,
   },

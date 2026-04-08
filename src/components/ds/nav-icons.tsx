@@ -8,7 +8,9 @@ import {
   ClipboardList,
   Crosshair,
   FlaskConical,
+  FolderTree,
   Home,
+  Layers,
   LayoutList,
   ListChecks,
   Package,
@@ -38,3 +40,5 @@ export const IPickLists: IC = ({ className }) => <ClipboardList className={class
 export const IDev: IC = ({ className }) => <Rocket className={className} />
 export const IPicking: IC = ({ className }) => <Crosshair className={className} />
 export const IActivity: IC = ({ className }) => <ListChecks className={className} />
+export const ICatalog: IC = ({ className }) => <FolderTree className={className} />
+export const IVariableProducts: IC = ({ className }) => <Layers className={className} />

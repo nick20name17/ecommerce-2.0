@@ -40,5 +40,15 @@ export const projectService = {
   delete: async (id: number) => {
     const { data } = await api.delete<Project>(`/projects/${id}/`)
     return data
-  }
+  },
+
+  createEcTables: async (projectId: number) => {
+    const { data } = await api.post<{
+      tables_created: string[]
+      tables_existing: string[]
+      indexes_created: string[]
+      errors: string[]
+    }>('/projects/ec-tables/', null, { params: { project_id: projectId } })
+    return data
+  },
 }

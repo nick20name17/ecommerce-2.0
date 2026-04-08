@@ -2,6 +2,7 @@ import { createFileRoute, redirect } from '@tanstack/react-router'
 import { parseAsString, useQueryState } from 'nuqs'
 
 import { SidebarTrigger } from '@/components/ui/sidebar'
+import { CatalogSection } from './-components/catalog-section'
 import { DataControlSection } from './-components/data-control-section'
 import { FilterGroupsSection } from './-components/filter-groups-section'
 import { GeneralSection } from './-components/general-section'
@@ -18,7 +19,7 @@ import { useAuth } from '@/providers/auth'
 
 // ── Section definitions ─────────────────────────────────────
 
-type SettingsSection = 'general' | 'data-control' | 'filters' | 'tasks' | 'shipping' | 'users'
+type SettingsSection = 'general' | 'data-control' | 'filters' | 'tasks' | 'shipping' | 'users' | 'catalog'
 
 const SECTIONS: { value: SettingsSection; label: string }[] = [
   { value: 'general', label: 'General' },
@@ -26,6 +27,7 @@ const SECTIONS: { value: SettingsSection; label: string }[] = [
   { value: 'filters', label: 'Filters' },
   { value: 'tasks', label: 'Statuses' },
   { value: 'shipping', label: 'Shipping' },
+  { value: 'catalog', label: 'Catalog Setup' },
   { value: 'users', label: 'Users' },
 ]
 
@@ -94,6 +96,7 @@ const SettingsPage = () => {
           {currentSection === 'filters' && <FilterGroupsSection />}
           {currentSection === 'tasks' && <TasksSection projectId={projectId} />}
           {currentSection === 'shipping' && <ShippingSection projectId={projectId} />}
+          {currentSection === 'catalog' && <CatalogSection projectId={projectId} />}
           {currentSection === 'users' && <UsersSection />}
         </div>
       </div>
