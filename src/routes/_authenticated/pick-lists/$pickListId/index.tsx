@@ -15,7 +15,7 @@ import {
 } from 'lucide-react'
 import { useMemo, useState } from 'react'
 
-
+import { useAuth } from '@/providers/auth'
 import { PICK_LIST_QUERY_KEYS, getPickListDetailQuery } from '@/api/pick-list/query'
 import { pickListService } from '@/api/pick-list/service'
 import { ShippingDialog } from './-components/shipping-dialog'
@@ -54,6 +54,8 @@ function formatQty(v: string) {
 const PickListDetailPage = () => {
   const { pickListId } = Route.useParams()
   const id = Number(pickListId)
+  const { user } = useAuth()
+  const shippingEnabled = user?.shipping_enabled !== false
   const bp = useBreakpoint()
   const isMobile = bp === 'mobile'
   const queryClient = useQueryClient()
@@ -191,13 +193,13 @@ const PickListDetailPage = () => {
 
         {/* Actions */}
         <div className='flex items-center gap-1.5'>
-          {isPushed && (
+          {shippingEnabled && isPushed && (
             <Button size='sm' onClick={() => setShippingOpen(true)}>
               <Box className='size-3.5' />
               {!isMobile && 'Create Package'}
             </Button>
           )}
-          {isRatesFetched && (
+          {shippingEnabled && isRatesFetched && (
             <Button size='sm' onClick={() => setShippingOpen(true)}>
               <Truck className='size-3.5' />
               {!isMobile && 'Purchase Label'}
@@ -209,7 +211,7 @@ const PickListDetailPage = () => {
               {!isMobile && 'Retry Push'}
             </Button>
           )}
-          {isLabelPurchased && (
+          {shippingEnabled && isLabelPurchased && (
             <Button
               size='sm'
               variant='outline'
@@ -249,7 +251,7 @@ const PickListDetailPage = () => {
                   <span>{formatDateTimeMedium(pickList.created_at)}</span>
                 </div>
                 <div className='mt-3'>
-                  <StatusLifecycle currentStatus={pickList.status} />
+                  <StatusLifecycle currentStatus={pickList.status} shippingEnabled={shippingEnabled} />
                 </div>
               </div>
 
@@ -333,7 +335,7 @@ const PickListDetailPage = () => {
           </div>
 
           {/* Shipments */}
-          {allShipments.length > 0 && (
+          {shippingEnabled && allShipments.length > 0 && (
             <div className='mb-6'>
               <div className='mb-3 flex items-center gap-2'>
                 <Truck className='size-4 text-text-tertiary' />
@@ -385,7 +387,9 @@ const PickListDetailPage = () => {
       </div>
 
       {/* Dialogs */}
-      <ShippingDialog pickList={pickList} open={shippingOpen} onOpenChange={setShippingOpen} />
+      {shippingEnabled && (
+        <ShippingDialog pickList={pickList} open={shippingOpen} onOpenChange={setShippingOpen} />
+      )}
 
       <AlertDialog open={deleteOpen} onOpenChange={setDeleteOpen}>
         <AlertDialogContent>
@@ -405,23 +409,25 @@ const PickListDetailPage = () => {
         </AlertDialogContent>
       </AlertDialog>
 
-      <AlertDialog open={voidOpen} onOpenChange={setVoidOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogMedia className='bg-destructive/10 text-destructive'><TriangleAlert /></AlertDialogMedia>
-            <AlertDialogTitle>Void Label</AlertDialogTitle>
-            <AlertDialogDescription>
-              This will void the shipping label. The pick list will return to pushed status.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction variant='destructive' onClick={() => voidMutation.mutate()} isPending={voidMutation.isPending}>
-              Void Label
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      {shippingEnabled && (
+        <AlertDialog open={voidOpen} onOpenChange={setVoidOpen}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogMedia className='bg-destructive/10 text-destructive'><TriangleAlert /></AlertDialogMedia>
+              <AlertDialogTitle>Void Label</AlertDialogTitle>
+              <AlertDialogDescription>
+                This will void the shipping label. The pick list will return to pushed status.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction variant='destructive' onClick={() => voidMutation.mutate()} isPending={voidMutation.isPending}>
+                Void Label
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      )}
     </div>
   )
 }
@@ -429,18 +435,19 @@ const PickListDetailPage = () => {
 // ── Status Lifecycle ─────────────────────────────────────────
 
 const LIFECYCLE_STEPS = [
-  { status: PICK_LIST_STATUS.pushed, label: 'Pushed to EBMS' },
-  { status: PICK_LIST_STATUS.ratesFetched, label: 'Rates Fetched' },
-  { status: PICK_LIST_STATUS.labelPurchased, label: 'Label Purchased' },
+  { status: PICK_LIST_STATUS.pushed, label: 'Pushed to EBMS', shipping: false },
+  { status: PICK_LIST_STATUS.ratesFetched, label: 'Rates Fetched', shipping: true },
+  { status: PICK_LIST_STATUS.labelPurchased, label: 'Label Purchased', shipping: true },
 ] as const
 
-function StatusLifecycle({ currentStatus }: { currentStatus: string }) {
-  const currentIndex = LIFECYCLE_STEPS.findIndex((s) => s.status === currentStatus)
+function StatusLifecycle({ currentStatus, shippingEnabled }: { currentStatus: string; shippingEnabled: boolean }) {
+  const steps = shippingEnabled ? LIFECYCLE_STEPS : LIFECYCLE_STEPS.filter((s) => !s.shipping)
+  const currentIndex = steps.findIndex((s) => s.status === currentStatus)
   const isPartiallyFailed = currentStatus === PICK_LIST_STATUS.partiallyFailed
 
   return (
     <div className='flex items-center gap-1'>
-      {LIFECYCLE_STEPS.map((step, i) => {
+      {steps.map((step, i) => {
         const isActive = step.status === currentStatus
         const isPast = currentIndex >= 0 && i < currentIndex
         return (

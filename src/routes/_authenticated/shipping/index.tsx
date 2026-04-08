@@ -49,6 +49,7 @@ import { useBreakpoint } from '@/hooks/use-breakpoint'
 import { useProjectId } from '@/hooks/use-project-id'
 import { useLimitParam, useOffsetParam } from '@/hooks/use-query-params'
 import { cn } from '@/lib/utils'
+import { useAuth } from '@/providers/auth'
 
 // ── Helpers ──────────────────────────────────────────────────
 
@@ -80,6 +81,8 @@ function getOrderDisplay(shipment: ShipmentRecord): string {
 // ── Page Component ───────────────────────────────────────────
 
 const ShippingPage = () => {
+  const { user } = useAuth()
+  const shippingEnabled = user?.shipping_enabled !== false
   const bp = useBreakpoint()
   const isMobile = bp === 'mobile'
   const isTablet = bp === 'tablet'
@@ -103,9 +106,27 @@ const ShippingPage = () => {
   const { data, isLoading } = useQuery({
     ...getShipmentsQuery(queryParams),
     placeholderData: keepPreviousData,
+    enabled: shippingEnabled,
   })
   const shipments = data?.results ?? []
   const totalCount = data?.count ?? 0
+
+  if (!shippingEnabled) {
+    return (
+      <div className='flex h-full flex-col overflow-hidden'>
+        <header className='flex h-12 shrink-0 items-center gap-2.5 border-b border-border px-6'>
+          <SidebarTrigger className='-ml-1' />
+          <PageHeaderIcon icon={IShipping} color={PAGE_COLORS.shipping} />
+          <h1 className='text-[14px] font-semibold tracking-[-0.01em]'>Shipping</h1>
+        </header>
+        <PageEmpty
+          icon={Truck}
+          title='Shipping is not enabled'
+          description='Shipping is not enabled for this project. Contact your administrator to enable it.'
+        />
+      </div>
+    )
+  }
 
   const hasFilters = voidedFilter !== 'all'
 
