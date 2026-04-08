@@ -177,12 +177,10 @@ export function StartPickingDialog({
   const createMutation = useMutation({
     mutationFn: async () => {
       if (!shipTo) throw new Error('No ship-to address')
-      if (!defaultShippingAddressId) throw new Error('No shipping address configured. Add one in Settings → Shipping.')
-
       // 1. Create pick list
       const pickList = await pickListService.create({
         ship_to: shipTo,
-        shipping_address_id: defaultShippingAddressId,
+        ...(defaultShippingAddressId ? { shipping_address_id: defaultShippingAddressId } : {}),
         name: `${customerName} picking`,
       })
 
@@ -320,12 +318,6 @@ export function StartPickingDialog({
           {/* Step 2: Set pick quantities — grouped by order */}
           {step === 'set-quantities' && (
             <div className='min-h-0 flex-1 space-y-3 overflow-y-auto'>
-              {!defaultShippingAddressId && (
-                <div className='flex items-center gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-[12px] text-amber-800 dark:border-amber-800 dark:bg-amber-500/10 dark:text-amber-300'>
-                  <span className='font-medium'>No shipping address configured.</span>
-                  <span className='text-amber-600 dark:text-amber-400'>Add one in Settings → Shipping to create pick lists.</span>
-                </div>
-              )}
               {/* Global actions */}
               <div className='flex items-center gap-3'>
                 <button
@@ -491,7 +483,7 @@ export function StartPickingDialog({
                 <ArrowLeft className='size-3.5' />
                 Back
               </Button>
-              <Button onClick={() => setConfirmOpen(true)} disabled={!hasAnyPicked || !defaultShippingAddressId}>
+              <Button onClick={() => setConfirmOpen(true)} disabled={!hasAnyPicked}>
                 <Check className='size-3.5' />
                 Create Pick List
               </Button>

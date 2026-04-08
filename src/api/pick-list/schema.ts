@@ -102,7 +102,7 @@ export interface ShippingSelectionResponse {
 
 export interface CreatePickListPayload {
   ship_to: ShipTo
-  shipping_address_id: number
+  shipping_address_id?: number
   name?: string
   notes?: string
 }
