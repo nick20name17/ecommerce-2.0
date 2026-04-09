@@ -10,7 +10,7 @@ import { ShippingSection } from './-components/shipping-section'
 import { TasksSection } from './-components/tasks-section'
 import { UsersSection } from './-components/users-section'
 import { ISettings, PAGE_COLORS, PageHeaderIcon } from '@/components/ds'
-import { isAdmin } from '@/constants/user'
+import { isAdmin, isSuperAdmin } from '@/constants/user'
 import type { UserRole } from '@/constants/user'
 import { getSession } from '@/helpers/auth'
 import { useProjectId } from '@/hooks/use-project-id'
@@ -37,9 +37,14 @@ const SettingsPage = () => {
   const [projectId] = useProjectId()
   const { user } = useAuth()
   const shippingEnabled = user?.shipping_enabled === true
+  const userIsSuperAdmin = !!user?.role && isSuperAdmin(user.role)
   const [section, setSection] = useQueryState('section', parseAsString)
 
-  const visibleSections = shippingEnabled ? SECTIONS : SECTIONS.filter(s => s.value !== 'shipping')
+  const visibleSections = SECTIONS.filter(s => {
+    if (s.value === 'shipping' && !shippingEnabled) return false
+    if (s.value === 'catalog' && !userIsSuperAdmin) return false
+    return true
+  })
   const currentSection = (section ?? 'general') as SettingsSection
 
   if (!projectId) {
