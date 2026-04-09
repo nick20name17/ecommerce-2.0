@@ -1,22 +1,27 @@
 import { api } from '..'
 
 import type {
+  CreateSpecOptionPayload,
+  CreateSpecPayload,
   CreateVariableProductPayload,
   CreateVPItemPayload,
-  CreateVPSpecPayload,
-  CreateVPSpecValuePayload,
+  GlobalSpecDefinition,
   ImportAllVPPayload,
   ImportFromSuperIdPayload,
   ImportVPResponse,
+  ItemSpecLink,
+  LinkItemSpecPayload,
+  MergeSpecsPayload,
+  SpecListResponse,
+  SpecOption,
+  SpecParams,
+  UpdateSpecOptionPayload,
+  UpdateSpecPayload,
   UpdateVariableProductPayload,
-  UpdateVPSpecPayload,
-  UpdateVPSpecValuePayload,
   VariableProduct,
   VariableProductItem,
   VariableProductListResponse,
   VariableProductParams,
-  VariableProductSpec,
-  VariableProductSpecValue,
 } from './schema'
 
 export const variableProductService = {
@@ -67,73 +72,123 @@ export const variableProductService = {
     await api.delete(`/variable-products/${vpId}/items/${itemId}/`, { params })
   },
 
-  // ── Spec Definitions ─────────────────────────────────────────
+  // ── Global Spec Definitions ─────────────────────────────────
 
-  addSpec: async (vpId: string, payload: CreateVPSpecPayload, params: { project_id?: number }) => {
-    const { data } = await api.post<VariableProductSpec>(
-      `/variable-products/${vpId}/specs/`,
+  listSpecs: async (params: SpecParams = {}) => {
+    const { data } = await api.get<SpecListResponse>('/variable-products/specs/', { params })
+    return data
+  },
+
+  getSpec: async (specId: string, params: SpecParams = {}) => {
+    const { data } = await api.get<GlobalSpecDefinition>(`/variable-products/specs/${specId}/`, {
+      params,
+    })
+    return data
+  },
+
+  createSpec: async (payload: CreateSpecPayload, params: SpecParams = {}) => {
+    const { data } = await api.post<GlobalSpecDefinition>('/variable-products/specs/', payload, {
+      params,
+    })
+    return data
+  },
+
+  updateSpec: async (specId: string, payload: UpdateSpecPayload, params: SpecParams = {}) => {
+    const { data } = await api.patch<GlobalSpecDefinition>(
+      `/variable-products/specs/${specId}/`,
       payload,
       { params }
     )
     return data
   },
 
-  updateSpec: async (
-    vpId: string,
+  deleteSpec: async (specId: string, params: SpecParams = {}) => {
+    await api.delete(`/variable-products/specs/${specId}/`, { params })
+  },
+
+  // ── Spec Options ────────────────────────────────────────────
+
+  listSpecOptions: async (specId: string, params: SpecParams = {}) => {
+    const { data } = await api.get<SpecOption[]>(`/variable-products/specs/${specId}/options/`, {
+      params,
+    })
+    return data
+  },
+
+  createSpecOption: async (
     specId: string,
-    payload: UpdateVPSpecPayload,
-    params: { project_id?: number }
+    payload: CreateSpecOptionPayload,
+    params: SpecParams = {}
   ) => {
-    const { data } = await api.patch<VariableProductSpec>(
-      `/variable-products/${vpId}/specs/${specId}/`,
+    const { data } = await api.post<SpecOption>(
+      `/variable-products/specs/${specId}/options/`,
       payload,
       { params }
     )
     return data
   },
 
-  deleteSpec: async (vpId: string, specId: string, params: { project_id?: number }) => {
-    await api.delete(`/variable-products/${vpId}/specs/${specId}/`, { params })
-  },
-
-  // ── Spec Values ──────────────────────────────────────────────
-
-  addSpecValue: async (
-    vpId: string,
+  updateSpecOption: async (
     specId: string,
-    payload: CreateVPSpecValuePayload,
-    params: { project_id?: number }
+    optionId: string,
+    payload: UpdateSpecOptionPayload,
+    params: SpecParams = {}
   ) => {
-    const { data } = await api.post<VariableProductSpecValue>(
-      `/variable-products/${vpId}/specs/${specId}/values/`,
+    const { data } = await api.patch<SpecOption>(
+      `/variable-products/specs/${specId}/options/${optionId}/`,
       payload,
       { params }
     )
     return data
   },
 
-  updateSpecValue: async (
-    vpId: string,
-    specId: string,
-    valueId: string,
-    payload: UpdateVPSpecValuePayload,
-    params: { project_id?: number }
-  ) => {
-    const { data } = await api.patch<VariableProductSpecValue>(
-      `/variable-products/${vpId}/specs/${specId}/values/${valueId}/`,
+  deleteSpecOption: async (specId: string, optionId: string, params: SpecParams = {}) => {
+    await api.delete(`/variable-products/specs/${specId}/options/${optionId}/`, { params })
+  },
+
+  // ── Spec Merge ──────────────────────────────────────────────
+
+  mergeSpecs: async (targetSpecId: string, payload: MergeSpecsPayload, params: SpecParams = {}) => {
+    const { data } = await api.post<GlobalSpecDefinition>(
+      `/variable-products/specs/${targetSpecId}/merge/`,
       payload,
       { params }
     )
     return data
   },
 
-  deleteSpecValue: async (
+  // ── Item-Spec Linking ───────────────────────────────────────
+
+  linkItemToOption: async (
     vpId: string,
-    specId: string,
-    valueId: string,
-    params: { project_id?: number }
+    itemId: string,
+    payload: LinkItemSpecPayload,
+    params: SpecParams = {}
   ) => {
-    await api.delete(`/variable-products/${vpId}/specs/${specId}/values/${valueId}/`, { params })
+    const { data } = await api.post<ItemSpecLink>(
+      `/variable-products/${vpId}/items/${itemId}/specs/`,
+      payload,
+      { params }
+    )
+    return data
+  },
+
+  unlinkItemFromOption: async (
+    vpId: string,
+    itemId: string,
+    optionId: string,
+    params: SpecParams = {}
+  ) => {
+    await api.delete(`/variable-products/${vpId}/items/${itemId}/specs/${optionId}/`, { params })
+  },
+
+  // ── Catalog Filtering ───────────────────────────────────────
+
+  filterBySpecs: async (filters: Record<string, string>, params: SpecParams = {}) => {
+    const { data } = await api.get<VariableProductListResponse>('/variable-products/filter/', {
+      params: { ...params, ...filters },
+    })
+    return data
   },
 
   // ── Import ───────────────────────────────────────────────────

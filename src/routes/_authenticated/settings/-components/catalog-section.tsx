@@ -74,7 +74,8 @@ export const CatalogSection = ({ projectId }: CatalogSectionProps) => {
             <div className='flex-1'>
               <h3 className='text-[13px] font-semibold'>1. Create EC Tables</h3>
               <p className='mt-0.5 text-[12px] text-text-tertiary'>
-                Creates EC_CATEGORY, EC_VARIABLE_PRODUCT, and related tables in the mirror database.
+                Creates EC_CATEGORY, EC_CATEGORY_PRODUCT, EC_CATEGORY_VP, EC_VARIABLE_PRODUCT,
+                EC_SPEC_DEFINITION, EC_SPEC_OPTION, and related tables in the mirror database.
                 Safe to run multiple times.
               </p>
               <Button

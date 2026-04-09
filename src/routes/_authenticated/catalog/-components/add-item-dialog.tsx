@@ -34,12 +34,13 @@ export const AddItemDialog = ({
   const [sortOrder, setSortOrder] = useState(0)
 
   const addMutation = useMutation({
-    mutationFn: () =>
-      catalogService.addItem(
-        categoryId,
-        { item_type: itemType, item_id: itemId, sort_order: sortOrder },
-        { project_id: projectId ?? undefined }
-      ),
+    mutationFn: () => {
+      const params = { project_id: projectId ?? undefined }
+      if (itemType === 'product') {
+        return catalogService.addProduct(categoryId, { product_autoid: itemId, sort_order: sortOrder }, params)
+      }
+      return catalogService.addVariableProduct(categoryId, { vp_id: itemId, sort_order: sortOrder }, params)
+    },
     meta: {
       successMessage: 'Item added to category',
       invalidatesQuery: CATALOG_QUERY_KEYS.detail(categoryId),

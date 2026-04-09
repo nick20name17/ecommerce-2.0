@@ -12,14 +12,21 @@ export interface CatalogCategory {
   sort_order: number
   active: boolean
   children: CatalogCategory[]
-  items?: CatalogCategoryItem[]
+  products?: CatalogCategoryProduct[]
+  variable_products?: CatalogCategoryVP[]
 }
 
-export interface CatalogCategoryItem {
+export interface CatalogCategoryProduct {
   id: string
   category_id: string
-  item_type: 'product' | 'variable_product'
-  item_id: string
+  product_autoid: string
+  sort_order: number
+}
+
+export interface CatalogCategoryVP {
+  id: string
+  category_id: string
+  vp_id: string
   sort_order: number
 }
 
@@ -46,9 +53,13 @@ export interface CreateCatalogCategoryPayload {
 
 export type UpdateCatalogCategoryPayload = Partial<CreateCatalogCategoryPayload>
 
-export interface CreateCatalogItemPayload {
-  item_type: 'product' | 'variable_product'
-  item_id: string
+export interface AddCatalogProductPayload {
+  product_autoid: string
+  sort_order?: number
+}
+
+export interface AddCatalogVPPayload {
+  vp_id: string
   sort_order?: number
 }
 

@@ -3,9 +3,9 @@ import { MoreHorizontal, Pencil, Plus, Trash2 } from 'lucide-react'
 import { useState } from 'react'
 
 import type {
+  GlobalSpecDefinition,
   SpecDisplayType,
   VariableProduct,
-  VariableProductSpec,
 } from '@/api/variable-product/schema'
 import { variableProductService } from '@/api/variable-product/service'
 import { VP_QUERY_KEYS } from '@/api/variable-product/query'
@@ -47,21 +47,20 @@ interface VPSpecsSectionProps {
 
 export const VPSpecsSection = ({ vp, projectId }: VPSpecsSectionProps) => {
   const [addOpen, setAddOpen] = useState(false)
-  const [editSpec, setEditSpec] = useState<VariableProductSpec | null>(null)
-  const [deleteSpec, setDeleteSpec] = useState<VariableProductSpec | null>(null)
+  const [editSpec, setEditSpec] = useState<GlobalSpecDefinition | null>(null)
+  const [deleteSpec, setDeleteSpec] = useState<GlobalSpecDefinition | null>(null)
   const [specName, setSpecName] = useState('')
   const [displayType, setDisplayType] = useState<SpecDisplayType>('dropdown')
   const [sortOrder, setSortOrder] = useState(0)
 
   const addSpecMutation = useMutation({
     mutationFn: () =>
-      variableProductService.addSpec(
-        vp.id,
+      variableProductService.createSpec(
         { name: specName, display_type: displayType, sort_order: sortOrder },
         { project_id: projectId ?? undefined }
       ),
     meta: {
-      successMessage: 'Spec added',
+      successMessage: 'Spec created',
       invalidatesQuery: VP_QUERY_KEYS.detail(vp.id),
     },
     onSuccess: () => {
@@ -73,7 +72,6 @@ export const VPSpecsSection = ({ vp, projectId }: VPSpecsSectionProps) => {
   const updateSpecMutation = useMutation({
     mutationFn: () =>
       variableProductService.updateSpec(
-        vp.id,
         editSpec!.id,
         { name: specName, display_type: displayType, sort_order: sortOrder },
         { project_id: projectId ?? undefined }
@@ -90,7 +88,7 @@ export const VPSpecsSection = ({ vp, projectId }: VPSpecsSectionProps) => {
 
   const deleteSpecMutation = useMutation({
     mutationFn: () =>
-      variableProductService.deleteSpec(vp.id, deleteSpec!.id, {
+      variableProductService.deleteSpec(deleteSpec!.id, {
         project_id: projectId ?? undefined,
       }),
     meta: {
@@ -106,7 +104,7 @@ export const VPSpecsSection = ({ vp, projectId }: VPSpecsSectionProps) => {
     setSortOrder(0)
   }
 
-  const openEdit = (spec: VariableProductSpec) => {
+  const openEdit = (spec: GlobalSpecDefinition) => {
     setSpecName(spec.name)
     setDisplayType(spec.display_type)
     setSortOrder(spec.sort_order)
@@ -120,7 +118,7 @@ export const VPSpecsSection = ({ vp, projectId }: VPSpecsSectionProps) => {
     <div>
       <div className='flex items-center gap-2 mb-2'>
         <h3 className='text-[13px] font-semibold text-text-secondary'>
-          Specs ({vp.specs.length})
+          Specs ({vp.spec_definitions.length})
         </h3>
         <div className='flex-1' />
         <Button variant='outline' size='xs' onClick={() => { resetForm(); setAddOpen(true) }}>
@@ -129,13 +127,13 @@ export const VPSpecsSection = ({ vp, projectId }: VPSpecsSectionProps) => {
         </Button>
       </div>
 
-      {vp.specs.length === 0 ? (
+      {vp.spec_definitions.length === 0 ? (
         <div className='rounded-lg border border-dashed border-border py-6 text-center text-[13px] text-text-tertiary'>
           No spec definitions yet
         </div>
       ) : (
         <div className='flex flex-wrap gap-2'>
-          {vp.specs.map((spec) => (
+          {vp.spec_definitions.map((spec) => (
             <div
               key={spec.id}
               className='group flex items-center gap-2 rounded-lg border border-border bg-background px-3 py-2'
@@ -143,7 +141,7 @@ export const VPSpecsSection = ({ vp, projectId }: VPSpecsSectionProps) => {
               <div>
                 <div className='text-[13px] font-medium'>{spec.name}</div>
                 <div className='text-[11px] text-text-tertiary capitalize'>
-                  {spec.display_type} · {spec.values.length} values
+                  {spec.display_type} · {spec.options?.length ?? 0} options
                 </div>
               </div>
               <DropdownMenu>
@@ -266,7 +264,7 @@ export const VPSpecsSection = ({ vp, projectId }: VPSpecsSectionProps) => {
           <DialogHeader>
             <DialogTitle>Delete Spec</DialogTitle>
             <DialogDescription>
-              Delete <strong>{deleteSpec?.name}</strong>? This will also delete all its values.
+              Delete <strong>{deleteSpec?.name}</strong>? This will also delete all its options and item links.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>

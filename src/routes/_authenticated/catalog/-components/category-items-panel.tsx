@@ -3,7 +3,7 @@ import { Box, Layers, Package, Plus, Trash2 } from 'lucide-react'
 import { useState } from 'react'
 
 import { CATALOG_QUERY_KEYS, getCatalogDetailQuery } from '@/api/catalog/query'
-import type { CatalogCategory } from '@/api/catalog/schema'
+import type { CatalogCategory, CatalogCategoryProduct, CatalogCategoryVP } from '@/api/catalog/schema'
 import { catalogService } from '@/api/catalog/service'
 import { PageEmpty } from '@/components/common/page-empty'
 import { Button } from '@/components/ui/button'
@@ -29,15 +29,37 @@ export const CategoryItemsPanel = ({
     getCatalogDetailQuery(category.id, { project_id: projectId ?? undefined })
   )
 
-  const items = data?.items ?? []
+  const products = data?.products ?? []
+  const variableProducts = data?.variable_products ?? []
 
-  const removeItemMutation = useMutation({
-    mutationFn: (itemRecordId: string) =>
-      catalogService.removeItem(category.id, itemRecordId, {
+  // Build a unified list for rendering
+  type UnifiedItem =
+    | { type: 'product'; record: CatalogCategoryProduct }
+    | { type: 'variable_product'; record: CatalogCategoryVP }
+
+  const items: UnifiedItem[] = [
+    ...products.map((p) => ({ type: 'product' as const, record: p })),
+    ...variableProducts.map((vp) => ({ type: 'variable_product' as const, record: vp })),
+  ].sort((a, b) => a.record.sort_order - b.record.sort_order)
+
+  const removeProductMutation = useMutation({
+    mutationFn: (recordId: string) =>
+      catalogService.removeProduct(category.id, recordId, {
         project_id: projectId ?? undefined,
       }),
     meta: {
-      successMessage: 'Item removed',
+      successMessage: 'Product removed',
+      invalidatesQuery: CATALOG_QUERY_KEYS.detail(category.id),
+    },
+  })
+
+  const removeVPMutation = useMutation({
+    mutationFn: (recordId: string) =>
+      catalogService.removeVariableProduct(category.id, recordId, {
+        project_id: projectId ?? undefined,
+      }),
+    meta: {
+      successMessage: 'Variable product removed',
       invalidatesQuery: CATALOG_QUERY_KEYS.detail(category.id),
     },
   })
@@ -96,40 +118,51 @@ export const CategoryItemsPanel = ({
           />
         ) : (
           <div className='flex flex-col'>
-            {items.map((item) => (
-              <div
-                key={item.id}
-                className={cn(
-                  'flex items-center gap-3 border-b border-border-light py-2 hover:bg-bg-hover transition-colors',
-                  isMobile ? 'px-3.5' : 'px-6'
-                )}
-              >
-                {item.item_type === 'product' ? (
-                  <Package className='size-4 text-amber-500 shrink-0' />
-                ) : (
-                  <Layers className='size-4 text-purple-500 shrink-0' />
-                )}
-                <div className='flex-1 min-w-0'>
-                  <div className='text-[13px] font-medium truncate'>{item.item_id}</div>
-                  <div className='text-[11px] text-text-tertiary capitalize'>
-                    {item.item_type.replace('_', ' ')}
-                  </div>
-                </div>
-                {!isMobile && (
-                  <span className='text-[11px] text-text-tertiary tabular-nums'>
-                    #{item.sort_order}
-                  </span>
-                )}
-                <Button
-                  variant='ghost'
-                  size='icon-xs'
-                  className='text-text-tertiary hover:text-destructive'
-                  onClick={() => removeItemMutation.mutate(item.id)}
+            {items.map((unified) => {
+              const isProduct = unified.type === 'product'
+              const record = unified.record
+              const displayId = isProduct
+                ? (record as CatalogCategoryProduct).product_autoid
+                : (record as CatalogCategoryVP).vp_id
+              return (
+                <div
+                  key={record.id}
+                  className={cn(
+                    'flex items-center gap-3 border-b border-border-light py-2 hover:bg-bg-hover transition-colors',
+                    isMobile ? 'px-3.5' : 'px-6'
+                  )}
                 >
-                  <Trash2 className='size-3.5' />
-                </Button>
-              </div>
-            ))}
+                  {isProduct ? (
+                    <Package className='size-4 text-amber-500 shrink-0' />
+                  ) : (
+                    <Layers className='size-4 text-purple-500 shrink-0' />
+                  )}
+                  <div className='flex-1 min-w-0'>
+                    <div className='text-[13px] font-medium truncate'>{displayId}</div>
+                    <div className='text-[11px] text-text-tertiary capitalize'>
+                      {unified.type.replace('_', ' ')}
+                    </div>
+                  </div>
+                  {!isMobile && (
+                    <span className='text-[11px] text-text-tertiary tabular-nums'>
+                      #{record.sort_order}
+                    </span>
+                  )}
+                  <Button
+                    variant='ghost'
+                    size='icon-xs'
+                    className='text-text-tertiary hover:text-destructive'
+                    onClick={() =>
+                      isProduct
+                        ? removeProductMutation.mutate(record.id)
+                        : removeVPMutation.mutate(record.id)
+                    }
+                  >
+                    <Trash2 className='size-3.5' />
+                  </Button>
+                </div>
+              )
+            })}
           </div>
         )}
       </div>

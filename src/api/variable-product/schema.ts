@@ -1,6 +1,37 @@
 import type { PaginationParams } from '@/api/schema'
 
-// ── Variable Product ─────────────────────────────────────────
+// ── Global Spec Definitions ─────────────────────────────────
+
+export type SpecDisplayType = 'swatch' | 'dropdown' | 'button'
+
+export interface SpecOption {
+  id: string
+  value: string
+  slug: string
+  color_hex: string
+  image_url: string
+  hover_text: string
+  sort_order: number
+}
+
+export interface GlobalSpecDefinition {
+  id: string
+  name: string
+  slug: string
+  display_type: SpecDisplayType
+  sort_order: number
+  options?: SpecOption[]
+}
+
+// ── Item Spec Link ──────────────────────────────────────────
+
+export interface ItemSpecLink {
+  id: string
+  item_id: string
+  spec_option_id: string
+}
+
+// ── Variable Product ────────────────────────────────────────
 
 export interface VariableProduct {
   id: string
@@ -12,7 +43,7 @@ export interface VariableProduct {
   sort_order: number
   active: boolean
   items: VariableProductItem[]
-  specs: VariableProductSpec[]
+  spec_definitions: GlobalSpecDefinition[]
 }
 
 export interface VariableProductListItem {
@@ -33,6 +64,7 @@ export interface VariableProductItem {
   product_autoid: string
   is_default: boolean
   sort_order: number
+  specs: Record<string, { option_id: string; value: string }>
   product_id: string
   descr_1: string
   descr_2: string
@@ -46,36 +78,16 @@ export interface VariableProductItem {
   notqtysell: boolean
 }
 
-// ── Spec Definitions ─────────────────────────────────────────
-
-export type SpecDisplayType = 'swatch' | 'dropdown' | 'button'
-
-export interface VariableProductSpec {
-  id: string
-  name: string
-  display_type: SpecDisplayType
-  sort_order: number
-  values: VariableProductSpecValue[]
-}
-
-// ── Spec Values ──────────────────────────────────────────────
-
-export interface VariableProductSpecValue {
-  id: string
-  item_id: string
-  value: string
-  color_hex: string
-  image_url: string
-  hover_text: string
-  sort_order: number
-}
-
 // ── Params ───────────────────────────────────────────────────
 
 export interface VariableProductParams extends PaginationParams {
   project_id?: number
   search?: string
   category_id?: string
+}
+
+export interface SpecParams {
+  project_id?: number
 }
 
 // ── Payloads ─────────────────────────────────────────────────
@@ -99,16 +111,15 @@ export interface CreateVPItemPayload {
   sort_order?: number
 }
 
-export interface CreateVPSpecPayload {
+export interface CreateSpecPayload {
   name: string
   display_type: SpecDisplayType
   sort_order?: number
 }
 
-export type UpdateVPSpecPayload = Partial<CreateVPSpecPayload>
+export type UpdateSpecPayload = Partial<CreateSpecPayload>
 
-export interface CreateVPSpecValuePayload {
-  item_id: string
+export interface CreateSpecOptionPayload {
   value: string
   color_hex?: string
   image_url?: string
@@ -116,7 +127,15 @@ export interface CreateVPSpecValuePayload {
   sort_order?: number
 }
 
-export type UpdateVPSpecValuePayload = Partial<CreateVPSpecValuePayload>
+export type UpdateSpecOptionPayload = Partial<CreateSpecOptionPayload>
+
+export interface MergeSpecsPayload {
+  source_id: string
+}
+
+export interface LinkItemSpecPayload {
+  spec_option_id: string
+}
 
 export interface ImportFromSuperIdPayload {
   super_id: string
@@ -134,6 +153,13 @@ export interface VariableProductListResponse {
   limit: number
   offset: number
   results: VariableProductListItem[]
+}
+
+export interface SpecListResponse {
+  count: number
+  limit: number
+  offset: number
+  results: GlobalSpecDefinition[]
 }
 
 export interface ImportVPResponse {

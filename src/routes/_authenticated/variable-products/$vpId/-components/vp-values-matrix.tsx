@@ -3,10 +3,9 @@ import { Plus, Trash2 } from 'lucide-react'
 import { useState } from 'react'
 
 import type {
+  GlobalSpecDefinition,
   VariableProduct,
   VariableProductItem,
-  VariableProductSpec,
-  VariableProductSpecValue,
 } from '@/api/variable-product/schema'
 import { variableProductService } from '@/api/variable-product/service'
 import { VP_QUERY_KEYS } from '@/api/variable-product/query'
@@ -38,82 +37,101 @@ interface VPValuesMatrixProps {
 }
 
 export const VPValuesMatrix = ({ vp, projectId, isMobile, isTablet }: VPValuesMatrixProps) => {
-  const [addValueDialog, setAddValueDialog] = useState<{
-    spec: VariableProductSpec
-    itemId?: string
+  const [linkDialog, setLinkDialog] = useState<{
+    spec: GlobalSpecDefinition
+    itemId: string
   } | null>(null)
 
-  const [value, setValue] = useState('')
-  const [colorHex, setColorHex] = useState('')
-  const [imageUrl, setImageUrl] = useState('')
-  const [hoverText, setHoverText] = useState('')
-  const [selectedItemId, setSelectedItemId] = useState('')
-  const [valueSortOrder, setValueSortOrder] = useState(0)
+  const [selectedOptionId, setSelectedOptionId] = useState('')
 
-  const addValueMutation = useMutation({
+  // For creating a new option inline
+  const [newOptionValue, setNewOptionValue] = useState('')
+  const [newOptionColorHex, setNewOptionColorHex] = useState('')
+  const [showNewOption, setShowNewOption] = useState(false)
+
+  const linkMutation = useMutation({
     mutationFn: () =>
-      variableProductService.addSpecValue(
+      variableProductService.linkItemToOption(
         vp.id,
-        addValueDialog!.spec.id,
-        {
-          item_id: selectedItemId || addValueDialog!.itemId!,
-          value,
-          color_hex: colorHex || undefined,
-          image_url: imageUrl || undefined,
-          hover_text: hoverText || undefined,
-          sort_order: valueSortOrder,
-        },
+        linkDialog!.itemId,
+        { spec_option_id: selectedOptionId },
         { project_id: projectId ?? undefined }
       ),
     meta: {
-      successMessage: 'Value added',
+      successMessage: 'Option linked',
       invalidatesQuery: VP_QUERY_KEYS.detail(vp.id),
     },
     onSuccess: () => {
-      resetValueForm()
-      setAddValueDialog(null)
+      resetLinkForm()
+      setLinkDialog(null)
     },
   })
 
-  const deleteValueMutation = useMutation({
-    mutationFn: ({ specId, valueId }: { specId: string; valueId: string }) =>
-      variableProductService.deleteSpecValue(vp.id, specId, valueId, {
+  const unlinkMutation = useMutation({
+    mutationFn: ({ itemId, optionId }: { itemId: string; optionId: string }) =>
+      variableProductService.unlinkItemFromOption(vp.id, itemId, optionId, {
         project_id: projectId ?? undefined,
       }),
     meta: {
-      successMessage: 'Value removed',
+      successMessage: 'Option unlinked',
       invalidatesQuery: VP_QUERY_KEYS.detail(vp.id),
     },
   })
 
-  const resetValueForm = () => {
-    setValue('')
-    setColorHex('')
-    setImageUrl('')
-    setHoverText('')
-    setSelectedItemId('')
-    setValueSortOrder(0)
+  const createOptionAndLinkMutation = useMutation({
+    mutationFn: async () => {
+      const option = await variableProductService.createSpecOption(
+        linkDialog!.spec.id,
+        {
+          value: newOptionValue,
+          color_hex: newOptionColorHex || undefined,
+        },
+        { project_id: projectId ?? undefined }
+      )
+      await variableProductService.linkItemToOption(
+        vp.id,
+        linkDialog!.itemId,
+        { spec_option_id: option.id },
+        { project_id: projectId ?? undefined }
+      )
+    },
+    meta: {
+      successMessage: 'Option created and linked',
+      invalidatesQuery: VP_QUERY_KEYS.detail(vp.id),
+    },
+    onSuccess: () => {
+      resetLinkForm()
+      setLinkDialog(null)
+    },
+  })
+
+  const resetLinkForm = () => {
+    setSelectedOptionId('')
+    setNewOptionValue('')
+    setNewOptionColorHex('')
+    setShowNewOption(false)
   }
 
-  if (vp.items.length === 0 || vp.specs.length === 0) {
+  if (vp.items.length === 0 || vp.spec_definitions.length === 0) {
     return (
       <div>
         <h3 className='text-[13px] font-semibold text-text-secondary mb-2'>Values Matrix</h3>
         <div className='rounded-lg border border-dashed border-border py-6 text-center text-[13px] text-text-tertiary'>
           {vp.items.length === 0
-            ? 'Add items first to define spec values'
-            : 'Add specs first to define values'}
+            ? 'Add items first to assign spec options'
+            : 'Add specs first to assign options'}
         </div>
       </div>
     )
   }
 
-  // Build the matrix: rows = items, columns = specs
+  // Build the matrix: rows = items, columns = spec_definitions
+  // Each item has specs: Record<string, { option_id, value }>
   const getValueForCell = (
     item: VariableProductItem,
-    spec: VariableProductSpec
-  ): VariableProductSpecValue | undefined => {
-    return spec.values.find((v) => v.item_id === item.id)
+    spec: GlobalSpecDefinition
+  ): { option_id: string; value: string } | undefined => {
+    return item.specs[spec.slug]
   }
 
   return (
@@ -132,7 +150,7 @@ export const VPValuesMatrix = ({ vp, projectId, isMobile, isTablet }: VPValuesMa
               )}>
                 Product
               </th>
-              {vp.specs.map((spec) => (
+              {vp.spec_definitions.map((spec) => (
                 <th key={spec.id} className={cn(
                   'py-1.5 text-left font-medium whitespace-nowrap',
                   isMobile ? 'px-2 min-w-[80px]' : isTablet ? 'px-2.5 min-w-[100px]' : 'px-3 min-w-[120px]'
@@ -161,16 +179,20 @@ export const VPValuesMatrix = ({ vp, projectId, isMobile, isTablet }: VPValuesMa
                     {item.descr_1 || item.product_id}
                   </div>
                 </td>
-                {vp.specs.map((spec) => {
+                {vp.spec_definitions.map((spec) => {
                   const val = getValueForCell(item, spec)
+                  // Find the matching option for swatch color display
+                  const matchedOption = val
+                    ? spec.options?.find((o) => o.id === val.option_id)
+                    : undefined
                   return (
                     <td key={spec.id} className={cn('py-1.5 whitespace-nowrap', isMobile ? 'px-2' : isTablet ? 'px-2.5' : 'px-3')}>
                       {val ? (
                         <div className='flex items-center gap-1.5 group'>
-                          {spec.display_type === 'swatch' && val.color_hex && (
+                          {spec.display_type === 'swatch' && matchedOption?.color_hex && (
                             <div
                               className='size-4 rounded-full border border-border shrink-0'
-                              style={{ backgroundColor: val.color_hex }}
+                              style={{ backgroundColor: matchedOption.color_hex }}
                             />
                           )}
                           <span>{val.value}</span>
@@ -179,9 +201,9 @@ export const VPValuesMatrix = ({ vp, projectId, isMobile, isTablet }: VPValuesMa
                             size='icon-xs'
                             className='sm:opacity-0 sm:group-hover:opacity-100 text-text-tertiary hover:text-destructive shrink-0'
                             onClick={() =>
-                              deleteValueMutation.mutate({
-                                specId: spec.id,
-                                valueId: val.id,
+                              unlinkMutation.mutate({
+                                itemId: item.id,
+                                optionId: val.option_id,
                               })
                             }
                           >
@@ -194,9 +216,8 @@ export const VPValuesMatrix = ({ vp, projectId, isMobile, isTablet }: VPValuesMa
                           size='xs'
                           className='text-text-tertiary h-6'
                           onClick={() => {
-                            resetValueForm()
-                            setSelectedItemId(item.id)
-                            setAddValueDialog({ spec, itemId: item.id })
+                            resetLinkForm()
+                            setLinkDialog({ spec, itemId: item.id })
                           }}
                         >
                           <Plus className='size-3' />
@@ -212,13 +233,13 @@ export const VPValuesMatrix = ({ vp, projectId, isMobile, isTablet }: VPValuesMa
         </table>
       </div>
 
-      {/* Add value dialog */}
+      {/* Link option dialog */}
       <Dialog
-        open={!!addValueDialog}
+        open={!!linkDialog}
         onOpenChange={(v) => {
           if (!v) {
-            setAddValueDialog(null)
-            resetValueForm()
+            setLinkDialog(null)
+            resetLinkForm()
           }
         }}
       >
@@ -226,103 +247,108 @@ export const VPValuesMatrix = ({ vp, projectId, isMobile, isTablet }: VPValuesMa
           <form
             onSubmit={(e) => {
               e.preventDefault()
-              addValueMutation.mutate()
+              if (showNewOption) {
+                createOptionAndLinkMutation.mutate()
+              } else {
+                linkMutation.mutate()
+              }
             }}
           >
             <DialogHeader>
               <DialogTitle>
-                Set {addValueDialog?.spec.name} Value
+                Set {linkDialog?.spec.name} Value
               </DialogTitle>
             </DialogHeader>
             <DialogBody className='flex flex-col gap-3'>
-              {!addValueDialog?.itemId && (
-                <div className='flex flex-col gap-1.5'>
-                  <Label>Item</Label>
-                  <Select value={selectedItemId} onValueChange={setSelectedItemId}>
-                    <SelectTrigger>
-                      <SelectValue placeholder='Select an item' />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {vp.items.map((item) => (
-                        <SelectItem key={item.id} value={item.id}>
-                          {item.descr_1 || item.product_id}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              )}
-              <div className='flex flex-col gap-1.5'>
-                <Label htmlFor='sv-value'>Value</Label>
-                <Input
-                  id='sv-value'
-                  value={value}
-                  onChange={(e) => setValue(e.target.value)}
-                  placeholder='e.g. Red, Large'
-                  required
-                  autoFocus
-                />
-              </div>
-              {addValueDialog?.spec.display_type === 'swatch' && (
-                <div className='flex flex-col gap-1.5'>
-                  <Label htmlFor='sv-color'>Color Hex</Label>
-                  <div className='flex items-center gap-2'>
-                    <Input
-                      id='sv-color'
-                      value={colorHex}
-                      onChange={(e) => setColorHex(e.target.value)}
-                      placeholder='#FF0000'
-                    />
-                    {colorHex && (
-                      <div
-                        className='size-8 rounded-md border border-border shrink-0'
-                        style={{ backgroundColor: colorHex }}
-                      />
-                    )}
+              {!showNewOption ? (
+                <>
+                  <div className='flex flex-col gap-1.5'>
+                    <Label>Select Option</Label>
+                    <Select value={selectedOptionId} onValueChange={setSelectedOptionId}>
+                      <SelectTrigger>
+                        <SelectValue placeholder='Choose an option' />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {(linkDialog?.spec.options ?? []).map((opt) => (
+                          <SelectItem key={opt.id} value={opt.id}>
+                            {opt.value}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
-                </div>
+                  <Button
+                    type='button'
+                    variant='link'
+                    size='sm'
+                    className='self-start px-0 text-[12px]'
+                    onClick={() => setShowNewOption(true)}
+                  >
+                    <Plus className='size-3' />
+                    Create new option
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <div className='flex flex-col gap-1.5'>
+                    <Label htmlFor='new-opt-value'>New Option Value</Label>
+                    <Input
+                      id='new-opt-value'
+                      value={newOptionValue}
+                      onChange={(e) => setNewOptionValue(e.target.value)}
+                      placeholder='e.g. Red, Large'
+                      required
+                      autoFocus
+                    />
+                  </div>
+                  {linkDialog?.spec.display_type === 'swatch' && (
+                    <div className='flex flex-col gap-1.5'>
+                      <Label htmlFor='new-opt-color'>Color Hex</Label>
+                      <div className='flex items-center gap-2'>
+                        <Input
+                          id='new-opt-color'
+                          value={newOptionColorHex}
+                          onChange={(e) => setNewOptionColorHex(e.target.value)}
+                          placeholder='#FF0000'
+                        />
+                        {newOptionColorHex && (
+                          <div
+                            className='size-8 rounded-md border border-border shrink-0'
+                            style={{ backgroundColor: newOptionColorHex }}
+                          />
+                        )}
+                      </div>
+                    </div>
+                  )}
+                  <Button
+                    type='button'
+                    variant='link'
+                    size='sm'
+                    className='self-start px-0 text-[12px]'
+                    onClick={() => setShowNewOption(false)}
+                  >
+                    Pick existing option instead
+                  </Button>
+                </>
               )}
-              <div className='flex flex-col gap-1.5'>
-                <Label htmlFor='sv-image'>Image URL</Label>
-                <Input
-                  id='sv-image'
-                  value={imageUrl}
-                  onChange={(e) => setImageUrl(e.target.value)}
-                  placeholder='https://...'
-                />
-              </div>
-              <div className='flex flex-col gap-1.5'>
-                <Label htmlFor='sv-hover'>Hover Text</Label>
-                <Input
-                  id='sv-hover'
-                  value={hoverText}
-                  onChange={(e) => setHoverText(e.target.value)}
-                  placeholder='Tooltip text'
-                />
-              </div>
-              <div className='flex flex-col gap-1.5'>
-                <Label htmlFor='sv-sort'>Sort Order</Label>
-                <Input
-                  id='sv-sort'
-                  type='number'
-                  value={valueSortOrder}
-                  onChange={(e) => setValueSortOrder(Number(e.target.value))}
-                />
-              </div>
             </DialogBody>
             <DialogFooter>
               <Button
                 type='button'
                 variant='outline'
                 onClick={() => {
-                  setAddValueDialog(null)
-                  resetValueForm()
+                  setLinkDialog(null)
+                  resetLinkForm()
                 }}
               >
                 Cancel
               </Button>
-              <Button type='submit' isPending={addValueMutation.isPending}>
-                Set Value
+              <Button
+                type='submit'
+                isPending={linkMutation.isPending || createOptionAndLinkMutation.isPending}
+                disabled={!showNewOption && !selectedOptionId}
+              >
+                {showNewOption ? 'Create & Link' : 'Link Option'}
               </Button>
             </DialogFooter>
           </form>

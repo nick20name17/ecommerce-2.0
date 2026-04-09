@@ -1,14 +1,16 @@
 import { api } from '..'
 
 import type {
+  AddCatalogProductPayload,
+  AddCatalogVPPayload,
   CatalogCategory,
-  CatalogCategoryItem,
+  CatalogCategoryProduct,
+  CatalogCategoryVP,
   CatalogListResponse,
   CatalogParams,
   CatalogTreeParams,
   CatalogTreeResponse,
   CreateCatalogCategoryPayload,
-  CreateCatalogItemPayload,
   ImportFromInventrePayload,
   UpdateCatalogCategoryPayload,
 } from './schema'
@@ -51,27 +53,50 @@ export const catalogService = {
     await api.delete(`/catalog/${id}/`, { params })
   },
 
-  // ── Category Items ───────────────────────────────────────────
+  // ── Category Products ─────────────────────────────────────────
 
-  addItem: async (
+  addProduct: async (
     categoryId: string,
-    payload: CreateCatalogItemPayload,
+    payload: AddCatalogProductPayload,
     params: { project_id?: number }
   ) => {
-    const { data } = await api.post<CatalogCategoryItem>(
-      `/catalog/${categoryId}/items/`,
+    const { data } = await api.post<CatalogCategoryProduct>(
+      `/catalog/${categoryId}/products/`,
       payload,
       { params }
     )
     return data
   },
 
-  removeItem: async (
+  removeProduct: async (
     categoryId: string,
-    itemRecordId: string,
+    recordId: string,
     params: { project_id?: number }
   ) => {
-    await api.delete(`/catalog/${categoryId}/items/${itemRecordId}/`, { params })
+    await api.delete(`/catalog/${categoryId}/products/${recordId}/`, { params })
+  },
+
+  // ── Category Variable Products ──────────────────────────────
+
+  addVariableProduct: async (
+    categoryId: string,
+    payload: AddCatalogVPPayload,
+    params: { project_id?: number }
+  ) => {
+    const { data } = await api.post<CatalogCategoryVP>(
+      `/catalog/${categoryId}/variable-products/`,
+      payload,
+      { params }
+    )
+    return data
+  },
+
+  removeVariableProduct: async (
+    categoryId: string,
+    recordId: string,
+    params: { project_id?: number }
+  ) => {
+    await api.delete(`/catalog/${categoryId}/variable-products/${recordId}/`, { params })
   },
 
   // ── Import ───────────────────────────────────────────────────
