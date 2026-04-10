@@ -138,10 +138,30 @@ export const CategoryItemsPanel = ({
                     <Layers className='size-4 text-purple-500 shrink-0' />
                   )}
                   <div className='flex-1 min-w-0'>
-                    <div className='text-[13px] font-medium truncate'>{displayId}</div>
-                    <div className='text-[11px] text-text-tertiary capitalize'>
-                      {unified.type.replace('_', ' ')}
-                    </div>
+                    {isProduct ? (
+                      <>
+                        <div className='text-[13px] font-medium truncate font-mono'>
+                          {(record as CatalogCategoryProduct).product_id || displayId}
+                        </div>
+                        {(record as CatalogCategoryProduct).descr_1 && (
+                          <div className='text-[11px] text-text-tertiary truncate'>
+                            {(record as CatalogCategoryProduct).descr_1}
+                          </div>
+                        )}
+                        {!(record as CatalogCategoryProduct).descr_1 && (
+                          <div className='text-[11px] text-text-tertiary capitalize'>
+                            {unified.type.replace('_', ' ')}
+                          </div>
+                        )}
+                      </>
+                    ) : (
+                      <>
+                        <div className='text-[13px] font-medium truncate'>{displayId}</div>
+                        <div className='text-[11px] text-text-tertiary capitalize'>
+                          {unified.type.replace('_', ' ')}
+                        </div>
+                      </>
+                    )}
                   </div>
                   {!isMobile && (
                     <span className='text-[11px] text-text-tertiary tabular-nums'>

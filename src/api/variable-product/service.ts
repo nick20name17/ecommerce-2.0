@@ -1,5 +1,7 @@
 import { api } from '..'
 
+import type { ImportStatusResponse, ImportTaskResponse } from '@/api/catalog/schema'
+
 import type {
   CreateSpecOptionPayload,
   CreateSpecPayload,
@@ -203,9 +205,17 @@ export const variableProductService = {
   },
 
   importAll: async (payload: ImportAllVPPayload, params: { project_id?: number }) => {
-    const { data } = await api.post<ImportVPResponse>('/variable-products/import-all/', payload, {
+    const { data } = await api.post<ImportTaskResponse>('/variable-products/import-all/', payload, {
       params,
     })
+    return data
+  },
+
+  getImportStatus: async (taskId: string, params?: { project_id?: number }) => {
+    const { data } = await api.get<ImportStatusResponse>(
+      `/variable-products/import-status/${taskId}/`,
+      { params }
+    )
     return data
   },
 }

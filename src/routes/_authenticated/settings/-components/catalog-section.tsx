@@ -1,8 +1,9 @@
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Database, Download, FolderTree, Layers } from 'lucide-react'
-import { useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
 import { CATALOG_QUERY_KEYS } from '@/api/catalog/query'
+import type { ImportStatusResponse } from '@/api/catalog/schema'
 import { catalogService } from '@/api/catalog/service'
 import { projectService } from '@/api/project/service'
 import { VP_QUERY_KEYS } from '@/api/variable-product/query'
@@ -11,12 +12,47 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 
+interface ImportPollState {
+  taskId: string
+  status: ImportStatusResponse['status']
+  progress?: string
+  result?: Record<string, unknown>
+  error?: string
+}
+
 interface CatalogSectionProps {
   projectId: number
 }
 
 export const CatalogSection = ({ projectId }: CatalogSectionProps) => {
   const [swatchSpecNames, setSwatchSpecNames] = useState('')
+  const [importStatus, setImportStatus] = useState<ImportPollState | null>(null)
+  const [vpImportStatus, setVPImportStatus] = useState<ImportPollState | null>(null)
+  const importIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  const vpImportIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  const queryClient = useQueryClient()
+
+  const clearImportPolling = useCallback(() => {
+    if (importIntervalRef.current) {
+      clearInterval(importIntervalRef.current)
+      importIntervalRef.current = null
+    }
+  }, [])
+
+  const clearVPImportPolling = useCallback(() => {
+    if (vpImportIntervalRef.current) {
+      clearInterval(vpImportIntervalRef.current)
+      vpImportIntervalRef.current = null
+    }
+  }, [])
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      clearImportPolling()
+      clearVPImportPolling()
+    }
+  }, [clearImportPolling, clearVPImportPolling])
 
   const createTablesMutation = useMutation({
     mutationFn: () => projectService.createEcTables(projectId),
@@ -26,9 +62,34 @@ export const CatalogSection = ({ projectId }: CatalogSectionProps) => {
   const importCategoriesMutation = useMutation({
     mutationFn: () =>
       catalogService.importFromInventre({ root_tree_id: null }, { project_id: projectId }),
-    meta: {
-      successMessage: 'Categories imported from EBMS',
-      invalidatesQuery: CATALOG_QUERY_KEYS.all(),
+    onSuccess: (data) => {
+      clearImportPolling()
+      setImportStatus({ taskId: data.task_id, status: 'running' })
+      importIntervalRef.current = setInterval(async () => {
+        try {
+          const status = await catalogService.getImportStatus(data.task_id, {
+            project_id: projectId,
+          })
+          setImportStatus({
+            taskId: data.task_id,
+            status: status.status,
+            progress: status.progress,
+            result: status.result,
+            error: status.error,
+          })
+          if (status.status === 'completed' || status.status === 'failed') {
+            clearImportPolling()
+            if (status.status === 'completed') {
+              queryClient.invalidateQueries({ queryKey: CATALOG_QUERY_KEYS.all() })
+            }
+          }
+        } catch {
+          clearImportPolling()
+          setImportStatus((prev) =>
+            prev ? { ...prev, status: 'failed', error: 'Failed to check import status' } : null
+          )
+        }
+      }, 2000)
     },
   })
 
@@ -43,9 +104,34 @@ export const CatalogSection = ({ projectId }: CatalogSectionProps) => {
         { project_id: projectId }
       )
     },
-    meta: {
-      successMessage: 'Variable products imported from EBMS',
-      invalidatesQuery: VP_QUERY_KEYS.lists(),
+    onSuccess: (data) => {
+      clearVPImportPolling()
+      setVPImportStatus({ taskId: data.task_id, status: 'running' })
+      vpImportIntervalRef.current = setInterval(async () => {
+        try {
+          const status = await variableProductService.getImportStatus(data.task_id, {
+            project_id: projectId,
+          })
+          setVPImportStatus({
+            taskId: data.task_id,
+            status: status.status,
+            progress: status.progress,
+            result: status.result,
+            error: status.error,
+          })
+          if (status.status === 'completed' || status.status === 'failed') {
+            clearVPImportPolling()
+            if (status.status === 'completed') {
+              queryClient.invalidateQueries({ queryKey: VP_QUERY_KEYS.lists() })
+            }
+          }
+        } catch {
+          clearVPImportPolling()
+          setVPImportStatus((prev) =>
+            prev ? { ...prev, status: 'failed', error: 'Failed to check import status' } : null
+          )
+        }
+      }, 2000)
     },
   })
 
@@ -128,10 +214,26 @@ export const CatalogSection = ({ projectId }: CatalogSectionProps) => {
                 className='mt-3'
                 onClick={() => importCategoriesMutation.mutate()}
                 isPending={importCategoriesMutation.isPending}
+                disabled={importStatus?.status === 'running'}
               >
                 <Download className='size-3.5' />
                 Import Categories
               </Button>
+              {importStatus?.status === 'running' && (
+                <div className='mt-2 text-[12px] text-text-tertiary animate-pulse'>
+                  {importStatus.progress || 'Running...'}
+                </div>
+              )}
+              {importStatus?.status === 'completed' && (
+                <div className='mt-2 rounded-md bg-bg-secondary p-2 text-[12px] text-emerald-600 dark:text-emerald-400'>
+                  Import complete{importStatus.result ? `: ${JSON.stringify(importStatus.result)}` : ''}
+                </div>
+              )}
+              {importStatus?.status === 'failed' && (
+                <div className='mt-2 text-[12px] text-destructive'>
+                  Import failed{importStatus.error ? `: ${importStatus.error}` : ''}
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -166,25 +268,24 @@ export const CatalogSection = ({ projectId }: CatalogSectionProps) => {
                   className='self-start'
                   onClick={() => importVPMutation.mutate()}
                   isPending={importVPMutation.isPending}
+                  disabled={vpImportStatus?.status === 'running'}
                 >
                   <Download className='size-3.5' />
                   Import Variable Products
                 </Button>
-                {importVPMutation.data && (
-                  <div className='rounded-md bg-bg-secondary p-2 text-[12px]'>
-                    <span className='text-emerald-600 dark:text-emerald-400'>
-                      Imported: {importVPMutation.data.imported}
-                    </span>
-                    {importVPMutation.data.skipped > 0 && (
-                      <span className='ml-3 text-text-tertiary'>
-                        Skipped: {importVPMutation.data.skipped}
-                      </span>
-                    )}
-                    {importVPMutation.data.errors.length > 0 && (
-                      <div className='mt-1 text-destructive'>
-                        Errors: {importVPMutation.data.errors.join(', ')}
-                      </div>
-                    )}
+                {vpImportStatus?.status === 'running' && (
+                  <div className='text-[12px] text-text-tertiary animate-pulse'>
+                    {vpImportStatus.progress || 'Running...'}
+                  </div>
+                )}
+                {vpImportStatus?.status === 'completed' && (
+                  <div className='rounded-md bg-bg-secondary p-2 text-[12px] text-emerald-600 dark:text-emerald-400'>
+                    Import complete{vpImportStatus.result ? `: ${JSON.stringify(vpImportStatus.result)}` : ''}
+                  </div>
+                )}
+                {vpImportStatus?.status === 'failed' && (
+                  <div className='text-[12px] text-destructive'>
+                    Import failed{vpImportStatus.error ? `: ${vpImportStatus.error}` : ''}
                   </div>
                 )}
               </div>

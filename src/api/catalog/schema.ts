@@ -21,6 +21,9 @@ export interface CatalogCategoryProduct {
   category_id: string
   product_autoid: string
   sort_order: number
+  product_id?: string
+  descr_1?: string
+  def_unit?: string
 }
 
 export interface CatalogCategoryVP {
@@ -75,4 +78,18 @@ export interface CatalogTreeResponse {
 
 export interface CatalogListResponse {
   results: CatalogCategory[]
+}
+
+// ── Import Task ─────────────────────────────────────────────
+
+export interface ImportTaskResponse {
+  task_id: string
+  status: 'running'
+}
+
+export interface ImportStatusResponse {
+  status: 'running' | 'completed' | 'failed'
+  progress?: string
+  result?: Record<string, unknown>
+  error?: string
 }

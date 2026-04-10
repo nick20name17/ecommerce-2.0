@@ -12,6 +12,8 @@ import type {
   CatalogTreeResponse,
   CreateCatalogCategoryPayload,
   ImportFromInventrePayload,
+  ImportStatusResponse,
+  ImportTaskResponse,
   UpdateCatalogCategoryPayload,
 } from './schema'
 
@@ -105,7 +107,17 @@ export const catalogService = {
     payload: ImportFromInventrePayload,
     params: { project_id?: number }
   ) => {
-    const { data } = await api.post('/catalog/import-from-inventre/', payload, { params })
+    const { data } = await api.post<ImportTaskResponse>('/catalog/import-from-inventre/', payload, {
+      params,
+    })
+    return data
+  },
+
+  getImportStatus: async (taskId: string, params?: { project_id?: number }) => {
+    const { data } = await api.get<ImportStatusResponse>(
+      `/catalog/import-status/${taskId}/`,
+      { params }
+    )
     return data
   },
 }
