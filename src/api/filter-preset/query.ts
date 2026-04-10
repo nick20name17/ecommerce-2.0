@@ -8,8 +8,8 @@ export const FILTER_PRESET_QUERY_KEYS = {
   lists: () => [...FILTER_PRESET_QUERY_KEYS.all(), 'list'] as const,
   list: (params?: FilterPresetParams) =>
     [...FILTER_PRESET_QUERY_KEYS.lists(), params] as const,
-  byEntity: (entityType: FilterPresetEntityType) =>
-    [...FILTER_PRESET_QUERY_KEYS.lists(), { entity_type: entityType }] as const,
+  byEntity: (entityType: FilterPresetEntityType, projectId?: number) =>
+    [...FILTER_PRESET_QUERY_KEYS.lists(), { entity_type: entityType, project_id: projectId }] as const,
 }
 
 export const getFilterPresetsQuery = (params?: FilterPresetParams) =>
@@ -18,8 +18,8 @@ export const getFilterPresetsQuery = (params?: FilterPresetParams) =>
     queryFn: () => filterPresetService.get(params),
   })
 
-export const getFilterPresetsByEntityQuery = (entityType: FilterPresetEntityType) =>
+export const getFilterPresetsByEntityQuery = (entityType: FilterPresetEntityType, projectId?: number) =>
   queryOptions({
-    queryKey: FILTER_PRESET_QUERY_KEYS.byEntity(entityType),
-    queryFn: () => filterPresetService.get({ entity_type: entityType }),
+    queryKey: FILTER_PRESET_QUERY_KEYS.byEntity(entityType, projectId),
+    queryFn: () => filterPresetService.get({ entity_type: entityType, project_id: projectId }),
   })

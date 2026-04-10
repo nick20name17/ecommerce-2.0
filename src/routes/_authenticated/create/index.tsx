@@ -98,7 +98,7 @@ const CreatePage = () => {
   const { data: fieldConfig } = useQuery(getFieldConfigQuery(projectId))
   const { data: priceLevels } = useQuery(getPriceLevelsQuery(projectId))
   const { data: editableFields } = useQuery(getEditableFieldsQuery(projectId))
-  const { data: salespersons } = useQuery(getSalespersonsQuery())
+  const { data: salespersons } = useQuery(getSalespersonsQuery(projectId))
 
   const customerId = customer?.id ?? ''
   const editableCustomerFields = editableFields?.customer ?? []

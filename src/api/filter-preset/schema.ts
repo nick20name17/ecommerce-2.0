@@ -55,4 +55,5 @@ export type UpdateFilterPresetPayload = Partial<CreateFilterPresetPayload>
 
 export interface FilterPresetParams {
   entity_type?: FilterPresetEntityType
+  project_id?: number
 }
