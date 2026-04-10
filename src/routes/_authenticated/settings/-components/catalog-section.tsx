@@ -24,6 +24,21 @@ interface CatalogSectionProps {
   projectId: number
 }
 
+const LS_KEY_CAT_IMPORT = 'catalog_import_task'
+const LS_KEY_VP_IMPORT = 'vp_import_task'
+
+function saveTask(key: string, taskId: string) {
+  localStorage.setItem(key, taskId)
+}
+
+function clearTask(key: string) {
+  localStorage.removeItem(key)
+}
+
+function getSavedTask(key: string): string | null {
+  return localStorage.getItem(key)
+}
+
 export const CatalogSection = ({ projectId }: CatalogSectionProps) => {
   const [swatchSpecNames, setSwatchSpecNames] = useState('')
   const [singleSuperId, setSingleSuperId] = useState('')
@@ -49,6 +64,96 @@ export const CatalogSection = ({ projectId }: CatalogSectionProps) => {
     }
   }, [])
 
+  // Start polling for category import
+  const startCategoryPolling = useCallback(
+    (taskId: string) => {
+      clearImportPolling()
+      setImportStatus({ taskId, status: 'running' })
+      saveTask(LS_KEY_CAT_IMPORT, taskId)
+
+      importIntervalRef.current = setInterval(async () => {
+        try {
+          const status = await catalogService.getImportStatus(taskId, {
+            project_id: projectId,
+          })
+          setImportStatus({
+            taskId,
+            status: status.status,
+            progress: status.progress,
+            result: status.result,
+            error: status.error,
+          })
+          if (status.status === 'completed' || status.status === 'failed') {
+            clearImportPolling()
+            clearTask(LS_KEY_CAT_IMPORT)
+            if (status.status === 'completed') {
+              queryClient.invalidateQueries({ queryKey: CATALOG_QUERY_KEYS.all() })
+            }
+          }
+        } catch {
+          clearImportPolling()
+          clearTask(LS_KEY_CAT_IMPORT)
+          setImportStatus((prev) =>
+            prev ? { ...prev, status: 'failed', error: 'Failed to check import status' } : null
+          )
+        }
+      }, 2000)
+    },
+    [clearImportPolling, projectId, queryClient]
+  )
+
+  // Start polling for VP import
+  const startVPPolling = useCallback(
+    (taskId: string) => {
+      clearVPImportPolling()
+      setVPImportStatus({ taskId, status: 'running' })
+      saveTask(LS_KEY_VP_IMPORT, taskId)
+
+      vpImportIntervalRef.current = setInterval(async () => {
+        try {
+          const status = await variableProductService.getImportStatus(taskId, {
+            project_id: projectId,
+          })
+          setVPImportStatus({
+            taskId,
+            status: status.status,
+            progress: status.progress,
+            result: status.result,
+            error: status.error,
+          })
+          if (status.status === 'completed' || status.status === 'failed') {
+            clearVPImportPolling()
+            clearTask(LS_KEY_VP_IMPORT)
+            if (status.status === 'completed') {
+              queryClient.invalidateQueries({ queryKey: VP_QUERY_KEYS.lists() })
+            }
+          }
+        } catch {
+          clearVPImportPolling()
+          clearTask(LS_KEY_VP_IMPORT)
+          setVPImportStatus((prev) =>
+            prev ? { ...prev, status: 'failed', error: 'Failed to check import status' } : null
+          )
+        }
+      }, 2000)
+    },
+    [clearVPImportPolling, projectId, queryClient]
+  )
+
+  // Resume polling on mount if tasks are saved in localStorage
+  useEffect(() => {
+    const savedCatTask = getSavedTask(LS_KEY_CAT_IMPORT)
+    if (savedCatTask) {
+      startCategoryPolling(savedCatTask)
+    }
+
+    const savedVPTask = getSavedTask(LS_KEY_VP_IMPORT)
+    if (savedVPTask) {
+      startVPPolling(savedVPTask)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   // Cleanup on unmount
   useEffect(() => {
     return () => {
@@ -66,33 +171,7 @@ export const CatalogSection = ({ projectId }: CatalogSectionProps) => {
     mutationFn: () =>
       catalogService.importFromInventre({ root_tree_id: null }, { project_id: projectId }),
     onSuccess: (data) => {
-      clearImportPolling()
-      setImportStatus({ taskId: data.task_id, status: 'running' })
-      importIntervalRef.current = setInterval(async () => {
-        try {
-          const status = await catalogService.getImportStatus(data.task_id, {
-            project_id: projectId,
-          })
-          setImportStatus({
-            taskId: data.task_id,
-            status: status.status,
-            progress: status.progress,
-            result: status.result,
-            error: status.error,
-          })
-          if (status.status === 'completed' || status.status === 'failed') {
-            clearImportPolling()
-            if (status.status === 'completed') {
-              queryClient.invalidateQueries({ queryKey: CATALOG_QUERY_KEYS.all() })
-            }
-          }
-        } catch {
-          clearImportPolling()
-          setImportStatus((prev) =>
-            prev ? { ...prev, status: 'failed', error: 'Failed to check import status' } : null
-          )
-        }
-      }, 2000)
+      startCategoryPolling(data.task_id)
     },
   })
 
@@ -108,33 +187,7 @@ export const CatalogSection = ({ projectId }: CatalogSectionProps) => {
       )
     },
     onSuccess: (data) => {
-      clearVPImportPolling()
-      setVPImportStatus({ taskId: data.task_id, status: 'running' })
-      vpImportIntervalRef.current = setInterval(async () => {
-        try {
-          const status = await variableProductService.getImportStatus(data.task_id, {
-            project_id: projectId,
-          })
-          setVPImportStatus({
-            taskId: data.task_id,
-            status: status.status,
-            progress: status.progress,
-            result: status.result,
-            error: status.error,
-          })
-          if (status.status === 'completed' || status.status === 'failed') {
-            clearVPImportPolling()
-            if (status.status === 'completed') {
-              queryClient.invalidateQueries({ queryKey: VP_QUERY_KEYS.lists() })
-            }
-          }
-        } catch {
-          clearVPImportPolling()
-          setVPImportStatus((prev) =>
-            prev ? { ...prev, status: 'failed', error: 'Failed to check import status' } : null
-          )
-        }
-      }, 2000)
+      startVPPolling(data.task_id)
     },
   })
 
