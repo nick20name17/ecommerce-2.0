@@ -4,6 +4,7 @@ import { Controller, FormProvider, useForm, useFormContext, useWatch } from 'rea
 
 import { getProjectsQuery } from '@/api/project/query'
 import { getSalespersonsQuery } from '@/api/salesperson/query'
+import { useProjectId } from '@/hooks/use-project-id'
 import { USER_QUERY_KEYS } from '@/api/user/query'
 import {
   type CreateUserFormValues,
@@ -67,7 +68,8 @@ export const UserModal = ({ user, open, onOpenChange }: UserModalProps) => {
 
 const SalesmanField = () => {
   const { control } = useFormContext()
-  const { data: salespersons = [] } = useQuery(getSalespersonsQuery())
+  const [projectId] = useProjectId()
+  const { data: salespersons = [] } = useQuery(getSalespersonsQuery(projectId))
 
   return (
     <Controller

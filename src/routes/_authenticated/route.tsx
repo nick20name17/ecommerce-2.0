@@ -24,7 +24,7 @@ const AuthenticatedLayout = () => {
     queryClient.prefetchQuery(getFieldConfigQuery(projectId))
     queryClient.prefetchQuery(getEditableFieldsQuery(projectId))
     queryClient.prefetchQuery(getPriceLevelsQuery(projectId))
-    queryClient.prefetchQuery(getSalespersonsQuery())
+    queryClient.prefetchQuery(getSalespersonsQuery(projectId))
   }, [projectId, queryClient])
 
   return (

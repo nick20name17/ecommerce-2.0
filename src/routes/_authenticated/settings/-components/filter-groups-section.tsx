@@ -206,14 +206,14 @@ interface ConditionRow {
 export const FilterGroupsSection = () => {
   const queryClient = useQueryClient()
   const [projectId] = useProjectId()
-  const { data: presets, isLoading } = useQuery(getFilterPresetsQuery())
+  const { data: presets, isLoading } = useQuery(getFilterPresetsQuery({ project_id: projectId ?? undefined }))
   const { data: fieldConfig } = useQuery(getFieldConfigQuery(projectId))
   const { data: fieldTypes } = useQuery(getFieldTypesQuery(projectId))
   const [expandedId, setExpandedId] = useState<number | null>(null)
   const [editingPreset, setEditingPreset] = useState<FilterPreset | 'create' | null>(null)
 
   const deleteMutation = useMutation({
-    mutationFn: (id: number) => filterPresetService.delete(id),
+    mutationFn: (id: number) => filterPresetService.delete(id, { project_id: projectId ?? undefined }),
     meta: {
       successMessage: 'Filter preset deleted',
       errorMessage: 'Failed to delete filter preset',
@@ -401,6 +401,7 @@ export const FilterGroupsSection = () => {
           preset={editingPreset === 'create' ? null : editingPreset}
           fieldConfig={fieldConfig}
           fieldTypes={fieldTypes}
+          projectId={projectId}
           open
           onOpenChange={(open) => !open && setEditingPreset(null)}
           onSaved={() => {
@@ -422,6 +423,7 @@ function FilterPresetDialog({
   open,
   onOpenChange,
   onSaved,
+  projectId,
 }: {
   preset: FilterPreset | null
   fieldConfig: FieldConfigResponse | null | undefined
@@ -429,6 +431,7 @@ function FilterPresetDialog({
   open: boolean
   onOpenChange: (open: boolean) => void
   onSaved: () => void
+  projectId?: number | null
 }) {
   const isNew = !preset
 
@@ -518,14 +521,14 @@ function FilterPresetDialog({
   }
 
   const createMutation = useMutation({
-    mutationFn: (payload: CreateFilterPresetPayload) => filterPresetService.create(payload),
+    mutationFn: (payload: CreateFilterPresetPayload) => filterPresetService.create(payload, { project_id: projectId ?? undefined }),
     meta: { successMessage: 'Filter preset created', errorMessage: 'Failed to create filter preset' },
     onSuccess: () => onSaved(),
   })
 
   const updateMutation = useMutation({
     mutationFn: ({ id, payload }: { id: number; payload: UpdateFilterPresetPayload }) =>
-      filterPresetService.update(id, payload),
+      filterPresetService.update(id, payload, { project_id: projectId ?? undefined }),
     meta: { successMessage: 'Filter preset updated', errorMessage: 'Failed to update filter preset' },
     onSuccess: () => onSaved(),
   })

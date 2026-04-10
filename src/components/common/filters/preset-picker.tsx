@@ -4,6 +4,7 @@ import { Bookmark, Check, Globe, Lock } from 'lucide-react'
 import { getFilterPresetsByEntityQuery } from '@/api/filter-preset/query'
 import type { FilterPresetEntityType } from '@/api/filter-preset/schema'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { useProjectId } from '@/hooks/use-project-id'
 import { cn } from '@/lib/utils'
 
 interface PresetPickerProps {
@@ -13,7 +14,8 @@ interface PresetPickerProps {
 }
 
 export function PresetPicker({ entityType, value, onChange }: PresetPickerProps) {
-  const { data: presets } = useQuery(getFilterPresetsByEntityQuery(entityType))
+  const [projectId] = useProjectId()
+  const { data: presets } = useQuery(getFilterPresetsByEntityQuery(entityType, projectId ?? undefined))
 
   if (!presets || presets.length === 0) return null
 
