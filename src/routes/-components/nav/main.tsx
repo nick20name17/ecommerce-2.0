@@ -119,14 +119,6 @@ const WORKSPACE_ITEMS: NavItem[] = [
     adminOnly: true,
   },
   {
-    title: 'Variable Products',
-    url: '/variable-products',
-    icon: IVariableProducts,
-    iconBg: 'bg-purple-500',
-    iconColor: 'text-white',
-    adminOnly: true,
-  },
-  {
     title: 'Development',
     url: '/dev',
     icon: IDev,

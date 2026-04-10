@@ -1,4 +1,5 @@
 import { useMutation, useQuery } from '@tanstack/react-query'
+import { useNavigate } from '@tanstack/react-router'
 import { Box, Layers, Package, Plus, Trash2 } from 'lucide-react'
 import { useState } from 'react'
 
@@ -22,6 +23,7 @@ export const CategoryItemsPanel = ({
   projectId,
   isMobile,
 }: CategoryItemsPanelProps) => {
+  const navigate = useNavigate()
   const [addItemOpen, setAddItemOpen] = useState(false)
   const [addItemType, setAddItemType] = useState<'product' | 'variable_product'>('product')
 
@@ -129,8 +131,10 @@ export const CategoryItemsPanel = ({
                   key={record.id}
                   className={cn(
                     'flex items-center gap-3 border-b border-border-light py-2 hover:bg-bg-hover transition-colors',
+                    !isProduct && 'cursor-pointer',
                     isMobile ? 'px-3.5' : 'px-6'
                   )}
+                  onClick={!isProduct ? () => navigate({ to: `/catalog/vp/${(record as CatalogCategoryVP).vp_id}` }) : undefined}
                 >
                   {isProduct ? (
                     <Package className='size-4 text-amber-500 shrink-0' />

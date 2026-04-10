@@ -7,6 +7,7 @@ import { CategoryDeleteDialog } from './-components/category-delete-dialog'
 import { CategoryFormDialog } from './-components/category-form-dialog'
 import { CategoryItemsPanel } from './-components/category-items-panel'
 import { CategoryTreeNode } from './-components/category-tree-node'
+import { VPCreateDialog } from './-components/vp-create-dialog'
 import { CATALOG_QUERY_KEYS, getCatalogTreeQuery } from '@/api/catalog/query'
 import type { CatalogCategory } from '@/api/catalog/schema'
 import { catalogService } from '@/api/catalog/service'
@@ -40,6 +41,7 @@ const CatalogPage = () => {
   const [editingCategory, setEditingCategory] = useState<CatalogCategory | null>(null)
   const [parentIdForNew, setParentIdForNew] = useState<string | null>(null)
   const [deleteCategory, setDeleteCategory] = useState<CatalogCategory | null>(null)
+  const [vpCreateOpen, setVpCreateOpen] = useState(false)
 
   const importMutation = useMutation({
     mutationFn: () =>
@@ -109,6 +111,11 @@ const CatalogPage = () => {
             <Button size='sm' onClick={() => openCreateDialog()}>
               <Plus className='size-3.5' />
               <span className={cn(isMobile && 'hidden')}>New Category</span>
+            </Button>
+
+            <Button size='sm' variant='outline' onClick={() => setVpCreateOpen(true)}>
+              <Plus className='size-3.5' />
+              <span className={cn(isMobile && 'hidden')}>New VP</span>
             </Button>
           </div>
         )}
@@ -211,6 +218,12 @@ const CatalogPage = () => {
             setSelectedCategory(null)
           }
         }}
+      />
+
+      <VPCreateDialog
+        open={vpCreateOpen}
+        onOpenChange={setVpCreateOpen}
+        projectId={projectId}
       />
     </div>
   )
