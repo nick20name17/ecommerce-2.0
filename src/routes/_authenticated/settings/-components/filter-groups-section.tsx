@@ -441,7 +441,7 @@ function FilterPresetDialog({
   const [visibleToRoles, setVisibleToRoles] = useState<string[]>(preset?.visible_to_roles ?? [])
   const [visibleToUsers, setVisibleToUsers] = useState<number[]>(preset?.visible_to_users ?? [])
 
-  const { data: usersData } = useQuery(getUsersQuery({ limit: 500 }))
+  const { data: usersData } = useQuery(getUsersQuery({ limit: 500, project: projectId ?? undefined }))
   const users = usersData?.results ?? []
 
   // Build initial condition rows from preset
