@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { Database, Download, FolderTree, Layers } from 'lucide-react'
+import { Database, Download, FolderTree, Layers, Package } from 'lucide-react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
 import { CATALOG_QUERY_KEYS } from '@/api/catalog/query'
@@ -26,8 +26,11 @@ interface CatalogSectionProps {
 
 export const CatalogSection = ({ projectId }: CatalogSectionProps) => {
   const [swatchSpecNames, setSwatchSpecNames] = useState('')
+  const [singleSuperId, setSingleSuperId] = useState('')
+  const [singleSwatchNames, setSingleSwatchNames] = useState('')
   const [importStatus, setImportStatus] = useState<ImportPollState | null>(null)
   const [vpImportStatus, setVPImportStatus] = useState<ImportPollState | null>(null)
+  const [singleVPResult, setSingleVPResult] = useState<Record<string, unknown> | null>(null)
   const importIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const vpImportIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const queryClient = useQueryClient()
@@ -132,6 +135,26 @@ export const CatalogSection = ({ projectId }: CatalogSectionProps) => {
           )
         }
       }, 2000)
+    },
+  })
+
+  const importSingleVPMutation = useMutation({
+    mutationFn: () => {
+      const names = singleSwatchNames
+        .split(',')
+        .map((s) => s.trim())
+        .filter(Boolean)
+      return variableProductService.importFromSuperId(
+        {
+          super_id: singleSuperId.trim(),
+          swatch_spec_names: names.length > 0 ? names : undefined,
+        },
+        { project_id: projectId }
+      )
+    },
+    onSuccess: (data) => {
+      setSingleVPResult(data as Record<string, unknown>)
+      queryClient.invalidateQueries({ queryKey: VP_QUERY_KEYS.lists() })
     },
   })
 
@@ -286,6 +309,68 @@ export const CatalogSection = ({ projectId }: CatalogSectionProps) => {
                 {vpImportStatus?.status === 'failed' && (
                   <div className='text-[12px] text-destructive'>
                     Import failed{vpImportStatus.error ? `: ${vpImportStatus.error}` : ''}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Step 4: Import Single VP */}
+        <div className='rounded-lg border border-border p-4'>
+          <div className='flex items-start gap-3'>
+            <div className='flex size-8 shrink-0 items-center justify-center rounded-md bg-orange-500/10 text-orange-500'>
+              <Package className='size-4' />
+            </div>
+            <div className='flex-1'>
+              <h3 className='text-[13px] font-semibold'>4. Import Single VP by SUPER_ID</h3>
+              <p className='mt-0.5 text-[12px] text-text-tertiary'>
+                Import or re-import a single variable product by its SUPER_ID.
+              </p>
+              <div className='mt-3 flex flex-col gap-2'>
+                <div className='flex flex-col gap-1'>
+                  <Label htmlFor='single-super-id' className='text-[12px]'>
+                    SUPER_ID
+                  </Label>
+                  <Input
+                    id='single-super-id'
+                    value={singleSuperId}
+                    onChange={(e) => setSingleSuperId(e.target.value)}
+                    placeholder='e.g. 4W-12B'
+                    className='h-8 text-[13px]'
+                  />
+                </div>
+                <div className='flex flex-col gap-1'>
+                  <Label htmlFor='single-swatch-names' className='text-[12px]'>
+                    Swatch spec names (comma-separated, optional)
+                  </Label>
+                  <Input
+                    id='single-swatch-names'
+                    value={singleSwatchNames}
+                    onChange={(e) => setSingleSwatchNames(e.target.value)}
+                    placeholder='Lens Colour, Beta Color'
+                    className='h-8 text-[13px]'
+                  />
+                </div>
+                <Button
+                  variant='outline'
+                  size='sm'
+                  className='self-start'
+                  onClick={() => importSingleVPMutation.mutate()}
+                  isPending={importSingleVPMutation.isPending}
+                  disabled={!singleSuperId.trim()}
+                >
+                  <Download className='size-3.5' />
+                  Import VP
+                </Button>
+                {importSingleVPMutation.isSuccess && singleVPResult && (
+                  <div className='rounded-md bg-bg-secondary p-2 text-[12px] text-emerald-600 dark:text-emerald-400'>
+                    Imported: {(singleVPResult as Record<string, unknown>).name as string ?? singleSuperId}
+                  </div>
+                )}
+                {importSingleVPMutation.isError && (
+                  <div className='text-[12px] text-destructive'>
+                    Import failed: {(importSingleVPMutation.error as Error).message}
                   </div>
                 )}
               </div>
