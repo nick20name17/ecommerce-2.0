@@ -160,9 +160,11 @@ export const CategoryItemsPanel = ({
                       </>
                     ) : (
                       <>
-                        <div className='text-[13px] font-medium truncate'>{displayId}</div>
-                        <div className='text-[11px] text-text-tertiary capitalize'>
-                          {unified.type.replace('_', ' ')}
+                        <div className='text-[13px] font-medium truncate'>
+                          {(record as CatalogCategoryVP).name || displayId}
+                        </div>
+                        <div className='text-[11px] text-text-tertiary'>
+                          {(record as CatalogCategoryVP).slug || 'Variable Product'}
                         </div>
                       </>
                     )}

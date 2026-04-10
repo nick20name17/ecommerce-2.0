@@ -31,6 +31,8 @@ export interface CatalogCategoryVP {
   category_id: string
   vp_id: string
   sort_order: number
+  name?: string
+  slug?: string
 }
 
 // ── Params ───────────────────────────────────────────────────
