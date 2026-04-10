@@ -16,7 +16,6 @@ import {
   ISettings,
   IShipping,
   ITodos,
-  IVariableProducts,
 } from '@/components/ds'
 import { isAdmin, isSuperAdmin } from '@/constants/user'
 import { usePendingOrders, usePendingProposals } from '@/hooks/use-pending-orders'

@@ -1,12 +1,12 @@
 import { useMutation, useQuery } from '@tanstack/react-query'
-import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { createFileRoute, useNavigate, useParams } from '@tanstack/react-router'
 import { Trash2 } from 'lucide-react'
 import { useState } from 'react'
 
-import { VPHeader } from '@/routes/_authenticated/variable-products/$vpId/-components/vp-header'
-import { VPItemsSection } from '@/routes/_authenticated/variable-products/$vpId/-components/vp-items-section'
-import { VPSpecsSection } from '@/routes/_authenticated/variable-products/$vpId/-components/vp-specs-section'
-import { VPValuesMatrix } from '@/routes/_authenticated/variable-products/$vpId/-components/vp-values-matrix'
+import { VPHeader } from './-components/vp-header'
+import { VPItemsSection } from './-components/vp-items-section'
+import { VPSpecsSection } from './-components/vp-specs-section'
+import { VPValuesMatrix } from './-components/vp-values-matrix'
 import { VP_QUERY_KEYS, getVariableProductDetailQuery } from '@/api/variable-product/query'
 import { variableProductService } from '@/api/variable-product/service'
 import { Button } from '@/components/ui/button'
@@ -24,7 +24,7 @@ import { useProjectId } from '@/hooks/use-project-id'
 import { cn } from '@/lib/utils'
 
 const CatalogVPDetailPage = () => {
-  const { vpId } = Route.useParams()
+  const { vpId } = useParams({ strict: false }) as { vpId: string }
   const navigate = useNavigate()
   const bp = useBreakpoint()
   const isMobile = bp === 'mobile'
