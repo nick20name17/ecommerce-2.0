@@ -1,6 +1,6 @@
-import { useMutation, useQuery } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
-import { ArrowLeft, Download, FolderTree, Plus } from 'lucide-react'
+import { ArrowLeft, FolderTree, Plus } from 'lucide-react'
 import { useState } from 'react'
 
 import { CategoryDeleteDialog } from './-components/category-delete-dialog'
@@ -8,9 +8,8 @@ import { CategoryFormDialog } from './-components/category-form-dialog'
 import { CategoryItemsPanel } from './-components/category-items-panel'
 import { CategoryTreeNode } from './-components/category-tree-node'
 import { VPCreateDialog } from './-components/vp-create-dialog'
-import { CATALOG_QUERY_KEYS, getCatalogTreeQuery } from '@/api/catalog/query'
+import { getCatalogTreeQuery } from '@/api/catalog/query'
 import type { CatalogCategory } from '@/api/catalog/schema'
-import { catalogService } from '@/api/catalog/service'
 import { PageEmpty } from '@/components/common/page-empty'
 import { ICatalog, PAGE_COLORS, PageHeaderIcon } from '@/components/ds'
 import { Button } from '@/components/ui/button'
@@ -42,18 +41,6 @@ const CatalogPage = () => {
   const [parentIdForNew, setParentIdForNew] = useState<string | null>(null)
   const [deleteCategory, setDeleteCategory] = useState<CatalogCategory | null>(null)
   const [vpCreateOpen, setVpCreateOpen] = useState(false)
-
-  const importMutation = useMutation({
-    mutationFn: () =>
-      catalogService.importFromInventre(
-        { root_tree_id: null },
-        { project_id: projectId ?? undefined }
-      ),
-    meta: {
-      successMessage: 'Categories imported from EBMS',
-      invalidatesQuery: CATALOG_QUERY_KEYS.all(),
-    },
-  })
 
   const openCreateDialog = (parentId: string | null = null) => {
     setEditingCategory(null)
@@ -98,16 +85,6 @@ const CatalogPage = () => {
 
         {!(isMobile && showDetail) && (
           <div className='flex items-center gap-1.5'>
-            <Button
-              variant='outline'
-              size='sm'
-              onClick={() => importMutation.mutate()}
-              isPending={importMutation.isPending}
-            >
-              <Download className='size-3.5' />
-              <span className={cn(isMobile && 'hidden')}>Import from EBMS</span>
-            </Button>
-
             <Button size='sm' onClick={() => openCreateDialog()}>
               <Plus className='size-3.5' />
               <span className={cn(isMobile && 'hidden')}>New Category</span>
