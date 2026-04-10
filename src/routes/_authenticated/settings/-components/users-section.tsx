@@ -14,6 +14,8 @@ import { Switch } from '@/components/ui/switch'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { getInitialsFromParts, getUserDisplayName } from '@/helpers/formatters'
 import { cn } from '@/lib/utils'
+import { isSuperAdmin } from '@/constants/user'
+import { useProjectId } from '@/hooks/use-project-id'
 import { useAuth } from '@/providers/auth'
 import { UserDeleteDialog } from '../../users/-components/user-delete-dialog'
 import { UserModal } from '../../users/-components/user-modal'
@@ -64,12 +66,15 @@ export const UsersSection = () => {
   const [search, setSearch] = useState('')
   const debouncedSetSearch = useDebouncedCallback((value: string) => setSearch(value), 300)
   const { user: currentUser } = useAuth()
+  const [projectId] = useProjectId()
+  const userIsSuperAdmin = !!currentUser?.role && isSuperAdmin(currentUser.role)
 
   const [modalUser, setModalUser] = useState<User | 'create' | null>(null)
   const [deleteUser, setDeleteUser] = useState<User | null>(null)
 
   const params: UserParams = {
     limit: 500,
+    project: userIsSuperAdmin && projectId != null ? projectId : undefined,
   }
 
   const { data, isLoading, isPlaceholderData } = useQuery({
