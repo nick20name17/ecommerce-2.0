@@ -1,5 +1,5 @@
 import { useMutation, useQuery } from '@tanstack/react-query'
-import { createFileRoute, useNavigate, useParams } from '@tanstack/react-router'
+import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { Trash2 } from 'lucide-react'
 import { useState } from 'react'
 
@@ -24,7 +24,8 @@ import { useProjectId } from '@/hooks/use-project-id'
 import { cn } from '@/lib/utils'
 
 const CatalogVPDetailPage = () => {
-  const { vpId } = useParams({ strict: false }) as { vpId: string }
+  const params = Route.useParams()
+  const vpId = (params as Record<string, string>).vpId
   const navigate = useNavigate()
   const bp = useBreakpoint()
   const isMobile = bp === 'mobile'

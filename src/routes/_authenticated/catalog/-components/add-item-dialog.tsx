@@ -33,13 +33,13 @@ export const AddItemDialog = ({
   const [itemId, setItemId] = useState('')
   const [sortOrder, setSortOrder] = useState(0)
 
-  const addMutation = useMutation({
+  const addMutation = useMutation<unknown, Error, void>({
     mutationFn: async () => {
       const params = { project_id: projectId ?? undefined }
       if (itemType === 'product') {
         return catalogService.addProduct(categoryId, { product_autoid: itemId, sort_order: sortOrder }, params)
       }
-      return catalogService.addVariableProduct(categoryId, { vp_id: itemId, sort_order: sortOrder }, params) as any
+      return catalogService.addVariableProduct(categoryId, { vp_id: itemId, sort_order: sortOrder }, params)
     },
     meta: {
       successMessage: 'Item added to category',
