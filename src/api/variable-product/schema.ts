@@ -64,6 +64,7 @@ export interface VariableProductItem {
   product_autoid: string
   is_default: boolean
   sort_order: number
+  active: boolean
   specs: Record<string, { option_id: string; value: string }>
   product_id: string
   descr_1: string

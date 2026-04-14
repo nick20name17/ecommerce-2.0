@@ -1,6 +1,6 @@
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
-import { Box, Layers, Package, Plus, Trash2 } from 'lucide-react'
+import { Box, Eye, EyeOff, Layers, Package, Plus, Trash2 } from 'lucide-react'
 import { useState } from 'react'
 
 import { CATALOG_QUERY_KEYS, getCatalogDetailQuery } from '@/api/catalog/query'
@@ -53,6 +53,14 @@ export const CategoryItemsPanel = ({
       successMessage: 'Product removed',
       invalidatesQuery: CATALOG_QUERY_KEYS.detail(category.id),
     },
+  })
+
+  const toggleProductActiveMutation = useMutation({
+    mutationFn: ({ recordId, active }: { recordId: string; active: boolean }) =>
+      catalogService.updateProduct(category.id, recordId, { active }, {
+        project_id: projectId ?? undefined,
+      }),
+    meta: { invalidatesQuery: CATALOG_QUERY_KEYS.detail(category.id) },
   })
 
   const removeVPMutation = useMutation({
@@ -132,7 +140,8 @@ export const CategoryItemsPanel = ({
                   className={cn(
                     'flex items-center gap-3 border-b border-border-light py-2 hover:bg-bg-hover transition-colors',
                     !isProduct && 'cursor-pointer',
-                    isMobile ? 'px-3.5' : 'px-6'
+                    isMobile ? 'px-3.5' : 'px-6',
+                    isProduct && (record as CatalogCategoryProduct).active === false && 'opacity-40'
                   )}
                   onClick={!isProduct ? () => navigate({ to: `/catalog/vp/${(record as CatalogCategoryVP).vp_id}` }) : undefined}
                 >
@@ -174,15 +183,40 @@ export const CategoryItemsPanel = ({
                       #{record.sort_order}
                     </span>
                   )}
+                  {isProduct && (
+                    <Button
+                      variant='ghost'
+                      size='icon-xs'
+                      className={cn(
+                        'shrink-0',
+                        (record as CatalogCategoryProduct).active !== false
+                          ? 'text-text-tertiary hover:text-amber-500'
+                          : 'text-text-quaternary hover:text-emerald-500'
+                      )}
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        const current = (record as CatalogCategoryProduct).active !== false
+                        toggleProductActiveMutation.mutate({ recordId: record.id, active: !current })
+                      }}
+                      title={(record as CatalogCategoryProduct).active !== false ? 'Hide from site' : 'Show on site'}
+                    >
+                      {(record as CatalogCategoryProduct).active !== false ? (
+                        <Eye className='size-3.5' />
+                      ) : (
+                        <EyeOff className='size-3.5' />
+                      )}
+                    </Button>
+                  )}
                   <Button
                     variant='ghost'
                     size='icon-xs'
                     className='text-text-tertiary hover:text-destructive'
-                    onClick={() =>
+                    onClick={(e) => {
+                      e.stopPropagation()
                       isProduct
                         ? removeProductMutation.mutate(record.id)
                         : removeVPMutation.mutate(record.id)
-                    }
+                    }}
                   >
                     <Trash2 className='size-3.5' />
                   </Button>
