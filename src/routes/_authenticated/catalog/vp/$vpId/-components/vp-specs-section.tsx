@@ -134,43 +134,57 @@ export const VPSpecsSection = ({ vp, projectId }: VPSpecsSectionProps) => {
         </div>
       ) : (
         <div className='flex flex-wrap gap-2'>
-          {vp.spec_definitions.map((spec) => (
-            <div
-              key={spec.id}
-              className='group flex items-center gap-2 rounded-lg border border-border bg-background px-3 py-2'
-            >
-              <div>
-                <div className='text-[13px] font-medium'>{spec.name}</div>
-                <div className='text-[11px] text-text-tertiary capitalize'>
-                  {spec.display_type} · {spec.options?.length ?? 0} options
+          {vp.spec_definitions.map((spec) => {
+            const isShared = (spec.vp_count ?? 0) > 1
+            return (
+              <div
+                key={spec.id}
+                className='group flex items-center gap-2 rounded-lg border border-border bg-background px-3 py-2'
+              >
+                <div>
+                  <div className='text-[13px] font-medium'>{spec.name}</div>
+                  <div className='text-[11px] text-text-tertiary capitalize'>
+                    {spec.display_type} · {spec.options?.length ?? 0} options
+                    {isShared && (
+                      <span className='ml-1 text-amber-500 font-medium normal-case'>
+                        · Used by {spec.vp_count} VPs
+                      </span>
+                    )}
+                  </div>
                 </div>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant='ghost'
+                      size='icon-xs'
+                      className='sm:opacity-0 sm:group-hover:opacity-100 transition-opacity'
+                    >
+                      <MoreHorizontal className='size-3.5' />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align='end' className='w-44'>
+                    {isShared ? (
+                      <div className='px-2 py-1.5 text-[12px] text-text-tertiary'>
+                        Shared spec — editing disabled
+                      </div>
+                    ) : (
+                      <DropdownMenuItem onClick={() => openEdit(spec)}>
+                        <Pencil className='size-3.5' />
+                        Edit
+                      </DropdownMenuItem>
+                    )}
+                    <DropdownMenuItem
+                      className='text-destructive focus:text-destructive'
+                      onClick={() => setDeleteSpec(spec)}
+                    >
+                      <Trash2 className='size-3.5' />
+                      Delete
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant='ghost'
-                    size='icon-xs'
-                    className='sm:opacity-0 sm:group-hover:opacity-100 transition-opacity'
-                  >
-                    <MoreHorizontal className='size-3.5' />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align='end' className='w-36'>
-                  <DropdownMenuItem onClick={() => openEdit(spec)}>
-                    <Pencil className='size-3.5' />
-                    Edit
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    className='text-destructive focus:text-destructive'
-                    onClick={() => setDeleteSpec(spec)}
-                  >
-                    <Trash2 className='size-3.5' />
-                    Delete
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
-          ))}
+            )
+          })}
         </div>
       )}
 
@@ -479,6 +493,7 @@ function ExistingSpecPicker({
                   <div className='text-[13px] font-medium'>{spec.name}</div>
                   <div className='text-[11px] text-text-tertiary capitalize'>
                     {spec.display_type} · {spec.options?.length ?? 0} options
+                    {(spec.vp_count ?? 0) > 0 && ` · ${spec.vp_count} VPs`}
                   </div>
                 </div>
               </button>
