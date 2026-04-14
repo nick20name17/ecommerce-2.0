@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
 import { Box, Eye, EyeOff, Layers, Package, Plus, Trash2 } from 'lucide-react'
 import { useState } from 'react'
@@ -7,6 +7,7 @@ import { CATALOG_QUERY_KEYS, getCatalogDetailQuery } from '@/api/catalog/query'
 import type { CatalogCategory, CatalogCategoryProduct, CatalogCategoryVP } from '@/api/catalog/schema'
 import { catalogService } from '@/api/catalog/service'
 import { PageEmpty } from '@/components/common/page-empty'
+import { ProductBrowserDialog } from '@/components/common/product-browser-dialog'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { cn } from '@/lib/utils'
@@ -26,6 +27,7 @@ export const CategoryItemsPanel = ({
   const navigate = useNavigate()
   const [addItemOpen, setAddItemOpen] = useState(false)
   const [addItemType, setAddItemType] = useState<'product' | 'variable_product'>('product')
+  const [productBrowserOpen, setProductBrowserOpen] = useState(false)
 
   const { data, isLoading } = useQuery(
     getCatalogDetailQuery(category.id, { project_id: projectId ?? undefined })
@@ -55,12 +57,43 @@ export const CategoryItemsPanel = ({
     },
   })
 
+  const queryClient = useQueryClient()
+  const detailQueryKey = CATALOG_QUERY_KEYS.detail(category.id)
+
   const toggleProductActiveMutation = useMutation({
     mutationFn: ({ recordId, active }: { recordId: string; active: boolean }) =>
       catalogService.updateProduct(category.id, recordId, { active }, {
         project_id: projectId ?? undefined,
       }),
-    meta: { invalidatesQuery: CATALOG_QUERY_KEYS.detail(category.id) },
+    onMutate: async ({ recordId, active }) => {
+      await queryClient.cancelQueries({ queryKey: detailQueryKey })
+      const prev = queryClient.getQueryData<CatalogCategory>(detailQueryKey)
+      if (prev) {
+        queryClient.setQueryData<CatalogCategory>(detailQueryKey, {
+          ...prev,
+          products: prev.products?.map((p) =>
+            p.id === recordId ? { ...p, active } : p
+          ),
+        })
+      }
+      return { prev }
+    },
+    onError: (_err, _vars, ctx) => {
+      if (ctx?.prev) queryClient.setQueryData(detailQueryKey, ctx.prev)
+    },
+  })
+
+  const addProductsMutation = useMutation({
+    mutationFn: async (products: { autoid: string }[]) => {
+      const params = { project_id: projectId ?? undefined }
+      for (const p of products) {
+        await catalogService.addProduct(category.id, { product_autoid: p.autoid }, params)
+      }
+    },
+    meta: {
+      successMessage: 'Products added',
+      invalidatesQuery: CATALOG_QUERY_KEYS.detail(category.id),
+    },
   })
 
   const removeVPMutation = useMutation({
@@ -90,10 +123,8 @@ export const CategoryItemsPanel = ({
         <Button
           variant='outline'
           size='sm'
-          onClick={() => {
-            setAddItemType('product')
-            setAddItemOpen(true)
-          }}
+          onClick={() => setProductBrowserOpen(true)}
+          isPending={addProductsMutation.isPending}
         >
           <Plus className='size-3.5' />
           Product
@@ -233,6 +264,14 @@ export const CategoryItemsPanel = ({
         categoryId={category.id}
         itemType={addItemType}
         projectId={projectId}
+      />
+
+      <ProductBrowserDialog
+        open={productBrowserOpen}
+        onOpenChange={setProductBrowserOpen}
+        projectId={projectId}
+        title='Add Products to Category'
+        onSelect={(products) => addProductsMutation.mutate(products)}
       />
     </div>
   )

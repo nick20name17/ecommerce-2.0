@@ -1,10 +1,11 @@
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Eye, EyeOff, Package, Plus, Star, Trash2 } from 'lucide-react'
 import { useState } from 'react'
 
-import type { VariableProduct } from '@/api/variable-product/schema'
+import type { VariableProduct, VariableProductItem } from '@/api/variable-product/schema'
 import { variableProductService } from '@/api/variable-product/service'
 import { VP_QUERY_KEYS } from '@/api/variable-product/query'
+import { ProductBrowserDialog } from '@/components/common/product-browser-dialog'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -27,6 +28,7 @@ interface VPItemsSectionProps {
 
 export const VPItemsSection = ({ vp, projectId, isMobile, isTablet }: VPItemsSectionProps) => {
   const [addOpen, setAddOpen] = useState(false)
+  const [productBrowserOpen, setProductBrowserOpen] = useState(false)
   const [productAutoid, setProductAutoid] = useState('')
   const [isDefault, setIsDefault] = useState(false)
   const [sortOrder, setSortOrder] = useState(0)
@@ -50,12 +52,42 @@ export const VPItemsSection = ({ vp, projectId, isMobile, isTablet }: VPItemsSec
     },
   })
 
+  const queryClient = useQueryClient()
+
   const toggleItemActiveMutation = useMutation({
     mutationFn: ({ itemId, active }: { itemId: string; active: boolean }) =>
       variableProductService.updateItem(vp.id, itemId, { active }, {
         project_id: projectId ?? undefined,
       }),
-    meta: { invalidatesQuery: VP_QUERY_KEYS.detail(vp.id) },
+    onMutate: async ({ itemId, active }) => {
+      // Optimistic update — find and patch the VP detail in cache
+      const queries = queryClient.getQueriesData<VariableProduct>({
+        queryKey: VP_QUERY_KEYS.detail(vp.id),
+      })
+      for (const [key, data] of queries) {
+        if (data) {
+          queryClient.setQueryData<VariableProduct>(key, {
+            ...data,
+            items: data.items.map((item: VariableProductItem) =>
+              item.id === itemId ? { ...item, active } : item
+            ),
+          })
+        }
+      }
+    },
+  })
+
+  const addProductsMutation = useMutation({
+    mutationFn: async (products: { autoid: string }[]) => {
+      const params = { project_id: projectId ?? undefined }
+      for (const p of products) {
+        await variableProductService.addItem(vp.id, { product_autoid: p.autoid }, params)
+      }
+    },
+    meta: {
+      successMessage: 'Products added',
+      invalidatesQuery: VP_QUERY_KEYS.detail(vp.id),
+    },
   })
 
   const removeItemMutation = useMutation({
@@ -76,9 +108,13 @@ export const VPItemsSection = ({ vp, projectId, isMobile, isTablet }: VPItemsSec
           Items ({vp.items.length})
         </h3>
         <div className='flex-1' />
-        <Button variant='outline' size='xs' onClick={() => setAddOpen(true)}>
+        <Button variant='outline' size='xs' onClick={() => setProductBrowserOpen(true)} isPending={addProductsMutation.isPending}>
           <Plus className='size-3' />
-          Add Product
+          Browse
+        </Button>
+        <Button variant='ghost' size='xs' onClick={() => setAddOpen(true)} title='Add by autoid'>
+          <Plus className='size-3' />
+          Manual
         </Button>
       </div>
 
@@ -260,6 +296,14 @@ export const VPItemsSection = ({ vp, projectId, isMobile, isTablet }: VPItemsSec
           </form>
         </DialogContent>
       </Dialog>
+
+      <ProductBrowserDialog
+        open={productBrowserOpen}
+        onOpenChange={setProductBrowserOpen}
+        projectId={projectId}
+        title='Add Products to Variable Product'
+        onSelect={(products) => addProductsMutation.mutate(products)}
+      />
     </div>
   )
 }
