@@ -11,6 +11,8 @@ export interface CatalogCategory {
   path: string
   sort_order: number
   active: boolean
+  product_count?: number
+  vp_count?: number
   children: CatalogCategory[]
   products?: CatalogCategoryProduct[]
   variable_products?: CatalogCategoryVP[]

@@ -58,7 +58,6 @@ export const CategoryItemsPanel = ({
   })
 
   const queryClient = useQueryClient()
-  const detailQueryKey = CATALOG_QUERY_KEYS.detail(category.id)
 
   const toggleProductActiveMutation = useMutation({
     mutationFn: ({ recordId, active }: { recordId: string; active: boolean }) =>
@@ -66,20 +65,20 @@ export const CategoryItemsPanel = ({
         project_id: projectId ?? undefined,
       }),
     onMutate: async ({ recordId, active }) => {
-      await queryClient.cancelQueries({ queryKey: detailQueryKey })
-      const prev = queryClient.getQueryData<CatalogCategory>(detailQueryKey)
-      if (prev) {
-        queryClient.setQueryData<CatalogCategory>(detailQueryKey, {
-          ...prev,
-          products: prev.products?.map((p) =>
-            p.id === recordId ? { ...p, active } : p
-          ),
-        })
+      // Optimistic update — patch all matching detail queries in cache
+      const queries = queryClient.getQueriesData<CatalogCategory>({
+        queryKey: CATALOG_QUERY_KEYS.detail(category.id),
+      })
+      for (const [key, data] of queries) {
+        if (data) {
+          queryClient.setQueryData<CatalogCategory>(key, {
+            ...data,
+            products: data.products?.map((p) =>
+              p.id === recordId ? { ...p, active } : p
+            ),
+          })
+        }
       }
-      return { prev }
-    },
-    onError: (_err, _vars, ctx) => {
-      if (ctx?.prev) queryClient.setQueryData(detailQueryKey, ctx.prev)
     },
   })
 
