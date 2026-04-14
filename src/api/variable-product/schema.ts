@@ -20,6 +20,7 @@ export interface GlobalSpecDefinition {
   slug: string
   display_type: SpecDisplayType
   sort_order: number
+  vp_count?: number
   options?: SpecOption[]
 }
 

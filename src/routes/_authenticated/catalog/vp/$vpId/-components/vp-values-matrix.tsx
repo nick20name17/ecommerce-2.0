@@ -50,15 +50,25 @@ export const VPValuesMatrix = ({ vp, projectId, isMobile, isTablet }: VPValuesMa
   const [showNewOption, setShowNewOption] = useState(false)
 
   const linkMutation = useMutation({
-    mutationFn: () =>
-      variableProductService.linkItemToOption(
+    mutationFn: async () => {
+      const params = { project_id: projectId ?? undefined }
+      // If item already has a value for this spec, unlink it first
+      const item = vp.items.find((i) => i.id === linkDialog!.itemId)
+      const existingVal = item?.specs[linkDialog!.spec.slug]
+      if (existingVal) {
+        await variableProductService.unlinkItemFromOption(
+          vp.id, linkDialog!.itemId, existingVal.option_id, params
+        )
+      }
+      return variableProductService.linkItemToOption(
         vp.id,
         linkDialog!.itemId,
         { spec_option_id: selectedOptionId },
-        { project_id: projectId ?? undefined }
-      ),
+        params
+      )
+    },
     meta: {
-      successMessage: 'Option linked',
+      successMessage: 'Option updated',
       invalidatesQuery: VP_QUERY_KEYS.detail(vp.id),
     },
     onSuccess: () => {
@@ -172,11 +182,12 @@ export const VPValuesMatrix = ({ vp, projectId, isMobile, isTablet }: VPValuesMa
                 className='border-t border-border-light hover:bg-bg-hover transition-colors'
               >
                 <td className={cn(
-                  'py-1.5 font-medium whitespace-nowrap sticky left-0 bg-background z-10',
-                  isMobile ? 'px-2' : isTablet ? 'px-2.5' : 'px-3'
+                  'py-1.5 font-medium sticky left-0 bg-background z-10',
+                  isMobile ? 'px-2 max-w-[120px]' : isTablet ? 'px-2.5 max-w-[180px]' : 'px-3 max-w-[300px]'
                 )}>
-                  <div className={cn('truncate', isMobile ? 'max-w-[90px]' : isTablet ? 'max-w-[130px]' : 'max-w-[200px]')} title={item.descr_1}>
-                    {item.descr_1 || item.product_id}
+                  <div className='text-[12px] leading-snug' title={`${item.product_id} — ${item.descr_1}`}>
+                    <span className='font-mono text-text-tertiary'>{item.product_id}</span>
+                    {item.descr_1 && <> {item.descr_1}</>}
                   </div>
                 </td>
                 {vp.spec_definitions.map((spec) => {
@@ -195,7 +206,18 @@ export const VPValuesMatrix = ({ vp, projectId, isMobile, isTablet }: VPValuesMa
                               style={{ backgroundColor: matchedOption.color_hex }}
                             />
                           )}
-                          <span>{val.value}</span>
+                          <button
+                            type='button'
+                            className='text-left hover:underline cursor-pointer'
+                            onClick={() => {
+                              resetLinkForm()
+                              setSelectedOptionId(val.option_id)
+                              setLinkDialog({ spec, itemId: item.id })
+                            }}
+                            title='Click to change'
+                          >
+                            {val.value}
+                          </button>
                           <Button
                             variant='ghost'
                             size='icon-xs'
