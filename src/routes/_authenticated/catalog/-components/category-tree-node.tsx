@@ -71,6 +71,12 @@ export const CategoryTreeNode = ({
         <FolderOpen className='size-4 shrink-0 text-amber-500' />
         <span className='flex-1 truncate'>{category.name}</span>
 
+        {((category.product_count ?? 0) > 0 || (category.vp_count ?? 0) > 0) && (
+          <span className='text-[10px] text-text-quaternary tabular-nums shrink-0'>
+            {(category.product_count ?? 0) + (category.vp_count ?? 0)}
+          </span>
+        )}
+
         {!category.active && (
           <>
             <span className='hidden sm:inline rounded bg-muted px-1 py-0.5 text-[10px] font-medium text-text-tertiary'>
