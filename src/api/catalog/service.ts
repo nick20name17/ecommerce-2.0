@@ -70,6 +70,15 @@ export const catalogService = {
     return data
   },
 
+  updateProduct: async (
+    categoryId: string,
+    recordId: string,
+    payload: { active?: boolean; sort_order?: number },
+    params: { project_id?: number }
+  ) => {
+    await api.patch(`/catalog/${categoryId}/products/${recordId}/`, payload, { params })
+  },
+
   removeProduct: async (
     categoryId: string,
     recordId: string,

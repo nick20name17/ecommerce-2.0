@@ -70,6 +70,15 @@ export const variableProductService = {
     return data
   },
 
+  updateItem: async (
+    vpId: string,
+    itemId: string,
+    payload: { active?: boolean; is_default?: boolean; sort_order?: number },
+    params: { project_id?: number }
+  ) => {
+    await api.patch(`/variable-products/${vpId}/items/${itemId}/`, payload, { params })
+  },
+
   removeItem: async (vpId: string, itemId: string, params: { project_id?: number }) => {
     await api.delete(`/variable-products/${vpId}/items/${itemId}/`, { params })
   },

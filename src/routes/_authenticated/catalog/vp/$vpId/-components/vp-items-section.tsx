@@ -1,5 +1,5 @@
 import { useMutation } from '@tanstack/react-query'
-import { Package, Plus, Star, Trash2 } from 'lucide-react'
+import { Eye, EyeOff, Package, Plus, Star, Trash2 } from 'lucide-react'
 import { useState } from 'react'
 
 import type { VariableProduct } from '@/api/variable-product/schema'
@@ -50,6 +50,14 @@ export const VPItemsSection = ({ vp, projectId, isMobile, isTablet }: VPItemsSec
     },
   })
 
+  const toggleItemActiveMutation = useMutation({
+    mutationFn: ({ itemId, active }: { itemId: string; active: boolean }) =>
+      variableProductService.updateItem(vp.id, itemId, { active }, {
+        project_id: projectId ?? undefined,
+      }),
+    meta: { invalidatesQuery: VP_QUERY_KEYS.detail(vp.id) },
+  })
+
   const removeItemMutation = useMutation({
     mutationFn: (itemId: string) =>
       variableProductService.removeItem(vp.id, itemId, {
@@ -84,7 +92,7 @@ export const VPItemsSection = ({ vp, projectId, isMobile, isTablet }: VPItemsSec
           {vp.items.map((item) => (
             <div
               key={item.id}
-              className='rounded-lg border border-border p-3'
+              className={cn('rounded-lg border border-border p-3', item.active === false && 'opacity-40')}
             >
               <div className='flex items-start gap-2'>
                 <Package className='size-4 text-amber-500 shrink-0 mt-0.5' />
@@ -95,6 +103,14 @@ export const VPItemsSection = ({ vp, projectId, isMobile, isTablet }: VPItemsSec
                 {item.is_default && (
                   <Star className='size-3.5 fill-amber-400 text-amber-400 shrink-0' />
                 )}
+                <Button
+                  variant='ghost'
+                  size='icon-xs'
+                  className={cn('shrink-0', item.active !== false ? 'text-text-tertiary' : 'text-text-quaternary')}
+                  onClick={() => toggleItemActiveMutation.mutate({ itemId: item.id, active: item.active === false })}
+                >
+                  {item.active !== false ? <Eye className='size-3.5' /> : <EyeOff className='size-3.5' />}
+                </Button>
                 <Button
                   variant='ghost'
                   size='icon-xs'
@@ -125,6 +141,7 @@ export const VPItemsSection = ({ vp, projectId, isMobile, isTablet }: VPItemsSec
             {!isTablet && <div className='w-[70px] shrink-0 text-right'>Stock</div>}
             {!isTablet && <div className='w-[50px] shrink-0 text-center'>Default</div>}
             <div className='w-[28px] shrink-0' />
+            <div className='w-[28px] shrink-0' />
           </div>
 
           {vp.items.map((item) => (
@@ -132,7 +149,8 @@ export const VPItemsSection = ({ vp, projectId, isMobile, isTablet }: VPItemsSec
               key={item.id}
               className={cn(
                 'flex items-center border-t border-border-light py-1.5 hover:bg-bg-hover transition-colors',
-                isTablet ? 'gap-3 px-3' : 'gap-4 px-4'
+                isTablet ? 'gap-3 px-3' : 'gap-4 px-4',
+                item.active === false && 'opacity-40'
               )}
             >
               <Package className='size-4 text-amber-500 shrink-0' />
@@ -160,6 +178,20 @@ export const VPItemsSection = ({ vp, projectId, isMobile, isTablet }: VPItemsSec
                   )}
                 </div>
               )}
+              <Button
+                variant='ghost'
+                size='icon-xs'
+                className={cn(
+                  'shrink-0',
+                  item.active !== false
+                    ? 'text-text-tertiary hover:text-amber-500'
+                    : 'text-text-quaternary hover:text-emerald-500'
+                )}
+                onClick={() => toggleItemActiveMutation.mutate({ itemId: item.id, active: item.active === false })}
+                title={item.active !== false ? 'Hide from site' : 'Show on site'}
+              >
+                {item.active !== false ? <Eye className='size-3.5' /> : <EyeOff className='size-3.5' />}
+              </Button>
               <Button
                 variant='ghost'
                 size='icon-xs'

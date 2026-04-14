@@ -21,6 +21,7 @@ export interface CatalogCategoryProduct {
   category_id: string
   product_autoid: string
   sort_order: number
+  active: boolean
   product_id?: string
   descr_1?: string
   def_unit?: string
