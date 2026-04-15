@@ -25,20 +25,20 @@ interface CatalogSectionProps {
   projectId: number
 }
 
-const LS_KEY_CAT_IMPORT = 'catalog_import_task'
-const LS_KEY_VP_IMPORT = 'vp_import_task'
-const LS_KEY_IMG_IMPORT = 'image_import_task'
-
-function saveTask(key: string, taskId: string) {
-  localStorage.setItem(key, taskId)
+function lsKey(type: string, projectId: number) {
+  return `import_task_${type}_${projectId}`
 }
 
-function clearTask(key: string) {
-  localStorage.removeItem(key)
+function saveTask(type: string, projectId: number, taskId: string) {
+  localStorage.setItem(lsKey(type, projectId), taskId)
 }
 
-function getSavedTask(key: string): string | null {
-  return localStorage.getItem(key)
+function clearTask(type: string, projectId: number) {
+  localStorage.removeItem(lsKey(type, projectId))
+}
+
+function getSavedTask(type: string, projectId: number): string | null {
+  return localStorage.getItem(lsKey(type, projectId))
 }
 
 export const CatalogSection = ({ projectId }: CatalogSectionProps) => {
@@ -80,7 +80,7 @@ export const CatalogSection = ({ projectId }: CatalogSectionProps) => {
     (taskId: string) => {
       clearImportPolling()
       setImportStatus({ taskId, status: 'running' })
-      saveTask(LS_KEY_CAT_IMPORT, taskId)
+      saveTask('cat', projectId, taskId)
 
       importIntervalRef.current = setInterval(async () => {
         try {
@@ -96,14 +96,14 @@ export const CatalogSection = ({ projectId }: CatalogSectionProps) => {
           })
           if (status.status === 'completed' || status.status === 'failed') {
             clearImportPolling()
-            clearTask(LS_KEY_CAT_IMPORT)
+            clearTask('cat', projectId)
             if (status.status === 'completed') {
               queryClient.invalidateQueries({ queryKey: CATALOG_QUERY_KEYS.all() })
             }
           }
         } catch {
           clearImportPolling()
-          clearTask(LS_KEY_CAT_IMPORT)
+          clearTask('cat', projectId)
           setImportStatus((prev) =>
             prev ? { ...prev, status: 'failed', error: 'Failed to check import status' } : null
           )
@@ -118,7 +118,7 @@ export const CatalogSection = ({ projectId }: CatalogSectionProps) => {
     (taskId: string) => {
       clearVPImportPolling()
       setVPImportStatus({ taskId, status: 'running' })
-      saveTask(LS_KEY_VP_IMPORT, taskId)
+      saveTask('vp', projectId, taskId)
 
       vpImportIntervalRef.current = setInterval(async () => {
         try {
@@ -134,14 +134,14 @@ export const CatalogSection = ({ projectId }: CatalogSectionProps) => {
           })
           if (status.status === 'completed' || status.status === 'failed') {
             clearVPImportPolling()
-            clearTask(LS_KEY_VP_IMPORT)
+            clearTask('vp', projectId)
             if (status.status === 'completed') {
               queryClient.invalidateQueries({ queryKey: VP_QUERY_KEYS.lists() })
             }
           }
         } catch {
           clearVPImportPolling()
-          clearTask(LS_KEY_VP_IMPORT)
+          clearTask('vp', projectId)
           setVPImportStatus((prev) =>
             prev ? { ...prev, status: 'failed', error: 'Failed to check import status' } : null
           )
@@ -155,7 +155,7 @@ export const CatalogSection = ({ projectId }: CatalogSectionProps) => {
     (taskId: string) => {
       clearImgImportPolling()
       setImgImportStatus({ taskId, status: 'running' })
-      saveTask(LS_KEY_IMG_IMPORT, taskId)
+      saveTask('img', projectId, taskId)
 
       imgImportIntervalRef.current = setInterval(async () => {
         try {
@@ -171,11 +171,11 @@ export const CatalogSection = ({ projectId }: CatalogSectionProps) => {
           })
           if (status.status === 'completed' || status.status === 'failed') {
             clearImgImportPolling()
-            clearTask(LS_KEY_IMG_IMPORT)
+            clearTask('img', projectId)
           }
         } catch {
           clearImgImportPolling()
-          clearTask(LS_KEY_IMG_IMPORT)
+          clearTask('img', projectId)
           setImgImportStatus((prev) =>
             prev ? { ...prev, status: 'failed', error: 'Failed to check import status' } : null
           )
@@ -187,13 +187,13 @@ export const CatalogSection = ({ projectId }: CatalogSectionProps) => {
 
   // Resume polling on mount if tasks are saved in localStorage
   useEffect(() => {
-    const savedCatTask = getSavedTask(LS_KEY_CAT_IMPORT)
+    const savedCatTask = getSavedTask('cat', projectId)
     if (savedCatTask) startCategoryPolling(savedCatTask)
 
-    const savedVPTask = getSavedTask(LS_KEY_VP_IMPORT)
+    const savedVPTask = getSavedTask('vp', projectId)
     if (savedVPTask) startVPPolling(savedVPTask)
 
-    const savedImgTask = getSavedTask(LS_KEY_IMG_IMPORT)
+    const savedImgTask = getSavedTask('img', projectId)
     if (savedImgTask) startImgPolling(savedImgTask)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
@@ -341,8 +341,25 @@ export const CatalogSection = ({ projectId }: CatalogSectionProps) => {
                 Import Categories
               </Button>
               {importStatus?.status === 'running' && (
-                <div className='mt-2 text-[12px] text-text-tertiary animate-pulse'>
-                  {importStatus.progress || 'Running...'}
+                <div className='mt-2'>
+                  <div className='text-[12px] text-text-tertiary animate-pulse whitespace-pre-line'>
+                    {importStatus.progress || 'Running...'}
+                  </div>
+                  <Button
+                    variant='ghost'
+                    size='xs'
+                    className='mt-1 text-destructive'
+                    onClick={() => {
+                      if (importStatus.taskId) {
+                        catalogImageService.cancelImport(importStatus.taskId, { project_id: projectId })
+                        clearImportPolling()
+                        clearTask('cat', projectId)
+                        setImportStatus((prev) => prev ? { ...prev, status: 'failed', error: 'Cancelled' } : null)
+                      }
+                    }}
+                  >
+                    Cancel
+                  </Button>
                 </div>
               )}
               {importStatus?.status === 'completed' && (
@@ -395,8 +412,25 @@ export const CatalogSection = ({ projectId }: CatalogSectionProps) => {
                   Import Variable Products
                 </Button>
                 {vpImportStatus?.status === 'running' && (
-                  <div className='text-[12px] text-text-tertiary animate-pulse'>
-                    {vpImportStatus.progress || 'Running...'}
+                  <div>
+                    <div className='text-[12px] text-text-tertiary animate-pulse whitespace-pre-line'>
+                      {vpImportStatus.progress || 'Running...'}
+                    </div>
+                    <Button
+                      variant='ghost'
+                      size='xs'
+                      className='mt-1 text-destructive'
+                      onClick={() => {
+                        if (vpImportStatus.taskId) {
+                          catalogImageService.cancelImport(vpImportStatus.taskId, { project_id: projectId })
+                          clearVPImportPolling()
+                          clearTask('vp', projectId)
+                          setVPImportStatus((prev) => prev ? { ...prev, status: 'failed', error: 'Cancelled' } : null)
+                        }
+                      }}
+                    >
+                      Cancel
+                    </Button>
                   </div>
                 )}
                 {vpImportStatus?.status === 'completed' && (
@@ -483,7 +517,7 @@ export const CatalogSection = ({ projectId }: CatalogSectionProps) => {
               <ImageIcon className='size-4' />
             </div>
             <div className='flex-1'>
-              <h3 className='text-[13px] font-semibold'>5. Import Product Images</h3>
+              <h3 className='text-[13px] font-semibold'>5. Import Images</h3>
               <p className='mt-0.5 text-[12px] text-text-tertiary'>
                 Copies product images from the project's S3 bucket to our catalog bucket with thumbnails.
               </p>
@@ -501,8 +535,25 @@ export const CatalogSection = ({ projectId }: CatalogSectionProps) => {
                 Import Images
               </Button>
               {imgImportStatus?.status === 'running' && (
-                <div className='mt-2 text-[12px] text-text-tertiary animate-pulse whitespace-pre-line'>
-                  {imgImportStatus.progress || 'Running...'}
+                <div className='mt-2'>
+                  <div className='text-[12px] text-text-tertiary animate-pulse whitespace-pre-line'>
+                    {imgImportStatus.progress || 'Running...'}
+                  </div>
+                  <Button
+                    variant='ghost'
+                    size='xs'
+                    className='mt-1 text-destructive'
+                    onClick={() => {
+                      if (imgImportStatus.taskId) {
+                        catalogImageService.cancelImport(imgImportStatus.taskId, { project_id: projectId })
+                        clearImgImportPolling()
+                        clearTask('img', projectId)
+                        setImgImportStatus((prev) => prev ? { ...prev, status: 'failed', error: 'Cancelled' } : null)
+                      }
+                    }}
+                  >
+                    Cancel
+                  </Button>
                 </div>
               )}
               {imgImportStatus?.status === 'completed' && (

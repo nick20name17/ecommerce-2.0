@@ -89,4 +89,8 @@ export const catalogImageService = {
     )
     return data
   },
+
+  cancelImport: async (taskId: string, params?: { project_id?: number }) => {
+    await api.post(`/catalog-images/cancel/${taskId}/`, {}, { params })
+  },
 }
