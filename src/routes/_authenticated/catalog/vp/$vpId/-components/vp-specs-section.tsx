@@ -163,16 +163,10 @@ export const VPSpecsSection = ({ vp, projectId }: VPSpecsSectionProps) => {
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align='end' className='w-44'>
-                    {isShared ? (
-                      <div className='px-2 py-1.5 text-[12px] text-text-tertiary'>
-                        Shared spec — editing disabled
-                      </div>
-                    ) : (
-                      <DropdownMenuItem onClick={() => openEdit(spec)}>
-                        <Pencil className='size-3.5' />
-                        Edit
-                      </DropdownMenuItem>
-                    )}
+                    <DropdownMenuItem onClick={() => openEdit(spec)}>
+                      <Pencil className='size-3.5' />
+                      Edit
+                    </DropdownMenuItem>
                     <DropdownMenuItem
                       className='text-destructive focus:text-destructive'
                       onClick={() => setDeleteSpec(spec)}
@@ -222,6 +216,11 @@ export const VPSpecsSection = ({ vp, projectId }: VPSpecsSectionProps) => {
               <DialogTitle>Edit Spec</DialogTitle>
             </DialogHeader>
             <DialogBody className='flex flex-col gap-3'>
+              {(editSpec?.vp_count ?? 0) > 1 && (
+                <div className='rounded-md bg-amber-500/10 border border-amber-500/20 px-3 py-2 text-[12px] text-amber-600 dark:text-amber-400'>
+                  This spec is used by {editSpec?.vp_count} VPs. Changes will affect all of them.
+                </div>
+              )}
               <div className='flex flex-col gap-1.5'>
                 <Label htmlFor='spec-name-edit'>Name</Label>
                 <Input
