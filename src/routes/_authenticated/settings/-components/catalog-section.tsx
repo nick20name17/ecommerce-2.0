@@ -519,7 +519,7 @@ export const CatalogSection = ({ projectId }: CatalogSectionProps) => {
             <div className='flex-1'>
               <h3 className='text-[13px] font-semibold'>5. Import Images</h3>
               <p className='mt-0.5 text-[12px] text-text-tertiary'>
-                Copies product images from the project's S3 bucket to our catalog bucket with thumbnails.
+                Copies existing product and category images from the EBMS S3 bucket into our catalog. Generates thumbnails automatically. Skips already imported images.
               </p>
               <Button
                 variant='outline'
