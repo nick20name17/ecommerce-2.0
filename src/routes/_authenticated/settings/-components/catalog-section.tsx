@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { Database, Download, FolderTree, Layers, Package } from 'lucide-react'
+import { Database, Download, FolderTree, ImageIcon, Layers, Package } from 'lucide-react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
 import { CATALOG_QUERY_KEYS } from '@/api/catalog/query'
@@ -7,6 +7,7 @@ import type { ImportStatusResponse } from '@/api/catalog/schema'
 import { catalogService } from '@/api/catalog/service'
 import { projectService } from '@/api/project/service'
 import { VP_QUERY_KEYS } from '@/api/variable-product/query'
+import { catalogImageService } from '@/api/catalog-image/service'
 import { variableProductService } from '@/api/variable-product/service'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -26,6 +27,7 @@ interface CatalogSectionProps {
 
 const LS_KEY_CAT_IMPORT = 'catalog_import_task'
 const LS_KEY_VP_IMPORT = 'vp_import_task'
+const LS_KEY_IMG_IMPORT = 'image_import_task'
 
 function saveTask(key: string, taskId: string) {
   localStorage.setItem(key, taskId)
@@ -46,8 +48,10 @@ export const CatalogSection = ({ projectId }: CatalogSectionProps) => {
   const [importStatus, setImportStatus] = useState<ImportPollState | null>(null)
   const [vpImportStatus, setVPImportStatus] = useState<ImportPollState | null>(null)
   const [singleVPResult, setSingleVPResult] = useState<Record<string, unknown> | null>(null)
+  const [imgImportStatus, setImgImportStatus] = useState<ImportPollState | null>(null)
   const importIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const vpImportIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  const imgImportIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const queryClient = useQueryClient()
 
   const clearImportPolling = useCallback(() => {
@@ -61,6 +65,13 @@ export const CatalogSection = ({ projectId }: CatalogSectionProps) => {
     if (vpImportIntervalRef.current) {
       clearInterval(vpImportIntervalRef.current)
       vpImportIntervalRef.current = null
+    }
+  }, [])
+
+  const clearImgImportPolling = useCallback(() => {
+    if (imgImportIntervalRef.current) {
+      clearInterval(imgImportIntervalRef.current)
+      imgImportIntervalRef.current = null
     }
   }, [])
 
@@ -140,17 +151,50 @@ export const CatalogSection = ({ projectId }: CatalogSectionProps) => {
     [clearVPImportPolling, projectId, queryClient]
   )
 
+  const startImgPolling = useCallback(
+    (taskId: string) => {
+      clearImgImportPolling()
+      setImgImportStatus({ taskId, status: 'running' })
+      saveTask(LS_KEY_IMG_IMPORT, taskId)
+
+      imgImportIntervalRef.current = setInterval(async () => {
+        try {
+          const status = await catalogImageService.getImportStatus(taskId, {
+            project_id: projectId,
+          })
+          setImgImportStatus({
+            taskId,
+            status: status.status,
+            progress: status.progress,
+            result: status.result,
+            error: status.error,
+          })
+          if (status.status === 'completed' || status.status === 'failed') {
+            clearImgImportPolling()
+            clearTask(LS_KEY_IMG_IMPORT)
+          }
+        } catch {
+          clearImgImportPolling()
+          clearTask(LS_KEY_IMG_IMPORT)
+          setImgImportStatus((prev) =>
+            prev ? { ...prev, status: 'failed', error: 'Failed to check import status' } : null
+          )
+        }
+      }, 2000)
+    },
+    [clearImgImportPolling, projectId]
+  )
+
   // Resume polling on mount if tasks are saved in localStorage
   useEffect(() => {
     const savedCatTask = getSavedTask(LS_KEY_CAT_IMPORT)
-    if (savedCatTask) {
-      startCategoryPolling(savedCatTask)
-    }
+    if (savedCatTask) startCategoryPolling(savedCatTask)
 
     const savedVPTask = getSavedTask(LS_KEY_VP_IMPORT)
-    if (savedVPTask) {
-      startVPPolling(savedVPTask)
-    }
+    if (savedVPTask) startVPPolling(savedVPTask)
+
+    const savedImgTask = getSavedTask(LS_KEY_IMG_IMPORT)
+    if (savedImgTask) startImgPolling(savedImgTask)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
@@ -159,8 +203,9 @@ export const CatalogSection = ({ projectId }: CatalogSectionProps) => {
     return () => {
       clearImportPolling()
       clearVPImportPolling()
+      clearImgImportPolling()
     }
-  }, [clearImportPolling, clearVPImportPolling])
+  }, [clearImportPolling, clearVPImportPolling, clearImgImportPolling])
 
   const createTablesMutation = useMutation({
     mutationFn: () => projectService.createEcTables(projectId),
@@ -427,6 +472,49 @@ export const CatalogSection = ({ projectId }: CatalogSectionProps) => {
                   </div>
                 )}
               </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Step 5: Import Images */}
+        <div className='rounded-lg border border-border p-4'>
+          <div className='flex items-start gap-3'>
+            <div className='flex size-8 shrink-0 items-center justify-center rounded-md bg-cyan-500/10 text-cyan-500'>
+              <ImageIcon className='size-4' />
+            </div>
+            <div className='flex-1'>
+              <h3 className='text-[13px] font-semibold'>5. Import Product Images</h3>
+              <p className='mt-0.5 text-[12px] text-text-tertiary'>
+                Copies product images from the project's S3 bucket to our catalog bucket with thumbnails.
+              </p>
+              <Button
+                variant='outline'
+                size='sm'
+                className='mt-3'
+                onClick={async () => {
+                  const data = await catalogImageService.startImport({ project_id: projectId })
+                  startImgPolling(data.task_id)
+                }}
+                disabled={imgImportStatus?.status === 'running'}
+              >
+                <Download className='size-3.5' />
+                Import Images
+              </Button>
+              {imgImportStatus?.status === 'running' && (
+                <div className='mt-2 text-[12px] text-text-tertiary animate-pulse whitespace-pre-line'>
+                  {imgImportStatus.progress || 'Running...'}
+                </div>
+              )}
+              {imgImportStatus?.status === 'completed' && (
+                <div className='mt-2 rounded-md bg-bg-secondary p-2 text-[12px] text-emerald-600 dark:text-emerald-400'>
+                  Import complete{imgImportStatus.result ? `: ${JSON.stringify(imgImportStatus.result)}` : ''}
+                </div>
+              )}
+              {imgImportStatus?.status === 'failed' && (
+                <div className='mt-2 text-[12px] text-destructive'>
+                  Import failed{imgImportStatus.error ? `: ${imgImportStatus.error}` : ''}
+                </div>
+              )}
             </div>
           </div>
         </div>

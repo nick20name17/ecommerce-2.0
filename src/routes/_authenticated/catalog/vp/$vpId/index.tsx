@@ -7,6 +7,7 @@ import { VPHeader } from './-components/vp-header'
 import { VPItemsSection } from './-components/vp-items-section'
 import { VPSpecsSection } from './-components/vp-specs-section'
 import { VPValuesMatrix } from './-components/vp-values-matrix'
+import { ImageGallery } from '@/components/common/image-gallery'
 import { VP_QUERY_KEYS, getVariableProductDetailQuery } from '@/api/variable-product/query'
 import { variableProductService } from '@/api/variable-product/service'
 import { Button } from '@/components/ui/button'
@@ -112,6 +113,9 @@ const CatalogVPDetailPage = () => {
               </div>
             )}
           </div>
+
+          {/* Images */}
+          <ImageGallery entityType='vp' entityId={vp.id} projectId={projectId} />
 
           {/* Items */}
           <VPItemsSection vp={vp} projectId={projectId} isMobile={isMobile} isTablet={isTablet} />
