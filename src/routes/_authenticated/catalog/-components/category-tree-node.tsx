@@ -1,4 +1,4 @@
-import { ChevronRight, FolderOpen, MoreHorizontal, Pencil, Plus, Trash2 } from 'lucide-react'
+import { ChevronRight, FolderClosed, FolderOpen, GripVertical, MoreHorizontal, Pencil, Plus, Trash2 } from 'lucide-react'
 import { useState } from 'react'
 
 import type { CatalogCategory } from '@/api/catalog/schema'
@@ -20,6 +20,7 @@ interface CategoryTreeNodeProps {
   onEdit: (category: CatalogCategory) => void
   onDelete: (category: CatalogCategory) => void
   onAddChild: (parentId: string) => void
+  onMove?: (categoryId: string, newParentId: string | null) => void
 }
 
 export const CategoryTreeNode = ({
@@ -31,24 +32,66 @@ export const CategoryTreeNode = ({
   onEdit,
   onDelete,
   onAddChild,
+  onMove,
 }: CategoryTreeNodeProps) => {
   const [expanded, setExpanded] = useState(depth === 0)
   const hasChildren = category.children && category.children.length > 0
   const isSelected = selectedId === category.id
+  const [dragOver, setDragOver] = useState(false)
+
+  const handleDragStart = (e: React.DragEvent) => {
+    e.stopPropagation()
+    e.dataTransfer.setData('text/plain', category.id)
+    e.dataTransfer.effectAllowed = 'move'
+  }
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    const draggedId = e.dataTransfer.types.includes('text/plain')
+    if (draggedId) {
+      e.dataTransfer.dropEffect = 'move'
+      setDragOver(true)
+    }
+  }
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.stopPropagation()
+    setDragOver(false)
+  }
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setDragOver(false)
+    const draggedId = e.dataTransfer.getData('text/plain')
+    if (draggedId && draggedId !== category.id && onMove) {
+      onMove(draggedId, category.id)
+      setExpanded(true)
+    }
+  }
 
   return (
     <div>
       <div
+        draggable
+        onDragStart={handleDragStart}
+        onDragOver={handleDragOver}
+        onDragLeave={handleDragLeave}
+        onDrop={handleDrop}
         className={cn(
           'group flex items-center gap-1 rounded-md px-1.5 text-[13px] transition-colors duration-75 cursor-pointer',
           'h-9 sm:h-8',
           isSelected
             ? 'bg-primary/10 text-foreground font-medium'
-            : 'hover:bg-bg-hover text-text-secondary'
+            : 'hover:bg-bg-hover text-text-secondary',
+          dragOver && 'ring-2 ring-primary/40 bg-primary/5'
         )}
         style={{ paddingLeft: `${depth * 16 + 6}px` }}
         onClick={() => onSelect(category)}
       >
+        <GripVertical className='size-3 shrink-0 text-text-quaternary opacity-0 group-hover:opacity-100 cursor-grab active:cursor-grabbing' />
+
         <button
           type='button'
           className={cn(
@@ -68,7 +111,11 @@ export const CategoryTreeNode = ({
           />
         </button>
 
-        <FolderOpen className='size-4 shrink-0 text-amber-500' />
+        {expanded && hasChildren ? (
+          <FolderOpen className='size-4 shrink-0 text-amber-500' />
+        ) : (
+          <FolderClosed className='size-4 shrink-0 text-amber-500' />
+        )}
         <span className='flex-1 truncate'>{category.name}</span>
 
         {((category.product_count ?? 0) > 0 || (category.vp_count ?? 0) > 0) && (
@@ -130,6 +177,7 @@ export const CategoryTreeNode = ({
               onEdit={onEdit}
               onDelete={onDelete}
               onAddChild={onAddChild}
+              onMove={onMove}
             />
           ))}
         </div>
