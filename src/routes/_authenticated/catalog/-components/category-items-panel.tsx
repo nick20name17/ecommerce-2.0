@@ -10,6 +10,7 @@ import { variableProductService } from '@/api/variable-product/service'
 import { VP_QUERY_KEYS } from '@/api/variable-product/query'
 import { ImageGallery } from '@/components/common/image-gallery'
 import { PageEmpty } from '@/components/common/page-empty'
+import { ProductThumbnail } from '@/components/common/product-thumbnail'
 import { ProductBrowserDialog } from '@/components/common/product-browser-dialog'
 import { VPCreateFromProductDialog } from './vp-create-from-product-dialog'
 import { Button } from '@/components/ui/button'
@@ -186,9 +187,19 @@ export const CategoryItemsPanel = ({
                   onClick={!isProduct ? () => navigate({ to: `/catalog/vp/${(record as CatalogCategoryVP).vp_id}` }) : undefined}
                 >
                   {isProduct ? (
-                    <Package className='size-4 text-amber-500 shrink-0' />
+                    <ProductThumbnail
+                      entityType='product'
+                      entityId={(record as CatalogCategoryProduct).product_autoid}
+                      projectId={projectId}
+                      className='size-8 shrink-0'
+                    />
                   ) : (
-                    <Layers className='size-4 text-purple-500 shrink-0' />
+                    <ProductThumbnail
+                      entityType='vp'
+                      entityId={(record as CatalogCategoryVP).vp_id}
+                      projectId={projectId}
+                      className='size-8 shrink-0'
+                    />
                   )}
                   <div className='flex-1 min-w-0'>
                     {isProduct ? (
