@@ -1,5 +1,5 @@
 import { useMutation } from '@tanstack/react-query'
-import { Plus, Trash2 } from 'lucide-react'
+import { Pencil, Plus, Trash2 } from 'lucide-react'
 import { useState } from 'react'
 
 import type {
@@ -48,6 +48,11 @@ export const VPValuesMatrix = ({ vp, projectId, isMobile, isTablet }: VPValuesMa
   const [newOptionValue, setNewOptionValue] = useState('')
   const [newOptionColorHex, setNewOptionColorHex] = useState('')
   const [showNewOption, setShowNewOption] = useState(false)
+
+  // For editing option value
+  const [editOption, setEditOption] = useState<{
+    specId: string; optionId: string; value: string; colorHex: string; vpCount: number
+  } | null>(null)
 
   const linkMutation = useMutation({
     mutationFn: async () => {
@@ -214,10 +219,25 @@ export const VPValuesMatrix = ({ vp, projectId, isMobile, isTablet }: VPValuesMa
                               setSelectedOptionId(val.option_id)
                               setLinkDialog({ spec, itemId: item.id })
                             }}
-                            title='Click to change'
+                            title='Click to change option'
                           >
                             {val.value}
                           </button>
+                          <Button
+                            variant='ghost'
+                            size='icon-xs'
+                            className='sm:opacity-0 sm:group-hover:opacity-100 text-text-tertiary hover:text-text-secondary shrink-0'
+                            onClick={() => setEditOption({
+                              specId: spec.id,
+                              optionId: val.option_id,
+                              value: val.value,
+                              colorHex: matchedOption?.color_hex ?? '',
+                              vpCount: spec.vp_count ?? 0,
+                            })}
+                            title='Edit option text'
+                          >
+                            <Pencil className='size-3' />
+                          </Button>
                           <Button
                             variant='ghost'
                             size='icon-xs'
@@ -376,6 +396,111 @@ export const VPValuesMatrix = ({ vp, projectId, isMobile, isTablet }: VPValuesMa
           </form>
         </DialogContent>
       </Dialog>
+
+      {/* Edit option dialog */}
+      <EditOptionDialog
+        option={editOption}
+        onClose={() => setEditOption(null)}
+        projectId={projectId}
+        vpId={vp.id}
+      />
     </div>
+  )
+}
+
+function EditOptionDialog({
+  option,
+  onClose,
+  projectId,
+  vpId,
+}: {
+  option: { specId: string; optionId: string; value: string; colorHex: string; vpCount: number } | null
+  onClose: () => void
+  projectId: number | null
+  vpId: string
+}) {
+  const [value, setValue] = useState('')
+  const [colorHex, setColorHex] = useState('')
+
+  // Sync state when dialog opens
+  const isOpen = !!option
+  if (isOpen && value === '' && option.value !== '') {
+    setValue(option.value)
+    setColorHex(option.colorHex)
+  }
+
+  const updateMutation = useMutation({
+    mutationFn: () =>
+      variableProductService.updateSpecOption(
+        option!.specId,
+        option!.optionId,
+        { value, color_hex: colorHex || undefined },
+        { project_id: projectId ?? undefined }
+      ),
+    meta: {
+      successMessage: 'Option updated',
+      invalidatesQuery: VP_QUERY_KEYS.detail(vpId),
+    },
+    onSuccess: () => {
+      handleClose()
+    },
+  })
+
+  const handleClose = () => {
+    setValue('')
+    setColorHex('')
+    onClose()
+  }
+
+  return (
+    <Dialog open={isOpen} onOpenChange={(v) => !v && handleClose()}>
+      <DialogContent className='sm:max-w-sm'>
+        <form onSubmit={(e) => { e.preventDefault(); updateMutation.mutate() }}>
+          <DialogHeader>
+            <DialogTitle>Edit Option</DialogTitle>
+          </DialogHeader>
+          <DialogBody className='flex flex-col gap-3'>
+            {(option?.vpCount ?? 0) > 1 && (
+              <div className='rounded-md bg-amber-500/10 border border-amber-500/20 px-3 py-2 text-[12px] text-amber-600 dark:text-amber-400'>
+                This option is shared across {option?.vpCount} VPs. Changes will affect all of them.
+              </div>
+            )}
+            <div className='flex flex-col gap-1.5'>
+              <Label htmlFor='edit-opt-value'>Value</Label>
+              <Input
+                id='edit-opt-value'
+                value={value}
+                onChange={(e) => setValue(e.target.value)}
+                required
+                autoFocus
+              />
+            </div>
+            {colorHex !== undefined && (
+              <div className='flex flex-col gap-1.5'>
+                <Label htmlFor='edit-opt-color'>Color Hex</Label>
+                <div className='flex items-center gap-2'>
+                  <Input
+                    id='edit-opt-color'
+                    value={colorHex}
+                    onChange={(e) => setColorHex(e.target.value)}
+                    placeholder='#FF0000'
+                  />
+                  {colorHex && (
+                    <div
+                      className='size-8 rounded-md border border-border shrink-0'
+                      style={{ backgroundColor: colorHex }}
+                    />
+                  )}
+                </div>
+              </div>
+            )}
+          </DialogBody>
+          <DialogFooter>
+            <Button type='button' variant='outline' onClick={handleClose}>Cancel</Button>
+            <Button type='submit' isPending={updateMutation.isPending}>Save</Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
   )
 }

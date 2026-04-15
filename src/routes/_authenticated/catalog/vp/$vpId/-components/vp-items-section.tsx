@@ -1,4 +1,4 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useMutation } from '@tanstack/react-query'
 import { Eye, EyeOff, Package, Plus, Star, Trash2 } from 'lucide-react'
 import { useState } from 'react'
 
@@ -33,6 +33,11 @@ export const VPItemsSection = ({ vp, projectId, isMobile, isTablet }: VPItemsSec
   const [isDefault, setIsDefault] = useState(false)
   const [sortOrder, setSortOrder] = useState(0)
 
+  // Local active state for instant toggle (fire-and-forget API call)
+  const [localActive, setLocalActive] = useState<Record<string, boolean>>({})
+  const getItemActive = (item: VariableProductItem) =>
+    localActive[item.id] ?? item.active ?? true
+
   const addItemMutation = useMutation({
     mutationFn: () =>
       variableProductService.addItem(
@@ -52,26 +57,14 @@ export const VPItemsSection = ({ vp, projectId, isMobile, isTablet }: VPItemsSec
     },
   })
 
-  const queryClient = useQueryClient()
-
-  const toggleItemActiveMutation = useMutation({
-    mutationFn: ({ itemId, active }: { itemId: string; active: boolean }) =>
-      variableProductService.updateItem(vp.id, itemId, { active }, {
-        project_id: projectId ?? undefined,
-      }),
-    onMutate: async ({ itemId, active }) => {
-      await queryClient.cancelQueries({ queryKey: VP_QUERY_KEYS.detail(vp.id) })
-      queryClient.setQueriesData<VariableProduct>(
-        { queryKey: VP_QUERY_KEYS.detail(vp.id) },
-        (old) => old ? {
-          ...old,
-          items: old.items.map((item: VariableProductItem) =>
-            item.id === itemId ? { ...item, active } : item
-          ),
-        } : old
-      )
-    },
-  })
+  const toggleItemActive = (itemId: string) => {
+    const current = localActive[itemId] ?? vp.items.find((i) => i.id === itemId)?.active ?? true
+    const next = !current
+    setLocalActive((prev) => ({ ...prev, [itemId]: next }))
+    variableProductService.updateItem(vp.id, itemId, { active: next }, {
+      project_id: projectId ?? undefined,
+    })
+  }
 
   const addProductsMutation = useMutation({
     mutationFn: async (products: { autoid: string }[]) => {
@@ -124,7 +117,7 @@ export const VPItemsSection = ({ vp, projectId, isMobile, isTablet }: VPItemsSec
           {vp.items.map((item) => (
             <div
               key={item.id}
-              className={cn('rounded-lg border border-border p-3', item.active === false && 'opacity-40')}
+              className={cn('rounded-lg border border-border p-3', !getItemActive(item) && 'opacity-40')}
             >
               <div className='flex items-start gap-2'>
                 <Package className='size-4 text-amber-500 shrink-0 mt-0.5' />
@@ -138,10 +131,10 @@ export const VPItemsSection = ({ vp, projectId, isMobile, isTablet }: VPItemsSec
                 <Button
                   variant='ghost'
                   size='icon-xs'
-                  className={cn('shrink-0', item.active !== false ? 'text-text-tertiary' : 'text-text-quaternary')}
-                  onClick={() => toggleItemActiveMutation.mutate({ itemId: item.id, active: item.active === false })}
+                  className={cn('shrink-0', getItemActive(item) ? 'text-text-tertiary' : 'text-text-quaternary')}
+                  onClick={() => toggleItemActive(item.id)}
                 >
-                  {item.active !== false ? <Eye className='size-3.5' /> : <EyeOff className='size-3.5' />}
+                  {getItemActive(item) ? <Eye className='size-3.5' /> : <EyeOff className='size-3.5' />}
                 </Button>
                 <Button
                   variant='ghost'
@@ -182,7 +175,7 @@ export const VPItemsSection = ({ vp, projectId, isMobile, isTablet }: VPItemsSec
               className={cn(
                 'flex items-center border-t border-border-light py-1.5 hover:bg-bg-hover transition-colors',
                 isTablet ? 'gap-3 px-3' : 'gap-4 px-4',
-                item.active === false && 'opacity-40'
+                !getItemActive(item) && 'opacity-40'
               )}
             >
               <Package className='size-4 text-amber-500 shrink-0' />
@@ -215,14 +208,14 @@ export const VPItemsSection = ({ vp, projectId, isMobile, isTablet }: VPItemsSec
                 size='icon-xs'
                 className={cn(
                   'shrink-0',
-                  item.active !== false
+                  getItemActive(item)
                     ? 'text-text-tertiary hover:text-amber-500'
                     : 'text-text-quaternary hover:text-emerald-500'
                 )}
-                onClick={() => toggleItemActiveMutation.mutate({ itemId: item.id, active: item.active === false })}
-                title={item.active !== false ? 'Hide from site' : 'Show on site'}
+                onClick={() => toggleItemActive(item.id)}
+                title={getItemActive(item) ? 'Hide from site' : 'Show on site'}
               >
-                {item.active !== false ? <Eye className='size-3.5' /> : <EyeOff className='size-3.5' />}
+                {getItemActive(item) ? <Eye className='size-3.5' /> : <EyeOff className='size-3.5' />}
               </Button>
               <Button
                 variant='ghost'
