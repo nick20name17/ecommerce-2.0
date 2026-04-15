@@ -60,31 +60,16 @@ export const VPItemsSection = ({ vp, projectId, isMobile, isTablet }: VPItemsSec
         project_id: projectId ?? undefined,
       }),
     onMutate: async ({ itemId, active }) => {
-      const detailKey = VP_QUERY_KEYS.detail(vp.id)
-      await queryClient.cancelQueries({ queryKey: detailKey })
-      const queries = queryClient.getQueriesData<VariableProduct>({
-        queryKey: detailKey,
-      })
-      const prevEntries: [readonly unknown[], VariableProduct | undefined][] = []
-      for (const [key, data] of queries) {
-        prevEntries.push([key, data])
-        if (data) {
-          queryClient.setQueryData<VariableProduct>(key, {
-            ...data,
-            items: data.items.map((item: VariableProductItem) =>
-              item.id === itemId ? { ...item, active } : item
-            ),
-          })
-        }
-      }
-      return { prevEntries }
-    },
-    onError: (_err, _vars, ctx) => {
-      if (ctx?.prevEntries) {
-        for (const [key, data] of ctx.prevEntries) {
-          queryClient.setQueryData(key, data)
-        }
-      }
+      await queryClient.cancelQueries({ queryKey: VP_QUERY_KEYS.detail(vp.id) })
+      queryClient.setQueriesData<VariableProduct>(
+        { queryKey: VP_QUERY_KEYS.detail(vp.id) },
+        (old) => old ? {
+          ...old,
+          items: old.items.map((item: VariableProductItem) =>
+            item.id === itemId ? { ...item, active } : item
+          ),
+        } : old
+      )
     },
   })
 
