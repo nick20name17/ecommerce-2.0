@@ -69,7 +69,6 @@ export const CategoryFormDialog = ({
     const payload: CreateCatalogCategoryPayload = {
       name,
       slug: slug || undefined,
-      image_url: imageUrl || undefined,
       sort_order: sortOrder,
       parent_id: isEditing ? category.parent_id : (parentId ?? null),
     }
@@ -115,15 +114,6 @@ export const CategoryFormDialog = ({
                 value={slug}
                 onChange={(e) => setSlug(e.target.value)}
                 placeholder='category-slug (auto-generated if empty)'
-              />
-            </div>
-            <div className='flex flex-col gap-1.5'>
-              <Label htmlFor='cat-image'>Image URL</Label>
-              <Input
-                id='cat-image'
-                value={imageUrl}
-                onChange={(e) => setImageUrl(e.target.value)}
-                placeholder='https://...'
               />
             </div>
             <div className='flex flex-col gap-1.5'>
