@@ -1,13 +1,17 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
-import { Box, Eye, EyeOff, Layers, Package, Plus, Trash2 } from 'lucide-react'
+import { Box, Eye, EyeOff, Layers, Package, Plus, Sparkles, Trash2 } from 'lucide-react'
 import { useState } from 'react'
 
 import { CATALOG_QUERY_KEYS, getCatalogDetailQuery } from '@/api/catalog/query'
 import type { CatalogCategory, CatalogCategoryProduct, CatalogCategoryVP } from '@/api/catalog/schema'
 import { catalogService } from '@/api/catalog/service'
+import { variableProductService } from '@/api/variable-product/service'
+import { VP_QUERY_KEYS } from '@/api/variable-product/query'
+import { ImageGallery } from '@/components/common/image-gallery'
 import { PageEmpty } from '@/components/common/page-empty'
 import { ProductBrowserDialog } from '@/components/common/product-browser-dialog'
+import { VPCreateFromProductDialog } from './vp-create-from-product-dialog'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { cn } from '@/lib/utils'
@@ -28,6 +32,7 @@ export const CategoryItemsPanel = ({
   const [addItemOpen, setAddItemOpen] = useState(false)
   const [addItemType, setAddItemType] = useState<'product' | 'variable_product'>('product')
   const [productBrowserOpen, setProductBrowserOpen] = useState(false)
+  const [createVPFromProduct, setCreateVPFromProduct] = useState<CatalogCategoryProduct | null>(null)
 
   const { data, isLoading } = useQuery(
     getCatalogDetailQuery(category.id, { project_id: projectId ?? undefined })
@@ -141,6 +146,11 @@ export const CategoryItemsPanel = ({
         </Button>
       </div>
 
+      {/* Category images */}
+      <div className={cn('border-b border-border', isMobile ? 'px-3.5 py-3' : 'px-6 py-4')}>
+        <ImageGallery entityType='category' entityId={category.id} projectId={projectId} />
+      </div>
+
       {/* Items list */}
       <div className='flex-1 overflow-y-auto'>
         {isLoading ? (
@@ -214,28 +224,42 @@ export const CategoryItemsPanel = ({
                     </span>
                   )}
                   {isProduct && (
-                    <Button
-                      variant='ghost'
-                      size='icon-xs'
-                      className={cn(
-                        'shrink-0',
-                        (record as CatalogCategoryProduct).active !== false
-                          ? 'text-text-tertiary hover:text-amber-500'
-                          : 'text-text-quaternary hover:text-emerald-500'
-                      )}
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        const current = (record as CatalogCategoryProduct).active !== false
-                        toggleProductActiveMutation.mutate({ recordId: record.id, active: !current })
-                      }}
-                      title={(record as CatalogCategoryProduct).active !== false ? 'Hide from site' : 'Show on site'}
-                    >
-                      {(record as CatalogCategoryProduct).active !== false ? (
-                        <Eye className='size-3.5' />
-                      ) : (
-                        <EyeOff className='size-3.5' />
-                      )}
-                    </Button>
+                    <>
+                      <Button
+                        variant='ghost'
+                        size='icon-xs'
+                        className='shrink-0 text-text-tertiary hover:text-purple-500'
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          setCreateVPFromProduct(record as CatalogCategoryProduct)
+                        }}
+                        title='Create VP from this product'
+                      >
+                        <Sparkles className='size-3.5' />
+                      </Button>
+                      <Button
+                        variant='ghost'
+                        size='icon-xs'
+                        className={cn(
+                          'shrink-0',
+                          (record as CatalogCategoryProduct).active !== false
+                            ? 'text-text-tertiary hover:text-amber-500'
+                            : 'text-text-quaternary hover:text-emerald-500'
+                        )}
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          const current = (record as CatalogCategoryProduct).active !== false
+                          toggleProductActiveMutation.mutate({ recordId: record.id, active: !current })
+                        }}
+                        title={(record as CatalogCategoryProduct).active !== false ? 'Hide from site' : 'Show on site'}
+                      >
+                        {(record as CatalogCategoryProduct).active !== false ? (
+                          <Eye className='size-3.5' />
+                        ) : (
+                          <EyeOff className='size-3.5' />
+                        )}
+                      </Button>
+                    </>
                   )}
                   <Button
                     variant='ghost'
@@ -271,6 +295,13 @@ export const CategoryItemsPanel = ({
         projectId={projectId}
         title='Add Products to Category'
         onSelect={(products) => addProductsMutation.mutate(products)}
+      />
+
+      <VPCreateFromProductDialog
+        product={createVPFromProduct}
+        open={!!createVPFromProduct}
+        onOpenChange={(v) => !v && setCreateVPFromProduct(null)}
+        projectId={projectId}
       />
     </div>
   )
