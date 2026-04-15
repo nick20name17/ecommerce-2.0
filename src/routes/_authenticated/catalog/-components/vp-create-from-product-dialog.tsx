@@ -1,8 +1,10 @@
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
 
+import { CATALOG_QUERY_KEYS } from '@/api/catalog/query'
 import type { CatalogCategoryProduct } from '@/api/catalog/schema'
+import { catalogService } from '@/api/catalog/service'
 import { VP_QUERY_KEYS } from '@/api/variable-product/query'
 import { variableProductService } from '@/api/variable-product/service'
 import { Button } from '@/components/ui/button'
@@ -19,6 +21,7 @@ import { Label } from '@/components/ui/label'
 
 interface VPCreateFromProductDialogProps {
   product: CatalogCategoryProduct | null
+  categoryId: string
   open: boolean
   onOpenChange: (open: boolean) => void
   projectId: number | null
@@ -26,6 +29,7 @@ interface VPCreateFromProductDialogProps {
 
 export const VPCreateFromProductDialog = ({
   product,
+  categoryId,
   open,
   onOpenChange,
   projectId,
@@ -41,28 +45,33 @@ export const VPCreateFromProductDialog = ({
     }
   }, [open, product])
 
+  const queryClient = useQueryClient()
+
   const createMutation = useMutation({
     mutationFn: async () => {
+      const params = { project_id: projectId ?? undefined }
       // 1. Create VP
       const vp = await variableProductService.create(
         { name, description: description || undefined },
-        { project_id: projectId ?? undefined }
+        params
       )
       // 2. Add the product as first item
       if (product) {
         await variableProductService.addItem(
           vp.id,
           { product_autoid: product.product_autoid, is_default: true },
-          { project_id: projectId ?? undefined }
+          params
         )
+      }
+      // 3. Link VP to the category
+      if (categoryId) {
+        await catalogService.addVariableProduct(categoryId, { vp_id: vp.id }, params)
       }
       return vp
     },
-    meta: {
-      successMessage: 'Variable product created',
-      invalidatesQuery: VP_QUERY_KEYS.lists(),
-    },
     onSuccess: (vp) => {
+      queryClient.invalidateQueries({ queryKey: VP_QUERY_KEYS.lists() })
+      queryClient.invalidateQueries({ queryKey: CATALOG_QUERY_KEYS.all() })
       onOpenChange(false)
       navigate({ to: `/catalog/vp/${vp.id}` })
     },

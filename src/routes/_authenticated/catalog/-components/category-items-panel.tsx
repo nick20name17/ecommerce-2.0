@@ -299,6 +299,7 @@ export const CategoryItemsPanel = ({
 
       <VPCreateFromProductDialog
         product={createVPFromProduct}
+        categoryId={category.id}
         open={!!createVPFromProduct}
         onOpenChange={(v) => !v && setCreateVPFromProduct(null)}
         projectId={projectId}
