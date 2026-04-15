@@ -6,6 +6,7 @@ import type { VariableProduct, VariableProductItem } from '@/api/variable-produc
 import { variableProductService } from '@/api/variable-product/service'
 import { VP_QUERY_KEYS } from '@/api/variable-product/query'
 import { ProductBrowserDialog } from '@/components/common/product-browser-dialog'
+import { ProductThumbnail } from '@/components/common/product-thumbnail'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -120,7 +121,7 @@ export const VPItemsSection = ({ vp, projectId, isMobile, isTablet }: VPItemsSec
               className={cn('rounded-lg border border-border p-3', !getItemActive(item) && 'opacity-40')}
             >
               <div className='flex items-start gap-2'>
-                <Package className='size-4 text-amber-500 shrink-0 mt-0.5' />
+                <ProductThumbnail entityType='product' entityId={item.product_autoid} projectId={projectId} className='size-8 shrink-0' />
                 <div className='flex-1 min-w-0'>
                   <div className='text-[13px] font-medium truncate'>{item.descr_1 || item.product_id}</div>
                   <div className='text-[11px] font-mono text-text-tertiary'>{item.product_id}</div>
@@ -159,7 +160,7 @@ export const VPItemsSection = ({ vp, projectId, isMobile, isTablet }: VPItemsSec
             'bg-bg-secondary text-text-tertiary flex items-center py-1.5 text-[12px] font-medium',
             isTablet ? 'gap-3 px-3' : 'gap-4 px-4'
           )}>
-            <div className='w-5 shrink-0' />
+            <div className='w-8 shrink-0' />
             <div className={cn(isTablet ? 'w-[80px]' : 'w-[100px]', 'shrink-0')}>Product ID</div>
             <div className='flex-1 min-w-0'>Description</div>
             <div className='w-[70px] shrink-0 text-right'>Price</div>
@@ -178,7 +179,7 @@ export const VPItemsSection = ({ vp, projectId, isMobile, isTablet }: VPItemsSec
                 !getItemActive(item) && 'opacity-40'
               )}
             >
-              <Package className='size-4 text-amber-500 shrink-0' />
+              <ProductThumbnail entityType='product' entityId={item.product_autoid} projectId={projectId} className='size-8 shrink-0' />
               <div className={cn(isTablet ? 'w-[80px]' : 'w-[100px]', 'shrink-0 text-[12px] font-mono text-text-secondary truncate')}>
                 {item.product_id}
               </div>
