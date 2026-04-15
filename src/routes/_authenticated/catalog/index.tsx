@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
 import { ArrowLeft, FolderTree, Plus } from 'lucide-react'
 import { useState } from 'react'
@@ -8,8 +8,9 @@ import { CategoryFormDialog } from './-components/category-form-dialog'
 import { CategoryItemsPanel } from './-components/category-items-panel'
 import { CategoryTreeNode } from './-components/category-tree-node'
 import { VPCreateDialog } from './-components/vp-create-dialog'
-import { getCatalogTreeQuery } from '@/api/catalog/query'
+import { CATALOG_QUERY_KEYS, getCatalogTreeQuery } from '@/api/catalog/query'
 import type { CatalogCategory } from '@/api/catalog/schema'
+import { catalogService } from '@/api/catalog/service'
 import { PageEmpty } from '@/components/common/page-empty'
 import { ICatalog, PAGE_COLORS, PageHeaderIcon } from '@/components/ds'
 import { Button } from '@/components/ui/button'
@@ -41,6 +42,17 @@ const CatalogPage = () => {
   const [parentIdForNew, setParentIdForNew] = useState<string | null>(null)
   const [deleteCategory, setDeleteCategory] = useState<CatalogCategory | null>(null)
   const [vpCreateOpen, setVpCreateOpen] = useState(false)
+
+  const queryClient = useQueryClient()
+  const moveMutation = useMutation({
+    mutationFn: ({ categoryId, newParentId }: { categoryId: string; newParentId: string | null }) =>
+      catalogService.update(categoryId, { parent_id: newParentId }, { project_id: projectId ?? undefined }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: CATALOG_QUERY_KEYS.all() }),
+  })
+
+  const handleMove = (categoryId: string, newParentId: string | null) => {
+    moveMutation.mutate({ categoryId, newParentId })
+  }
 
   const openCreateDialog = (parentId: string | null = null) => {
     setEditingCategory(null)
@@ -132,7 +144,15 @@ const CatalogPage = () => {
                 }
               />
             ) : (
-              <div className='py-1 px-1.5'>
+              <div
+                className='py-1 px-1.5 min-h-full'
+                onDragOver={(e) => { e.preventDefault(); e.dataTransfer.dropEffect = 'move' }}
+                onDrop={(e) => {
+                  e.preventDefault()
+                  const draggedId = e.dataTransfer.getData('text/plain')
+                  if (draggedId) handleMove(draggedId, null)
+                }}
+              >
                 {tree.map((cat) => (
                   <CategoryTreeNode
                     key={cat.id}
@@ -144,6 +164,7 @@ const CatalogPage = () => {
                     onEdit={openEditDialog}
                     onDelete={setDeleteCategory}
                     onAddChild={(parentId) => openCreateDialog(parentId)}
+                    onMove={handleMove}
                   />
                 ))}
               </div>
