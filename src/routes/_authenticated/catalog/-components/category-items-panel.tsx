@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
-import { Box, Eye, EyeOff, Layers, Package, Plus, Sparkles, Trash2 } from 'lucide-react'
+import { Box, ChevronDown, Eye, EyeOff, Layers, Package, Plus, Sparkles, Trash2 } from 'lucide-react'
 import { useState } from 'react'
 
 import { CATALOG_QUERY_KEYS, getCatalogDetailQuery } from '@/api/catalog/query'
@@ -34,6 +34,7 @@ export const CategoryItemsPanel = ({
   const [addItemType, setAddItemType] = useState<'product' | 'variable_product'>('product')
   const [productBrowserOpen, setProductBrowserOpen] = useState(false)
   const [createVPFromProduct, setCreateVPFromProduct] = useState<CatalogCategoryProduct | null>(null)
+  const [expandedProductId, setExpandedProductId] = useState<string | null>(null)
 
   const { data, isLoading } = useQuery(
     getCatalogDetailQuery(category.id, { project_id: projectId ?? undefined })
@@ -175,16 +176,20 @@ export const CategoryItemsPanel = ({
               const displayId = isProduct
                 ? (record as CatalogCategoryProduct).product_autoid
                 : (record as CatalogCategoryVP).vp_id
+              const isExpanded = isProduct && expandedProductId === (record as CatalogCategoryProduct).product_autoid
               return (
+                <div key={record.id} className='border-b border-border-light'>
                 <div
-                  key={record.id}
                   className={cn(
-                    'flex items-center gap-3 border-b border-border-light py-2 hover:bg-bg-hover transition-colors',
-                    !isProduct && 'cursor-pointer',
+                    'flex items-center gap-3 py-2 hover:bg-bg-hover transition-colors cursor-pointer',
                     isMobile ? 'px-3.5' : 'px-6',
                     isProduct && (record as CatalogCategoryProduct).active === false && 'opacity-40'
                   )}
-                  onClick={!isProduct ? () => navigate({ to: `/catalog/vp/${(record as CatalogCategoryVP).vp_id}` }) : undefined}
+                  onClick={
+                    isProduct
+                      ? () => setExpandedProductId(isExpanded ? null : (record as CatalogCategoryProduct).product_autoid)
+                      : () => navigate({ to: `/catalog/vp/${(record as CatalogCategoryVP).vp_id}` })
+                  }
                 >
                   {isProduct ? (
                     <ProductThumbnail
@@ -285,6 +290,22 @@ export const CategoryItemsPanel = ({
                   >
                     <Trash2 className='size-3.5' />
                   </Button>
+                  {isProduct && (
+                    <ChevronDown className={cn(
+                      'size-3.5 shrink-0 text-text-quaternary transition-transform',
+                      isExpanded && 'rotate-180'
+                    )} />
+                  )}
+                </div>
+                {isExpanded && (
+                  <div className={cn('pb-3', isMobile ? 'px-3.5' : 'px-6')}>
+                    <ImageGallery
+                      entityType='product'
+                      entityId={(record as CatalogCategoryProduct).product_autoid}
+                      projectId={projectId}
+                    />
+                  </div>
+                )}
                 </div>
               )
             })}
