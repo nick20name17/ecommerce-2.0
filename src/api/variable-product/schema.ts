@@ -21,6 +21,7 @@ export interface GlobalSpecDefinition {
   display_type: SpecDisplayType
   sort_order: number
   vp_count?: number
+  option_count?: number
   options?: SpecOption[]
 }
 

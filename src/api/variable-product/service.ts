@@ -193,6 +193,16 @@ export const variableProductService = {
     await api.delete(`/variable-products/${vpId}/items/${itemId}/specs/${optionId}/`, { params })
   },
 
+  // ── VP Spec Association ─────────────────────────────────────
+
+  associateSpec: async (vpId: string, specId: string, params: SpecParams = {}) => {
+    await api.post(`/variable-products/${vpId}/specs/associate/`, { spec_id: specId }, { params })
+  },
+
+  disassociateSpec: async (vpId: string, specId: string, params: SpecParams = {}) => {
+    await api.delete(`/variable-products/${vpId}/specs/associate/${specId}/`, { params })
+  },
+
   // ── Catalog Filtering ───────────────────────────────────────
 
   filterBySpecs: async (filters: Record<string, string>, params: SpecParams = {}) => {

@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Check, MoreHorizontal, Pencil, Plus, Search, Trash2 } from 'lucide-react'
 import { useState } from 'react'
 
@@ -434,24 +434,25 @@ function ExistingSpecPicker({
   projectId: number | null
   onDone: () => void
 }) {
-  // To "use" an existing spec, we just need to link one of its options
-  // to an item. But actually, the spec shows up on the VP detail when
-  // any of its options are linked to any VP item. So we need a way to
-  // "associate" a spec with this VP — the simplest is to create a
-  // placeholder link. But that requires an item and option.
-  //
-  // Actually, specs appear in vp.spec_definitions when fetched via
-  // the VP detail endpoint which joins through EC_VP_ITEM_SPEC.
-  // To make a spec appear, at least one item must be linked to one
-  // of the spec's options.
-  //
-  // For now: show the list, user clicks a spec, we show its options,
-  // and user can immediately link an item. But this is complex UX.
-  //
-  // Simpler approach: just show available specs and let user know
-  // they need to use the Values Matrix to link items to this spec's options.
-
   const [selectedId, setSelectedId] = useState<string | null>(null)
+  const [isPending, setIsPending] = useState(false)
+  const queryClient = useQueryClient()
+
+  const handleAdd = async () => {
+    if (!selectedId) return
+    setIsPending(true)
+    try {
+      await variableProductService.associateSpec(vp.id, selectedId, {
+        project_id: projectId ?? undefined,
+      })
+      queryClient.invalidateQueries({ queryKey: VP_QUERY_KEYS.detail(vp.id) })
+      onDone()
+    } catch (err) {
+      console.error('Failed to associate spec:', err)
+    } finally {
+      setIsPending(false)
+    }
+  }
 
   return (
     <>
@@ -491,7 +492,7 @@ function ExistingSpecPicker({
                 <div className='flex-1 min-w-0'>
                   <div className='text-[13px] font-medium'>{spec.name}</div>
                   <div className='text-[11px] text-text-tertiary capitalize'>
-                    {spec.display_type} · {spec.options?.length ?? 0} options
+                    {spec.display_type} · {spec.option_count ?? spec.options?.length ?? 0} options
                     {(spec.vp_count ?? 0) > 0 && ` · ${spec.vp_count} VPs`}
                   </div>
                 </div>
@@ -499,16 +500,10 @@ function ExistingSpecPicker({
             ))}
           </div>
         )}
-
-        {selectedId && (
-          <div className='rounded-md bg-bg-secondary p-2 text-[12px] text-text-tertiary'>
-            After adding, use the Values Matrix below to link items to this spec's options.
-          </div>
-        )}
       </DialogBody>
       <DialogFooter>
         <Button variant='outline' onClick={onDone}>Cancel</Button>
-        <Button disabled={!selectedId} onClick={onDone}>
+        <Button disabled={!selectedId} isPending={isPending} onClick={handleAdd}>
           Done
         </Button>
       </DialogFooter>
