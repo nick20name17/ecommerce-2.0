@@ -222,11 +222,11 @@ export const UnassignedProductsPanel = ({
                           )}
                         </div>
                         {((product as Record<string, string>).descr_2 || (product as Record<string, string>).web_descr1) && (
-                          <div className='text-[12px] text-text-tertiary space-y-1'>
-                            {(product as Record<string, string>).descr_2 && <p>{(product as Record<string, string>).descr_2}</p>}
-                            {(product as Record<string, string>).web_descr1 && <p>{(product as Record<string, string>).web_descr1}</p>}
-                            {(product as Record<string, string>).web_descr2 && <p>{(product as Record<string, string>).web_descr2}</p>}
-                            {(product as Record<string, string>).web_descr3 && <p>{(product as Record<string, string>).web_descr3}</p>}
+                          <div className='text-[12px] text-text-tertiary space-y-1.5'>
+                            {(product as Record<string, string>).descr_2 && <p><span className='text-text-secondary font-medium'>Description 2:</span> {(product as Record<string, string>).descr_2}</p>}
+                            {(product as Record<string, string>).web_descr1 && <p><span className='text-text-secondary font-medium'>Web Description 1:</span> {(product as Record<string, string>).web_descr1}</p>}
+                            {(product as Record<string, string>).web_descr2 && <p><span className='text-text-secondary font-medium'>Web Description 2:</span> {(product as Record<string, string>).web_descr2}</p>}
+                            {(product as Record<string, string>).web_descr3 && <p><span className='text-text-secondary font-medium'>Web Description 3:</span> {(product as Record<string, string>).web_descr3}</p>}
                           </div>
                         )}
                         <ImageGallery

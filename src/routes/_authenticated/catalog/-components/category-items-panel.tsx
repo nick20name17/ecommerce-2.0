@@ -35,6 +35,8 @@ export const CategoryItemsPanel = ({
   const [productBrowserOpen, setProductBrowserOpen] = useState(false)
   const [createVPFromProduct, setCreateVPFromProduct] = useState<CatalogCategoryProduct | null>(null)
   const [expandedProductId, setExpandedProductId] = useState<string | null>(null)
+  const [productsCollapsed, setProductsCollapsed] = useState(false)
+  const [vpsCollapsed, setVpsCollapsed] = useState(false)
 
   const { data, isLoading } = useQuery(
     getCatalogDetailQuery(category.id, { project_id: projectId ?? undefined })
@@ -164,11 +166,16 @@ export const CategoryItemsPanel = ({
             {/* ── Products section ── */}
             {products.length > 0 && (
               <>
-                <div className={cn('flex items-center gap-2 py-2 text-[11px] font-semibold uppercase tracking-wider text-text-quaternary border-b border-border', isMobile ? 'px-3.5' : 'px-6')}>
+                <button
+                  type='button'
+                  className={cn('flex items-center gap-2 py-2 text-[11px] font-semibold uppercase tracking-wider text-text-quaternary border-b border-border w-full text-left', isMobile ? 'px-3.5' : 'px-6')}
+                  onClick={() => setProductsCollapsed(!productsCollapsed)}
+                >
+                  <ChevronDown className={cn('size-3 transition-transform', productsCollapsed && '-rotate-90')} />
                   <Package className='size-3 text-amber-500' />
                   Products ({products.length})
-                </div>
-                {products.map((p) => {
+                </button>
+                {!productsCollapsed && products.map((p) => {
                   const isExpanded = expandedProductId === p.product_autoid
                   return (
                     <div key={p.id} className='border-b border-border-light'>
@@ -210,11 +217,11 @@ export const CategoryItemsPanel = ({
                             <span><span className='text-text-secondary font-medium'>Autoid:</span> {p.product_autoid}</span>
                           </div>
                           {(p.descr_2 || p.web_descr1) && (
-                            <div className='text-[12px] text-text-tertiary space-y-1'>
-                              {p.descr_2 && <p>{p.descr_2}</p>}
-                              {p.web_descr1 && <p>{p.web_descr1}</p>}
-                              {p.web_descr2 && <p>{p.web_descr2}</p>}
-                              {p.web_descr3 && <p>{p.web_descr3}</p>}
+                            <div className='text-[12px] text-text-tertiary space-y-1.5'>
+                              {p.descr_2 && <p><span className='text-text-secondary font-medium'>Description 2:</span> {p.descr_2}</p>}
+                              {p.web_descr1 && <p><span className='text-text-secondary font-medium'>Web Description 1:</span> {p.web_descr1}</p>}
+                              {p.web_descr2 && <p><span className='text-text-secondary font-medium'>Web Description 2:</span> {p.web_descr2}</p>}
+                              {p.web_descr3 && <p><span className='text-text-secondary font-medium'>Web Description 3:</span> {p.web_descr3}</p>}
                             </div>
                           )}
                           <ImageGallery entityType='product' entityId={p.product_autoid} projectId={projectId} />
@@ -229,11 +236,16 @@ export const CategoryItemsPanel = ({
             {/* ── Variable Products section ── */}
             {variableProducts.length > 0 && (
               <>
-                <div className={cn('flex items-center gap-2 py-2 text-[11px] font-semibold uppercase tracking-wider text-text-quaternary border-b border-border', isMobile ? 'px-3.5' : 'px-6', products.length > 0 && 'mt-1')}>
+                <button
+                  type='button'
+                  className={cn('flex items-center gap-2 py-2 text-[11px] font-semibold uppercase tracking-wider text-text-quaternary border-b border-border w-full text-left', isMobile ? 'px-3.5' : 'px-6', products.length > 0 && 'mt-1')}
+                  onClick={() => setVpsCollapsed(!vpsCollapsed)}
+                >
+                  <ChevronDown className={cn('size-3 transition-transform', vpsCollapsed && '-rotate-90')} />
                   <Layers className='size-3 text-purple-500' />
                   Variable Products ({variableProducts.length})
-                </div>
-                {variableProducts.map((vp) => (
+                </button>
+                {!vpsCollapsed && variableProducts.map((vp) => (
                   <div
                     key={vp.id}
                     className={cn(
