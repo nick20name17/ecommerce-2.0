@@ -110,6 +110,23 @@ export const catalogService = {
     await api.delete(`/catalog/${categoryId}/variable-products/${recordId}/`, { params })
   },
 
+  // ── Unassigned Products ──────────────────────────────────────
+
+  getUnassignedProducts: async (params: {
+    project_id?: number
+    search?: string
+    limit?: number
+    offset?: number
+  }) => {
+    const { data } = await api.get<{
+      count: number
+      limit: number
+      offset: number
+      results: { autoid: string; id: string; descr_1: string; wtree_id: string }[]
+    }>('/catalog/unassigned-products/', { params })
+    return data
+  },
+
   // ── Import ───────────────────────────────────────────────────
 
   importFromInventre: async (
