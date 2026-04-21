@@ -42,16 +42,7 @@ export const CategoryItemsPanel = ({
 
   const products = data?.products ?? []
   const variableProducts = data?.variable_products ?? []
-
-  // Build a unified list for rendering
-  type UnifiedItem =
-    | { type: 'product'; record: CatalogCategoryProduct }
-    | { type: 'variable_product'; record: CatalogCategoryVP }
-
-  const items: UnifiedItem[] = [
-    ...products.map((p) => ({ type: 'product' as const, record: p })),
-    ...variableProducts.map((vp) => ({ type: 'variable_product' as const, record: vp })),
-  ].sort((a, b) => a.record.sort_order - b.record.sort_order)
+  const hasItems = products.length > 0 || variableProducts.length > 0
 
   const removeProductMutation = useMutation({
     mutationFn: (recordId: string) =>
@@ -161,7 +152,7 @@ export const CategoryItemsPanel = ({
               <Skeleton key={i} className='h-9 w-full rounded-md' />
             ))}
           </div>
-        ) : items.length === 0 ? (
+        ) : !hasItems ? (
           <PageEmpty
             icon={Box}
             title='No items'
@@ -170,145 +161,103 @@ export const CategoryItemsPanel = ({
           />
         ) : (
           <div className='flex flex-col'>
-            {items.map((unified) => {
-              const isProduct = unified.type === 'product'
-              const record = unified.record
-              const displayId = isProduct
-                ? (record as CatalogCategoryProduct).product_autoid
-                : (record as CatalogCategoryVP).vp_id
-              const isExpanded = isProduct && expandedProductId === (record as CatalogCategoryProduct).product_autoid
-              return (
-                <div key={record.id} className='border-b border-border-light'>
-                <div
-                  className={cn(
-                    'flex items-center gap-3 py-2 hover:bg-bg-hover transition-colors cursor-pointer',
-                    isMobile ? 'px-3.5' : 'px-6',
-                    isProduct && (record as CatalogCategoryProduct).active === false && 'opacity-40'
-                  )}
-                  onClick={
-                    isProduct
-                      ? () => setExpandedProductId(isExpanded ? null : (record as CatalogCategoryProduct).product_autoid)
-                      : () => navigate({ to: `/catalog/vp/${(record as CatalogCategoryVP).vp_id}` })
-                  }
-                >
-                  {isProduct ? (
-                    <ProductThumbnail
-                      entityType='product'
-                      entityId={(record as CatalogCategoryProduct).product_autoid}
-                      projectId={projectId}
-                      className='size-8 shrink-0'
-                    />
-                  ) : (
-                    <ProductThumbnail
-                      entityType='vp'
-                      entityId={(record as CatalogCategoryVP).vp_id}
-                      projectId={projectId}
-                      className='size-8 shrink-0'
-                    />
-                  )}
-                  <div className='flex-1 min-w-0'>
-                    {isProduct ? (
-                      <>
-                        <div className='text-[13px] font-medium truncate font-mono'>
-                          {(record as CatalogCategoryProduct).product_id || displayId}
-                        </div>
-                        {(record as CatalogCategoryProduct).descr_1 && (
-                          <div className='text-[11px] text-text-tertiary truncate'>
-                            {(record as CatalogCategoryProduct).descr_1}
-                          </div>
-                        )}
-                        {!(record as CatalogCategoryProduct).descr_1 && (
-                          <div className='text-[11px] text-text-tertiary capitalize'>
-                            {unified.type.replace('_', ' ')}
-                          </div>
-                        )}
-                      </>
-                    ) : (
-                      <>
-                        <div className='text-[13px] font-medium truncate'>
-                          {(record as CatalogCategoryVP).name || displayId}
-                        </div>
-                        <div className='text-[11px] text-text-tertiary'>
-                          {(record as CatalogCategoryVP).slug || 'Variable Product'}
-                        </div>
-                      </>
-                    )}
-                  </div>
-                  {!isMobile && (
-                    <span className='text-[11px] text-text-tertiary tabular-nums'>
-                      #{record.sort_order}
-                    </span>
-                  )}
-                  {isProduct && (
-                    <>
-                      <Button
-                        variant='ghost'
-                        size='icon-xs'
-                        className='shrink-0 text-text-tertiary hover:text-purple-500'
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          setCreateVPFromProduct(record as CatalogCategoryProduct)
-                        }}
-                        title='Create VP from this product'
-                      >
-                        <Sparkles className='size-3.5' />
-                      </Button>
-                      <Button
-                        variant='ghost'
-                        size='icon-xs'
+            {/* ── Products section ── */}
+            {products.length > 0 && (
+              <>
+                <div className={cn('flex items-center gap-2 py-2 text-[11px] font-semibold uppercase tracking-wider text-text-quaternary border-b border-border', isMobile ? 'px-3.5' : 'px-6')}>
+                  <Package className='size-3 text-amber-500' />
+                  Products ({products.length})
+                </div>
+                {products.map((p) => {
+                  const isExpanded = expandedProductId === p.product_autoid
+                  return (
+                    <div key={p.id} className='border-b border-border-light'>
+                      <div
                         className={cn(
-                          'shrink-0',
-                          (record as CatalogCategoryProduct).active !== false
-                            ? 'text-text-tertiary hover:text-amber-500'
-                            : 'text-text-quaternary hover:text-emerald-500'
+                          'flex items-center gap-3 py-2 hover:bg-bg-hover transition-colors cursor-pointer',
+                          isMobile ? 'px-3.5' : 'px-6',
+                          p.active === false && 'opacity-40'
                         )}
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          const current = (record as CatalogCategoryProduct).active !== false
-                          toggleProductActiveMutation.mutate({ recordId: record.id, active: !current })
-                        }}
-                        title={(record as CatalogCategoryProduct).active !== false ? 'Hide from site' : 'Show on site'}
+                        onClick={() => setExpandedProductId(isExpanded ? null : p.product_autoid)}
                       >
-                        {(record as CatalogCategoryProduct).active !== false ? (
-                          <Eye className='size-3.5' />
-                        ) : (
-                          <EyeOff className='size-3.5' />
-                        )}
-                      </Button>
-                    </>
-                  )}
-                  <Button
-                    variant='ghost'
-                    size='icon-xs'
-                    className='text-text-tertiary hover:text-destructive'
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      isProduct
-                        ? removeProductMutation.mutate(record.id)
-                        : removeVPMutation.mutate(record.id)
-                    }}
+                        <ProductThumbnail entityType='product' entityId={p.product_autoid} projectId={projectId} className='size-8 shrink-0' />
+                        <div className='flex-1 min-w-0'>
+                          <div className='text-[13px] font-medium truncate font-mono'>{p.product_id || p.product_autoid}</div>
+                          <div className='text-[11px] text-text-tertiary truncate'>{p.descr_1 || 'Product'}</div>
+                        </div>
+                        {!isMobile && <span className='text-[11px] text-text-tertiary tabular-nums'>#{p.sort_order}</span>}
+                        <Button variant='ghost' size='icon-xs' className='shrink-0 text-text-tertiary hover:text-purple-500' onClick={(e) => { e.stopPropagation(); setCreateVPFromProduct(p) }} title='Create VP'>
+                          <Sparkles className='size-3.5' />
+                        </Button>
+                        <Button
+                          variant='ghost' size='icon-xs'
+                          className={cn('shrink-0', p.active !== false ? 'text-text-tertiary hover:text-amber-500' : 'text-text-quaternary hover:text-emerald-500')}
+                          onClick={(e) => { e.stopPropagation(); toggleProductActiveMutation.mutate({ recordId: p.id, active: !(p.active !== false) }) }}
+                          title={p.active !== false ? 'Hide' : 'Show'}
+                        >
+                          {p.active !== false ? <Eye className='size-3.5' /> : <EyeOff className='size-3.5' />}
+                        </Button>
+                        <Button variant='ghost' size='icon-xs' className='text-text-tertiary hover:text-destructive' onClick={(e) => { e.stopPropagation(); removeProductMutation.mutate(p.id) }}>
+                          <Trash2 className='size-3.5' />
+                        </Button>
+                        <ChevronDown className={cn('size-3.5 shrink-0 text-text-quaternary transition-transform', isExpanded && 'rotate-180')} />
+                      </div>
+                      {isExpanded && (
+                        <div className={cn('pb-3 flex flex-col gap-3', isMobile ? 'px-3.5' : 'px-6')}>
+                          <div className='flex flex-wrap gap-x-4 gap-y-1 text-[12px] text-text-tertiary'>
+                            {p.product_id && <span><span className='text-text-secondary font-medium'>ID:</span> {p.product_id}</span>}
+                            {p.def_unit && <span><span className='text-text-secondary font-medium'>Unit:</span> {p.def_unit}</span>}
+                            <span><span className='text-text-secondary font-medium'>Autoid:</span> {p.product_autoid}</span>
+                          </div>
+                          {(p.descr_2 || p.web_descr1) && (
+                            <div className='text-[12px] text-text-tertiary space-y-1'>
+                              {p.descr_2 && <p>{p.descr_2}</p>}
+                              {p.web_descr1 && <p>{p.web_descr1}</p>}
+                              {p.web_descr2 && <p>{p.web_descr2}</p>}
+                              {p.web_descr3 && <p>{p.web_descr3}</p>}
+                            </div>
+                          )}
+                          <ImageGallery entityType='product' entityId={p.product_autoid} projectId={projectId} />
+                        </div>
+                      )}
+                    </div>
+                  )
+                })}
+              </>
+            )}
+
+            {/* ── Variable Products section ── */}
+            {variableProducts.length > 0 && (
+              <>
+                <div className={cn('flex items-center gap-2 py-2 text-[11px] font-semibold uppercase tracking-wider text-text-quaternary border-b border-border', isMobile ? 'px-3.5' : 'px-6', products.length > 0 && 'mt-1')}>
+                  <Layers className='size-3 text-purple-500' />
+                  Variable Products ({variableProducts.length})
+                </div>
+                {variableProducts.map((vp) => (
+                  <div
+                    key={vp.id}
+                    className={cn(
+                      'flex items-center gap-3 border-b border-border-light py-2 hover:bg-bg-hover transition-colors cursor-pointer',
+                      isMobile ? 'px-3.5' : 'px-6'
+                    )}
+                    onClick={() => navigate({ to: `/catalog/vp/${vp.vp_id}` })}
                   >
-                    <Trash2 className='size-3.5' />
-                  </Button>
-                  {isProduct && (
-                    <ChevronDown className={cn(
-                      'size-3.5 shrink-0 text-text-quaternary transition-transform',
-                      isExpanded && 'rotate-180'
-                    )} />
-                  )}
-                </div>
-                {isExpanded && (
-                  <div className={cn('pb-3', isMobile ? 'px-3.5' : 'px-6')}>
-                    <ImageGallery
-                      entityType='product'
-                      entityId={(record as CatalogCategoryProduct).product_autoid}
-                      projectId={projectId}
-                    />
+                    <ProductThumbnail entityType='vp' entityId={vp.vp_id} projectId={projectId} className='size-8 shrink-0' />
+                    <div className='flex-1 min-w-0'>
+                      <div className='flex items-center gap-1.5'>
+                        <span className='text-[13px] font-medium truncate'>{vp.name || vp.vp_id}</span>
+                        <span className='shrink-0 rounded bg-purple-500/10 px-1 py-0.5 text-[9px] font-bold uppercase text-purple-500'>VP</span>
+                      </div>
+                      <div className='text-[11px] text-text-tertiary'>{vp.slug || 'Variable Product'}</div>
+                    </div>
+                    {!isMobile && <span className='text-[11px] text-text-tertiary tabular-nums'>#{vp.sort_order}</span>}
+                    <Button variant='ghost' size='icon-xs' className='text-text-tertiary hover:text-destructive' onClick={(e) => { e.stopPropagation(); removeVPMutation.mutate(vp.id) }}>
+                      <Trash2 className='size-3.5' />
+                    </Button>
                   </div>
-                )}
-                </div>
-              )
-            })}
+                ))}
+              </>
+            )}
           </div>
         )}
       </div>
