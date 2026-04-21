@@ -1,11 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { AlertCircle, FolderPlus, Package, Search, Sparkles, Zap } from 'lucide-react'
+import { AlertCircle, ChevronDown, FolderPlus, Package, Search, Sparkles } from 'lucide-react'
 import { useState } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { useDebouncedCallback } from 'use-debounce'
 
 import { CATALOG_QUERY_KEYS } from '@/api/catalog/query'
 import { catalogService } from '@/api/catalog/service'
+import { ImageGallery } from '@/components/common/image-gallery'
 import { VP_QUERY_KEYS } from '@/api/variable-product/query'
 import { variableProductService } from '@/api/variable-product/service'
 import { Button } from '@/components/ui/button'
@@ -37,6 +38,7 @@ export const UnassignedProductsPanel = ({
   const [offset, setOffset] = useState(0)
   const limit = 50
 
+  const [expandedAutoid, setExpandedAutoid] = useState<string | null>(null)
   // Category picker state
   const [pickerProduct, setPickerProduct] = useState<{ autoid: string; id: string; descr_1: string } | null>(null)
 
@@ -148,57 +150,95 @@ export const UnassignedProductsPanel = ({
         ) : (
           <>
             <div className='flex flex-col'>
-              {products.map((product) => (
-                <div
-                  key={product.autoid}
-                  draggable
-                  onDragStart={(e) => handleDragStart(e, product)}
-                  className={cn(
-                    'group flex items-center gap-3 border-b border-border-light py-2 cursor-grab active:cursor-grabbing hover:bg-bg-hover transition-colors',
-                    isMobile ? 'px-3.5' : 'px-6'
-                  )}
-                >
-                  <Package className='size-4 text-amber-500 shrink-0' />
-                  <div className='flex-1 min-w-0'>
-                    <div className='text-[13px] font-medium truncate font-mono'>
-                      {product.id}
+              {products.map((product) => {
+                const isExpanded = expandedAutoid === product.autoid
+                return (
+                  <div key={product.autoid} className='border-b border-border-light'>
+                    <div
+                      draggable
+                      onDragStart={(e) => handleDragStart(e, product)}
+                      className={cn(
+                        'group flex items-center gap-3 py-2 cursor-pointer hover:bg-bg-hover transition-colors',
+                        isMobile ? 'px-3.5' : 'px-6'
+                      )}
+                      onClick={() => setExpandedAutoid(isExpanded ? null : product.autoid)}
+                    >
+                      <Package className='size-4 text-amber-500 shrink-0' />
+                      <div className='flex-1 min-w-0'>
+                        <div className='text-[13px] font-medium truncate font-mono'>
+                          {product.id}
+                        </div>
+                        <div className='text-[11px] text-text-tertiary truncate'>
+                          {product.descr_1 || 'No description'}
+                          {(product as Record<string, string>).def_unit && (
+                            <span className='ml-2 text-text-quaternary'>
+                              · {(product as Record<string, string>).def_unit}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      {product.wtree_id && (
+                        <span className='text-[10px] text-text-quaternary tabular-nums shrink-0'>
+                          cat:{product.wtree_id}
+                        </span>
+                      )}
+
+                      {/* Context menu */}
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            variant='ghost'
+                            size='icon-xs'
+                            className='opacity-0 group-hover:opacity-100 shrink-0'
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <span className='text-[16px] leading-none'>···</span>
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align='end' className='w-48'>
+                          <DropdownMenuItem onClick={() => setPickerProduct(product)}>
+                            <FolderPlus className='size-3.5' />
+                            Add to category
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => createVPMutation.mutate(product)}>
+                            <Sparkles className='size-3.5' />
+                            Create VP from product
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+
+                      <ChevronDown className={cn(
+                        'size-3.5 shrink-0 text-text-quaternary transition-transform',
+                        isExpanded && 'rotate-180'
+                      )} />
                     </div>
-                    {product.descr_1 && (
-                      <div className='text-[11px] text-text-tertiary truncate'>
-                        {product.descr_1}
+
+                    {isExpanded && (
+                      <div className={cn('pb-3 flex flex-col gap-2', isMobile ? 'px-3.5' : 'px-6')}>
+                        <div className='flex flex-wrap gap-x-4 gap-y-1 text-[12px] text-text-tertiary'>
+                          <span><span className='text-text-secondary font-medium'>Autoid:</span> {product.autoid}</span>
+                          {(product as Record<string, string>).def_unit && (
+                            <span><span className='text-text-secondary font-medium'>Unit:</span> {(product as Record<string, string>).def_unit}</span>
+                          )}
+                        </div>
+                        {((product as Record<string, string>).descr_2 || (product as Record<string, string>).web_descr1) && (
+                          <div className='text-[12px] text-text-tertiary space-y-1'>
+                            {(product as Record<string, string>).descr_2 && <p>{(product as Record<string, string>).descr_2}</p>}
+                            {(product as Record<string, string>).web_descr1 && <p>{(product as Record<string, string>).web_descr1}</p>}
+                            {(product as Record<string, string>).web_descr2 && <p>{(product as Record<string, string>).web_descr2}</p>}
+                            {(product as Record<string, string>).web_descr3 && <p>{(product as Record<string, string>).web_descr3}</p>}
+                          </div>
+                        )}
+                        <ImageGallery
+                          entityType='product'
+                          entityId={product.autoid}
+                          projectId={projectId}
+                        />
                       </div>
                     )}
                   </div>
-                  {product.wtree_id && (
-                    <span className='text-[10px] text-text-quaternary tabular-nums shrink-0'>
-                      cat:{product.wtree_id}
-                    </span>
-                  )}
-
-                  {/* Context menu */}
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button
-                        variant='ghost'
-                        size='icon-xs'
-                        className='opacity-0 group-hover:opacity-100 shrink-0'
-                      >
-                        <span className='text-[16px] leading-none'>···</span>
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align='end' className='w-48'>
-                      <DropdownMenuItem onClick={() => setPickerProduct(product)}>
-                        <FolderPlus className='size-3.5' />
-                        Add to category
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => createVPMutation.mutate(product)}>
-                        <Sparkles className='size-3.5' />
-                        Create VP from product
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </div>
-              ))}
+                )
+              })}
             </div>
 
             {/* Pagination */}

@@ -26,7 +26,11 @@ export interface CatalogCategoryProduct {
   active: boolean
   product_id?: string
   descr_1?: string
+  descr_2?: string
   def_unit?: string
+  web_descr1?: string
+  web_descr2?: string
+  web_descr3?: string
 }
 
 export interface CatalogCategoryVP {
