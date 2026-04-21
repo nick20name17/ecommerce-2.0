@@ -1,12 +1,13 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
-import { ArrowLeft, FolderTree, Plus } from 'lucide-react'
+import { AlertCircle, ArrowLeft, FolderTree, Plus } from 'lucide-react'
 import { useState } from 'react'
 
 import { CategoryDeleteDialog } from './-components/category-delete-dialog'
 import { CategoryFormDialog } from './-components/category-form-dialog'
 import { CategoryItemsPanel } from './-components/category-items-panel'
 import { CategoryTreeNode } from './-components/category-tree-node'
+import { UnassignedProductsPanel } from './-components/unassigned-products-panel'
 import { VPCreateDialog } from './-components/vp-create-dialog'
 import { CATALOG_QUERY_KEYS, getCatalogTreeQuery } from '@/api/catalog/query'
 import type { CatalogCategory } from '@/api/catalog/schema'
@@ -42,6 +43,7 @@ const CatalogPage = () => {
   const [parentIdForNew, setParentIdForNew] = useState<string | null>(null)
   const [deleteCategory, setDeleteCategory] = useState<CatalogCategory | null>(null)
   const [vpCreateOpen, setVpCreateOpen] = useState(false)
+  const [showUnassigned, setShowUnassigned] = useState(false)
 
   const queryClient = useQueryClient()
   const moveMutation = useMutation({
@@ -97,6 +99,18 @@ const CatalogPage = () => {
 
         {!(isMobile && showDetail) && (
           <div className='flex items-center gap-1.5'>
+            <Button
+              size='sm'
+              variant={showUnassigned ? 'default' : 'ghost'}
+              onClick={() => {
+                setShowUnassigned(!showUnassigned)
+                if (!showUnassigned) setSelectedCategory(null)
+              }}
+            >
+              <AlertCircle className='size-3.5' />
+              <span className={cn(isMobile && 'hidden')}>Unassigned</span>
+            </Button>
+
             <Button size='sm' onClick={() => openCreateDialog()}>
               <Plus className='size-3.5' />
               <span className={cn(isMobile && 'hidden')}>New Category</span>
@@ -175,7 +189,9 @@ const CatalogPage = () => {
         {/* Detail panel — full width on mobile when selected */}
         {(!isMobile || showDetail) && (
           <div className='flex-1 overflow-hidden'>
-            {selectedCategory ? (
+            {showUnassigned ? (
+              <UnassignedProductsPanel projectId={projectId} isMobile={isMobile} />
+            ) : selectedCategory ? (
               <CategoryItemsPanel
                 category={selectedCategory}
                 projectId={projectId}
