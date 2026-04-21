@@ -1,13 +1,25 @@
-import { useQuery } from '@tanstack/react-query'
-import { AlertCircle, Package, Search } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { AlertCircle, FolderPlus, Package, Search, Sparkles, Zap } from 'lucide-react'
+import { useState } from 'react'
+import { useNavigate } from '@tanstack/react-router'
 import { useDebouncedCallback } from 'use-debounce'
 
+import { CATALOG_QUERY_KEYS } from '@/api/catalog/query'
 import { catalogService } from '@/api/catalog/service'
+import { VP_QUERY_KEYS } from '@/api/variable-product/query'
+import { variableProductService } from '@/api/variable-product/service'
 import { Button } from '@/components/ui/button'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import { Input } from '@/components/ui/input'
 import { Skeleton } from '@/components/ui/skeleton'
 import { cn } from '@/lib/utils'
+
+import { CategoryPickerDialog } from './category-picker-dialog'
 
 interface UnassignedProductsPanelProps {
   projectId: number | null
@@ -18,10 +30,15 @@ export const UnassignedProductsPanel = ({
   projectId,
   isMobile,
 }: UnassignedProductsPanelProps) => {
+  const navigate = useNavigate()
+  const queryClient = useQueryClient()
   const [search, setSearch] = useState('')
   const [debouncedSearch, setDebouncedSearch] = useState('')
   const [offset, setOffset] = useState(0)
   const limit = 50
+
+  // Category picker state
+  const [pickerProduct, setPickerProduct] = useState<{ autoid: string; id: string; descr_1: string } | null>(null)
 
   const debouncedSetSearch = useDebouncedCallback((val: string) => {
     setDebouncedSearch(val)
@@ -48,6 +65,34 @@ export const UnassignedProductsPanel = ({
   const products = data?.results ?? []
   const total = data?.count ?? 0
   const hasMore = offset + limit < total
+
+  const addToCategoryMutation = useMutation({
+    mutationFn: ({ categoryId, autoid }: { categoryId: string; autoid: string }) =>
+      catalogService.addProduct(categoryId, { product_autoid: autoid }, { project_id: projectId ?? undefined }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['unassigned-products'] })
+      queryClient.invalidateQueries({ queryKey: CATALOG_QUERY_KEYS.all() })
+    },
+  })
+
+  const createVPMutation = useMutation({
+    mutationFn: async (product: { autoid: string; descr_1: string }) => {
+      const params = { project_id: projectId ?? undefined }
+      const vp = await variableProductService.create({ name: product.descr_1 }, params)
+      await variableProductService.addItem(vp.id, { product_autoid: product.autoid, is_default: true }, params)
+      return vp
+    },
+    onSuccess: (vp) => {
+      queryClient.invalidateQueries({ queryKey: VP_QUERY_KEYS.lists() })
+      navigate({ to: `/catalog/vp/${vp.id}` })
+    },
+  })
+
+  const handleDragStart = (e: React.DragEvent, product: typeof products[0]) => {
+    e.dataTransfer.setData('application/product-autoid', product.autoid)
+    e.dataTransfer.setData('text/plain', product.id)
+    e.dataTransfer.effectAllowed = 'copy'
+  }
 
   return (
     <div className='flex h-full flex-col'>
@@ -80,6 +125,9 @@ export const UnassignedProductsPanel = ({
             className='pl-8 h-8 text-[13px]'
           />
         </div>
+        <p className='mt-1.5 text-[11px] text-text-quaternary'>
+          Drag products onto categories in the tree, or use the menu.
+        </p>
       </div>
 
       {/* List */}
@@ -103,8 +151,10 @@ export const UnassignedProductsPanel = ({
               {products.map((product) => (
                 <div
                   key={product.autoid}
+                  draggable
+                  onDragStart={(e) => handleDragStart(e, product)}
                   className={cn(
-                    'flex items-center gap-3 border-b border-border-light py-2',
+                    'group flex items-center gap-3 border-b border-border-light py-2 cursor-grab active:cursor-grabbing hover:bg-bg-hover transition-colors',
                     isMobile ? 'px-3.5' : 'px-6'
                   )}
                 >
@@ -124,6 +174,29 @@ export const UnassignedProductsPanel = ({
                       cat:{product.wtree_id}
                     </span>
                   )}
+
+                  {/* Context menu */}
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant='ghost'
+                        size='icon-xs'
+                        className='opacity-0 group-hover:opacity-100 shrink-0'
+                      >
+                        <span className='text-[16px] leading-none'>···</span>
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align='end' className='w-48'>
+                      <DropdownMenuItem onClick={() => setPickerProduct(product)}>
+                        <FolderPlus className='size-3.5' />
+                        Add to category
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => createVPMutation.mutate(product)}>
+                        <Sparkles className='size-3.5' />
+                        Create VP from product
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
               ))}
             </div>
@@ -160,6 +233,19 @@ export const UnassignedProductsPanel = ({
           </>
         )}
       </div>
+
+      {/* Category picker dialog */}
+      <CategoryPickerDialog
+        open={!!pickerProduct}
+        onOpenChange={(v) => !v && setPickerProduct(null)}
+        projectId={projectId}
+        onSelect={(categoryId) => {
+          if (pickerProduct) {
+            addToCategoryMutation.mutate({ categoryId, autoid: pickerProduct.autoid })
+            setPickerProduct(null)
+          }
+        }}
+      />
     </div>
   )
 }

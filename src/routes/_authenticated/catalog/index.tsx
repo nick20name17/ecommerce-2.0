@@ -56,6 +56,19 @@ const CatalogPage = () => {
     moveMutation.mutate({ categoryId, newParentId })
   }
 
+  const productDropMutation = useMutation({
+    mutationFn: ({ productAutoid, categoryId }: { productAutoid: string; categoryId: string }) =>
+      catalogService.addProduct(categoryId, { product_autoid: productAutoid }, { project_id: projectId ?? undefined }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: CATALOG_QUERY_KEYS.all() })
+      queryClient.invalidateQueries({ queryKey: ['unassigned-products'] })
+    },
+  })
+
+  const handleProductDrop = (productAutoid: string, categoryId: string) => {
+    productDropMutation.mutate({ productAutoid, categoryId })
+  }
+
   const openCreateDialog = (parentId: string | null = null) => {
     setEditingCategory(null)
     setParentIdForNew(parentId)
@@ -179,6 +192,7 @@ const CatalogPage = () => {
                     onDelete={setDeleteCategory}
                     onAddChild={(parentId) => openCreateDialog(parentId)}
                     onMove={handleMove}
+                    onProductDrop={handleProductDrop}
                   />
                 ))}
               </div>

@@ -21,6 +21,7 @@ interface CategoryTreeNodeProps {
   onDelete: (category: CatalogCategory) => void
   onAddChild: (parentId: string) => void
   onMove?: (categoryId: string, newParentId: string | null) => void
+  onProductDrop?: (productAutoid: string, categoryId: string) => void
 }
 
 export const CategoryTreeNode = ({
@@ -33,6 +34,7 @@ export const CategoryTreeNode = ({
   onDelete,
   onAddChild,
   onMove,
+  onProductDrop,
 }: CategoryTreeNodeProps) => {
   const [expanded, setExpanded] = useState(depth === 0)
   const hasChildren = category.children && category.children.length > 0
@@ -64,6 +66,15 @@ export const CategoryTreeNode = ({
     e.preventDefault()
     e.stopPropagation()
     setDragOver(false)
+
+    // Check if it's a product drop (from unassigned panel)
+    const productAutoid = e.dataTransfer.getData('application/product-autoid')
+    if (productAutoid && onProductDrop) {
+      onProductDrop(productAutoid, category.id)
+      return
+    }
+
+    // Otherwise it's a category move
     const draggedId = e.dataTransfer.getData('text/plain')
     if (draggedId && draggedId !== category.id && onMove) {
       onMove(draggedId, category.id)
@@ -178,6 +189,7 @@ export const CategoryTreeNode = ({
               onDelete={onDelete}
               onAddChild={onAddChild}
               onMove={onMove}
+              onProductDrop={onProductDrop}
             />
           ))}
         </div>
