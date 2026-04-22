@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
 import { Box, ChevronDown, Eye, EyeOff, Layers, Package, Plus, Sparkles, Trash2 } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import { CATALOG_QUERY_KEYS, getCatalogDetailQuery } from '@/api/catalog/query'
 import type { CatalogCategory, CatalogCategoryProduct, CatalogCategoryVP } from '@/api/catalog/schema'
@@ -37,6 +37,18 @@ export const CategoryItemsPanel = ({
   const [expandedProductId, setExpandedProductId] = useState<string | null>(null)
   const [productsCollapsed, setProductsCollapsed] = useState(false)
   const [vpsCollapsed, setVpsCollapsed] = useState(false)
+  const [showAllProducts, setShowAllProducts] = useState(false)
+  const [showAllVPs, setShowAllVPs] = useState(false)
+  const [imagesCollapsed, setImagesCollapsed] = useState(false)
+  const PREVIEW_LIMIT = 5
+
+  // Reset expand/collapse states when category changes
+  useEffect(() => {
+    setExpandedProductId(null)
+    setShowAllProducts(false)
+    setShowAllVPs(false)
+    setImagesCollapsed(false)
+  }, [category.id])
 
   const { data, isLoading } = useQuery(
     getCatalogDetailQuery(category.id, { project_id: projectId ?? undefined })
@@ -141,9 +153,21 @@ export const CategoryItemsPanel = ({
         </Button>
       </div>
 
-      {/* Category images */}
-      <div className={cn('border-b border-border', isMobile ? 'px-3.5 py-3' : 'px-6 py-4')}>
-        <ImageGallery entityType='category' entityId={category.id} projectId={projectId} />
+      {/* Category images — collapsible */}
+      <div className='border-b border-border'>
+        <button
+          type='button'
+          className={cn('flex items-center gap-2 py-2 text-[11px] font-semibold uppercase tracking-wider text-text-quaternary w-full text-left', isMobile ? 'px-3.5' : 'px-6')}
+          onClick={() => setImagesCollapsed(!imagesCollapsed)}
+        >
+          <ChevronDown className={cn('size-3 transition-transform', imagesCollapsed && '-rotate-90')} />
+          Images
+        </button>
+        {!imagesCollapsed && (
+          <div className={cn('pb-3', isMobile ? 'px-3.5' : 'px-6')}>
+            <ImageGallery entityType='category' entityId={category.id} projectId={projectId} />
+          </div>
+        )}
       </div>
 
       {/* Items list */}
@@ -175,7 +199,7 @@ export const CategoryItemsPanel = ({
                   <Package className='size-3 text-amber-500' />
                   Products ({products.length})
                 </button>
-                {!productsCollapsed && products.map((p) => {
+                {!productsCollapsed && (showAllProducts ? products : products.slice(0, PREVIEW_LIMIT)).map((p) => {
                   const isExpanded = expandedProductId === p.product_autoid
                   return (
                     <div key={p.id} className='border-b border-border-light'>
@@ -230,6 +254,15 @@ export const CategoryItemsPanel = ({
                     </div>
                   )
                 })}
+                {!productsCollapsed && !showAllProducts && products.length > PREVIEW_LIMIT && (
+                  <button
+                    type='button'
+                    className={cn('w-full py-2 text-[12px] font-medium text-primary hover:underline border-b border-border-light', isMobile ? 'px-3.5' : 'px-6')}
+                    onClick={() => setShowAllProducts(true)}
+                  >
+                    Show all ({products.length})
+                  </button>
+                )}
               </>
             )}
 
@@ -245,7 +278,7 @@ export const CategoryItemsPanel = ({
                   <Layers className='size-3 text-purple-500' />
                   Variable Products ({variableProducts.length})
                 </button>
-                {!vpsCollapsed && variableProducts.map((vp) => (
+                {!vpsCollapsed && (showAllVPs ? variableProducts : variableProducts.slice(0, PREVIEW_LIMIT)).map((vp) => (
                   <div
                     key={vp.id}
                     className={cn(
@@ -268,6 +301,15 @@ export const CategoryItemsPanel = ({
                     </Button>
                   </div>
                 ))}
+                {!vpsCollapsed && !showAllVPs && variableProducts.length > PREVIEW_LIMIT && (
+                  <button
+                    type='button'
+                    className={cn('w-full py-2 text-[12px] font-medium text-primary hover:underline border-b border-border-light', isMobile ? 'px-3.5' : 'px-6')}
+                    onClick={() => setShowAllVPs(true)}
+                  >
+                    Show all ({variableProducts.length})
+                  </button>
+                )}
               </>
             )}
           </div>
