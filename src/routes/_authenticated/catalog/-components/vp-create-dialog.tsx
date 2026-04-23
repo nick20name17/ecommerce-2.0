@@ -21,9 +21,11 @@ interface VPCreateDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   projectId: number | null
+  categoryId?: string | null
+  categoryName?: string | null
 }
 
-export const VPCreateDialog = ({ open, onOpenChange, projectId }: VPCreateDialogProps) => {
+export const VPCreateDialog = ({ open, onOpenChange, projectId, categoryId, categoryName }: VPCreateDialogProps) => {
   const navigate = useNavigate()
   const [name, setName] = useState('')
   const [description, setDescription] = useState('')
@@ -60,6 +62,7 @@ export const VPCreateDialog = ({ open, onOpenChange, projectId }: VPCreateDialog
               description: description || undefined,
               slug: slug || undefined,
               image_url: imageUrl || undefined,
+              category_id: categoryId || undefined,
             })
           }}
         >
@@ -67,6 +70,11 @@ export const VPCreateDialog = ({ open, onOpenChange, projectId }: VPCreateDialog
             <DialogTitle>New Variable Product</DialogTitle>
           </DialogHeader>
           <DialogBody className='flex flex-col gap-3'>
+            {categoryName && (
+              <div className='rounded-md bg-muted px-3 py-2 text-sm text-muted-foreground'>
+                Category: <span className='font-medium text-foreground'>{categoryName}</span>
+              </div>
+            )}
             <div className='flex flex-col gap-1.5'>
               <Label htmlFor='vp-name'>Name</Label>
               <Input

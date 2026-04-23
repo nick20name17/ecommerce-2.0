@@ -252,6 +252,8 @@ const CatalogPage = () => {
         open={vpCreateOpen}
         onOpenChange={setVpCreateOpen}
         projectId={projectId}
+        categoryId={selectedCategory?.id ?? null}
+        categoryName={selectedCategory?.name ?? null}
       />
     </div>
   )
