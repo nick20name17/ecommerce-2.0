@@ -79,7 +79,7 @@ const CatalogVPDetailPage = () => {
       <VPHeader
         vp={vp}
         projectId={projectId}
-        onBack={() => navigate({ to: '/catalog' })}
+        onBack={() => window.history.back()}
         isMobile={isMobile}
         isTablet={isTablet}
       />
