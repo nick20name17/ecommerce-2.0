@@ -124,7 +124,7 @@ const CatalogPage = () => {
               <span className={cn(isMobile && 'hidden')}>Unassigned</span>
             </Button>
 
-            <Button size='sm' onClick={() => openCreateDialog()}>
+            <Button size='sm' onClick={() => openCreateDialog(selectedCategory?.id ?? null)}>
               <Plus className='size-3.5' />
               <span className={cn(isMobile && 'hidden')}>New Category</span>
             </Button>
