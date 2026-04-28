@@ -1,5 +1,5 @@
 import { ChevronRight, GripVertical, MoreHorizontal, Pencil, Plus, Trash2 } from 'lucide-react'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 
 import type { CatalogCategory } from '@/api/catalog/schema'
 import { CategoryIcon } from './category-thumbnail'
@@ -55,6 +55,7 @@ export const CategoryTreeNode = ({
   const hasChildren = category.children && category.children.length > 0
   const isSelected = selectedId === category.id
   const [dragOver, setDragOver] = useState(false)
+  const dragCountRef = useRef(0) // track nested drag enter/leave
   const itemCount = (category.product_count ?? 0) + (category.vp_count ?? 0)
   const iconStyle = getDepthStyle(depth)
 
@@ -67,22 +68,26 @@ export const CategoryTreeNode = ({
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault()
     e.stopPropagation()
-    // Accept both category drags and product drops
-    const hasData = e.dataTransfer.types.includes('text/plain') || e.dataTransfer.types.includes('application/product-autoid')
-    if (hasData) {
-      e.dataTransfer.dropEffect = e.dataTransfer.types.includes('application/product-autoid') ? 'copy' : 'move'
-      setDragOver(true)
-    }
+    e.dataTransfer.dropEffect = e.dataTransfer.types.includes('application/product-autoid') ? 'copy' : 'move'
+  }
+
+  const handleDragEnter = (e: React.DragEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    dragCountRef.current++
+    if (dragCountRef.current === 1) setDragOver(true)
   }
 
   const handleDragLeave = (e: React.DragEvent) => {
     e.stopPropagation()
-    setDragOver(false)
+    dragCountRef.current--
+    if (dragCountRef.current === 0) setDragOver(false)
   }
 
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault()
     e.stopPropagation()
+    dragCountRef.current = 0
     setDragOver(false)
 
     const productAutoid = e.dataTransfer.getData('application/product-autoid')
@@ -103,6 +108,7 @@ export const CategoryTreeNode = ({
       <div
         draggable
         onDragStart={handleDragStart}
+        onDragEnter={handleDragEnter}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}

@@ -75,22 +75,28 @@ const CatalogPage = () => {
     mutationFn: ({ categoryId, newParentId }: { categoryId: string; newParentId: string | null }) =>
       catalogService.update(categoryId, { parent_id: newParentId }, { project_id: projectId ?? undefined }),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: CATALOG_QUERY_KEYS.all() }),
+    meta: { successMessage: 'Category moved' },
   })
 
   const handleMove = (categoryId: string, newParentId: string | null) => {
+    if (moveMutation.isPending) return
     moveMutation.mutate({ categoryId, newParentId })
   }
 
   const productDropMutation = useMutation({
     mutationFn: ({ productAutoid, categoryId }: { productAutoid: string; categoryId: string }) =>
       catalogService.addProduct(categoryId, { product_autoid: productAutoid }, { project_id: projectId ?? undefined }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: CATALOG_QUERY_KEYS.all() })
+    meta: { successMessage: 'Product added to category' },
+    onSuccess: (_data, { categoryId: catId }) => {
+      // Only invalidate the target category detail + unassigned list, not entire tree
+      queryClient.invalidateQueries({ queryKey: CATALOG_QUERY_KEYS.detail(catId) })
+      queryClient.invalidateQueries({ queryKey: CATALOG_QUERY_KEYS.trees() })
       queryClient.invalidateQueries({ queryKey: ['unassigned-products'] })
     },
   })
 
   const handleProductDrop = (productAutoid: string, categoryId: string) => {
+    if (productDropMutation.isPending) return
     productDropMutation.mutate({ productAutoid, categoryId })
   }
 
