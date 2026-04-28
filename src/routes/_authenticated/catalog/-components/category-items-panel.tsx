@@ -135,7 +135,9 @@ export const CategoryItemsPanel = ({
     }
     const standalone: CatalogCategoryProduct[] = []
     for (const p of products) {
-      const vpId = productToVPId.get(p.product_autoid)
+      // Check optimistic moves first, then server mapping
+      const optimisticVpId = optimisticMoves.get(p.product_autoid)
+      const vpId = optimisticVpId || productToVPId.get(p.product_autoid)
       if (vpId && groups.has(vpId)) {
         groups.get(vpId)!.products.push(p)
       } else {
@@ -146,7 +148,7 @@ export const CategoryItemsPanel = ({
       vpGroups: [...groups.values()].sort((a, b) => a.vp.sort_order - b.vp.sort_order),
       standaloneProducts: standalone.sort((a, b) => a.sort_order - b.sort_order),
     }
-  }, [products, variableProducts, productToVPId])
+  }, [products, variableProducts, productToVPId, optimisticMoves])
 
   const totalCount = products.length + variableProducts.length
 
@@ -209,32 +211,55 @@ export const CategoryItemsPanel = ({
     },
   })
 
+  // Optimistic overrides: product autoids forced into a VP
+  const [optimisticMoves, setOptimisticMoves] = useState<Map<string, string>>(new Map())
+
+  const invalidateAfterMove = (vpId: string) => {
+    queryClient.invalidateQueries({ queryKey: VP_QUERY_KEYS.detail(vpId) })
+    queryClient.invalidateQueries({ queryKey: CATALOG_QUERY_KEYS.detail(category.id) })
+  }
+
   const addProductToVPMutation = useMutation({
     mutationFn: ({ vpId, productAutoid }: { vpId: string; productAutoid: string }) =>
       variableProductService.addItem(vpId, { product_autoid: productAutoid }, {
         project_id: projectId ?? undefined,
       }),
-    meta: {
-      successMessage: 'Product added to superinventory',
+    onMutate: ({ vpId, productAutoid }) => {
+      setOptimisticMoves((prev) => new Map(prev).set(productAutoid, vpId))
     },
-    onSuccess: (_data, { vpId }) => {
-      queryClient.invalidateQueries({ queryKey: VP_QUERY_KEYS.detail(vpId) })
-      queryClient.invalidateQueries({ queryKey: CATALOG_QUERY_KEYS.detail(category.id) })
+    onSuccess: (_data, { vpId }) => invalidateAfterMove(vpId),
+    onError: (_err, { productAutoid }) => {
+      setOptimisticMoves((prev) => { const next = new Map(prev); next.delete(productAutoid); return next })
+      invalidateAfterMove('')
     },
   })
 
   const bulkAddToVPMutation = useMutation({
     mutationFn: async ({ vpId, productAutoids }: { vpId: string; productAutoids: string[] }) => {
       const params = { project_id: projectId ?? undefined }
-      for (const autoid of productAutoids) {
-        await variableProductService.addItem(vpId, { product_autoid: autoid }, params)
-      }
+      // Parallel — all at once instead of sequential
+      await Promise.all(
+        productAutoids.map((autoid) =>
+          variableProductService.addItem(vpId, { product_autoid: autoid }, params)
+        )
+      )
     },
     meta: { successMessage: 'Products added to superinventory' },
+    onMutate: ({ vpId, productAutoids }) => {
+      setOptimisticMoves((prev) => {
+        const next = new Map(prev)
+        for (const autoid of productAutoids) next.set(autoid, vpId)
+        return next
+      })
+    },
     onSuccess: (_data, { vpId }) => {
-      queryClient.invalidateQueries({ queryKey: VP_QUERY_KEYS.detail(vpId) })
-      queryClient.invalidateQueries({ queryKey: CATALOG_QUERY_KEYS.detail(category.id) })
+      invalidateAfterMove(vpId)
       clearSelection()
+      setOptimisticMoves(new Map())
+    },
+    onError: () => {
+      setOptimisticMoves(new Map())
+      queryClient.invalidateQueries({ queryKey: CATALOG_QUERY_KEYS.detail(category.id) })
     },
   })
 
