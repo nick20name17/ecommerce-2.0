@@ -16,10 +16,15 @@ export const VP_QUERY_KEYS = {
   filter: (filters: Record<string, string>) => [...VP_QUERY_KEYS.all(), 'filter', filters] as const,
 }
 
+const STALE_5M = 5 * 60 * 1000
+const GC_30M = 30 * 60 * 1000
+
 export const getVariableProductsQuery = (params: VariableProductParams = {}) =>
   queryOptions({
     queryKey: VP_QUERY_KEYS.list(params),
     queryFn: () => variableProductService.list(params),
+    staleTime: STALE_5M,
+    gcTime: GC_30M,
   })
 
 export const getVariableProductDetailQuery = (
@@ -30,12 +35,16 @@ export const getVariableProductDetailQuery = (
     queryKey: [...VP_QUERY_KEYS.detail(id), params ?? {}] as const,
     queryFn: () => variableProductService.getById(id, params),
     enabled: !!id,
+    staleTime: STALE_5M,
+    gcTime: GC_30M,
   })
 
 export const getSpecsQuery = (params: SpecParams = {}) =>
   queryOptions({
     queryKey: VP_QUERY_KEYS.specList(params),
     queryFn: () => variableProductService.listSpecs(params),
+    staleTime: STALE_5M,
+    gcTime: GC_30M,
   })
 
 export const getSpecDetailQuery = (specId: string, params: SpecParams = {}) =>
@@ -43,6 +52,8 @@ export const getSpecDetailQuery = (specId: string, params: SpecParams = {}) =>
     queryKey: [...VP_QUERY_KEYS.specDetail(specId), params] as const,
     queryFn: () => variableProductService.getSpec(specId, params),
     enabled: !!specId,
+    staleTime: STALE_5M,
+    gcTime: GC_30M,
   })
 
 export const getSpecOptionsQuery = (specId: string, params: SpecParams = {}) =>
@@ -50,6 +61,8 @@ export const getSpecOptionsQuery = (specId: string, params: SpecParams = {}) =>
     queryKey: [...VP_QUERY_KEYS.specOptions(specId), params] as const,
     queryFn: () => variableProductService.listSpecOptions(specId, params),
     enabled: !!specId,
+    staleTime: STALE_5M,
+    gcTime: GC_30M,
   })
 
 export const getFilteredVPQuery = (
@@ -60,4 +73,5 @@ export const getFilteredVPQuery = (
     queryKey: VP_QUERY_KEYS.filter(filters),
     queryFn: () => variableProductService.filterBySpecs(filters, params),
     enabled: Object.keys(filters).length > 0,
+    staleTime: STALE_5M,
   })

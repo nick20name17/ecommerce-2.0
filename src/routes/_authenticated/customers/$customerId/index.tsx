@@ -26,7 +26,7 @@ import { CustomerModal } from '@/routes/_authenticated/customers/-components/cus
 import { SidebarTrigger } from '@/components/ui/sidebar'
 import { Skeleton } from '@/components/ui/skeleton'
 import { CUSTOMER_TABS } from '@/constants/customer'
-import { useBreakpoint } from '@/hooks/use-breakpoint'
+
 import { useProjectId } from '@/hooks/use-project-id'
 import { useCustomerTabParam } from '@/hooks/use-query-params'
 import { isAdmin } from '@/constants/user'
@@ -38,8 +38,6 @@ import { useAuth } from '@/providers/auth'
 function CustomerDetailPage() {
   const { customerId } = Route.useParams()
   const router = useRouter()
-  const bp = useBreakpoint()
-  const isMobile = bp === 'mobile'
   const [projectId] = useProjectId()
   const [activeTab, setActiveTab] = useCustomerTabParam()
   const { user } = useAuth()
@@ -121,7 +119,7 @@ function CustomerDetailPage() {
   if (isLoading) {
     return (
       <div className='flex h-full flex-col overflow-hidden'>
-        <header className={cn('flex h-12 shrink-0 items-center gap-2.5 border-b border-border', isMobile ? 'px-3.5' : 'px-6')}>
+        <header className='flex h-12 shrink-0 items-center gap-2.5 border-b border-border px-3.5 sm:px-6'>
           <SidebarTrigger className='-ml-1' />
           <Skeleton className='h-4 w-16' />
           <Skeleton className='size-5 rounded-[5px]' />
@@ -131,9 +129,9 @@ function CustomerDetailPage() {
           <Skeleton className='h-7 w-14 rounded-[5px]' />
           <Skeleton className='size-7 rounded-[5px]' />
         </header>
-        <div className='flex min-h-0 flex-1'>
+        <div className='flex min-h-0 flex-1 flex-col lg:flex-row'>
           <div className='flex flex-1 flex-col overflow-hidden'>
-            <div className={cn('flex gap-1 border-b border-border', isMobile ? 'px-3.5' : 'px-6')}>
+            <div className='flex gap-1 border-b border-border px-3.5 sm:px-6'>
               {Array.from({ length: 3 }).map((_, i) => (
                 <Skeleton key={i} className='my-2.5 h-4 w-16' />
               ))}
@@ -142,21 +140,19 @@ function CustomerDetailPage() {
               <Skeleton className='h-64 w-full' />
             </div>
           </div>
-          {!isMobile && (
-            <div className='w-[380px] shrink-0 border-l border-border bg-bg-secondary/50'>
-              <div className='space-y-3 px-4 py-3'>
-                <Skeleton className='h-3 w-16' />
-                <div className='grid grid-cols-2 gap-x-4 gap-y-2'>
-                  {Array.from({ length: 6 }).map((_, i) => (
-                    <div key={i}>
-                      <Skeleton className='mb-1 h-2.5 w-12' />
-                      <Skeleton className='h-3.5 w-full' />
-                    </div>
-                  ))}
-                </div>
+          <div className='hidden shrink-0 border-l border-border bg-bg-secondary/50 lg:block lg:w-[380px]'>
+            <div className='space-y-3 px-4 py-3'>
+              <Skeleton className='h-3 w-16' />
+              <div className='grid grid-cols-2 gap-x-4 gap-y-2'>
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <div key={i}>
+                    <Skeleton className='mb-1 h-2.5 w-12' />
+                    <Skeleton className='h-3.5 w-full' />
+                  </div>
+                ))}
               </div>
             </div>
-          )}
+          </div>
         </div>
       </div>
     )
@@ -176,11 +172,11 @@ function CustomerDetailPage() {
   return (
     <div className='flex h-full flex-col overflow-hidden'>
       {/* ── Header bar ── */}
-      <header className={cn('flex h-12 shrink-0 items-center gap-2.5 border-b border-border', isMobile ? 'px-3.5' : 'px-6')}>
+      <header className='flex h-12 shrink-0 items-center gap-2.5 border-b border-border px-3.5 sm:px-6'>
         <SidebarTrigger className='-ml-1' />
         <button
           type='button'
-          className='inline-flex h-7 items-center gap-0.5 rounded-[6px] border border-border bg-bg-secondary pl-1.5 pr-2.5 text-[13px] font-medium text-text-secondary transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground'
+          className='inline-flex h-7 shrink-0 items-center gap-0.5 rounded-[6px] border border-border bg-bg-secondary pl-1.5 pr-2.5 text-[13px] font-medium text-text-secondary transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground'
           onClick={() => router.history.back()}
         >
           <ChevronLeft className='size-3.5' />
@@ -188,13 +184,13 @@ function CustomerDetailPage() {
         </button>
 
         <PageHeaderIcon icon={ICustomers} color={PAGE_COLORS.customers} />
-        <h1 className='text-[14px] font-semibold tracking-[-0.01em]'>
+        <h1 className='truncate text-[14px] font-semibold tracking-[-0.01em]'>
           {customer.l_name}
         </h1>
 
         <span
           className={cn(
-            'inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-[12px] font-semibold leading-none',
+            'hidden shrink-0 items-center gap-1.5 rounded-full border px-2 py-0.5 text-[12px] font-semibold leading-none sm:inline-flex',
             isActive
               ? 'border-green-300 bg-green-500/10 text-green-800 dark:border-green-600 dark:bg-green-500/20 dark:text-green-300'
               : 'border-slate-300 bg-slate-500/10 text-slate-700 dark:border-slate-600 dark:bg-slate-500/20 dark:text-slate-300',
@@ -209,94 +205,90 @@ function CustomerDetailPage() {
           {isActive ? 'Active' : 'Inactive'}
         </span>
 
-        <span className='text-[13px] tabular-nums text-text-tertiary'>
+        <span className='hidden text-[13px] tabular-nums text-text-tertiary sm:inline'>
           CUS-{customer.id}
         </span>
 
         <div className='flex-1' />
 
-        {canAssign && (
+        <div className='flex shrink-0 items-center gap-1.5'>
+          {canAssign && (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  type='button'
+                  className={cn(
+                    'inline-flex size-7 items-center justify-center rounded-[5px] border text-[12px] font-medium transition-colors duration-[80ms] md:h-7 md:w-auto md:gap-1.5 md:px-2.5',
+                    (customer.assigned_users?.length || customer.assigned_user)
+                      ? 'border-primary/20 bg-primary/[0.06] text-primary hover:bg-primary/[0.1]'
+                      : 'border-border bg-bg-secondary text-text-secondary hover:bg-bg-active hover:text-foreground'
+                  )}
+                  onClick={() => setAssignOpen(true)}
+                >
+                  <UserPlus className='size-3.5' />
+                  <span className='hidden md:inline'>
+                    {(customer.assigned_users?.length ? customer.assigned_users[0] : customer.assigned_user)
+                      ? getUserDisplayName(customer.assigned_users?.length ? customer.assigned_users[0] : customer.assigned_user!)
+                      : 'Assign'}
+                  </span>
+                </button>
+              </TooltipTrigger>
+              <TooltipContent>
+                {(customer.assigned_users?.length || customer.assigned_user)
+                  ? `Assigned to ${(customer.assigned_users?.length ? customer.assigned_users : customer.assigned_user ? [customer.assigned_user] : []).map((u) => getUserDisplayName(u)).join(', ')} — click to change`
+                  : 'Assign a sales user'}
+              </TooltipContent>
+            </Tooltip>
+          )}
+
           <Tooltip>
             <TooltipTrigger asChild>
               <button
                 type='button'
-                className={cn(
-                  'inline-flex h-7 items-center gap-1.5 rounded-[5px] border px-2.5 text-[12px] font-medium transition-colors duration-[80ms]',
-                  (customer.assigned_users?.length || customer.assigned_user)
-                    ? 'border-primary/20 bg-primary/[0.06] text-primary hover:bg-primary/[0.1]'
-                    : 'border-border bg-bg-secondary text-text-secondary hover:bg-bg-active hover:text-foreground'
-                )}
-                onClick={() => setAssignOpen(true)}
+                className='inline-flex size-7 items-center justify-center rounded-[5px] border border-border bg-bg-secondary text-text-secondary transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground'
+                onClick={() => setNotesOpen(true)}
               >
-                <UserPlus className='size-3.5' />
-                <span className='hidden sm:inline'>
-                  {(customer.assigned_users?.length ? customer.assigned_users[0] : customer.assigned_user)
-                    ? getUserDisplayName(customer.assigned_users?.length ? customer.assigned_users[0] : customer.assigned_user!)
-                    : 'Assign'}
-                </span>
+                <StickyNote className='size-3.5' />
               </button>
             </TooltipTrigger>
-            <TooltipContent>
-              {(customer.assigned_users?.length || customer.assigned_user)
-                ? `Assigned to ${(customer.assigned_users?.length ? customer.assigned_users : customer.assigned_user ? [customer.assigned_user] : []).map((u) => getUserDisplayName(u)).join(', ')} — click to change`
-                : 'Assign a sales user'}
-            </TooltipContent>
+            <TooltipContent>Notes</TooltipContent>
           </Tooltip>
-        )}
 
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <button
-              type='button'
-              className='inline-flex h-7 items-center gap-1.5 rounded-[5px] border border-border bg-bg-secondary px-2.5 text-[12px] font-medium text-text-secondary transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground'
-              onClick={() => setNotesOpen(true)}
-            >
-              <StickyNote className='size-3.5' />
-              <span className='hidden sm:inline'>Notes</span>
-            </button>
-          </TooltipTrigger>
-          <TooltipContent>Notes</TooltipContent>
-        </Tooltip>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button
+                type='button'
+                className='inline-flex size-7 items-center justify-center rounded-[5px] border border-border bg-bg-secondary text-text-secondary transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground'
+                onClick={() => setEditOpen(true)}
+              >
+                <Pencil className='size-3.5' />
+              </button>
+            </TooltipTrigger>
+            <TooltipContent>Edit Customer</TooltipContent>
+          </Tooltip>
 
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <button
-              type='button'
-              className='inline-flex h-7 items-center gap-1.5 rounded-[5px] border border-border bg-bg-secondary px-2.5 text-[12px] font-medium text-text-secondary transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground'
-              onClick={() => setEditOpen(true)}
-            >
-              <Pencil className='size-3.5' />
-              <span className='hidden sm:inline'>Edit</span>
-            </button>
-          </TooltipTrigger>
-          <TooltipContent>Edit Customer</TooltipContent>
-        </Tooltip>
-
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <button
-              type='button'
-              className='inline-flex size-7 items-center justify-center rounded-[5px] text-text-tertiary transition-colors duration-[80ms] hover:bg-bg-hover hover:text-destructive'
-              onClick={() => setDeleteOpen(true)}
-            >
-              <Trash2 className='size-3.5' />
-            </button>
-          </TooltipTrigger>
-          <TooltipContent>Delete Customer</TooltipContent>
-        </Tooltip>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button
+                type='button'
+                className='inline-flex size-7 items-center justify-center rounded-[5px] text-text-tertiary transition-colors duration-[80ms] hover:bg-bg-hover hover:text-destructive'
+                onClick={() => setDeleteOpen(true)}
+              >
+                <Trash2 className='size-3.5' />
+              </button>
+            </TooltipTrigger>
+            <TooltipContent>Delete Customer</TooltipContent>
+          </Tooltip>
+        </div>
       </header>
 
       {/* Content area: main + right panel */}
-      <div className={cn('flex min-h-0 flex-1', isMobile && 'flex-col')}>
+      <div className='flex min-h-0 flex-1 flex-col lg:flex-row'>
         {/* Main content — scrollable */}
         <div className='flex flex-1 flex-col overflow-hidden'>
           {/* Tabs */}
-          <div
-            className={cn(
-              'flex shrink-0 gap-1 border-b border-border',
-              isMobile ? 'px-5' : 'px-6'
-            )}
-          >
+          <div className='flex shrink-0 gap-1 border-b border-border px-3.5 sm:px-6'>
+
             {CUSTOMER_TABS.map((tab) => (
               <button
                 key={tab.value}
@@ -329,7 +321,7 @@ function CustomerDetailPage() {
               <CustomerTasksTab customerId={customerId} customerName={customer?.l_name} />
             )}
             {activeTab === 'dashboard' && (
-              <div className={cn('flex-1 overflow-y-auto', isMobile ? 'px-5 py-4' : 'px-6 py-5')}>
+              <div className='flex-1 overflow-y-auto px-5 py-4 sm:px-6 sm:py-5'>
                 <CustomerDashboardTab
                   customerId={customerId}
                   projectId={projectId ?? null}
@@ -341,12 +333,7 @@ function CustomerDetailPage() {
 
         {/* Right panel — properties */}
         <div
-          className={cn(
-            'flex shrink-0 flex-col overflow-hidden bg-bg-secondary/50',
-            isMobile
-              ? 'border-t border-border'
-              : 'w-[380px] border-l border-border'
-          )}
+          className='flex shrink-0 flex-col overflow-hidden border-t border-border bg-bg-secondary/50 lg:border-t-0 lg:w-[380px] lg:border-l'
         >
           {/* Panel tabs */}
           <div className='flex shrink-0 items-center gap-0 border-b border-border px-1'>

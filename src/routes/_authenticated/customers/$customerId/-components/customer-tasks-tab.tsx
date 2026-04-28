@@ -110,10 +110,7 @@ export const CustomerTasksTab = ({ customerId, customerName }: CustomerTasksTabP
     <div className='flex h-full flex-col overflow-hidden'>
       {/* Search + create */}
       <div
-        className={cn(
-          'flex shrink-0 items-center gap-2 border-b border-border py-2',
-          isMobile ? 'px-5' : 'px-6'
-        )}
+        className='flex shrink-0 items-center gap-2 border-b border-border py-2 px-5 sm:px-6'
       >
         <div className='flex flex-1 items-center gap-1.5 rounded-[6px] border border-border bg-background px-2.5 py-1.5'>
           <Search className='size-3.5 shrink-0 text-text-tertiary' />
@@ -141,10 +138,7 @@ export const CustomerTasksTab = ({ customerId, customerName }: CustomerTasksTabP
             {Array.from({ length: 5 }).map((_, i) => (
               <div
                 key={i}
-                className={cn(
-                  'flex items-center gap-2 border-b border-border-light py-2',
-                  isMobile ? 'px-5' : 'px-6'
-                )}
+                className='flex items-center gap-2 border-b border-border-light py-2 px-5 sm:px-6'
               >
                 <div className='size-3.5 animate-pulse rounded-full bg-border' />
                 <div className='h-3 w-12 animate-pulse rounded bg-border' />
@@ -173,10 +167,7 @@ export const CustomerTasksTab = ({ customerId, customerName }: CustomerTasksTabP
       {/* Footer */}
       {tasks.length > 0 && (
         <div
-          className={cn(
-            'shrink-0 border-t border-border py-1.5',
-            isMobile ? 'px-5' : 'px-6'
-          )}
+          className='shrink-0 border-t border-border py-1.5 px-5 sm:px-6'
         >
           <p className='text-[13px] tabular-nums text-text-tertiary'>
             {tasks.length} task{tasks.length !== 1 ? 's' : ''}

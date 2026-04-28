@@ -61,7 +61,10 @@ export const VPHeader = ({ vp, projectId, onBack, isMobile, isTablet }: VPHeader
           <ArrowLeft className='size-4' />
         </Button>
         <div className='flex-1 min-w-0'>
-          <h1 className={cn('font-semibold tracking-[-0.01em] truncate', isMobile ? 'text-[14px]' : 'text-[15px]')}>{vp.name}</h1>
+          <div className='flex items-center gap-2'>
+            <h1 className={cn('font-semibold tracking-[-0.01em] truncate', isMobile ? 'text-[14px]' : 'text-[15px]')}>{vp.name}</h1>
+            <span className='shrink-0 rounded bg-purple-500/10 px-1.5 py-0.5 text-[10px] font-bold uppercase text-purple-500'>SUPER</span>
+          </div>
           {!isMobile && vp.description && (
             <p className='text-[12px] text-text-tertiary truncate'>{vp.description}</p>
           )}
@@ -97,7 +100,7 @@ export const VPHeader = ({ vp, projectId, onBack, isMobile, isTablet }: VPHeader
             }}
           >
             <DialogHeader>
-              <DialogTitle>Edit Variable Product</DialogTitle>
+              <DialogTitle>Edit Superinventory</DialogTitle>
             </DialogHeader>
             <DialogBody className='flex flex-col gap-3'>
               <div className='flex flex-col gap-1.5'>

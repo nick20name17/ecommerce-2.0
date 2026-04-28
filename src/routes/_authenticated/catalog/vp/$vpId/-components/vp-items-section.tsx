@@ -1,5 +1,5 @@
 import { useMutation } from '@tanstack/react-query'
-import { Eye, EyeOff, Package, Plus, Star, Trash2 } from 'lucide-react'
+import { Eye, EyeOff, Plus, Star, Trash2 } from 'lucide-react'
 import { useState } from 'react'
 
 import type { VariableProduct, VariableProductItem } from '@/api/variable-product/schema'
@@ -291,7 +291,7 @@ export const VPItemsSection = ({ vp, projectId, isMobile, isTablet }: VPItemsSec
         open={productBrowserOpen}
         onOpenChange={setProductBrowserOpen}
         projectId={projectId}
-        title='Add Products to Variable Product'
+        title='Add Products to Superinventory'
         onSelect={(products) => addProductsMutation.mutate(products)}
       />
     </div>

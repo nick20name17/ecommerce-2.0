@@ -1,7 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { createFileRoute } from '@tanstack/react-router'
-import { AlertCircle, ArrowLeft, FolderTree, Plus } from 'lucide-react'
-import { useState } from 'react'
+import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { AlertCircle, ArrowLeft, FolderTree, Layers, Plus } from 'lucide-react'
+import { useCallback, useMemo, useState } from 'react'
+import { parseAsString, useQueryState } from 'nuqs'
 
 import { CategoryDeleteDialog } from './-components/category-delete-dialog'
 import { CategoryFormDialog } from './-components/category-form-dialog'
@@ -21,7 +22,20 @@ import { useBreakpoint } from '@/hooks/use-breakpoint'
 import { useProjectId } from '@/hooks/use-project-id'
 import { cn } from '@/lib/utils'
 
+// Find a category by ID anywhere in the tree
+function findCategoryById(tree: CatalogCategory[], id: string): CatalogCategory | null {
+  for (const cat of tree) {
+    if (cat.id === id) return cat
+    if (cat.children?.length) {
+      const found = findCategoryById(cat.children, id)
+      if (found) return found
+    }
+  }
+  return null
+}
+
 const CatalogPage = () => {
+  const navigate = useNavigate()
   const [projectId] = useProjectId()
   const bp = useBreakpoint()
   const isMobile = bp === 'mobile'
@@ -33,8 +47,19 @@ const CatalogPage = () => {
 
   const tree = data?.results ?? []
 
-  // Selection state — on mobile, selecting a category navigates to detail view
-  const [selectedCategory, setSelectedCategory] = useState<CatalogCategory | null>(null)
+  // Selection state — synced to URL so it persists on reload and is shareable
+  const [selectedCategoryId, setSelectedCategoryId] = useQueryState('category', parseAsString)
+
+  const selectedCategory = useMemo(
+    () => (selectedCategoryId && tree.length > 0 ? findCategoryById(tree, selectedCategoryId) : null),
+    [selectedCategoryId, tree]
+  )
+
+  const setSelectedCategory = useCallback(
+    (cat: CatalogCategory | null) => setSelectedCategoryId(cat?.id ?? null),
+    [setSelectedCategoryId]
+  )
+
   const showDetail = isMobile && selectedCategory !== null
 
   // Dialog state
@@ -85,10 +110,7 @@ const CatalogPage = () => {
     <div className='flex h-full flex-col overflow-hidden'>
       {/* Header */}
       <header
-        className={cn(
-          'border-border flex h-12 shrink-0 items-center gap-2 border-b',
-          isMobile ? 'px-3.5' : 'px-6'
-        )}
+        className='border-border flex h-12 shrink-0 items-center gap-2 border-b px-3.5 sm:px-6'
       >
         <SidebarTrigger className='-ml-1' />
 
@@ -114,6 +136,15 @@ const CatalogPage = () => {
           <div className='flex items-center gap-1.5'>
             <Button
               size='sm'
+              variant='ghost'
+              onClick={() => navigate({ to: '/catalog/specs' })}
+            >
+              <Layers className='size-3.5' />
+              <span className={cn(isMobile && 'hidden')}>Specs</span>
+            </Button>
+
+            <Button
+              size='sm'
               variant={showUnassigned ? 'default' : 'ghost'}
               onClick={() => {
                 setShowUnassigned(!showUnassigned)
@@ -131,7 +162,7 @@ const CatalogPage = () => {
 
             <Button size='sm' variant='outline' onClick={() => setVpCreateOpen(true)}>
               <Plus className='size-3.5' />
-              <span className={cn(isMobile && 'hidden')}>New VP</span>
+              <span className={cn(isMobile && 'hidden')}>New Superinventory</span>
             </Button>
           </div>
         )}
@@ -152,9 +183,14 @@ const CatalogPage = () => {
             )}
           >
             {isLoading ? (
-              <div className={cn('flex flex-col gap-1 py-2', isMobile ? 'px-3.5' : 'px-1.5')}>
-                {Array.from({ length: 8 }).map((_, i) => (
-                  <Skeleton key={i} className={cn('w-full rounded-md', isMobile ? 'h-9' : 'h-8')} />
+              <div className='flex flex-col gap-0.5 py-2 px-1.5'>
+                {/* Mimic tree structure with indented skeleton rows */}
+                {[0, 1, 2, 2, 2, 1, 2, 1, 1, 0, 1, 1].map((indent, i) => (
+                  <div key={i} className='flex h-8 items-center gap-1.5 rounded-md px-1.5' style={{ paddingLeft: `${indent * 16 + 6}px` }}>
+                    {indent > 0 && <Skeleton className='size-3.5 shrink-0 rounded' />}
+                    <Skeleton className='size-[18px] shrink-0 rounded' />
+                    <Skeleton className={cn('h-3.5 rounded', i % 3 === 0 ? 'w-24' : i % 3 === 1 ? 'w-32' : 'w-20')} />
+                  </div>
                 ))}
               </div>
             ) : tree.length === 0 ? (
@@ -210,6 +246,7 @@ const CatalogPage = () => {
                 category={selectedCategory}
                 projectId={projectId}
                 isMobile={isMobile}
+                onAddSubcategory={() => openCreateDialog(selectedCategory.id)}
               />
             ) : (
               !isMobile && (

@@ -34,13 +34,13 @@ export const CategoryFormDialog = ({
   const isEditing = !!category
   const [name, setName] = useState(category?.name ?? '')
   const [slug, setSlug] = useState(category?.slug ?? '')
-  const [imageUrl, setImageUrl] = useState(category?.image_url ?? '')
+  const [_imageUrl, _setImageUrl] = useState(category?.image_url ?? '')
   const [sortOrder, setSortOrder] = useState(category?.sort_order ?? 0)
 
   const resetForm = () => {
     setName(category?.name ?? '')
     setSlug(category?.slug ?? '')
-    setImageUrl(category?.image_url ?? '')
+    _setImageUrl(category?.image_url ?? '')
     setSortOrder(category?.sort_order ?? 0)
   }
 

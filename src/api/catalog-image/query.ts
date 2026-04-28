@@ -22,4 +22,6 @@ export const getCatalogImagesQuery = (
         project_id: projectId,
       }),
     enabled: !!entityType && !!entityId,
+    staleTime: 10 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
   })

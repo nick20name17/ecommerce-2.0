@@ -1,12 +1,11 @@
 import { useMutation, useQuery } from '@tanstack/react-query'
-import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { createFileRoute, useNavigate, useRouter } from '@tanstack/react-router'
 import { Trash2 } from 'lucide-react'
 import { useState } from 'react'
 
 import { VPHeader } from './-components/vp-header'
-import { VPItemsSection } from './-components/vp-items-section'
-import { VPSpecsSection } from './-components/vp-specs-section'
-import { VPValuesMatrix } from './-components/vp-values-matrix'
+import { VariantsTable } from './-components/variants-table'
+import { SpecsBar } from './-components/specs-bar'
 import { ImageGallery } from '@/components/common/image-gallery'
 import { VP_QUERY_KEYS, getVariableProductDetailQuery } from '@/api/variable-product/query'
 import { variableProductService } from '@/api/variable-product/service'
@@ -28,6 +27,7 @@ const CatalogVPDetailPage = () => {
   const params = Route.useParams()
   const vpId = (params as Record<string, string>).vpId
   const navigate = useNavigate()
+  const router = useRouter()
   const bp = useBreakpoint()
   const isMobile = bp === 'mobile'
   const isTablet = bp === 'tablet'
@@ -79,7 +79,7 @@ const CatalogVPDetailPage = () => {
       <VPHeader
         vp={vp}
         projectId={projectId}
-        onBack={() => navigate({ to: '/catalog' })}
+        onBack={() => router.history.back()}
         isMobile={isMobile}
         isTablet={isTablet}
       />
@@ -117,20 +117,17 @@ const CatalogVPDetailPage = () => {
           {/* Images */}
           <ImageGallery entityType='vp' entityId={vp.id} projectId={projectId} />
 
-          {/* Items */}
-          <VPItemsSection vp={vp} projectId={projectId} isMobile={isMobile} isTablet={isTablet} />
+          {/* Specs bar — compact horizontal view */}
+          <SpecsBar vp={vp} projectId={projectId} />
 
-          {/* Specs */}
-          <VPSpecsSection vp={vp} projectId={projectId} />
-
-          {/* Values Matrix */}
-          <VPValuesMatrix vp={vp} projectId={projectId} isMobile={isMobile} isTablet={isTablet} />
+          {/* Unified variants table — products + spec values in one view */}
+          <VariantsTable vp={vp} projectId={projectId} />
 
           {/* Danger zone */}
           <div className='rounded-lg border border-destructive/20 p-4'>
             <div className={cn('flex gap-3', isMobile ? 'flex-col' : 'items-center justify-between')}>
               <div>
-                <h3 className='text-[13px] font-semibold text-destructive'>Delete Variable Product</h3>
+                <h3 className='text-[13px] font-semibold text-destructive'>Delete Superinventory</h3>
                 <p className='text-[12px] text-text-tertiary mt-0.5'>
                   This will permanently delete all items, specs, and values.
                 </p>
@@ -148,7 +145,7 @@ const CatalogVPDetailPage = () => {
       <Dialog open={deleteOpen} onOpenChange={setDeleteOpen}>
         <DialogContent className='sm:max-w-sm'>
           <DialogHeader>
-            <DialogTitle>Delete Variable Product</DialogTitle>
+            <DialogTitle>Delete Superinventory</DialogTitle>
             <DialogDescription>
               Are you sure you want to delete <strong>{vp.name}</strong>? This action cannot be
               undone.
@@ -175,6 +172,6 @@ const CatalogVPDetailPage = () => {
 export const Route = createFileRoute('/_authenticated/catalog/vp/$vpId/')({
   component: CatalogVPDetailPage,
   head: () => ({
-    meta: [{ title: 'Variable Product' }],
+    meta: [{ title: 'Superinventory' }],
   }),
 })

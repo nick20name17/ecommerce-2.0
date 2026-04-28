@@ -36,6 +36,8 @@ import { Route as AuthenticatedProposalsProposalIdIndexRouteImport } from './rou
 import { Route as AuthenticatedPickListsPickListIdIndexRouteImport } from './routes/_authenticated/pick-lists/$pickListId/index'
 import { Route as AuthenticatedOrdersOrderIdIndexRouteImport } from './routes/_authenticated/orders/$orderId/index'
 import { Route as AuthenticatedCustomersCustomerIdIndexRouteImport } from './routes/_authenticated/customers/$customerId/index'
+import { Route as AuthenticatedCatalogSpecsIndexRouteImport } from './routes/_authenticated/catalog/specs/index'
+import { Route as AuthenticatedCatalogVpVpIdIndexRouteImport } from './routes/_authenticated/catalog/vp/$vpId/index'
 
 const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
   id: '/_authenticated',
@@ -190,6 +192,18 @@ const AuthenticatedCustomersCustomerIdIndexRoute =
     path: '/customers/$customerId/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedCatalogSpecsIndexRoute =
+  AuthenticatedCatalogSpecsIndexRouteImport.update({
+    id: '/catalog/specs/',
+    path: '/catalog/specs/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedCatalogVpVpIdIndexRoute =
+  AuthenticatedCatalogVpVpIdIndexRouteImport.update({
+    id: '/catalog/vp/$vpId/',
+    path: '/catalog/vp/$vpId/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof AuthenticatedIndexRoute
@@ -211,12 +225,14 @@ export interface FileRoutesByFullPath {
   '/tasks/': typeof AuthenticatedTasksIndexRoute
   '/users/': typeof AuthenticatedUsersIndexRoute
   '/variable-products/': typeof AuthenticatedVariableProductsIndexRoute
+  '/catalog/specs/': typeof AuthenticatedCatalogSpecsIndexRoute
   '/customers/$customerId/': typeof AuthenticatedCustomersCustomerIdIndexRoute
   '/orders/$orderId/': typeof AuthenticatedOrdersOrderIdIndexRoute
   '/pick-lists/$pickListId/': typeof AuthenticatedPickListsPickListIdIndexRoute
   '/proposals/$proposalId/': typeof AuthenticatedProposalsProposalIdIndexRoute
   '/tasks/$taskId/': typeof AuthenticatedTasksTaskIdIndexRoute
   '/variable-products/$vpId/': typeof AuthenticatedVariableProductsVpIdIndexRoute
+  '/catalog/vp/$vpId/': typeof AuthenticatedCatalogVpVpIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof AuthenticatedIndexRoute
@@ -238,12 +254,14 @@ export interface FileRoutesByTo {
   '/tasks': typeof AuthenticatedTasksIndexRoute
   '/users': typeof AuthenticatedUsersIndexRoute
   '/variable-products': typeof AuthenticatedVariableProductsIndexRoute
+  '/catalog/specs': typeof AuthenticatedCatalogSpecsIndexRoute
   '/customers/$customerId': typeof AuthenticatedCustomersCustomerIdIndexRoute
   '/orders/$orderId': typeof AuthenticatedOrdersOrderIdIndexRoute
   '/pick-lists/$pickListId': typeof AuthenticatedPickListsPickListIdIndexRoute
   '/proposals/$proposalId': typeof AuthenticatedProposalsProposalIdIndexRoute
   '/tasks/$taskId': typeof AuthenticatedTasksTaskIdIndexRoute
   '/variable-products/$vpId': typeof AuthenticatedVariableProductsVpIdIndexRoute
+  '/catalog/vp/$vpId': typeof AuthenticatedCatalogVpVpIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -268,12 +286,14 @@ export interface FileRoutesById {
   '/_authenticated/tasks/': typeof AuthenticatedTasksIndexRoute
   '/_authenticated/users/': typeof AuthenticatedUsersIndexRoute
   '/_authenticated/variable-products/': typeof AuthenticatedVariableProductsIndexRoute
+  '/_authenticated/catalog/specs/': typeof AuthenticatedCatalogSpecsIndexRoute
   '/_authenticated/customers/$customerId/': typeof AuthenticatedCustomersCustomerIdIndexRoute
   '/_authenticated/orders/$orderId/': typeof AuthenticatedOrdersOrderIdIndexRoute
   '/_authenticated/pick-lists/$pickListId/': typeof AuthenticatedPickListsPickListIdIndexRoute
   '/_authenticated/proposals/$proposalId/': typeof AuthenticatedProposalsProposalIdIndexRoute
   '/_authenticated/tasks/$taskId/': typeof AuthenticatedTasksTaskIdIndexRoute
   '/_authenticated/variable-products/$vpId/': typeof AuthenticatedVariableProductsVpIdIndexRoute
+  '/_authenticated/catalog/vp/$vpId/': typeof AuthenticatedCatalogVpVpIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -297,12 +317,14 @@ export interface FileRouteTypes {
     | '/tasks/'
     | '/users/'
     | '/variable-products/'
+    | '/catalog/specs/'
     | '/customers/$customerId/'
     | '/orders/$orderId/'
     | '/pick-lists/$pickListId/'
     | '/proposals/$proposalId/'
     | '/tasks/$taskId/'
     | '/variable-products/$vpId/'
+    | '/catalog/vp/$vpId/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -324,12 +346,14 @@ export interface FileRouteTypes {
     | '/tasks'
     | '/users'
     | '/variable-products'
+    | '/catalog/specs'
     | '/customers/$customerId'
     | '/orders/$orderId'
     | '/pick-lists/$pickListId'
     | '/proposals/$proposalId'
     | '/tasks/$taskId'
     | '/variable-products/$vpId'
+    | '/catalog/vp/$vpId'
   id:
     | '__root__'
     | '/_auth'
@@ -353,12 +377,14 @@ export interface FileRouteTypes {
     | '/_authenticated/tasks/'
     | '/_authenticated/users/'
     | '/_authenticated/variable-products/'
+    | '/_authenticated/catalog/specs/'
     | '/_authenticated/customers/$customerId/'
     | '/_authenticated/orders/$orderId/'
     | '/_authenticated/pick-lists/$pickListId/'
     | '/_authenticated/proposals/$proposalId/'
     | '/_authenticated/tasks/$taskId/'
     | '/_authenticated/variable-products/$vpId/'
+    | '/_authenticated/catalog/vp/$vpId/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -557,6 +583,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCustomersCustomerIdIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/catalog/specs/': {
+      id: '/_authenticated/catalog/specs/'
+      path: '/catalog/specs'
+      fullPath: '/catalog/specs/'
+      preLoaderRoute: typeof AuthenticatedCatalogSpecsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/catalog/vp/$vpId/': {
+      id: '/_authenticated/catalog/vp/$vpId/'
+      path: '/catalog/vp/$vpId'
+      fullPath: '/catalog/vp/$vpId/'
+      preLoaderRoute: typeof AuthenticatedCatalogVpVpIdIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
@@ -591,12 +631,14 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedTasksIndexRoute: typeof AuthenticatedTasksIndexRoute
   AuthenticatedUsersIndexRoute: typeof AuthenticatedUsersIndexRoute
   AuthenticatedVariableProductsIndexRoute: typeof AuthenticatedVariableProductsIndexRoute
+  AuthenticatedCatalogSpecsIndexRoute: typeof AuthenticatedCatalogSpecsIndexRoute
   AuthenticatedCustomersCustomerIdIndexRoute: typeof AuthenticatedCustomersCustomerIdIndexRoute
   AuthenticatedOrdersOrderIdIndexRoute: typeof AuthenticatedOrdersOrderIdIndexRoute
   AuthenticatedPickListsPickListIdIndexRoute: typeof AuthenticatedPickListsPickListIdIndexRoute
   AuthenticatedProposalsProposalIdIndexRoute: typeof AuthenticatedProposalsProposalIdIndexRoute
   AuthenticatedTasksTaskIdIndexRoute: typeof AuthenticatedTasksTaskIdIndexRoute
   AuthenticatedVariableProductsVpIdIndexRoute: typeof AuthenticatedVariableProductsVpIdIndexRoute
+  AuthenticatedCatalogVpVpIdIndexRoute: typeof AuthenticatedCatalogVpVpIdIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -619,6 +661,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedUsersIndexRoute: AuthenticatedUsersIndexRoute,
   AuthenticatedVariableProductsIndexRoute:
     AuthenticatedVariableProductsIndexRoute,
+  AuthenticatedCatalogSpecsIndexRoute: AuthenticatedCatalogSpecsIndexRoute,
   AuthenticatedCustomersCustomerIdIndexRoute:
     AuthenticatedCustomersCustomerIdIndexRoute,
   AuthenticatedOrdersOrderIdIndexRoute: AuthenticatedOrdersOrderIdIndexRoute,
@@ -629,6 +672,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedTasksTaskIdIndexRoute: AuthenticatedTasksTaskIdIndexRoute,
   AuthenticatedVariableProductsVpIdIndexRoute:
     AuthenticatedVariableProductsVpIdIndexRoute,
+  AuthenticatedCatalogVpVpIdIndexRoute: AuthenticatedCatalogVpVpIdIndexRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =

@@ -251,7 +251,7 @@ export const CatalogSection = ({ projectId }: CatalogSectionProps) => {
       )
     },
     onSuccess: (data) => {
-      setSingleVPResult(data as Record<string, unknown>)
+      setSingleVPResult(data as unknown as Record<string, unknown>)
       queryClient.invalidateQueries({ queryKey: VP_QUERY_KEYS.lists() })
     },
   })
@@ -264,7 +264,7 @@ export const CatalogSection = ({ projectId }: CatalogSectionProps) => {
         {/* Header */}
         <div>
           <h2 className='text-[15px] font-semibold tracking-[-0.01em]'>
-            Custom Catalog & Variable Products
+            Custom Catalog & Superinventory
           </h2>
           <p className='mt-1 text-[13px] text-text-tertiary leading-snug'>
             Set up EC tables and import data from EBMS. Tables only need to be created once — the
@@ -383,9 +383,9 @@ export const CatalogSection = ({ projectId }: CatalogSectionProps) => {
               <Layers className='size-4' />
             </div>
             <div className='flex-1'>
-              <h3 className='text-[13px] font-semibold'>3. Import Variable Products</h3>
+              <h3 className='text-[13px] font-semibold'>3. Import Superinventory</h3>
               <p className='mt-0.5 text-[12px] text-text-tertiary'>
-                Imports all SUPER_ID product groups from EBMS as variable products.
+                Imports all SUPER_ID product groups from EBMS as superinventory items.
               </p>
               <div className='mt-3 flex flex-col gap-2'>
                 <div className='flex flex-col gap-1'>
@@ -409,7 +409,7 @@ export const CatalogSection = ({ projectId }: CatalogSectionProps) => {
                   disabled={vpImportStatus?.status === 'running'}
                 >
                   <Download className='size-3.5' />
-                  Import Variable Products
+                  Import Superinventory
                 </Button>
                 {vpImportStatus?.status === 'running' && (
                   <div>
@@ -455,9 +455,9 @@ export const CatalogSection = ({ projectId }: CatalogSectionProps) => {
               <Package className='size-4' />
             </div>
             <div className='flex-1'>
-              <h3 className='text-[13px] font-semibold'>4. Import Single VP by SUPER_ID</h3>
+              <h3 className='text-[13px] font-semibold'>4. Import Single Superinventory by SUPER_ID</h3>
               <p className='mt-0.5 text-[12px] text-text-tertiary'>
-                Import or re-import a single variable product by its SUPER_ID.
+                Import or re-import a single superinventory item by its SUPER_ID.
               </p>
               <div className='mt-3 flex flex-col gap-2'>
                 <div className='flex flex-col gap-1'>
@@ -493,7 +493,7 @@ export const CatalogSection = ({ projectId }: CatalogSectionProps) => {
                   disabled={!singleSuperId.trim()}
                 >
                   <Download className='size-3.5' />
-                  Import VP
+                  Import
                 </Button>
                 {importSingleVPMutation.isSuccess && singleVPResult && (
                   <div className='rounded-md bg-bg-secondary p-2 text-[12px] text-emerald-600 dark:text-emerald-400'>

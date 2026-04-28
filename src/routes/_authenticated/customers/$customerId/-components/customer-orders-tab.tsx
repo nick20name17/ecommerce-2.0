@@ -43,7 +43,6 @@ export const CustomerOrdersTab = ({ customerId, customerName }: CustomerOrdersTa
   const navigate = useNavigate()
   const bp = useBreakpoint()
   const isMobile = bp === 'mobile'
-  const isTablet = bp === 'tablet'
   const [projectId] = useProjectId()
   const [search, setSearch] = useState('')
   const [orderToDelete, setOrderToDelete] = useState<Order | null>(null)
@@ -66,12 +65,7 @@ export const CustomerOrdersTab = ({ customerId, customerName }: CustomerOrdersTa
   return (
     <div className='flex h-full flex-col overflow-hidden'>
       {/* Search bar */}
-      <div
-        className={cn(
-          'flex shrink-0 items-center gap-2 border-b border-border py-2',
-          isMobile ? 'px-5' : 'px-6'
-        )}
-      >
+      <div className='flex shrink-0 items-center gap-2 border-b border-border px-5 py-2 sm:px-6'>
         <div className='flex flex-1 items-center gap-1.5 rounded-[6px] border border-border bg-background px-2.5 py-1.5'>
           <Search className='size-3.5 shrink-0 text-text-tertiary' />
           <input
@@ -94,38 +88,27 @@ export const CustomerOrdersTab = ({ customerId, customerName }: CustomerOrdersTa
         </button>
       </div>
 
-      {/* Table header */}
-      {!isMobile && (
-        <div
-          className={cn(
-            'grid shrink-0 items-center border-b border-border bg-bg-secondary/60',
-            isTablet
-              ? 'grid-cols-[1fr_80px_26px] gap-3 px-5 py-1.5'
-              : 'grid-cols-[1fr_100px_60px_80px_26px] gap-4 px-6 py-1.5'
-          )}
-        >
-          <div className='min-w-0 text-[12px] font-medium uppercase tracking-[0.04em] text-text-tertiary'>
-            Invoice
-          </div>
-          {!isTablet && (
-            <div className='text-right text-[12px] font-medium uppercase tracking-[0.04em] text-text-tertiary'>
+      {/* Table */}
+      <div className='flex-1 overflow-auto'>
+        {/* Column headers */}
+        {!isMobile && (orders.length > 0 || isLoading) && (
+          <div className='sticky top-0 z-10 flex min-w-fit items-center gap-4 border-b border-border bg-bg-secondary/60 px-5 py-1.5 xl:px-6'>
+            <div className='min-w-0 flex-1 text-[12px] font-medium uppercase tracking-[0.04em] text-text-tertiary'>
+              Invoice
+            </div>
+            <div className='w-[80px] shrink-0 text-right text-[12px] font-medium uppercase tracking-[0.04em] text-text-tertiary'>
               Date
             </div>
-          )}
-          {!isTablet && (
-            <div className='text-right text-[12px] font-medium uppercase tracking-[0.04em] text-text-tertiary'>
+            <div className='w-[50px] shrink-0 text-right text-[12px] font-medium uppercase tracking-[0.04em] text-text-tertiary'>
               Qty
             </div>
-          )}
-          <div className='text-right text-[12px] font-medium uppercase tracking-[0.04em] text-text-tertiary'>
-            Total
+            <div className='w-[80px] shrink-0 text-right text-[12px] font-medium uppercase tracking-[0.04em] text-text-tertiary'>
+              Total
+            </div>
+            <div className='w-[26px] shrink-0' />
           </div>
-          <div />
-        </div>
-      )}
+        )}
 
-      {/* Order list */}
-      <div className='flex-1 overflow-y-auto'>
         {isLoading ? (
           <div className='space-y-0'>
             {Array.from({ length: 6 }).map((_, i) =>
@@ -146,21 +129,16 @@ export const CustomerOrdersTab = ({ customerId, customerName }: CustomerOrdersTa
               ) : (
                 <div
                   key={i}
-                  className={cn(
-                    'grid items-center border-b border-border-light',
-                    isTablet
-                      ? 'grid-cols-[1fr_80px_26px] gap-3 px-5 py-1.5'
-                      : 'grid-cols-[1fr_100px_60px_80px_26px] gap-4 px-6 py-1.5'
-                  )}
+                  className='flex min-w-fit items-center gap-4 border-b border-border-light px-5 py-1.5 xl:px-6'
                 >
-                  <div className='flex min-w-0 items-center gap-2'>
+                  <div className='flex min-w-0 flex-1 items-center gap-2'>
                     <Skeleton className='h-3.5 w-20 rounded' />
                     <Skeleton className='h-[18px] w-[52px] rounded-full' />
                   </div>
-                  {!isTablet && <Skeleton className='h-3.5 w-16 rounded' />}
-                  {!isTablet && <Skeleton className='ml-auto h-3.5 w-8 rounded' />}
+                  <Skeleton className='h-3.5 w-16 rounded' />
+                  <Skeleton className='ml-auto h-3.5 w-8 rounded' />
                   <Skeleton className='ml-auto h-3.5 w-14 rounded' />
-                  <div />
+                  <div className='w-[26px]' />
                 </div>
               )
             )}
@@ -173,7 +151,6 @@ export const CustomerOrdersTab = ({ customerId, customerName }: CustomerOrdersTa
               key={order.autoid}
               order={order}
               isMobile={isMobile}
-              isTablet={isTablet}
               onDelete={setOrderToDelete}
               onPick={setOrderForPicking}
               onClick={() =>
@@ -189,12 +166,7 @@ export const CustomerOrdersTab = ({ customerId, customerName }: CustomerOrdersTa
 
       {/* Footer */}
       {orders.length > 0 && (
-        <div
-          className={cn(
-            'shrink-0 border-t border-border py-1.5',
-            isMobile ? 'px-5' : 'px-6'
-          )}
-        >
+        <div className='shrink-0 border-t border-border px-5 py-1.5 sm:px-6'>
           <p className='text-[13px] tabular-nums text-text-tertiary'>
             {orders.length} order{orders.length !== 1 ? 's' : ''}
           </p>
@@ -223,14 +195,12 @@ export const CustomerOrdersTab = ({ customerId, customerName }: CustomerOrdersTa
 function OrderRow({
   order,
   isMobile,
-  isTablet,
   onDelete,
   onPick,
   onClick,
 }: {
   order: Order
   isMobile: boolean
-  isTablet: boolean
   onDelete: (order: Order) => void
   onPick: (order: Order) => void
   onClick: () => void
@@ -270,16 +240,11 @@ function OrderRow({
 
   return (
     <div
-      className={cn(
-        'group/row grid cursor-pointer items-center border-b border-border-light transition-colors duration-100 hover:bg-bg-hover',
-        isTablet
-          ? 'grid-cols-[1fr_80px_26px] gap-3 px-5 py-1.5'
-          : 'grid-cols-[1fr_100px_60px_80px_26px] gap-4 px-6 py-1.5'
-      )}
+      className='group/row flex min-w-fit cursor-pointer items-center gap-4 border-b border-border-light px-5 py-1.5 transition-colors duration-100 hover:bg-bg-hover xl:px-6'
       onClick={onClick}
     >
       {/* Invoice / ID */}
-      <div className='flex min-w-0 items-center gap-2'>
+      <div className='flex min-w-0 flex-1 items-center gap-2'>
         <Tooltip>
           <TooltipTrigger asChild>
             <span className='truncate text-[13px] font-medium text-foreground'>
@@ -294,27 +259,23 @@ function OrderRow({
       </div>
 
       {/* Date */}
-      {!isTablet && (
-        <div className='text-right text-[13px] tabular-nums text-text-tertiary'>
-          {invoiceDate}
-        </div>
-      )}
+      <div className='w-[80px] shrink-0 text-right text-[13px] tabular-nums text-text-tertiary'>
+        {invoiceDate}
+      </div>
 
       {/* Qty */}
-      {!isTablet && (
-        <div className='text-right text-[13px] tabular-nums text-text-secondary'>
-          {order.total_quan ?? '—'}
-        </div>
-      )}
+      <div className='w-[50px] shrink-0 text-right text-[13px] tabular-nums text-text-secondary'>
+        {order.total_quan ?? '—'}
+      </div>
 
       {/* Total */}
-      <div className='text-right text-[13px] font-medium tabular-nums text-foreground'>
+      <div className='w-[80px] shrink-0 text-right text-[13px] font-medium tabular-nums text-foreground'>
         {total}
       </div>
 
       {/* Actions */}
       <div
-        className='flex justify-center opacity-0 transition-opacity group-hover/row:opacity-100'
+        className='flex w-[26px] shrink-0 justify-center opacity-0 transition-opacity group-hover/row:opacity-100'
         onClick={(e) => e.stopPropagation()}
         onKeyDown={(e) => e.stopPropagation()}
         role='group'

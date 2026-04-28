@@ -115,6 +115,9 @@ export function StartPickingDialog({
     const items: (PickingOrderItem & { orderAutoid: string; orderInvoice: string })[] = []
     for (const order of selectedOrders) {
       for (const item of order.items ?? []) {
+        // Skip description-only rows (no inventory ID or zero quantity)
+        const qty = parseFloat(item.qty_in_uom || item.quan || '0')
+        if (!item.inven?.trim() && qty <= 0) continue
         items.push({ ...item, orderAutoid: order.autoid, orderInvoice: order.invoice || order.id })
       }
     }
@@ -228,7 +231,7 @@ export function StartPickingDialog({
   }
 
   const handleClose = () => {
-    if (step === 'set-quantities' && hasAnyPicked) {
+    if (step === 'set-quantities') {
       setCloseConfirmOpen(true)
       return
     }
@@ -529,9 +532,9 @@ export function StartPickingDialog({
       <AlertDialog open={closeConfirmOpen} onOpenChange={setCloseConfirmOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Discard pick quantities?</AlertDialogTitle>
+            <AlertDialogTitle>Discard pick list?</AlertDialogTitle>
             <AlertDialogDescription>
-              You have pick quantities set. Closing will discard your changes.
+              Closing will discard your progress. Are you sure?
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

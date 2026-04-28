@@ -53,7 +53,6 @@ const METHOD_OPTIONS = ['GET', 'POST', 'PATCH', 'PUT', 'DELETE'] as const
 const ActivityPage = () => {
   const bp = useBreakpoint()
   const isMobile = bp === 'mobile'
-  const isTablet = bp === 'tablet'
   const [projectId] = useProjectId()
   const [offset, setOffset] = useOffsetParam()
   const [limit] = useLimitParam()
@@ -96,7 +95,7 @@ const ActivityPage = () => {
   return (
     <div className='flex h-full flex-col overflow-hidden'>
       {/* Header */}
-      <header className={cn('flex h-12 shrink-0 items-center gap-2.5 border-b border-border', isMobile ? 'px-3.5' : 'px-6')}>
+      <header className='flex h-12 shrink-0 items-center gap-2.5 border-b border-border px-3.5 sm:px-6'>
         <SidebarTrigger className='-ml-1' />
         <PageHeaderIcon icon={IActivity} color={PAGE_COLORS.activity} />
         <h1 className='text-[14px] font-semibold tracking-[-0.01em]'>Activity</h1>
@@ -182,7 +181,7 @@ const ActivityPage = () => {
 
       {/* Active filter chips */}
       {hasFilters && (
-        <div className={cn('flex shrink-0 flex-wrap items-center gap-1.5 border-b border-border py-1.5', isMobile ? 'px-3.5' : 'px-6')}>
+        <div className='flex shrink-0 flex-wrap items-center gap-1.5 border-b border-border py-1.5 px-3.5 sm:px-6'>
           <button
             type='button'
             className='text-[13px] font-medium text-text-tertiary transition-colors duration-[80ms] hover:text-foreground'
@@ -207,28 +206,28 @@ const ActivityPage = () => {
 
       {/* Column headers */}
       {!isMobile && (results.length > 0 || isLoading) && (
-        <div className={cn('flex shrink-0 items-center gap-4 border-b border-border bg-bg-secondary/60 py-1.5', isTablet ? 'px-5' : 'px-6')}>
+        <div className='flex shrink-0 min-w-fit items-center gap-4 border-b border-border bg-bg-secondary/60 px-5 py-1.5 xl:px-6'>
           <div className='w-[70px] shrink-0 text-[12px] font-medium text-text-tertiary'>Method</div>
           <div className='min-w-0 flex-1 text-[12px] font-medium text-text-tertiary'>URL</div>
-          {!isTablet && <div className='w-[100px] shrink-0 text-[12px] font-medium text-text-tertiary'>Entity</div>}
+          <div className='w-[100px] shrink-0 text-[12px] font-medium text-text-tertiary'>Entity</div>
           <div className='w-[50px] shrink-0 text-[12px] font-medium text-text-tertiary'>Status</div>
-          {!isTablet && <div className='w-[70px] shrink-0 text-right text-[12px] font-medium text-text-tertiary'>Duration</div>}
-          {!isTablet && <div className='w-[140px] shrink-0 text-[12px] font-medium text-text-tertiary'>Time</div>}
+          <div className='w-[70px] shrink-0 text-right text-[12px] font-medium text-text-tertiary'>Duration</div>
+          <div className='w-[140px] shrink-0 text-[12px] font-medium text-text-tertiary'>Time</div>
           <div className='w-[20px] shrink-0' />
         </div>
       )}
 
       {/* Body */}
-      <div className='flex-1 overflow-y-auto'>
+      <div className='flex-1 overflow-auto'>
         {isLoading ? (
           Array.from({ length: 10 }).map((_, i) => (
-            <div key={i} className={cn('flex items-center gap-4 border-b border-border-light py-2.5', isMobile ? 'px-3.5' : 'px-6')}>
+            <div key={i} className={cn('flex min-w-fit items-center gap-4 border-b border-border-light px-5 py-2.5 xl:px-6', isMobile && 'px-3.5')}>
               <Skeleton className='h-5 w-12' />
               <Skeleton className='h-4 w-48 flex-1' />
-              {!isTablet && <Skeleton className='h-4 w-16' />}
+              <Skeleton className='h-4 w-16' />
               <Skeleton className='h-5 w-10' />
-              {!isTablet && <Skeleton className='h-4 w-14' />}
-              {!isTablet && <Skeleton className='h-4 w-24' />}
+              <Skeleton className='h-4 w-14' />
+              <Skeleton className='h-4 w-24' />
             </div>
           ))
         ) : results.length === 0 ? (
@@ -239,7 +238,6 @@ const ActivityPage = () => {
               key={log.id}
               log={log}
               isMobile={isMobile}
-              isTablet={isTablet}
               onClick={() => setSelectedLog(log)}
             />
           ))
@@ -247,7 +245,7 @@ const ActivityPage = () => {
       </div>
 
       {/* Pagination footer */}
-      <div className={cn('shrink-0 border-t border-border py-1.5', isMobile ? 'px-3.5' : 'px-6')}>
+      <div className='shrink-0 border-t border-border py-1.5 px-3.5 sm:px-6'>
         <Pagination totalCount={totalCount} />
       </div>
 
@@ -266,12 +264,10 @@ const ActivityPage = () => {
 function LogRow({
   log,
   isMobile,
-  isTablet,
   onClick,
 }: {
   log: PayloadLog
   isMobile: boolean
-  isTablet: boolean
   onClick: () => void
 }) {
   const methodColor = METHOD_COLORS[log.method] ?? 'bg-bg-secondary text-text-secondary border-border'
@@ -312,8 +308,7 @@ function LogRow({
   return (
     <div
       className={cn(
-        'group/row flex cursor-pointer items-center gap-4 border-b border-border-light py-2 transition-colors duration-100 hover:bg-bg-hover',
-        isTablet ? 'px-5' : 'px-6',
+        'group/row flex min-w-fit cursor-pointer items-center gap-4 border-b border-border-light px-5 py-2 transition-colors duration-100 hover:bg-bg-hover xl:px-6',
         log.is_error && 'bg-red-500/[0.02]',
       )}
       onClick={onClick}
@@ -327,26 +322,20 @@ function LogRow({
         {log.is_error && <AlertCircle className='size-3 shrink-0 text-red-500' />}
         <span className='truncate font-mono text-[12px] text-foreground'>{log.url}</span>
       </div>
-      {!isTablet && (
-        <div className='w-[100px] shrink-0 truncate text-[13px] text-text-tertiary'>
-          {log.entity || '—'}
-        </div>
-      )}
+      <div className='w-[100px] shrink-0 truncate text-[13px] text-text-tertiary'>
+        {log.entity || '—'}
+      </div>
       <div className='w-[50px] shrink-0'>
         <span className={cn('font-mono text-[12px] font-semibold tabular-nums', statusColor)}>
           {log.status_code}
         </span>
       </div>
-      {!isTablet && (
-        <div className='w-[70px] shrink-0 text-right text-[12px] tabular-nums text-text-tertiary'>
-          {formatDuration(log.duration_ms)}
-        </div>
-      )}
-      {!isTablet && (
-        <div className='w-[140px] shrink-0 text-[12px] tabular-nums text-text-tertiary'>
-          {formatDateTimeShort(log.created_at)}
-        </div>
-      )}
+      <div className='w-[70px] shrink-0 text-right text-[12px] tabular-nums text-text-tertiary'>
+        {formatDuration(log.duration_ms)}
+      </div>
+      <div className='w-[140px] shrink-0 text-[12px] tabular-nums text-text-tertiary'>
+        {formatDateTimeShort(log.created_at)}
+      </div>
       <div className='w-[20px] shrink-0 text-text-tertiary opacity-0 transition-opacity group-hover/row:opacity-100'>
         <ChevronRight className='size-3.5' />
       </div>

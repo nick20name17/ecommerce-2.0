@@ -24,7 +24,8 @@ import { getColumnLabel } from '@/helpers/dynamic-columns'
 import { SidebarTrigger } from '@/components/ui/sidebar'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
-import { useBreakpoint } from '@/hooks/use-breakpoint'
+
+import { getEntityNotesQuery } from '@/api/note/query'
 import { useProjectId } from '@/hooks/use-project-id'
 import { formatCurrency, formatDate, getUserDisplayName } from '@/helpers/formatters'
 import { cn } from '@/lib/utils'
@@ -69,8 +70,6 @@ function OrderDetailPage() {
   const queryClient = useQueryClient()
   const { user } = useAuth()
   const shippingEnabled = user?.shipping_enabled === true
-  const bp = useBreakpoint()
-  const isMobile = bp === 'mobile'
   const [projectId] = useProjectId()
   const [deleteOpen, setDeleteOpen] = useState(false)
   const [panelTab, setPanelTab] = useState<'general' | 'custom' | 'shipments'>('general')
@@ -82,6 +81,8 @@ function OrderDetailPage() {
   const { data: order, isLoading } = useQuery(getOrderDetailQuery(orderId, projectId))
   const { data: fieldConfig } = useQuery(getFieldConfigQuery(projectId))
   const { data: editableFields } = useQuery(getEditableFieldsQuery(projectId))
+  const { data: notesData } = useQuery(getEntityNotesQuery('order', orderId, projectId))
+  const noteCount = notesData?.length ?? 0
   const editableOrderFields = editableFields?.order ?? []
 
   const patchMutation = useMutation({
@@ -144,7 +145,7 @@ function OrderDetailPage() {
     return (
       <div className='flex h-full flex-col overflow-hidden'>
         {/* Header skeleton */}
-        <header className={cn('flex h-12 shrink-0 items-center gap-2.5 border-b border-border', isMobile ? 'px-3.5' : 'px-6')}>
+        <header className='flex h-12 shrink-0 items-center gap-2.5 border-b border-border px-3.5 sm:px-6'>
           <SidebarTrigger className='-ml-1' />
           <Skeleton className='h-4 w-12' />
           <Skeleton className='size-5 rounded-[5px]' />
@@ -155,7 +156,7 @@ function OrderDetailPage() {
           <Skeleton className='size-7 rounded-[5px]' />
         </header>
 
-        <div className={cn('flex min-h-0 flex-1', isMobile && 'flex-col')}>
+        <div className='flex min-h-0 flex-1 flex-col lg:flex-row'>
           {/* Table skeleton */}
           <div className='flex min-h-0 flex-1 flex-col overflow-hidden'>
             {/* Table header */}
@@ -198,8 +199,7 @@ function OrderDetailPage() {
           </div>
 
           {/* Right panel skeleton */}
-          {!isMobile && (
-            <div className='w-[380px] shrink-0 border-l border-border bg-bg-secondary/50'>
+          <div className='hidden shrink-0 border-l border-border bg-bg-secondary/50 lg:block lg:w-[380px]'>
               <div className='flex items-center gap-0 border-b border-border px-4'>
                 <Skeleton className='my-2 h-4 w-14' />
                 <Skeleton className='my-2 ml-4 h-4 w-14' />
@@ -225,7 +225,6 @@ function OrderDetailPage() {
                 </div>
               </div>
             </div>
-          )}
         </div>
       </div>
     )
@@ -252,11 +251,11 @@ function OrderDetailPage() {
   return (
     <div className='flex h-full flex-col overflow-hidden'>
       {/* ── Header bar ── */}
-      <header className={cn('flex h-12 shrink-0 items-center gap-2.5 border-b border-border', isMobile ? 'px-3.5' : 'px-6')}>
+      <header className='flex h-12 shrink-0 items-center gap-2.5 border-b border-border px-3.5 sm:px-6'>
         <SidebarTrigger className='-ml-1' />
         <button
           type='button'
-          className='inline-flex h-7 items-center gap-0.5 rounded-[6px] border border-border bg-bg-secondary pl-1.5 pr-2.5 text-[13px] font-medium text-text-secondary transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground'
+          className='inline-flex h-7 shrink-0 items-center gap-0.5 rounded-[6px] border border-border bg-bg-secondary pl-1.5 pr-2.5 text-[13px] font-medium text-text-secondary transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground'
           onClick={() => router.history.back()}
         >
           <ChevronLeft className='size-3.5' />
@@ -264,7 +263,7 @@ function OrderDetailPage() {
         </button>
 
         <PageHeaderIcon icon={IOrders} color={PAGE_COLORS.orders} />
-        <h1 className='text-[14px] font-semibold tracking-[-0.01em]'>
+        <h1 className='truncate text-[14px] font-semibold tracking-[-0.01em]'>
           {order.invoice || `Order ${order.id}`}
         </h1>
         {order.invoice && (
@@ -272,7 +271,7 @@ function OrderDetailPage() {
             <TooltipTrigger asChild>
               <button
                 type='button'
-                className='inline-flex size-6 items-center justify-center rounded-[5px] text-text-tertiary transition-colors duration-[80ms] hover:bg-bg-hover hover:text-foreground'
+                className='inline-flex size-6 shrink-0 items-center justify-center rounded-[5px] text-text-tertiary transition-colors duration-[80ms] hover:bg-bg-hover hover:text-foreground'
                 onClick={() => {
                   navigator.clipboard.writeText(order.invoice)
                   toast.success('Invoice # copied')
@@ -287,7 +286,7 @@ function OrderDetailPage() {
 
         <span
           className={cn(
-            'inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-[12px] font-semibold leading-none',
+            'hidden shrink-0 items-center gap-1.5 rounded-full border px-2 py-0.5 text-[12px] font-semibold leading-none sm:inline-flex',
             statusClass,
           )}
         >
@@ -296,7 +295,7 @@ function OrderDetailPage() {
         </span>
 
         {/* Assignee */}
-        <div className='hidden items-center gap-1.5 sm:flex'>
+        <div className='hidden shrink-0 items-center gap-1.5 md:flex'>
           <button
             type='button'
             className={cn(
@@ -316,95 +315,104 @@ function OrderDetailPage() {
 
         <div className='flex-1' />
 
-        {shippingEnabled && (
+        <div className='flex shrink-0 items-center gap-1.5'>
+          {shippingEnabled && (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  type='button'
+                  className='inline-flex size-7 items-center justify-center rounded-[5px] border border-border bg-bg-secondary text-[12px] font-medium text-text-secondary transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground lg:h-7 lg:w-auto lg:gap-1.5 lg:px-2.5'
+                  onClick={() => setShippingOpen(true)}
+                >
+                  <Truck className='size-3.5' />
+                  <span className='hidden lg:inline'>Shipping</span>
+                </button>
+              </TooltipTrigger>
+              <TooltipContent>Manage Shipping</TooltipContent>
+            </Tooltip>
+          )}
+
           <Tooltip>
             <TooltipTrigger asChild>
               <button
                 type='button'
-                className='inline-flex h-7 items-center gap-1.5 rounded-[5px] border border-border bg-bg-secondary px-2.5 text-[12px] font-medium text-text-secondary transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground'
-                onClick={() => setShippingOpen(true)}
+                className='inline-flex size-7 items-center justify-center rounded-[5px] border border-border bg-bg-secondary text-[12px] font-medium text-text-secondary transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground disabled:pointer-events-none disabled:opacity-50 lg:h-7 lg:w-auto lg:gap-1.5 lg:px-2.5'
+                onClick={() => setPickingOpen(true)}
+                disabled={allPicked}
               >
-                <Truck className='size-3.5' />
-                <span className='hidden sm:inline'>Shipping</span>
+                <ClipboardList className='size-3.5' />
+                <span className='hidden lg:inline'>{allPicked ? 'All Picked' : 'Start Picking'}</span>
               </button>
             </TooltipTrigger>
-            <TooltipContent>Manage Shipping</TooltipContent>
+            <TooltipContent>{allPicked ? 'All items have been picked' : 'Start picking for this customer'}</TooltipContent>
           </Tooltip>
-        )}
 
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <button
-              type='button'
-              className='inline-flex h-7 items-center gap-1.5 rounded-[5px] border border-border bg-bg-secondary px-2.5 text-[12px] font-medium text-text-secondary transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground disabled:pointer-events-none disabled:opacity-50'
-              onClick={() => setPickingOpen(true)}
-              disabled={allPicked}
-            >
-              <ClipboardList className='size-3.5' />
-              <span className='hidden sm:inline'>{allPicked ? 'All Picked' : 'Start Picking'}</span>
-            </button>
-          </TooltipTrigger>
-          <TooltipContent>{allPicked ? 'All items have been picked' : 'Start picking for this customer'}</TooltipContent>
-        </Tooltip>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button
+                type='button'
+                className='inline-flex size-7 items-center justify-center rounded-[5px] border border-border bg-bg-secondary text-text-secondary transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground'
+                onClick={() => setTaskModalOpen(true)}
+              >
+                <ListTodo className='size-3.5' />
+              </button>
+            </TooltipTrigger>
+            <TooltipContent>Create Task</TooltipContent>
+          </Tooltip>
 
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <button
-              type='button'
-              className='inline-flex h-7 items-center gap-1.5 rounded-[5px] border border-border bg-bg-secondary px-2.5 text-[12px] font-medium text-text-secondary transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground'
-              onClick={() => setTaskModalOpen(true)}
-            >
-              <ListTodo className='size-3.5' />
-              <span className='hidden sm:inline'>Create Task</span>
-            </button>
-          </TooltipTrigger>
-          <TooltipContent>Create Task</TooltipContent>
-        </Tooltip>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button
+                type='button'
+                className={cn(
+                  'relative inline-flex size-7 items-center justify-center rounded-[5px] border transition-colors duration-[80ms]',
+                  noteCount > 0
+                    ? 'border-primary/30 bg-primary/5 text-primary hover:bg-primary/10'
+                    : 'border-border bg-bg-secondary text-text-secondary hover:bg-bg-active hover:text-foreground'
+                )}
+                onClick={() => setNotesOpen(true)}
+              >
+                <StickyNote className='size-3.5' />
+                {noteCount > 0 && (
+                  <span className='absolute -right-1.5 -top-1.5 flex size-4 items-center justify-center rounded-full bg-primary text-[9px] font-bold text-primary-foreground'>
+                    {noteCount > 9 ? '9+' : noteCount}
+                  </span>
+                )}
+              </button>
+            </TooltipTrigger>
+            <TooltipContent>{noteCount > 0 ? `${noteCount} note${noteCount !== 1 ? 's' : ''}` : 'Notes'}</TooltipContent>
+          </Tooltip>
 
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <button
-              type='button'
-              className='inline-flex h-7 items-center gap-1.5 rounded-[5px] border border-border bg-bg-secondary px-2.5 text-[12px] font-medium text-text-secondary transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground'
-              onClick={() => setNotesOpen(true)}
-            >
-              <StickyNote className='size-3.5' />
-              <span className='hidden sm:inline'>Notes</span>
-            </button>
-          </TooltipTrigger>
-          <TooltipContent>Notes</TooltipContent>
-        </Tooltip>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button
+                type='button'
+                className='inline-flex size-7 items-center justify-center rounded-[5px] border border-border bg-bg-secondary text-text-secondary transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground'
+                onClick={() => setAttachmentsOpen(true)}
+              >
+                <Paperclip className='size-3.5' />
+              </button>
+            </TooltipTrigger>
+            <TooltipContent>Attachments</TooltipContent>
+          </Tooltip>
 
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <button
-              type='button'
-              className='inline-flex h-7 items-center gap-1.5 rounded-[5px] border border-border bg-bg-secondary px-2.5 text-[12px] font-medium text-text-secondary transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground'
-              onClick={() => setAttachmentsOpen(true)}
-            >
-              <Paperclip className='size-3.5' />
-              <span className='hidden sm:inline'>Attachments</span>
-            </button>
-          </TooltipTrigger>
-          <TooltipContent>Attachments</TooltipContent>
-        </Tooltip>
-
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <button
-              type='button'
-              className='inline-flex size-7 items-center justify-center rounded-[5px] text-text-tertiary transition-colors duration-[80ms] hover:bg-bg-hover hover:text-destructive'
-              onClick={() => setDeleteOpen(true)}
-            >
-              <Trash2 className='size-3.5' />
-            </button>
-          </TooltipTrigger>
-          <TooltipContent>Delete</TooltipContent>
-        </Tooltip>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button
+                type='button'
+                className='inline-flex size-7 items-center justify-center rounded-[5px] text-text-tertiary transition-colors duration-[80ms] hover:bg-bg-hover hover:text-destructive'
+                onClick={() => setDeleteOpen(true)}
+              >
+                <Trash2 className='size-3.5' />
+              </button>
+            </TooltipTrigger>
+            <TooltipContent>Delete</TooltipContent>
+          </Tooltip>
+        </div>
       </header>
 
       {/* ── Main content area ── */}
-      <div className={cn('flex min-h-0 flex-1', isMobile && 'flex-col')}>
+      <div className='flex min-h-0 flex-1 flex-col lg:flex-row'>
         {/* Left: Line items */}
         <div className='flex min-h-0 flex-1 flex-col overflow-hidden'>
           <div className='flex-1 overflow-auto'>
@@ -496,10 +504,7 @@ function OrderDetailPage() {
 
           {/* Summary footer */}
           <div
-            className={cn(
-              'flex shrink-0 items-center justify-end gap-4 border-t border-border bg-bg-secondary/40',
-              isMobile ? 'px-4 py-2' : 'px-6 py-2',
-            )}
+            className='flex shrink-0 items-center justify-end gap-4 border-t border-border bg-bg-secondary/40 px-4 py-2 sm:px-6'
           >
             <SummaryCell label='Subtotal' value={formatCurrency(order.subtotal)} />
             <SummaryCell label='Tax' value={formatCurrency(order.tax)} />
@@ -517,9 +522,7 @@ function OrderDetailPage() {
         <div
           className={cn(
             'flex shrink-0 flex-col overflow-hidden bg-bg-secondary/50',
-            isMobile
-              ? 'border-t border-border'
-              : 'w-[380px] border-l border-border',
+            'border-t border-border lg:border-t-0 lg:w-[380px] lg:border-l',
           )}
         >
           {/* Panel tabs */}

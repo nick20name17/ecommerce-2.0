@@ -64,7 +64,7 @@ export const VPCreateDialog = ({ open, onOpenChange, projectId }: VPCreateDialog
           }}
         >
           <DialogHeader>
-            <DialogTitle>New Variable Product</DialogTitle>
+            <DialogTitle>New Superinventory</DialogTitle>
           </DialogHeader>
           <DialogBody className='flex flex-col gap-3'>
             <div className='flex flex-col gap-1.5'>

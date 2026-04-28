@@ -1,7 +1,8 @@
-import { ChevronRight, FolderClosed, FolderOpen, GripVertical, MoreHorizontal, Pencil, Plus, Trash2 } from 'lucide-react'
+import { ChevronRight, GripVertical, MoreHorizontal, Pencil, Plus, Trash2 } from 'lucide-react'
 import { useState } from 'react'
 
 import type { CatalogCategory } from '@/api/catalog/schema'
+import { CategoryIcon } from './category-thumbnail'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -24,6 +25,20 @@ interface CategoryTreeNodeProps {
   onProductDrop?: (productAutoid: string, categoryId: string) => void
 }
 
+// Color pairs: [stroke, fill] per depth
+const DEPTH_STYLES = [
+  'text-blue-500 fill-blue-500/20',
+  'text-violet-500 fill-violet-500/20',
+  'text-amber-500 fill-amber-500/20',
+  'text-emerald-500 fill-emerald-500/20',
+  'text-rose-500 fill-rose-500/20',
+  'text-cyan-500 fill-cyan-500/20',
+]
+
+function getDepthStyle(depth: number) {
+  return DEPTH_STYLES[Math.min(depth, DEPTH_STYLES.length - 1)]
+}
+
 export const CategoryTreeNode = ({
   category,
   depth,
@@ -40,6 +55,8 @@ export const CategoryTreeNode = ({
   const hasChildren = category.children && category.children.length > 0
   const isSelected = selectedId === category.id
   const [dragOver, setDragOver] = useState(false)
+  const itemCount = (category.product_count ?? 0) + (category.vp_count ?? 0)
+  const iconStyle = getDepthStyle(depth)
 
   const handleDragStart = (e: React.DragEvent) => {
     e.stopPropagation()
@@ -67,14 +84,12 @@ export const CategoryTreeNode = ({
     e.stopPropagation()
     setDragOver(false)
 
-    // Check if it's a product drop (from unassigned panel)
     const productAutoid = e.dataTransfer.getData('application/product-autoid')
     if (productAutoid && onProductDrop) {
       onProductDrop(productAutoid, category.id)
       return
     }
 
-    // Otherwise it's a category move
     const draggedId = e.dataTransfer.getData('text/plain')
     if (draggedId && draggedId !== category.id && onMove) {
       onMove(draggedId, category.id)
@@ -92,7 +107,7 @@ export const CategoryTreeNode = ({
         onDrop={handleDrop}
         className={cn(
           'group flex items-center gap-1 rounded-md px-1.5 text-[13px] transition-colors duration-75 cursor-pointer',
-          'h-9 sm:h-8',
+          'h-8',
           isSelected
             ? 'bg-primary/10 text-foreground font-medium'
             : 'hover:bg-bg-hover text-text-secondary',
@@ -106,7 +121,7 @@ export const CategoryTreeNode = ({
         <button
           type='button'
           className={cn(
-            'flex size-6 sm:size-5 shrink-0 items-center justify-center rounded transition-colors',
+            'flex size-5 shrink-0 items-center justify-center rounded transition-colors',
             hasChildren ? 'hover:bg-black/5 dark:hover:bg-white/10' : 'invisible'
           )}
           onClick={(e) => {
@@ -122,16 +137,18 @@ export const CategoryTreeNode = ({
           />
         </button>
 
-        {expanded && hasChildren ? (
-          <FolderOpen className='size-4 shrink-0 text-amber-500' />
-        ) : (
-          <FolderClosed className='size-4 shrink-0 text-amber-500' />
-        )}
+        <CategoryIcon
+          categoryId={category.id}
+          projectId={projectId}
+          expanded={expanded}
+          hasChildren={!!hasChildren}
+          depthStyle={iconStyle}
+        />
         <span className='flex-1 truncate'>{category.name}</span>
 
-        {((category.product_count ?? 0) > 0 || (category.vp_count ?? 0) > 0) && (
-          <span className='text-[10px] text-text-quaternary tabular-nums shrink-0'>
-            {(category.product_count ?? 0) + (category.vp_count ?? 0)}
+        {itemCount > 0 && (
+          <span className='text-[10px] text-text-quaternary tabular-nums shrink-0 mr-0.5'>
+            {itemCount}
           </span>
         )}
 

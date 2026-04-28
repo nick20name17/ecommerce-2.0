@@ -64,16 +64,16 @@ const SettingsPage = () => {
   return (
     <div className='flex h-full flex-col overflow-hidden'>
       {/* ── Header bar ── */}
-      <header className='flex h-12 shrink-0 items-center gap-2.5 border-b border-border px-6'>
+      <header className='flex h-12 shrink-0 items-center gap-2.5 border-b border-border px-3.5 sm:px-6'>
         <SidebarTrigger className='-ml-1' />
         <PageHeaderIcon icon={ISettings} color={PAGE_COLORS.settings} />
         <h1 className='text-[14px] font-semibold tracking-[-0.01em]'>Settings</h1>
       </header>
 
       {/* Sidebar + Content */}
-      <div className='flex min-h-0 flex-1 overflow-hidden'>
-        {/* Vertical sidebar tabs */}
-        <nav className='flex w-[180px] shrink-0 flex-col gap-px border-r border-border bg-bg-secondary/40 px-3 py-3'>
+      <div className='flex min-h-0 flex-1 flex-col overflow-hidden md:flex-row'>
+        {/* Horizontal tabs on narrow, vertical sidebar on md+ */}
+        <nav className='flex shrink-0 gap-px overflow-x-auto border-b border-border bg-bg-secondary/40 px-3 py-1.5 md:w-[180px] md:flex-col md:overflow-x-visible md:border-b-0 md:border-r md:py-3'>
           {visibleSections.map((s) => {
             const isActive = currentSection === s.value
             return (
@@ -81,7 +81,7 @@ const SettingsPage = () => {
                 key={s.value}
                 type='button'
                 className={cn(
-                  'flex h-[30px] items-center rounded-[6px] px-2.5 text-[13px] font-medium transition-colors duration-[80ms]',
+                  'flex h-[30px] shrink-0 items-center whitespace-nowrap rounded-[6px] px-2.5 text-[13px] font-medium transition-colors duration-[80ms]',
                   isActive
                     ? 'bg-bg-active text-foreground'
                     : 'text-text-tertiary hover:bg-bg-hover hover:text-foreground'

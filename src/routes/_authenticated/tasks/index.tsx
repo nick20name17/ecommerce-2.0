@@ -286,7 +286,7 @@ function Todos2Page() {
     <div className='flex h-full flex-col overflow-hidden'>
       {/* ── Header ── */}
       <header
-        className={cn('flex h-12 shrink-0 items-center gap-2.5 border-b border-border', isMobile ? 'px-3.5' : 'px-6')}
+        className='flex h-12 shrink-0 items-center gap-2.5 border-b border-border px-3.5 sm:px-6'
       >
         <SidebarTrigger className='-ml-1' />
         <div className='flex items-center gap-1.5'>
@@ -383,7 +383,7 @@ function Todos2Page() {
 
       {/* Active filter chips */}
       {hasFilters && (
-        <div className={cn('flex shrink-0 flex-wrap items-center gap-1.5 border-b border-border py-1.5', isMobile ? 'px-3.5' : 'px-6')}>
+        <div className='flex shrink-0 flex-wrap items-center gap-1.5 border-b border-border py-1.5 px-3.5 sm:px-6'>
           <button
             type='button'
             className='text-[13px] font-medium text-text-tertiary transition-colors duration-[80ms] hover:text-foreground'
@@ -416,7 +416,7 @@ function Todos2Page() {
       {view === 'board' ? (
         <div className='flex-1 overflow-hidden'>
           {isLoading ? (
-            <div className={cn('flex h-full gap-4 py-4', isMobile ? 'px-3.5' : 'px-6')}>
+            <div className='flex h-full gap-4 py-4 px-3.5 sm:px-6'>
               {Array.from({ length: 4 }).map((_, i) => (
                 <div key={i} className='w-[300px] shrink-0'>
                   <div className='mb-3 flex items-center gap-2 px-1'>
@@ -446,12 +446,12 @@ function Todos2Page() {
             <div className='space-y-0'>
               {Array.from({ length: 3 }).map((_, gi) => (
                 <div key={gi}>
-                  <div className={cn('flex items-center gap-2 border-b border-border bg-bg-secondary py-1.5', isMobile ? 'px-3.5' : 'px-6')}>
+                  <div className='flex items-center gap-2 border-b border-border bg-bg-secondary py-1.5 px-3.5 sm:px-6'>
                     <div className='size-3.5 animate-pulse rounded-full bg-border' />
                     <div className='h-3.5 w-20 animate-pulse rounded bg-border' />
                   </div>
                   {Array.from({ length: gi === 0 ? 3 : 2 }).map((_, ti) => (
-                    <div key={ti} className={cn('flex items-center gap-3 border-b border-border-light py-2.5', isMobile ? 'px-3.5' : 'px-6')}>
+                    <div key={ti} className='flex items-center gap-3 border-b border-border-light py-2.5 px-3.5 sm:px-6'>
                       <div className='size-3.5 animate-pulse rounded-full bg-border' />
                       <div className='h-3 w-16 animate-pulse rounded bg-border' />
                       <div className='h-3 flex-1 animate-pulse rounded bg-border' />
@@ -470,7 +470,7 @@ function Todos2Page() {
                   {/* Status Group Header */}
                   <button
                     type='button'
-                    className={cn('flex w-full items-center gap-2 border-b border-border bg-bg-secondary py-1.5 transition-colors duration-[80ms] hover:bg-bg-hover', isMobile ? 'px-3.5' : 'px-6')}
+                    className='flex w-full items-center gap-2 border-b border-border bg-bg-secondary py-1.5 transition-colors duration-[80ms] hover:bg-bg-hover px-3.5 sm:px-6'
                     onClick={() => toggleGroup(status.name)}
                   >
                     <StatusIcon status={status.name} color={status.color} size={14} />
@@ -554,7 +554,7 @@ function Todos2Page() {
 
       {/* Footer */}
       {tasks.length > 0 && (
-        <div className={cn('shrink-0 border-t border-border py-2', isMobile ? 'px-5' : 'px-6')}>
+        <div className='shrink-0 border-t border-border py-2 px-3.5 sm:px-6'>
           <p className='text-[13px] tabular-nums text-text-tertiary'>
             {tasks.length} task{tasks.length !== 1 ? 's' : ''}
           </p>

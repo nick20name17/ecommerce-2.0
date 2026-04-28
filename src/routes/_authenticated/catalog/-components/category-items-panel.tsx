@@ -1,54 +1,101 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueries, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
-import { Box, ChevronDown, Eye, EyeOff, Layers, Package, Plus, Sparkles, Trash2 } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import {
+  ChevronDown,
+  ChevronRight,
+  Eye,
+  EyeOff,
+  Layers,
+  MoreHorizontal,
+  Package,
+  Plus,
+  Sparkles,
+  Trash2,
+} from 'lucide-react'
+import { useEffect, useMemo, useState } from 'react'
 
 import { CATALOG_QUERY_KEYS, getCatalogDetailQuery } from '@/api/catalog/query'
+import { VP_QUERY_KEYS, getVariableProductDetailQuery } from '@/api/variable-product/query'
+import { variableProductService } from '@/api/variable-product/service'
 import type { CatalogCategory, CatalogCategoryProduct, CatalogCategoryVP } from '@/api/catalog/schema'
 import { catalogService } from '@/api/catalog/service'
-import { variableProductService } from '@/api/variable-product/service'
-import { VP_QUERY_KEYS } from '@/api/variable-product/query'
-import { ImageGallery } from '@/components/common/image-gallery'
 import { PageEmpty } from '@/components/common/page-empty'
 import { ProductThumbnail } from '@/components/common/product-thumbnail'
 import { ProductBrowserDialog } from '@/components/common/product-browser-dialog'
 import { VPCreateFromProductDialog } from './vp-create-from-product-dialog'
+import { ImageStrip } from './image-strip'
 import { Button } from '@/components/ui/button'
+import {
+  Dialog,
+  DialogBody,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import { Skeleton } from '@/components/ui/skeleton'
 import { cn } from '@/lib/utils'
 import { AddItemDialog } from './add-item-dialog'
+
+// ── Types ────────────────────────────────────────────────────
+
+type ItemTab = 'all' | 'products' | 'vps'
+
+// No preview limit — grouped view is naturally compact
+
+// ── Component ────────────────────────────────────────────────
 
 interface CategoryItemsPanelProps {
   category: CatalogCategory
   projectId: number | null
   isMobile?: boolean
+  onAddSubcategory?: () => void
 }
 
 export const CategoryItemsPanel = ({
   category,
   projectId,
   isMobile,
+  onAddSubcategory,
 }: CategoryItemsPanelProps) => {
   const navigate = useNavigate()
+  const queryClient = useQueryClient()
+
+  // UI state
   const [addItemOpen, setAddItemOpen] = useState(false)
   const [addItemType, setAddItemType] = useState<'product' | 'variable_product'>('product')
   const [productBrowserOpen, setProductBrowserOpen] = useState(false)
   const [createVPFromProduct, setCreateVPFromProduct] = useState<CatalogCategoryProduct | null>(null)
   const [expandedProductId, setExpandedProductId] = useState<string | null>(null)
-  const [productsCollapsed, setProductsCollapsed] = useState(false)
-  const [vpsCollapsed, setVpsCollapsed] = useState(false)
-  const [showAllProducts, setShowAllProducts] = useState(false)
-  const [showAllVPs, setShowAllVPs] = useState(false)
-  const [imagesCollapsed, setImagesCollapsed] = useState(false)
-  const PREVIEW_LIMIT = 5
+  const [activeTab, setActiveTab] = useState<ItemTab>('all')
+  const [selectedProductIds, setSelectedProductIds] = useState<Set<string>>(new Set())
+  const [siPickerOpen, setSiPickerOpen] = useState(false)
 
-  // Reset expand/collapse states when category changes
+  const toggleProductSelect = (autoid: string) => {
+    setSelectedProductIds((prev) => {
+      const next = new Set(prev)
+      if (next.has(autoid)) next.delete(autoid)
+      else next.add(autoid)
+      return next
+    })
+  }
+
+  const clearSelection = () => setSelectedProductIds(new Set())
+
+  // Reset states when category changes
   useEffect(() => {
     setExpandedProductId(null)
-    setShowAllProducts(false)
-    setShowAllVPs(false)
-    setImagesCollapsed(false)
+    setActiveTab('all')
+    setSelectedProductIds(new Set())
   }, [category.id])
+
+  // ── Data ─────────────────────────────────────────────────
 
   const { data, isLoading } = useQuery(
     getCatalogDetailQuery(category.id, { project_id: projectId ?? undefined })
@@ -56,7 +103,54 @@ export const CategoryItemsPanel = ({
 
   const products = data?.products ?? []
   const variableProducts = data?.variable_products ?? []
+
   const hasItems = products.length > 0 || variableProducts.length > 0
+
+  // ── Product → Superinventory mapping ─────────────────────
+
+  const { productToVPId, vpDetailsLoading } = useQueries({
+    queries: variableProducts.map((vp) =>
+      getVariableProductDetailQuery(vp.vp_id, { project_id: projectId ?? undefined })
+    ),
+    combine: (results) => {
+      const map = new Map<string, string>()
+      let loading = false
+      for (const r of results) {
+        if (r.isLoading) loading = true
+        const vp = r.data
+        if (!vp) continue
+        for (const item of vp.items ?? []) {
+          map.set(item.product_autoid, vp.id)
+        }
+      }
+      return { productToVPId: map, vpDetailsLoading: variableProducts.length > 0 && loading }
+    },
+  })
+
+  // Build grouped view: SI groups (with their child products) + standalone products
+  const { vpGroups, standaloneProducts } = useMemo(() => {
+    const groups = new Map<string, { vp: CatalogCategoryVP; products: CatalogCategoryProduct[] }>()
+    for (const vp of variableProducts) {
+      groups.set(vp.vp_id, { vp, products: [] })
+    }
+    const standalone: CatalogCategoryProduct[] = []
+    for (const p of products) {
+      const vpId = productToVPId.get(p.product_autoid)
+      if (vpId && groups.has(vpId)) {
+        groups.get(vpId)!.products.push(p)
+      } else {
+        standalone.push(p)
+      }
+    }
+    return {
+      vpGroups: [...groups.values()].sort((a, b) => a.vp.sort_order - b.vp.sort_order),
+      standaloneProducts: standalone.sort((a, b) => a.sort_order - b.sort_order),
+    }
+  }, [products, variableProducts, productToVPId])
+
+  const totalCount = products.length + variableProducts.length
+
+  // ── Mutations ────────────────────────────────────────────
 
   const removeProductMutation = useMutation({
     mutationFn: (recordId: string) =>
@@ -69,15 +163,12 @@ export const CategoryItemsPanel = ({
     },
   })
 
-  const queryClient = useQueryClient()
-
   const toggleProductActiveMutation = useMutation({
     mutationFn: ({ recordId, active }: { recordId: string; active: boolean }) =>
       catalogService.updateProduct(category.id, recordId, { active }, {
         project_id: projectId ?? undefined,
       }),
     onMutate: async ({ recordId, active }) => {
-      // Optimistic update — patch all matching detail queries in cache
       const queries = queryClient.getQueriesData<CatalogCategory>({
         queryKey: CATALOG_QUERY_KEYS.detail(category.id),
       })
@@ -118,204 +209,368 @@ export const CategoryItemsPanel = ({
     },
   })
 
+  const addProductToVPMutation = useMutation({
+    mutationFn: ({ vpId, productAutoid }: { vpId: string; productAutoid: string }) =>
+      variableProductService.addItem(vpId, { product_autoid: productAutoid }, {
+        project_id: projectId ?? undefined,
+      }),
+    meta: {
+      successMessage: 'Product added to superinventory',
+    },
+    onSuccess: (_data, { vpId }) => {
+      queryClient.invalidateQueries({ queryKey: VP_QUERY_KEYS.detail(vpId) })
+      queryClient.invalidateQueries({ queryKey: CATALOG_QUERY_KEYS.detail(category.id) })
+    },
+  })
+
+  const bulkAddToVPMutation = useMutation({
+    mutationFn: async ({ vpId, productAutoids }: { vpId: string; productAutoids: string[] }) => {
+      const params = { project_id: projectId ?? undefined }
+      for (const autoid of productAutoids) {
+        await variableProductService.addItem(vpId, { product_autoid: autoid }, params)
+      }
+    },
+    meta: { successMessage: 'Products added to superinventory' },
+    onSuccess: (_data, { vpId }) => {
+      queryClient.invalidateQueries({ queryKey: VP_QUERY_KEYS.detail(vpId) })
+      queryClient.invalidateQueries({ queryKey: CATALOG_QUERY_KEYS.detail(category.id) })
+      clearSelection()
+    },
+  })
+
+  // ── Render ───────────────────────────────────────────────
+
   return (
     <div className='flex h-full flex-col'>
-      {/* Panel header */}
-      <div
-        className={cn(
-          'flex items-center gap-2 border-b border-border py-3',
-          isMobile ? 'flex-wrap px-3.5' : 'px-6'
-        )}
-      >
+      {/* ── Header ── */}
+      <div className={cn('flex items-center gap-2 border-b border-border py-3', isMobile ? 'px-3.5' : 'px-5')}>
         {!isMobile && (
-          <h2 className='text-[14px] font-semibold flex-1 truncate'>{category.name}</h2>
+          <h2 className='flex-1 truncate text-[14px] font-semibold tracking-[-0.01em]'>{category.name}</h2>
         )}
         {isMobile && <div className='flex-1' />}
-        <Button
-          variant='outline'
-          size='sm'
-          onClick={() => setProductBrowserOpen(true)}
-          isPending={addProductsMutation.isPending}
-        >
-          <Plus className='size-3.5' />
-          Product
-        </Button>
-        <Button
-          variant='outline'
-          size='sm'
-          onClick={() => {
-            setAddItemType('variable_product')
-            setAddItemOpen(true)
-          }}
-        >
-          <Plus className='size-3.5' />
-          {isMobile ? 'VP' : 'Variable Product'}
-        </Button>
+
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant='outline' size='sm' isPending={addProductsMutation.isPending}>
+              <Plus className='size-3.5' />
+              Add
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align='end' className='w-48'>
+            <DropdownMenuItem onClick={() => setProductBrowserOpen(true)}>
+              <Package className='size-3.5' />
+              Add products
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => { setAddItemType('variable_product'); setAddItemOpen(true) }}>
+              <Layers className='size-3.5' />
+              Add superinventory
+            </DropdownMenuItem>
+            {onAddSubcategory && (
+              <>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={onAddSubcategory}>
+                  <Plus className='size-3.5' />
+                  Add subcategory
+                </DropdownMenuItem>
+              </>
+            )}
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
 
-      {/* Category images — collapsible */}
-      <div className='border-b border-border'>
-        <button
-          type='button'
-          className={cn('flex items-center gap-2 py-2 text-[11px] font-semibold uppercase tracking-wider text-text-quaternary w-full text-left', isMobile ? 'px-3.5' : 'px-6')}
-          onClick={() => setImagesCollapsed(!imagesCollapsed)}
-        >
-          <ChevronDown className={cn('size-3 transition-transform', imagesCollapsed && '-rotate-90')} />
-          Images
-        </button>
-        {!imagesCollapsed && (
-          <div className={cn('pb-3', isMobile ? 'px-3.5' : 'px-6')}>
-            <ImageGallery entityType='category' entityId={category.id} projectId={projectId} />
-          </div>
-        )}
+      {/* ── Image strip ── */}
+      <div className={cn('border-b border-border py-2.5', isMobile ? 'px-3.5' : 'px-5')}>
+        <ImageStrip
+          entityType='category'
+          entityId={category.id}
+          projectId={projectId}
+          label={`${category.name} — Images`}
+        />
       </div>
 
-      {/* Items list */}
+      {/* ── Tab bar ── */}
+      {hasItems && !isLoading && (
+        <div className={cn('flex items-center gap-1 border-b border-border py-1.5', isMobile ? 'px-3.5' : 'px-5')}>
+          {([
+            { key: 'all' as const, label: 'All', count: totalCount, stable: true },
+            { key: 'vps' as const, label: 'Super Inventory', count: vpGroups.length, stable: !vpDetailsLoading },
+            { key: 'products' as const, label: 'Standalone', count: standaloneProducts.length, stable: !vpDetailsLoading },
+          ]).map(({ key, label, count, stable }) => (
+            <button
+              key={key}
+              type='button'
+              className={cn(
+                'rounded-md px-2 py-1 text-[12px] font-medium transition-colors duration-75',
+                activeTab === key
+                  ? 'bg-bg-active text-foreground'
+                  : 'text-text-tertiary hover:bg-bg-hover hover:text-text-secondary'
+              )}
+              onClick={() => setActiveTab(key)}
+            >
+              {label}
+              <span className='ml-1 tabular-nums text-text-quaternary'>{stable ? count : '…'}</span>
+            </button>
+          ))}
+        </div>
+      )}
+
+      {/* ── Item list ── */}
       <div className='flex-1 overflow-y-auto'>
         {isLoading ? (
-          <div className={cn('flex flex-col gap-1 py-3', isMobile ? 'px-3.5' : 'px-6')}>
-            {Array.from({ length: 4 }).map((_, i) => (
-              <Skeleton key={i} className='h-9 w-full rounded-md' />
+          <div className={cn('flex flex-col gap-0.5 py-2', isMobile ? 'px-3.5' : 'px-5')}>
+            {Array.from({ length: 5 }).map((_, i) => (
+              <div key={i} className='flex items-center gap-3 py-2'>
+                <Skeleton className='size-8 shrink-0 rounded-md' />
+                <div className='flex-1'>
+                  <Skeleton className={cn('mb-1 h-3.5 rounded', i % 2 === 0 ? 'w-32' : 'w-24')} />
+                  <Skeleton className='h-3 w-20 rounded' />
+                </div>
+              </div>
             ))}
           </div>
         ) : !hasItems ? (
           <PageEmpty
-            icon={Box}
-            title='No items'
-            description='Add products or variable products to this category.'
+            icon={Package}
+            title='No items yet'
+            description='Add products, superinventory items, or subcategories.'
             compact
+            action={
+              <div className='flex items-center gap-2'>
+                <Button variant='outline' size='sm' onClick={() => setProductBrowserOpen(true)}>
+                  <Plus className='size-3.5' />
+                  Add products
+                </Button>
+                {onAddSubcategory && (
+                  <Button variant='outline' size='sm' onClick={onAddSubcategory}>
+                    <Plus className='size-3.5' />
+                    Add subcategory
+                  </Button>
+                )}
+              </div>
+            }
           />
-        ) : (
-          <div className='flex flex-col'>
-            {/* ── Products section ── */}
-            {products.length > 0 && (
-              <>
-                <button
-                  type='button'
-                  className={cn('flex items-center gap-2 py-2 text-[11px] font-semibold uppercase tracking-wider text-text-quaternary border-b border-border w-full text-left', isMobile ? 'px-3.5' : 'px-6')}
-                  onClick={() => setProductsCollapsed(!productsCollapsed)}
-                >
-                  <ChevronDown className={cn('size-3 transition-transform', productsCollapsed && '-rotate-90')} />
-                  <Package className='size-3 text-amber-500' />
-                  Products ({products.length})
-                </button>
-                {!productsCollapsed && (showAllProducts ? products : products.slice(0, PREVIEW_LIMIT)).map((p) => {
-                  const isExpanded = expandedProductId === p.product_autoid
-                  return (
-                    <div key={p.id} className='border-b border-border-light'>
-                      <div
-                        className={cn(
-                          'flex items-center gap-3 py-2 hover:bg-bg-hover transition-colors cursor-pointer',
-                          isMobile ? 'px-3.5' : 'px-6',
-                          p.active === false && 'opacity-40'
-                        )}
-                        onClick={() => setExpandedProductId(isExpanded ? null : p.product_autoid)}
-                      >
-                        <ProductThumbnail entityType='product' entityId={p.product_autoid} projectId={projectId} className='size-8 shrink-0' />
-                        <div className='flex-1 min-w-0'>
-                          <div className='text-[13px] font-medium truncate font-mono'>{p.product_id || p.product_autoid}</div>
-                          <div className='text-[11px] text-text-tertiary truncate'>{p.descr_1 || 'Product'}</div>
-                        </div>
-                        {!isMobile && <span className='text-[11px] text-text-tertiary tabular-nums'>#{p.sort_order}</span>}
-                        <Button variant='ghost' size='icon-xs' className='shrink-0 text-text-tertiary hover:text-purple-500' onClick={(e) => { e.stopPropagation(); setCreateVPFromProduct(p) }} title='Create VP'>
-                          <Sparkles className='size-3.5' />
-                        </Button>
-                        <Button
-                          variant='ghost' size='icon-xs'
-                          className={cn('shrink-0', p.active !== false ? 'text-text-tertiary hover:text-amber-500' : 'text-text-quaternary hover:text-emerald-500')}
-                          onClick={(e) => { e.stopPropagation(); toggleProductActiveMutation.mutate({ recordId: p.id, active: !(p.active !== false) }) }}
-                          title={p.active !== false ? 'Hide' : 'Show'}
-                        >
-                          {p.active !== false ? <Eye className='size-3.5' /> : <EyeOff className='size-3.5' />}
-                        </Button>
-                        <Button variant='ghost' size='icon-xs' className='text-text-tertiary hover:text-destructive' onClick={(e) => { e.stopPropagation(); removeProductMutation.mutate(p.id) }}>
-                          <Trash2 className='size-3.5' />
-                        </Button>
-                        <ChevronDown className={cn('size-3.5 shrink-0 text-text-quaternary transition-transform', isExpanded && 'rotate-180')} />
-                      </div>
-                      {isExpanded && (
-                        <div className={cn('pb-3 flex flex-col gap-3', isMobile ? 'px-3.5' : 'px-6')}>
-                          <div className='flex flex-wrap gap-x-4 gap-y-1 text-[12px] text-text-tertiary'>
-                            {p.product_id && <span><span className='text-text-secondary font-medium'>ID:</span> {p.product_id}</span>}
-                            {p.def_unit && <span><span className='text-text-secondary font-medium'>Unit:</span> {p.def_unit}</span>}
-                            <span><span className='text-text-secondary font-medium'>Autoid:</span> {p.product_autoid}</span>
-                          </div>
-                          {(p.descr_2 || p.web_descr1) && (
-                            <div className='text-[12px] text-text-tertiary space-y-1.5'>
-                              {p.descr_2 && <p><span className='text-text-secondary font-medium'>Description 2:</span> {p.descr_2}</p>}
-                              {p.web_descr1 && <p><span className='text-text-secondary font-medium'>Web Description 1:</span> {p.web_descr1}</p>}
-                              {p.web_descr2 && <p><span className='text-text-secondary font-medium'>Web Description 2:</span> {p.web_descr2}</p>}
-                              {p.web_descr3 && <p><span className='text-text-secondary font-medium'>Web Description 3:</span> {p.web_descr3}</p>}
-                            </div>
-                          )}
-                          <ImageGallery entityType='product' entityId={p.product_autoid} projectId={projectId} />
-                        </div>
-                      )}
-                    </div>
-                  )
-                })}
-                {!productsCollapsed && !showAllProducts && products.length > PREVIEW_LIMIT && (
-                  <button
-                    type='button'
-                    className={cn('w-full py-2 text-[12px] font-medium text-primary hover:underline border-b border-border-light', isMobile ? 'px-3.5' : 'px-6')}
-                    onClick={() => setShowAllProducts(true)}
-                  >
-                    Show all ({products.length})
-                  </button>
-                )}
-              </>
-            )}
-
-            {/* ── Variable Products section ── */}
-            {variableProducts.length > 0 && (
-              <>
-                <button
-                  type='button'
-                  className={cn('flex items-center gap-2 py-2 text-[11px] font-semibold uppercase tracking-wider text-text-quaternary border-b border-border w-full text-left', isMobile ? 'px-3.5' : 'px-6', products.length > 0 && 'mt-1')}
-                  onClick={() => setVpsCollapsed(!vpsCollapsed)}
-                >
-                  <ChevronDown className={cn('size-3 transition-transform', vpsCollapsed && '-rotate-90')} />
-                  <Layers className='size-3 text-purple-500' />
-                  Variable Products ({variableProducts.length})
-                </button>
-                {!vpsCollapsed && (showAllVPs ? variableProducts : variableProducts.slice(0, PREVIEW_LIMIT)).map((vp) => (
-                  <div
-                    key={vp.id}
-                    className={cn(
-                      'flex items-center gap-3 border-b border-border-light py-2 hover:bg-bg-hover transition-colors cursor-pointer',
-                      isMobile ? 'px-3.5' : 'px-6'
-                    )}
-                    onClick={() => navigate({ to: `/catalog/vp/${vp.vp_id}` })}
-                  >
-                    <ProductThumbnail entityType='vp' entityId={vp.vp_id} projectId={projectId} className='size-8 shrink-0' />
-                    <div className='flex-1 min-w-0'>
-                      <div className='flex items-center gap-1.5'>
-                        <span className='text-[13px] font-medium truncate'>{vp.name || vp.vp_id}</span>
-                        <span className='shrink-0 rounded bg-purple-500/10 px-1 py-0.5 text-[9px] font-bold uppercase text-purple-500'>VP</span>
-                      </div>
-                      <div className='text-[11px] text-text-tertiary'>{vp.slug || 'Variable Product'}</div>
-                    </div>
-                    {!isMobile && <span className='text-[11px] text-text-tertiary tabular-nums'>#{vp.sort_order}</span>}
-                    <Button variant='ghost' size='icon-xs' className='text-text-tertiary hover:text-destructive' onClick={(e) => { e.stopPropagation(); removeVPMutation.mutate(vp.id) }}>
-                      <Trash2 className='size-3.5' />
-                    </Button>
-                  </div>
-                ))}
-                {!vpsCollapsed && !showAllVPs && variableProducts.length > PREVIEW_LIMIT && (
-                  <button
-                    type='button'
-                    className={cn('w-full py-2 text-[12px] font-medium text-primary hover:underline border-b border-border-light', isMobile ? 'px-3.5' : 'px-6')}
-                    onClick={() => setShowAllVPs(true)}
-                  >
-                    Show all ({variableProducts.length})
-                  </button>
-                )}
-              </>
-            )}
+        ) : vpDetailsLoading ? (
+          /* Show skeleton while VP details load to prevent flat→grouped jump */
+          <div className={cn('flex flex-col gap-0.5 py-2', isMobile ? 'px-3.5' : 'px-5')}>
+            {variableProducts.map((vp) => (
+              <div key={vp.id} className='flex items-center gap-3 rounded-lg bg-purple-500/[0.02] px-3 py-2.5'>
+                <Skeleton className='size-8 shrink-0 rounded-md' />
+                <div className='flex-1'>
+                  <span className='text-[13px] font-medium text-foreground'>{vp.name || vp.vp_id}</span>
+                  <span className='ml-2 text-[11px] text-text-quaternary'>loading products...</span>
+                </div>
+              </div>
+            ))}
+            {Array.from({ length: Math.min(products.length, 5) }).map((_, i) => (
+              <div key={i} className='flex items-center gap-3 py-2'>
+                <Skeleton className='size-8 shrink-0 rounded-md' />
+                <div className='flex-1'>
+                  <Skeleton className={cn('mb-1 h-3.5 rounded', i % 2 === 0 ? 'w-40' : 'w-32')} />
+                  <Skeleton className='h-3 w-24 rounded' />
+                </div>
+              </div>
+            ))}
           </div>
+        ) : (
+          <>
+            {/* SI groups */}
+            {(activeTab === 'all' || activeTab === 'vps') && vpGroups.map(({ vp, products: groupProducts }) => (
+              <SuperInventoryGroup
+                key={vp.id}
+                vp={vp}
+                products={groupProducts}
+                projectId={projectId}
+                isMobile={isMobile}
+                expandedProductId={expandedProductId}
+                onToggleProductExpand={(autoid) =>
+                  setExpandedProductId(expandedProductId === autoid ? null : autoid)
+                }
+                onToggleProductActive={(p) =>
+                  toggleProductActiveMutation.mutate({ recordId: p.id, active: !(p.active !== false) })
+                }
+                onCreateVPFromProduct={setCreateVPFromProduct}
+                onRemoveProduct={(p) => removeProductMutation.mutate(p.id)}
+                onNavigateToVP={() => navigate({ to: `/catalog/vp/${vp.vp_id}` })}
+                onRemoveVP={() => removeVPMutation.mutate(vp.id)}
+              />
+            ))}
+
+            {/* Standalone products */}
+            {(activeTab === 'all' || activeTab === 'products') && standaloneProducts.map((p) => (
+              <ProductRow
+                key={p.id}
+                product={p}
+                projectId={projectId}
+                isMobile={isMobile}
+                isExpanded={expandedProductId === p.product_autoid}
+                onToggleExpand={() =>
+                  setExpandedProductId(expandedProductId === p.product_autoid ? null : p.product_autoid)
+                }
+                onToggleActive={() =>
+                  toggleProductActiveMutation.mutate({ recordId: p.id, active: !(p.active !== false) })
+                }
+                onCreateVP={() => setCreateVPFromProduct(p)}
+                onRemove={() => removeProductMutation.mutate(p.id)}
+                availableVPs={variableProducts}
+                onAddToVP={(vpId) => addProductToVPMutation.mutate({ vpId, productAutoid: p.product_autoid })}
+                selected={selectedProductIds.has(p.product_autoid)}
+                onToggleSelect={() => toggleProductSelect(p.product_autoid)}
+              />
+            ))}
+          </>
         )}
       </div>
 
+      {/* ── Bulk action bar ── */}
+      {selectedProductIds.size > 0 && (
+        <div className={cn('flex shrink-0 items-center gap-2 border-t border-border bg-bg-secondary/80 py-2', isMobile ? 'px-3.5' : 'px-5')}>
+          <span className='text-[12px] font-medium text-text-secondary tabular-nums'>
+            {selectedProductIds.size} selected
+          </span>
+          <button
+            type='button'
+            className='text-[12px] text-text-tertiary hover:text-foreground transition-colors'
+            onClick={clearSelection}
+          >
+            Clear
+          </button>
+          <div className='flex-1' />
+          {variableProducts.length > 0 ? (
+            <Button
+              size='sm'
+              isPending={bulkAddToVPMutation.isPending}
+              onClick={() => setSiPickerOpen(true)}
+            >
+              <Layers className='size-3.5' />
+              Add to superinventory
+            </Button>
+          ) : (
+            <Button
+              size='sm'
+              onClick={() => {
+                // Use first selected product to seed a new SI
+                const firstAutoid = [...selectedProductIds][0]
+                const firstProduct = standaloneProducts.find((p) => p.product_autoid === firstAutoid)
+                if (firstProduct) setCreateVPFromProduct(firstProduct)
+              }}
+            >
+              <Sparkles className='size-3.5' />
+              Create superinventory
+            </Button>
+          )}
+        </div>
+      )}
+
+      {/* ── SI Picker Dialog ── */}
+      <Dialog open={siPickerOpen} onOpenChange={(v) => { if (!bulkAddToVPMutation.isPending) setSiPickerOpen(v) }}>
+        <DialogContent className='sm:max-w-lg' onPointerDownOutside={(e) => { if (bulkAddToVPMutation.isPending) e.preventDefault() }}>
+          {bulkAddToVPMutation.isPending ? (
+            <>
+              <DialogHeader>
+                <DialogTitle>Adding products...</DialogTitle>
+              </DialogHeader>
+              <DialogBody>
+                <div className='flex flex-col items-center gap-4 py-8'>
+                  <div className='size-10 animate-spin rounded-full border-2 border-border border-t-primary' />
+                  <p className='text-[13px] text-text-tertiary'>
+                    Adding {selectedProductIds.size} product{selectedProductIds.size !== 1 ? 's' : ''} to superinventory...
+                  </p>
+                </div>
+              </DialogBody>
+            </>
+          ) : (
+            <>
+              <DialogHeader>
+                <DialogTitle>Add to superinventory</DialogTitle>
+              </DialogHeader>
+              <DialogBody className='max-h-[60vh] overflow-y-auto'>
+                {/* Selected products preview */}
+                <div className='mb-3 flex items-center gap-2'>
+                  <div className='flex -space-x-2'>
+                    {[...selectedProductIds].slice(0, 4).map((autoid) => (
+                      <ProductThumbnail
+                        key={autoid}
+                        entityType='product'
+                        entityId={autoid}
+                        projectId={projectId}
+                        className='size-7 rounded-full border-2 border-background'
+                      />
+                    ))}
+                  </div>
+                  <span className='text-[12px] text-text-tertiary'>
+                    {selectedProductIds.size} product{selectedProductIds.size !== 1 ? 's' : ''} selected
+                  </span>
+                </div>
+
+                {/* Existing SIs */}
+                <div className='flex flex-col gap-1.5'>
+                  {variableProducts.map((vp) => {
+                    const group = vpGroups.find((g) => g.vp.vp_id === vp.vp_id)
+                    const itemCount = group?.products.length ?? 0
+                    return (
+                      <button
+                        key={vp.vp_id}
+                        type='button'
+                        className='group/si flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left outline-none transition-colors hover:bg-bg-hover'
+                        onClick={() => {
+                          bulkAddToVPMutation.mutate(
+                            { vpId: vp.vp_id, productAutoids: [...selectedProductIds] },
+                            { onSuccess: () => setSiPickerOpen(false) }
+                          )
+                        }}
+                      >
+                        <ProductThumbnail
+                          entityType='vp'
+                          entityId={vp.vp_id}
+                          projectId={projectId}
+                          className='size-10 shrink-0 rounded-lg'
+                        />
+                        <div className='min-w-0 flex-1'>
+                          <span className='block truncate text-[13px] font-medium text-foreground'>
+                            {vp.name || vp.vp_id}
+                          </span>
+                          <span className='text-[11px] text-text-tertiary'>
+                            {itemCount} product{itemCount !== 1 ? 's' : ''} already
+                          </span>
+                        </div>
+                        <span className='shrink-0 text-[12px] font-medium text-primary opacity-0 transition-opacity group-hover/si:opacity-100'>
+                          Add →
+                        </span>
+                      </button>
+                    )
+                  })}
+
+                  {/* Create new option */}
+                  <button
+                    type='button'
+                    className='flex w-full items-center gap-3 rounded-lg border border-dashed border-border px-3 py-2.5 text-left transition-colors hover:border-purple-400 hover:bg-purple-500/[0.03]'
+                    onClick={() => {
+                      setSiPickerOpen(false)
+                      const firstAutoid = [...selectedProductIds][0]
+                      const firstProduct = standaloneProducts.find((p) => p.product_autoid === firstAutoid)
+                      if (firstProduct) setCreateVPFromProduct(firstProduct)
+                    }}
+                  >
+                    <div className='flex size-10 shrink-0 items-center justify-center rounded-lg bg-purple-500/10'>
+                      <Sparkles className='size-4 text-purple-500' />
+                    </div>
+                    <div className='min-w-0 flex-1'>
+                      <span className='block text-[13px] font-medium text-foreground'>
+                        Create new superinventory
+                      </span>
+                      <span className='text-[11px] text-text-tertiary'>
+                        Group these products into a new one
+                      </span>
+                    </div>
+                  </button>
+                </div>
+              </DialogBody>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* ── Dialogs ── */}
       <AddItemDialog
         open={addItemOpen}
         onOpenChange={setAddItemOpen}
@@ -339,6 +594,340 @@ export const CategoryItemsPanel = ({
         onOpenChange={(v) => !v && setCreateVPFromProduct(null)}
         projectId={projectId}
       />
+    </div>
+  )
+}
+
+// ── Product Row ──────────────────────────────────────────────
+
+function ProductRow({
+  product: p,
+  projectId,
+  isMobile,
+  isExpanded,
+  onToggleExpand,
+  onToggleActive,
+  onCreateVP,
+  onRemove,
+  onAddToVP,
+  availableVPs,
+  indent,
+  selected,
+  onToggleSelect,
+}: {
+  product: CatalogCategoryProduct
+  projectId: number | null
+  isMobile?: boolean
+  isExpanded: boolean
+  onToggleExpand: () => void
+  onToggleActive: () => void
+  onCreateVP: () => void
+  onRemove: () => void
+  onAddToVP?: (vpId: string) => void
+  availableVPs?: CatalogCategoryVP[]
+  indent?: boolean
+  selected?: boolean
+  onToggleSelect?: () => void
+}) {
+  const isHidden = p.active === false
+
+  return (
+    <div className='border-b border-border-light'>
+      <div
+        className={cn(
+          'group flex cursor-pointer items-center gap-3 py-2 transition-colors hover:bg-bg-hover',
+          isMobile ? 'px-3.5' : indent ? 'pl-12 pr-5' : 'px-5',
+          isHidden && 'opacity-50'
+        )}
+        onClick={onToggleExpand}
+      >
+        {onToggleSelect && (
+          <button
+            type='button'
+            className={cn(
+              'flex size-4 shrink-0 items-center justify-center rounded border transition-colors',
+              selected
+                ? 'border-primary bg-primary'
+                : 'border-border hover:border-primary/50'
+            )}
+            onClick={(e) => { e.stopPropagation(); onToggleSelect() }}
+          >
+            {selected && (
+              <svg viewBox='0 0 12 12' className='size-2.5 text-primary-foreground' fill='none' stroke='currentColor' strokeWidth='2'>
+                <polyline points='2.5,6 5,9 9.5,3' />
+              </svg>
+            )}
+          </button>
+        )}
+        <ProductThumbnail
+          entityType='product'
+          entityId={p.product_autoid}
+          projectId={projectId}
+          className='size-8 shrink-0 rounded-md'
+        />
+        <div className='min-w-0 flex-1'>
+          <div className='flex items-center gap-1.5'>
+            <span className='truncate text-[13px] font-medium text-foreground'>
+              {p.descr_1 || p.product_id || 'Untitled'}
+            </span>
+          </div>
+          <div className='truncate text-[11px] text-text-tertiary'>
+            {p.product_id}
+            {p.def_unit && <span className='ml-1.5 text-text-quaternary'>· {p.def_unit}</span>}
+          </div>
+        </div>
+
+        {isHidden && (
+          <span className='shrink-0 rounded bg-muted px-1 py-0.5 text-[10px] font-medium text-text-tertiary'>
+            Hidden
+          </span>
+        )}
+
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant='ghost'
+              size='icon-xs'
+              className='shrink-0 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity'
+              onClick={(e) => e.stopPropagation()}
+            >
+              <MoreHorizontal className='size-3.5' />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align='end' className='w-48'>
+            <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onToggleActive() }}>
+              {isHidden ? <Eye className='size-3.5' /> : <EyeOff className='size-3.5' />}
+              {isHidden ? 'Show in catalog' : 'Hide from catalog'}
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onCreateVP() }}>
+              <Sparkles className='size-3.5' />
+              Create superinventory
+            </DropdownMenuItem>
+            {onAddToVP && availableVPs && availableVPs.length > 0 && (
+              <>
+                <DropdownMenuSeparator />
+                <div className='px-2 py-1 text-[11px] font-medium text-text-quaternary'>Add to superinventory</div>
+                {availableVPs.map((vp) => (
+                  <DropdownMenuItem
+                    key={vp.vp_id}
+                    onClick={(e) => { e.stopPropagation(); onAddToVP(vp.vp_id) }}
+                  >
+                    <Layers className='size-3.5 text-purple-500' />
+                    <span className='truncate'>{vp.name || vp.vp_id}</span>
+                  </DropdownMenuItem>
+                ))}
+              </>
+            )}
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              variant='destructive'
+              onClick={(e) => { e.stopPropagation(); onRemove() }}
+            >
+              <Trash2 className='size-3.5' />
+              Remove from category
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+
+        <ChevronDown
+          className={cn(
+            'size-3.5 shrink-0 text-text-quaternary transition-transform',
+            isExpanded && 'rotate-180'
+          )}
+        />
+      </div>
+
+      {isExpanded && (
+        <ExpandedProductDetail product={p} projectId={projectId} isMobile={isMobile} />
+      )}
+    </div>
+  )
+}
+
+
+// ── Expanded Product Detail ──────────────────────────────────
+
+function isUsefulText(val?: string | null): val is string {
+  if (!val) return false
+  const trimmed = val.trim()
+  return trimmed.length > 0 && trimmed.toLowerCase() !== 'none'
+}
+
+function ExpandedProductDetail({
+  product: p,
+  projectId,
+  isMobile,
+}: {
+  product: CatalogCategoryProduct
+  projectId: number | null
+  isMobile?: boolean
+}) {
+  // Collect non-empty, non-"None" descriptions
+  const descriptions = [p.descr_2, p.web_descr1, p.web_descr2, p.web_descr3].filter(isUsefulText)
+
+  return (
+    <div className={cn('flex flex-col gap-2 border-t border-border-light bg-bg-secondary/30 py-3', isMobile ? 'px-3.5' : 'px-5')}>
+      {/* Metadata pills */}
+      <div className='flex flex-wrap gap-1.5'>
+        {p.product_id && (
+          <span className='inline-flex items-center rounded-md bg-bg-secondary px-1.5 py-0.5 text-[11px] font-medium text-text-secondary'>
+            {p.product_id}
+          </span>
+        )}
+        {p.def_unit && (
+          <span className='inline-flex items-center rounded-md bg-bg-secondary px-1.5 py-0.5 text-[11px] font-medium text-text-secondary'>
+            {p.def_unit}
+          </span>
+        )}
+      </div>
+
+      {/* Description — only first meaningful one, truncated */}
+      {descriptions.length > 0 && (
+        <p className='text-[12px] leading-relaxed text-text-tertiary line-clamp-3'>
+          {descriptions[0]}
+        </p>
+      )}
+
+      {/* Product images — compact strip */}
+      <ImageStrip
+        entityType='product'
+        entityId={p.product_autoid}
+        projectId={projectId}
+        label={`${p.descr_1 || p.product_id} — Images`}
+      />
+    </div>
+  )
+}
+
+// ── Superinventory Group ─────────────────────────────────────
+
+function SuperInventoryGroup({
+  vp,
+  products: groupProducts,
+  projectId,
+  isMobile,
+  expandedProductId,
+  onToggleProductExpand,
+  onToggleProductActive,
+  onCreateVPFromProduct,
+  onRemoveProduct,
+  onNavigateToVP,
+  onRemoveVP,
+}: {
+  vp: CatalogCategoryVP
+  products: CatalogCategoryProduct[]
+  projectId: number | null
+  isMobile?: boolean
+  expandedProductId: string | null
+  onToggleProductExpand: (autoid: string) => void
+  onToggleProductActive: (p: CatalogCategoryProduct) => void
+  onCreateVPFromProduct: (p: CatalogCategoryProduct) => void
+  onRemoveProduct: (p: CatalogCategoryProduct) => void
+  onNavigateToVP: () => void
+  onRemoveVP: () => void
+}) {
+  const [expanded, setExpanded] = useState(false)
+
+  return (
+    <div className='border-b border-border-light'>
+      {/* SI header */}
+      <div
+        className={cn(
+          'group flex cursor-pointer items-center gap-3 py-2 transition-colors hover:bg-purple-500/[0.03]',
+          isMobile ? 'px-3.5' : 'px-5',
+        )}
+        onClick={() => setExpanded(!expanded)}
+      >
+        <ProductThumbnail
+          entityType='vp'
+          entityId={vp.vp_id}
+          projectId={projectId}
+          className='size-8 shrink-0 rounded-md'
+        />
+        <div className='min-w-0 flex-1'>
+          <div className='flex items-center gap-1.5'>
+            <span className='truncate text-[13px] font-medium text-foreground'>
+              {vp.name || vp.vp_id}
+            </span>
+            <span className='shrink-0 rounded bg-purple-500/10 px-1 py-0.5 text-[9px] font-bold uppercase text-purple-500'>
+              SUPER
+            </span>
+            {groupProducts.length > 0 && (
+              <span className='shrink-0 text-[11px] tabular-nums text-text-quaternary'>
+                {groupProducts.length} item{groupProducts.length !== 1 ? 's' : ''}
+              </span>
+            )}
+          </div>
+          <div className='truncate text-[11px] text-text-tertiary'>
+            {vp.slug || 'Superinventory'}
+          </div>
+        </div>
+
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant='ghost'
+              size='icon-xs'
+              className='shrink-0 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity'
+              onClick={(e) => e.stopPropagation()}
+            >
+              <MoreHorizontal className='size-3.5' />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align='end' className='w-48'>
+            <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onNavigateToVP() }}>
+              <ChevronRight className='size-3.5' />
+              View details
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              variant='destructive'
+              onClick={(e) => { e.stopPropagation(); onRemoveVP() }}
+            >
+              <Trash2 className='size-3.5' />
+              Remove from category
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+
+        <ChevronDown
+          className={cn(
+            'size-3.5 shrink-0 text-text-quaternary transition-transform',
+            expanded && 'rotate-180'
+          )}
+        />
+      </div>
+
+      {/* Child products */}
+      {expanded && groupProducts.length > 0 && (
+        <div className='border-l-2 border-purple-500/20 ml-5 sm:ml-9'>
+          {groupProducts.map((p) => (
+            <ProductRow
+              key={p.id}
+              product={p}
+              projectId={projectId}
+              isMobile={isMobile}
+              indent
+              isExpanded={expandedProductId === p.product_autoid}
+              onToggleExpand={() => onToggleProductExpand(p.product_autoid)}
+              onToggleActive={() => onToggleProductActive(p)}
+              onCreateVP={() => onCreateVPFromProduct(p)}
+              onRemove={() => onRemoveProduct(p)}
+            />
+          ))}
+        </div>
+      )}
+
+      {/* Collapsed preview — show count */}
+      {!expanded && groupProducts.length > 0 && (
+        <button
+          type='button'
+          className={cn('flex w-full items-center gap-2 py-1 text-[11px] text-purple-500 hover:bg-purple-500/[0.03] transition-colors', isMobile ? 'px-3.5' : 'pl-16 pr-5')}
+          onClick={() => setExpanded(true)}
+        >
+          Show {groupProducts.length} product{groupProducts.length !== 1 ? 's' : ''} in this group
+        </button>
+      )}
     </div>
   )
 }

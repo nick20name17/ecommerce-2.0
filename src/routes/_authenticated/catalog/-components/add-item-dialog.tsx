@@ -52,7 +52,7 @@ export const AddItemDialog = ({
     },
   })
 
-  const label = itemType === 'product' ? 'Product' : 'Variable Product'
+  const label = itemType === 'product' ? 'Product' : 'Superinventory'
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -74,7 +74,7 @@ export const AddItemDialog = ({
                 value={itemId}
                 onChange={(e) => setItemId(e.target.value)}
                 placeholder={
-                  itemType === 'product' ? 'INVENTRY_AUTOID' : 'Variable Product ID'
+                  itemType === 'product' ? 'INVENTRY_AUTOID' : 'Superinventory ID'
                 }
                 required
                 autoFocus

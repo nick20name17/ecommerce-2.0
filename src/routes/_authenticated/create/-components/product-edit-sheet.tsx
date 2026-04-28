@@ -153,16 +153,21 @@ export const ProductEditSheet = ({
     saveMutation.mutate()
   }
 
+  const selectedUnitData = units?.find((u) => u.unit === selectedUnit)
   const priceDisplay = hasConfigs
     ? selectedConfigCount > 0
       ? totalPrice
       : Number(configData?.base_price) || 0
-    : Number(product?.price || (product && !isCartItem(product) ? product.cost : 0) || 0)
+    : selectedUnitData
+      ? Number(selectedUnitData.price) || 0
+      : Number(product?.price || (product && !isCartItem(product) ? product.cost : 0) || 0)
   const oldPriceDisplay = hasConfigs
     ? selectedConfigCount > 0
       ? totalOldPrice
       : Number(configData?.base_old_price) || 0
-    : Number((product && !isCartItem(product) ? product.old_price : 0) || 0)
+    : selectedUnitData
+      ? Number(selectedUnitData.old_price) || 0
+      : Number((product && !isCartItem(product) ? product.old_price : 0) || 0)
   const hasDiscount = oldPriceDisplay > priceDisplay
 
   const totalConfigCount = configs.length
@@ -329,20 +334,20 @@ export const ProductEditSheet = ({
 
           {/* Footer */}
           <div className='flex shrink-0 items-center justify-between gap-4 border-t border-border px-5 py-3'>
-            <div className='flex items-center gap-3'>
-              <div>
-                <span className='text-[12px] font-medium uppercase tracking-[0.04em] text-text-tertiary'>
-                  Total
-                </span>
-                <p className='text-[18px] font-bold tabular-nums leading-tight'>
+            <div>
+              <span className='text-[12px] font-medium uppercase tracking-[0.04em] text-text-tertiary'>
+                Total
+              </span>
+              <div className='flex items-baseline gap-2'>
+                <p className='text-[15px] font-bold tabular-nums leading-tight'>
                   {formatCurrency(priceDisplay * quantity)}
                 </p>
+                {quantity > 1 && (
+                  <span className='text-[12px] tabular-nums text-text-tertiary'>
+                    {formatCurrency(priceDisplay)} × {quantity}
+                  </span>
+                )}
               </div>
-              {quantity > 1 && (
-                <span className='text-[12px] tabular-nums text-text-tertiary'>
-                  {formatCurrency(priceDisplay)} × {quantity}
-                </span>
-              )}
             </div>
 
             <div className='flex items-center gap-2'>

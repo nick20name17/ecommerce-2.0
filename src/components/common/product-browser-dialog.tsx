@@ -1,10 +1,9 @@
 import { useQuery } from '@tanstack/react-query'
-import { ChevronRight, FolderClosed, FolderOpen, Package, Search } from 'lucide-react'
+import { ChevronRight, Folder, FolderOpen, Search } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
 import { useDebouncedCallback } from 'use-debounce'
 
 import { categoryService } from '@/api/category/service'
-import type { Category } from '@/api/category/schema'
 import { api } from '@/api'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -20,6 +19,15 @@ import { Input } from '@/components/ui/input'
 import { Skeleton } from '@/components/ui/skeleton'
 import { cn } from '@/lib/utils'
 
+const DEPTH_COLORS = [
+  'text-blue-500 fill-blue-500/20',
+  'text-violet-500 fill-violet-500/20',
+  'text-amber-500 fill-amber-500/20',
+  'text-emerald-500 fill-emerald-500/20',
+  'text-rose-500 fill-rose-500/20',
+  'text-cyan-500 fill-cyan-500/20',
+]
+
 interface ProductRow {
   autoid: string
   id: string
@@ -32,6 +40,8 @@ interface ProductBrowserDialogProps {
   projectId: number | null
   onSelect: (products: { autoid: string; id: string; descr_1: string }[]) => void
   title?: string
+  /** Pre-select this EBMS category when dialog opens */
+  defaultCategoryId?: string | null
 }
 
 export const ProductBrowserDialog = ({
@@ -40,6 +50,7 @@ export const ProductBrowserDialog = ({
   projectId,
   onSelect,
   title = 'Browse Products',
+  defaultCategoryId,
 }: ProductBrowserDialogProps) => {
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null)
   const [search, setSearch] = useState('')
@@ -50,13 +61,19 @@ export const ProductBrowserDialog = ({
   const debouncedSetSearch = useDebouncedCallback((val: string) => setDebouncedSearch(val), 300)
 
   useEffect(() => {
-    if (!open) {
+    if (open) {
+      if (defaultCategoryId) {
+        setSelectedCategoryId(defaultCategoryId)
+        setExpandedCategories(new Set([defaultCategoryId]))
+      }
+    } else {
       setSelected(new Map())
       setSearch('')
       setDebouncedSearch('')
       setSelectedCategoryId(null)
+      setExpandedCategories(new Set())
     }
-  }, [open])
+  }, [open, defaultCategoryId])
 
   const handleSearchChange = useCallback(
     (val: string) => {
@@ -235,9 +252,9 @@ function CategoryTreeBrowser({
                 <span className='w-4 shrink-0' />
               )}
               {isExpanded && hasChildren ? (
-                <FolderOpen className='size-3.5 shrink-0 text-amber-500' />
+                <FolderOpen className={cn('size-3.5 shrink-0', DEPTH_COLORS[Math.min(depth, DEPTH_COLORS.length - 1)])} />
               ) : (
-                <FolderClosed className='size-3.5 shrink-0 text-amber-500' />
+                <Folder className={cn('size-3.5 shrink-0', DEPTH_COLORS[Math.min(depth, DEPTH_COLORS.length - 1)])} />
               )}
               <span className='flex-1 truncate'>{cat.tree_descr}</span>
               {cat.product_count > 0 && (

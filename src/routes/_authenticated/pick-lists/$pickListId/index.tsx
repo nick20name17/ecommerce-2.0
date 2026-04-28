@@ -138,7 +138,7 @@ const PickListDetailPage = () => {
   if (isLoading) {
     return (
       <div className='flex h-full flex-col overflow-hidden'>
-        <header className={cn('flex h-12 shrink-0 items-center gap-2.5 border-b border-border', isMobile ? 'px-3.5' : 'px-6')}>
+        <header className='flex h-12 shrink-0 items-center gap-2.5 border-b border-border px-3.5 sm:px-6'>
           <SidebarTrigger className='-ml-1' />
           <Skeleton className='h-5 w-40' />
         </header>
@@ -169,10 +169,7 @@ const PickListDetailPage = () => {
     <div className='flex h-full flex-col overflow-hidden'>
       {/* Header */}
       <header
-        className={cn(
-          'flex h-12 shrink-0 items-center gap-2.5 border-b border-border',
-          isMobile ? 'px-3.5' : 'px-6',
-        )}
+        className='flex h-12 shrink-0 items-center gap-2.5 border-b border-border px-3.5 sm:px-6'
       >
         <SidebarTrigger className='-ml-1' />
         <Link
@@ -230,7 +227,7 @@ const PickListDetailPage = () => {
 
       {/* Content */}
       <div className='flex-1 overflow-y-auto'>
-        <div className={cn(isMobile ? 'px-3.5 py-4' : 'px-6 py-5')}>
+        <div className='px-3.5 py-4 sm:px-6 sm:py-5'>
 
           {/* Summary card */}
           <div className='mb-6 overflow-hidden rounded-lg border border-border'>

@@ -87,7 +87,7 @@ export const VPCreateFromProductDialog = ({
           }}
         >
           <DialogHeader>
-            <DialogTitle>Create VP from Product</DialogTitle>
+            <DialogTitle>Create Superinventory from Product</DialogTitle>
           </DialogHeader>
           <DialogBody className='flex flex-col gap-3'>
             {product && (
@@ -97,7 +97,7 @@ export const VPCreateFromProductDialog = ({
               </div>
             )}
             <div className='flex flex-col gap-1.5'>
-              <Label htmlFor='vp-from-name'>VP Name</Label>
+              <Label htmlFor='vp-from-name'>Name</Label>
               <Input
                 id='vp-from-name'
                 value={name}
@@ -125,7 +125,7 @@ export const VPCreateFromProductDialog = ({
               Cancel
             </Button>
             <Button type='submit' isPending={createMutation.isPending}>
-              Create VP
+              Create Superinventory
             </Button>
           </DialogFooter>
         </form>

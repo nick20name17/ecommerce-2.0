@@ -202,7 +202,7 @@ export const UnassignedProductsPanel = ({
                           </DropdownMenuItem>
                           <DropdownMenuItem onClick={() => createVPMutation.mutate(product)}>
                             <Sparkles className='size-3.5' />
-                            Create VP from product
+                            Create superinventory
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
