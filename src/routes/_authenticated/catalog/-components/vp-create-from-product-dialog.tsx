@@ -52,7 +52,7 @@ export const VPCreateFromProductDialog = ({
       const params = { project_id: projectId ?? undefined }
       // 1. Create VP
       const vp = await variableProductService.create(
-        { name, description: description || undefined },
+        { name, description: description || undefined, category_id: categoryId },
         params
       )
       // 2. Add the product as first item

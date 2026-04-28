@@ -57,12 +57,13 @@ export const VPCreateDialog = ({ open, onOpenChange, projectId, categoryId, cate
         <form
           onSubmit={(e) => {
             e.preventDefault()
+            if (!categoryId) return
             createMutation.mutate({
               name,
               description: description || undefined,
               slug: slug || undefined,
               image_url: imageUrl || undefined,
-              category_id: categoryId || undefined,
+              category_id: categoryId,
             })
           }}
         >
@@ -118,7 +119,7 @@ export const VPCreateDialog = ({ open, onOpenChange, projectId, categoryId, cate
             <Button type='button' variant='outline' onClick={() => onOpenChange(false)}>
               Cancel
             </Button>
-            <Button type='submit' isPending={createMutation.isPending}>
+            <Button type='submit' disabled={!categoryId} isPending={createMutation.isPending}>
               Create
             </Button>
           </DialogFooter>
