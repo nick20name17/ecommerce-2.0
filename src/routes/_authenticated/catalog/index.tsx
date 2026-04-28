@@ -87,10 +87,24 @@ const CatalogPage = () => {
     mutationFn: ({ productAutoid, categoryId }: { productAutoid: string; categoryId: string }) =>
       catalogService.addProduct(categoryId, { product_autoid: productAutoid }, { project_id: projectId ?? undefined }),
     meta: { successMessage: 'Product added to category' },
+    onMutate: ({ productAutoid }) => {
+      // Optimistically remove from all unassigned query caches immediately
+      queryClient.setQueriesData<{ results: { autoid: string }[]; count: number }>(
+        { queryKey: ['unassigned-products'] },
+        (old) => old ? {
+          ...old,
+          results: old.results.filter((p) => p.autoid !== productAutoid),
+          count: old.count - 1,
+        } : old
+      )
+    },
     onSuccess: (_data, { categoryId: catId }) => {
-      // Only invalidate the target category detail + unassigned list, not entire tree
       queryClient.invalidateQueries({ queryKey: CATALOG_QUERY_KEYS.detail(catId) })
       queryClient.invalidateQueries({ queryKey: CATALOG_QUERY_KEYS.trees() })
+      queryClient.invalidateQueries({ queryKey: ['unassigned-products'] })
+    },
+    onError: () => {
+      // Revert — refetch unassigned list
       queryClient.invalidateQueries({ queryKey: ['unassigned-products'] })
     },
   })
