@@ -108,22 +108,20 @@ export const CategoryItemsPanel = ({
 
   // ── Product → Superinventory mapping ─────────────────────
 
-  const { productToVPId, vpDetailsLoading } = useQueries({
+  const { productToVPId } = useQueries({
     queries: variableProducts.map((vp) =>
       getVariableProductDetailQuery(vp.vp_id, { project_id: projectId ?? undefined })
     ),
     combine: (results) => {
       const map = new Map<string, string>()
-      let loading = false
       for (const r of results) {
-        if (r.isLoading) loading = true
         const vp = r.data
         if (!vp) continue
         for (const item of vp.items ?? []) {
           map.set(item.product_autoid, vp.id)
         }
       }
-      return { productToVPId: map, vpDetailsLoading: variableProducts.length > 0 && loading }
+      return { productToVPId: map }
     },
   })
 
@@ -317,10 +315,10 @@ export const CategoryItemsPanel = ({
       {hasItems && !isLoading && (
         <div className={cn('flex items-center gap-1 border-b border-border py-1.5', isMobile ? 'px-3.5' : 'px-5')}>
           {([
-            { key: 'all' as const, label: 'All', count: totalCount, stable: true },
-            { key: 'vps' as const, label: 'Super Inventory', count: vpGroups.length, stable: !vpDetailsLoading },
-            { key: 'products' as const, label: 'Standalone', count: standaloneProducts.length, stable: !vpDetailsLoading },
-          ]).map(({ key, label, count, stable }) => (
+            { key: 'all' as const, label: 'All', count: totalCount },
+            { key: 'vps' as const, label: 'Super Inventory', count: vpGroups.length },
+            { key: 'products' as const, label: 'Standalone', count: standaloneProducts.length },
+          ]).map(({ key, label, count }) => (
             <button
               key={key}
               type='button'
@@ -333,7 +331,7 @@ export const CategoryItemsPanel = ({
               onClick={() => setActiveTab(key)}
             >
               {label}
-              <span className='ml-1 tabular-nums text-text-quaternary'>{stable ? count : '…'}</span>
+              <span className='ml-1 tabular-nums text-text-quaternary'>{count}</span>
             </button>
           ))}
         </div>
@@ -374,28 +372,6 @@ export const CategoryItemsPanel = ({
               </div>
             }
           />
-        ) : vpDetailsLoading ? (
-          /* Show skeleton while VP details load to prevent flat→grouped jump */
-          <div className={cn('flex flex-col gap-0.5 py-2', isMobile ? 'px-3.5' : 'px-5')}>
-            {variableProducts.map((vp) => (
-              <div key={vp.id} className='flex items-center gap-3 rounded-lg bg-purple-500/[0.02] px-3 py-2.5'>
-                <Skeleton className='size-8 shrink-0 rounded-md' />
-                <div className='flex-1'>
-                  <span className='text-[13px] font-medium text-foreground'>{vp.name || vp.vp_id}</span>
-                  <span className='ml-2 text-[11px] text-text-quaternary'>loading products...</span>
-                </div>
-              </div>
-            ))}
-            {Array.from({ length: Math.min(products.length, 5) }).map((_, i) => (
-              <div key={i} className='flex items-center gap-3 py-2'>
-                <Skeleton className='size-8 shrink-0 rounded-md' />
-                <div className='flex-1'>
-                  <Skeleton className={cn('mb-1 h-3.5 rounded', i % 2 === 0 ? 'w-40' : 'w-32')} />
-                  <Skeleton className='h-3 w-24 rounded' />
-                </div>
-              </div>
-            ))}
-          </div>
         ) : (
           <>
             {/* SI groups */}
