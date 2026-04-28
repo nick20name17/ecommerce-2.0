@@ -155,12 +155,18 @@ const CatalogPage = () => {
               <span className={cn(isMobile && 'hidden')}>Unassigned</span>
             </Button>
 
-            <Button size='sm' onClick={() => openCreateDialog()}>
+            <Button size='sm' onClick={() => openCreateDialog(selectedCategory?.id ?? null)}>
               <Plus className='size-3.5' />
               <span className={cn(isMobile && 'hidden')}>New Category</span>
             </Button>
 
-            <Button size='sm' variant='outline' onClick={() => setVpCreateOpen(true)}>
+            <Button
+              size='sm'
+              variant='outline'
+              onClick={() => setVpCreateOpen(true)}
+              disabled={!selectedCategory}
+              title={!selectedCategory ? 'Select a category first' : ''}
+            >
               <Plus className='size-3.5' />
               <span className={cn(isMobile && 'hidden')}>New Superinventory</span>
             </Button>
@@ -289,6 +295,8 @@ const CatalogPage = () => {
         open={vpCreateOpen}
         onOpenChange={setVpCreateOpen}
         projectId={projectId}
+        categoryId={selectedCategory?.id ?? null}
+        categoryName={selectedCategory?.name ?? null}
       />
     </div>
   )

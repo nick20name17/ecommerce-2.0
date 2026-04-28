@@ -97,10 +97,10 @@ export interface SpecParams {
 
 export interface CreateVariableProductPayload {
   name: string
+  category_id: string
   description?: string
   slug?: string
   image_url?: string
-  category_id?: string | null
   sort_order?: number
 }
 
