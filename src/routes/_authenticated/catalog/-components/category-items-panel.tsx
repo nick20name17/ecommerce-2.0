@@ -375,31 +375,32 @@ export const CategoryItemsPanel = ({
         ) : (
           <>
             {/* SI groups */}
-            {(activeTab === 'all' || activeTab === 'vps') && vpGroups.map(({ vp, products: groupProducts }) => (
-              <SuperInventoryGroup
-                key={vp.id}
-                vp={vp}
-                products={groupProducts}
-                projectId={projectId}
-                isMobile={isMobile}
-                expandedProductId={expandedProductId}
-                onToggleProductExpand={(autoid) =>
-                  setExpandedProductId(expandedProductId === autoid ? null : autoid)
-                }
-                onToggleProductActive={(p) =>
-                  toggleProductActiveMutation.mutate({ recordId: p.id, active: !(p.active !== false) })
-                }
-                onCreateVPFromProduct={setCreateVPFromProduct}
-                onRemoveProduct={(p) => removeProductMutation.mutate(p.id)}
-                onNavigateToVP={() => navigate({ to: `/catalog/vp/${vp.vp_id}` })}
-                onRemoveVP={() => removeVPMutation.mutate(vp.id)}
-              />
+            {(activeTab === 'all' || activeTab === 'vps') && vpGroups.map(({ vp, products: groupProducts }, i) => (
+              <div key={vp.id} className='animate-fade-in-up' style={{ animationDelay: `${i * 0.04}s` }}>
+                <SuperInventoryGroup
+                  vp={vp}
+                  products={groupProducts}
+                  projectId={projectId}
+                  isMobile={isMobile}
+                  expandedProductId={expandedProductId}
+                  onToggleProductExpand={(autoid) =>
+                    setExpandedProductId(expandedProductId === autoid ? null : autoid)
+                  }
+                  onToggleProductActive={(p) =>
+                    toggleProductActiveMutation.mutate({ recordId: p.id, active: !(p.active !== false) })
+                  }
+                  onCreateVPFromProduct={setCreateVPFromProduct}
+                  onRemoveProduct={(p) => removeProductMutation.mutate(p.id)}
+                  onNavigateToVP={() => navigate({ to: `/catalog/vp/${vp.vp_id}` })}
+                  onRemoveVP={() => removeVPMutation.mutate(vp.id)}
+                />
+              </div>
             ))}
 
             {/* Standalone products */}
-            {(activeTab === 'all' || activeTab === 'products') && standaloneProducts.map((p) => (
+            {(activeTab === 'all' || activeTab === 'products') && standaloneProducts.map((p, i) => (
+              <div key={p.id} className='animate-fade-in-up' style={{ animationDelay: `${(vpGroups.length + i) * 0.04}s` }}>
               <ProductRow
-                key={p.id}
                 product={p}
                 projectId={projectId}
                 isMobile={isMobile}
@@ -417,6 +418,7 @@ export const CategoryItemsPanel = ({
                 selected={selectedProductIds.has(p.product_autoid)}
                 onToggleSelect={() => toggleProductSelect(p.product_autoid)}
               />
+              </div>
             ))}
           </>
         )}

@@ -200,7 +200,7 @@ export const CategoryTreeNode = ({
       </div>
 
       {expanded && hasChildren && (
-        <div>
+        <div className='animate-fade-in-up' style={{ animationDuration: '0.15s' }}>
           {category.children.map((child) => (
             <CategoryTreeNode
               key={child.id}

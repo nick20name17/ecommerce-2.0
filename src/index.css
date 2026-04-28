@@ -312,6 +312,25 @@ input:-webkit-autofill:focus {
   50% { opacity: 0.2; }
 }
 
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-8px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+/* Staggered list item animation — use style={{ animationDelay: `${i * 0.04}s` }} */
+.animate-fade-in-up {
+  animation: fadeInUp 0.2s ease-out both;
+}
+
+.animate-slide-in-left {
+  animation: slideInLeft 0.2s ease-out both;
+}
+
 /* ─── Base ─── */
 
 @layer base {
