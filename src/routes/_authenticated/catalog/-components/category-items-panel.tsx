@@ -127,6 +127,9 @@ export const CategoryItemsPanel = ({
     },
   })
 
+  // Optimistic overrides: product autoids forced into a VP
+  const [optimisticMoves, setOptimisticMoves] = useState<Map<string, string>>(new Map())
+
   // Build grouped view: SI groups (with their child products) + standalone products
   const { vpGroups, standaloneProducts } = useMemo(() => {
     const groups = new Map<string, { vp: CatalogCategoryVP; products: CatalogCategoryProduct[] }>()
@@ -210,9 +213,6 @@ export const CategoryItemsPanel = ({
       invalidatesQuery: CATALOG_QUERY_KEYS.detail(category.id),
     },
   })
-
-  // Optimistic overrides: product autoids forced into a VP
-  const [optimisticMoves, setOptimisticMoves] = useState<Map<string, string>>(new Map())
 
   const invalidateAfterMove = (vpId: string) => {
     queryClient.invalidateQueries({ queryKey: VP_QUERY_KEYS.detail(vpId) })
