@@ -151,7 +151,19 @@ export const SpecOptionsPanel = ({ spec, projectId }: SpecOptionsPanelProps) => 
                   )}
                 </div>
 
-                <span className='text-[11px] tabular-nums text-text-quaternary'>#{opt.sort_order}</span>
+                <input
+                  type='number'
+                  defaultValue={opt.sort_order}
+                  className='w-12 rounded border border-transparent bg-transparent px-1 py-0.5 text-right text-[11px] tabular-nums text-text-quaternary outline-none transition-colors hover:border-border focus:border-primary focus:text-foreground'
+                  onBlur={(e) => {
+                    const val = Number(e.target.value)
+                    if (val !== opt.sort_order) {
+                      variableProductService.updateSpecOption(spec.id, opt.id, { sort_order: val }, params)
+                        .then(() => invalidate())
+                    }
+                  }}
+                  onKeyDown={(e) => { if (e.key === 'Enter') (e.target as HTMLInputElement).blur() }}
+                />
 
                 <div className='flex items-center gap-0.5 opacity-0 transition-opacity group-hover:opacity-100'>
                   <Button variant='ghost' size='icon-xs' onClick={() => openEdit(opt)}>
