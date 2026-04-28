@@ -8,7 +8,6 @@ import {
   ClipboardList,
   MapPin,
   Package,
-  RefreshCw,
   Trash2,
   Truck,
   TriangleAlert,
@@ -65,11 +64,15 @@ const PickListDetailPage = () => {
   const [deleteOpen, setDeleteOpen] = useState(false)
   const [voidOpen, setVoidOpen] = useState(false)
   const [shippingOpen, setShippingOpen] = useState(false)
+  const [editingItem, setEditingItem] = useState<number | null>(null)
+  const [editQty, setEditQty] = useState('')
+  const [itemToRemove, setItemToRemove] = useState<{ id: number; pushed: boolean; label: string } | null>(null)
 
-  const isPartiallyFailed = pickList?.status === PICK_LIST_STATUS.partiallyFailed
+  const isDraft = pickList?.status === PICK_LIST_STATUS.draft
   const isPushed = pickList?.status === PICK_LIST_STATUS.pushed
   const isRatesFetched = pickList?.status === PICK_LIST_STATUS.ratesFetched
   const isLabelPurchased = pickList?.status === PICK_LIST_STATUS.labelPurchased
+  const isEditable = !isLabelPurchased
 
   const items = pickList?.items ?? []
 
@@ -133,6 +136,28 @@ const PickListDetailPage = () => {
     },
   })
 
+  const updateItemMutation = useMutation({
+    mutationFn: ({ itemId, quantity }: { itemId: number; quantity: string }) =>
+      pickListService.updateItem(id, itemId, { picked_quantity: quantity }),
+    meta: { successMessage: 'Quantity updated' },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: PICK_LIST_QUERY_KEYS.detail(id) })
+      queryClient.invalidateQueries({ queryKey: PICK_LIST_QUERY_KEYS.lists() })
+      setEditingItem(null)
+    },
+  })
+
+  const removeItemMutation = useMutation({
+    mutationFn: ({ itemId, resetShipped }: { itemId: number; resetShipped: boolean }) =>
+      pickListService.removeItem(id, itemId, resetShipped),
+    meta: { successMessage: 'Item removed' },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: PICK_LIST_QUERY_KEYS.detail(id) })
+      queryClient.invalidateQueries({ queryKey: PICK_LIST_QUERY_KEYS.lists() })
+      setItemToRemove(null)
+    },
+  })
+
   // ── Loading / Not found ────────────────────────────────
 
   if (isLoading) {
@@ -190,6 +215,12 @@ const PickListDetailPage = () => {
 
         {/* Actions */}
         <div className='flex items-center gap-1.5'>
+          {isDraft && (
+            <Button size='sm' onClick={() => pushMutation.mutate()} isPending={pushMutation.isPending}>
+              <Truck className='size-3.5' />
+              {!isMobile && 'Push to EBMS'}
+            </Button>
+          )}
           {shippingEnabled && isPushed && (
             <Button size='sm' onClick={() => setShippingOpen(true)}>
               <Box className='size-3.5' />
@@ -200,12 +231,6 @@ const PickListDetailPage = () => {
             <Button size='sm' onClick={() => setShippingOpen(true)}>
               <Truck className='size-3.5' />
               {!isMobile && 'Purchase Label'}
-            </Button>
-          )}
-          {isPartiallyFailed && (
-            <Button size='sm' onClick={() => pushMutation.mutate()} isPending={pushMutation.isPending}>
-              <RefreshCw className='size-3.5' />
-              {!isMobile && 'Retry Push'}
             </Button>
           )}
           {shippingEnabled && isLabelPurchased && (
@@ -219,9 +244,11 @@ const PickListDetailPage = () => {
               {!isMobile && 'Void Label'}
             </Button>
           )}
-          <Button size='icon-sm' variant='ghost' className='text-destructive' onClick={() => setDeleteOpen(true)}>
-            <Trash2 className='size-3.5' />
-          </Button>
+          {isDraft && (
+            <Button size='icon-sm' variant='ghost' className='text-destructive' onClick={() => setDeleteOpen(true)}>
+              <Trash2 className='size-3.5' />
+            </Button>
+          )}
         </div>
       </header>
 
@@ -298,33 +325,82 @@ const PickListDetailPage = () => {
                     </span>
                   </div>
                   <div>
-                    {orderItems.map((item, i) => (
-                      <div
-                        key={item.id}
-                        className={cn(
-                          'flex items-center gap-3 px-3.5 py-[6px]',
-                          i < orderItems.length - 1 && 'border-b border-border-light/50',
-                        )}
-                      >
-                        <span className='min-w-0 flex-1 truncate text-[12px] font-medium text-foreground'>
-                          {descrMap.get(item.detail_autoid) || item.descr || item.detail_autoid}
-                        </span>
-                        <span className='rounded bg-bg-secondary px-1.5 py-0.5 text-[12px] font-medium tabular-nums text-text-secondary'>
-                          {formatQty(item.picked_quantity)}
-                        </span>
-                        {item.push_status && (
-                          <span className={cn(
-                            'inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-semibold leading-none',
-                            item.push_status === 'success'
-                              ? 'border-emerald-200 bg-emerald-500/10 text-emerald-700 dark:border-emerald-700 dark:text-emerald-400'
-                              : 'border-red-200 bg-red-500/10 text-red-700 dark:border-red-700 dark:text-red-400',
-                          )}>
-                            {item.push_status === 'success' ? <Check className='size-2.5' /> : '!'}
-                            {item.push_status === 'success' ? 'Pushed' : 'Failed'}
+                    {orderItems.map((item, i) => {
+                      const isEditingThis = editingItem === item.id
+                      return (
+                        <div
+                          key={item.id}
+                          className={cn(
+                            'group/item flex items-center gap-3 px-3.5 py-[6px]',
+                            i < orderItems.length - 1 && 'border-b border-border-light/50',
+                          )}
+                        >
+                          <span className='min-w-0 flex-1 truncate text-[12px] font-medium text-foreground'>
+                            {descrMap.get(item.detail_autoid) || item.descr || item.detail_autoid}
                           </span>
-                        )}
-                      </div>
-                    ))}
+                          {isEditingThis && isEditable ? (
+                            <div className='flex items-center gap-1'>
+                              <input
+                                value={editQty}
+                                onChange={(e) => setEditQty(e.target.value)}
+                                className='h-6 w-[60px] rounded border border-border bg-background px-1.5 text-right text-[12px] tabular-nums outline-none focus:border-primary'
+                                onKeyDown={(e) => {
+                                  if (e.key === 'Enter') updateItemMutation.mutate({ itemId: item.id, quantity: editQty })
+                                  if (e.key === 'Escape') setEditingItem(null)
+                                }}
+                                autoFocus
+                              />
+                              <button
+                                type='button'
+                                className='rounded p-0.5 text-primary hover:bg-primary/10'
+                                onClick={() => updateItemMutation.mutate({ itemId: item.id, quantity: editQty })}
+                              >
+                                <Check className='size-3' />
+                              </button>
+                            </div>
+                          ) : (
+                            <span
+                              className={cn(
+                                'rounded bg-bg-secondary px-1.5 py-0.5 text-[12px] font-medium tabular-nums text-text-secondary',
+                                isEditable && 'cursor-pointer hover:bg-primary/10 hover:text-primary',
+                              )}
+                              onClick={() => {
+                                if (isEditable) {
+                                  setEditingItem(item.id)
+                                  setEditQty(item.picked_quantity)
+                                }
+                              }}
+                            >
+                              {formatQty(item.picked_quantity)}
+                            </span>
+                          )}
+                          {item.push_status && (
+                            <span className={cn(
+                              'inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-semibold leading-none',
+                              item.push_status === 'success'
+                                ? 'border-emerald-200 bg-emerald-500/10 text-emerald-700 dark:border-emerald-700 dark:text-emerald-400'
+                                : 'border-red-200 bg-red-500/10 text-red-700 dark:border-red-700 dark:text-red-400',
+                            )}>
+                              {item.push_status === 'success' ? <Check className='size-2.5' /> : '!'}
+                              {item.push_status === 'success' ? 'Pushed' : 'Failed'}
+                            </span>
+                          )}
+                          {isEditable && !isEditingThis && (
+                            <button
+                              type='button'
+                              className='rounded p-0.5 text-destructive opacity-0 transition-opacity hover:bg-destructive/10 group-hover/item:opacity-100'
+                              onClick={() => setItemToRemove({
+                                id: item.id,
+                                pushed: item.push_status === 'success',
+                                label: descrMap.get(item.detail_autoid) || item.descr || item.detail_autoid,
+                              })}
+                            >
+                              <Trash2 className='size-3' />
+                            </button>
+                          )}
+                        </div>
+                      )
+                    })}
                   </div>
                 </div>
               ))}
@@ -406,6 +482,48 @@ const PickListDetailPage = () => {
         </AlertDialogContent>
       </AlertDialog>
 
+      <AlertDialog open={!!itemToRemove} onOpenChange={(open) => !open && setItemToRemove(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogMedia className='bg-destructive/10 text-destructive'><Trash2 /></AlertDialogMedia>
+            <AlertDialogTitle>Remove Item</AlertDialogTitle>
+            <AlertDialogDescription>
+              Remove {itemToRemove?.label} from this pick list?
+              {itemToRemove?.pushed && ' This item was already pushed to EBMS.'}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            {itemToRemove?.pushed ? (
+              <>
+                <AlertDialogAction
+                  variant='outline'
+                  onClick={() => itemToRemove && removeItemMutation.mutate({ itemId: itemToRemove.id, resetShipped: false })}
+                  isPending={removeItemMutation.isPending}
+                >
+                  Remove Only
+                </AlertDialogAction>
+                <AlertDialogAction
+                  variant='destructive'
+                  onClick={() => itemToRemove && removeItemMutation.mutate({ itemId: itemToRemove.id, resetShipped: true })}
+                  isPending={removeItemMutation.isPending}
+                >
+                  Remove & Reset EBMS
+                </AlertDialogAction>
+              </>
+            ) : (
+              <AlertDialogAction
+                variant='destructive'
+                onClick={() => itemToRemove && removeItemMutation.mutate({ itemId: itemToRemove.id, resetShipped: false })}
+                isPending={removeItemMutation.isPending}
+              >
+                Remove
+              </AlertDialogAction>
+            )}
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
       {shippingEnabled && (
         <AlertDialog open={voidOpen} onOpenChange={setVoidOpen}>
           <AlertDialogContent>
@@ -440,7 +558,6 @@ const LIFECYCLE_STEPS = [
 function StatusLifecycle({ currentStatus, shippingEnabled }: { currentStatus: string; shippingEnabled: boolean }) {
   const steps = shippingEnabled ? LIFECYCLE_STEPS : LIFECYCLE_STEPS.filter((s) => !s.shipping)
   const currentIndex = steps.findIndex((s) => s.status === currentStatus)
-  const isPartiallyFailed = currentStatus === PICK_LIST_STATUS.partiallyFailed
 
   return (
     <div className='flex items-center gap-1'>
@@ -467,14 +584,6 @@ function StatusLifecycle({ currentStatus, shippingEnabled }: { currentStatus: st
           </div>
         )
       })}
-      {isPartiallyFailed && (
-        <>
-          <div className='h-px w-5 bg-red-400' />
-          <span className='rounded-full bg-red-500/10 px-2 py-0.5 text-[11px] font-semibold text-red-700 dark:text-red-400'>
-            Partially Failed
-          </span>
-        </>
-      )}
     </div>
   )
 }

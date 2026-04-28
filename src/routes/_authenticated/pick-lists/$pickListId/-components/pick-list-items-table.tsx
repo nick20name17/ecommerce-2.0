@@ -27,12 +27,12 @@ import { cn } from '@/lib/utils'
 interface Props {
   pickListId: number
   items: PickListItem[]
-  isDraft: boolean
+  isEditable: boolean
   isMobile: boolean
   descrMap?: Map<string, string>
 }
 
-export function PickListItemsTable({ pickListId, items, isDraft, isMobile, descrMap }: Props) {
+export function PickListItemsTable({ pickListId, items, isEditable, isMobile, descrMap }: Props) {
   const queryClient = useQueryClient()
   const [editingItem, setEditingItem] = useState<number | null>(null)
   const [editQty, setEditQty] = useState('')
@@ -73,7 +73,7 @@ export function PickListItemsTable({ pickListId, items, isDraft, isMobile, descr
   if (items.length === 0) {
     return (
       <div className='py-8 text-center text-[13px] text-text-tertiary'>
-        No items yet.{isDraft ? ' Add items to this pick list.' : ''}
+        No items yet.{isEditable ? ' Add items to this pick list.' : ''}
       </div>
     )
   }
@@ -89,7 +89,7 @@ export function PickListItemsTable({ pickListId, items, isDraft, isMobile, descr
           {items.some((i) => i.push_status) && (
             <div className='w-[100px] shrink-0'>Push Status</div>
           )}
-          {isDraft && <div className='w-[60px] shrink-0' />}
+          {isEditable && <div className='w-[60px] shrink-0' />}
         </div>
       )}
 
@@ -112,7 +112,7 @@ export function PickListItemsTable({ pickListId, items, isDraft, isMobile, descr
                 <span className='text-[13px] text-text-tertiary'>{descrMap?.get(item.detail_autoid) || item.descr || item.detail_autoid}</span>
                 {item.push_status && <PushStatusBadge status={item.push_status} error={item.push_error} />}
               </div>
-              {isDraft && (
+              {isEditable && (
                 <div className='mt-1.5 flex gap-1.5'>
                   <button
                     type='button'
@@ -146,7 +146,7 @@ export function PickListItemsTable({ pickListId, items, isDraft, isMobile, descr
               {descrMap?.get(item.detail_autoid) || item.descr || item.detail_autoid}
             </div>
             <div className='w-[100px] shrink-0 text-right'>
-              {isEditing && isDraft ? (
+              {isEditing && isEditable ? (
                 <div className='flex items-center justify-end gap-1'>
                   <Input
                     value={editQty}
@@ -171,9 +171,9 @@ export function PickListItemsTable({ pickListId, items, isDraft, isMobile, descr
                 <span
                   className={cn(
                     'text-[13px] tabular-nums text-foreground',
-                    isDraft && 'cursor-pointer hover:text-primary',
+                    isEditable && 'cursor-pointer hover:text-primary',
                   )}
-                  onClick={() => isDraft && startEdit(item)}
+                  onClick={() => isEditable && startEdit(item)}
                 >
                   {item.picked_quantity}
                 </span>
@@ -184,7 +184,7 @@ export function PickListItemsTable({ pickListId, items, isDraft, isMobile, descr
                 {item.push_status && <PushStatusBadge status={item.push_status} error={item.push_error} />}
               </div>
             )}
-            {isDraft && (
+            {isEditable && (
               <div className='flex w-[60px] shrink-0 justify-end'>
                 <Button
                   size='icon-xs'
