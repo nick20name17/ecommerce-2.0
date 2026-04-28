@@ -258,7 +258,7 @@ const SpecsManagerPage = () => {
           {selectedSpec ? (
             <SpecOptionsPanel spec={selectedSpec} projectId={projectId} />
           ) : (
-            <div className='flex h-full items-center justify-center text-[13px] text-text-tertiary'>
+            <div className='flex flex-1 items-center justify-center text-[13px] text-text-tertiary'>
               Select a spec to manage its options
             </div>
           )}

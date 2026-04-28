@@ -67,9 +67,10 @@ export const CategoryTreeNode = ({
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault()
     e.stopPropagation()
-    const draggedId = e.dataTransfer.types.includes('text/plain')
-    if (draggedId) {
-      e.dataTransfer.dropEffect = 'move'
+    // Accept both category drags and product drops
+    const hasData = e.dataTransfer.types.includes('text/plain') || e.dataTransfer.types.includes('application/product-autoid')
+    if (hasData) {
+      e.dataTransfer.dropEffect = e.dataTransfer.types.includes('application/product-autoid') ? 'copy' : 'move'
       setDragOver(true)
     }
   }
@@ -111,7 +112,7 @@ export const CategoryTreeNode = ({
           isSelected
             ? 'bg-primary/10 text-foreground font-medium'
             : 'hover:bg-bg-hover text-text-secondary',
-          dragOver && 'ring-2 ring-primary/40 bg-primary/5'
+          dragOver && 'ring-2 ring-primary bg-primary/10'
         )}
         style={{ paddingLeft: `${depth * 16 + 6}px` }}
         onClick={() => onSelect(category)}

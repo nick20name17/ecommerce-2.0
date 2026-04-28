@@ -219,6 +219,10 @@ export const SpecOptionsPanel = ({ spec, projectId }: SpecOptionsPanelProps) => 
                   </div>
                 </div>
               )}
+              <div className='flex flex-col gap-1.5'>
+                <Label className='text-[12px]'>Sort Order</Label>
+                <Input type='number' value={formSort} onChange={(e) => setFormSort(Number(e.target.value))} />
+              </div>
             </DialogBody>
             <DialogFooter>
               <Button type='button' variant='outline' onClick={() => { setCreateOpen(false); setEditOption(null) }}>Cancel</Button>
