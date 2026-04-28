@@ -662,6 +662,12 @@ function ProductRow({
             )}
           </button>
         )}
+        <ProductThumbnail
+          entityType='product'
+          entityId={p.product_autoid}
+          projectId={projectId}
+          className='size-8 shrink-0 rounded-md'
+        />
         <div className='min-w-0 flex-1'>
           <div className='flex items-center gap-1.5'>
             <span className='truncate text-[13px] font-medium text-foreground'>
@@ -835,6 +841,12 @@ function SuperInventoryGroup({
         )}
         onClick={() => setExpanded(!expanded)}
       >
+        <ProductThumbnail
+          entityType='vp'
+          entityId={vp.vp_id}
+          projectId={projectId}
+          className='size-8 shrink-0 rounded-md'
+        />
         <div className='min-w-0 flex-1'>
           <div className='flex items-center gap-1.5'>
             <span className='truncate text-[13px] font-medium text-foreground'>
