@@ -35,7 +35,6 @@ import { cn } from '@/lib/utils'
 
 const STATUS_DOT_COLORS: Record<PickListStatus, string> = {
   [PICK_LIST_STATUS.draft]: 'bg-slate-400',
-  [PICK_LIST_STATUS.partiallyFailed]: 'bg-red-500',
   [PICK_LIST_STATUS.pushed]: 'bg-blue-500',
   [PICK_LIST_STATUS.ratesFetched]: 'bg-amber-500',
   [PICK_LIST_STATUS.labelPurchased]: 'bg-emerald-500',
