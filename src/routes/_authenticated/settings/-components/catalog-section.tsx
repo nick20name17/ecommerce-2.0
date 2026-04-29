@@ -256,6 +256,28 @@ export const CatalogSection = ({ projectId }: CatalogSectionProps) => {
     },
   })
 
+  // Reset all state when project changes
+  useEffect(() => {
+    clearImportPolling()
+    clearVPImportPolling()
+    clearImgImportPolling()
+    setImportStatus(null)
+    setVPImportStatus(null)
+    setImgImportStatus(null)
+    setSingleVPResult(null)
+    createTablesMutation.reset()
+    importSingleVPMutation.reset()
+
+    // Resume polling for new project if tasks saved
+    const savedCatTask = getSavedTask('cat', projectId)
+    if (savedCatTask) startCategoryPolling(savedCatTask)
+    const savedVPTask = getSavedTask('vp', projectId)
+    if (savedVPTask) startVPPolling(savedVPTask)
+    const savedImgTask = getSavedTask('img', projectId)
+    if (savedImgTask) startImgPolling(savedImgTask)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [projectId])
+
   const tablesResult = createTablesMutation.data
 
   return (
