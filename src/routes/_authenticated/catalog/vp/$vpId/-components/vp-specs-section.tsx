@@ -341,33 +341,32 @@ function AddSpecDialog({
 
   return (
     <Dialog open={open} onOpenChange={(v) => { onOpenChange(v); if (!v) { setSearch(''); setTab('existing') } }}>
-      <DialogContent className='sm:max-w-md'>
-        <DialogHeader>
+      <DialogContent className='sm:max-w-md gap-0 p-0'>
+        <div className='px-5 pt-5 pb-3'>
           <DialogTitle>Add Spec</DialogTitle>
-        </DialogHeader>
+        </div>
 
         {/* Tabs */}
-        <div className='flex gap-1 border-b border-border'>
-          <button
-            type='button'
-            className={cn(
-              'px-3 py-1.5 text-[13px] font-medium border-b-2 transition-colors',
-              tab === 'existing' ? 'border-primary text-foreground' : 'border-transparent text-text-tertiary hover:text-text-secondary'
-            )}
-            onClick={() => setTab('existing')}
-          >
-            Use Existing
-          </button>
-          <button
-            type='button'
-            className={cn(
-              'px-3 py-1.5 text-[13px] font-medium border-b-2 transition-colors',
-              tab === 'new' ? 'border-primary text-foreground' : 'border-transparent text-text-tertiary hover:text-text-secondary'
-            )}
-            onClick={() => setTab('new')}
-          >
-            Create New
-          </button>
+        <div className='flex gap-1 border-b border-border px-5'>
+          {([
+            { key: 'existing' as const, label: 'Use Existing' },
+            { key: 'new' as const, label: 'Create New' },
+          ]).map((t) => (
+            <button
+              key={t.key}
+              type='button'
+              className={cn(
+                'relative px-3 py-2 text-[13px] font-medium outline-none transition-colors',
+                tab === t.key ? 'text-foreground' : 'text-text-tertiary hover:text-text-secondary'
+              )}
+              onClick={() => setTab(t.key)}
+            >
+              {t.label}
+              {tab === t.key && (
+                <span className='absolute bottom-0 left-3 right-3 h-[2px] rounded-full bg-primary' />
+              )}
+            </button>
+          ))}
         </div>
 
         {tab === 'existing' ? (
@@ -386,7 +385,7 @@ function AddSpecDialog({
               onCreateNew()
             }}
           >
-            <DialogBody className='flex flex-col gap-3'>
+            <div className='flex flex-col gap-3 px-5 py-4'>
               <div className='flex flex-col gap-1.5'>
                 <Label htmlFor='spec-name-new'>Name</Label>
                 <Input
@@ -433,11 +432,12 @@ function AddSpecDialog({
                   onChange={(e) => setSortOrder(Number(e.target.value))}
                 />
               </div>
-            </DialogBody>
-            <DialogFooter>
+            </div>
+            <div className='flex items-center gap-2 border-t border-border px-5 py-3'>
+              <div className='flex-1' />
               <Button type='button' variant='outline' onClick={() => onOpenChange(false)}>Cancel</Button>
               <Button type='submit' isPending={isPending}>Create</Button>
-            </DialogFooter>
+            </div>
           </form>
         )}
       </DialogContent>
@@ -484,57 +484,73 @@ function ExistingSpecPicker({
 
   return (
     <>
-      <DialogBody className='flex flex-col gap-2 min-h-[200px] max-h-[350px]'>
+      <div className='border-b border-border px-5 py-2'>
         <div className='relative'>
           <Search className='absolute left-2.5 top-1/2 -translate-y-1/2 size-3.5 text-text-tertiary' />
           <Input
             value={search}
             onChange={(e) => onSearchChange(e.target.value)}
             placeholder='Search specs...'
-            className='pl-8 h-8 text-[13px]'
+            className='h-8 pl-8 text-[13px]'
+            autoFocus
           />
         </div>
+      </div>
 
+      <div className='min-h-[200px] max-h-[350px] overflow-y-auto'>
         {specs.length === 0 ? (
-          <div className='flex-1 flex items-center justify-center text-[13px] text-text-tertiary'>
+          <div className='flex flex-1 items-center justify-center py-12 text-[13px] text-text-tertiary'>
             {search ? 'No matching specs' : 'All specs are already added'}
           </div>
         ) : (
-          <div className='flex-1 overflow-y-auto -mx-1'>
-            {specs.map((spec) => (
-              <button
-                key={spec.id}
-                type='button'
-                className={cn(
-                  'w-full flex items-center gap-3 rounded-md px-3 py-2 text-left transition-colors',
-                  selectedId === spec.id ? 'bg-primary/10' : 'hover:bg-bg-hover'
-                )}
-                onClick={() => setSelectedId(selectedId === spec.id ? null : spec.id)}
-              >
-                <div className={cn(
-                  'flex size-4 items-center justify-center rounded-full border transition-colors',
-                  selectedId === spec.id ? 'border-primary bg-primary' : 'border-border'
-                )}>
-                  {selectedId === spec.id && <Check className='size-2.5 text-primary-foreground' />}
-                </div>
-                <div className='flex-1 min-w-0'>
-                  <div className='text-[13px] font-medium'>{spec.name}</div>
-                  <div className='text-[11px] text-text-tertiary capitalize'>
-                    {spec.display_type} · {spec.option_count ?? spec.options?.length ?? 0} options
-                    {(spec.vp_count ?? 0) > 0 && ` · ${spec.vp_count} VPs`}
+          <div className='p-1.5'>
+            {specs.map((spec) => {
+              const isSelected = selectedId === spec.id
+              const typeIcon = spec.display_type === 'swatch' ? '🎨' : spec.display_type === 'button' ? '▢' : '▾'
+              return (
+                <button
+                  key={spec.id}
+                  type='button'
+                  className={cn(
+                    'flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left outline-none transition-colors',
+                    isSelected ? 'bg-primary/10 ring-1 ring-primary/30' : 'hover:bg-bg-hover'
+                  )}
+                  onClick={() => setSelectedId(isSelected ? null : spec.id)}
+                >
+                  <div className={cn(
+                    'flex size-7 shrink-0 items-center justify-center rounded-md text-sm',
+                    spec.display_type === 'swatch' ? 'bg-pink-50 dark:bg-pink-500/10'
+                      : spec.display_type === 'button' ? 'bg-blue-50 dark:bg-blue-500/10'
+                      : 'bg-amber-50 dark:bg-amber-500/10'
+                  )}>
+                    {typeIcon}
                   </div>
-                </div>
-              </button>
-            ))}
+                  <div className='min-w-0 flex-1'>
+                    <div className='text-[13px] font-medium text-foreground'>{spec.name}</div>
+                    <div className='text-[11px] text-text-tertiary'>
+                      {spec.option_count ?? spec.options?.length ?? 0} options
+                      {(spec.vp_count ?? 0) > 0 && ` · used by ${spec.vp_count} supers`}
+                    </div>
+                  </div>
+                  {isSelected && (
+                    <div className='flex size-5 shrink-0 items-center justify-center rounded-full bg-primary'>
+                      <Check className='size-3 text-primary-foreground' />
+                    </div>
+                  )}
+                </button>
+              )
+            })}
           </div>
         )}
-      </DialogBody>
-      <DialogFooter>
+      </div>
+
+      <div className='flex items-center gap-2 border-t border-border px-5 py-3'>
+        <div className='flex-1' />
         <Button variant='outline' onClick={onDone}>Cancel</Button>
         <Button disabled={!selectedId} isPending={isPending} onClick={handleAdd}>
-          Done
+          Add Spec
         </Button>
-      </DialogFooter>
+      </div>
     </>
   )
 }
