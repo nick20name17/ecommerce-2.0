@@ -53,15 +53,18 @@ import { cn } from '@/lib/utils'
 interface VariantsTableProps {
   vp: VariableProduct
   projectId: number | null
+  addProductsOpen?: boolean
+  onAddProductsChange?: (open: boolean) => void
 }
 
 // ── Component ────────────────────────────────────────────────
 
-export const VariantsTable = ({ vp, projectId }: VariantsTableProps) => {
+export const VariantsTable = ({ vp, projectId, addProductsOpen, onAddProductsChange }: VariantsTableProps) => {
   const queryClient = useQueryClient()
   const params = { project_id: projectId ?? undefined }
 
-  const [productBrowserOpen, setProductBrowserOpen] = useState(false)
+  const productBrowserOpen = addProductsOpen ?? false
+  const setProductBrowserOpen = onAddProductsChange ?? (() => {})
   const [addManualOpen, setAddManualOpen] = useState(false)
   const [manualAutoid, setManualAutoid] = useState('')
   const [editingCell, setEditingCell] = useState<{ itemId: string; spec: GlobalSpecDefinition } | null>(null)
@@ -174,17 +177,6 @@ export const VariantsTable = ({ vp, projectId }: VariantsTableProps) => {
 
   return (
     <div>
-      {/* Header */}
-      <div className='mb-3 flex items-center gap-2'>
-        <h3 className='text-[13px] font-semibold text-text-secondary'>
-          Variants ({items.length})
-        </h3>
-        <div className='flex-1' />
-        <Button variant='outline' size='xs' onClick={() => setProductBrowserOpen(true)}>
-          <Plus className='size-3' />
-          Add Products
-        </Button>
-      </div>
 
       {items.length === 0 ? (
         <div className='rounded-lg border border-dashed border-border py-8 text-center text-[13px] text-text-tertiary'>

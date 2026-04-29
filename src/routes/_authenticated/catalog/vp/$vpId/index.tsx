@@ -34,6 +34,7 @@ const CatalogVPDetailPage = () => {
   const isTablet = bp === 'tablet'
   const [projectId] = useProjectId()
   const [deleteOpen, setDeleteOpen] = useState(false)
+  const [addProductsOpen, setAddProductsOpen] = useState(false)
 
   const { data: vp, isLoading } = useQuery(
     getVariableProductDetailQuery(vpId, { project_id: projectId ?? undefined })
@@ -113,11 +114,11 @@ const CatalogVPDetailPage = () => {
 
         {/* ── Main content ── */}
         <div className={cn('flex flex-col gap-5', isMobile ? 'p-3.5' : 'p-5')}>
-          {/* Specs bar */}
-          <SpecsBar vp={vp} projectId={projectId} />
+          {/* Specs + Variants unified header */}
+          <SpecsBar vp={vp} projectId={projectId} onAddProducts={() => setAddProductsOpen(true)} />
 
           {/* Variants table */}
-          <VariantsTable vp={vp} projectId={projectId} />
+          <VariantsTable vp={vp} projectId={projectId} addProductsOpen={addProductsOpen} onAddProductsChange={setAddProductsOpen} />
 
           {/* Danger zone — compact */}
           <div className='flex items-center gap-3 rounded-lg border border-destructive/20 px-4 py-3'>
