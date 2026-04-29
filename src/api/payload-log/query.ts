@@ -14,5 +14,7 @@ export const PAYLOAD_LOG_QUERY_KEYS = {
 export const getPayloadLogsQuery = (params: PayloadLogParams = {}) =>
   queryOptions({
     queryKey: PAYLOAD_LOG_QUERY_KEYS.list(params),
-    queryFn: () => payloadLogService.get(params)
+    queryFn: () => payloadLogService.get(params),
+    staleTime: 0,
+    refetchInterval: 10_000,
   })
