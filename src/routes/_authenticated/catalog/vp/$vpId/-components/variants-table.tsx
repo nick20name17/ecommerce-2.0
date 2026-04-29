@@ -1,5 +1,6 @@
 import { useMutation, useQueries, useQueryClient } from '@tanstack/react-query'
 import {
+  Check,
   ChevronDown,
   Eye,
   EyeOff,
@@ -454,7 +455,7 @@ function OptionPicker({
         <button
           type='button'
           className={cn(
-            'inline-flex h-7 w-[130px] items-center gap-1.5 rounded-md border px-2 text-[13px] transition-colors',
+            'inline-flex h-7 max-w-[150px] items-center gap-1.5 rounded-md border px-2 text-[12px] transition-colors',
             currentValue
               ? 'border-border bg-bg-secondary/60 hover:bg-bg-active'
               : 'border-dashed border-border text-text-tertiary hover:border-primary/40 hover:text-primary'
@@ -464,11 +465,11 @@ function OptionPicker({
             <>
               {spec.display_type === 'swatch' && matchedOption?.color_hex && (
                 <div
-                  className='size-3 shrink-0 rounded-full border border-border/50'
+                  className='size-2.5 shrink-0 rounded-full border border-border/50'
                   style={{ backgroundColor: matchedOption.color_hex }}
                 />
               )}
-              <span className='flex-1 truncate text-foreground'>{currentValue}</span>
+              <span className='truncate text-foreground'>{currentValue}</span>
               <ChevronDown className='size-3 shrink-0 text-text-quaternary' />
             </>
           ) : (
@@ -479,52 +480,58 @@ function OptionPicker({
           )}
         </button>
       </PopoverTrigger>
-      <PopoverContent align='start' className='w-52 p-0'>
-        {/* Search */}
-        <div className='border-b border-border px-2 py-1.5'>
-          <input
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder='Search...'
-            className='w-full bg-transparent text-[13px] outline-none placeholder:text-text-tertiary'
-            autoFocus
-          />
-        </div>
+      <PopoverContent align='start' sideOffset={4} className='w-[180px] p-0'>
+        {/* Search — only show if more than 6 options */}
+        {options.length > 6 && (
+          <div className='border-b border-border px-2.5 py-1.5'>
+            <input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder='Search...'
+              className='w-full bg-transparent text-[12px] outline-none placeholder:text-text-quaternary'
+              autoFocus
+            />
+          </div>
+        )}
         {/* Options list */}
-        <div className='max-h-[200px] overflow-y-auto p-1'>
+        <div className='max-h-[180px] overflow-y-auto p-1'>
           {filtered.length === 0 ? (
-            <div className='px-2 py-3 text-center text-[12px] text-text-tertiary'>No matches</div>
+            <div className='px-2 py-2 text-center text-[11px] text-text-tertiary'>No matches</div>
           ) : (
-            filtered.map((opt) => (
-              <button
-                key={opt.id}
-                type='button'
-                className={cn(
-                  'flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-[13px] transition-colors',
-                  opt.id === currentOptionId ? 'bg-primary/10 text-primary font-medium' : 'hover:bg-bg-hover'
-                )}
-                onClick={() => {
-                  if (opt.id !== currentOptionId) onSelect(opt.id)
-                  setOpen(false)
-                }}
-              >
-                {spec.display_type === 'swatch' && opt.color_hex && (
-                  <div
-                    className='size-4 shrink-0 rounded-full border border-border'
-                    style={{ backgroundColor: opt.color_hex }}
-                  />
-                )}
-                <span className='flex-1 truncate'>{opt.value}</span>
-              </button>
-            ))
+            filtered.map((opt) => {
+              const isActive = opt.id === currentOptionId
+              return (
+                <button
+                  key={opt.id}
+                  type='button'
+                  className={cn(
+                    'flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-[12px] transition-colors',
+                    isActive ? 'bg-primary/10 text-primary font-medium' : 'text-foreground hover:bg-bg-hover'
+                  )}
+                  onClick={() => {
+                    if (!isActive) onSelect(opt.id)
+                    setOpen(false)
+                  }}
+                >
+                  {spec.display_type === 'swatch' && opt.color_hex && (
+                    <div
+                      className='size-3 shrink-0 rounded-full border border-border'
+                      style={{ backgroundColor: opt.color_hex }}
+                    />
+                  )}
+                  <span className='flex-1 truncate'>{opt.value}</span>
+                  {isActive && <Check className='size-3 shrink-0' />}
+                </button>
+              )
+            })
           )}
         </div>
-        {/* Remove option */}
+        {/* Remove */}
         {onRemove && (
           <div className='border-t border-border p-1'>
             <button
               type='button'
-              className='flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-[12px] text-destructive transition-colors hover:bg-destructive/10'
+              className='flex w-full items-center gap-1.5 rounded-md px-2 py-1 text-[11px] text-destructive transition-colors hover:bg-destructive/5'
               onClick={() => { onRemove(); setOpen(false) }}
             >
               <Trash2 className='size-3' />
