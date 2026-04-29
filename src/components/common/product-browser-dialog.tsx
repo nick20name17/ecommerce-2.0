@@ -102,34 +102,39 @@ export const ProductBrowserDialog = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className='sm:max-w-4xl h-[80vh] flex flex-col'>
-        <DialogHeader>
-          <DialogTitle>{title}</DialogTitle>
-        </DialogHeader>
-
-        {/* Search */}
-        <div className='px-1'>
+      <DialogContent className='sm:max-w-4xl h-[80vh] flex flex-col gap-0 p-0'>
+        {/* Header with search */}
+        <div className='flex shrink-0 flex-col gap-3 border-b border-border px-5 pb-3 pt-5'>
+          <div className='flex items-center gap-2'>
+            <DialogTitle className='flex-1 text-[15px]'>{title}</DialogTitle>
+            {selected.size > 0 && (
+              <span className='rounded-full bg-primary px-2.5 py-0.5 text-[11px] font-semibold text-primary-foreground'>
+                {selected.size} selected
+              </span>
+            )}
+          </div>
           <div className='relative'>
-            <Search className='absolute left-2.5 top-1/2 -translate-y-1/2 size-3.5 text-text-tertiary' />
+            <Search className='absolute left-3 top-1/2 -translate-y-1/2 size-3.5 text-text-tertiary' />
             <Input
               value={search}
               onChange={(e) => handleSearchChange(e.target.value)}
               placeholder='Search by ID or description...'
-              className='pl-8 h-8 text-[13px]'
+              className='h-9 pl-9 text-[13px]'
             />
           </div>
         </div>
 
-        <DialogBody className='flex-1 flex gap-0 overflow-hidden border rounded-lg border-border'>
+        {/* Body: categories + products */}
+        <div className='flex min-h-0 flex-1 overflow-hidden'>
           {/* Left: EBMS categories */}
-          <div className='w-[260px] shrink-0 border-r border-border overflow-y-auto'>
+          <div className='w-[240px] shrink-0 overflow-y-auto border-r border-border bg-bg-secondary/30'>
             <div className='p-1.5'>
               <button
                 type='button'
                 className={cn(
-                  'w-full text-left rounded-md px-2 py-1.5 text-[13px] transition-colors',
+                  'w-full text-left rounded-md px-2.5 py-1.5 text-[13px] font-medium transition-colors',
                   selectedCategoryId === null && !debouncedSearch
-                    ? 'bg-primary/10 text-primary font-medium'
+                    ? 'bg-primary/10 text-primary'
                     : 'hover:bg-bg-hover text-text-secondary'
                 )}
                 onClick={() => {
@@ -167,19 +172,18 @@ export const ProductBrowserDialog = ({
               onToggle={toggleProduct}
             />
           </div>
-        </DialogBody>
+        </div>
 
-        <DialogFooter>
-          <div className='flex-1 text-[12px] text-text-tertiary'>
-            {selected.size > 0 ? `${selected.size} selected` : ''}
-          </div>
+        {/* Footer */}
+        <div className='flex shrink-0 items-center gap-2 border-t border-border px-5 py-3'>
+          <div className='flex-1' />
           <Button variant='outline' onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
           <Button onClick={handleAdd} disabled={selected.size === 0}>
-            Add {selected.size > 0 ? `(${selected.size})` : ''}
+            Add {selected.size > 0 ? `${selected.size} products` : ''}
           </Button>
-        </DialogFooter>
+        </div>
       </DialogContent>
     </Dialog>
   )
@@ -251,7 +255,11 @@ function CategoryTreeBrowser({
               ) : (
                 <span className='w-4 shrink-0' />
               )}
-              {isExpanded && hasChildren ? (
+              {cat.photo ? (
+                <div className='size-4 shrink-0 overflow-hidden rounded-[3px] border border-border/50 bg-bg-secondary'>
+                  <img src={cat.photo} alt='' className='size-full object-cover' loading='lazy' />
+                </div>
+              ) : isExpanded && hasChildren ? (
                 <FolderOpen className={cn('size-3.5 shrink-0', DEPTH_COLORS[Math.min(depth, DEPTH_COLORS.length - 1)])} />
               ) : (
                 <Folder className={cn('size-3.5 shrink-0', DEPTH_COLORS[Math.min(depth, DEPTH_COLORS.length - 1)])} />
