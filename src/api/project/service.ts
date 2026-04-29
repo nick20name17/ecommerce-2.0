@@ -42,13 +42,13 @@ export const projectService = {
     return data
   },
 
-  createEcTables: async (projectId: number) => {
+  createEcTables: async (projectId: number, force = false) => {
     const { data } = await api.post<{
       tables_created: string[]
       tables_existing: string[]
       indexes_created: string[]
       errors: string[]
-    }>('/projects/ec-tables/', null, { params: { project_id: projectId } })
+    }>('/projects/ec-tables/', null, { params: { project_id: projectId, ...(force ? { force: 'true' } : {}) } })
     return data
   },
 }
