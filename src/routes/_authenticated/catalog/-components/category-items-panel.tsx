@@ -667,6 +667,7 @@ function ProductRow({
           entityId={p.product_autoid}
           projectId={projectId}
           className='size-8 shrink-0 rounded-md'
+          lazy
         />
         <div className='min-w-0 flex-1'>
           <div className='flex items-center gap-1.5'>
@@ -846,6 +847,7 @@ function SuperInventoryGroup({
           entityId={vp.vp_id}
           projectId={projectId}
           className='size-8 shrink-0 rounded-md'
+          lazy
         />
         <div className='min-w-0 flex-1'>
           <div className='flex items-center gap-1.5'>
