@@ -117,68 +117,79 @@ export const VPSpecsSection = ({ vp, projectId }: VPSpecsSectionProps) => {
 
   return (
     <div>
-      <div className='flex items-center gap-2 mb-2'>
-        <h3 className='text-[13px] font-semibold text-text-secondary'>
-          Specs ({vp.spec_definitions.length})
-        </h3>
-        <div className='flex-1' />
-        <Button variant='outline' size='xs' onClick={() => { resetForm(); setAddOpen(true) }}>
-          <Plus className='size-3' />
-          Add Spec
-        </Button>
-      </div>
-
       {vp.spec_definitions.length === 0 ? (
-        <div className='rounded-lg border border-dashed border-border py-6 text-center text-[13px] text-text-tertiary'>
-          No spec definitions yet
+        <div className='flex flex-col items-center gap-3 py-8 text-center'>
+          <div className='flex size-10 items-center justify-center rounded-xl bg-bg-secondary'>
+            <Plus className='size-5 text-text-quaternary' />
+          </div>
+          <div>
+            <p className='text-[13px] font-medium text-text-secondary'>No specs yet</p>
+            <p className='text-[12px] text-text-tertiary'>Add attributes like Color, Size, or Material</p>
+          </div>
+          <Button variant='outline' size='sm' onClick={() => { resetForm(); setAddOpen(true) }}>
+            <Plus className='size-3.5' />
+            Add first spec
+          </Button>
         </div>
       ) : (
-        <div className='flex flex-wrap gap-2'>
+        <div className='flex flex-col gap-1'>
           {vp.spec_definitions.map((spec) => {
             const isShared = (spec.vp_count ?? 0) > 1
+            const typeIcon = spec.display_type === 'swatch' ? '🎨' : spec.display_type === 'button' ? '▢' : '▾'
             return (
               <div
                 key={spec.id}
-                className='group flex items-center gap-2 rounded-lg border border-border bg-background px-3 py-2'
+                className='group flex items-center gap-3 rounded-lg px-3 py-2.5 transition-colors hover:bg-bg-hover'
               >
-                <div>
-                  <div className='text-[13px] font-medium'>{spec.name}</div>
-                  <div className='text-[11px] text-text-tertiary capitalize'>
-                    {spec.display_type} · {spec.options?.length ?? 0} options
+                <div className={cn(
+                  'flex size-8 shrink-0 items-center justify-center rounded-lg text-sm',
+                  spec.display_type === 'swatch' ? 'bg-pink-50 dark:bg-pink-500/10'
+                    : spec.display_type === 'button' ? 'bg-blue-50 dark:bg-blue-500/10'
+                    : 'bg-amber-50 dark:bg-amber-500/10'
+                )}>
+                  {typeIcon}
+                </div>
+                <div className='min-w-0 flex-1'>
+                  <div className='text-[13px] font-medium text-foreground'>{spec.name}</div>
+                  <div className='flex items-center gap-1.5 text-[11px] text-text-tertiary'>
+                    <span className='capitalize'>{spec.display_type}</span>
+                    <span>·</span>
+                    <span>{spec.option_count ?? spec.options?.length ?? 0} options</span>
                     {isShared && (
-                      <span className='ml-1 text-amber-500 font-medium normal-case'>
-                        · Used by {spec.vp_count} VPs
-                      </span>
+                      <>
+                        <span>·</span>
+                        <span className='text-text-quaternary'>shared by {spec.vp_count} supers</span>
+                      </>
                     )}
                   </div>
                 </div>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      variant='ghost'
-                      size='icon-xs'
-                      className='sm:opacity-0 sm:group-hover:opacity-100 transition-opacity'
-                    >
-                      <MoreHorizontal className='size-3.5' />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align='end' className='w-44'>
-                    <DropdownMenuItem onClick={() => openEdit(spec)}>
-                      <Pencil className='size-3.5' />
-                      Edit
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      className='text-destructive focus:text-destructive'
-                      onClick={() => setDeleteSpec(spec)}
-                    >
-                      <Trash2 className='size-3.5' />
-                      Delete
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                <Button
+                  variant='ghost'
+                  size='icon-xs'
+                  className='shrink-0 text-text-tertiary opacity-0 transition-opacity group-hover:opacity-100'
+                  onClick={() => openEdit(spec)}
+                >
+                  <Pencil className='size-3' />
+                </Button>
+                <Button
+                  variant='ghost'
+                  size='icon-xs'
+                  className='shrink-0 text-text-tertiary opacity-0 transition-opacity hover:text-destructive group-hover:opacity-100'
+                  onClick={() => setDeleteSpec(spec)}
+                >
+                  <Trash2 className='size-3' />
+                </Button>
               </div>
             )
           })}
+          <button
+            type='button'
+            className='flex items-center gap-2 rounded-lg px-3 py-2 text-[12px] font-medium text-primary transition-colors hover:bg-primary/5'
+            onClick={() => { resetForm(); setAddOpen(true) }}
+          >
+            <Plus className='size-3.5' />
+            Add another spec
+          </button>
         </div>
       )}
 
