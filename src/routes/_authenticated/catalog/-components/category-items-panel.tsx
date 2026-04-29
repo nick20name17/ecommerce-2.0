@@ -24,6 +24,7 @@ import { ProductThumbnail } from '@/components/common/product-thumbnail'
 import { ProductBrowserDialog } from '@/components/common/product-browser-dialog'
 import { VPCreateFromProductDialog } from './vp-create-from-product-dialog'
 import { ImageStrip } from './image-strip'
+import { MetaEditor } from '@/components/common/meta-editor'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -309,6 +310,11 @@ export const CategoryItemsPanel = ({
           projectId={projectId}
           label={`${category.name} — Images`}
         />
+      </div>
+
+      {/* Meta tags */}
+      <div className={cn('border-b border-border py-2', isMobile ? 'px-3.5' : 'px-5')}>
+        <MetaEditor entityType='category' entityId={category.id} projectId={projectId} />
       </div>
 
       {/* ── Tab bar ── */}
@@ -799,6 +805,9 @@ function ExpandedProductDetail({
         projectId={projectId}
         label={`${p.descr_1 || p.product_id} — Images`}
       />
+
+      {/* Product meta tags */}
+      <MetaEditor entityType='product' entityId={p.product_autoid} projectId={projectId} />
     </div>
   )
 }

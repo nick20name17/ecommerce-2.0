@@ -50,8 +50,10 @@ export const pickListService = {
     return data
   },
 
-  removeItem: async (id: number, itemId: number) => {
-    await api.delete(`/pick-lists/${id}/items/${itemId}/`)
+  removeItem: async (id: number, itemId: number, resetShipped = false) => {
+    await api.delete(`/pick-lists/${id}/items/${itemId}/`, {
+      params: resetShipped ? { reset_shipped: 'true' } : undefined,
+    })
   },
 
   // ── Push to EBMS ──────────────────────────────────────
