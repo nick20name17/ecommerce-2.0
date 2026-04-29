@@ -109,20 +109,22 @@ export const CategoryItemsPanel = ({
 
   // ── Product → Superinventory mapping ─────────────────────
 
-  const { productToVPId } = useQueries({
+  const { productToVPId, vpItemCounts } = useQueries({
     queries: variableProducts.map((vp) =>
       getVariableProductDetailQuery(vp.vp_id, { project_id: projectId ?? undefined })
     ),
     combine: (results) => {
       const map = new Map<string, string>()
+      const counts = new Map<string, number>()
       for (const r of results) {
         const vp = r.data
         if (!vp) continue
+        counts.set(vp.id, vp.items?.length ?? 0)
         for (const item of vp.items ?? []) {
           map.set(item.product_autoid, vp.id)
         }
       }
-      return { productToVPId: map }
+      return { productToVPId: map, vpItemCounts: counts }
     },
   })
 
@@ -386,6 +388,7 @@ export const CategoryItemsPanel = ({
                 <SuperInventoryGroup
                   vp={vp}
                   products={groupProducts}
+                  totalItemCount={vpItemCounts.get(vp.vp_id)}
                   projectId={projectId}
                   isMobile={isMobile}
                   expandedProductId={expandedProductId}
@@ -817,6 +820,7 @@ function ExpandedProductDetail({
 function SuperInventoryGroup({
   vp,
   products: groupProducts,
+  totalItemCount,
   projectId,
   isMobile,
   expandedProductId,
@@ -829,6 +833,7 @@ function SuperInventoryGroup({
 }: {
   vp: CatalogCategoryVP
   products: CatalogCategoryProduct[]
+  totalItemCount?: number
   projectId: number | null
   isMobile?: boolean
   expandedProductId: string | null
@@ -866,9 +871,9 @@ function SuperInventoryGroup({
             <span className='shrink-0 rounded bg-purple-500/10 px-1 py-0.5 text-[9px] font-bold uppercase text-purple-500'>
               SUPER
             </span>
-            {groupProducts.length > 0 && (
+            {(totalItemCount ?? groupProducts.length) > 0 && (
               <span className='shrink-0 text-[11px] tabular-nums text-text-quaternary'>
-                {groupProducts.length} item{groupProducts.length !== 1 ? 's' : ''}
+                {totalItemCount ?? groupProducts.length} item{(totalItemCount ?? groupProducts.length) !== 1 ? 's' : ''}
               </span>
             )}
           </div>
