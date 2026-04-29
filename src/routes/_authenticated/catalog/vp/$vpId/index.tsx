@@ -6,7 +6,7 @@ import { useState } from 'react'
 import { VPHeader } from './-components/vp-header'
 import { VariantsTable } from './-components/variants-table'
 import { SpecsBar } from './-components/specs-bar'
-import { ImageGallery } from '@/components/common/image-gallery'
+import { ImageStrip } from '@/routes/_authenticated/catalog/-components/image-strip'
 import { MetaEditor } from '@/components/common/meta-editor'
 import { VP_QUERY_KEYS, getVariableProductDetailQuery } from '@/api/variable-product/query'
 import { variableProductService } from '@/api/variable-product/service'
@@ -86,36 +86,22 @@ const CatalogVPDetailPage = () => {
       />
 
       <div className='flex-1 overflow-y-auto'>
-        <div className={cn('flex flex-col gap-6', isMobile ? 'p-3.5' : isTablet ? 'p-5' : 'p-6')}>
-          {/* Meta info */}
-          <div className='flex flex-wrap gap-x-4 gap-y-1 text-[12px] text-text-tertiary'>
+        {/* ── Top bar: images + meta in a compact strip ── */}
+        <div className={cn('flex flex-col gap-3 border-b border-border py-3', isMobile ? 'px-3.5' : 'px-5')}>
+          <div className='flex items-center gap-4'>
+            <ImageStrip
+              entityType='vp'
+              entityId={vp.id}
+              projectId={projectId}
+              label={`${vp.name} — Images`}
+              className='flex-1'
+            />
             {vp.slug && (
-              <div>
-                <span className='font-medium text-text-secondary'>Slug:</span> {vp.slug}
-              </div>
-            )}
-            {vp.category_id && (
-              <div>
-                <span className='font-medium text-text-secondary'>Category:</span>{' '}
-                {vp.category_id}
-              </div>
-            )}
-            {vp.image_url && (
-              <div>
-                <span className='font-medium text-text-secondary'>Image:</span>{' '}
-                <a
-                  href={vp.image_url}
-                  target='_blank'
-                  rel='noopener noreferrer'
-                  className='text-primary hover:underline'
-                >
-                  View
-                </a>
-              </div>
+              <span className='shrink-0 rounded-md bg-bg-secondary px-2 py-0.5 font-mono text-[11px] text-text-quaternary'>
+                {vp.slug}
+              </span>
             )}
           </div>
-
-          {/* SEO Meta Tags */}
           <MetaEditor
             entityType='vp'
             entityId={vp.id}
@@ -123,30 +109,26 @@ const CatalogVPDetailPage = () => {
             initialTitle={(vp as Record<string, string>).meta_title}
             initialDescription={(vp as Record<string, string>).meta_description}
           />
+        </div>
 
-          {/* Images */}
-          <ImageGallery entityType='vp' entityId={vp.id} projectId={projectId} />
-
-          {/* Specs bar — compact horizontal view */}
+        {/* ── Main content ── */}
+        <div className={cn('flex flex-col gap-5', isMobile ? 'p-3.5' : 'p-5')}>
+          {/* Specs bar */}
           <SpecsBar vp={vp} projectId={projectId} />
 
-          {/* Unified variants table — products + spec values in one view */}
+          {/* Variants table */}
           <VariantsTable vp={vp} projectId={projectId} />
 
-          {/* Danger zone */}
-          <div className='rounded-lg border border-destructive/20 p-4'>
-            <div className={cn('flex gap-3', isMobile ? 'flex-col' : 'items-center justify-between')}>
-              <div>
-                <h3 className='text-[13px] font-semibold text-destructive'>Delete Superinventory</h3>
-                <p className='text-[12px] text-text-tertiary mt-0.5'>
-                  This will permanently delete all items, specs, and values.
-                </p>
-              </div>
-              <Button variant='destructive' size='sm' className={cn('shrink-0', isMobile ? 'self-stretch' : 'self-start')} onClick={() => setDeleteOpen(true)}>
-                <Trash2 className='size-3.5' />
-                Delete
-              </Button>
+          {/* Danger zone — compact */}
+          <div className='flex items-center gap-3 rounded-lg border border-destructive/20 px-4 py-3'>
+            <div className='min-w-0 flex-1'>
+              <span className='text-[13px] font-medium text-destructive'>Delete this superinventory</span>
+              <span className='ml-2 text-[11px] text-text-tertiary'>Permanently removes all items, specs, and values</span>
             </div>
+            <Button variant='destructive' size='sm' className='shrink-0' onClick={() => setDeleteOpen(true)}>
+              <Trash2 className='size-3.5' />
+              Delete
+            </Button>
           </div>
         </div>
       </div>
