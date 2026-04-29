@@ -208,7 +208,7 @@ export const CatalogSection = ({ projectId }: CatalogSectionProps) => {
   }, [clearImportPolling, clearVPImportPolling, clearImgImportPolling])
 
   const createTablesMutation = useMutation({
-    mutationFn: () => projectService.createEcTables(projectId),
+    mutationFn: (force = false) => projectService.createEcTables(projectId, force),
     meta: { successMessage: 'EC tables created successfully' },
   })
 
@@ -307,16 +307,30 @@ export const CatalogSection = ({ projectId }: CatalogSectionProps) => {
                 EC_SPEC_DEFINITION, EC_SPEC_OPTION, and related tables in the mirror database.
                 Safe to run multiple times.
               </p>
-              <Button
-                variant='outline'
-                size='sm'
-                className='mt-3'
-                onClick={() => createTablesMutation.mutate()}
-                isPending={createTablesMutation.isPending}
-              >
-                <Database className='size-3.5' />
-                Create EC Tables
-              </Button>
+              <div className='mt-3 flex gap-2'>
+                <Button
+                  variant='outline'
+                  size='sm'
+                  onClick={() => createTablesMutation.mutate(false)}
+                  isPending={createTablesMutation.isPending}
+                >
+                  <Database className='size-3.5' />
+                  Create / Migrate
+                </Button>
+                <Button
+                  variant='ghost'
+                  size='sm'
+                  className='text-destructive'
+                  onClick={() => {
+                    if (confirm('This will DROP and recreate all EC_ tables. All catalog data will be lost. Continue?')) {
+                      createTablesMutation.mutate(true)
+                    }
+                  }}
+                  isPending={createTablesMutation.isPending}
+                >
+                  Recreate
+                </Button>
+              </div>
               {tablesResult && (
                 <div className='mt-2 rounded-md bg-bg-secondary p-2 text-[12px] break-all'>
                   {tablesResult.tables_created.length > 0 && (
