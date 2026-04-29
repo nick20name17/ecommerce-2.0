@@ -798,6 +798,9 @@ function ExpandedProductDetail({
         projectId={projectId}
         label={`${p.descr_1 || p.product_id} — Images`}
       />
+
+      {/* Product meta tags */}
+      <MetaEditor entityType='product' entityId={p.product_autoid} projectId={projectId} />
     </div>
   )
 }
