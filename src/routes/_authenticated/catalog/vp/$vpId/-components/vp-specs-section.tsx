@@ -27,20 +27,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
 import { cn } from '@/lib/utils'
-
-const DISPLAY_TYPES: { value: SpecDisplayType; label: string }[] = [
-  { value: 'swatch', label: 'Swatch (Color circles)' },
-  { value: 'dropdown', label: 'Dropdown (Select menu)' },
-  { value: 'button', label: 'Button (Toggle group)' },
-]
 
 interface VPSpecsSectionProps {
   vp: VariableProduct
@@ -242,16 +229,31 @@ export const VPSpecsSection = ({ vp, projectId }: VPSpecsSectionProps) => {
                   autoFocus
                 />
               </div>
-              <div className='flex flex-col gap-1.5'>
-                <Label>Display Type</Label>
-                <Select value={displayType} onValueChange={(v) => setDisplayType(v as SpecDisplayType)}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    {DISPLAY_TYPES.map((dt) => (
-                      <SelectItem key={dt.value} value={dt.value}>{dt.label}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+              <div className='flex flex-col gap-2'>
+                <Label className='text-[12px]'>How should customers choose?</Label>
+                <div className='grid grid-cols-3 gap-2'>
+                  {([
+                    { value: 'dropdown' as const, icon: '▾', label: 'Dropdown', desc: 'Select list' },
+                    { value: 'swatch' as const, icon: '🎨', label: 'Swatch', desc: 'Color circles' },
+                    { value: 'button' as const, icon: '▢', label: 'Button', desc: 'Clickable pills' },
+                  ]).map((opt) => (
+                    <button
+                      key={opt.value}
+                      type='button'
+                      className={cn(
+                        'flex flex-col items-center gap-1 rounded-lg border-2 px-2 py-3 text-center transition-colors',
+                        displayType === opt.value
+                          ? 'border-primary bg-primary/5'
+                          : 'border-border hover:border-border-dark hover:bg-bg-hover'
+                      )}
+                      onClick={() => setDisplayType(opt.value)}
+                    >
+                      <span className='text-lg'>{opt.icon}</span>
+                      <span className='text-[12px] font-medium'>{opt.label}</span>
+                      <span className='text-[10px] text-text-tertiary'>{opt.desc}</span>
+                    </button>
+                  ))}
+                </div>
               </div>
               <div className='flex flex-col gap-1.5'>
                 <Label htmlFor='spec-sort-edit'>Sort Order</Label>
@@ -396,16 +398,31 @@ function AddSpecDialog({
                   autoFocus
                 />
               </div>
-              <div className='flex flex-col gap-1.5'>
-                <Label>Display Type</Label>
-                <Select value={displayType} onValueChange={(v) => setDisplayType(v as SpecDisplayType)}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    {DISPLAY_TYPES.map((dt) => (
-                      <SelectItem key={dt.value} value={dt.value}>{dt.label}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+              <div className='flex flex-col gap-2'>
+                <Label className='text-[12px]'>How should customers choose?</Label>
+                <div className='grid grid-cols-3 gap-2'>
+                  {([
+                    { value: 'dropdown' as const, icon: '▾', label: 'Dropdown', desc: 'Select list' },
+                    { value: 'swatch' as const, icon: '🎨', label: 'Swatch', desc: 'Color circles' },
+                    { value: 'button' as const, icon: '▢', label: 'Button', desc: 'Clickable pills' },
+                  ]).map((opt) => (
+                    <button
+                      key={opt.value}
+                      type='button'
+                      className={cn(
+                        'flex flex-col items-center gap-1 rounded-lg border-2 px-2 py-3 text-center transition-colors',
+                        displayType === opt.value
+                          ? 'border-primary bg-primary/5'
+                          : 'border-border hover:border-border-dark hover:bg-bg-hover'
+                      )}
+                      onClick={() => setDisplayType(opt.value)}
+                    >
+                      <span className='text-lg'>{opt.icon}</span>
+                      <span className='text-[12px] font-medium'>{opt.label}</span>
+                      <span className='text-[10px] text-text-tertiary'>{opt.desc}</span>
+                    </button>
+                  ))}
+                </div>
               </div>
               <div className='flex flex-col gap-1.5'>
                 <Label htmlFor='spec-sort-new'>Sort Order</Label>
