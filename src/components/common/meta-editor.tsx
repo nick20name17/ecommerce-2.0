@@ -47,7 +47,7 @@ export const MetaEditor = ({
         entity_id: entityId,
         project_id: projectId ?? undefined,
       }),
-    enabled: initialTitle === undefined, // skip fetch if initial values provided
+    enabled: initialTitle === undefined,
     staleTime: 5 * 60 * 1000,
   })
 
@@ -75,7 +75,6 @@ export const MetaEditor = ({
       ),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey })
-      // Also invalidate parent detail queries
       if (entityType === 'category') {
         queryClient.invalidateQueries({ queryKey: ['catalog', 'detail', entityId] })
       } else if (entityType === 'vp') {
@@ -87,31 +86,29 @@ export const MetaEditor = ({
 
   return (
     <>
-      <div className='flex items-start gap-2'>
-        <Globe className='size-3.5 text-text-quaternary mt-0.5 shrink-0' />
-        <div className='flex-1 min-w-0'>
-          {hasMeta ? (
-            <div className='text-[12px]'>
-              {metaTitle && (
-                <div className='font-medium text-text-secondary truncate'>{metaTitle}</div>
-              )}
-              {metaDescription && (
-                <div className='text-text-tertiary truncate'>{metaDescription}</div>
-              )}
-            </div>
-          ) : (
-            <span className='text-[12px] text-text-quaternary'>No meta tags set</span>
-          )}
-        </div>
-        <Button
-          variant='ghost'
-          size='icon-xs'
-          className='shrink-0 text-text-tertiary'
-          onClick={() => setEditOpen(true)}
-        >
-          <Pencil className='size-3' />
-        </Button>
-      </div>
+      <button
+        type='button'
+        className={cn(
+          'group flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left transition-colors',
+          hasMeta ? 'bg-bg-secondary/50 hover:bg-bg-secondary' : 'hover:bg-bg-hover'
+        )}
+        onClick={() => setEditOpen(true)}
+      >
+        <Globe className={cn('size-3.5 shrink-0', hasMeta ? 'text-emerald-500' : 'text-text-quaternary')} />
+        {hasMeta ? (
+          <div className='min-w-0 flex-1'>
+            {metaTitle && (
+              <span className='block truncate text-[12px] font-medium text-text-secondary'>{metaTitle}</span>
+            )}
+            {metaDescription && (
+              <span className='block truncate text-[11px] text-text-tertiary'>{metaDescription}</span>
+            )}
+          </div>
+        ) : (
+          <span className='flex-1 text-[12px] text-text-quaternary'>Add SEO meta tags</span>
+        )}
+        <Pencil className='size-3 shrink-0 text-text-quaternary opacity-0 transition-opacity group-hover:opacity-100' />
+      </button>
 
       <Dialog open={editOpen} onOpenChange={setEditOpen}>
         <DialogContent className='sm:max-w-md'>
@@ -123,10 +120,26 @@ export const MetaEditor = ({
           >
             <DialogHeader>
               <DialogTitle>SEO Meta Tags</DialogTitle>
+              <p className='text-[12px] text-text-tertiary'>
+                Help search engines understand this page
+              </p>
             </DialogHeader>
             <DialogBody className='flex flex-col gap-3'>
+              {/* Google preview */}
+              <div className='rounded-lg border border-border bg-bg-secondary/40 p-3'>
+                <div className='truncate text-[14px] font-medium text-blue-700'>
+                  {title || 'Page Title'}
+                </div>
+                <div className='truncate text-[12px] text-emerald-700'>
+                  example.com/{entityType}/{entityId}
+                </div>
+                <div className='mt-0.5 line-clamp-2 text-[12px] text-text-tertiary'>
+                  {description || 'Add a description to help people find this page in search results.'}
+                </div>
+              </div>
+
               <div className='flex flex-col gap-1.5'>
-                <Label htmlFor='meta-title'>Meta Title</Label>
+                <Label htmlFor='meta-title' className='text-[12px]'>Title</Label>
                 <Input
                   id='meta-title'
                   value={title}
@@ -135,10 +148,13 @@ export const MetaEditor = ({
                   maxLength={200}
                   autoFocus
                 />
-                <span className='text-[10px] text-text-quaternary'>{title.length}/200</span>
+                <div className='flex justify-between'>
+                  <span className='text-[10px] text-text-quaternary'>Recommended: 50–60 characters</span>
+                  <span className={cn('text-[10px] tabular-nums', title.length > 60 ? 'text-amber-500' : 'text-text-quaternary')}>{title.length}/200</span>
+                </div>
               </div>
               <div className='flex flex-col gap-1.5'>
-                <Label htmlFor='meta-desc'>Meta Description</Label>
+                <Label htmlFor='meta-desc' className='text-[12px]'>Description</Label>
                 <textarea
                   id='meta-desc'
                   value={description}
@@ -153,7 +169,10 @@ export const MetaEditor = ({
                     'disabled:cursor-not-allowed disabled:opacity-50'
                   )}
                 />
-                <span className='text-[10px] text-text-quaternary'>{description.length}/1000</span>
+                <div className='flex justify-between'>
+                  <span className='text-[10px] text-text-quaternary'>Recommended: 120–160 characters</span>
+                  <span className={cn('text-[10px] tabular-nums', description.length > 160 ? 'text-amber-500' : 'text-text-quaternary')}>{description.length}/1000</span>
+                </div>
               </div>
             </DialogBody>
             <DialogFooter>
