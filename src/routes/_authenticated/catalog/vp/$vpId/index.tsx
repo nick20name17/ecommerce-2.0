@@ -7,6 +7,7 @@ import { VPHeader } from './-components/vp-header'
 import { VariantsTable } from './-components/variants-table'
 import { SpecsBar } from './-components/specs-bar'
 import { ImageGallery } from '@/components/common/image-gallery'
+import { MetaEditor } from '@/components/common/meta-editor'
 import { VP_QUERY_KEYS, getVariableProductDetailQuery } from '@/api/variable-product/query'
 import { variableProductService } from '@/api/variable-product/service'
 import { Button } from '@/components/ui/button'
@@ -113,6 +114,15 @@ const CatalogVPDetailPage = () => {
               </div>
             )}
           </div>
+
+          {/* SEO Meta Tags */}
+          <MetaEditor
+            entityType='vp'
+            entityId={vp.id}
+            projectId={projectId}
+            initialTitle={(vp as Record<string, string>).meta_title}
+            initialDescription={(vp as Record<string, string>).meta_description}
+          />
 
           {/* Images */}
           <ImageGallery entityType='vp' entityId={vp.id} projectId={projectId} />
