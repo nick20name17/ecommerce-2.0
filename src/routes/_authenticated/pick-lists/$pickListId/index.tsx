@@ -78,6 +78,8 @@ const PickListDetailPage = () => {
   const isEditable = !isLabelPurchased
 
   const items = pickList?.items ?? []
+  const hasPushedItems = items.some((i) => i.push_status === 'success')
+  const existingDetailAutoids = useMemo(() => new Set(items.map((i) => i.detail_autoid)), [items])
 
   // Build description lookup from orders data
   const descrMap = useMemo(() => {
@@ -116,7 +118,7 @@ const PickListDetailPage = () => {
   // ── Mutations ──────────────────────────────────────────
 
   const deleteMutation = useMutation({
-    mutationFn: () => pickListService.delete(id),
+    mutationFn: (resetShipped: boolean) => pickListService.delete(id, resetShipped),
     meta: { successMessage: 'Pick list deleted', invalidatesQuery: PICK_LIST_QUERY_KEYS.lists() },
     onSuccess: () => window.history.back(),
   })
@@ -253,7 +255,7 @@ const PickListDetailPage = () => {
               {!isMobile && 'Void Label'}
             </Button>
           )}
-          {isDraft && (
+          {!isLabelPurchased && (
             <Button size='icon-sm' variant='ghost' className='text-destructive' onClick={() => setDeleteOpen(true)}>
               <Trash2 className='size-3.5' />
             </Button>
@@ -469,7 +471,13 @@ const PickListDetailPage = () => {
       </div>
 
       {/* Dialogs */}
-      <AddItemsModal pickListId={id} open={addItemsOpen} onOpenChange={setAddItemsOpen} />
+      <AddItemsModal
+        pickListId={id}
+        customerId={pickList.customer_id ?? ''}
+        existingDetailAutoids={existingDetailAutoids}
+        open={addItemsOpen}
+        onOpenChange={setAddItemsOpen}
+      />
 
       {shippingEnabled && (
         <ShippingDialog pickList={pickList} open={shippingOpen} onOpenChange={setShippingOpen} />
@@ -482,13 +490,37 @@ const PickListDetailPage = () => {
             <AlertDialogTitle>Delete Pick List</AlertDialogTitle>
             <AlertDialogDescription>
               Are you sure you want to delete pick list #{pickList.id}? This cannot be undone.
+              {hasPushedItems && ' Some items have been pushed to EBMS.'}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction variant='destructive' onClick={() => deleteMutation.mutate()} isPending={deleteMutation.isPending}>
-              Delete
-            </AlertDialogAction>
+            {hasPushedItems ? (
+              <>
+                <AlertDialogAction
+                  variant='outline'
+                  onClick={() => deleteMutation.mutate(false)}
+                  isPending={deleteMutation.isPending}
+                >
+                  Delete Only
+                </AlertDialogAction>
+                <AlertDialogAction
+                  variant='destructive'
+                  onClick={() => deleteMutation.mutate(true)}
+                  isPending={deleteMutation.isPending}
+                >
+                  Delete & Reset EBMS
+                </AlertDialogAction>
+              </>
+            ) : (
+              <AlertDialogAction
+                variant='destructive'
+                onClick={() => deleteMutation.mutate(false)}
+                isPending={deleteMutation.isPending}
+              >
+                Delete
+              </AlertDialogAction>
+            )}
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

@@ -54,6 +54,7 @@ export interface PickList {
   name: string | null
   notes: string | null
   status: PickListStatus
+  customer_id?: string
   ship_to: ShipTo
   item_count: number
   order_count: number
