@@ -8,6 +8,7 @@ import {
   ClipboardList,
   MapPin,
   Package,
+  Plus,
   Trash2,
   Truck,
   TriangleAlert,
@@ -17,6 +18,7 @@ import { useMemo, useState } from 'react'
 import { useAuth } from '@/providers/auth'
 import { PICK_LIST_QUERY_KEYS, getPickListDetailQuery } from '@/api/pick-list/query'
 import { pickListService } from '@/api/pick-list/service'
+import { AddItemsModal } from './-components/add-items-modal'
 import { ShippingDialog } from './-components/shipping-dialog'
 import { IPickLists, PAGE_COLORS, PageHeaderIcon } from '@/components/ds'
 import {
@@ -64,6 +66,7 @@ const PickListDetailPage = () => {
   const [deleteOpen, setDeleteOpen] = useState(false)
   const [voidOpen, setVoidOpen] = useState(false)
   const [shippingOpen, setShippingOpen] = useState(false)
+  const [addItemsOpen, setAddItemsOpen] = useState(false)
   const [editingItem, setEditingItem] = useState<number | null>(null)
   const [editQty, setEditQty] = useState('')
   const [itemToRemove, setItemToRemove] = useState<{ id: number; pushed: boolean; label: string } | null>(null)
@@ -215,6 +218,12 @@ const PickListDetailPage = () => {
 
         {/* Actions */}
         <div className='flex items-center gap-1.5'>
+          {isEditable && (
+            <Button size='sm' variant='outline' onClick={() => setAddItemsOpen(true)}>
+              <Plus className='size-3.5' />
+              {!isMobile && 'Add Items'}
+            </Button>
+          )}
           {isDraft && (
             <Button size='sm' onClick={() => pushMutation.mutate()} isPending={pushMutation.isPending}>
               <Truck className='size-3.5' />
@@ -460,6 +469,8 @@ const PickListDetailPage = () => {
       </div>
 
       {/* Dialogs */}
+      <AddItemsModal pickListId={id} open={addItemsOpen} onOpenChange={setAddItemsOpen} />
+
       {shippingEnabled && (
         <ShippingDialog pickList={pickList} open={shippingOpen} onOpenChange={setShippingOpen} />
       )}
