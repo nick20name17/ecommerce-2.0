@@ -34,8 +34,10 @@ export const pickListService = {
     return data
   },
 
-  delete: async (id: number) => {
-    await api.delete(`/pick-lists/${id}/`)
+  delete: async (id: number, resetShipped = false) => {
+    await api.delete(`/pick-lists/${id}/`, {
+      params: resetShipped ? { reset_shipped: 'true' } : undefined,
+    })
   },
 
   // ── Items ───────────────────────────────────────────────
