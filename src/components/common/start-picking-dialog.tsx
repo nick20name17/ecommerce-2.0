@@ -179,7 +179,7 @@ export function StartPickingDialog({
   }, [selectedOrders])
 
   const createMutation = useMutation({
-    mutationFn: async () => {
+    mutationFn: async (pushToEbms: boolean) => {
       if (!shipTo) throw new Error('No ship-to address')
       // 1. Create pick list
       const pickList = await pickListService.create({
@@ -201,14 +201,17 @@ export function StartPickingDialog({
       if (payload.items.length === 0) throw new Error('No items with quantity > 0')
       await pickListService.addItems(pickList.id, payload)
 
-      // 3. Push to EBMS
-      const pushed = await pickListService.push(pickList.id)
-      return pushed
+      // 3. Push to EBMS (only if requested)
+      if (pushToEbms) {
+        const pushed = await pickListService.push(pickList.id)
+        return pushed
+      }
+      return pickList
     },
-    onSuccess: (pickList) => {
+    onSuccess: (pickList, pushToEbms) => {
       queryClient.invalidateQueries({ queryKey: PICK_LIST_QUERY_KEYS.all() })
       queryClient.invalidateQueries({ queryKey: PICKING_QUERY_KEYS.all() })
-      toast.success('Pick list created and pushed to EBMS')
+      toast.success(pushToEbms ? 'Pick list created and pushed to EBMS' : 'Pick list saved as draft')
       onOpenChange(false)
       resetState()
       navigate({
@@ -224,10 +227,10 @@ export function StartPickingDialog({
 
   const hasAnyPicked = Array.from(pickQuantities.values()).some((v) => parseFloat(v) > 0)
 
-  const handleCreate = () => {
+  const handleCreate = (pushToEbms: boolean) => {
     setConfirmOpen(false)
     setStep('saving')
-    createMutation.mutate()
+    createMutation.mutate(pushToEbms)
   }
 
   const handleClose = () => {
@@ -467,7 +470,7 @@ export function StartPickingDialog({
               <div className='text-center'>
                 <p className='text-[14px] font-semibold text-foreground'>Creating pick list</p>
                 <p className='mt-1 text-[13px] text-text-tertiary'>
-                  Pushing {allItems.length} item{allItems.length !== 1 && 's'} to EBMS...
+                  Saving {allItems.length} item{allItems.length !== 1 && 's'}...
                 </p>
               </div>
               <div className='flex gap-1'>
@@ -502,9 +505,12 @@ export function StartPickingDialog({
                 <ArrowLeft className='size-3.5' />
                 Back
               </Button>
+              <Button variant='outline' onClick={() => handleCreate(false)} disabled={!hasAnyPicked}>
+                Save as Draft
+              </Button>
               <Button onClick={() => setConfirmOpen(true)} disabled={!hasAnyPicked}>
                 <Check className='size-3.5' />
-                Create Pick List
+                Save & Push to EBMS
               </Button>
             </>
           )}
@@ -515,15 +521,15 @@ export function StartPickingDialog({
       <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Create Pick List?</AlertDialogTitle>
+            <AlertDialogTitle>Push to EBMS?</AlertDialogTitle>
             <AlertDialogDescription>
-              This will create a pick list and push it to EBMS. Items will be marked as picked.
+              This will create a pick list and push it to EBMS. Items will be marked as shipped.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleCreate}>
-              Create Pick List
+            <AlertDialogAction onClick={() => handleCreate(true)}>
+              Save & Push
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
