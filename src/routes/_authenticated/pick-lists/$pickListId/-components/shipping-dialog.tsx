@@ -39,9 +39,9 @@ export function ShippingDialog({ pickList, open, onOpenChange }: ShippingDialogP
 
   // Package form
   const [addressId, setAddressId] = useState<number | null>(null)
-  const [length, setLength] = useState('')
-  const [width, setWidth] = useState('')
-  const [height, setHeight] = useState('')
+  const [length, setLength] = useState('1')
+  const [width, setWidth] = useState('1')
+  const [height, setHeight] = useState('1')
   const [weight, setWeight] = useState('')
   const [rates, setRates] = useState<PickListShippingRate[]>([])
   const [shipToEditOpen, setShipToEditOpen] = useState(false)
@@ -146,9 +146,9 @@ export function ShippingDialog({ pickList, open, onOpenChange }: ShippingDialogP
   const reset = () => {
     setStep('package')
     setRates([])
-    setLength('')
-    setWidth('')
-    setHeight('')
+    setLength('1')
+    setWidth('1')
+    setHeight('1')
     setWeight('')
   }
 
