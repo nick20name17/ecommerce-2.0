@@ -12,6 +12,8 @@ export const GeneralSection = ({ projectId }: { projectId: number }) => {
   const [unitSystem, setUnitSystem] = useState<string>('metric')
   const [categoryWebFilter, setCategoryWebFilter] = useState(true)
   const [productWebFilter, setProductWebFilter] = useState(true)
+  const [oosField, setOosField] = useState('')
+  const [salesTotalField, setSalesTotalField] = useState('')
   const [loaded, setLoaded] = useState(false)
 
   // Fetch settings via project detail — only for superadmins
@@ -28,6 +30,8 @@ export const GeneralSection = ({ projectId }: { projectId: number }) => {
       setUnitSystem(project.unit_system ?? 'metric')
       setCategoryWebFilter(project.category_show_web_filter ?? true)
       setProductWebFilter(project.product_show_web_filter ?? true)
+      setOosField(project.oos_field ?? '')
+      setSalesTotalField(project.sales_total_field ?? '')
       setLoaded(true)
     }
   }, [project, loaded])
@@ -117,6 +121,45 @@ export const GeneralSection = ({ projectId }: { projectId: number }) => {
             </button>
           </div>
         </div>
+
+        {/* Advanced fields (superadmin only) */}
+        {isSuperAdminUser && (
+          <div className='space-y-3'>
+            <label className='mb-1.5 block text-[12px] font-medium text-text-tertiary'>Database Fields</label>
+
+            <div className='rounded-[8px] border border-border px-3.5 py-2.5'>
+              <div className='mb-1'>
+                <span className='text-[13px] font-medium text-foreground'>Out-of-Stock Field</span>
+                <p className='text-[12px] text-text-tertiary'>INVENTRY column used for out-of-stock filtering</p>
+              </div>
+              <input
+                value={oosField}
+                onChange={(e) => setOosField(e.target.value)}
+                onBlur={() => save({ oos_field: oosField })}
+                onKeyDown={(e) => { if (e.key === 'Enter') save({ oos_field: oosField }) }}
+                placeholder='e.g. QTY_ON_HND'
+                disabled={updateMutation.isPending}
+                className='h-8 w-full rounded-[6px] border border-border bg-background px-2.5 text-[13px] outline-none placeholder:text-text-quaternary focus:border-primary'
+              />
+            </div>
+
+            <div className='rounded-[8px] border border-border px-3.5 py-2.5'>
+              <div className='mb-1'>
+                <span className='text-[13px] font-medium text-foreground'>Sales Total Field</span>
+                <p className='text-[12px] text-text-tertiary'>ARINV column for monetary totals (e.g. total, sub_total)</p>
+              </div>
+              <input
+                value={salesTotalField}
+                onChange={(e) => setSalesTotalField(e.target.value)}
+                onBlur={() => save({ sales_total_field: salesTotalField })}
+                onKeyDown={(e) => { if (e.key === 'Enter') save({ sales_total_field: salesTotalField }) }}
+                placeholder='e.g. total'
+                disabled={updateMutation.isPending}
+                className='h-8 w-full rounded-[6px] border border-border bg-background px-2.5 text-[13px] outline-none placeholder:text-text-quaternary focus:border-primary'
+              />
+            </div>
+          </div>
+        )}
       </div>
     </div>
   )

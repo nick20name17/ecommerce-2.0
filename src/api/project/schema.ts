@@ -41,8 +41,11 @@ export interface Project {
   has_sync_config?: boolean
   unit_system?: string
   oos_field?: string
+  sales_total_field?: string
   category_show_web_filter?: boolean
   product_show_web_filter?: boolean
+  shipping_enabled?: boolean
+  shipengine_test_api_key?: string
   created_at: string
   updated_at: string
 }
