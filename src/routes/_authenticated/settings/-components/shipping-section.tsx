@@ -1,12 +1,17 @@
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { MapPin, MoreHorizontal, Pencil, Plus, Star, Trash2, TriangleAlert } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import { PageEmpty } from '@/components/common/page-empty'
 import { ShippingAddressModal } from './shipping-address-modal'
+import { getProjectByIdQuery } from '@/api/project/query'
+import { projectService } from '@/api/project/service'
 import { SHIPPING_ADDRESS_QUERY_KEYS, getShippingAddressesQuery } from '@/api/shipping-address/query'
 import type { ShippingAddress } from '@/api/shipping-address/schema'
 import { shippingAddressService } from '@/api/shipping-address/service'
+import { isSuperAdmin } from '@/constants/user'
+import { useAuth } from '@/providers/auth'
+import { cn } from '@/lib/utils'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -28,7 +33,42 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 
 export const ShippingSection = ({ projectId }: { projectId: number }) => {
-  const { data: addresses, isLoading } = useQuery(getShippingAddressesQuery(projectId))
+  const { user } = useAuth()
+  const userIsSuperAdmin = !!user?.role && isSuperAdmin(user.role)
+
+  const { data: project } = useQuery({
+    ...getProjectByIdQuery(projectId),
+    enabled: userIsSuperAdmin,
+    retry: false,
+  })
+
+  const [shippingEnabled, setShippingEnabled] = useState(false)
+  const [shipengineKey, setShipengineKey] = useState('')
+  const [configLoaded, setConfigLoaded] = useState(false)
+
+  useEffect(() => {
+    if (project && !configLoaded) {
+      setShippingEnabled(project.shipping_enabled ?? false)
+      setShipengineKey(project.shipengine_test_api_key ?? '')
+      setConfigLoaded(true)
+    }
+  }, [project, configLoaded])
+
+  const updateProjectMutation = useMutation({
+    mutationFn: (payload: Record<string, unknown>) =>
+      projectService.update({ id: projectId, payload }),
+    onSuccess: (_data, variables) => {
+      if ('shipping_enabled' in variables) {
+        window.location.reload()
+      }
+    },
+    meta: { successMessage: 'Settings updated' },
+  })
+
+  const { data: addresses, isLoading } = useQuery({
+    ...getShippingAddressesQuery(projectId),
+    enabled: shippingEnabled || !userIsSuperAdmin,
+  })
 
   const [modalAddress, setModalAddress] = useState<ShippingAddress | 'create' | null>(null)
   const [deleteAddress, setDeleteAddress] = useState<ShippingAddress | null>(null)
@@ -46,6 +86,61 @@ export const ShippingSection = ({ projectId }: { projectId: number }) => {
 
   return (
     <div className='flex min-h-0 flex-1 flex-col'>
+      {/* Shipping config (superadmin only) */}
+      {userIsSuperAdmin && (
+        <div className='border-b border-border px-6 py-4'>
+          <div className='max-w-xl space-y-4'>
+            <div>
+              <h3 className='text-[14px] font-semibold text-foreground'>Shipping Configuration</h3>
+              <p className='mt-0.5 text-[13px] text-text-tertiary'>Enable shipping and configure ShipEngine for this project.</p>
+            </div>
+
+            <div className='flex items-center justify-between rounded-[8px] border border-border px-3.5 py-2.5'>
+              <div>
+                <span className='text-[13px] font-medium text-foreground'>Enable Shipping</span>
+                <p className='text-[12px] text-text-tertiary'>Allow shipping rates, labels, and shipments</p>
+              </div>
+              <button
+                type='button'
+                disabled={updateProjectMutation.isPending}
+                className={cn(
+                  'relative inline-flex h-5 w-9 shrink-0 cursor-pointer items-center rounded-full transition-colors duration-200',
+                  shippingEnabled ? 'bg-primary' : 'bg-border',
+                )}
+                onClick={() => {
+                  const next = !shippingEnabled
+                  setShippingEnabled(next)
+                  updateProjectMutation.mutate({ shipping_enabled: next })
+                }}
+              >
+                <span className={cn('inline-block size-3.5 rounded-full bg-background shadow-sm transition-transform duration-200', shippingEnabled ? 'translate-x-[18px]' : 'translate-x-[3px]')} />
+              </button>
+            </div>
+
+            {shippingEnabled && (
+              <div className='rounded-[8px] border border-border px-3.5 py-2.5'>
+                <div className='mb-1'>
+                  <span className='text-[13px] font-medium text-foreground'>ShipEngine Test API Key</span>
+                  <p className='text-[12px] text-text-tertiary'>Sandbox key for rate/label testing</p>
+                </div>
+                <input
+                  value={shipengineKey}
+                  onChange={(e) => setShipengineKey(e.target.value)}
+                  onBlur={() => updateProjectMutation.mutate({ shipengine_test_api_key: shipengineKey })}
+                  onKeyDown={(e) => { if (e.key === 'Enter') updateProjectMutation.mutate({ shipengine_test_api_key: shipengineKey }) }}
+                  placeholder='TEST_...'
+                  disabled={updateProjectMutation.isPending}
+                  className='h-8 w-full rounded-[6px] border border-border bg-background px-2.5 font-mono text-[13px] outline-none placeholder:text-text-quaternary focus:border-primary'
+                />
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Addresses section — only when shipping is enabled */}
+      {!shippingEnabled && userIsSuperAdmin ? null : (
+      <>
       {/* Column labels + Add button */}
       <div
         className='sticky top-0 z-10 flex select-none items-center gap-6 border-b border-border bg-bg-secondary px-6 py-1'
@@ -206,6 +301,8 @@ export const ShippingSection = ({ projectId }: { projectId: number }) => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+      </>
+      )}
     </div>
   )
 }

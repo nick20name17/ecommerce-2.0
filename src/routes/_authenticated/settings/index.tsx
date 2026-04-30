@@ -41,7 +41,7 @@ const SettingsPage = () => {
   const [section, setSection] = useQueryState('section', parseAsString)
 
   const visibleSections = SECTIONS.filter(s => {
-    if (s.value === 'shipping' && !shippingEnabled) return false
+    if (s.value === 'shipping' && !shippingEnabled && !userIsSuperAdmin) return false
     if (s.value === 'catalog' && !userIsSuperAdmin) return false
     return true
   })
