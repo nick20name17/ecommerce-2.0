@@ -105,6 +105,11 @@ export const CartTable = ({
                         className='inline-flex items-center rounded-[4px] border border-border bg-bg-secondary px-1.5 py-0.5 text-[11px] font-medium text-text-secondary'
                       >
                         {c.name}
+                        {c.childs && c.childs.length > 0 && (
+                          <span className='ml-1 text-text-tertiary'>
+                            ({c.childs.map((ch) => ch.name).join(', ')})
+                          </span>
+                        )}
                       </span>
                     ))}
                   </div>

@@ -29,6 +29,7 @@ export type SheetAction =
   | { type: 'SET_ACTIVE_TAB'; value: string }
   | { type: 'UPDATE_CONFIGS'; updater: (prev: Configuration[]) => Configuration[] }
   | { type: 'SELECT_CONFIG_ITEM'; configName: string; itemId: string }
+  | { type: 'SELECT_SUB_CONFIG_ITEM'; parentConfigName: string; parentItemId: string; subConfigName: string; subItemId: string }
   | { type: 'DESELECT_ALL_CONFIGS' }
 
 export const initialSheetState: SheetState = {
@@ -87,8 +88,36 @@ export const sheetReducer = (state: SheetState, action: SheetAction): SheetState
             ...c,
             items: c.items.map((i) => ({
               ...i,
-              active: i.id === action.itemId ? !i.active : false
+              active: i.id === action.itemId ? !i.active : false,
+              // Clear sub-configurations when deselecting a CTO item
+              ...((i.id === action.itemId && i.active) ? { subConfigurations: undefined, subConfigsLoaded: false } : {})
             }))
+          }
+        })
+      }
+    case 'SELECT_SUB_CONFIG_ITEM':
+      return {
+        ...state,
+        configs: state.configs.map((c) => {
+          if (c.name !== action.parentConfigName) return c
+          return {
+            ...c,
+            items: c.items.map((i) => {
+              if (i.id !== action.parentItemId || !i.subConfigurations) return i
+              return {
+                ...i,
+                subConfigurations: i.subConfigurations.map((sc) => {
+                  if (sc.name !== action.subConfigName) return sc
+                  return {
+                    ...sc,
+                    items: sc.items.map((si) => ({
+                      ...si,
+                      active: si.id === action.subItemId ? !si.active : false
+                    }))
+                  }
+                })
+              }
+            })
           }
         })
       }
