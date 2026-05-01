@@ -12,7 +12,8 @@ export const useProductEditSheet = (
   mode: 'add' | 'edit',
   open: boolean,
   configData: ConfigurationProduct | null,
-  projectId?: number | null
+  projectId?: number | null,
+  customerId?: string
 ) => {
   const [state, dispatch] = useReducer(sheetReducer, initialSheetState)
   const requestedTabsRef = useRef<Set<string>>(new Set())
@@ -120,11 +121,151 @@ export const useProductEditSheet = (
     }
   }, [configs.length, product, projectId, configData]) // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Fetch sub-configurations for active CTO items (components > 0)
+  useEffect(() => {
+    if (configs.length === 0 || !product) return
+
+    for (const config of configs) {
+      for (const item of config.items) {
+        if (
+          item.active &&
+          item.components > 0 &&
+          item.c_type === '2' &&
+          !item.subConfigsLoaded &&
+          !item.subConfigsLoading &&
+          item.autoid
+        ) {
+          // Mark as loading
+          dispatch({
+            type: 'UPDATE_CONFIGS',
+            updater: (prev) =>
+              prev.map((c) =>
+                c.name !== config.name
+                  ? c
+                  : {
+                      ...c,
+                      items: c.items.map((i) =>
+                        i.id !== item.id ? i : { ...i, subConfigsLoading: true }
+                      )
+                    }
+              )
+          })
+
+          const configName = config.name
+          const itemId = item.id
+          const itemAutoid = item.autoid
+
+          productService
+            .getConfigurations(itemAutoid, {
+              customer_id: customerId || '',
+              project_id: projectId ?? undefined
+            })
+            .then((subProduct) => {
+              const subConfigs = subProduct.configurations.map((sc) => ({
+                ...sc,
+                items: sc.items.map((si) => {
+                  const isDefault = !sc.allownone && sc.default === si.id
+                  return { ...si, active: isDefault }
+                })
+              }))
+              dispatch({
+                type: 'UPDATE_CONFIGS',
+                updater: (prev) =>
+                  prev.map((c) =>
+                    c.name !== configName
+                      ? c
+                      : {
+                          ...c,
+                          items: c.items.map((i) =>
+                            i.id !== itemId
+                              ? i
+                              : {
+                                  ...i,
+                                  subConfigsLoading: false,
+                                  subConfigsLoaded: true,
+                                  subConfigurations: subConfigs
+                                }
+                          )
+                        }
+                  )
+              })
+            })
+            .catch(() => {
+              dispatch({
+                type: 'UPDATE_CONFIGS',
+                updater: (prev) =>
+                  prev.map((c) =>
+                    c.name !== configName
+                      ? c
+                      : {
+                          ...c,
+                          items: c.items.map((i) =>
+                            i.id !== itemId
+                              ? i
+                              : { ...i, subConfigsLoading: false, subConfigsLoaded: true }
+                          )
+                        }
+                  )
+              })
+            })
+        }
+      }
+    }
+  }, [configs, product, projectId]) // eslint-disable-line react-hooks/exhaustive-deps
+
   const activeConfigurations = (() => {
-    const result: { name: string; id: string | number }[] = []
+    const result: Array<{
+      name: string
+      id: string | number
+      quan?: string
+      cType?: string
+      components?: number
+      price?: string
+      old_price?: string
+      childs?: Array<{
+        name: string
+        id: string | number
+        quan?: string
+        cType?: string
+        components?: number
+        price?: string
+        old_price?: string
+        childs?: unknown[]
+      }>
+    }> = []
     configs.forEach((c) => {
       c.items.forEach((i) => {
-        if (i.active) result.push({ name: c.name, id: i.id })
+        if (!i.active) return
+        const entry: (typeof result)[number] = {
+          name: c.name,
+          id: i.id,
+          quan: i.quan,
+          cType: i.c_type,
+          components: i.components,
+          price: i.price,
+          old_price: i.old_price
+        }
+        // Collect active sub-config items as childs
+        if (i.subConfigurations) {
+          const childs: NonNullable<typeof entry.childs> = []
+          i.subConfigurations.forEach((sc) => {
+            sc.items.forEach((si) => {
+              if (!si.active) return
+              childs.push({
+                name: sc.name,
+                id: si.id,
+                quan: si.quan,
+                cType: si.c_type,
+                components: si.components,
+                price: si.price,
+                old_price: si.old_price,
+                childs: []
+              })
+            })
+          })
+          if (childs.length > 0) entry.childs = childs
+        }
+        result.push(entry)
       })
     })
     return result
@@ -140,6 +281,15 @@ export const useProductEditSheet = (
         const qty = Math.trunc(Number(i.quan))
         const multiplier = !Number.isNaN(qty) && qty > 0 ? qty : 1
         total += (Number(i.price) || 0) * multiplier
+        // Add sub-configuration prices
+        i.subConfigurations?.forEach((sc) =>
+          sc.items.forEach((si) => {
+            if (!si.active) return
+            const sqty = Math.trunc(Number(si.quan))
+            const smult = !Number.isNaN(sqty) && sqty > 0 ? sqty : 1
+            total += (Number(si.price) || 0) * smult
+          })
+        )
       })
     )
     return total
@@ -153,6 +303,15 @@ export const useProductEditSheet = (
         const qty = Math.trunc(Number(i.quan))
         const multiplier = !Number.isNaN(qty) && qty > 0 ? qty : 1
         total += (Number(i.old_price) || 0) * multiplier
+        // Add sub-configuration prices
+        i.subConfigurations?.forEach((sc) =>
+          sc.items.forEach((si) => {
+            if (!si.active) return
+            const sqty = Math.trunc(Number(si.quan))
+            const smult = !Number.isNaN(sqty) && sqty > 0 ? sqty : 1
+            total += (Number(si.old_price) || 0) * smult
+          })
+        )
       })
     )
     return total

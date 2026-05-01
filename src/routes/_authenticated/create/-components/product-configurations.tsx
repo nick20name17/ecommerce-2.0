@@ -11,6 +11,7 @@ interface ProductConfigurationsProps {
   activeTab: string
   onActiveTabChange: (tab: string) => void
   onSelectConfigItem: (configName: string, itemId: string) => void
+  onSelectSubConfigItem?: (parentConfigName: string, parentItemId: string, subConfigName: string, subItemId: string) => void
   onResetConfigurations?: () => void
   hasUncheckedRequired: boolean
   selectedConfigCount: number
@@ -20,6 +21,7 @@ interface ProductConfigurationsProps {
 export const ProductConfigurations = ({
   configs,
   onSelectConfigItem,
+  onSelectSubConfigItem,
   onResetConfigurations,
   hasUncheckedRequired,
   selectedConfigCount,
@@ -62,6 +64,11 @@ export const ProductConfigurations = ({
             key={config.name}
             config={config}
             onSelect={(itemId) => onSelectConfigItem(config.name, itemId)}
+            onSelectSubConfigItem={onSelectSubConfigItem
+              ? (parentItemId, subConfigName, subItemId) =>
+                  onSelectSubConfigItem(config.name, parentItemId, subConfigName, subItemId)
+              : undefined
+            }
           />
         ))}
       </div>
@@ -74,9 +81,13 @@ export const ProductConfigurations = ({
 function ConfigGroup({
   config,
   onSelect,
+  onSelectSubConfigItem,
+  depth = 0,
 }: {
   config: Configuration
   onSelect: (itemId: string) => void
+  onSelectSubConfigItem?: (parentItemId: string, subConfigName: string, subItemId: string) => void
+  depth?: number
 }) {
   const [collapsed, setCollapsed] = useState(false)
   const hasSelected = config.items.some((i) => i.active)
@@ -207,6 +218,30 @@ function ConfigGroup({
               </button>
             )
           })}
+
+          {/* Sub-configurations for active CTO items */}
+          {config.items
+            .filter((item) => item.active && item.subConfigurations?.length)
+            .map((item) => (
+              <div key={`sub-${item.id}`} className='border-t border-border-light bg-bg-secondary/40 pl-4'>
+                {item.subConfigsLoading && (
+                  <div className='flex items-center gap-2 px-4 py-2 text-[12px] text-text-tertiary'>
+                    <Spinner className='size-3' />
+                    Loading sub-configurations…
+                  </div>
+                )}
+                {item.subConfigurations?.map((subConfig) => (
+                  <ConfigGroup
+                    key={`${item.id}-${subConfig.name}`}
+                    config={subConfig}
+                    onSelect={(subItemId) =>
+                      onSelectSubConfigItem?.(item.id, subConfig.name, subItemId)
+                    }
+                    depth={depth + 1}
+                  />
+                ))}
+              </div>
+            ))}
         </div>
       )}
     </div>

@@ -45,6 +45,7 @@ export interface ConfigurationUnit {
 
 export interface ConfigurationItem {
   id: string
+  autoid: string
   descr_1: string
   int_note: string
   def_unit: string
@@ -57,6 +58,10 @@ export interface ConfigurationItem {
   isLoading?: boolean
   photo?: string
   photos?: string[]
+  /** Sub-configurations for CTO items (c_type=2, components>0). Populated on demand. */
+  subConfigurations?: Configuration[]
+  subConfigsLoading?: boolean
+  subConfigsLoaded?: boolean
 }
 
 export interface ConfigurationPhotosParams {
@@ -109,6 +114,12 @@ export interface CartConfiguration {
   id: string
   name: string
   active: boolean
+  quan?: string
+  cType?: string
+  components?: number
+  price?: string
+  old_price?: string
+  childs?: CartConfiguration[]
 }
 
 export interface CartItem {

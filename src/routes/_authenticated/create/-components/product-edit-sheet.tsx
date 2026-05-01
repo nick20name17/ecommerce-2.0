@@ -57,7 +57,7 @@ export const ProductEditSheet = ({
     totalOldPrice,
     hasChanges,
     isCartItem
-  } = useProductEditSheet(product, mode, open, configData, projectId)
+  } = useProductEditSheet(product, mode, open, configData, projectId, customerId)
 
   const { quantity, confirmClose, photoIndex, selectedUnit, configs, activeTab } = state
 
@@ -138,6 +138,15 @@ export const ProductEditSheet = ({
 
   const handleSelectConfigItem = (configName: string, itemId: string) => {
     dispatch({ type: 'SELECT_CONFIG_ITEM', configName, itemId })
+  }
+
+  const handleSelectSubConfigItem = (
+    parentConfigName: string,
+    parentItemId: string,
+    subConfigName: string,
+    subItemId: string
+  ) => {
+    dispatch({ type: 'SELECT_SUB_CONFIG_ITEM', parentConfigName, parentItemId, subConfigName, subItemId })
   }
 
   const handleClose = () => {
@@ -244,6 +253,7 @@ export const ProductEditSheet = ({
                     activeTab={activeTab}
                     onActiveTabChange={(tab) => dispatch({ type: 'SET_ACTIVE_TAB', value: tab })}
                     onSelectConfigItem={handleSelectConfigItem}
+                    onSelectSubConfigItem={handleSelectSubConfigItem}
                     onResetConfigurations={() => dispatch({ type: 'DESELECT_ALL_CONFIGS' })}
                     hasUncheckedRequired={hasUncheckedRequired}
                     selectedConfigCount={selectedConfigCount}
