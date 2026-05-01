@@ -42,8 +42,9 @@ export function AddItemsModal({ pickListId, customerId, existingDetailAutoids, o
       ...(customerId ? { customer_id: customerId } : {}),
       include_items: true,
       project_id: projectId ?? undefined,
+      pick_list_id: pickListId,
     }),
-    enabled: open && !!customerId,
+    enabled: open,
   })
 
   const groups = data?.results ?? []
@@ -146,26 +147,6 @@ export function AddItemsModal({ pickListId, customerId, existingDetailAutoids, o
     },
     [existingDetailAutoids],
   )
-
-  if (!customerId) {
-    return (
-      <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className='sm:max-w-md'>
-          <DialogHeader>
-            <DialogTitle>Add Items</DialogTitle>
-          </DialogHeader>
-          <DialogBody>
-            <p className='py-6 text-center text-[13px] text-text-tertiary'>
-              No customer associated with this pick list. Cannot browse orders.
-            </p>
-          </DialogBody>
-          <DialogFooter>
-            <Button variant='outline' onClick={() => onOpenChange(false)}>Close</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-    )
-  }
 
   return (
     <Dialog

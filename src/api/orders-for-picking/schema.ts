@@ -54,4 +54,5 @@ export interface PickingOrdersParams {
   customer_id?: string
   search?: string
   project_id?: number
+  pick_list_id?: number
 }
