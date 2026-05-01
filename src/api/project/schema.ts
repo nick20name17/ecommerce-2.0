@@ -161,6 +161,11 @@ export const CreateProjectSchema = z.object({
 
 export type CreateProjectFormValues = z.infer<typeof CreateProjectSchema>
 
-export const UpdateProjectSchema = z.object(sharedFields)
+export const UpdateProjectSchema = z.object({
+  ...sharedFields,
+  db_password: OptionalStringSchema,
+  api_password: OptionalStringSchema,
+  s3_secret_key: OptionalStringSchema
+})
 
 export type UpdateProjectFormValues = z.infer<typeof UpdateProjectSchema>

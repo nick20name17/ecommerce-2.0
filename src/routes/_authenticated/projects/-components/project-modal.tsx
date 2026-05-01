@@ -613,6 +613,57 @@ const EditForm = ({
         >
           <FieldGroup>
             <SharedFields />
+
+            <Controller
+              name='db_password'
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor='edit-db-password'>DB Password</FieldLabel>
+                  <PasswordInput
+                    {...field}
+                    value={field.value ?? ''}
+                    id='edit-db-password'
+                    placeholder='Leave empty to keep current'
+                  />
+                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                </Field>
+              )}
+            />
+
+            <Controller
+              name='api_password'
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor='edit-api-password'>API Password</FieldLabel>
+                  <PasswordInput
+                    {...field}
+                    value={field.value ?? ''}
+                    id='edit-api-password'
+                    placeholder='Leave empty to keep current'
+                  />
+                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                </Field>
+              )}
+            />
+
+            <Controller
+              name='s3_secret_key'
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor='edit-s3-secret-key'>S3 Secret Key</FieldLabel>
+                  <PasswordInput
+                    {...field}
+                    value={field.value ?? ''}
+                    id='edit-s3-secret-key'
+                    placeholder='Leave empty to keep current'
+                  />
+                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                </Field>
+              )}
+            />
           </FieldGroup>
         </form>
       </DialogBody>
