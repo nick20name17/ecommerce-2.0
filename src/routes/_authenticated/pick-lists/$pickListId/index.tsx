@@ -328,7 +328,7 @@ const PickListDetailPage = () => {
                 <div key={orderAutoid} className='overflow-hidden rounded-lg border border-border'>
                   <div className='flex items-center gap-2 bg-bg-secondary/50 px-3.5 py-2'>
                     <span className='text-[12px] font-semibold text-foreground'>
-                      Order {orderInvoiceMap.get(orderAutoid) || orderAutoid.slice(0, 12)}
+                      Order {orderInvoiceMap.get(orderAutoid) || orderItems[0]?.order_number || orderAutoid.slice(0, 12)}
                     </span>
                     <div className='flex-1' />
                     <span className='text-[11px] text-text-quaternary'>
@@ -347,7 +347,7 @@ const PickListDetailPage = () => {
                           )}
                         >
                           <span className='min-w-0 flex-1 truncate text-[12px] font-medium text-foreground'>
-                            {descrMap.get(item.detail_autoid) || item.descr || item.detail_autoid}
+                            {descrMap.get(item.detail_autoid) || item.description || item.descr || item.detail_autoid}
                           </span>
                           {isEditingThis && isEditable ? (
                             <div className='flex items-center gap-1'>
@@ -385,7 +385,7 @@ const PickListDetailPage = () => {
                               {formatQty(item.picked_quantity)}
                             </span>
                           )}
-                          {item.push_status && (
+                          {(item.push_status === 'success' || item.push_status === 'failed') && (
                             <span className={cn(
                               'inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-semibold leading-none',
                               item.push_status === 'success'
