@@ -258,6 +258,23 @@ const SharedFields = () => {
         />
       </div>
 
+      <Controller
+        name='db_password'
+        control={control}
+        render={({ field, fieldState }) => (
+          <Field data-invalid={fieldState.invalid}>
+            <FieldLabel htmlFor='db-password'>DB Password</FieldLabel>
+            <PasswordInput
+              {...field}
+              value={field.value ?? ''}
+              id='db-password'
+              placeholder='••••••••'
+            />
+            {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+          </Field>
+        )}
+      />
+
       <FieldSeparator>API</FieldSeparator>
 
       <div className='grid grid-cols-2 gap-4'>
@@ -296,6 +313,23 @@ const SharedFields = () => {
           )}
         />
       </div>
+
+      <Controller
+        name='api_password'
+        control={control}
+        render={({ field, fieldState }) => (
+          <Field data-invalid={fieldState.invalid}>
+            <FieldLabel htmlFor='api-password'>API Password</FieldLabel>
+            <PasswordInput
+              {...field}
+              value={field.value ?? ''}
+              id='api-password'
+              placeholder='••••••••'
+            />
+            {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+          </Field>
+        )}
+      />
 
       <FieldSeparator>S3 Storage</FieldSeparator>
 
@@ -348,6 +382,23 @@ const SharedFields = () => {
               id='s3-access-key'
               placeholder='AKIA...'
               aria-invalid={fieldState.invalid}
+            />
+            {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+          </Field>
+        )}
+      />
+
+      <Controller
+        name='s3_secret_key'
+        control={control}
+        render={({ field, fieldState }) => (
+          <Field data-invalid={fieldState.invalid}>
+            <FieldLabel htmlFor='s3-secret-key'>S3 Secret Key</FieldLabel>
+            <PasswordInput
+              {...field}
+              value={field.value ?? ''}
+              id='s3-secret-key'
+              placeholder='••••••••'
             />
             {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
           </Field>
@@ -485,56 +536,6 @@ const CreateForm = ({ onOpenChange }: { onOpenChange: (open: boolean) => void })
         >
           <FieldGroup>
             <SharedFields />
-
-            <Controller
-              name='db_password'
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor='db-password'>DB Password</FieldLabel>
-                  <PasswordInput
-                    {...field}
-                    id='db-password'
-                    placeholder='••••••••'
-                  />
-                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                </Field>
-              )}
-            />
-
-            <Controller
-              name='api_password'
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor='api-password'>API Password</FieldLabel>
-                  <PasswordInput
-                    {...field}
-                    value={field.value ?? ''}
-                    id='api-password'
-                    placeholder='••••••••'
-                  />
-                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                </Field>
-              )}
-            />
-
-            <Controller
-              name='s3_secret_key'
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor='s3-secret-key'>S3 Secret Key</FieldLabel>
-                  <PasswordInput
-                    {...field}
-                    value={field.value ?? ''}
-                    id='s3-secret-key'
-                    placeholder='••••••••'
-                  />
-                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                </Field>
-              )}
-            />
           </FieldGroup>
         </form>
       </DialogBody>
@@ -613,57 +614,6 @@ const EditForm = ({
         >
           <FieldGroup>
             <SharedFields />
-
-            <Controller
-              name='db_password'
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor='edit-db-password'>DB Password</FieldLabel>
-                  <PasswordInput
-                    {...field}
-                    value={field.value ?? ''}
-                    id='edit-db-password'
-                    placeholder='Leave empty to keep current'
-                  />
-                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                </Field>
-              )}
-            />
-
-            <Controller
-              name='api_password'
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor='edit-api-password'>API Password</FieldLabel>
-                  <PasswordInput
-                    {...field}
-                    value={field.value ?? ''}
-                    id='edit-api-password'
-                    placeholder='Leave empty to keep current'
-                  />
-                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                </Field>
-              )}
-            />
-
-            <Controller
-              name='s3_secret_key'
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor='edit-s3-secret-key'>S3 Secret Key</FieldLabel>
-                  <PasswordInput
-                    {...field}
-                    value={field.value ?? ''}
-                    id='edit-s3-secret-key'
-                    placeholder='Leave empty to keep current'
-                  />
-                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                </Field>
-              )}
-            />
           </FieldGroup>
         </form>
       </DialogBody>
