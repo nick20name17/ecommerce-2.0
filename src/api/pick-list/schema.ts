@@ -26,10 +26,12 @@ export interface PickListItem {
   id: number
   order_autoid: string
   detail_autoid: string
+  description?: string
+  order_number?: string
   inven?: string
   descr?: string
   picked_quantity: string
-  push_status?: 'success' | 'failed' | null
+  push_status?: 'pending' | 'success' | 'failed' | null
   push_error?: string | null
 }
 
@@ -104,6 +106,7 @@ export interface ShippingSelectionResponse {
 export interface CreatePickListPayload {
   ship_to: ShipTo
   shipping_address_id?: number
+  customer_id?: string
   name?: string
   notes?: string
 }

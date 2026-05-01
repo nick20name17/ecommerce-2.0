@@ -185,6 +185,7 @@ export function StartPickingDialog({
       const pickList = await pickListService.create({
         ship_to: shipTo,
         ...(defaultShippingAddressId ? { shipping_address_id: defaultShippingAddressId } : {}),
+        ...(customerId ? { customer_id: customerId } : {}),
         name: `${customerName} picking`,
       })
 
