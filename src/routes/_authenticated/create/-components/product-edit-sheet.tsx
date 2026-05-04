@@ -56,7 +56,12 @@ export const ProductEditSheet = ({
     totalPrice,
     totalOldPrice,
     hasChanges,
-    isCartItem
+    isCartItem,
+    wizardMode,
+    canGoNext,
+    canGoPrev,
+    goNext,
+    goPrev
   } = useProductEditSheet(product, mode, open, configData, projectId, customerId)
 
   const { quantity, confirmClose, photoIndex, selectedUnit, configs, activeTab } = state
@@ -258,6 +263,13 @@ export const ProductEditSheet = ({
                     hasUncheckedRequired={hasUncheckedRequired}
                     selectedConfigCount={selectedConfigCount}
                     totalConfigCount={totalConfigCount}
+                    wizardMode={wizardMode}
+                    activeStep={activeTab}
+                    onStepChange={(step) => dispatch({ type: 'SET_ACTIVE_TAB', value: step })}
+                    canGoNext={canGoNext}
+                    canGoPrev={canGoPrev}
+                    onNext={goNext}
+                    onPrev={goPrev}
                   />
                 ) : (
                   <div className='flex flex-1 items-center justify-center'>
