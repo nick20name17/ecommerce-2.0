@@ -317,6 +317,37 @@ export const useProductEditSheet = (
     return total
   })()
 
+  // Wizard mode: activated when any config item is CTO (c_type=2, components>0)
+  const wizardMode = configs.some((c) =>
+    c.items.some((i) => i.components > 0 && i.c_type === '2')
+  )
+
+  const activeStepIndex = wizardMode ? configs.findIndex((c) => c.name === state.activeTab) : -1
+
+  const canGoNext = (() => {
+    if (!wizardMode || activeStepIndex < 0 || activeStepIndex >= configs.length - 1) return false
+    const current = configs[activeStepIndex]
+    if (!current.allownone && !current.items.some((i) => i.active)) return false
+    const activeCTO = current.items.find((i) => i.active && i.subConfigurations?.length)
+    if (activeCTO) {
+      const hasUncheckedSub = activeCTO.subConfigurations!.some(
+        (sc) => !sc.allownone && !sc.items.some((si) => si.active)
+      )
+      if (hasUncheckedSub) return false
+    }
+    return true
+  })()
+
+  const canGoPrev = wizardMode && activeStepIndex > 0
+
+  const goNext = () => {
+    if (canGoNext) dispatch({ type: 'SET_ACTIVE_TAB', value: configs[activeStepIndex + 1].name })
+  }
+
+  const goPrev = () => {
+    if (canGoPrev) dispatch({ type: 'SET_ACTIVE_TAB', value: configs[activeStepIndex - 1].name })
+  }
+
   const hasChanges = (() => {
     if (state.quantity !== state.initialQuantity) return true
     const currentIds = new Set(activeConfigurations.map((c) => c.id))
@@ -335,6 +366,11 @@ export const useProductEditSheet = (
     totalPrice,
     totalOldPrice,
     hasChanges,
-    isCartItem
+    isCartItem,
+    wizardMode,
+    canGoNext,
+    canGoPrev,
+    goNext,
+    goPrev
   }
 }

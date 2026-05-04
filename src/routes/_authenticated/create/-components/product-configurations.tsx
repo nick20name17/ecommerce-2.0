@@ -1,4 +1,4 @@
-import { AlertCircle, Check, ChevronDown, ImageIcon, RotateCcw } from 'lucide-react'
+import { AlertCircle, Check, ChevronDown, ChevronRight, ImageIcon, RotateCcw } from 'lucide-react'
 import { useState } from 'react'
 
 import type { Configuration } from '@/api/product/schema'
@@ -16,6 +16,13 @@ interface ProductConfigurationsProps {
   hasUncheckedRequired: boolean
   selectedConfigCount: number
   totalConfigCount: number
+  wizardMode?: boolean
+  activeStep?: string
+  onStepChange?: (step: string) => void
+  canGoNext?: boolean
+  canGoPrev?: boolean
+  onNext?: () => void
+  onPrev?: () => void
 }
 
 export const ProductConfigurations = ({
@@ -25,7 +32,14 @@ export const ProductConfigurations = ({
   onResetConfigurations,
   hasUncheckedRequired,
   selectedConfigCount,
-  totalConfigCount
+  totalConfigCount,
+  wizardMode,
+  activeStep,
+  onStepChange,
+  canGoNext,
+  canGoPrev,
+  onNext,
+  onPrev
 }: ProductConfigurationsProps) => {
   return (
     <div className='flex h-full flex-col overflow-hidden'>
@@ -57,22 +71,99 @@ export const ProductConfigurations = ({
         </div>
       </div>
 
-      {/* All configuration groups — inline, no tabs */}
+      {/* Configuration groups */}
       <div className='min-h-0 flex-1 overflow-y-auto'>
-        {configs.map((config) => (
-          <ConfigGroup
-            key={config.name}
-            config={config}
-            onSelect={(itemId) => onSelectConfigItem(config.name, itemId)}
-            onSelectSubConfigItem={onSelectSubConfigItem
-              ? (parentItemId, subConfigName, subItemId) =>
-                  onSelectSubConfigItem(config.name, parentItemId, subConfigName, subItemId)
-              : undefined
-            }
-          />
-        ))}
+        {configs.map((config, index) => {
+          const isActive = wizardMode ? config.name === activeStep : true
+
+          return wizardMode && !isActive ? (
+            <WizardStepHeader
+              key={config.name}
+              config={config}
+              stepIndex={index}
+              onClick={() => onStepChange?.(config.name)}
+            />
+          ) : (
+            <ConfigGroup
+              key={config.name}
+              config={config}
+              onSelect={(itemId) => onSelectConfigItem(config.name, itemId)}
+              onSelectSubConfigItem={onSelectSubConfigItem
+                ? (parentItemId, subConfigName, subItemId) =>
+                    onSelectSubConfigItem(config.name, parentItemId, subConfigName, subItemId)
+                : undefined
+              }
+              wizardFooter={wizardMode ? (
+                <div className='flex items-center gap-2 border-t border-border px-4 py-2.5'>
+                  <button
+                    type='button'
+                    disabled={!canGoPrev}
+                    onClick={onPrev}
+                    className='flex-1 rounded-[6px] border border-border px-3 py-1.5 text-[13px] font-medium transition-colors duration-75 hover:bg-bg-hover disabled:pointer-events-none disabled:opacity-40'
+                  >
+                    Previous step
+                  </button>
+                  <button
+                    type='button'
+                    disabled={!canGoNext}
+                    onClick={onNext}
+                    className='flex-1 rounded-[6px] bg-primary px-3 py-1.5 text-[13px] font-medium text-primary-foreground transition-opacity duration-75 hover:opacity-90 disabled:pointer-events-none disabled:opacity-40'
+                  >
+                    Next step
+                  </button>
+                </div>
+              ) : undefined}
+            />
+          )
+        })}
       </div>
     </div>
+  )
+}
+
+// ── Wizard Step Header (collapsed, non-active step) ─────────
+
+function WizardStepHeader({
+  config,
+  stepIndex,
+  onClick,
+}: {
+  config: Configuration
+  stepIndex: number
+  onClick: () => void
+}) {
+  const hasSelected = config.items.some((i) => i.active)
+  const isRequired = !config.allownone
+  const selectedItem = config.items.find((i) => i.active)
+
+  return (
+    <button
+      type='button'
+      className='flex w-full items-center gap-2 border-b border-border px-4 py-2.5 text-left transition-colors duration-75 hover:bg-bg-hover/50'
+      onClick={onClick}
+    >
+      <span className='flex size-5 shrink-0 items-center justify-center rounded-full border border-border text-[10px] font-semibold tabular-nums text-text-tertiary'>
+        {stepIndex + 1}
+      </span>
+      <span className={cn('text-[13px] font-medium', hasSelected ? 'text-foreground' : 'text-text-secondary')}>
+        {config.name}
+      </span>
+      {isRequired && !hasSelected && (
+        <span className='text-[11px] font-medium text-destructive'>*</span>
+      )}
+      {hasSelected && (
+        <>
+          <span className='flex size-3.5 items-center justify-center rounded-full bg-primary text-white'>
+            <Check className='size-2' />
+          </span>
+          <span className='truncate text-[12px] text-text-tertiary'>
+            {selectedItem?.descr_1}
+          </span>
+        </>
+      )}
+      <div className='flex-1' />
+      <ChevronRight className='size-3.5 shrink-0 text-text-tertiary' />
+    </button>
   )
 }
 
@@ -83,11 +174,13 @@ function ConfigGroup({
   onSelect,
   onSelectSubConfigItem,
   depth = 0,
+  wizardFooter,
 }: {
   config: Configuration
   onSelect: (itemId: string) => void
   onSelectSubConfigItem?: (parentItemId: string, subConfigName: string, subItemId: string) => void
   depth?: number
+  wizardFooter?: React.ReactNode
 }) {
   const [collapsed, setCollapsed] = useState(false)
   const hasSelected = config.items.some((i) => i.active)
@@ -242,6 +335,9 @@ function ConfigGroup({
                 ))}
               </div>
             ))}
+
+          {/* Wizard prev/next buttons */}
+          {wizardFooter}
         </div>
       )}
     </div>
