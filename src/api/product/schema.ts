@@ -110,10 +110,16 @@ export interface ConfigurationProduct {
   configurations: Configuration[]
 }
 
+/**
+ * Used for both POST /cart/ payload and GET /cart/ response.
+ * - Request: only `name` + `id` are required (extra fields enrich pricing/CTO metadata).
+ * - Response: server populates `active`. Backward-compat with flat `[{name, id}]`.
+ */
 export interface CartConfiguration {
   id: string
   name: string
-  active: boolean
+  /** Present in cart response; not required in request payload. */
+  active?: boolean
   quan?: string
   cType?: string
   components?: number

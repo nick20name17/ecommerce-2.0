@@ -61,7 +61,9 @@ export const ProductEditSheet = ({
     canGoNext,
     canGoPrev,
     goNext,
-    goPrev
+    goPrev,
+    isStepFullyDone,
+    userInteractionTick
   } = useProductEditSheet(product, mode, open, configData, projectId, customerId)
 
   const { quantity, confirmClose, photoIndex, selectedUnit, configs, activeTab } = state
@@ -75,16 +77,13 @@ export const ProductEditSheet = ({
             product_autoid: isCartItem(product) ? product.product_autoid : product.autoid,
             quantity,
             unit: selectedUnit || (isCartItem(product) ? '' : product.def_unit) || '',
-            configurations:
-              activeConfigurations.length > 0
-                ? (activeConfigurations as AddToCartPayload['configurations'])
-                : undefined
+            configurations: activeConfigurations.length > 0 ? activeConfigurations : undefined
           }
         : null
       const editPayload: UpdateCartItemPayload | null = !isAdd
         ? {
             quantity,
-            configurations: activeConfigurations as UpdateCartItemPayload['configurations']
+            configurations: activeConfigurations
           }
         : null
       const itemId = !isAdd && isCartItem(product) ? product.id : 0
@@ -141,17 +140,12 @@ export const ProductEditSheet = ({
   const showConfigs = hasConfigs || configLoading
   const selectedConfigCount = activeConfigurations.length
 
-  const handleSelectConfigItem = (configName: string, itemId: string) => {
-    dispatch({ type: 'SELECT_CONFIG_ITEM', configName, itemId })
-  }
-
-  const handleSelectSubConfigItem = (
-    parentConfigName: string,
-    parentItemId: string,
-    subConfigName: string,
-    subItemId: string
+  const handleSelectItem = (
+    path: import('./product-edit-sheet-reducer').ConfigPath,
+    configName: string,
+    itemId: string
   ) => {
-    dispatch({ type: 'SELECT_SUB_CONFIG_ITEM', parentConfigName, parentItemId, subConfigName, subItemId })
+    dispatch({ type: 'SELECT_ITEM', path, configName, itemId })
   }
 
   const handleClose = () => {
@@ -257,8 +251,7 @@ export const ProductEditSheet = ({
                     configs={configs}
                     activeTab={activeTab}
                     onActiveTabChange={(tab) => dispatch({ type: 'SET_ACTIVE_TAB', value: tab })}
-                    onSelectConfigItem={handleSelectConfigItem}
-                    onSelectSubConfigItem={handleSelectSubConfigItem}
+                    onSelectItem={handleSelectItem}
                     onResetConfigurations={() => dispatch({ type: 'DESELECT_ALL_CONFIGS' })}
                     hasUncheckedRequired={hasUncheckedRequired}
                     selectedConfigCount={selectedConfigCount}
@@ -270,6 +263,8 @@ export const ProductEditSheet = ({
                     canGoPrev={canGoPrev}
                     onNext={goNext}
                     onPrev={goPrev}
+                    isConfigComplete={isStepFullyDone}
+                    userInteractionTick={userInteractionTick}
                   />
                 ) : (
                   <div className='flex flex-1 items-center justify-center'>
