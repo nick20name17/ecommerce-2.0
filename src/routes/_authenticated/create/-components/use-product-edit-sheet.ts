@@ -332,6 +332,40 @@ export const useProductEditSheet = (
             subConfigsLoaded: true,
             subConfigurations: subConfigs
           }))
+
+          // Fetch photos for each sub-configuration category
+          const subProductId = subProduct.id || t.itemId
+          for (const sc of subConfigs) {
+            const catName = sc.name
+            const photoKey = `sub:${t.itemId}:${catName}`
+            if (requestedTabsRef.current.has(photoKey)) continue
+            requestedTabsRef.current.add(photoKey)
+
+            productService
+              .getConfigurationPhotos({
+                configuration_id: subProductId,
+                category_name: catName,
+                project_id: projectId ?? undefined
+              })
+              .then((photos) => {
+                const photosMap = new Map(photos.map((p) => [p.id, p.photos]))
+                patchItem(t, (i) => ({
+                  ...i,
+                  subConfigurations: i.subConfigurations?.map((c) => {
+                    if (c.name !== catName) return c
+                    return {
+                      ...c,
+                      photosLoading: false,
+                      items: c.items.map((si) => ({
+                        ...si,
+                        photos: photosMap.get(si.id) ?? si.photos
+                      }))
+                    }
+                  })
+                }))
+              })
+              .catch(() => {})
+          }
         })
         .catch(() => {
           patchItem(t, (i) => ({ ...i, subConfigsLoading: false, subConfigsLoaded: true }))
