@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { ImagePlus, Pencil, Star, Trash2, Upload } from 'lucide-react'
+import { GripVertical, ImagePlus, Pencil, Star, Trash2, Upload } from 'lucide-react'
 import { useCallback, useRef, useState } from 'react'
 
 import {
@@ -39,6 +39,8 @@ export const ImageGallery = ({
   const [editImage, setEditImage] = useState<CatalogImageItem | null>(null)
   const [editAlt, setEditAlt] = useState('')
   const [dragOver, setDragOver] = useState(false)
+  const [dragImageId, setDragImageId] = useState<number | null>(null)
+  const [dropTargetId, setDropTargetId] = useState<number | null>(null)
 
   const queryKey = CATALOG_IMAGE_QUERY_KEYS.list(
     entityType,
@@ -60,7 +62,6 @@ export const ImageGallery = ({
       setUploading(true)
       try {
         for (const file of Array.from(files)) {
-          // 1. Get presigned URL
           const presigned = await catalogImageService.getPresignedUrl(
             {
               entity_type: entityType,
@@ -71,14 +72,12 @@ export const ImageGallery = ({
             { project_id: projectId ?? undefined }
           )
 
-          // 2. Upload directly to S3
           await fetch(presigned.upload_url, {
             method: 'PUT',
             body: file,
             headers: { 'Content-Type': file.type },
           })
 
-          // 3. Confirm upload
           await catalogImageService.confirmUpload(
             {
               entity_type: entityType,
@@ -131,7 +130,17 @@ export const ImageGallery = ({
     },
   })
 
-  const handleDrop = useCallback(
+  const reorderMutation = useMutation({
+    mutationFn: ({ imageId, newSortOrder }: { imageId: number; newSortOrder: number }) =>
+      catalogImageService.update(
+        imageId,
+        { sort_order: newSortOrder },
+        { project_id: projectId ?? undefined }
+      ),
+    onSuccess: invalidate,
+  })
+
+  const handleFileDrop = useCallback(
     (e: React.DragEvent) => {
       e.preventDefault()
       setDragOver(false)
@@ -140,6 +149,45 @@ export const ImageGallery = ({
     },
     [uploadFiles]
   )
+
+  const handleImageDragStart = (e: React.DragEvent, imageId: number) => {
+    e.dataTransfer.effectAllowed = 'move'
+    e.dataTransfer.setData('image-reorder', String(imageId))
+    setDragImageId(imageId)
+  }
+
+  const handleImageDragOver = (e: React.DragEvent, targetId: number) => {
+    if (!e.dataTransfer.types.includes('image-reorder')) return
+    e.preventDefault()
+    e.dataTransfer.dropEffect = 'move'
+    setDropTargetId(targetId)
+  }
+
+  const handleImageDrop = (e: React.DragEvent, targetId: number) => {
+    e.preventDefault()
+    e.stopPropagation()
+    const sourceId = Number(e.dataTransfer.getData('image-reorder'))
+    setDragImageId(null)
+    setDropTargetId(null)
+    if (!sourceId || sourceId === targetId) return
+
+    const targetImage = images.find((img) => img.id === targetId)
+    if (targetImage) {
+      reorderMutation.mutate({
+        imageId: sourceId,
+        newSortOrder: targetImage.sort_order,
+      })
+    }
+  }
+
+  const handleDrop = (e: React.DragEvent) => {
+    if (e.dataTransfer.types.includes('image-reorder')) {
+      setDragImageId(null)
+      setDropTargetId(null)
+      return
+    }
+    handleFileDrop(e)
+  }
 
   const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files
@@ -194,7 +242,7 @@ export const ImageGallery = ({
             setDragOver(true)
           }}
           onDragLeave={() => setDragOver(false)}
-          onDrop={handleDrop}
+          onDrop={handleFileDrop}
         >
           <ImagePlus className='mx-auto size-8 text-text-quaternary mb-2' />
           <p className='text-[13px] text-text-tertiary'>
@@ -219,22 +267,41 @@ export const ImageGallery = ({
           )}
           onDragOver={(e) => {
             e.preventDefault()
-            setDragOver(true)
+            if (!e.dataTransfer.types.includes('image-reorder')) setDragOver(true)
           }}
-          onDragLeave={() => setDragOver(false)}
+          onDragLeave={() => { setDragOver(false); setDropTargetId(null) }}
           onDrop={handleDrop}
         >
           {images.map((img) => (
             <div
               key={img.id}
-              className='group relative aspect-square rounded-lg overflow-hidden border border-border bg-bg-secondary'
+              draggable
+              onDragStart={(e) => handleImageDragStart(e, img.id)}
+              onDragEnd={() => { setDragImageId(null); setDropTargetId(null) }}
+              onDragOver={(e) => handleImageDragOver(e, img.id)}
+              onDrop={(e) => handleImageDrop(e, img.id)}
+              className={cn(
+                'group relative aspect-square rounded-lg overflow-hidden border bg-bg-secondary cursor-grab active:cursor-grabbing transition-all',
+                dragImageId === img.id
+                  ? 'opacity-40 border-border'
+                  : dropTargetId === img.id
+                    ? 'border-primary ring-2 ring-primary/30'
+                    : 'border-border'
+              )}
             >
               <img
                 src={img.thumbnail_url}
                 alt={img.alt || img.original_filename}
-                className='size-full object-cover'
+                className='size-full object-cover pointer-events-none'
                 loading='lazy'
               />
+
+              {/* Drag handle */}
+              <div className='absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity'>
+                <div className='rounded bg-black/50 p-0.5'>
+                  <GripVertical className='size-3 text-white' />
+                </div>
+              </div>
 
               {/* Primary badge */}
               {img.is_primary && (

@@ -1,15 +1,17 @@
 import { useMutation } from '@tanstack/react-query'
-import { ArrowLeft, Pencil } from 'lucide-react'
+import { ArrowLeft, Pencil, Trash2 } from 'lucide-react'
 import { useState } from 'react'
 
 import type { VariableProduct, UpdateVariableProductPayload } from '@/api/variable-product/schema'
 import { variableProductService } from '@/api/variable-product/service'
 import { VP_QUERY_KEYS } from '@/api/variable-product/query'
+import { CATALOG_QUERY_KEYS } from '@/api/catalog/query'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
   DialogBody,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -28,6 +30,7 @@ interface VPHeaderProps {
 
 export const VPHeader = ({ vp, projectId, onBack, isMobile, isTablet }: VPHeaderProps) => {
   const [editOpen, setEditOpen] = useState(false)
+  const [deleteOpen, setDeleteOpen] = useState(false)
   const [name, setName] = useState(vp.name)
   const [description, setDescription] = useState(vp.description)
   const [slug, setSlug] = useState(vp.slug)
@@ -51,6 +54,19 @@ export const VPHeader = ({ vp, projectId, onBack, isMobile, isTablet }: VPHeader
     meta: {
       successMessage: vp.active ? 'Deactivated' : 'Activated',
       invalidatesQuery: VP_QUERY_KEYS.detail(vp.id),
+    },
+  })
+
+  const deleteMutation = useMutation({
+    mutationFn: () =>
+      variableProductService.delete(vp.id, { project_id: projectId ?? undefined }),
+    meta: {
+      successMessage: 'Superinventory deleted',
+      invalidatesQuery: CATALOG_QUERY_KEYS.all(),
+    },
+    onSuccess: () => {
+      setDeleteOpen(false)
+      onBack()
     },
   })
 
@@ -83,6 +99,15 @@ export const VPHeader = ({ vp, projectId, onBack, isMobile, isTablet }: VPHeader
         <Button variant='outline' size={isMobile ? 'icon-sm' : 'sm'} onClick={() => setEditOpen(true)}>
           <Pencil className='size-3.5' />
           {!isMobile && 'Edit'}
+        </Button>
+        <Button
+          variant='outline'
+          size='icon-sm'
+          className='hover:bg-destructive hover:text-destructive-foreground hover:border-destructive'
+          onClick={() => setDeleteOpen(true)}
+          title='Delete superinventory'
+        >
+          <Trash2 className='size-3.5' />
         </Button>
       </div>
 
@@ -146,6 +171,31 @@ export const VPHeader = ({ vp, projectId, onBack, isMobile, isTablet }: VPHeader
               </Button>
             </DialogFooter>
           </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete confirmation dialog */}
+      <Dialog open={deleteOpen} onOpenChange={setDeleteOpen}>
+        <DialogContent className='sm:max-w-sm'>
+          <DialogHeader>
+            <DialogTitle>Delete Superinventory</DialogTitle>
+            <DialogDescription>
+              This will permanently delete <strong>{vp.name}</strong> and all its items.
+              This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button type='button' variant='outline' onClick={() => setDeleteOpen(false)}>
+              Cancel
+            </Button>
+            <Button
+              variant='destructive'
+              onClick={() => deleteMutation.mutate()}
+              isPending={deleteMutation.isPending}
+            >
+              Delete
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </>
