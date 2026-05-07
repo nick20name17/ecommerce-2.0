@@ -1,14 +1,14 @@
 import { api } from '..'
 
-export interface MetaData {
-  id: string | null
-  meta_title: string
-  meta_description: string
-}
+import type { MetaTagsData } from './schema'
 
 export const metaService = {
-  get: async (params: { entity_type: string; entity_id: string; project_id?: number }) => {
-    const { data } = await api.get<MetaData>('/meta/', { params })
+  get: async (params: {
+    entity_type: string
+    entity_id: string
+    project_id?: number
+  }) => {
+    const { data } = await api.get<MetaTagsData>('/meta/', { params })
     return data
   },
 
@@ -21,7 +21,7 @@ export const metaService = {
     },
     params?: { project_id?: number }
   ) => {
-    const { data } = await api.post<MetaData>('/meta/', payload, { params })
+    const { data } = await api.post<MetaTagsData>('/meta/', payload, { params })
     return data
   },
 }
