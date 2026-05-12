@@ -1,5 +1,9 @@
+import { defaultPreset } from '@dnd-kit/dom'
+import { OptimisticSortingPlugin, SortableKeyboardPlugin } from '@dnd-kit/dom/sortable'
+import { DragDropProvider } from '@dnd-kit/react'
+import { useSortable } from '@dnd-kit/react/sortable'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { Plus, Trash2 } from 'lucide-react'
+import { GripVertical, Plus, Trash2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useDebouncedCallback } from 'use-debounce'
 
@@ -11,6 +15,19 @@ import { ColorPicker } from '@/components/ui/color-picker'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Skeleton } from '@/components/ui/skeleton'
+import { cn } from '@/lib/utils'
+
+const SORTABLE_PLUGINS = [
+  ...defaultPreset.plugins,
+  OptimisticSortingPlugin,
+  SortableKeyboardPlugin,
+]
+
+const arrayMove = <T,>(array: T[], from: number, to: number): T[] => {
+  const next = array.slice()
+  next.splice(to, 0, next.splice(from, 1)[0]!)
+  return next
+}
 
 interface Props {
   specId: string
@@ -29,9 +46,15 @@ export const SpecOptionsInlineEditor = ({
   const params = { project_id: projectId ?? undefined }
 
   const { data: rawData, isLoading } = useQuery(getSpecOptionsQuery(specId, params))
-  const options: SpecOption[] = Array.isArray(rawData)
+  const serverOptions: SpecOption[] = Array.isArray(rawData)
     ? rawData
     : ((rawData as unknown as { results?: SpecOption[] })?.results ?? [])
+
+  const [orderedOptions, setOrderedOptions] = useState<SpecOption[]>(serverOptions)
+  useEffect(() => {
+    setOrderedOptions(serverOptions)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [rawData])
 
   const invalidate = () => {
     queryClient.invalidateQueries({ queryKey: VP_QUERY_KEYS.specOptions(specId) })
@@ -43,7 +66,7 @@ export const SpecOptionsInlineEditor = ({
     mutationFn: () =>
       variableProductService.createSpecOption(
         specId,
-        { value: newValue.trim(), sort_order: options.length },
+        { value: newValue.trim(), sort_order: orderedOptions.length },
         params
       ),
     meta: { successMessage: 'Option added' },
@@ -60,50 +83,118 @@ export const SpecOptionsInlineEditor = ({
     onSuccess: invalidate,
   })
 
+  const reorderMutation = useMutation({
+    mutationFn: ({ id, sort_order }: { id: string; sort_order: number }) =>
+      variableProductService.updateSpecOption(specId, id, { sort_order }, params),
+  })
+
+  const handleDragEnd = (event: unknown) => {
+    const e = event as {
+      canceled?: boolean
+      operation?: {
+        source: { id: string | number } | null
+        target: { id: string | number } | null
+      }
+    }
+    if (e.canceled) return
+    const op = e.operation
+    if (!op?.source) return
+
+    const { source, target } = op
+    const sortableSource = source as { initialIndex?: number; index?: number }
+    const useSortableIndices =
+      typeof sortableSource.initialIndex === 'number' &&
+      typeof sortableSource.index === 'number'
+
+    const fromIndex = useSortableIndices
+      ? sortableSource.initialIndex
+      : orderedOptions.findIndex((o) => o.id === String(source?.id))
+    const toIndex = useSortableIndices
+      ? sortableSource.index
+      : target != null
+        ? orderedOptions.findIndex((o) => o.id === String(target.id))
+        : -1
+
+    if (
+      typeof fromIndex !== 'number' ||
+      typeof toIndex !== 'number' ||
+      fromIndex === -1 ||
+      toIndex === -1 ||
+      fromIndex === toIndex
+    )
+      return
+
+    const next = arrayMove(orderedOptions, fromIndex, toIndex)
+    setOrderedOptions(next)
+
+    Promise.all(
+      next.map((opt, i) =>
+        opt.sort_order === i
+          ? Promise.resolve()
+          : reorderMutation.mutateAsync({ id: opt.id, sort_order: i })
+      )
+    )
+      .then(() => invalidate())
+      .catch(() => {})
+  }
+
   return (
     <div className='flex flex-col gap-2'>
       <Label className='text-[12px]'>
         Options
         {displayType === 'swatch' && (
           <span className='ml-1 text-[11px] font-normal text-text-tertiary'>
-            · click swatch to set color
+            · click swatch to set color · drag to reorder
+          </span>
+        )}
+        {displayType !== 'swatch' && (
+          <span className='ml-1 text-[11px] font-normal text-text-tertiary'>
+            · drag to reorder
           </span>
         )}
       </Label>
 
-      <div className='rounded-lg border border-border'>
-        {isLoading ? (
-          <div className='flex flex-col gap-1 p-2'>
-            {Array.from({ length: 3 }).map((_, i) => (
-              <Skeleton key={i} className='h-9 w-full rounded-md' />
-            ))}
-          </div>
-        ) : options.length === 0 ? (
-          <div className='px-3 py-4 text-center text-[12px] text-text-tertiary'>
-            No options yet. Add one below.
-          </div>
-        ) : (
-          <div className='flex flex-col divide-y divide-border-light'>
-            {options.map((opt) => (
-              <OptionRow
-                key={opt.id}
-                specId={specId}
-                option={opt}
-                displayType={displayType}
-                projectId={projectId}
-                vpId={vpId}
-                onDelete={() => deleteMutation.mutate(opt.id)}
-                isDeleting={
-                  deleteMutation.isPending && deleteMutation.variables === opt.id
-                }
-              />
-            ))}
-          </div>
-        )}
+      <div className='flex flex-col overflow-hidden rounded-lg border border-border'>
+        <div
+          className='max-h-[40vh] overflow-y-auto overscroll-contain'
+          onWheel={(e) => e.stopPropagation()}
+        >
+          {isLoading ? (
+            <div className='flex flex-col gap-1 p-2'>
+              {Array.from({ length: 3 }).map((_, i) => (
+                <Skeleton key={i} className='h-9 w-full rounded-md' />
+              ))}
+            </div>
+          ) : orderedOptions.length === 0 ? (
+            <div className='px-3 py-4 text-center text-[12px] text-text-tertiary'>
+              No options yet. Add one below.
+            </div>
+          ) : (
+            <DragDropProvider plugins={SORTABLE_PLUGINS} onDragEnd={handleDragEnd}>
+              <div className='flex flex-col divide-y divide-border-light'>
+                {orderedOptions.map((opt, index) => (
+                  <SortableOptionRow
+                    key={opt.id}
+                    index={index}
+                    specId={specId}
+                    option={opt}
+                    displayType={displayType}
+                    projectId={projectId}
+                    vpId={vpId}
+                    onDelete={() => deleteMutation.mutate(opt.id)}
+                    isDeleting={
+                      deleteMutation.isPending && deleteMutation.variables === opt.id
+                    }
+                  />
+                ))}
+              </div>
+            </DragDropProvider>
+          )}
+        </div>
 
-        {/* Add row */}
+        {/* Add row — sticky at bottom of the list card */}
         <form
-          className='flex items-center gap-2 border-t border-border-light px-2 py-1.5'
+          className='flex items-center gap-2 border-t border-border-light bg-bg-secondary/40 px-2 py-1.5'
           onSubmit={(e) => {
             e.preventDefault()
             if (newValue.trim()) createMutation.mutate()
@@ -132,6 +223,7 @@ export const SpecOptionsInlineEditor = ({
 }
 
 interface OptionRowProps {
+  index: number
   specId: string
   option: SpecOption
   displayType: SpecDisplayType
@@ -141,7 +233,8 @@ interface OptionRowProps {
   isDeleting: boolean
 }
 
-const OptionRow = ({
+const SortableOptionRow = ({
+  index,
   specId,
   option,
   displayType,
@@ -153,16 +246,18 @@ const OptionRow = ({
   const queryClient = useQueryClient()
   const params = { project_id: projectId ?? undefined }
 
+  const { handleRef, ref, isDragging } = useSortable({
+    id: option.id,
+    index,
+  })
+
   const [value, setValue] = useState(option.value)
   const [color, setColor] = useState(option.color_hex || '')
-  const [sort, setSort] = useState(option.sort_order)
 
-  // Sync from upstream changes (e.g. refetch after another mutation)
   useEffect(() => {
     setValue(option.value)
     setColor(option.color_hex || '')
-    setSort(option.sort_order)
-  }, [option.id, option.value, option.color_hex, option.sort_order])
+  }, [option.id, option.value, option.color_hex])
 
   const patch = async (payload: Partial<SpecOption>) => {
     await variableProductService.updateSpecOption(specId, option.id, payload, params)
@@ -175,7 +270,22 @@ const OptionRow = ({
   }, 400)
 
   return (
-    <div className='flex items-center gap-2 px-2 py-1.5'>
+    <div
+      ref={ref}
+      className={cn(
+        'flex items-center gap-2 px-2 py-1.5',
+        isDragging && 'bg-bg-hover opacity-60 shadow-sm'
+      )}
+    >
+      <button
+        ref={handleRef}
+        type='button'
+        className='shrink-0 cursor-grab touch-none text-text-quaternary hover:text-text-secondary'
+        aria-label='Drag to reorder'
+      >
+        <GripVertical className='size-3.5' />
+      </button>
+
       {displayType === 'swatch' ? (
         <ColorPicker
           value={color}
@@ -210,20 +320,6 @@ const OptionRow = ({
           {color}
         </span>
       )}
-
-      <input
-        type='number'
-        value={sort}
-        onChange={(e) => setSort(Number(e.target.value))}
-        onBlur={() => {
-          if (sort !== option.sort_order) patch({ sort_order: sort })
-        }}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter') (e.target as HTMLInputElement).blur()
-        }}
-        className='w-10 rounded border border-transparent bg-transparent px-1 py-0.5 text-right text-[11px] tabular-nums text-text-quaternary outline-none transition-colors hover:border-border focus:border-primary focus:text-foreground'
-        title='Sort order'
-      />
 
       <Button
         type='button'

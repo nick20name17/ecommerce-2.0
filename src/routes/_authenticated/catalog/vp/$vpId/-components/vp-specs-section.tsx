@@ -204,7 +204,7 @@ export const VPSpecsSection = ({ vp, projectId }: VPSpecsSectionProps) => {
           if (!v) { setEditSpec(null); resetForm() }
         }}
       >
-        <DialogContent className='sm:max-w-lg'>
+        <DialogContent className='max-h-[85vh] sm:max-w-lg'>
           <form
             onSubmit={(e) => {
               e.preventDefault()
