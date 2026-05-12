@@ -71,39 +71,41 @@ export const SpecOptionsInlineEditor = ({
         )}
       </Label>
 
-      <div className='rounded-lg border border-border'>
-        {isLoading ? (
-          <div className='flex flex-col gap-1 p-2'>
-            {Array.from({ length: 3 }).map((_, i) => (
-              <Skeleton key={i} className='h-9 w-full rounded-md' />
-            ))}
-          </div>
-        ) : options.length === 0 ? (
-          <div className='px-3 py-4 text-center text-[12px] text-text-tertiary'>
-            No options yet. Add one below.
-          </div>
-        ) : (
-          <div className='flex flex-col divide-y divide-border-light'>
-            {options.map((opt) => (
-              <OptionRow
-                key={opt.id}
-                specId={specId}
-                option={opt}
-                displayType={displayType}
-                projectId={projectId}
-                vpId={vpId}
-                onDelete={() => deleteMutation.mutate(opt.id)}
-                isDeleting={
-                  deleteMutation.isPending && deleteMutation.variables === opt.id
-                }
-              />
-            ))}
-          </div>
-        )}
+      <div className='flex flex-col overflow-hidden rounded-lg border border-border'>
+        <div className='max-h-[40vh] overflow-y-auto'>
+          {isLoading ? (
+            <div className='flex flex-col gap-1 p-2'>
+              {Array.from({ length: 3 }).map((_, i) => (
+                <Skeleton key={i} className='h-9 w-full rounded-md' />
+              ))}
+            </div>
+          ) : options.length === 0 ? (
+            <div className='px-3 py-4 text-center text-[12px] text-text-tertiary'>
+              No options yet. Add one below.
+            </div>
+          ) : (
+            <div className='flex flex-col divide-y divide-border-light'>
+              {options.map((opt) => (
+                <OptionRow
+                  key={opt.id}
+                  specId={specId}
+                  option={opt}
+                  displayType={displayType}
+                  projectId={projectId}
+                  vpId={vpId}
+                  onDelete={() => deleteMutation.mutate(opt.id)}
+                  isDeleting={
+                    deleteMutation.isPending && deleteMutation.variables === opt.id
+                  }
+                />
+              ))}
+            </div>
+          )}
+        </div>
 
-        {/* Add row */}
+        {/* Add row — sticky at bottom of the list card */}
         <form
-          className='flex items-center gap-2 border-t border-border-light px-2 py-1.5'
+          className='flex items-center gap-2 border-t border-border-light bg-bg-secondary/40 px-2 py-1.5'
           onSubmit={(e) => {
             e.preventDefault()
             if (newValue.trim()) createMutation.mutate()
