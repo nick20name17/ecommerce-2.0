@@ -9,6 +9,7 @@ import type {
 } from '@/api/variable-product/schema'
 import { variableProductService } from '@/api/variable-product/service'
 import { VP_QUERY_KEYS, getSpecsQuery } from '@/api/variable-product/query'
+import { SpecOptionsInlineEditor } from './spec-options-inline-editor'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -203,7 +204,7 @@ export const VPSpecsSection = ({ vp, projectId }: VPSpecsSectionProps) => {
           if (!v) { setEditSpec(null); resetForm() }
         }}
       >
-        <DialogContent className='sm:max-w-sm'>
+        <DialogContent className='sm:max-w-lg'>
           <form
             onSubmit={(e) => {
               e.preventDefault()
@@ -264,6 +265,14 @@ export const VPSpecsSection = ({ vp, projectId }: VPSpecsSectionProps) => {
                   onChange={(e) => setSortOrder(Number(e.target.value))}
                 />
               </div>
+              {editSpec && (
+                <SpecOptionsInlineEditor
+                  specId={editSpec.id}
+                  displayType={displayType}
+                  projectId={projectId}
+                  vpId={vp.id}
+                />
+              )}
             </DialogBody>
             <DialogFooter>
               <Button type='button' variant='outline' onClick={() => { setEditSpec(null); resetForm() }}>Cancel</Button>
