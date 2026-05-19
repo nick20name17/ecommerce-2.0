@@ -7,6 +7,7 @@ import {
   FolderPlus,
   Layers,
   Package,
+  Pencil,
   Plus,
   Trash2,
 } from 'lucide-react'
@@ -17,7 +18,16 @@ import type { CatalogCategory, CatalogCategoryProduct, CatalogCategoryVP } from 
 import { catalogService } from '@/api/catalog/service'
 import { ImageGallery } from '@/components/common/image-gallery'
 import { MetaTagsEditor } from '@/components/common/meta-tags-editor'
+import { StatusBadge, StatusEditor, type StatusValue } from '@/components/common/status-editor'
 import { Button } from '@/components/ui/button'
+import {
+  Dialog,
+  DialogBody,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
 import { Skeleton } from '@/components/ui/skeleton'
 import { cn } from '@/lib/utils'
 
@@ -172,6 +182,9 @@ export const CategoryItemsPanel = ({
               <ProductRow
                 key={product.id}
                 product={product}
+                categoryId={category.id}
+                projectId={projectId}
+                onInvalidate={invalidate}
                 onRemove={() => removeProductMutation.mutate(product.id)}
                 onToggleActive={() =>
                   toggleProductMutation.mutate({
@@ -255,44 +268,121 @@ function VPRow({
 
 function ProductRow({
   product,
+  categoryId,
+  projectId,
+  onInvalidate,
   onRemove,
   onToggleActive,
 }: {
   product: CatalogCategoryProduct
+  categoryId: string
+  projectId: number | null
+  onInvalidate: () => void
   onRemove: () => void
   onToggleActive: () => void
 }) {
+  const [editOpen, setEditOpen] = useState(false)
+  const [status, setStatus] = useState<StatusValue>(product.status ?? '')
+  const [statusExpiresAt, setStatusExpiresAt] = useState<string | null>(
+    product.status_expires_at ?? null
+  )
+
+  const updateMutation = useMutation({
+    mutationFn: () =>
+      catalogService.updateProduct(
+        categoryId,
+        product.id,
+        { status, status_expires_at: statusExpiresAt },
+        { project_id: projectId ?? undefined }
+      ),
+    meta: { successMessage: 'Status updated' },
+    onSuccess: () => {
+      onInvalidate()
+      setEditOpen(false)
+    },
+  })
+
   return (
-    <div className='group flex items-center gap-2 rounded-lg px-2.5 py-2 hover:bg-bg-secondary transition-colors'>
-      <div className='flex size-8 shrink-0 items-center justify-center rounded bg-blue-500/10'>
-        <Box className='size-3.5 text-blue-500' />
+    <>
+      <div className='group flex items-center gap-2 rounded-lg px-2.5 py-2 hover:bg-bg-secondary transition-colors'>
+        <div className='flex size-8 shrink-0 items-center justify-center rounded bg-blue-500/10'>
+          <Box className='size-3.5 text-blue-500' />
+        </div>
+        <div className='flex-1 min-w-0'>
+          <p className={cn('text-[13px] font-medium truncate', !product.active && 'text-text-tertiary')}>
+            {product.descr_1 || product.product_id || product.product_autoid}
+          </p>
+          {product.product_id && (
+            <p className='text-[11px] text-text-quaternary truncate'>{product.product_id}</p>
+          )}
+        </div>
+        <StatusBadge status={product.status} expiresAt={product.status_expires_at} />
+        <Button
+          variant='ghost'
+          size='icon-xs'
+          className='opacity-0 group-hover:opacity-100'
+          onClick={() => {
+            setStatus(product.status ?? '')
+            setStatusExpiresAt(product.status_expires_at ?? null)
+            setEditOpen(true)
+          }}
+          title='Edit status'
+        >
+          <Pencil className='size-3' />
+        </Button>
+        <Button
+          variant='ghost'
+          size='icon-xs'
+          className='opacity-0 group-hover:opacity-100'
+          onClick={onToggleActive}
+          title={product.active ? 'Deactivate' : 'Activate'}
+        >
+          {product.active ? <Eye className='size-3' /> : <EyeOff className='size-3 text-text-quaternary' />}
+        </Button>
+        <Button
+          variant='ghost'
+          size='icon-xs'
+          className='opacity-0 group-hover:opacity-100 hover:bg-destructive hover:text-destructive-foreground'
+          onClick={onRemove}
+          title='Remove from category'
+        >
+          <Trash2 className='size-3' />
+        </Button>
       </div>
-      <div className='flex-1 min-w-0'>
-        <p className={cn('text-[13px] font-medium truncate', !product.active && 'text-text-tertiary')}>
-          {product.descr_1 || product.product_id || product.product_autoid}
-        </p>
-        {product.product_id && (
-          <p className='text-[11px] text-text-quaternary truncate'>{product.product_id}</p>
-        )}
-      </div>
-      <Button
-        variant='ghost'
-        size='icon-xs'
-        className='opacity-0 group-hover:opacity-100'
-        onClick={onToggleActive}
-        title={product.active ? 'Deactivate' : 'Activate'}
-      >
-        {product.active ? <Eye className='size-3' /> : <EyeOff className='size-3 text-text-quaternary' />}
-      </Button>
-      <Button
-        variant='ghost'
-        size='icon-xs'
-        className='opacity-0 group-hover:opacity-100 hover:bg-destructive hover:text-destructive-foreground'
-        onClick={onRemove}
-        title='Remove from category'
-      >
-        <Trash2 className='size-3' />
-      </Button>
-    </div>
+
+      <Dialog open={editOpen} onOpenChange={setEditOpen}>
+        <DialogContent className='sm:max-w-sm'>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault()
+              updateMutation.mutate()
+            }}
+          >
+            <DialogHeader>
+              <DialogTitle>Edit Status</DialogTitle>
+            </DialogHeader>
+            <DialogBody className='flex flex-col gap-3'>
+              <p className='text-[12px] text-text-tertiary'>
+                {product.descr_1 || product.product_id || product.product_autoid}
+              </p>
+              <StatusEditor
+                status={status}
+                expiresAt={statusExpiresAt}
+                onStatusChange={setStatus}
+                onExpiresAtChange={setStatusExpiresAt}
+              />
+            </DialogBody>
+            <DialogFooter>
+              <Button type='button' variant='outline' onClick={() => setEditOpen(false)}>
+                Cancel
+              </Button>
+              <Button type='submit' isPending={updateMutation.isPending}>
+                Save
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+    </>
   )
 }

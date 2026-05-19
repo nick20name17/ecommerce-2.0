@@ -24,6 +24,8 @@ export interface CatalogCategoryProduct {
   product_autoid: string
   sort_order: number
   active: boolean
+  status: import('@/api/variable-product/schema').ProductStatus | ''
+  status_expires_at: string | null
   product_id?: string
   descr_1?: string
   descr_2?: string
