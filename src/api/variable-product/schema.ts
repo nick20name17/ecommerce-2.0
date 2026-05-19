@@ -35,6 +35,21 @@ export interface ItemSpecLink {
 
 // ── Variable Product ────────────────────────────────────────
 
+export type ProductStatus =
+  | 'featured'
+  | 'sale'
+  | 'new'
+  | 'clearance'
+  | 'coming_soon'
+
+export const PRODUCT_STATUS_VALUES: ProductStatus[] = [
+  'featured',
+  'sale',
+  'new',
+  'clearance',
+  'coming_soon',
+]
+
 export interface VariableProduct {
   id: string
   name: string
@@ -44,6 +59,8 @@ export interface VariableProduct {
   category_id: string | null
   sort_order: number
   active: boolean
+  status: ProductStatus | ''
+  status_expires_at: string | null
   items: VariableProductItem[]
   spec_definitions: GlobalSpecDefinition[]
 }
@@ -57,6 +74,8 @@ export interface VariableProductListItem {
   category_id: string | null
   sort_order: number
   active: boolean
+  status: ProductStatus | ''
+  status_expires_at: string | null
 }
 
 // ── Items (product variants within a VP) ─────────────────────
@@ -87,6 +106,7 @@ export interface VariableProductParams extends PaginationParams {
   project_id?: number
   search?: string
   category_id?: string
+  status?: ProductStatus
 }
 
 export interface SpecParams {
@@ -106,6 +126,8 @@ export interface CreateVariableProductPayload {
 
 export type UpdateVariableProductPayload = Partial<CreateVariableProductPayload> & {
   active?: boolean
+  status?: ProductStatus | ''
+  status_expires_at?: string | null
 }
 
 export interface CreateVPItemPayload {

@@ -6,6 +6,7 @@ import type { VariableProduct, UpdateVariableProductPayload } from '@/api/variab
 import { variableProductService } from '@/api/variable-product/service'
 import { VP_QUERY_KEYS } from '@/api/variable-product/query'
 import { CATALOG_QUERY_KEYS } from '@/api/catalog/query'
+import { StatusBadge, StatusEditor, type StatusValue } from '@/components/common/status-editor'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -35,6 +36,10 @@ export const VPHeader = ({ vp, projectId, onBack, isMobile, isTablet }: VPHeader
   const [description, setDescription] = useState(vp.description)
   const [slug, setSlug] = useState(vp.slug)
   const [imageUrl, setImageUrl] = useState(vp.image_url)
+  const [status, setStatus] = useState<StatusValue>(vp.status ?? '')
+  const [statusExpiresAt, setStatusExpiresAt] = useState<string | null>(
+    vp.status_expires_at ?? null
+  )
 
   const updateMutation = useMutation({
     mutationFn: (payload: UpdateVariableProductPayload) =>
@@ -85,6 +90,7 @@ export const VPHeader = ({ vp, projectId, onBack, isMobile, isTablet }: VPHeader
             <p className='text-[12px] text-text-tertiary truncate'>{vp.description}</p>
           )}
         </div>
+        <StatusBadge status={vp.status} expiresAt={vp.status_expires_at} />
         <span
           className={cn(
             'inline-flex shrink-0 items-center rounded-full px-2 py-0.5 text-[11px] font-medium cursor-pointer transition-colors',
@@ -121,6 +127,8 @@ export const VPHeader = ({ vp, projectId, onBack, isMobile, isTablet }: VPHeader
                 description: description || undefined,
                 slug: slug || undefined,
                 image_url: imageUrl || undefined,
+                status,
+                status_expires_at: statusExpiresAt,
               })
             }}
           >
@@ -161,6 +169,12 @@ export const VPHeader = ({ vp, projectId, onBack, isMobile, isTablet }: VPHeader
                   onChange={(e) => setImageUrl(e.target.value)}
                 />
               </div>
+              <StatusEditor
+                status={status}
+                expiresAt={statusExpiresAt}
+                onStatusChange={setStatus}
+                onExpiresAtChange={setStatusExpiresAt}
+              />
             </DialogBody>
             <DialogFooter>
               <Button type='button' variant='outline' onClick={() => setEditOpen(false)}>
