@@ -86,6 +86,8 @@ export interface VariableProductItem {
   is_default: boolean
   sort_order: number
   active: boolean
+  status: ProductStatus | ''
+  status_expires_at: string | null
   specs: Record<string, { option_id: string; value: string }>
   product_id: string
   descr_1: string
