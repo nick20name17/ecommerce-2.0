@@ -5,6 +5,7 @@ import {
   Eye,
   EyeOff,
   MoreHorizontal,
+  Pencil,
   Plus,
   Star,
   Trash2,
@@ -21,6 +22,7 @@ import { variableProductService } from '@/api/variable-product/service'
 import { VP_QUERY_KEYS, getSpecOptionsQuery } from '@/api/variable-product/query'
 import { ProductBrowserDialog } from '@/components/common/product-browser-dialog'
 import { ProductThumbnail } from '@/components/common/product-thumbnail'
+import { StatusBadge, StatusEditor, type StatusValue } from '@/components/common/status-editor'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -70,6 +72,9 @@ export const VariantsTable = ({ vp, projectId, addProductsOpen, onAddProductsCha
   const [manualAutoid, setManualAutoid] = useState('')
   const [editingCell, setEditingCell] = useState<{ itemId: string; spec: GlobalSpecDefinition } | null>(null)
   const [selectedOptionId, setSelectedOptionId] = useState('')
+  const [editingStatusItem, setEditingStatusItem] = useState<VariableProductItem | null>(null)
+  const [statusDraft, setStatusDraft] = useState<StatusValue>('')
+  const [statusExpiresDraft, setStatusExpiresDraft] = useState<string | null>(null)
 
   // Local optimistic state for instant UI updates
   const [localActive, setLocalActive] = useState<Record<string, boolean>>({})
@@ -113,6 +118,18 @@ export const VariantsTable = ({ vp, projectId, addProductsOpen, onAddProductsCha
     mutationFn: (itemId: string) =>
       variableProductService.updateItem(vp.id, itemId, { is_default: true }, params),
     meta: { successMessage: 'Default variant updated', invalidatesQuery: VP_QUERY_KEYS.detail(vp.id) },
+  })
+
+  const updateItemStatusMutation = useMutation({
+    mutationFn: (vars: { itemId: string; status: StatusValue; expires: string | null }) =>
+      variableProductService.updateItem(
+        vp.id,
+        vars.itemId,
+        { status: vars.status, status_expires_at: vars.expires },
+        params,
+      ),
+    meta: { successMessage: 'Variant status updated', invalidatesQuery: VP_QUERY_KEYS.detail(vp.id) },
+    onSuccess: () => setEditingStatusItem(null),
   })
 
   const toggleVisibility = (item: VariableProductItem) => {
@@ -231,6 +248,10 @@ export const VariantsTable = ({ vp, projectId, addProductsOpen, onAddProductsCha
                                 DEFAULT
                               </span>
                             )}
+                            <StatusBadge
+                              status={item.status}
+                              expiresAt={item.status_expires_at}
+                            />
                           </div>
                           <div className='truncate text-[11px] text-text-tertiary'>
                             {item.product_id}
@@ -297,6 +318,16 @@ export const VariantsTable = ({ vp, projectId, addProductsOpen, onAddProductsCha
                               Set as default variant
                             </DropdownMenuItem>
                           )}
+                          <DropdownMenuItem
+                            onClick={() => {
+                              setStatusDraft(item.status ?? '')
+                              setStatusExpiresDraft(item.status_expires_at ?? null)
+                              setEditingStatusItem(item)
+                            }}
+                          >
+                            <Pencil className='size-3.5' />
+                            Edit status
+                          </DropdownMenuItem>
                           <DropdownMenuItem onClick={() => toggleVisibility(item)}>
                             {isActive ? <EyeOff className='size-3.5' /> : <Eye className='size-3.5' />}
                             {isActive ? 'Hide from catalog' : 'Show in catalog'}
@@ -319,6 +350,54 @@ export const VariantsTable = ({ vp, projectId, addProductsOpen, onAddProductsCha
           </table>
         </div>
       )}
+
+      {/* ── Edit Item Status Dialog ── */}
+      <Dialog
+        open={!!editingStatusItem}
+        onOpenChange={(v) => !v && setEditingStatusItem(null)}
+      >
+        <DialogContent className='sm:max-w-sm'>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault()
+              if (editingStatusItem) {
+                updateItemStatusMutation.mutate({
+                  itemId: editingStatusItem.id,
+                  status: statusDraft,
+                  expires: statusExpiresDraft,
+                })
+              }
+            }}
+          >
+            <DialogHeader>
+              <DialogTitle>Variant Status</DialogTitle>
+            </DialogHeader>
+            <DialogBody className='flex flex-col gap-3'>
+              <p className='text-[12px] text-text-tertiary'>
+                {editingStatusItem?.descr_1 || editingStatusItem?.product_id}
+                <span className='text-text-quaternary'>
+                  {' '}
+                  · per-variant status, independent of the parent VP's
+                </span>
+              </p>
+              <StatusEditor
+                status={statusDraft}
+                expiresAt={statusExpiresDraft}
+                onStatusChange={setStatusDraft}
+                onExpiresAtChange={setStatusExpiresDraft}
+              />
+            </DialogBody>
+            <DialogFooter>
+              <Button type='button' variant='outline' onClick={() => setEditingStatusItem(null)}>
+                Cancel
+              </Button>
+              <Button type='submit' isPending={updateItemStatusMutation.isPending}>
+                Save
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
 
       {/* ── Set Option Dialog ── */}
       <Dialog open={!!editingCell} onOpenChange={(v) => !v && setEditingCell(null)}>

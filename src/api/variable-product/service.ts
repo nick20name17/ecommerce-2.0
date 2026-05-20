@@ -73,7 +73,13 @@ export const variableProductService = {
   updateItem: async (
     vpId: string,
     itemId: string,
-    payload: { active?: boolean; is_default?: boolean; sort_order?: number },
+    payload: {
+      active?: boolean
+      is_default?: boolean
+      sort_order?: number
+      status?: import('./schema').ProductStatus | ''
+      status_expires_at?: string | null
+    },
     params: { project_id?: number }
   ) => {
     await api.patch(`/variable-products/${vpId}/items/${itemId}/`, payload, { params })
