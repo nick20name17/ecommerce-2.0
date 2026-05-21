@@ -8,6 +8,7 @@ import {
   ICustomers,
   IDashboard,
   IDev,
+  ILegacyCarts,
   IOrderDesk,
   IOrders,
   IPickLists,
@@ -108,6 +109,13 @@ const WORKSPACE_ITEMS: NavItem[] = [
     iconBg: 'bg-slate-500',
     iconColor: 'text-white',
     adminOnly: true,
+  },
+  {
+    title: 'Abandoned Carts',
+    url: '/legacy-carts',
+    icon: ILegacyCarts,
+    iconBg: 'bg-yellow-500',
+    iconColor: 'text-white',
   },
   {
     title: 'Catalog',

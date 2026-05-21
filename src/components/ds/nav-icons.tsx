@@ -16,6 +16,7 @@ import {
   Package,
   Rocket,
   Settings,
+  ShoppingCart,
   SquarePlus,
   FileText,
   Truck,
@@ -42,3 +43,4 @@ export const IPicking: IC = ({ className }) => <Crosshair className={className} 
 export const IActivity: IC = ({ className }) => <ListChecks className={className} />
 export const ICatalog: IC = ({ className }) => <FolderTree className={className} />
 export const IVariableProducts: IC = ({ className }) => <Layers className={className} />
+export const ILegacyCarts: IC = ({ className }) => <ShoppingCart className={className} />
