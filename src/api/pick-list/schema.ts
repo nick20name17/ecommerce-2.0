@@ -136,6 +136,7 @@ export interface PickListParams extends PaginationParams {
   status?: string
   search?: string
   ordering?: string
+  project_id?: number
 }
 
 // ── Zod schemas ─────────────────────────────────────────────

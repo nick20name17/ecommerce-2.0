@@ -26,6 +26,7 @@ import {
   getPickListStatusLabel,
 } from '@/constants/pick-list'
 import { useBreakpoint } from '@/hooks/use-breakpoint'
+import { useProjectId } from '@/hooks/use-project-id'
 import { useLimitParam, useOffsetParam, useSearchParam } from '@/hooks/use-query-params'
 import { formatDateMedium } from '@/helpers/formatters'
 import { cn } from '@/lib/utils'
@@ -48,6 +49,7 @@ const PickListsPage = () => {
   const bp = useBreakpoint()
   const isMobile = bp === 'mobile'
   const navigate = useNavigate()
+  const [projectId] = useProjectId()
 
   const [search, setSearch] = useSearchParam()
   const [offset, setOffset] = useOffsetParam()
@@ -61,6 +63,7 @@ const PickListsPage = () => {
     offset,
     limit,
     status: activeStatus ?? undefined,
+    project_id: projectId ?? undefined,
   }
 
   const { data, isLoading } = useQuery({
