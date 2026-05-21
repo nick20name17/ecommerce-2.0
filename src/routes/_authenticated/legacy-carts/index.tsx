@@ -11,6 +11,7 @@ import { PageEmpty } from '@/components/common/page-empty'
 import { ILegacyCarts, PAGE_COLORS, PageHeaderIcon } from '@/components/ds'
 import { Skeleton } from '@/components/ui/skeleton'
 import { SidebarTrigger } from '@/components/ui/sidebar'
+import { Spinner } from '@/components/ui/spinner'
 import { useBreakpoint } from '@/hooks/use-breakpoint'
 import { useProjectId } from '@/hooks/use-project-id'
 import { useLimitParam, useOffsetParam, useSearchParam } from '@/hooks/use-query-params'
@@ -95,6 +96,9 @@ function LegacyCartsPage() {
           <h1 className='text-[14px] font-semibold tracking-[-0.01em]'>
             Abandoned Carts
           </h1>
+          {isPlaceholderData && (
+            <Spinner className='size-3.5 text-text-tertiary' />
+          )}
         </div>
 
         <div className='flex-1' />
@@ -196,9 +200,17 @@ function LegacyCartsPage() {
             }
           />
         ) : (
-          carts.map((cart) => (
-            <LegacyCartRow key={cart.user_id} cart={cart} isMobile={isMobile} />
-          ))
+          <div
+            className={cn(
+              'transition-opacity duration-150',
+              isPlaceholderData && 'pointer-events-none opacity-50',
+            )}
+            aria-busy={isPlaceholderData}
+          >
+            {carts.map((cart) => (
+              <LegacyCartRow key={cart.user_id} cart={cart} isMobile={isMobile} />
+            ))}
+          </div>
         )}
       </div>
 
