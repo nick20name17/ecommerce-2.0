@@ -64,9 +64,9 @@ export function LegacyCartRow({ cart, isMobile }: LegacyCartRowProps) {
             <div className='w-[100px] shrink-0 truncate text-[13px] font-medium tabular-nums'>
               {cart.ebms_id || '—'}
             </div>
-            <div className='w-[80px] shrink-0'>
+            <div className='w-[110px] shrink-0'>
               {cart.in_level ? (
-                <span className='inline-flex items-center rounded-[4px] bg-bg-secondary px-1.5 py-0.5 text-[13px] font-medium text-text-secondary'>
+                <span className='inline-flex items-center whitespace-nowrap rounded-[4px] bg-bg-secondary px-1.5 py-0.5 text-[13px] font-medium text-text-secondary'>
                   {cart.in_level}
                 </span>
               ) : (

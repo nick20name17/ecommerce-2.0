@@ -135,7 +135,7 @@ function LegacyCartsPage() {
               sortField={sortField}
               sortDir={sortDir}
               onSort={handleSort}
-              className='w-[80px] shrink-0'
+              className='w-[110px] shrink-0'
             />
             <SortableHeader
               field='email'
