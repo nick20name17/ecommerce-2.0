@@ -118,7 +118,7 @@ export const ProductConfigurations = ({
       {/* Header */}
       <div className='flex shrink-0 items-center justify-between border-b border-border px-4 py-2'>
         <div className='flex items-center gap-2'>
-          <span className='text-[13px] font-semibold'>Configurations</span>
+          <span className='text-[13px] font-semibold'>Components</span>
           <span className='text-[12px] tabular-nums text-text-tertiary'>
             {selectedConfigCount} of {totalConfigCount} selected
           </span>
