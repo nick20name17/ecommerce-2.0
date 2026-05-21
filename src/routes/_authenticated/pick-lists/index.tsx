@@ -1,12 +1,11 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
-import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
 import {
   ChevronRight,
   ClipboardList,
   Package,
-
+  Receipt,
   Search,
-  ShoppingCart,
 } from 'lucide-react'
 import { useState } from 'react'
 
@@ -184,7 +183,8 @@ const PickListsPage = () => {
             <div className='w-[60px] shrink-0'>ID</div>
             <div className='min-w-0 flex-1'>Name / Ship To</div>
             <div className='w-[130px] shrink-0'>Status</div>
-            <div className='w-[160px] shrink-0'>Contents</div>
+            <div className='w-[110px] shrink-0'>Items</div>
+            <div className='w-[220px] shrink-0'>Orders</div>
             <div className='w-[100px] shrink-0'>Created</div>
             <div className='w-[20px] shrink-0' />
           </div>
@@ -311,15 +311,33 @@ function PickListRow({
           {statusLabel}
         </span>
       </div>
-      <div className='flex w-[160px] shrink-0 items-center gap-1.5'>
+      <div className='flex w-[110px] shrink-0 items-center'>
         <span className='inline-flex items-center gap-1 rounded-md bg-bg-secondary px-1.5 py-0.5 text-[11px] font-medium text-text-secondary'>
           <Package className='size-3 text-text-quaternary' />
           {pickList.item_count} item{pickList.item_count !== 1 ? 's' : ''}
         </span>
-        <span className='inline-flex items-center gap-1 rounded-md bg-bg-secondary px-1.5 py-0.5 text-[11px] font-medium text-text-secondary'>
-          <ShoppingCart className='size-3 text-text-quaternary' />
-          {pickList.order_count}
-        </span>
+      </div>
+      <div className='flex w-[220px] shrink-0 flex-wrap items-center gap-1'>
+        {(pickList.orders ?? []).slice(0, 3).map((order) => (
+          <Link
+            key={order.autoid}
+            to='/orders/$orderId'
+            params={{ orderId: order.autoid }}
+            onClick={(e) => e.stopPropagation()}
+            className='inline-flex items-center gap-1 rounded-md bg-bg-secondary px-1.5 py-0.5 text-[11px] font-medium text-text-secondary tabular-nums transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground'
+          >
+            <Receipt className='size-3 text-text-quaternary' />
+            {order.invoice || order.autoid.slice(0, 8)}
+          </Link>
+        ))}
+        {(pickList.orders?.length ?? 0) > 3 && (
+          <span className='text-[11px] tabular-nums text-text-tertiary'>
+            +{(pickList.orders?.length ?? 0) - 3}
+          </span>
+        )}
+        {(pickList.orders?.length ?? 0) === 0 && (
+          <span className='text-[11px] text-text-tertiary'>—</span>
+        )}
       </div>
       <div className='w-[100px] shrink-0 text-[13px] tabular-nums text-text-tertiary'>
         {formatDateMedium(pickList.created_at)}
