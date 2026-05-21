@@ -1,17 +1,13 @@
 import {
   ArrowDownRight,
   ArrowUpRight,
-  Ban,
   ClipboardList,
-  DollarSign,
   Minus,
   Receipt,
   ShoppingCart,
-  TrendingUp,
 } from 'lucide-react'
 
 import type { DashboardMetrics } from '@/api/dashboard/schema'
-import { formatCurrency } from '@/helpers/formatters'
 import { cn } from '@/lib/utils'
 
 interface DashboardKpisProps {
@@ -52,39 +48,6 @@ const KPI_CONFIG = [
     iconBg: 'bg-orange-500/10',
     iconColor: 'text-orange-500',
   },
-  {
-    key: 'totalSales',
-    title: 'Total Sales',
-    subtitle: 'This month',
-    value: (m: DashboardMetrics) => m.total.total_sales,
-    format: (n: number) => formatCurrency(n),
-    prev: (m: DashboardMetrics) => m.total.last_month_total_sales,
-    icon: DollarSign,
-    iconBg: 'bg-green-500/10',
-    iconColor: 'text-green-500',
-  },
-  {
-    key: 'avgOrder',
-    title: 'Avg Order',
-    subtitle: 'Per order value',
-    value: (m: DashboardMetrics) => m.total.average_order_value,
-    format: (n: number) => formatCurrency(n),
-    prev: (m: DashboardMetrics) => m.total.last_month_average_order_value,
-    icon: TrendingUp,
-    iconBg: 'bg-purple-500/10',
-    iconColor: 'text-purple-500',
-  },
-  {
-    key: 'outstanding',
-    title: 'Outstanding',
-    subtitle: 'Unpaid balance',
-    value: (m: DashboardMetrics) => m.total.outstanding_invoices,
-    format: (n: number) => formatCurrency(n),
-    prev: null,
-    icon: Ban,
-    iconBg: 'bg-red-500/10',
-    iconColor: 'text-red-500',
-  },
 ] as const
 
 function getChange(
@@ -99,7 +62,7 @@ function getChange(
 
 export const DashboardKpis = ({ metrics }: DashboardKpisProps) => {
   return (
-    <div className='grid min-w-0 grid-cols-2 gap-2.5 sm:grid-cols-3 sm:gap-3 lg:grid-cols-6'>
+    <div className='grid min-w-0 grid-cols-2 gap-2.5 sm:grid-cols-3 sm:gap-3'>
       {KPI_CONFIG.map((config) => {
         const value = config.value(metrics)
         const prev = config.prev ? config.prev(metrics) : null
