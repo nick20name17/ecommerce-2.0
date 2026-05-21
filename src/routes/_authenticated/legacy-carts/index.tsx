@@ -124,6 +124,7 @@ function LegacyCartsPage() {
               bp === 'tablet' ? 'gap-4 px-5 py-1' : 'gap-6 px-6 py-1',
             )}
           >
+            <div className='w-[70px] shrink-0'>ID</div>
             <SortableHeader
               field='ebms_id'
               label='User'
@@ -138,7 +139,7 @@ function LegacyCartsPage() {
               sortField={sortField}
               sortDir={sortDir}
               onSort={handleSort}
-              className='w-[80px] shrink-0'
+              className='w-[110px] shrink-0'
             />
             <SortableHeader
               field='email'
@@ -181,6 +182,7 @@ function LegacyCartsPage() {
                 bp === 'tablet' ? 'gap-4 px-5 py-2.5' : 'gap-6 px-6 py-2.5',
               )}
             >
+              <Skeleton className='h-3.5 w-[50px] rounded' />
               <Skeleton className='h-3.5 w-[80px] rounded' />
               <Skeleton className='h-[18px] w-[60px] rounded-[4px]' />
               <Skeleton className='h-3.5 w-[200px] rounded' />
