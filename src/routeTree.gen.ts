@@ -24,6 +24,7 @@ import { Route as AuthenticatedPickListsIndexRouteImport } from './routes/_authe
 import { Route as AuthenticatedOrdersIndexRouteImport } from './routes/_authenticated/orders/index'
 import { Route as AuthenticatedOrderDeskIndexRouteImport } from './routes/_authenticated/order-desk/index'
 import { Route as AuthenticatedNavOptionsIndexRouteImport } from './routes/_authenticated/nav-options/index'
+import { Route as AuthenticatedLegacyCartsIndexRouteImport } from './routes/_authenticated/legacy-carts/index'
 import { Route as AuthenticatedDevIndexRouteImport } from './routes/_authenticated/dev/index'
 import { Route as AuthenticatedCustomersIndexRouteImport } from './routes/_authenticated/customers/index'
 import { Route as AuthenticatedCreateIndexRouteImport } from './routes/_authenticated/create/index'
@@ -122,6 +123,12 @@ const AuthenticatedNavOptionsIndexRoute =
     path: '/nav-options/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedLegacyCartsIndexRoute =
+  AuthenticatedLegacyCartsIndexRouteImport.update({
+    id: '/legacy-carts/',
+    path: '/legacy-carts/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedDevIndexRoute = AuthenticatedDevIndexRouteImport.update({
   id: '/dev/',
   path: '/dev/',
@@ -213,6 +220,7 @@ export interface FileRoutesByFullPath {
   '/create/': typeof AuthenticatedCreateIndexRoute
   '/customers/': typeof AuthenticatedCustomersIndexRoute
   '/dev/': typeof AuthenticatedDevIndexRoute
+  '/legacy-carts/': typeof AuthenticatedLegacyCartsIndexRoute
   '/nav-options/': typeof AuthenticatedNavOptionsIndexRoute
   '/order-desk/': typeof AuthenticatedOrderDeskIndexRoute
   '/orders/': typeof AuthenticatedOrdersIndexRoute
@@ -242,6 +250,7 @@ export interface FileRoutesByTo {
   '/create': typeof AuthenticatedCreateIndexRoute
   '/customers': typeof AuthenticatedCustomersIndexRoute
   '/dev': typeof AuthenticatedDevIndexRoute
+  '/legacy-carts': typeof AuthenticatedLegacyCartsIndexRoute
   '/nav-options': typeof AuthenticatedNavOptionsIndexRoute
   '/order-desk': typeof AuthenticatedOrderDeskIndexRoute
   '/orders': typeof AuthenticatedOrdersIndexRoute
@@ -274,6 +283,7 @@ export interface FileRoutesById {
   '/_authenticated/create/': typeof AuthenticatedCreateIndexRoute
   '/_authenticated/customers/': typeof AuthenticatedCustomersIndexRoute
   '/_authenticated/dev/': typeof AuthenticatedDevIndexRoute
+  '/_authenticated/legacy-carts/': typeof AuthenticatedLegacyCartsIndexRoute
   '/_authenticated/nav-options/': typeof AuthenticatedNavOptionsIndexRoute
   '/_authenticated/order-desk/': typeof AuthenticatedOrderDeskIndexRoute
   '/_authenticated/orders/': typeof AuthenticatedOrdersIndexRoute
@@ -305,6 +315,7 @@ export interface FileRouteTypes {
     | '/create/'
     | '/customers/'
     | '/dev/'
+    | '/legacy-carts/'
     | '/nav-options/'
     | '/order-desk/'
     | '/orders/'
@@ -334,6 +345,7 @@ export interface FileRouteTypes {
     | '/create'
     | '/customers'
     | '/dev'
+    | '/legacy-carts'
     | '/nav-options'
     | '/order-desk'
     | '/orders'
@@ -365,6 +377,7 @@ export interface FileRouteTypes {
     | '/_authenticated/create/'
     | '/_authenticated/customers/'
     | '/_authenticated/dev/'
+    | '/_authenticated/legacy-carts/'
     | '/_authenticated/nav-options/'
     | '/_authenticated/order-desk/'
     | '/_authenticated/orders/'
@@ -499,6 +512,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedNavOptionsIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/legacy-carts/': {
+      id: '/_authenticated/legacy-carts/'
+      path: '/legacy-carts'
+      fullPath: '/legacy-carts/'
+      preLoaderRoute: typeof AuthenticatedLegacyCartsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/dev/': {
       id: '/_authenticated/dev/'
       path: '/dev'
@@ -619,6 +639,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedCreateIndexRoute: typeof AuthenticatedCreateIndexRoute
   AuthenticatedCustomersIndexRoute: typeof AuthenticatedCustomersIndexRoute
   AuthenticatedDevIndexRoute: typeof AuthenticatedDevIndexRoute
+  AuthenticatedLegacyCartsIndexRoute: typeof AuthenticatedLegacyCartsIndexRoute
   AuthenticatedNavOptionsIndexRoute: typeof AuthenticatedNavOptionsIndexRoute
   AuthenticatedOrderDeskIndexRoute: typeof AuthenticatedOrderDeskIndexRoute
   AuthenticatedOrdersIndexRoute: typeof AuthenticatedOrdersIndexRoute
@@ -648,6 +669,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedCreateIndexRoute: AuthenticatedCreateIndexRoute,
   AuthenticatedCustomersIndexRoute: AuthenticatedCustomersIndexRoute,
   AuthenticatedDevIndexRoute: AuthenticatedDevIndexRoute,
+  AuthenticatedLegacyCartsIndexRoute: AuthenticatedLegacyCartsIndexRoute,
   AuthenticatedNavOptionsIndexRoute: AuthenticatedNavOptionsIndexRoute,
   AuthenticatedOrderDeskIndexRoute: AuthenticatedOrderDeskIndexRoute,
   AuthenticatedOrdersIndexRoute: AuthenticatedOrdersIndexRoute,

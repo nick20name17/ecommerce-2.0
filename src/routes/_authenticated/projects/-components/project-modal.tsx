@@ -480,6 +480,43 @@ const SharedFields = () => {
           </Field>
         )}
       />
+
+      <FieldSeparator>Legacy Cart Integration</FieldSeparator>
+
+      <Controller
+        name='legacy_storefront_url'
+        control={control}
+        render={({ field, fieldState }) => (
+          <Field data-invalid={fieldState.invalid}>
+            <FieldLabel htmlFor='legacy-storefront-url'>Storefront URL</FieldLabel>
+            <Input
+              {...field}
+              value={field.value ?? ''}
+              id='legacy-storefront-url'
+              placeholder='https://api.example.com'
+              aria-invalid={fieldState.invalid}
+            />
+            {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+          </Field>
+        )}
+      />
+
+      <Controller
+        name='legacy_cart_secret'
+        control={control}
+        render={({ field, fieldState }) => (
+          <Field data-invalid={fieldState.invalid}>
+            <FieldLabel htmlFor='legacy-cart-secret'>X-CRM-KEY Secret</FieldLabel>
+            <PasswordInput
+              {...field}
+              value={field.value ?? ''}
+              id='legacy-cart-secret'
+              placeholder='••••••••'
+            />
+            {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+          </Field>
+        )}
+      />
     </>
   )
 }
@@ -505,7 +542,9 @@ const CreateForm = ({ onOpenChange }: { onOpenChange: (open: boolean) => void })
       s3_bucket_name: '',
       s3_region: '',
       s3_access_key_id: '',
-      s3_secret_key: ''
+      s3_secret_key: '',
+      legacy_storefront_url: '',
+      legacy_cart_secret: ''
     }
   })
 
@@ -584,7 +623,8 @@ const EditForm = ({
       salesman: project.salesman ?? '',
       s3_bucket_name: project.s3_bucket_name ?? '',
       s3_region: project.s3_region ?? '',
-      s3_access_key_id: project.s3_access_key_id ?? ''
+      s3_access_key_id: project.s3_access_key_id ?? '',
+      legacy_storefront_url: project.legacy_storefront_url ?? ''
     }
   })
 

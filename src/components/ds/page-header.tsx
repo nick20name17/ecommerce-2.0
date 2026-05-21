@@ -37,4 +37,5 @@ export const PAGE_COLORS = {
   activity: 'bg-slate-500',
   catalog: 'bg-green-500',
   variableProducts: 'bg-purple-500',
+  legacyCarts: 'bg-yellow-500',
 } as const
