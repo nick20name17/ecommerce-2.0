@@ -1,6 +1,6 @@
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Check, ChevronDown } from 'lucide-react'
-import { useEffect } from 'react'
+import { useCallback, useEffect } from 'react'
 import { useLocalStorage } from 'usehooks-ts'
 
 import { DEFAULT_LIMIT } from '@/api/constants'
@@ -60,6 +60,28 @@ export const NavProjects = () => {
 
   const [projectId, setProjectId] = useProjectId()
   const [cachedName, setCachedName] = useLocalStorage<string>(STORAGE_KEYS.projectName, '')
+  const queryClient = useQueryClient()
+
+  // Switching projects: drop every cached query whose params include
+  // project_id so pages don't briefly show the previous project's data.
+  // Queries without project_id (auth/user/projects-list/profile) stay.
+  const switchProject = useCallback(
+    (nextId: number) => {
+      if (nextId !== projectId) {
+        queryClient.removeQueries({
+          predicate: (query) =>
+            query.queryKey.some(
+              (part) =>
+                typeof part === 'object' &&
+                part !== null &&
+                'project_id' in (part as Record<string, unknown>),
+            ),
+        })
+      }
+      setProjectId(nextId)
+    },
+    [projectId, queryClient, setProjectId],
+  )
 
   const { data, isLoading } = useQuery({
     ...getProjectsQuery({ limit: DEFAULT_LIMIT, offset: 0 }),
@@ -152,7 +174,7 @@ export const NavProjects = () => {
             return (
               <DropdownMenuItem
                 key={project.id}
-                onClick={() => setProjectId(project.id)}
+                onClick={() => switchProject(project.id)}
                 className='flex cursor-pointer items-center gap-2 rounded-[6px] px-2 py-1.5 text-[13px]'
               >
                 <div className={`flex size-[18px] items-center justify-center rounded-[4px] text-[9px] font-bold ${color.bg} ${color.text}`}>
