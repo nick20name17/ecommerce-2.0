@@ -537,32 +537,19 @@ const PickListDetailPage = () => {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            {itemToRemove?.pushed ? (
-              <>
-                <AlertDialogAction
-                  variant='outline'
-                  onClick={() => itemToRemove && removeItemMutation.mutate({ itemId: itemToRemove.id, resetShipped: false })}
-                  isPending={removeItemMutation.isPending}
-                >
-                  Remove Only
-                </AlertDialogAction>
-                <AlertDialogAction
-                  variant='destructive'
-                  onClick={() => itemToRemove && removeItemMutation.mutate({ itemId: itemToRemove.id, resetShipped: true })}
-                  isPending={removeItemMutation.isPending}
-                >
-                  Remove & Reset EBMS
-                </AlertDialogAction>
-              </>
-            ) : (
-              <AlertDialogAction
-                variant='destructive'
-                onClick={() => itemToRemove && removeItemMutation.mutate({ itemId: itemToRemove.id, resetShipped: false })}
-                isPending={removeItemMutation.isPending}
-              >
-                Remove
-              </AlertDialogAction>
-            )}
+            <AlertDialogAction
+              variant='destructive'
+              onClick={() =>
+                itemToRemove &&
+                removeItemMutation.mutate({
+                  itemId: itemToRemove.id,
+                  resetShipped: !!itemToRemove.pushed,
+                })
+              }
+              isPending={removeItemMutation.isPending}
+            >
+              {itemToRemove?.pushed ? 'Unship' : 'Remove'}
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
