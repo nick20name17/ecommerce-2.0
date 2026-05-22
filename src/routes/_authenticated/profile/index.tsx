@@ -1,12 +1,10 @@
 import { Navigate, createFileRoute } from '@tanstack/react-router'
 import { DangerZoneCard } from './-components/danger-zone-card'
-import { PayloadLogsCard } from './-components/payload-logs-card'
 import { ProfileInfoCard } from './-components/profile-info-card'
 import { SecurityCard } from './-components/security-card'
 import { AUTH_REDIRECTS } from '@/api/constants'
 import { IUser, PAGE_COLORS, PageHeaderIcon } from '@/components/ds'
 import { SidebarTrigger } from '@/components/ui/sidebar'
-import { isSuperAdmin } from '@/constants/user'
 import { useAuth } from '@/providers/auth'
 
 const ProfilePage = () => {
@@ -15,8 +13,6 @@ const ProfilePage = () => {
   if (!user) {
     return <Navigate to={AUTH_REDIRECTS.logout} />
   }
-
-  const showLogs = isSuperAdmin(user.role)
 
   return (
     <div className='flex h-full flex-col overflow-hidden'>
@@ -29,34 +25,17 @@ const ProfilePage = () => {
       </header>
 
       <div className='flex-1 overflow-y-auto'>
-        {showLogs ? (
-          <div className='grid items-start lg:grid-cols-[400px_1fr]'>
-            <div className='p-4'>
-              <div className='overflow-hidden rounded-[10px] border border-border bg-background'>
-                <ProfileInfoCard user={user} />
-                <div className='border-t border-border'>
-                  <SecurityCard />
-                </div>
-                <div className='border-t border-border'>
-                  <DangerZoneCard user={user} />
-                </div>
-              </div>
+        <div className='mx-auto max-w-[560px] py-6 px-4'>
+          <div className='overflow-hidden rounded-[10px] border border-border bg-background'>
+            <ProfileInfoCard user={user} />
+            <div className='border-t border-border'>
+              <SecurityCard />
             </div>
-            <PayloadLogsCard />
-          </div>
-        ) : (
-          <div className='mx-auto max-w-[560px] py-6 px-4'>
-            <div className='overflow-hidden rounded-[10px] border border-border bg-background'>
-              <ProfileInfoCard user={user} />
-              <div className='border-t border-border'>
-                <SecurityCard />
-              </div>
-              <div className='border-t border-border'>
-                <DangerZoneCard user={user} />
-              </div>
+            <div className='border-t border-border'>
+              <DangerZoneCard user={user} />
             </div>
           </div>
-        )}
+        </div>
       </div>
     </div>
   )

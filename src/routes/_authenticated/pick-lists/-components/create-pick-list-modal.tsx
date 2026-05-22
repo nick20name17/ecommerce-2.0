@@ -61,7 +61,8 @@ export function CreatePickListModal({ open, onOpenChange }: Props) {
   const { control, handleSubmit, reset } = form
 
   const mutation = useMutation({
-    mutationFn: pickListService.create,
+    mutationFn: (payload: Parameters<typeof pickListService.create>[0]) =>
+      pickListService.create(payload, projectId),
     meta: {
       successMessage: 'Pick list created',
       invalidatesQuery: PICK_LIST_QUERY_KEYS.lists(),

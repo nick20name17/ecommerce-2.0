@@ -182,12 +182,15 @@ export function StartPickingDialog({
     mutationFn: async (pushToEbms: boolean) => {
       if (!shipTo) throw new Error('No ship-to address')
       // 1. Create pick list
-      const pickList = await pickListService.create({
-        ship_to: shipTo,
-        ...(defaultShippingAddressId ? { shipping_address_id: defaultShippingAddressId } : {}),
-        ...(customerId ? { customer_id: customerId } : {}),
-        name: `${customerName} picking`,
-      })
+      const pickList = await pickListService.create(
+        {
+          ship_to: shipTo,
+          ...(defaultShippingAddressId ? { shipping_address_id: defaultShippingAddressId } : {}),
+          ...(customerId ? { customer_id: customerId } : {}),
+          name: `${customerName} picking`,
+        },
+        projectId,
+      )
 
       // 2. Add items (exclude items with 0 quantity)
       const payload: AddItemsPayload = {
@@ -200,11 +203,11 @@ export function StartPickingDialog({
           .filter((item) => parseFloat(item.picked_quantity) > 0),
       }
       if (payload.items.length === 0) throw new Error('No items with quantity > 0')
-      await pickListService.addItems(pickList.id, payload)
+      await pickListService.addItems(pickList.id, payload, projectId)
 
       // 3. Push to EBMS (only if requested)
       if (pushToEbms) {
-        const pushed = await pickListService.push(pickList.id)
+        const pushed = await pickListService.push(pickList.id, projectId)
         return pushed
       }
       return pickList

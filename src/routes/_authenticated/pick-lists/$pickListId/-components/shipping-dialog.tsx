@@ -103,16 +103,20 @@ export function ShippingDialog({ pickList, open, onOpenChange }: ShippingDialogP
 
   const ratesMutation = useMutation({
     mutationFn: () =>
-      pickListService.getShippingRates(pickList.id, {
-        shipping_address_id: addressId!,
-        packages: [{
-          items: items.map((i) => i.detail_autoid),
-          length,
-          width,
-          height,
-          weight: weight || undefined,
-        }],
-      }),
+      pickListService.getShippingRates(
+        pickList.id,
+        {
+          shipping_address_id: addressId!,
+          packages: [{
+            items: items.map((i) => i.detail_autoid),
+            length,
+            width,
+            height,
+            weight: weight || undefined,
+          }],
+        },
+        projectId,
+      ),
     onSuccess: (data) => {
       setRates(data.rates)
       setStep('rates')
@@ -123,7 +127,7 @@ export function ShippingDialog({ pickList, open, onOpenChange }: ShippingDialogP
 
   const selectMutation = useMutation({
     mutationFn: (rateId: string) =>
-      pickListService.selectShippingRate(pickList.id, rateId),
+      pickListService.selectShippingRate(pickList.id, rateId, projectId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: PICK_LIST_QUERY_KEYS.detail(pickList.id) })
       queryClient.invalidateQueries({ queryKey: PICK_LIST_QUERY_KEYS.lists() })

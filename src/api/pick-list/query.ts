@@ -17,9 +17,9 @@ export const getPickListsQuery = (params: PickListParams = {}) =>
     queryFn: () => pickListService.get(params),
   })
 
-export const getPickListDetailQuery = (id: number) =>
+export const getPickListDetailQuery = (id: number, projectId?: number | null) =>
   queryOptions({
     queryKey: PICK_LIST_QUERY_KEYS.detail(id),
-    queryFn: () => pickListService.getById(id),
+    queryFn: () => pickListService.getById(id, projectId),
     enabled: !!id,
   })

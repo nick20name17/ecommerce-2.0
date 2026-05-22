@@ -122,7 +122,7 @@ export function AddItemsModal({ pickListId, customerId, existingDetailAutoids, o
           .filter((item) => parseFloat(item.picked_quantity) > 0),
       }
       if (payload.items.length === 0) throw new Error('No items with quantity > 0')
-      return pickListService.addItems(pickListId, payload)
+      return pickListService.addItems(pickListId, payload, projectId)
     },
     meta: { successMessage: 'Items added' },
     onSuccess: () => {

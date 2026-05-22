@@ -389,10 +389,11 @@ function ShipmentDetailDialog({
 }) {
   const queryClient = useQueryClient()
   const [voidConfirmOpen, setVoidConfirmOpen] = useState(false)
+  const [projectId] = useProjectId()
 
   // Fetch pick list items when shipment is from a pick list
   const { data: pickListData, isLoading: isPickListLoading } = useQuery({
-    ...getPickListDetailQuery(shipment.pick_list_id!),
+    ...getPickListDetailQuery(shipment.pick_list_id!, projectId),
     enabled: open && shipment.pick_list_id != null,
   })
   const pickListItems = pickListData?.items ?? []
@@ -401,7 +402,7 @@ function ShipmentDetailDialog({
   const voidMutation = useMutation({
     mutationFn: async () => {
       if (shipment.pick_list_id) {
-        await pickListService.voidLabel(shipment.pick_list_id)
+        await pickListService.voidLabel(shipment.pick_list_id, projectId)
         return
       }
       await shipmentService.void(shipment.order_autoid, shipment.id)
