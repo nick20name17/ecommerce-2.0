@@ -481,6 +481,27 @@ const SharedFields = () => {
         )}
       />
 
+      <FieldSeparator>EBMS Multi-tenant Scope</FieldSeparator>
+
+      <Controller
+        name='website_autoid'
+        control={control}
+        render={({ field, fieldState }) => (
+          <Field data-invalid={fieldState.invalid}>
+            <FieldLabel htmlFor='website-autoid'>Website AUTOID</FieldLabel>
+            <Input
+              {...field}
+              value={field.value ?? ''}
+              id='website-autoid'
+              placeholder='ARCUSSITES.WEB_AID (only when sharing EBMS DB)'
+              maxLength={16}
+              aria-invalid={fieldState.invalid}
+            />
+            {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+          </Field>
+        )}
+      />
+
       <FieldSeparator>Legacy Cart Integration</FieldSeparator>
 
       <Controller
@@ -543,6 +564,7 @@ const CreateForm = ({ onOpenChange }: { onOpenChange: (open: boolean) => void })
       s3_region: '',
       s3_access_key_id: '',
       s3_secret_key: '',
+      website_autoid: '',
       legacy_storefront_url: '',
       legacy_cart_secret: ''
     }
@@ -624,6 +646,7 @@ const EditForm = ({
       s3_bucket_name: project.s3_bucket_name ?? '',
       s3_region: project.s3_region ?? '',
       s3_access_key_id: project.s3_access_key_id ?? '',
+      website_autoid: project.website_autoid ?? '',
       legacy_storefront_url: project.legacy_storefront_url ?? ''
     }
   })

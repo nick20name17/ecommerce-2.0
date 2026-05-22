@@ -46,6 +46,7 @@ export interface Project {
   product_show_web_filter?: boolean
   shipping_enabled?: boolean
   shipengine_test_api_key?: string
+  website_autoid?: string
   legacy_storefront_url?: string
   created_at: string
   updated_at: string
@@ -113,6 +114,7 @@ export interface CreateProjectPayload {
   s3_region?: string
   s3_access_key_id?: string
   s3_secret_key?: string
+  website_autoid?: string
   legacy_storefront_url?: string
   legacy_cart_secret?: string
 }
@@ -153,6 +155,7 @@ const sharedFields = {
   s3_bucket_name: OptionalStringSchema,
   s3_region: OptionalStringSchema,
   s3_access_key_id: OptionalStringSchema,
+  website_autoid: OptionalStringSchema,
   legacy_storefront_url: OptionalStringSchema
 }
 
