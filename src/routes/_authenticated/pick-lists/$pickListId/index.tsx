@@ -495,32 +495,13 @@ const PickListDetailPage = () => {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            {hasPushedItems ? (
-              <>
-                <AlertDialogAction
-                  variant='outline'
-                  onClick={() => deleteMutation.mutate(false)}
-                  isPending={deleteMutation.isPending}
-                >
-                  Delete Only
-                </AlertDialogAction>
-                <AlertDialogAction
-                  variant='destructive'
-                  onClick={() => deleteMutation.mutate(true)}
-                  isPending={deleteMutation.isPending}
-                >
-                  Delete & Reset EBMS
-                </AlertDialogAction>
-              </>
-            ) : (
-              <AlertDialogAction
-                variant='destructive'
-                onClick={() => deleteMutation.mutate(false)}
-                isPending={deleteMutation.isPending}
-              >
-                Delete
-              </AlertDialogAction>
-            )}
+            <AlertDialogAction
+              variant='destructive'
+              onClick={() => deleteMutation.mutate(hasPushedItems)}
+              isPending={deleteMutation.isPending}
+            >
+              {hasPushedItems ? 'Unship & Delete' : 'Delete'}
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
