@@ -47,11 +47,13 @@ const getPageNumbers = (currentPage: number, totalPages: number): (number | 'ell
 
 interface PaginationProps {
   totalCount: number
+  /** Override the default page size for this instance (e.g. 10 for slow upstreams). */
+  defaultLimit?: number
 }
 
-export const Pagination = ({ totalCount }: PaginationProps) => {
+export const Pagination = ({ totalCount, defaultLimit }: PaginationProps) => {
   const [offset, setOffset] = useOffsetParam()
-  const [limit, setLimit] = useLimitParam()
+  const [limit, setLimit] = useLimitParam(defaultLimit)
   const bp = useBreakpoint()
   const isMobile = bp === 'mobile'
 

@@ -22,6 +22,10 @@ import { cn } from '@/lib/utils'
 type SortField = 'email' | 'ebms_id' | 'in_level' | 'created_at' | 'updated_at'
 type SortDir = 'asc' | 'desc'
 
+// Legacy storefronts have N+1 SQL + S3 HEAD calls per cart item; halve the
+// default page size so initial load matches the old CRM admin's pace.
+const LEGACY_CARTS_DEFAULT_LIMIT = 10
+
 // ── Page ─────────────────────────────────────────────────────
 
 function LegacyCartsPage() {
@@ -35,7 +39,7 @@ function LegacyCartsPage() {
     300,
   )
   const [offset] = useOffsetParam()
-  const [limit] = useLimitParam()
+  const [limit] = useLimitParam(LEGACY_CARTS_DEFAULT_LIMIT)
 
   const [sortField, setSortField] = useState<SortField | null>('updated_at')
   const [sortDir, setSortDir] = useState<SortDir>('desc')
@@ -224,7 +228,10 @@ function LegacyCartsPage() {
             isMobile ? 'px-3.5' : 'px-6',
           )}
         >
-          <Pagination totalCount={totalCount} />
+          <Pagination
+            totalCount={totalCount}
+            defaultLimit={LEGACY_CARTS_DEFAULT_LIMIT}
+          />
         </div>
       )}
     </div>
