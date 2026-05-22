@@ -70,11 +70,14 @@ export const useOffsetParam = () => {
   return [normalized, setOffset] as const
 }
 
-export const useLimitParam = () => {
-  const [limit, setLimitRaw] = useQueryState('limit', limitParser)
+export const useLimitParam = (customDefault?: number) => {
+  const def = customDefault ?? DEFAULT_LIMIT
+  // Reuse the shared parser when no override given to keep behaviour identical.
+  const parser = customDefault != null ? parseAsInteger.withDefault(def) : limitParser
+  const [limit, setLimitRaw] = useQueryState('limit', parser)
   const normalized = Math.max(1, limit)
   const setLimit = (value: number) => {
-    setLimitRaw(value === DEFAULT_LIMIT ? null : value)
+    setLimitRaw(value === def ? null : value)
   }
   return [normalized, setLimit] as const
 }
