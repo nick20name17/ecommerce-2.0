@@ -9,6 +9,7 @@ import { useState } from 'react'
 import { PICK_LIST_QUERY_KEYS } from '@/api/pick-list/query'
 import type { PickListItem } from '@/api/pick-list/schema'
 import { pickListService } from '@/api/pick-list/service'
+import { useProjectId } from '@/hooks/use-project-id'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -37,10 +38,11 @@ export function PickListItemsTable({ pickListId, items, isEditable, isMobile, de
   const [editingItem, setEditingItem] = useState<number | null>(null)
   const [editQty, setEditQty] = useState('')
   const [itemToRemove, setItemToRemove] = useState<PickListItem | null>(null)
+  const [projectId] = useProjectId()
 
   const updateMutation = useMutation({
     mutationFn: ({ itemId, quantity }: { itemId: number; quantity: string }) =>
-      pickListService.updateItem(pickListId, itemId, { picked_quantity: quantity }),
+      pickListService.updateItem(pickListId, itemId, { picked_quantity: quantity }, projectId),
     meta: {
       successMessage: 'Quantity updated',
     },
@@ -51,7 +53,7 @@ export function PickListItemsTable({ pickListId, items, isEditable, isMobile, de
   })
 
   const removeMutation = useMutation({
-    mutationFn: (itemId: number) => pickListService.removeItem(pickListId, itemId),
+    mutationFn: (itemId: number) => pickListService.removeItem(pickListId, itemId, false, projectId),
     meta: {
       successMessage: 'Item removed',
     },

@@ -42,6 +42,7 @@ import {
   getPickListStatusLabel,
 } from '@/constants/pick-list'
 import { useBreakpoint } from '@/hooks/use-breakpoint'
+import { useProjectId } from '@/hooks/use-project-id'
 import { formatDateTimeMedium } from '@/helpers/formatters'
 import { cn } from '@/lib/utils'
 
@@ -60,8 +61,9 @@ const PickListDetailPage = () => {
   const bp = useBreakpoint()
   const isMobile = bp === 'mobile'
   const queryClient = useQueryClient()
+  const [projectId] = useProjectId()
 
-  const { data: pickList, isLoading } = useQuery(getPickListDetailQuery(id))
+  const { data: pickList, isLoading } = useQuery(getPickListDetailQuery(id, projectId))
 
   const [deleteOpen, setDeleteOpen] = useState(false)
   const [voidOpen, setVoidOpen] = useState(false)
@@ -118,13 +120,13 @@ const PickListDetailPage = () => {
   // ── Mutations ──────────────────────────────────────────
 
   const deleteMutation = useMutation({
-    mutationFn: (resetShipped: boolean) => pickListService.delete(id, resetShipped),
+    mutationFn: (resetShipped: boolean) => pickListService.delete(id, resetShipped, projectId),
     meta: { successMessage: 'Pick list deleted', invalidatesQuery: PICK_LIST_QUERY_KEYS.lists() },
     onSuccess: () => window.history.back(),
   })
 
   const pushMutation = useMutation({
-    mutationFn: () => pickListService.push(id),
+    mutationFn: () => pickListService.push(id, projectId),
     meta: { successMessage: 'Pushed to EBMS' },
     onSuccess: (updated) => {
       queryClient.setQueryData(PICK_LIST_QUERY_KEYS.detail(id), updated)
@@ -132,7 +134,7 @@ const PickListDetailPage = () => {
   })
 
   const voidMutation = useMutation({
-    mutationFn: () => pickListService.voidLabel(id),
+    mutationFn: () => pickListService.voidLabel(id, projectId),
     meta: { successMessage: 'Label voided' },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: PICK_LIST_QUERY_KEYS.detail(id) })
@@ -143,7 +145,7 @@ const PickListDetailPage = () => {
 
   const updateItemMutation = useMutation({
     mutationFn: ({ itemId, quantity }: { itemId: number; quantity: string }) =>
-      pickListService.updateItem(id, itemId, { picked_quantity: quantity }),
+      pickListService.updateItem(id, itemId, { picked_quantity: quantity }, projectId),
     meta: { successMessage: 'Quantity updated' },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: PICK_LIST_QUERY_KEYS.detail(id) })
@@ -154,7 +156,7 @@ const PickListDetailPage = () => {
 
   const removeItemMutation = useMutation({
     mutationFn: ({ itemId, resetShipped }: { itemId: number; resetShipped: boolean }) =>
-      pickListService.removeItem(id, itemId, resetShipped),
+      pickListService.removeItem(id, itemId, resetShipped, projectId),
     meta: { successMessage: 'Item removed' },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: PICK_LIST_QUERY_KEYS.detail(id) })
