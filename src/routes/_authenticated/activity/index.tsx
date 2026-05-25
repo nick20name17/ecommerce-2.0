@@ -259,7 +259,7 @@ const ActivityPage = () => {
       {/* Column headers */}
       {!isMobile && (results.length > 0 || isLoading) && (
         <div className='flex shrink-0 min-w-fit items-center gap-4 border-b border-border bg-bg-secondary/60 px-5 py-1.5 xl:px-6'>
-          <div className='w-[70px] shrink-0 text-[12px] font-medium text-text-tertiary'>Method</div>
+          <div className='w-[110px] shrink-0 text-[12px] font-medium text-text-tertiary'>Method</div>
           <div className='min-w-0 flex-1 text-[12px] font-medium text-text-tertiary'>URL / Action</div>
           <div className='w-[100px] shrink-0 text-[12px] font-medium text-text-tertiary'>Entity</div>
           <div className='w-[80px] shrink-0 text-[12px] font-medium text-text-tertiary'>Source</div>
@@ -387,7 +387,7 @@ function LogRow({
       )}
       onClick={onClick}
     >
-      <div className='w-[70px] shrink-0'>
+      <div className='w-[110px] shrink-0'>
         <span className={cn('rounded border px-1.5 py-0.5 font-mono text-[11px] font-semibold', methodColor)}>
           {log.method}
         </span>
