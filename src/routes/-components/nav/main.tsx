@@ -16,6 +16,7 @@ import {
   IProposals,
   ISettings,
   IShipping,
+  IStorefront,
   ITodos,
 } from '@/components/ds'
 import { isAdmin, isSuperAdmin } from '@/constants/user'
@@ -122,6 +123,14 @@ const WORKSPACE_ITEMS: NavItem[] = [
     url: '/catalog',
     icon: ICatalog,
     iconBg: 'bg-green-500',
+    iconColor: 'text-white',
+    adminOnly: true,
+  },
+  {
+    title: 'Storefront',
+    url: '/storefront',
+    icon: IStorefront,
+    iconBg: 'bg-fuchsia-500',
     iconColor: 'text-white',
     adminOnly: true,
   },

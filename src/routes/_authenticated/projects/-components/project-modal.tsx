@@ -502,18 +502,18 @@ const SharedFields = () => {
         )}
       />
 
-      <FieldSeparator>Legacy Cart Integration</FieldSeparator>
+      <FieldSeparator>Storefront Integration</FieldSeparator>
 
       <Controller
-        name='legacy_storefront_url'
+        name='storefront_url'
         control={control}
         render={({ field, fieldState }) => (
           <Field data-invalid={fieldState.invalid}>
-            <FieldLabel htmlFor='legacy-storefront-url'>Storefront URL</FieldLabel>
+            <FieldLabel htmlFor='storefront-url'>Storefront URL</FieldLabel>
             <Input
               {...field}
               value={field.value ?? ''}
-              id='legacy-storefront-url'
+              id='storefront-url'
               placeholder='https://api.example.com'
               aria-invalid={fieldState.invalid}
             />
@@ -523,15 +523,15 @@ const SharedFields = () => {
       />
 
       <Controller
-        name='legacy_cart_secret'
+        name='storefront_token'
         control={control}
         render={({ field, fieldState }) => (
           <Field data-invalid={fieldState.invalid}>
-            <FieldLabel htmlFor='legacy-cart-secret'>X-CRM-KEY Secret</FieldLabel>
+            <FieldLabel htmlFor='storefront-token'>Storefront Token</FieldLabel>
             <PasswordInput
               {...field}
               value={field.value ?? ''}
-              id='legacy-cart-secret'
+              id='storefront-token'
               placeholder='••••••••'
             />
             {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
@@ -565,8 +565,8 @@ const CreateForm = ({ onOpenChange }: { onOpenChange: (open: boolean) => void })
       s3_access_key_id: '',
       s3_secret_key: '',
       website_autoid: '',
-      legacy_storefront_url: '',
-      legacy_cart_secret: ''
+      storefront_url: '',
+      storefront_token: ''
     }
   })
 
@@ -647,7 +647,7 @@ const EditForm = ({
       s3_region: project.s3_region ?? '',
       s3_access_key_id: project.s3_access_key_id ?? '',
       website_autoid: project.website_autoid ?? '',
-      legacy_storefront_url: project.legacy_storefront_url ?? ''
+      storefront_url: project.storefront_url ?? ''
     }
   })
 

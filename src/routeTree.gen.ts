@@ -15,6 +15,7 @@ import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedVariableProductsIndexRouteImport } from './routes/_authenticated/variable-products/index'
 import { Route as AuthenticatedUsersIndexRouteImport } from './routes/_authenticated/users/index'
 import { Route as AuthenticatedTasksIndexRouteImport } from './routes/_authenticated/tasks/index'
+import { Route as AuthenticatedStorefrontIndexRouteImport } from './routes/_authenticated/storefront/index'
 import { Route as AuthenticatedShippingIndexRouteImport } from './routes/_authenticated/shipping/index'
 import { Route as AuthenticatedSettingsIndexRouteImport } from './routes/_authenticated/settings/index'
 import { Route as AuthenticatedProposalsIndexRouteImport } from './routes/_authenticated/proposals/index'
@@ -69,6 +70,12 @@ const AuthenticatedTasksIndexRoute = AuthenticatedTasksIndexRouteImport.update({
   path: '/tasks/',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedStorefrontIndexRoute =
+  AuthenticatedStorefrontIndexRouteImport.update({
+    id: '/storefront/',
+    path: '/storefront/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedShippingIndexRoute =
   AuthenticatedShippingIndexRouteImport.update({
     id: '/shipping/',
@@ -230,6 +237,7 @@ export interface FileRoutesByFullPath {
   '/proposals/': typeof AuthenticatedProposalsIndexRoute
   '/settings/': typeof AuthenticatedSettingsIndexRoute
   '/shipping/': typeof AuthenticatedShippingIndexRoute
+  '/storefront/': typeof AuthenticatedStorefrontIndexRoute
   '/tasks/': typeof AuthenticatedTasksIndexRoute
   '/users/': typeof AuthenticatedUsersIndexRoute
   '/variable-products/': typeof AuthenticatedVariableProductsIndexRoute
@@ -260,6 +268,7 @@ export interface FileRoutesByTo {
   '/proposals': typeof AuthenticatedProposalsIndexRoute
   '/settings': typeof AuthenticatedSettingsIndexRoute
   '/shipping': typeof AuthenticatedShippingIndexRoute
+  '/storefront': typeof AuthenticatedStorefrontIndexRoute
   '/tasks': typeof AuthenticatedTasksIndexRoute
   '/users': typeof AuthenticatedUsersIndexRoute
   '/variable-products': typeof AuthenticatedVariableProductsIndexRoute
@@ -293,6 +302,7 @@ export interface FileRoutesById {
   '/_authenticated/proposals/': typeof AuthenticatedProposalsIndexRoute
   '/_authenticated/settings/': typeof AuthenticatedSettingsIndexRoute
   '/_authenticated/shipping/': typeof AuthenticatedShippingIndexRoute
+  '/_authenticated/storefront/': typeof AuthenticatedStorefrontIndexRoute
   '/_authenticated/tasks/': typeof AuthenticatedTasksIndexRoute
   '/_authenticated/users/': typeof AuthenticatedUsersIndexRoute
   '/_authenticated/variable-products/': typeof AuthenticatedVariableProductsIndexRoute
@@ -325,6 +335,7 @@ export interface FileRouteTypes {
     | '/proposals/'
     | '/settings/'
     | '/shipping/'
+    | '/storefront/'
     | '/tasks/'
     | '/users/'
     | '/variable-products/'
@@ -355,6 +366,7 @@ export interface FileRouteTypes {
     | '/proposals'
     | '/settings'
     | '/shipping'
+    | '/storefront'
     | '/tasks'
     | '/users'
     | '/variable-products'
@@ -387,6 +399,7 @@ export interface FileRouteTypes {
     | '/_authenticated/proposals/'
     | '/_authenticated/settings/'
     | '/_authenticated/shipping/'
+    | '/_authenticated/storefront/'
     | '/_authenticated/tasks/'
     | '/_authenticated/users/'
     | '/_authenticated/variable-products/'
@@ -447,6 +460,13 @@ declare module '@tanstack/react-router' {
       path: '/tasks'
       fullPath: '/tasks/'
       preLoaderRoute: typeof AuthenticatedTasksIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/storefront/': {
+      id: '/_authenticated/storefront/'
+      path: '/storefront'
+      fullPath: '/storefront/'
+      preLoaderRoute: typeof AuthenticatedStorefrontIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/shipping/': {
@@ -649,6 +669,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedProposalsIndexRoute: typeof AuthenticatedProposalsIndexRoute
   AuthenticatedSettingsIndexRoute: typeof AuthenticatedSettingsIndexRoute
   AuthenticatedShippingIndexRoute: typeof AuthenticatedShippingIndexRoute
+  AuthenticatedStorefrontIndexRoute: typeof AuthenticatedStorefrontIndexRoute
   AuthenticatedTasksIndexRoute: typeof AuthenticatedTasksIndexRoute
   AuthenticatedUsersIndexRoute: typeof AuthenticatedUsersIndexRoute
   AuthenticatedVariableProductsIndexRoute: typeof AuthenticatedVariableProductsIndexRoute
@@ -679,6 +700,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedProposalsIndexRoute: AuthenticatedProposalsIndexRoute,
   AuthenticatedSettingsIndexRoute: AuthenticatedSettingsIndexRoute,
   AuthenticatedShippingIndexRoute: AuthenticatedShippingIndexRoute,
+  AuthenticatedStorefrontIndexRoute: AuthenticatedStorefrontIndexRoute,
   AuthenticatedTasksIndexRoute: AuthenticatedTasksIndexRoute,
   AuthenticatedUsersIndexRoute: AuthenticatedUsersIndexRoute,
   AuthenticatedVariableProductsIndexRoute:

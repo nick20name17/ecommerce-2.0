@@ -47,7 +47,7 @@ export interface Project {
   shipping_enabled?: boolean
   shipengine_test_api_key?: string
   website_autoid?: string
-  legacy_storefront_url?: string
+  storefront_url?: string
   created_at: string
   updated_at: string
 }
@@ -115,8 +115,8 @@ export interface CreateProjectPayload {
   s3_access_key_id?: string
   s3_secret_key?: string
   website_autoid?: string
-  legacy_storefront_url?: string
-  legacy_cart_secret?: string
+  storefront_url?: string
+  storefront_token?: string
 }
 
 export interface UpdateProjectPayload {
@@ -156,7 +156,7 @@ const sharedFields = {
   s3_region: OptionalStringSchema,
   s3_access_key_id: OptionalStringSchema,
   website_autoid: OptionalStringSchema,
-  legacy_storefront_url: OptionalStringSchema
+  storefront_url: OptionalStringSchema
 }
 
 export const CreateProjectSchema = z.object({
@@ -164,7 +164,7 @@ export const CreateProjectSchema = z.object({
   db_password: RequiredStringSchema,
   api_password: OptionalStringSchema,
   s3_secret_key: OptionalStringSchema,
-  legacy_cart_secret: OptionalStringSchema
+  storefront_token: OptionalStringSchema
 })
 
 export type CreateProjectFormValues = z.infer<typeof CreateProjectSchema>
@@ -174,7 +174,7 @@ export const UpdateProjectSchema = z.object({
   db_password: OptionalStringSchema,
   api_password: OptionalStringSchema,
   s3_secret_key: OptionalStringSchema,
-  legacy_cart_secret: OptionalStringSchema
+  storefront_token: OptionalStringSchema
 })
 
 export type UpdateProjectFormValues = z.infer<typeof UpdateProjectSchema>
