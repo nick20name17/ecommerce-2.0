@@ -84,7 +84,7 @@ export const PayloadLogDetailDialog = ({
                 variant={log.source === 'storefront' ? 'outline' : 'secondary'}
                 className='text-[13px]'
               >
-                {log.source === 'storefront' ? 'Pushed by storefront' : 'Internal'}
+                {log.source === 'storefront' ? 'Storefront' : 'Internal'}
               </Badge>
             </DetailItem>
             <DetailItem label='Entity'>{log.entity || '—'}</DetailItem>
