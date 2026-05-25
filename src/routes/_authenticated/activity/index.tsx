@@ -51,12 +51,12 @@ const METHOD_OPTIONS = ['GET', 'POST', 'PATCH', 'PUT', 'DELETE'] as const
 
 const SOURCE_OPTIONS: { value: PayloadLogSource; label: string; description: string }[] = [
   { value: 'internal', label: 'Internal', description: 'Outgoing EBMS calls from ebms.app' },
-  { value: 'storefront', label: 'Storefront', description: 'Pushed by Symfony storefronts' },
+  { value: 'storefront', label: 'Pushed by storefront', description: 'Posted by Symfony storefronts' },
 ]
 
 const SOURCE_LABEL: Record<PayloadLogSource, string> = {
   internal: 'Internal',
-  storefront: 'Storefront',
+  storefront: 'Pushed by storefront',
 }
 
 // ── Page Component ───────────────────────────────────────────
@@ -262,7 +262,7 @@ const ActivityPage = () => {
           <div className='w-[70px] shrink-0 text-[12px] font-medium text-text-tertiary'>Method</div>
           <div className='min-w-0 flex-1 text-[12px] font-medium text-text-tertiary'>URL / Action</div>
           <div className='w-[100px] shrink-0 text-[12px] font-medium text-text-tertiary'>Entity</div>
-          <div className='w-[80px] shrink-0 text-[12px] font-medium text-text-tertiary'>Source</div>
+          <div className='w-[160px] shrink-0 text-[12px] font-medium text-text-tertiary'>Source</div>
           <div className='w-[50px] shrink-0 text-[12px] font-medium text-text-tertiary'>Status</div>
           <div className='w-[70px] shrink-0 text-right text-[12px] font-medium text-text-tertiary'>Duration</div>
           <div className='w-[140px] shrink-0 text-[12px] font-medium text-text-tertiary'>Time</div>
@@ -358,7 +358,7 @@ function LogRow({
           {log.is_error && <AlertCircle className='size-3 shrink-0 text-red-500' />}
           {log.source === 'storefront' && (
             <span className={cn('shrink-0 rounded border px-1.5 py-0.5 text-[11px] font-medium', sourceColor)}>
-              Storefront
+              {SOURCE_LABEL.storefront}
             </span>
           )}
           <span className='ml-auto shrink-0 text-[11px] text-text-tertiary'>{log.entity}</span>
@@ -409,7 +409,7 @@ function LogRow({
       <div className='w-[100px] shrink-0 truncate text-[13px] text-text-tertiary'>
         {log.entity || '—'}
       </div>
-      <div className='w-[80px] shrink-0'>
+      <div className='w-[160px] shrink-0'>
         <span className={cn('rounded border px-1.5 py-0.5 text-[11px] font-medium', sourceColor)}>
           {SOURCE_LABEL[log.source] ?? log.source}
         </span>
