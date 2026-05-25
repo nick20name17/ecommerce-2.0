@@ -262,6 +262,8 @@ const ActivityPage = () => {
           <div className='w-[110px] shrink-0 text-[12px] font-medium text-text-tertiary'>Method</div>
           <div className='min-w-0 flex-1 text-[12px] font-medium text-text-tertiary'>URL / Action</div>
           <div className='w-[100px] shrink-0 text-[12px] font-medium text-text-tertiary'>Entity</div>
+          <div className='w-[80px] shrink-0 text-[12px] font-medium text-text-tertiary'>Proposal</div>
+          <div className='w-[140px] shrink-0 text-[12px] font-medium text-text-tertiary'>Autoid</div>
           <div className='w-[80px] shrink-0 text-[12px] font-medium text-text-tertiary'>Source</div>
           <div className='w-[50px] shrink-0 text-[12px] font-medium text-text-tertiary'>Status</div>
           <div className='w-[70px] shrink-0 text-right text-[12px] font-medium text-text-tertiary'>Duration</div>
@@ -408,6 +410,12 @@ function LogRow({
       </div>
       <div className='w-[100px] shrink-0 truncate text-[13px] text-text-tertiary'>
         {log.entity || '—'}
+      </div>
+      <div className='w-[80px] shrink-0 truncate text-[13px] text-text-tertiary tabular-nums'>
+        {log.external_ref || '—'}
+      </div>
+      <div className='w-[140px] shrink-0 truncate font-mono text-[12px] text-text-tertiary' title={log.key ?? ''}>
+        {log.key || '—'}
       </div>
       <div className='w-[80px] shrink-0'>
         <span className={cn('rounded border px-1.5 py-0.5 text-[11px] font-medium', sourceColor)}>
