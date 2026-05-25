@@ -9,7 +9,7 @@ import {
 import { useState, useDeferredValue } from 'react'
 
 import { getPayloadLogsQuery } from '@/api/payload-log/query'
-import type { PayloadLog, PayloadLogParams } from '@/api/payload-log/schema'
+import type { PayloadLog, PayloadLogParams, PayloadLogSource } from '@/api/payload-log/schema'
 import { PayloadLogDetailDialog } from '@/routes/_authenticated/profile/-components/payload-log-detail-dialog'
 import { Pagination } from '@/components/common/filters/pagination'
 import { PageEmpty } from '@/components/common/page-empty'
@@ -39,6 +39,7 @@ const METHOD_COLORS: Record<string, string> = {
 
 type ErrorFilter = 'all' | 'errors' | 'success'
 type MethodFilter = string | null
+type SourceFilter = PayloadLogSource | null
 
 const ERROR_OPTIONS: { value: ErrorFilter; label: string }[] = [
   { value: 'all', label: 'All' },
@@ -47,6 +48,16 @@ const ERROR_OPTIONS: { value: ErrorFilter; label: string }[] = [
 ]
 
 const METHOD_OPTIONS = ['GET', 'POST', 'PATCH', 'PUT', 'DELETE'] as const
+
+const SOURCE_OPTIONS: { value: PayloadLogSource; label: string; description: string }[] = [
+  { value: 'internal', label: 'Internal', description: 'Outgoing EBMS calls from ebms.app' },
+  { value: 'storefront', label: 'Storefront', description: 'Pushed by Symfony storefronts' },
+]
+
+const SOURCE_LABEL: Record<PayloadLogSource, string> = {
+  internal: 'Internal',
+  storefront: 'Storefront',
+}
 
 // ── Page Component ───────────────────────────────────────────
 
@@ -61,6 +72,7 @@ const ActivityPage = () => {
   const deferredSearch = useDeferredValue(search)
   const [errorFilter, setErrorFilter] = useState<ErrorFilter>('all')
   const [methodFilter, setMethodFilter] = useState<MethodFilter>(null)
+  const [sourceFilter, setSourceFilter] = useState<SourceFilter>(null)
   const [selectedLog, setSelectedLog] = useState<PayloadLog | null>(null)
 
   const searchUpper = deferredSearch.toUpperCase()
@@ -73,6 +85,7 @@ const ActivityPage = () => {
     search: isMethodSearch ? undefined : (deferredSearch || undefined),
     is_error: errorFilter === 'errors' ? true : errorFilter === 'success' ? false : undefined,
     method: isMethodSearch ? searchUpper : (methodFilter ?? undefined),
+    source: sourceFilter ?? undefined,
     project_id: projectId ?? undefined,
   }
 
@@ -84,11 +97,12 @@ const ActivityPage = () => {
   const results = data?.results ?? []
   const totalCount = data?.count ?? 0
 
-  const hasFilters = errorFilter !== 'all' || methodFilter !== null
+  const hasFilters = errorFilter !== 'all' || methodFilter !== null || sourceFilter !== null
 
   const clearAllFilters = () => {
     setErrorFilter('all')
     setMethodFilter(null)
+    setSourceFilter(null)
     setOffset(null)
   }
 
@@ -177,6 +191,38 @@ const ActivityPage = () => {
             )
           })}
         </FilterPopover>
+
+        {/* Source filter */}
+        <FilterPopover
+          label='Source'
+          active={sourceFilter !== null}
+        >
+          {SOURCE_OPTIONS.map((opt) => {
+            const selected_ = sourceFilter === opt.value
+            return (
+              <button
+                key={opt.value}
+                type='button'
+                className={cn(
+                  'flex w-full items-start gap-2 rounded-[5px] px-2 py-[3px] text-left text-[13px] font-medium',
+                  'transition-colors duration-[80ms] hover:bg-bg-hover'
+                )}
+                onClick={() => { setSourceFilter(selected_ ? null : opt.value); setOffset(null) }}
+              >
+                <div className={cn(
+                  'mt-[3px] flex size-3.5 items-center justify-center rounded-full border transition-colors duration-[80ms]',
+                  selected_ ? 'border-primary bg-primary' : 'border-border'
+                )}>
+                  {selected_ && <div className='size-1.5 rounded-full bg-primary-foreground' />}
+                </div>
+                <div className='flex flex-col'>
+                  <span>{opt.label}</span>
+                  <span className='text-[11px] font-normal text-text-tertiary'>{opt.description}</span>
+                </div>
+              </button>
+            )
+          })}
+        </FilterPopover>
       </header>
 
       {/* Active filter chips */}
@@ -201,6 +247,12 @@ const ActivityPage = () => {
               {methodFilter}
             </FilterChip>
           )}
+          {sourceFilter && (
+            <FilterChip onRemove={() => { setSourceFilter(null); setOffset(null) }}>
+              <span className='text-text-tertiary'>Source is</span>
+              {SOURCE_LABEL[sourceFilter]}
+            </FilterChip>
+          )}
         </div>
       )}
 
@@ -208,8 +260,9 @@ const ActivityPage = () => {
       {!isMobile && (results.length > 0 || isLoading) && (
         <div className='flex shrink-0 min-w-fit items-center gap-4 border-b border-border bg-bg-secondary/60 px-5 py-1.5 xl:px-6'>
           <div className='w-[70px] shrink-0 text-[12px] font-medium text-text-tertiary'>Method</div>
-          <div className='min-w-0 flex-1 text-[12px] font-medium text-text-tertiary'>URL</div>
+          <div className='min-w-0 flex-1 text-[12px] font-medium text-text-tertiary'>URL / Action</div>
           <div className='w-[100px] shrink-0 text-[12px] font-medium text-text-tertiary'>Entity</div>
+          <div className='w-[80px] shrink-0 text-[12px] font-medium text-text-tertiary'>Source</div>
           <div className='w-[50px] shrink-0 text-[12px] font-medium text-text-tertiary'>Status</div>
           <div className='w-[70px] shrink-0 text-right text-[12px] font-medium text-text-tertiary'>Duration</div>
           <div className='w-[140px] shrink-0 text-[12px] font-medium text-text-tertiary'>Time</div>
@@ -261,6 +314,11 @@ const ActivityPage = () => {
 
 // ── Log Row ─────────────────────────────────────────────────
 
+const SOURCE_COLORS: Record<PayloadLogSource, string> = {
+  internal: 'bg-bg-secondary text-text-secondary border-border',
+  storefront: 'bg-violet-500/10 text-violet-700 border-violet-200 dark:text-violet-400 dark:border-violet-800',
+}
+
 function LogRow({
   log,
   isMobile,
@@ -271,11 +329,18 @@ function LogRow({
   onClick: () => void
 }) {
   const methodColor = METHOD_COLORS[log.method] ?? 'bg-bg-secondary text-text-secondary border-border'
+  const sourceColor = SOURCE_COLORS[log.source] ?? SOURCE_COLORS.internal
   const statusColor = log.is_error
     ? 'text-red-700 dark:text-red-400'
     : log.status_code >= 200 && log.status_code < 300
       ? 'text-emerald-700 dark:text-emerald-400'
       : 'text-text-secondary'
+
+  // Storefront logs include a human-readable action label (e.g. "SEND ARINV
+  // ITEMS"); when present it's the more useful primary line, with the URL
+  // demoted to a secondary line.
+  const primaryLine = log.action_name || log.url
+  const secondaryLine = log.action_name ? log.url : null
 
   if (isMobile) {
     return (
@@ -291,10 +356,19 @@ function LogRow({
             {log.status_code}
           </span>
           {log.is_error && <AlertCircle className='size-3 shrink-0 text-red-500' />}
+          {log.source === 'storefront' && (
+            <span className={cn('shrink-0 rounded border px-1.5 py-0.5 text-[11px] font-medium', sourceColor)}>
+              Storefront
+            </span>
+          )}
           <span className='ml-auto shrink-0 text-[11px] text-text-tertiary'>{log.entity}</span>
         </div>
-        <div className='mb-1 truncate font-mono text-[12px] text-foreground'>
-          {log.url}
+        <div className='mb-1 truncate text-[12px] text-foreground'>
+          {log.action_name ? (
+            <span className='font-medium'>{log.action_name}</span>
+          ) : (
+            <span className='font-mono'>{log.url}</span>
+          )}
         </div>
         <div className='flex items-center gap-2 text-[11px] tabular-nums text-text-tertiary'>
           <span>{formatDuration(log.duration_ms)}</span>
@@ -320,10 +394,25 @@ function LogRow({
       </div>
       <div className='min-w-0 flex-1 flex items-center gap-1.5'>
         {log.is_error && <AlertCircle className='size-3 shrink-0 text-red-500' />}
-        <span className='truncate font-mono text-[12px] text-foreground'>{log.url}</span>
+        <div className='min-w-0 flex flex-col'>
+          <span className={cn(
+            'truncate text-[12px]',
+            log.action_name ? 'font-medium text-foreground' : 'font-mono text-foreground',
+          )}>
+            {primaryLine}
+          </span>
+          {secondaryLine && (
+            <span className='truncate font-mono text-[11px] text-text-tertiary'>{secondaryLine}</span>
+          )}
+        </div>
       </div>
       <div className='w-[100px] shrink-0 truncate text-[13px] text-text-tertiary'>
         {log.entity || '—'}
+      </div>
+      <div className='w-[80px] shrink-0'>
+        <span className={cn('rounded border px-1.5 py-0.5 text-[11px] font-medium', sourceColor)}>
+          {SOURCE_LABEL[log.source] ?? log.source}
+        </span>
       </div>
       <div className='w-[50px] shrink-0'>
         <span className={cn('font-mono text-[12px] font-semibold tabular-nums', statusColor)}>

@@ -79,6 +79,14 @@ export const PayloadLogDetailDialog = ({
                 {log.method}
               </Badge>
             </DetailItem>
+            <DetailItem label='Source'>
+              <Badge
+                variant={log.source === 'storefront' ? 'outline' : 'secondary'}
+                className='text-[13px]'
+              >
+                {log.source === 'storefront' ? 'Storefront' : 'Internal'}
+              </Badge>
+            </DetailItem>
             <DetailItem label='Entity'>{log.entity || '—'}</DetailItem>
             <DetailItem label='Key'>{log.key || '—'}</DetailItem>
             <DetailItem label='Status'>
@@ -95,6 +103,14 @@ export const PayloadLogDetailDialog = ({
                 {log.is_error ? 'Yes' : 'No'}
               </Badge>
             </DetailItem>
+            {log.action_name ? (
+              <DetailItem label='Action'>{log.action_name}</DetailItem>
+            ) : null}
+            {log.external_ref ? (
+              <DetailItem label='External Ref'>
+                <span className='font-mono'>{log.external_ref}</span>
+              </DetailItem>
+            ) : null}
             <DetailItem label='Created At'>{formatDate(log.created_at, 'dateTime')}</DetailItem>
           </div>
 

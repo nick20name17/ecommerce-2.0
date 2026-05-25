@@ -1,13 +1,18 @@
 import type { PaginationParams } from '@/api/schema'
 
+export type PayloadLogSource = 'internal' | 'storefront'
+
 export interface PayloadLog {
   id: number
   project_id: number
   project_name: string
+  source: PayloadLogSource
   method: string
   url: string
   entity: string
   key: string
+  action_name: string | null
+  external_ref: string | null
   payload: Record<string, unknown> | null
   response: Record<string, unknown> | null
   status_code: number
@@ -38,4 +43,7 @@ export interface PayloadLogParams extends PaginationParams {
   method?: string
   project_id?: number
   status_code?: number
+  source?: PayloadLogSource
+  action_name?: string
+  external_ref?: string
 }
