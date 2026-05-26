@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { createFileRoute, useRouter } from '@tanstack/react-router'
-import { Check, ChevronLeft, ClipboardList, Copy, ExternalLink, ListTodo, Package, PackageCheck, Paperclip, StickyNote, Trash2, Truck, UserPlus, XCircle } from 'lucide-react'
+import { Check, ChevronLeft, ClipboardList, Copy, ExternalLink, ListTodo, Package, PackageCheck, Paperclip, Printer, StickyNote, Trash2, Truck, UserPlus, XCircle } from 'lucide-react'
 
 import { PageEmpty } from '@/components/common/page-empty'
 import { EntityAttachmentsDialog } from '@/components/common/entity-attachments/entity-attachments-dialog'
@@ -138,6 +138,18 @@ function OrderDetailPage() {
       toast.success('Shipment voided')
     },
     onError: () => toast.error('Failed to void shipment'),
+  })
+
+  const processMutation = useMutation({
+    mutationFn: (withPrint: boolean) => orderService.process(orderId, withPrint, projectId),
+    onSuccess: (_data, withPrint) => {
+      queryClient.invalidateQueries({ queryKey: ORDER_QUERY_KEYS.detail(orderId) })
+      queryClient.invalidateQueries({ queryKey: ORDER_QUERY_KEYS.lists() })
+      toast.success(withPrint ? 'Order processed (print queued)' : 'Order processed')
+    },
+    meta: {
+      errorMessage: 'Failed to process order',
+    },
   })
 
   // Loading
@@ -346,6 +358,40 @@ function OrderDetailPage() {
             </TooltipTrigger>
             <TooltipContent>{allPicked ? 'All items have been picked' : 'Start picking for this customer'}</TooltipContent>
           </Tooltip>
+
+          {order.status === 'U' && (
+            <>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    type='button'
+                    className='inline-flex size-7 items-center justify-center rounded-[5px] border border-border bg-bg-secondary text-[12px] font-medium text-text-secondary transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground disabled:pointer-events-none disabled:opacity-50 lg:h-7 lg:w-auto lg:gap-1.5 lg:px-2.5'
+                    onClick={() => processMutation.mutate(true)}
+                    disabled={processMutation.isPending}
+                  >
+                    <Printer className='size-3.5' />
+                    <span className='hidden lg:inline'>Process & Print</span>
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent>Process order and print</TooltipContent>
+              </Tooltip>
+
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    type='button'
+                    className='inline-flex size-7 items-center justify-center rounded-[5px] border border-border bg-bg-secondary text-[12px] font-medium text-text-secondary transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground disabled:pointer-events-none disabled:opacity-50 lg:h-7 lg:w-auto lg:gap-1.5 lg:px-2.5'
+                    onClick={() => processMutation.mutate(false)}
+                    disabled={processMutation.isPending}
+                  >
+                    <PackageCheck className='size-3.5' />
+                    <span className='hidden lg:inline'>Process</span>
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent>Process order without printing</TooltipContent>
+              </Tooltip>
+            </>
+          )}
 
           <Tooltip>
             <TooltipTrigger asChild>
