@@ -10,7 +10,7 @@ import {
   MapPin,
   Paperclip,
   ShoppingCart,
-  User,
+  User
 } from 'lucide-react'
 import { useCallback, useMemo, useState } from 'react'
 import { toast } from 'sonner'
@@ -20,29 +20,22 @@ import { CartSummary } from './-components/cart-summary'
 import { CustomerCombobox } from './-components/customer-combobox'
 import { ProductCatalogDialog } from './-components/product-catalog-dialog'
 import { ProductEditSheet } from './-components/product-edit-sheet'
-import { useCreatePage, type AddressFields } from './-components/use-create-page'
-import {
-  EntityAttachments,
-} from '@/components/common/entity-attachments/entity-attachments'
+import { type AddressFields, useCreatePage } from './-components/use-create-page'
 import { CUSTOMER_QUERY_KEYS } from '@/api/customer/query'
 import { customerService } from '@/api/customer/service'
 import { getEditableFieldsQuery } from '@/api/data/query'
 import { getFieldConfigQuery } from '@/api/field-config/query'
 import { getPriceLevelsQuery } from '@/api/price-level/query'
 import { getSalespersonsQuery } from '@/api/salesperson/query'
-import { getColumnLabel } from '@/helpers/dynamic-columns'
-import { CustomerInfoPanel } from '@/routes/_authenticated/customers/$customerId/-components/customer-info-card'
-import { PropertyField } from '@/routes/_authenticated/orders/$orderId/-components/order-properties'
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
+import { EntityAttachments } from '@/components/common/entity-attachments/entity-attachments'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { SidebarTrigger } from '@/components/ui/sidebar'
 import { Spinner } from '@/components/ui/spinner'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
+import { getColumnLabel } from '@/helpers/dynamic-columns'
 import { cn } from '@/lib/utils'
+import { CustomerInfoPanel } from '@/routes/_authenticated/customers/$customerId/-components/customer-info-card'
+import { PropertyField } from '@/routes/_authenticated/orders/$orderId/-components/order-properties'
 
 const CreatePage = () => {
   const router = useRouter()
@@ -72,6 +65,8 @@ const CreatePage = () => {
     editDispatch,
     configData,
     configLoading,
+    accessories,
+    accessoriesLoading,
     invalidateCart,
     billTo,
     setBillTo,
@@ -85,14 +80,14 @@ const CreatePage = () => {
     handleClearAll,
     handleCreateProposal,
     handleCreateOrder,
-    isCartItemType,
+    isCartItemType
   } = useCreatePage()
 
   const hasCartItems = cartItems.length > 0
 
   useBlocker({
     shouldBlockFn: () => hasCartItems,
-    withResolver: true,
+    withResolver: true
   })
 
   const { data: fieldConfig } = useQuery(getFieldConfigQuery(projectId))
@@ -115,25 +110,24 @@ const CreatePage = () => {
     onSuccess: (updatedCustomer) => {
       queryClient.setQueryData(
         [...CUSTOMER_QUERY_KEYS.detail(customerId), projectId],
-        updatedCustomer,
+        updatedCustomer
       )
       invalidateCustomerDelayed()
       toast.success('Price level updated')
-    },
+    }
   })
 
   const patchMutation = useMutation({
-    mutationFn: (payload: Record<string, unknown>) =>
-      customerService.update(customerId, payload),
+    mutationFn: (payload: Record<string, unknown>) => customerService.update(customerId, payload),
     onSuccess: (updatedCustomer) => {
       queryClient.setQueryData(
         [...CUSTOMER_QUERY_KEYS.detail(customerId), projectId],
-        updatedCustomer,
+        updatedCustomer
       )
       invalidateCustomerDelayed()
       toast.success('Customer updated')
     },
-    meta: { errorMessage: 'Failed to update customer' },
+    meta: { errorMessage: 'Failed to update customer' }
   })
 
   const handleFieldSave = useCallback(
@@ -143,11 +137,11 @@ const CreatePage = () => {
       if (value === current) return
       patchMutation.mutate({ [field]: value || null })
     },
-    [customerDetail, patchMutation],
+    [customerDetail, patchMutation]
   )
 
   const savingField = patchMutation.isPending
-    ? Object.keys(patchMutation.variables ?? {})[0] ?? null
+    ? (Object.keys(patchMutation.variables ?? {})[0] ?? null)
     : null
 
   const customerCustomFields = useMemo(() => {
@@ -162,11 +156,11 @@ const CreatePage = () => {
   return (
     <div className='flex h-full flex-col overflow-hidden'>
       {/* ── Header ── */}
-      <header className='flex h-12 shrink-0 items-center gap-2.5 border-b border-border px-3.5 sm:px-6'>
+      <header className='border-border flex h-12 shrink-0 items-center gap-2.5 border-b px-3.5 sm:px-6'>
         <SidebarTrigger className='-ml-1' />
         <button
           type='button'
-          className='inline-flex h-7 items-center gap-0.5 rounded-[6px] border border-border bg-bg-secondary pl-1.5 pr-2.5 text-[13px] font-medium text-text-secondary transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground'
+          className='border-border bg-bg-secondary text-text-secondary hover:bg-bg-active hover:text-foreground inline-flex h-7 items-center gap-0.5 rounded-[6px] border pr-2.5 pl-1.5 text-[13px] font-medium transition-colors duration-[80ms]'
           onClick={() => router.history.back()}
         >
           <ChevronLeft className='size-3.5' />
@@ -184,7 +178,7 @@ const CreatePage = () => {
         <button
           type='button'
           className={cn(
-            'inline-flex h-7 items-center gap-1.5 rounded-[5px] border border-border bg-bg-secondary px-2.5 text-[12px] font-medium text-text-secondary transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground disabled:pointer-events-none disabled:opacity-40',
+            'border-border bg-bg-secondary text-text-secondary hover:bg-bg-active hover:text-foreground inline-flex h-7 items-center gap-1.5 rounded-[5px] border px-2.5 text-[12px] font-medium transition-colors duration-[80ms] disabled:pointer-events-none disabled:opacity-40'
           )}
           disabled={!customer || isBusy}
           onClick={() => setCatalogOpen(true)}
@@ -198,11 +192,15 @@ const CreatePage = () => {
           <TooltipTrigger asChild>
             <button
               type='button'
-              className='inline-flex size-7 items-center justify-center rounded-[5px] text-text-tertiary transition-colors duration-[80ms] hover:bg-bg-hover hover:text-destructive disabled:pointer-events-none disabled:opacity-40'
+              className='text-text-tertiary hover:bg-bg-hover hover:text-destructive inline-flex size-7 items-center justify-center rounded-[5px] transition-colors duration-[80ms] disabled:pointer-events-none disabled:opacity-40'
               disabled={cartItems.length === 0 || isBusy || isCreating}
               onClick={handleClearAll}
             >
-              {busy.clearingCart ? <Spinner className='size-3.5' /> : <Eraser className='size-3.5' />}
+              {busy.clearingCart ? (
+                <Spinner className='size-3.5' />
+              ) : (
+                <Eraser className='size-3.5' />
+              )}
             </button>
           </TooltipTrigger>
           <TooltipContent>Clear all items</TooltipContent>
@@ -230,7 +228,7 @@ const CreatePage = () => {
 
           {/* Cart summary footer */}
           {(cart || loading) && (
-            <div className='shrink-0 border-t border-border px-6 py-2.5'>
+            <div className='border-border shrink-0 border-t px-6 py-2.5'>
               <CartSummary
                 cart={cart ?? null}
                 loading={loading}
@@ -241,12 +239,12 @@ const CreatePage = () => {
         </div>
 
         {/* Right: Sidebar — customer, info, addresses, actions */}
-        <div className='hidden w-[320px] shrink-0 flex-col overflow-hidden border-l border-border bg-bg-secondary/30 lg:flex'>
+        <div className='border-border bg-bg-secondary/30 hidden w-[320px] shrink-0 flex-col overflow-hidden border-l lg:flex'>
           {/* Customer combobox — fixed at top */}
-          <div className='shrink-0 border-b border-border p-4'>
+          <div className='border-border shrink-0 border-b p-4'>
             <div className='mb-2.5 flex items-center gap-1.5'>
-              <User className='size-3.5 text-text-tertiary' />
-              <span className='text-[12px] font-semibold uppercase tracking-[0.04em] text-text-tertiary'>
+              <User className='text-text-tertiary size-3.5' />
+              <span className='text-text-tertiary text-[12px] font-semibold tracking-[0.04em] uppercase'>
                 Customer
               </span>
             </div>
@@ -258,7 +256,7 @@ const CreatePage = () => {
           </div>
 
           {/* Scrollable middle area */}
-          <div className='min-h-0 flex-1 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]'>
+          <div className='min-h-0 flex-1 [scrollbar-width:none] overflow-y-auto [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden'>
             {/* Customer details — same as customer detail page */}
             {customer && customerDetail && (
               <>
@@ -276,9 +274,9 @@ const CreatePage = () => {
 
                 {/* Custom fields */}
                 {customerCustomFields.length > 0 && (
-                  <div className='border-b border-border'>
+                  <div className='border-border border-b'>
                     <div className='bg-bg-secondary/60 px-4 py-2'>
-                      <span className='text-[11px] font-semibold uppercase tracking-[0.06em] text-text-tertiary'>
+                      <span className='text-text-tertiary text-[11px] font-semibold tracking-[0.06em] uppercase'>
                         Custom Fields
                       </span>
                     </div>
@@ -287,7 +285,8 @@ const CreatePage = () => {
                         const label = getColumnLabel(entry.field, 'customer', fieldConfig)
                         const val = customerDetail[entry.field]
                         const strVal = val != null ? String(val) : null
-                        const isEditable = !!entry.editable || editableCustomerFields.includes(entry.field)
+                        const isEditable =
+                          !!entry.editable || editableCustomerFields.includes(entry.field)
                         return (
                           <PropertyField
                             key={entry.field}
@@ -309,16 +308,24 @@ const CreatePage = () => {
             {/* Bill To / Ship To */}
             {customer && (
               <>
-                <AddressCard title='Bill To' address={billTo} onChange={setBillTo} />
-                <AddressCard title='Ship To' address={shipTo} onChange={setShipTo} />
+                <AddressCard
+                  title='Bill To'
+                  address={billTo}
+                  onChange={setBillTo}
+                />
+                <AddressCard
+                  title='Ship To'
+                  address={shipTo}
+                  onChange={setShipTo}
+                />
               </>
             )}
 
             {/* Attachments */}
-            <div className='border-b border-border p-4'>
+            <div className='border-border border-b p-4'>
               <button
                 type='button'
-                className='inline-flex h-8 w-full items-center justify-center gap-1.5 rounded-[6px] border border-border bg-background text-[13px] font-medium text-text-secondary transition-colors duration-[80ms] hover:bg-bg-hover hover:text-foreground disabled:pointer-events-none disabled:opacity-50'
+                className='border-border bg-background text-text-secondary hover:bg-bg-hover hover:text-foreground inline-flex h-8 w-full items-center justify-center gap-1.5 rounded-[6px] border text-[13px] font-medium transition-colors duration-[80ms] disabled:pointer-events-none disabled:opacity-50'
                 disabled={!customer}
                 onClick={() => setAttachmentsOpen(true)}
               >
@@ -329,13 +336,13 @@ const CreatePage = () => {
           </div>
 
           {/* Actions — fixed at bottom */}
-          <div className='shrink-0 border-t border-border p-4'>
+          <div className='border-border shrink-0 border-t p-4'>
             <div className='flex flex-col gap-2'>
               <Tooltip>
                 <TooltipTrigger asChild>
                   <button
                     type='button'
-                    className='inline-flex h-9 w-full items-center justify-center gap-2 rounded-[6px] bg-primary text-[13px] font-semibold text-primary-foreground transition-opacity duration-[80ms] hover:opacity-90 disabled:pointer-events-none disabled:opacity-40'
+                    className='bg-primary text-primary-foreground inline-flex h-9 w-full items-center justify-center gap-2 rounded-[6px] text-[13px] font-semibold transition-opacity duration-[80ms] hover:opacity-90 disabled:pointer-events-none disabled:opacity-40'
                     disabled={!canSubmit}
                     onClick={handleCreateProposal}
                   >
@@ -362,7 +369,7 @@ const CreatePage = () => {
                 <TooltipTrigger asChild>
                   <button
                     type='button'
-                    className='inline-flex h-9 w-full items-center justify-center gap-2 rounded-[6px] border border-border bg-background text-[13px] font-medium text-foreground transition-colors duration-[80ms] hover:bg-bg-hover disabled:pointer-events-none disabled:opacity-40'
+                    className='border-border bg-background text-foreground hover:bg-bg-hover inline-flex h-9 w-full items-center justify-center gap-2 rounded-[6px] border text-[13px] font-medium transition-colors duration-[80ms] disabled:pointer-events-none disabled:opacity-40'
                     disabled={!canSubmit}
                     onClick={handleCreateOrder}
                   >
@@ -390,7 +397,7 @@ const CreatePage = () => {
       </div>
 
       {/* ── Mobile/tablet bottom bar (visible below lg breakpoint) ── */}
-      <div className='flex shrink-0 items-center justify-between gap-2 border-t border-border px-4 py-2 lg:hidden'>
+      <div className='border-border flex shrink-0 items-center justify-between gap-2 border-t px-4 py-2 lg:hidden'>
         <div className='flex min-w-0 flex-1 items-center gap-2'>
           <div className='min-w-0 flex-1'>
             <CustomerCombobox
@@ -401,7 +408,7 @@ const CreatePage = () => {
           </div>
           <button
             type='button'
-            className='inline-flex h-8 shrink-0 items-center gap-1.5 rounded-[6px] border border-border bg-background px-2.5 text-[12px] font-medium text-text-secondary'
+            className='border-border bg-background text-text-secondary inline-flex h-8 shrink-0 items-center gap-1.5 rounded-[6px] border px-2.5 text-[12px] font-medium'
             disabled={!customer}
             onClick={() => setAttachmentsOpen(true)}
           >
@@ -411,7 +418,7 @@ const CreatePage = () => {
         <div className='flex shrink-0 items-center gap-2'>
           <button
             type='button'
-            className='inline-flex h-8 items-center gap-1.5 rounded-[6px] border border-border bg-background px-3 text-[12px] font-medium text-foreground disabled:opacity-40'
+            className='border-border bg-background text-foreground inline-flex h-8 items-center gap-1.5 rounded-[6px] border px-3 text-[12px] font-medium disabled:opacity-40'
             disabled={!canSubmit}
             onClick={handleCreateOrder}
           >
@@ -420,7 +427,7 @@ const CreatePage = () => {
           </button>
           <button
             type='button'
-            className='inline-flex h-8 items-center gap-1.5 rounded-[6px] bg-primary px-3 text-[12px] font-semibold text-primary-foreground disabled:opacity-40'
+            className='bg-primary text-primary-foreground inline-flex h-8 items-center gap-1.5 rounded-[6px] px-3 text-[12px] font-semibold disabled:opacity-40'
             disabled={!canSubmit}
             onClick={handleCreateProposal}
           >
@@ -433,11 +440,7 @@ const CreatePage = () => {
       {/* ── Dialogs ── */}
       <ProductEditSheet
         key={
-          editProduct
-            ? isCartItemType(editProduct)
-              ? editProduct.id
-              : editProduct.autoid
-            : 'none'
+          editProduct ? (isCartItemType(editProduct) ? editProduct.id : editProduct.autoid) : 'none'
         }
         open={editSheetOpen}
         onOpenChange={(open) => {
@@ -447,6 +450,8 @@ const CreatePage = () => {
         mode={editMode}
         configData={configData}
         configLoading={configLoading}
+        accessories={accessories}
+        accessoriesLoading={accessoriesLoading}
         customerId={customer?.id ?? ''}
         projectId={projectId}
         onSaved={invalidateCart}
@@ -465,11 +470,14 @@ const CreatePage = () => {
       />
 
       {/* Attachments dialog */}
-      <Dialog open={attachmentsOpen} onOpenChange={setAttachmentsOpen}>
+      <Dialog
+        open={attachmentsOpen}
+        onOpenChange={setAttachmentsOpen}
+      >
         <DialogContent className='flex max-h-[85vh] flex-col gap-0 overflow-hidden p-0 sm:max-w-md'>
-          <DialogHeader className='border-b border-border px-5 py-3'>
+          <DialogHeader className='border-border border-b px-5 py-3'>
             <DialogTitle className='flex items-center gap-2 text-[14px]'>
-              <Paperclip className='size-4 text-text-tertiary' />
+              <Paperclip className='text-text-tertiary size-4' />
               Attachments
             </DialogTitle>
           </DialogHeader>
@@ -492,7 +500,7 @@ const CreatePage = () => {
 function AddressCard({
   title,
   address,
-  onChange,
+  onChange
 }: {
   title: string
   address: AddressFields
@@ -521,56 +529,84 @@ function AddressCard({
   return (
     <>
       <div
-        className='cursor-pointer border-b border-border px-4 py-2.5 transition-colors duration-75 hover:bg-bg-hover/50'
+        className='border-border hover:bg-bg-hover/50 cursor-pointer border-b px-4 py-2.5 transition-colors duration-75'
         onClick={handleOpen}
       >
         <div className='mb-1 flex items-center gap-1.5'>
-          <MapPin className='size-3 shrink-0 text-text-quaternary' />
-          <span className='text-[11px] font-semibold uppercase tracking-[0.04em] text-text-tertiary'>
+          <MapPin className='text-text-quaternary size-3 shrink-0' />
+          <span className='text-text-tertiary text-[11px] font-semibold tracking-[0.04em] uppercase'>
             {title}
           </span>
         </div>
         {hasAddress ? (
-          <div className='pl-[18px] text-[12px] leading-relaxed text-text-secondary'>
-            {address.name && <div className='font-medium text-foreground'>{address.name}</div>}
+          <div className='text-text-secondary pl-[18px] text-[12px] leading-relaxed'>
+            {address.name && <div className='text-foreground font-medium'>{address.name}</div>}
             {address.address1 && <div>{address.address1}</div>}
             {address.address2 && <div>{address.address2}</div>}
             {cityStateZip && <div>{cityStateZip}</div>}
           </div>
         ) : (
-          <div className='pl-[18px] text-[12px] text-text-quaternary'>No address set</div>
+          <div className='text-text-quaternary pl-[18px] text-[12px]'>No address set</div>
         )}
       </div>
 
-      <Dialog open={open} onOpenChange={setOpen}>
+      <Dialog
+        open={open}
+        onOpenChange={setOpen}
+      >
         <DialogContent className='gap-0 overflow-hidden p-0 sm:max-w-[380px]'>
-          <DialogHeader className='border-b border-border px-5 py-3'>
+          <DialogHeader className='border-border border-b px-5 py-3'>
             <DialogTitle className='flex items-center gap-2 text-[14px]'>
-              <MapPin className='size-4 text-text-tertiary' />
+              <MapPin className='text-text-tertiary size-4' />
               {title}
             </DialogTitle>
           </DialogHeader>
           <div className='space-y-3 px-5 py-4'>
-            <AddressDialogField label='Name' value={draft.name} onChange={(v) => updateDraft('name', v)} autoFocus />
-            <AddressDialogField label='Street' value={draft.address1} onChange={(v) => updateDraft('address1', v)} />
-            <AddressDialogField label='Apt / Suite' value={draft.address2} onChange={(v) => updateDraft('address2', v)} />
+            <AddressDialogField
+              label='Name'
+              value={draft.name}
+              onChange={(v) => updateDraft('name', v)}
+              autoFocus
+            />
+            <AddressDialogField
+              label='Street'
+              value={draft.address1}
+              onChange={(v) => updateDraft('address1', v)}
+            />
+            <AddressDialogField
+              label='Apt / Suite'
+              value={draft.address2}
+              onChange={(v) => updateDraft('address2', v)}
+            />
             <div className='grid grid-cols-3 gap-2'>
-              <AddressDialogField label='City' value={draft.city} onChange={(v) => updateDraft('city', v)} />
-              <AddressDialogField label='State' value={draft.state} onChange={(v) => updateDraft('state', v)} />
-              <AddressDialogField label='ZIP' value={draft.zip} onChange={(v) => updateDraft('zip', v)} />
+              <AddressDialogField
+                label='City'
+                value={draft.city}
+                onChange={(v) => updateDraft('city', v)}
+              />
+              <AddressDialogField
+                label='State'
+                value={draft.state}
+                onChange={(v) => updateDraft('state', v)}
+              />
+              <AddressDialogField
+                label='ZIP'
+                value={draft.zip}
+                onChange={(v) => updateDraft('zip', v)}
+              />
             </div>
           </div>
-          <div className='flex justify-end gap-2 border-t border-border px-5 py-3'>
+          <div className='border-border flex justify-end gap-2 border-t px-5 py-3'>
             <button
               type='button'
-              className='inline-flex h-7 items-center rounded-[6px] border border-border px-3 text-[12px] font-medium text-text-secondary transition-colors duration-[80ms] hover:bg-bg-hover hover:text-foreground'
+              className='border-border text-text-secondary hover:bg-bg-hover hover:text-foreground inline-flex h-7 items-center rounded-[6px] border px-3 text-[12px] font-medium transition-colors duration-[80ms]'
               onClick={() => setOpen(false)}
             >
               Cancel
             </button>
             <button
               type='button'
-              className='inline-flex h-7 items-center rounded-[6px] bg-primary px-3 text-[12px] font-semibold text-primary-foreground transition-opacity duration-[80ms] hover:opacity-90'
+              className='bg-primary text-primary-foreground inline-flex h-7 items-center rounded-[6px] px-3 text-[12px] font-semibold transition-opacity duration-[80ms] hover:opacity-90'
               onClick={handleSave}
             >
               Save
@@ -586,7 +622,7 @@ function AddressDialogField({
   label,
   value,
   onChange,
-  autoFocus,
+  autoFocus
 }: {
   label: string
   value: string
@@ -595,13 +631,13 @@ function AddressDialogField({
 }) {
   return (
     <div>
-      <label className='mb-1 block text-[12px] font-medium text-text-tertiary'>{label}</label>
+      <label className='text-text-tertiary mb-1 block text-[12px] font-medium'>{label}</label>
       <input
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={label}
         autoFocus={autoFocus}
-        className='h-8 w-full rounded-[6px] border border-border bg-background px-2.5 text-[13px] text-foreground outline-none transition-colors duration-[80ms] placeholder:text-text-quaternary focus:border-primary focus:ring-1 focus:ring-primary/20'
+        className='border-border bg-background text-foreground placeholder:text-text-quaternary focus:border-primary focus:ring-primary/20 h-8 w-full rounded-[6px] border px-2.5 text-[13px] transition-colors duration-[80ms] outline-none focus:ring-1'
       />
     </div>
   )
@@ -610,6 +646,6 @@ function AddressDialogField({
 export const Route = createFileRoute('/_authenticated/create/')({
   component: CreatePage,
   head: () => ({
-    meta: [{ title: 'Create' }],
-  }),
+    meta: [{ title: 'Create' }]
+  })
 })

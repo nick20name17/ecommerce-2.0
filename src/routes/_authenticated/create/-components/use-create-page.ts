@@ -6,16 +6,21 @@ import { toast } from 'sonner'
 import { useEditSheetData } from './use-edit-sheet-data'
 import { CART_QUERY_KEYS, getCartQuery } from '@/api/cart/query'
 import { cartService } from '@/api/cart/service'
-import type { Cart } from '@/api/product/schema'
 import { getCustomerDetailQuery } from '@/api/customer/query'
 import type { Customer } from '@/api/customer/schema'
-import { orderService } from '@/api/order/service'
 import type { OrderPatchPayload } from '@/api/order/schema'
+import { orderService } from '@/api/order/service'
+import type { Cart } from '@/api/product/schema'
 import type { CartItem, Product } from '@/api/product/schema'
 import type { EntityAttachmentsRef } from '@/components/common/entity-attachments/entity-attachments'
 import { getErrorMessage } from '@/helpers/error'
 import { waitForCreatedAutoid } from '@/helpers/pending-created-autoid'
-import { addPendingOrder, addPendingProposal, removePendingOrder, removePendingProposal } from '@/hooks/use-pending-orders'
+import {
+  addPendingOrder,
+  addPendingProposal,
+  removePendingOrder,
+  removePendingProposal
+} from '@/hooks/use-pending-orders'
 import { useProjectId } from '@/hooks/use-project-id'
 import { useSelectedCustomerId } from '@/hooks/use-selected-customer'
 
@@ -89,7 +94,14 @@ export interface AddressFields {
   zip: string
 }
 
-const emptyAddress: AddressFields = { name: '', address1: '', address2: '', city: '', state: '', zip: '' }
+const emptyAddress: AddressFields = {
+  name: '',
+  address1: '',
+  address2: '',
+  city: '',
+  state: '',
+  zip: ''
+}
 
 const addressFromCustomer = (c: Customer): AddressFields => ({
   name: c.l_name ?? '',
@@ -97,7 +109,7 @@ const addressFromCustomer = (c: Customer): AddressFields => ({
   address2: c.address2 ?? '',
   city: c.city ?? '',
   state: c.state ?? '',
-  zip: c.zip ?? '',
+  zip: c.zip ?? ''
 })
 
 export function useCreatePage() {
@@ -140,20 +152,19 @@ export function useCreatePage() {
     }
   }, [customerDetail, customer, savedCustomerId])
 
-  const { data: cart, isLoading: cartLoading, fetchStatus: cartFetchStatus } = useQuery({
+  const {
+    data: cart,
+    isLoading: cartLoading,
+    fetchStatus: cartFetchStatus
+  } = useQuery({
     ...getCartQuery(customer?.id ?? '', projectId)
   })
   // isLoading is true for disabled queries (pending + idle). Only treat as loading when actually fetching.
   const cartActuallyLoading = cartLoading && cartFetchStatus === 'fetching'
   const { product: editProduct, mode: editMode, open: editSheetOpen } = editState
 
-  const { configData, configLoading, editProductWithPhotos } = useEditSheetData(
-    editProduct,
-    editSheetOpen,
-    customer?.id ?? '',
-    projectId,
-    editDispatch
-  )
+  const { configData, configLoading, editProductWithPhotos, accessories, accessoriesLoading } =
+    useEditSheetData(editProduct, editSheetOpen, customer?.id ?? '', projectId, editDispatch)
 
   const cartItems = cart?.items ?? []
   const isBusy = busy.cartUpdating || cartLoading || busy.creatingProposal || busy.creatingOrder
@@ -171,9 +182,8 @@ export function useCreatePage() {
   const updateCartOptimistic = useCallback(
     (updater: (prev: Cart) => Cart) => {
       if (customer?.id != null) {
-        queryClient.setQueryData<Cart>(
-          CART_QUERY_KEYS.detail(customer.id, projectId),
-          (prev) => prev ? updater(prev) : prev
+        queryClient.setQueryData<Cart>(CART_QUERY_KEYS.detail(customer.id, projectId), (prev) =>
+          prev ? updater(prev) : prev
         )
       }
     },
@@ -213,28 +223,32 @@ export function useCreatePage() {
       const payload = {
         product_autoid: product.autoid,
         quantity: 1,
-        unit,
+        unit
       }
 
       // Optimistic: add to cart UI immediately
       updateCartOptimistic((prev) => ({
         ...prev,
-        items: [...prev.items, {
-          id: -Date.now(),
-          product_autoid: product.autoid,
-          product_id: product.id,
-          name: product.descr_1,
-          quantity: 1,
-          unit,
-          price: product.price,
-          total: product.price,
-          photo: product.photo,
-        } as unknown as Cart['items'][number]],
+        items: [
+          ...prev.items,
+          {
+            id: -Date.now(),
+            product_autoid: product.autoid,
+            product_id: product.id,
+            name: product.descr_1,
+            quantity: 1,
+            unit,
+            price: product.price,
+            total: product.price,
+            photo: product.photo
+          } as unknown as Cart['items'][number]
+        ]
       }))
       toast.success(`${product.id} added to cart`)
 
       // Fire API in background — replace optimistic with real data
-      cartService.addItem(payload, customerId, projectId)
+      cartService
+        .addItem(payload, customerId, projectId)
         .then((updatedCart) => setCart(updatedCart))
         .catch((error) => {
           invalidateCart()
@@ -255,12 +269,13 @@ export function useCreatePage() {
     // Optimistic: remove from UI immediately
     updateCartOptimistic((prev) => ({
       ...prev,
-      items: prev.items.filter((i) => i.id !== itemId),
+      items: prev.items.filter((i) => i.id !== itemId)
     }))
     if (item) toast.success(`${item.product_id} removed`)
 
     // Fire API in background
-    cartService.deleteItem(itemId, customer.id, projectId)
+    cartService
+      .deleteItem(itemId, customer.id, projectId)
       .then((updatedCart) => setCart(updatedCart))
       .catch((error) => {
         invalidateCart() // revert on failure
@@ -284,9 +299,7 @@ export function useCreatePage() {
         if (item) {
           queryClient.setQueryData(cartKey, {
             ...currentCart,
-            items: currentCart.items.map((i) =>
-              i.id === itemId ? { ...i, quantity } : i
-            )
+            items: currentCart.items.map((i) => (i.id === itemId ? { ...i, quantity } : i))
           })
         }
       }
@@ -335,11 +348,10 @@ export function useCreatePage() {
     toast.success('All items cleared')
 
     // Fire API in background
-    cartService.flush(customer.id, projectId)
-      .catch((error) => {
-        invalidateCart()
-        toast.error(getErrorMessage(error))
-      })
+    cartService.flush(customer.id, projectId).catch((error) => {
+      invalidateCart()
+      toast.error(getErrorMessage(error))
+    })
   }
 
   const handleCreateProposal = () => {
@@ -365,7 +377,8 @@ export function useCreatePage() {
     toast.success('Proposal submitted — processing in background')
     navigate({ to: '/proposals', search: { status: 'all' } })
 
-    cartService.submitProposal(custId, projId)
+    cartService
+      .submitProposal(custId, projId)
       .then(() => {
         removePendingProposal()
         return waitForCreatedAutoid('proposal', 60_000)
@@ -394,7 +407,7 @@ export function useCreatePage() {
       c_address2: shipTo.address2,
       c_city: shipTo.city,
       c_state: shipTo.state,
-      c_zip: shipTo.zip,
+      c_zip: shipTo.zip
     }
     try {
       await orderService.patch(autoid, payload)
@@ -429,7 +442,8 @@ export function useCreatePage() {
     navigate({ to: '/orders', search: { status: 'all' } })
 
     // Fire-and-forget: entire flow runs in background
-    cartService.submitOrder(custId, projId)
+    cartService
+      .submitOrder(custId, projId)
       .then(() => {
         removePendingOrder()
         return waitForCreatedAutoid('order', 60_000)
@@ -439,7 +453,7 @@ export function useCreatePage() {
           patchAddresses(autoid),
           pendingAttachments
             ? pendingAttachments.uploadPendingFiles(autoid, 'order')
-            : Promise.resolve(),
+            : Promise.resolve()
         ])
       })
       .catch(() => {
@@ -471,6 +485,8 @@ export function useCreatePage() {
     editDispatch,
     configData,
     configLoading,
+    accessories,
+    accessoriesLoading,
     invalidateCart,
     billTo,
     setBillTo,

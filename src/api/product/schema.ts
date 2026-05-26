@@ -64,6 +64,24 @@ export interface ConfigurationItem {
   subConfigsLoaded?: boolean
 }
 
+export interface ProductAccessory {
+  id: string
+  autoid: string
+  descr_1: string
+  def_unit: string
+  c_type: string
+  quan: string
+  unit_meas: string
+  int_note: string
+  max_count: number
+  ignore_count: boolean
+  price: string | null
+  old_price: string | null
+  configurations_count: number
+  single_components: number
+  photos: string[]
+}
+
 export interface ConfigurationPhotosParams {
   configuration_id: string
   category_name: string

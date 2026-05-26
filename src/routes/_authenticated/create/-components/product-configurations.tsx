@@ -1,4 +1,12 @@
-import { AlertCircle, Check, ChevronDown, ChevronRight, ImageIcon, RotateCcw, X } from 'lucide-react'
+import {
+  AlertCircle,
+  Check,
+  ChevronDown,
+  ChevronRight,
+  ImageIcon,
+  RotateCcw,
+  X
+} from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 
 import type { ConfigPath } from './product-edit-sheet-reducer'
@@ -87,13 +95,7 @@ export const ProductConfigurations = ({
       const wasTracked = prevDoneRef.current.has(c.name)
       const isDone = isConfigComplete(c)
       prevDoneRef.current.set(c.name, isDone)
-      if (
-        userInteractionTick > 0 &&
-        wasTracked &&
-        isDone &&
-        !wasDone &&
-        configs[i + 1]
-      ) {
+      if (userInteractionTick > 0 && wasTracked && isDone && !wasDone && configs[i + 1]) {
         newOpens.push(configs[i + 1].name)
       }
     }
@@ -114,18 +116,18 @@ export const ProductConfigurations = ({
     })
 
   return (
-    <div className='flex h-full flex-col overflow-hidden'>
+    <div className='flex flex-col'>
       {/* Header */}
-      <div className='flex shrink-0 items-center justify-between border-b border-border px-4 py-2'>
+      <div className='border-border flex shrink-0 items-center justify-between border-b px-4 py-2'>
         <div className='flex items-center gap-2'>
           <span className='text-[13px] font-semibold'>Components</span>
-          <span className='text-[12px] tabular-nums text-text-tertiary'>
+          <span className='text-text-tertiary text-[12px] tabular-nums'>
             {selectedConfigCount} of {totalConfigCount} selected
           </span>
         </div>
         <div className='flex items-center gap-2'>
           {hasUncheckedRequired && (
-            <span className='flex items-center gap-1 rounded-[4px] bg-destructive/10 px-1.5 py-0.5 text-[11px] font-semibold text-destructive'>
+            <span className='bg-destructive/10 text-destructive flex items-center gap-1 rounded-[4px] px-1.5 py-0.5 text-[11px] font-semibold'>
               <AlertCircle className='size-2.5' />
               Required
             </span>
@@ -133,7 +135,7 @@ export const ProductConfigurations = ({
           {selectedConfigCount > 0 && onResetConfigurations && (
             <button
               type='button'
-              className='flex items-center gap-1 rounded-[5px] px-2 py-1 text-[12px] font-medium text-text-tertiary transition-colors duration-[80ms] hover:bg-bg-hover hover:text-foreground'
+              className='text-text-tertiary hover:bg-bg-hover hover:text-foreground flex items-center gap-1 rounded-[5px] px-2 py-1 text-[12px] font-medium transition-colors duration-[80ms]'
               onClick={onResetConfigurations}
             >
               <RotateCcw className='size-3' />
@@ -144,7 +146,7 @@ export const ProductConfigurations = ({
       </div>
 
       {/* Configuration groups */}
-      <div className='min-h-0 flex-1 overflow-y-auto'>
+      <div>
         {configs.map((config, index) => {
           const isActive = wizardMode ? config.name === activeStep : true
           const stepNumber = String(index + 1)
@@ -167,12 +169,12 @@ export const ProductConfigurations = ({
               onSelectItem={onSelectItem}
               wizardFooter={
                 wizardMode ? (
-                  <div className='sticky bottom-0 z-10 flex items-center gap-2 border-t border-border bg-background px-4 py-2.5'>
+                  <div className='border-border bg-background sticky bottom-0 z-10 flex items-center gap-2 border-t px-4 py-2.5'>
                     <button
                       type='button'
                       disabled={!canGoPrev}
                       onClick={onPrev}
-                      className='flex-1 rounded-full border border-border px-3 py-2 text-[13px] font-medium transition-colors duration-75 hover:bg-bg-hover disabled:pointer-events-none disabled:opacity-40'
+                      className='border-border hover:bg-bg-hover flex-1 rounded-full border px-3 py-2 text-[13px] font-medium transition-colors duration-75 disabled:pointer-events-none disabled:opacity-40'
                     >
                       Previous step
                     </button>
@@ -180,7 +182,7 @@ export const ProductConfigurations = ({
                       type='button'
                       disabled={!canGoNext}
                       onClick={onNext}
-                      className='flex-1 rounded-full bg-primary px-3 py-2 text-[13px] font-medium text-primary-foreground transition-opacity duration-75 hover:opacity-90 disabled:pointer-events-none disabled:opacity-40'
+                      className='bg-primary text-primary-foreground flex-1 rounded-full px-3 py-2 text-[13px] font-medium transition-opacity duration-75 hover:opacity-90 disabled:pointer-events-none disabled:opacity-40'
                     >
                       Next step
                     </button>
@@ -213,10 +215,10 @@ const WizardStepHeader = ({
   return (
     <button
       type='button'
-      className='flex w-full items-center gap-2 border-b border-border px-4 py-2.5 text-left transition-colors duration-75 hover:bg-bg-hover/50'
+      className='border-border hover:bg-bg-hover/50 flex w-full items-center gap-2 border-b px-4 py-2.5 text-left transition-colors duration-75'
       onClick={onClick}
     >
-      <span className='flex size-5 shrink-0 items-center justify-center rounded-full border border-border text-[10px] font-semibold tabular-nums text-text-tertiary'>
+      <span className='border-border text-text-tertiary flex size-5 shrink-0 items-center justify-center rounded-full border text-[10px] font-semibold tabular-nums'>
         {stepLabel}
       </span>
       <span
@@ -228,18 +230,18 @@ const WizardStepHeader = ({
         {config.name}
       </span>
       {isRequired && !hasSelected && (
-        <span className='text-[11px] font-medium text-destructive'>*</span>
+        <span className='text-destructive text-[11px] font-medium'>*</span>
       )}
       {hasSelected && (
         <>
-          <span className='flex size-3.5 items-center justify-center rounded-full bg-primary text-white'>
+          <span className='bg-primary flex size-3.5 items-center justify-center rounded-full text-white'>
             <Check className='size-2' />
           </span>
-          <span className='truncate text-[12px] text-text-tertiary'>{selectedItem?.descr_1}</span>
+          <span className='text-text-tertiary truncate text-[12px]'>{selectedItem?.descr_1}</span>
         </>
       )}
       <div className='flex-1' />
-      <ChevronRight className='size-3.5 shrink-0 text-text-tertiary' />
+      <ChevronRight className='text-text-tertiary size-3.5 shrink-0' />
     </button>
   )
 }
@@ -282,15 +284,15 @@ const ConfigGroup = ({
   return (
     <div
       className={cn(
-        depth === 0 && 'border-b border-border',
-        isNested && 'rounded-[8px] border border-primary/15 bg-background'
+        depth === 0 && 'border-border border-b',
+        isNested && 'border-primary/15 bg-background rounded-[8px] border'
       )}
     >
       {/* Group header */}
       <button
         type='button'
         className={cn(
-          'flex w-full items-center gap-2 px-4 py-2.5 text-left transition-colors duration-75 hover:bg-bg-hover/50'
+          'hover:bg-bg-hover/50 flex w-full items-center gap-2 px-4 py-2.5 text-left transition-colors duration-75'
         )}
         onClick={handleToggle}
       >
@@ -309,8 +311,8 @@ const ConfigGroup = ({
           className={cn(
             'flex shrink-0 items-center justify-center rounded-full border font-semibold tabular-nums',
             isNested
-              ? 'h-4 min-w-[28px] border-primary/30 bg-primary/10 px-1 text-[9px] text-primary'
-              : 'size-5 border-border text-[10px] text-text-tertiary',
+              ? 'border-primary/30 bg-primary/10 text-primary h-4 min-w-[28px] px-1 text-[9px]'
+              : 'border-border text-text-tertiary size-5 text-[10px]',
             hasSelected && !isNested && 'border-primary/50 bg-primary/10 text-primary'
           )}
         >
@@ -320,7 +322,7 @@ const ConfigGroup = ({
         <span
           className={cn(
             'font-semibold',
-            isNested ? 'text-[12px] text-text-secondary' : 'text-[13px]'
+            isNested ? 'text-text-secondary text-[12px]' : 'text-[13px]'
           )}
         >
           {config.name}
@@ -339,7 +341,7 @@ const ConfigGroup = ({
 
         <ChevronDown
           className={cn(
-            'size-3.5 shrink-0 text-text-tertiary transition-transform duration-150',
+            'text-text-tertiary size-3.5 shrink-0 transition-transform duration-150',
             collapsed && '-rotate-90'
           )}
         />
@@ -361,7 +363,7 @@ const ConfigGroup = ({
               Render only once data is present — silent fetch for non-CTO items avoids a
               "Loading…" flash on every click. */}
           {hasSelected && selectedItem && !!selectedItem.subConfigurations?.length && (
-            <div className='flex flex-col gap-2 border-t border-border-light bg-primary/[0.02] px-4 py-3'>
+            <div className='border-border-light bg-primary/[0.02] flex flex-col gap-2 border-t px-4 py-3'>
               {selectedItem.subConfigurations.map((subConfig, subIndex) => (
                 <ConfigGroup
                   key={`${selectedItem.id}-${subConfig.name}`}
@@ -410,10 +412,10 @@ const SelectedPreview = ({
   const totalPrice = price * (hasQuan ? quanInt : 1)
 
   return (
-    <div className='flex items-center gap-3 border-t border-border-light bg-primary/[0.04] px-4 py-2'>
-      <div className='flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-[6px] border border-primary/30 bg-background'>
+    <div className='border-border-light bg-primary/[0.04] flex items-center gap-3 border-t px-4 py-2'>
+      <div className='border-primary/30 bg-background flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-[6px] border'>
         {photosLoading ? (
-          <Spinner className='size-3 text-text-tertiary' />
+          <Spinner className='text-text-tertiary size-3' />
         ) : photo ? (
           <img
             src={photo}
@@ -422,13 +424,13 @@ const SelectedPreview = ({
             loading='lazy'
           />
         ) : (
-          <ImageIcon className='size-4 text-text-tertiary/40' />
+          <ImageIcon className='text-text-tertiary/40 size-4' />
         )}
       </div>
       <div className='flex min-w-0 flex-1 flex-col'>
         <span className='truncate text-[13px] font-medium'>{item.descr_1}</span>
         {(price !== 0 || hasQuan) && (
-          <span className='text-[11px] tabular-nums text-text-tertiary'>
+          <span className='text-text-tertiary text-[11px] tabular-nums'>
             +{formatCurrency(totalPrice)}
             {hasQuan && <span className='ml-1'>· {quanInt}× included</span>}
           </span>
@@ -440,7 +442,7 @@ const SelectedPreview = ({
           e.stopPropagation()
           onClear()
         }}
-        className='inline-flex size-7 shrink-0 items-center justify-center rounded-full text-text-tertiary transition-colors duration-[80ms] hover:bg-bg-hover hover:text-foreground'
+        className='text-text-tertiary hover:bg-bg-hover hover:text-foreground inline-flex size-7 shrink-0 items-center justify-center rounded-full transition-colors duration-[80ms]'
         aria-label='Clear selection'
       >
         <X className='size-4' />
@@ -460,7 +462,7 @@ const CardGrid = ({
   photosLoading?: boolean
   onSelect: (itemId: string) => void
 }) => (
-  <div className='border-t border-border-light p-2.5'>
+  <div className='border-border-light border-t p-2.5'>
     <div className='grid grid-cols-3 gap-1.5 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6'>
       {items.map((item) => (
         <ConfigCard
@@ -495,13 +497,13 @@ const ConfigCard = ({
   return (
     <button
       type='button'
-      className='group flex flex-col overflow-hidden rounded-[8px] border border-border bg-background text-left transition-all duration-100 hover:border-primary/50 hover:shadow-sm'
+      className='group border-border bg-background hover:border-primary/50 flex flex-col overflow-hidden rounded-[8px] border text-left transition-all duration-100 hover:shadow-sm'
       onClick={onClick}
     >
       {/* Photo */}
-      <div className='relative flex aspect-square w-full items-center justify-center overflow-hidden bg-bg-secondary/50'>
+      <div className='bg-bg-secondary/50 relative flex aspect-square w-full items-center justify-center overflow-hidden'>
         {photosLoading ? (
-          <Spinner className='size-3.5 text-text-tertiary' />
+          <Spinner className='text-text-tertiary size-3.5' />
         ) : photo ? (
           <img
             src={photo}
@@ -510,11 +512,11 @@ const ConfigCard = ({
             loading='lazy'
           />
         ) : (
-          <ImageIcon className='size-5 text-text-tertiary/40' />
+          <ImageIcon className='text-text-tertiary/40 size-5' />
         )}
 
         {hasQuan && (
-          <span className='absolute bottom-0.5 right-0.5 rounded-[3px] bg-foreground/85 px-1 py-px text-[9px] font-semibold tabular-nums text-white shadow'>
+          <span className='bg-foreground/85 absolute right-0.5 bottom-0.5 rounded-[3px] px-1 py-px text-[9px] font-semibold text-white tabular-nums shadow'>
             {quanInt}×
           </span>
         )}
@@ -522,11 +524,11 @@ const ConfigCard = ({
 
       {/* Info */}
       <div className='flex min-h-[36px] flex-col justify-center gap-0.5 px-1.5 py-1'>
-        <span className='line-clamp-2 text-[11px] font-medium leading-tight text-foreground'>
+        <span className='text-foreground line-clamp-2 text-[11px] leading-tight font-medium'>
           {item.descr_1}
         </span>
         {showPrice && (
-          <span className='text-[10px] tabular-nums text-text-tertiary'>
+          <span className='text-text-tertiary text-[10px] tabular-nums'>
             +{formatCurrency(totalPrice)}
           </span>
         )}

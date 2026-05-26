@@ -2,7 +2,11 @@ import { useQuery } from '@tanstack/react-query'
 import { useEffect } from 'react'
 import { toast } from 'sonner'
 
-import { getProductByAutoidQuery, getProductConfigurationsQuery } from '@/api/product/query'
+import {
+  getProductAccessoriesQuery,
+  getProductByAutoidQuery,
+  getProductConfigurationsQuery
+} from '@/api/product/query'
 import type { CartItem, ConfigurationProduct, Product } from '@/api/product/schema'
 import { getErrorMessage } from '@/helpers/error'
 
@@ -49,6 +53,17 @@ export const useEditSheetData = (
       !!customerId
   })
 
+  // Optional accessories (INVENACCDET) — independent of required configurations.
+  // We fetch whenever the sheet is open for a product with a known customer; an
+  // empty array is the common case and renders nothing.
+  const accessoriesQuery = useQuery({
+    ...getProductAccessoriesQuery(autoidForConfig ?? '', {
+      customer_id: customerId,
+      project_id: projectIdNum
+    }),
+    enabled: editSheetOpen && !!editProduct && !!customerId
+  })
+
   const configData = ((): ConfigurationProduct | null => {
     const data = configQuery.data
     if (!data?.configurations || !editProduct || !isCartItem(editProduct)) return data ?? null
@@ -81,6 +96,8 @@ export const useEditSheetData = (
   return {
     configData,
     configLoading: needConfig && configQuery.isLoading && configQuery.fetchStatus !== 'idle',
-    editProductWithPhotos
+    editProductWithPhotos,
+    accessories: accessoriesQuery.data ?? [],
+    accessoriesLoading: accessoriesQuery.isLoading && accessoriesQuery.fetchStatus !== 'idle'
   }
 }
