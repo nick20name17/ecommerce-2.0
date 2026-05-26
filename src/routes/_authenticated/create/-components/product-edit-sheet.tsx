@@ -1,6 +1,7 @@
 import { useMutation } from '@tanstack/react-query'
 import { X } from 'lucide-react'
 
+import { ProductAccessories } from './product-accessories'
 import { ProductConfigurations } from './product-configurations'
 import { ProductImageGallery } from './product-image-gallery'
 import { ProductInfoSection } from './product-info-section'
@@ -8,7 +9,12 @@ import { useProductEditSheet } from './use-product-edit-sheet'
 import { CART_QUERY_KEYS } from '@/api/cart/query'
 import type { AddToCartPayload, UpdateCartItemPayload } from '@/api/cart/schema'
 import { cartService } from '@/api/cart/service'
-import type { CartItem, ConfigurationProduct, Product } from '@/api/product/schema'
+import type {
+  CartItem,
+  ConfigurationProduct,
+  Product,
+  ProductAccessory
+} from '@/api/product/schema'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -32,6 +38,8 @@ interface ProductEditSheetProps {
   mode: 'add' | 'edit'
   configData: ConfigurationProduct | null
   configLoading: boolean
+  accessories?: ProductAccessory[]
+  accessoriesLoading?: boolean
   customerId: string
   projectId?: number | null
   onSaved: () => void
@@ -44,6 +52,8 @@ export const ProductEditSheet = ({
   mode,
   configData,
   configLoading,
+  accessories = [],
+  accessoriesLoading = false,
   customerId,
   projectId,
   onSaved
@@ -191,19 +201,17 @@ export const ProductEditSheet = ({
           className={`flex ${showConfigs ? 'h-[92vh] w-[94vw] max-w-[1200px]!' : 'h-auto max-h-[92vh] w-[94vw] max-w-[500px]!'} flex-col gap-0 overflow-hidden rounded-[12px] border p-0 shadow-2xl`}
         >
           {/* Header */}
-          <div className='flex h-12 shrink-0 items-center gap-2.5 border-b border-border px-5'>
+          <div className='border-border flex h-12 shrink-0 items-center gap-2.5 border-b px-5'>
             <h2 className='shrink-0 text-[14px] font-semibold tracking-[-0.01em]'>
               {mode === 'add' ? 'Add Product' : 'Edit Product'}
             </h2>
             {showConfigs && (
-              <span className='truncate text-[13px] text-text-tertiary'>
-                {displayName}
-              </span>
+              <span className='text-text-tertiary truncate text-[13px]'>{displayName}</span>
             )}
             <div className='flex-1' />
             <button
               type='button'
-              className='inline-flex size-7 shrink-0 items-center justify-center rounded-[5px] text-text-tertiary transition-colors duration-[80ms] hover:bg-bg-hover hover:text-foreground'
+              className='text-text-tertiary hover:bg-bg-hover hover:text-foreground inline-flex size-7 shrink-0 items-center justify-center rounded-[5px] transition-colors duration-[80ms]'
               onClick={handleClose}
             >
               <X className='size-4' />
@@ -214,7 +222,7 @@ export const ProductEditSheet = ({
             /* Full two-panel layout for products with configurations */
             <div className='flex min-h-0 flex-1'>
               {/* Left panel: image + info */}
-              <div className='flex w-[380px] shrink-0 flex-col overflow-y-auto border-r border-border bg-bg-secondary/30 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]'>
+              <div className='border-border bg-bg-secondary/30 flex w-[380px] shrink-0 [scrollbar-width:none] flex-col overflow-y-auto border-r [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden'>
                 <div className='p-4'>
                   <ProductImageGallery
                     photos={photos}
@@ -223,7 +231,7 @@ export const ProductEditSheet = ({
                     displayName={displayName}
                   />
                 </div>
-                <div className='border-t border-border p-4'>
+                <div className='border-border border-t p-4'>
                   <ProductInfoSection
                     displayName={displayName}
                     configLoading={configLoading}
@@ -244,31 +252,39 @@ export const ProductEditSheet = ({
                 </div>
               </div>
 
-              {/* Right panel: configurations */}
+              {/* Right panel: configurations + optional accessories */}
               <div className='flex min-h-0 flex-1 flex-col overflow-hidden'>
                 {!configLoading && hasConfigs ? (
-                  <ProductConfigurations
-                    configs={configs}
-                    activeTab={activeTab}
-                    onActiveTabChange={(tab) => dispatch({ type: 'SET_ACTIVE_TAB', value: tab })}
-                    onSelectItem={handleSelectItem}
-                    onResetConfigurations={() => dispatch({ type: 'DESELECT_ALL_CONFIGS' })}
-                    hasUncheckedRequired={hasUncheckedRequired}
-                    selectedConfigCount={selectedConfigCount}
-                    totalConfigCount={totalConfigCount}
-                    wizardMode={wizardMode}
-                    activeStep={activeTab}
-                    onStepChange={(step) => dispatch({ type: 'SET_ACTIVE_TAB', value: step })}
-                    canGoNext={canGoNext}
-                    canGoPrev={canGoPrev}
-                    onNext={goNext}
-                    onPrev={goPrev}
-                    isConfigComplete={isStepFullyDone}
-                    userInteractionTick={userInteractionTick}
-                  />
+                  <div className='flex min-h-0 flex-1 flex-col overflow-y-auto'>
+                    <ProductConfigurations
+                      configs={configs}
+                      activeTab={activeTab}
+                      onActiveTabChange={(tab) => dispatch({ type: 'SET_ACTIVE_TAB', value: tab })}
+                      onSelectItem={handleSelectItem}
+                      onResetConfigurations={() => dispatch({ type: 'DESELECT_ALL_CONFIGS' })}
+                      hasUncheckedRequired={hasUncheckedRequired}
+                      selectedConfigCount={selectedConfigCount}
+                      totalConfigCount={totalConfigCount}
+                      wizardMode={wizardMode}
+                      activeStep={activeTab}
+                      onStepChange={(step) => dispatch({ type: 'SET_ACTIVE_TAB', value: step })}
+                      canGoNext={canGoNext}
+                      canGoPrev={canGoPrev}
+                      onNext={goNext}
+                      onPrev={goPrev}
+                      isConfigComplete={isStepFullyDone}
+                      userInteractionTick={userInteractionTick}
+                    />
+                    <ProductAccessories
+                      accessories={accessories}
+                      loading={accessoriesLoading}
+                      customerId={customerId}
+                      projectId={projectId}
+                    />
+                  </div>
                 ) : (
                   <div className='flex flex-1 items-center justify-center'>
-                    <Spinner className='size-5 text-text-tertiary' />
+                    <Spinner className='text-text-tertiary size-5' />
                   </div>
                 )}
               </div>
@@ -279,7 +295,7 @@ export const ProductEditSheet = ({
               <div className='flex gap-4 p-4'>
                 {/* Small thumbnail */}
                 {photos && photos.length > 0 && (
-                  <div className='size-[80px] shrink-0 overflow-hidden rounded-[8px] border border-border bg-background'>
+                  <div className='border-border bg-background size-[80px] shrink-0 overflow-hidden rounded-[8px] border'>
                     <img
                       src={photos[0]}
                       alt={displayName}
@@ -289,17 +305,17 @@ export const ProductEditSheet = ({
                   </div>
                 )}
                 <div className='flex min-w-0 flex-1 flex-col justify-center gap-1'>
-                  <h3 className='text-[14px] font-semibold leading-tight'>{displayName}</h3>
-                  <span className='text-[18px] font-bold tabular-nums tracking-tight'>
+                  <h3 className='text-[14px] leading-tight font-semibold'>{displayName}</h3>
+                  <span className='text-[18px] font-bold tracking-tight tabular-nums'>
                     {formatCurrency(priceDisplay)}
                   </span>
                 </div>
               </div>
 
-              <div className='flex flex-col gap-4 border-t border-border px-4 py-3'>
+              <div className='border-border flex flex-col gap-4 border-t px-4 py-3'>
                 {/* Quantity */}
                 <div>
-                  <span className='mb-1.5 block text-[12px] font-medium uppercase tracking-[0.04em] text-text-tertiary'>
+                  <span className='text-text-tertiary mb-1.5 block text-[12px] font-medium tracking-[0.04em] uppercase'>
                     Quantity
                   </span>
                   <div className='w-fit'>
@@ -317,7 +333,7 @@ export const ProductEditSheet = ({
                 {/* Units */}
                 {hasMultipleUnits && units && (
                   <div>
-                    <span className='mb-1.5 block text-[12px] font-medium uppercase tracking-[0.04em] text-text-tertiary'>
+                    <span className='text-text-tertiary mb-1.5 block text-[12px] font-medium tracking-[0.04em] uppercase'>
                       Unit of Measure
                     </span>
                     <div className='flex flex-wrap gap-1.5'>
@@ -330,13 +346,18 @@ export const ProductEditSheet = ({
                             className={cn(
                               'flex items-center gap-1.5 rounded-[6px] border px-2.5 py-1.5 text-[13px] transition-colors duration-[80ms]',
                               isSelected
-                                ? 'border-primary bg-primary/10 font-semibold text-primary'
+                                ? 'border-primary bg-primary/10 text-primary font-semibold'
                                 : 'border-border hover:border-primary/40'
                             )}
                             onClick={() => dispatch({ type: 'SET_SELECTED_UNIT', value: u.unit })}
                           >
                             <span className='font-medium'>{u.unit}</span>
-                            <span className={cn('text-[12px] tabular-nums', isSelected ? 'text-primary/80' : 'text-text-tertiary')}>
+                            <span
+                              className={cn(
+                                'text-[12px] tabular-nums',
+                                isSelected ? 'text-primary/80' : 'text-text-tertiary'
+                              )}
+                            >
                               {formatCurrency(u.price)}
                             </span>
                           </button>
@@ -350,17 +371,17 @@ export const ProductEditSheet = ({
           )}
 
           {/* Footer */}
-          <div className='flex shrink-0 items-center justify-between gap-4 border-t border-border px-5 py-3'>
+          <div className='border-border flex shrink-0 items-center justify-between gap-4 border-t px-5 py-3'>
             <div>
-              <span className='text-[12px] font-medium uppercase tracking-[0.04em] text-text-tertiary'>
+              <span className='text-text-tertiary text-[12px] font-medium tracking-[0.04em] uppercase'>
                 Total
               </span>
               <div className='flex items-baseline gap-2'>
-                <p className='text-[15px] font-bold tabular-nums leading-tight'>
+                <p className='text-[15px] leading-tight font-bold tabular-nums'>
                   {formatCurrency(priceDisplay * quantity)}
                 </p>
                 {quantity > 1 && (
-                  <span className='text-[12px] tabular-nums text-text-tertiary'>
+                  <span className='text-text-tertiary text-[12px] tabular-nums'>
                     {formatCurrency(priceDisplay)} × {quantity}
                   </span>
                 )}
@@ -370,14 +391,14 @@ export const ProductEditSheet = ({
             <div className='flex items-center gap-2'>
               <button
                 type='button'
-                className='inline-flex h-8 items-center rounded-[6px] px-3 text-[13px] font-medium text-text-secondary transition-colors duration-[80ms] hover:bg-bg-hover hover:text-foreground'
+                className='text-text-secondary hover:bg-bg-hover hover:text-foreground inline-flex h-8 items-center rounded-[6px] px-3 text-[13px] font-medium transition-colors duration-[80ms]'
                 onClick={handleClose}
               >
                 Cancel
               </button>
               <button
                 type='button'
-                className='inline-flex h-8 items-center gap-1.5 rounded-[6px] bg-primary px-4 text-[13px] font-medium text-primary-foreground transition-opacity duration-[80ms] hover:opacity-90 disabled:pointer-events-none disabled:opacity-50'
+                className='bg-primary text-primary-foreground inline-flex h-8 items-center gap-1.5 rounded-[6px] px-4 text-[13px] font-medium transition-opacity duration-[80ms] hover:opacity-90 disabled:pointer-events-none disabled:opacity-50'
                 disabled={
                   hasUncheckedRequired ||
                   configLoading ||
