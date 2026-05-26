@@ -94,5 +94,14 @@ export const orderService = {
       { params: orderParams(projectId) }
     )
     return data
+  },
+
+  process: async (autoid: string, withPrint: boolean, projectId?: number | null) => {
+    const { data } = await api.post<{ success?: boolean } & Record<string, unknown>>(
+      `/data/orders/${autoid}/process/`,
+      { print: withPrint },
+      { params: orderParams(projectId) }
+    )
+    return data
   }
 }
