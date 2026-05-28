@@ -11,6 +11,7 @@ import type {
   CatalogTreeParams,
   CatalogTreeResponse,
   CreateCatalogCategoryPayload,
+  ImportAllPayload,
   ImportFromInventrePayload,
   ImportStatusResponse,
   ImportTaskResponse,
@@ -139,6 +140,18 @@ export const catalogService = {
     params: { project_id?: number }
   ) => {
     const { data } = await api.post<ImportTaskResponse>('/catalog/import-from-inventre/', payload, {
+      params,
+    })
+    return data
+  },
+
+  // Single trigger that runs Superinventory → Categories → Images in order.
+  // Progress is reported under one task_id with `Step X/3: ...` prefixes.
+  importAll: async (
+    payload: ImportAllPayload,
+    params: { project_id?: number }
+  ) => {
+    const { data } = await api.post<ImportTaskResponse>('/catalog/import-all/', payload, {
       params,
     })
     return data

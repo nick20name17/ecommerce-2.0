@@ -1,5 +1,14 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { Database, Download, FolderTree, ImageIcon, Layers, Package } from 'lucide-react'
+import {
+  ChevronDown,
+  Database,
+  Download,
+  FolderTree,
+  ImageIcon,
+  Layers,
+  Package,
+  Sparkles,
+} from 'lucide-react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
 import { CATALOG_QUERY_KEYS } from '@/api/catalog/query'
@@ -10,6 +19,11 @@ import { VP_QUERY_KEYS } from '@/api/variable-product/query'
 import { catalogImageService } from '@/api/catalog-image/service'
 import { variableProductService } from '@/api/variable-product/service'
 import { Button } from '@/components/ui/button'
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from '@/components/ui/collapsible'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 
@@ -49,9 +63,12 @@ export const CatalogSection = ({ projectId }: CatalogSectionProps) => {
   const [vpImportStatus, setVPImportStatus] = useState<ImportPollState | null>(null)
   const [singleVPResult, setSingleVPResult] = useState<Record<string, unknown> | null>(null)
   const [imgImportStatus, setImgImportStatus] = useState<ImportPollState | null>(null)
+  const [fullImportStatus, setFullImportStatus] = useState<ImportPollState | null>(null)
   const importIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const vpImportIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const imgImportIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  const fullImportIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  const [advancedOpen, setAdvancedOpen] = useState(false)
   const queryClient = useQueryClient()
 
   const clearImportPolling = useCallback(() => {
@@ -74,6 +91,54 @@ export const CatalogSection = ({ projectId }: CatalogSectionProps) => {
       imgImportIntervalRef.current = null
     }
   }, [])
+
+  const clearFullImportPolling = useCallback(() => {
+    if (fullImportIntervalRef.current) {
+      clearInterval(fullImportIntervalRef.current)
+      fullImportIntervalRef.current = null
+    }
+  }, [])
+
+  // Poll the full-import task. The backend reports stage transitions and
+  // detailed progress through the same task_id; on completion we invalidate
+  // both catalog and VP query caches since the pipeline writes both.
+  const startFullImportPolling = useCallback(
+    (taskId: string) => {
+      clearFullImportPolling()
+      setFullImportStatus({ taskId, status: 'running' })
+      saveTask('full', projectId, taskId)
+
+      fullImportIntervalRef.current = setInterval(async () => {
+        try {
+          const status = await catalogService.getImportStatus(taskId, {
+            project_id: projectId,
+          })
+          setFullImportStatus({
+            taskId,
+            status: status.status,
+            progress: status.progress,
+            result: status.result,
+            error: status.error,
+          })
+          if (status.status === 'completed' || status.status === 'failed') {
+            clearFullImportPolling()
+            clearTask('full', projectId)
+            if (status.status === 'completed') {
+              queryClient.invalidateQueries({ queryKey: CATALOG_QUERY_KEYS.all() })
+              queryClient.invalidateQueries({ queryKey: VP_QUERY_KEYS.lists() })
+            }
+          }
+        } catch {
+          clearFullImportPolling()
+          clearTask('full', projectId)
+          setFullImportStatus((prev) =>
+            prev ? { ...prev, status: 'failed', error: 'Failed to check import status' } : null
+          )
+        }
+      }, 2000)
+    },
+    [clearFullImportPolling, projectId, queryClient]
+  )
 
   // Start polling for category import
   const startCategoryPolling = useCallback(
@@ -187,6 +252,9 @@ export const CatalogSection = ({ projectId }: CatalogSectionProps) => {
 
   // Resume polling on mount if tasks are saved in localStorage
   useEffect(() => {
+    const savedFullTask = getSavedTask('full', projectId)
+    if (savedFullTask) startFullImportPolling(savedFullTask)
+
     const savedCatTask = getSavedTask('cat', projectId)
     if (savedCatTask) startCategoryPolling(savedCatTask)
 
@@ -204,12 +272,40 @@ export const CatalogSection = ({ projectId }: CatalogSectionProps) => {
       clearImportPolling()
       clearVPImportPolling()
       clearImgImportPolling()
+      clearFullImportPolling()
     }
-  }, [clearImportPolling, clearVPImportPolling, clearImgImportPolling])
+  }, [
+    clearImportPolling,
+    clearVPImportPolling,
+    clearImgImportPolling,
+    clearFullImportPolling,
+  ])
 
   const createTablesMutation = useMutation({
     mutationFn: (force = false) => projectService.createEcTables(projectId, force),
     meta: { successMessage: 'EC tables created successfully' },
+  })
+
+  // Single trigger that chains Superinventory → Categories → Images on the
+  // backend in the right order. Replaces the need to fire steps 2, 3, 5
+  // manually; those stay accessible under "Advanced" for re-running a stage.
+  const importAllMutation = useMutation({
+    mutationFn: () => {
+      const names = swatchSpecNames
+        .split(',')
+        .map((s) => s.trim())
+        .filter(Boolean)
+      return catalogService.importAll(
+        {
+          root_tree_id: null,
+          swatch_spec_names: names.length > 0 ? names : undefined,
+        },
+        { project_id: projectId }
+      )
+    },
+    onSuccess: (data) => {
+      startFullImportPolling(data.task_id)
+    },
   })
 
   const importCategoriesMutation = useMutation({
@@ -261,14 +357,18 @@ export const CatalogSection = ({ projectId }: CatalogSectionProps) => {
     clearImportPolling()
     clearVPImportPolling()
     clearImgImportPolling()
+    clearFullImportPolling()
     setImportStatus(null)
     setVPImportStatus(null)
     setImgImportStatus(null)
+    setFullImportStatus(null)
     setSingleVPResult(null)
     createTablesMutation.reset()
     importSingleVPMutation.reset()
 
     // Resume polling for new project if tasks saved
+    const savedFullTask = getSavedTask('full', projectId)
+    if (savedFullTask) startFullImportPolling(savedFullTask)
     const savedCatTask = getSavedTask('cat', projectId)
     if (savedCatTask) startCategoryPolling(savedCatTask)
     const savedVPTask = getSavedTask('vp', projectId)
@@ -354,6 +454,109 @@ export const CatalogSection = ({ projectId }: CatalogSectionProps) => {
           </div>
         </div>
 
+        {/* Step 2: Import All — primary action, chains Superinv → Cats → Images */}
+        <div className='rounded-lg border border-border bg-bg-secondary/40 p-4'>
+          <div className='flex items-start gap-3'>
+            <div className='flex size-8 shrink-0 items-center justify-center rounded-md bg-amber-500/10 text-amber-500'>
+              <Sparkles className='size-4' />
+            </div>
+            <div className='flex-1'>
+              <h3 className='text-[13px] font-semibold'>2. Import All</h3>
+              <p className='mt-0.5 text-[12px] text-text-tertiary'>
+                Runs Superinventory → Categories → Images in the correct dependency
+                order in a single task. Use this for a fresh import or a normal
+                re-import. Individual stages stay available under <em>Advanced</em>{' '}
+                below for re-running a specific stage.
+              </p>
+              <div className='mt-3 flex flex-col gap-2'>
+                <div className='flex flex-col gap-1'>
+                  <Label htmlFor='full-swatch-names' className='text-[12px]'>
+                    Swatch spec names (comma-separated, optional — used by Superinventory stage)
+                  </Label>
+                  <Input
+                    id='full-swatch-names'
+                    value={swatchSpecNames}
+                    onChange={(e) => setSwatchSpecNames(e.target.value)}
+                    placeholder='Lens Colour, Beta Color'
+                    className='h-8 text-[13px]'
+                  />
+                </div>
+                <Button
+                  size='sm'
+                  className='self-start'
+                  onClick={() => importAllMutation.mutate()}
+                  isPending={importAllMutation.isPending}
+                  disabled={fullImportStatus?.status === 'running'}
+                >
+                  <Download className='size-3.5' />
+                  Import All
+                </Button>
+                {fullImportStatus?.status === 'running' && (
+                  <div>
+                    <div className='text-[12px] text-text-tertiary animate-pulse whitespace-pre-line'>
+                      {fullImportStatus.progress || 'Running...'}
+                    </div>
+                    <Button
+                      variant='ghost'
+                      size='xs'
+                      className='mt-1 text-destructive'
+                      onClick={() => {
+                        if (fullImportStatus.taskId) {
+                          catalogImageService.cancelImport(fullImportStatus.taskId, {
+                            project_id: projectId,
+                          })
+                          clearFullImportPolling()
+                          clearTask('full', projectId)
+                          setFullImportStatus((prev) =>
+                            prev ? { ...prev, status: 'failed', error: 'Cancelled' } : null
+                          )
+                        }
+                      }}
+                    >
+                      Cancel
+                    </Button>
+                  </div>
+                )}
+                {fullImportStatus?.status === 'completed' && (
+                  <div className='rounded-md bg-bg-secondary p-2 text-[12px] text-emerald-600 dark:text-emerald-400 whitespace-pre-line'>
+                    Import complete
+                    {fullImportStatus.result
+                      ? `: ${JSON.stringify(fullImportStatus.result)}`
+                      : ''}
+                  </div>
+                )}
+                {fullImportStatus?.status === 'failed' && (
+                  <div className='text-[12px] text-destructive'>
+                    Import failed{fullImportStatus.error ? `: ${fullImportStatus.error}` : ''}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Advanced — individual stages for re-running a single step */}
+        <Collapsible open={advancedOpen} onOpenChange={setAdvancedOpen}>
+          <CollapsibleTrigger asChild>
+            <button
+              type='button'
+              className='flex w-full items-center justify-between rounded-md border border-border px-3 py-2 text-[13px] text-text-secondary hover:bg-bg-secondary/50'
+            >
+              <span className='font-medium'>Advanced — run a single stage</span>
+              <ChevronDown
+                className={`size-4 transition-transform ${advancedOpen ? 'rotate-180' : ''}`}
+              />
+            </button>
+          </CollapsibleTrigger>
+          <CollapsibleContent className='mt-3 flex flex-col gap-4'>
+            <p className='text-[12px] text-text-tertiary'>
+              Re-run a single stage of the pipeline (e.g. only Images after fixing
+              an asset). <strong>Order matters</strong> if running from scratch —
+              Superinventory must run before Categories (Cats needs the VPs to link
+              them), and Images runs last. Use <em>Import All</em> above for the
+              normal flow.
+            </p>
+
         {/* Step 2: Import Categories */}
         <div className='rounded-lg border border-border p-4'>
           <div className='flex items-start gap-3'>
@@ -361,7 +564,7 @@ export const CatalogSection = ({ projectId }: CatalogSectionProps) => {
               <FolderTree className='size-4' />
             </div>
             <div className='flex-1'>
-              <h3 className='text-[13px] font-semibold'>2. Import Categories</h3>
+              <h3 className='text-[13px] font-semibold'>Categories</h3>
               <p className='mt-0.5 text-[12px] text-text-tertiary'>
                 Imports all SHOW_WEB=true categories from INVENTRE into the custom catalog.
               </p>
@@ -419,7 +622,7 @@ export const CatalogSection = ({ projectId }: CatalogSectionProps) => {
               <Layers className='size-4' />
             </div>
             <div className='flex-1'>
-              <h3 className='text-[13px] font-semibold'>3. Import Superinventory</h3>
+              <h3 className='text-[13px] font-semibold'>Superinventory</h3>
               <p className='mt-0.5 text-[12px] text-text-tertiary'>
                 Imports all SUPER_ID product groups from EBMS as superinventory items.
               </p>
@@ -491,7 +694,7 @@ export const CatalogSection = ({ projectId }: CatalogSectionProps) => {
               <Package className='size-4' />
             </div>
             <div className='flex-1'>
-              <h3 className='text-[13px] font-semibold'>4. Import Single Superinventory by SUPER_ID</h3>
+              <h3 className='text-[13px] font-semibold'>Single Superinventory by SUPER_ID</h3>
               <p className='mt-0.5 text-[12px] text-text-tertiary'>
                 Import or re-import a single superinventory item by its SUPER_ID.
               </p>
@@ -553,7 +756,7 @@ export const CatalogSection = ({ projectId }: CatalogSectionProps) => {
               <ImageIcon className='size-4' />
             </div>
             <div className='flex-1'>
-              <h3 className='text-[13px] font-semibold'>5. Import Images</h3>
+              <h3 className='text-[13px] font-semibold'>Images</h3>
               <p className='mt-0.5 text-[12px] text-text-tertiary'>
                 Copies existing product and category images from the EBMS S3 bucket into our catalog. Generates thumbnails automatically. Skips already imported images.
               </p>
@@ -605,6 +808,8 @@ export const CatalogSection = ({ projectId }: CatalogSectionProps) => {
             </div>
           </div>
         </div>
+          </CollapsibleContent>
+        </Collapsible>
       </div>
     </div>
   )

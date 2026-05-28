@@ -81,6 +81,11 @@ export interface ImportFromInventrePayload {
   root_tree_id?: string | null
 }
 
+export interface ImportAllPayload {
+  root_tree_id?: string | null
+  swatch_spec_names?: string[] | null
+}
+
 // ── Responses ────────────────────────────────────────────────
 
 export interface CatalogTreeResponse {
