@@ -20,6 +20,12 @@ import { useEffect, useRef, useState } from 'react'
 import { ProposalAssignDialog } from './-components/proposal-assign-dialog'
 import { ProposalDeleteDialog } from './-components/proposal-delete-dialog'
 import { getFieldConfigQuery } from '@/api/field-config/query'
+import {
+  buildCustomColumns,
+  CustomColumnsCells,
+  CustomColumnsHeader,
+  type CustomColumn
+} from '@/components/common/custom-list-columns'
 import { CommandBarCreate } from '@/components/tasks/command-bar-create'
 import { FilterChip, FilterPopover, IProposals, InitialsAvatar, PAGE_COLORS, PageHeaderIcon } from '@/components/ds'
 import { getProposalDetailQuery, getProposalsQuery } from '@/api/proposal/query'
@@ -71,6 +77,15 @@ const STATUS_DOT_COLORS: Record<string, string> = {
 type ProposalSortField = 'quote' | 'b_name' | 'qt_date' | 'total'
 type SortDir = 'asc' | 'desc'
 
+const PROPOSAL_FIXED_FIELDS: ReadonlySet<string> = new Set([
+  'quote',
+  'b_name',
+  'qt_date',
+  'total',
+  'status',
+  'c_name'
+])
+
 const FILTER_STATUSES: { value: ProposalStatus; label: string }[] = [
   { value: PROPOSAL_STATUS.open, label: 'Open' },
   { value: PROPOSAL_STATUS.accepted, label: 'Accepted' },
@@ -97,8 +112,15 @@ const ProposalsPage = () => {
 
   const canAssign = !!user?.role && isAdmin(user.role)
 
-  const [sortField, setSortField] = useState<ProposalSortField | null>('quote')
+  const [sortField, setSortField] = useState<ProposalSortField | string | null>('quote')
   const [sortDir, setSortDir] = useState<SortDir>('asc')
+
+  const { data: fieldConfig } = useQuery(getFieldConfigQuery(projectId))
+  const customColumns: CustomColumn[] = buildCustomColumns(
+    fieldConfig,
+    'proposal',
+    PROPOSAL_FIXED_FIELDS
+  )
 
   const [activeStatus, setActiveStatus] = useState<ProposalStatus | null>(PROPOSAL_STATUS.open)
   const [assignedToMe, setAssignedToMe] = useState(false)
@@ -111,7 +133,7 @@ const ProposalsPage = () => {
 
   const ordering = sortField ? (sortDir === 'desc' ? `-${sortField}` : sortField) : undefined
 
-  const handleSort = (field: ProposalSortField) => {
+  const handleSort = (field: ProposalSortField | string) => {
     if (sortField === field) {
       if (sortDir === 'asc') setSortDir('desc')
       else { setSortField(null); setSortDir('asc') }
@@ -162,14 +184,16 @@ const ProposalsPage = () => {
     notes: true,
     assigned_to: assignedToMe ? 'me' : undefined,
     preset_id: activePresetId ?? undefined,
+    fields:
+      customColumns.length > 0
+        ? customColumns.map((c) => c.field).join(',')
+        : undefined,
   }
 
   const { data, refetch, isLoading } = useQuery({
     ...getProposalsQuery(params),
     placeholderData: keepPreviousData,
   })
-
-  const { data: _fieldConfig } = useQuery(getFieldConfigQuery(projectId))
 
   const results = data?.results ?? []
   const proposalInResults =
@@ -331,6 +355,12 @@ const ProposalsPage = () => {
             {!isTablet && <ProposalSortableHeader field='qt_date' label='Date' sortField={sortField} sortDir={sortDir} onSort={handleSort} className='w-[92px] shrink-0' />}
             <ProposalSortableHeader field='total' label='Total' sortField={sortField} sortDir={sortDir} onSort={handleSort} className='w-[100px] shrink-0 justify-end text-right' />
             <div className='w-[120px] shrink-0'>Responsible</div>
+            <CustomColumnsHeader
+              columns={customColumns}
+              sortField={sortField}
+              sortDir={sortDir}
+              onSort={handleSort}
+            />
             <div className='w-[46px] shrink-0' />
             <div className='w-[28px] shrink-0' />
           </div>
@@ -383,6 +413,7 @@ const ProposalsPage = () => {
               <ProposalRow
                 key={proposal.autoid}
                 proposal={proposal}
+                customColumns={customColumns}
                 isMobile={isMobile}
                 isTablet={isTablet}
                 canAssign={canAssign}
@@ -473,6 +504,7 @@ function PendingProposalRow({ autoid, isMobile }: { autoid: string; isMobile: bo
 
 function ProposalRow({
   proposal,
+  customColumns,
   isMobile,
   isTablet,
   canAssign,
@@ -485,6 +517,7 @@ function ProposalRow({
   onMouseEnter,
 }: {
   proposal: Proposal
+  customColumns: CustomColumn[]
   isMobile: boolean
   isTablet: boolean
   canAssign: boolean
@@ -626,6 +659,9 @@ function ProposalRow({
         })()}
       </div>
 
+      {/* Custom columns from Data Control list_columns */}
+      <CustomColumnsCells row={proposal as Record<string, unknown>} columns={customColumns} />
+
       {/* Notes */}
       <div className='flex w-[46px] shrink-0 justify-center'>
         <button
@@ -719,9 +755,9 @@ function ProposalSortableHeader({
 }: {
   field: ProposalSortField
   label: string
-  sortField: ProposalSortField | null
+  sortField: ProposalSortField | string | null
   sortDir: SortDir
-  onSort: (field: ProposalSortField) => void
+  onSort: (field: ProposalSortField | string) => void
   className?: string
 }) {
   const active = sortField === field

@@ -15,9 +15,9 @@ export function OrderSortableHeader({
 }: {
   field: OrderSortField
   label: string
-  sortField: OrderSortField | null
+  sortField: OrderSortField | string | null
   sortDir: SortDir
-  onSort: (field: OrderSortField) => void
+  onSort: (field: OrderSortField | string) => void
   className?: string
 }) {
   const active = sortField === field
