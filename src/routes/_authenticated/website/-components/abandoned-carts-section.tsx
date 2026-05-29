@@ -1,37 +1,26 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
-import { createFileRoute } from '@tanstack/react-router'
 import { ArrowDown, ArrowUp, Search, ShoppingCart } from 'lucide-react'
 import { useState } from 'react'
 import { useDebouncedCallback } from 'use-debounce'
 
-import { LegacyCartRow } from './-components/legacy-cart-row'
+import { LegacyCartRow } from './legacy-cart-row'
 import { getLegacyCartsQuery } from '@/api/legacy-cart/query'
 import { Pagination } from '@/components/common/filters/pagination'
 import { PageEmpty } from '@/components/common/page-empty'
-import { ILegacyCarts, PAGE_COLORS, PageHeaderIcon } from '@/components/ds'
 import { Skeleton } from '@/components/ui/skeleton'
-import { SidebarTrigger } from '@/components/ui/sidebar'
 import { Spinner } from '@/components/ui/spinner'
 import { useBreakpoint } from '@/hooks/use-breakpoint'
-import { useProjectId } from '@/hooks/use-project-id'
 import { useLimitParam, useOffsetParam, useSearchParam } from '@/hooks/use-query-params'
 import { cn } from '@/lib/utils'
-
-// ── Sort state ───────────────────────────────────────────────
 
 type SortField = 'email' | 'ebms_id' | 'in_level' | 'created_at' | 'updated_at'
 type SortDir = 'asc' | 'desc'
 
-// Legacy storefronts have N+1 SQL + S3 HEAD calls per cart item; halve the
-// default page size so initial load matches the old CRM admin's pace.
-const LEGACY_CARTS_DEFAULT_LIMIT = 10
+const ABANDONED_CARTS_DEFAULT_LIMIT = 20
 
-// ── Page ─────────────────────────────────────────────────────
-
-function LegacyCartsPage() {
+export function AbandonedCartsSection({ projectId }: { projectId: number }) {
   const bp = useBreakpoint()
   const isMobile = bp === 'mobile'
-  const [projectId] = useProjectId()
 
   const [search, setSearch] = useSearchParam()
   const handleSearch = useDebouncedCallback(
@@ -39,26 +28,22 @@ function LegacyCartsPage() {
     300,
   )
   const [offset] = useOffsetParam()
-  const [limit] = useLimitParam(LEGACY_CARTS_DEFAULT_LIMIT)
+  const [limit] = useLimitParam(ABANDONED_CARTS_DEFAULT_LIMIT)
 
   const [sortField, setSortField] = useState<SortField | null>('updated_at')
   const [sortDir, setSortDir] = useState<SortDir>('desc')
   const ordering = sortField
-    ? sortDir === 'desc'
-      ? `-${sortField}`
-      : sortField
+    ? sortDir === 'desc' ? `-${sortField}` : sortField
     : undefined
 
-  const params = {
-    search: search || undefined,
-    project_id: projectId ?? undefined,
-    ordering,
-    offset,
-    limit,
-  }
-
   const { data, isLoading, isPlaceholderData, error } = useQuery({
-    ...getLegacyCartsQuery(params),
+    ...getLegacyCartsQuery({
+      search: search || undefined,
+      project_id: projectId,
+      ordering,
+      offset,
+      limit,
+    }),
     placeholderData: keepPreviousData,
     retry: false,
   })
@@ -79,7 +64,6 @@ function LegacyCartsPage() {
     }
   }
 
-  // 400 with "not configured" message gets a friendlier hint.
   const errMsg =
     (error as { response?: { data?: { error?: string } } } | null)
       ?.response?.data?.error ?? ''
@@ -87,26 +71,19 @@ function LegacyCartsPage() {
 
   return (
     <div className='flex h-full flex-col overflow-hidden'>
-      {/* ── Header ── */}
-      <header
+      <div
         className={cn(
-          'flex h-12 shrink-0 items-center gap-2.5 border-b border-border',
+          'flex h-11 shrink-0 items-center gap-2.5 border-b border-border',
           isMobile ? 'px-3.5' : 'px-6',
         )}
       >
-        <SidebarTrigger className='-ml-1' />
-        <div className='flex items-center gap-1.5'>
-          <PageHeaderIcon icon={ILegacyCarts} color={PAGE_COLORS.legacyCarts} />
-          <h1 className='text-[14px] font-semibold tracking-[-0.01em]'>
-            Abandoned Carts
-          </h1>
+        <div className='text-[13px] font-medium text-text-tertiary'>
+          {totalCount > 0 && `${totalCount} cart${totalCount === 1 ? '' : 's'}`}
           {isPlaceholderData && (
-            <Spinner className='size-3.5 text-text-tertiary' />
+            <Spinner className='ml-2 inline size-3 text-text-tertiary' />
           )}
         </div>
-
         <div className='flex-1' />
-
         <div className='hidden h-7 w-full max-w-[260px] items-center gap-1.5 rounded-[5px] border border-border bg-background px-2 transition-[border-color,box-shadow] focus-within:border-ring focus-within:ring-2 focus-within:ring-ring/50 sm:flex'>
           <Search className='size-3 shrink-0 text-text-tertiary' />
           <input
@@ -116,11 +93,9 @@ function LegacyCartsPage() {
             className='flex-1 bg-transparent text-[13px] outline-none placeholder:text-text-tertiary'
           />
         </div>
-      </header>
+      </div>
 
-      {/* ── Body ── */}
       <div className='flex-1 overflow-y-auto'>
-        {/* Column header */}
         {!isMobile && (carts.length > 0 || isLoading || isPlaceholderData) && (
           <div
             className={cn(
@@ -166,11 +141,10 @@ function LegacyCartsPage() {
           </div>
         )}
 
-        {/* Content */}
         {error ? (
           <PageEmpty
             icon={ShoppingCart}
-            title={isNotConfigured ? 'Legacy carts not configured' : 'Failed to load carts'}
+            title={isNotConfigured ? 'Abandoned carts not configured' : 'Failed to load carts'}
             description={
               isNotConfigured
                 ? 'Set Storefront URL and X-CRM-KEY Secret in Project settings.'
@@ -178,7 +152,7 @@ function LegacyCartsPage() {
             }
           />
         ) : isLoading ? (
-          Array.from({ length: 10 }).map((_, i) => (
+          Array.from({ length: ABANDONED_CARTS_DEFAULT_LIMIT }).map((_, i) => (
             <div
               key={i}
               className={cn(
@@ -220,7 +194,6 @@ function LegacyCartsPage() {
         )}
       </div>
 
-      {/* Footer */}
       {!error && (
         <div
           className={cn(
@@ -230,15 +203,13 @@ function LegacyCartsPage() {
         >
           <Pagination
             totalCount={totalCount}
-            defaultLimit={LEGACY_CARTS_DEFAULT_LIMIT}
+            defaultLimit={ABANDONED_CARTS_DEFAULT_LIMIT}
           />
         </div>
       )}
     </div>
   )
 }
-
-// ── Sortable header ─────────────────────────────────────────
 
 function SortableHeader({
   field,
@@ -279,12 +250,3 @@ function SortableHeader({
     </button>
   )
 }
-
-// ── Route ───────────────────────────────────────────────────
-
-export const Route = createFileRoute('/_authenticated/legacy-carts/')({
-  component: LegacyCartsPage,
-  head: () => ({
-    meta: [{ title: 'Abandoned Carts' }],
-  }),
-})
