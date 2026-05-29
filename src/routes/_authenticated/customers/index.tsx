@@ -21,6 +21,13 @@ import { CustomerModal } from './-components/customer-modal'
 import { getCustomerDetailQuery, getCustomersQuery } from '@/api/customer/query'
 import { getFieldConfigQuery } from '@/api/field-config/query'
 import type { Customer } from '@/api/customer/schema'
+import {
+  buildCustomColumns,
+  customFieldsParam,
+  CustomColumnsCells,
+  CustomColumnsHeader,
+  type CustomColumn
+} from '@/components/common/custom-list-columns'
 import { EntityNotesSheet } from '@/components/common/entity-notes/entity-notes-sheet'
 import { SidebarTrigger } from '@/components/ui/sidebar'
 import { Pagination } from '@/components/common/filters/pagination'
@@ -48,7 +55,23 @@ import { useAuth } from '@/providers/auth'
 
 // ── Helpers ──────────────────────────────────────────────────
 
-type SortField = 'l_name' | 'contact_3' | 'in_level'
+/**
+ * Fixed list-view fields — these are always rendered as the leftmost
+ * columns with their own bespoke layout. Custom columns from Data Control
+ * are skipped if they duplicate any of these so we don't end up rendering
+ * the same field twice.
+ */
+const CUSTOMER_FIXED_FIELDS: ReadonlySet<string> = new Set([
+  'l_name',
+  'f_name',
+  'contact_1',
+  'contact_3',
+  'in_level',
+  'type'
+])
+
+type FixedSortField = 'l_name' | 'contact_3' | 'in_level'
+type SortField = FixedSortField | string
 type SortDir = 'asc' | 'desc'
 
 // ── Page Component ───────────────────────────────────────────
@@ -67,6 +90,13 @@ function CustomersPage() {
   const [limit] = useLimitParam()
   const [sortField, setSortField] = useState<SortField | null>('l_name')
   const [sortDir, setSortDir] = useState<SortDir>('asc')
+
+  const { data: fieldConfig } = useQuery(getFieldConfigQuery(projectId))
+  const customColumns: CustomColumn[] = buildCustomColumns(
+    fieldConfig,
+    'customer',
+    CUSTOMER_FIXED_FIELDS
+  )
 
   const [assignedToMe, setAssignedToMe] = useState(false)
   const [activePresetId, setActivePresetId] = usePresetParam()
@@ -98,14 +128,13 @@ function CustomersPage() {
     notes: true as const,
     assigned_to: assignedToMe ? 'me' : undefined,
     preset_id: activePresetId ?? undefined,
+    fields: customFieldsParam(customColumns),
   }
 
   const { data, isLoading } = useQuery({
     ...getCustomersQuery(params),
     placeholderData: keepPreviousData,
   })
-
-  const { data: _fieldConfig } = useQuery(getFieldConfigQuery(projectId))
 
   const customers = data?.results ?? []
   const totalCount = data?.count ?? 0
@@ -218,6 +247,12 @@ function CustomersPage() {
             {bp !== 'tablet' && <SortableHeader field='contact_3' label='Email' sortField={sortField} sortDir={sortDir} onSort={handleSort} className='w-[160px] shrink-0' />}
             <SortableHeader field='in_level' label='Type' sortField={sortField} sortDir={sortDir} onSort={handleSort} className='w-[100px] shrink-0' />
             <div className='w-[120px] shrink-0'>Responsible</div>
+            <CustomColumnsHeader
+              columns={customColumns}
+              sortField={sortField}
+              sortDir={sortDir}
+              onSort={handleSort}
+            />
             <div className='w-[46px] shrink-0' />
             <div className='w-[28px] shrink-0' />
           </div>
@@ -266,6 +301,7 @@ function CustomersPage() {
               <CustomerRow
                 key={customer.id}
                 customer={customer}
+                customColumns={customColumns}
                 isMobile={isMobile}
                 isTablet={bp === 'tablet'}
                 canAssign={canAssign}
@@ -335,7 +371,7 @@ function SortableHeader({
   onSort,
   className,
 }: {
-  field: SortField
+  field: FixedSortField
   label: string
   sortField: SortField | null
   sortDir: SortDir
@@ -369,6 +405,7 @@ function SortableHeader({
 
 function CustomerRow({
   customer,
+  customColumns,
   isMobile,
   isTablet,
   canAssign,
@@ -380,6 +417,7 @@ function CustomerRow({
   onMouseEnter,
 }: {
   customer: Customer
+  customColumns: CustomColumn[]
   isMobile: boolean
   isTablet: boolean
   canAssign: boolean
@@ -534,6 +572,9 @@ function CustomerRow({
           return <span className='px-1 text-[13px] text-text-tertiary'>&mdash;</span>
         })()}
       </div>
+
+      {/* Custom columns from Data Control list_columns */}
+      <CustomColumnsCells row={customer as Record<string, unknown>} columns={customColumns} />
 
       {/* Notes */}
       <div className='flex w-[46px] shrink-0 justify-center'>

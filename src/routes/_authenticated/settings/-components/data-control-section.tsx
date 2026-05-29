@@ -5,6 +5,7 @@ import { useMemo } from 'react'
 
 import { PageEmpty } from '@/components/common/page-empty'
 import { FieldsDataTable } from './fields-data-table'
+import { ListColumnsReorder } from './list-columns-reorder'
 import { CUSTOMER_QUERY_KEYS } from '@/api/customer/query'
 import { FIELD_CONFIG_QUERY_KEYS, getFieldConfigQuery } from '@/api/field-config/query'
 import type { FieldConfigResponse, FieldConfigRow } from '@/api/field-config/schema'
@@ -81,6 +82,36 @@ const applyEditableToggle = (
   }
 }
 
+const applyListColumns = (
+  prev: FieldConfigResponse | undefined,
+  entity: string,
+  next: string[]
+): FieldConfigResponse | undefined => {
+  if (!prev) return prev
+  const inListSet = new Set(next)
+  // Build via spread + cast — the intersection type's index signature
+  // requires entity values be FieldConfigEntry[], so the _list_columns
+  // sibling fights the literal. Cast at the boundary.
+  const updated = { ...prev } as FieldConfigResponse
+  updated._list_columns = {
+    ...(prev._list_columns ?? {}),
+    [entity]: next
+  }
+  const entityEntries = prev[entity]
+  if (entityEntries) {
+    updated[entity] = entityEntries.map((entry) => ({
+      ...entry,
+      in_list: inListSet.has(entry.field)
+    }))
+  }
+  return updated
+}
+
+// Entities for which the project has a customizable list view. Order Items
+// and Proposal Items render only inline inside their parent, so they don't
+// get the Header toggle.
+const LIST_VIEW_ENTITIES = new Set(['customer', 'order', 'proposal'])
+
 export const DataControlSection = ({ projectId }: { projectId: number }) => {
   const [activeTab, setActiveTab] = useQueryState('tab', parseAsString)
   const client = useQueryClient()
@@ -123,7 +154,12 @@ export const DataControlSection = ({ projectId }: { projectId: number }) => {
     }
   })
 
-  const entities = useMemo(() => Object.keys(data ?? {}), [data])
+  // Filter out top-level meta keys (e.g. _list_columns) when building the
+  // entity-tab list. Without this the meta key would show up as a tab.
+  const entities = useMemo(
+    () => Object.keys(data ?? {}).filter((k) => !k.startsWith('_')),
+    [data]
+  )
   const currentTab = activeTab ?? entities[0] ?? ''
 
   const fields: FieldConfigRow[] = useMemo(() => {
@@ -135,9 +171,16 @@ export const DataControlSection = ({ projectId }: { projectId: number }) => {
       default: entry.default,
       enabled: entry.enabled,
       editable: entry.editable,
+      in_list: entry.in_list,
+      type: entry.type,
       entity: currentTab
     }))
   }, [data, currentTab])
+
+  const currentListColumns = useMemo(
+    () => data?._list_columns?.[currentTab] ?? [],
+    [data, currentTab]
+  )
 
   const editableMutation = useMutation({
     mutationFn: ({
@@ -165,6 +208,70 @@ export const DataControlSection = ({ projectId }: { projectId: number }) => {
       successMessage: 'Editable fields updated'
     }
   })
+
+  const listColumnsMutation = useMutation({
+    mutationFn: ({
+      payload
+    }: {
+      payload: Record<string, unknown>
+      entity: string
+      next: string[]
+    }) =>
+      fieldConfigService.patchFieldConfig(
+        projectId,
+        payload as unknown as Record<string, string[]>
+      ),
+    onMutate: async ({ entity, next }) => {
+      const key = FIELD_CONFIG_QUERY_KEYS.fieldConfig(projectId)
+      await client.cancelQueries({ queryKey: key })
+      const prev = client.getQueryData<FieldConfigResponse>(key)
+      const updated = applyListColumns(prev, entity, next)
+      if (updated) client.setQueryData(key, updated)
+      return { prev }
+    },
+    onError: (_err, _variables, context) => {
+      if (context?.prev)
+        client.setQueryData(FIELD_CONFIG_QUERY_KEYS.fieldConfig(projectId), context.prev)
+    },
+    onSuccess: (_data, variables) => {
+      const queryKey = getQueryKeyToInvalidate(variables.entity)
+      if (queryKey) client.invalidateQueries({ queryKey })
+    },
+    meta: {
+      invalidatesQuery: FIELD_CONFIG_QUERY_KEYS.fieldConfig(projectId),
+      successMessage: 'List columns updated'
+    }
+  })
+
+  const setListColumns = (entity: string, next: string[]) => {
+    listColumnsMutation.mutate({
+      payload: { _list_columns: { [entity]: next } },
+      entity,
+      next
+    })
+  }
+
+  const handleListToggle = (entity: string, fieldName: string, inList: boolean) => {
+    const current = data?._list_columns?.[entity] ?? []
+    const next = inList
+      ? current.includes(fieldName)
+        ? current
+        : [...current, fieldName]
+      : current.filter((f) => f !== fieldName)
+    setListColumns(entity, next)
+  }
+
+  const handleListReorder = (entity: string, next: string[]) => {
+    setListColumns(entity, next)
+  }
+
+  const handleListRemove = (entity: string, fieldName: string) => {
+    const current = data?._list_columns?.[entity] ?? []
+    setListColumns(
+      entity,
+      current.filter((f) => f !== fieldName)
+    )
+  }
 
   const handleEditableToggle = (entity: string, fieldName: string, editable: boolean) => {
     if (!data?.[entity]) return
@@ -244,23 +351,46 @@ export const DataControlSection = ({ projectId }: { projectId: number }) => {
         ) : entities.length === 0 ? (
           <PageEmpty icon={TriangleAlert} title='No field configuration' description='No field configuration is available for this project.' />
         ) : (
-          entities.map((entity) => (
-            <TabsContent key={entity} value={entity}>
-              <FieldsDataTable
-                fields={entity === currentTab ? fields : []}
-                isLoading={isLoading}
-                entity={entity}
-                projectId={projectId}
-                onFieldToggle={handleFieldToggle}
-                onAliasSubmit={handleAliasSubmit}
-                onEditableToggle={handleEditableToggle}
-                isPending={patchMutation.isPending}
-                isAliasPending={patchMutation.isPending}
-                isEditablePending={editableMutation.isPending}
-                isSuperAdmin={userIsSuperAdmin}
-              />
-            </TabsContent>
-          ))
+          entities.map((entity) => {
+            const showList = LIST_VIEW_ENTITIES.has(entity)
+            const listColumns =
+              entity === currentTab ? currentListColumns : data?._list_columns?.[entity] ?? []
+            const entityEntries = data?.[entity] ?? []
+            return (
+              <TabsContent key={entity} value={entity}>
+                <FieldsDataTable
+                  fields={entity === currentTab ? fields : []}
+                  isLoading={isLoading}
+                  entity={entity}
+                  projectId={projectId}
+                  onFieldToggle={handleFieldToggle}
+                  onAliasSubmit={handleAliasSubmit}
+                  onEditableToggle={handleEditableToggle}
+                  onListToggle={showList ? handleListToggle : undefined}
+                  showListToggle={showList}
+                  isPending={patchMutation.isPending}
+                  isAliasPending={patchMutation.isPending}
+                  isEditablePending={editableMutation.isPending}
+                  isListPending={listColumnsMutation.isPending}
+                  isSuperAdmin={userIsSuperAdmin}
+                />
+                {showList && listColumns.length > 0 && (
+                  <div className='border-t border-border'>
+                    <div className='border-b border-border-light px-6 py-2 text-[11px] font-semibold uppercase tracking-[0.05em] text-text-tertiary'>
+                      List column order — drag to rearrange
+                    </div>
+                    <ListColumnsReorder
+                      orderedFields={listColumns}
+                      entries={entityEntries}
+                      onReorder={(next) => handleListReorder(entity, next)}
+                      onRemove={(field) => handleListRemove(entity, field)}
+                      disabled={listColumnsMutation.isPending}
+                    />
+                  </div>
+                )}
+              </TabsContent>
+            )
+          })
         )}
       </div>
     </Tabs>

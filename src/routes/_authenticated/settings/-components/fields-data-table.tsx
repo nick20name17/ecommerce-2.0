@@ -18,9 +18,21 @@ export interface FieldsDataTableProps {
   onFieldToggle: (entity: string, fieldName: string, enabled: boolean) => void
   onAliasSubmit: (entity: string, fieldName: string, alias: string) => void
   onEditableToggle: (entity: string, fieldName: string, editable: boolean) => void
+  /**
+   * `Header` toggle: whether the field is rendered as a column in the
+   * list view (Customers / Orders / Proposals).
+   */
+  onListToggle?: (entity: string, fieldName: string, inList: boolean) => void
+  /**
+   * Entities that don't support a customizable list view (e.g. order
+   * details rendered only inline). When provided and false, the Header
+   * column is hidden.
+   */
+  showListToggle?: boolean
   isPending: boolean
   isAliasPending: boolean
   isEditablePending: boolean
+  isListPending?: boolean
   isSuperAdmin: boolean
 }
 
@@ -31,9 +43,12 @@ export const FieldsDataTable = ({
   onFieldToggle,
   onAliasSubmit,
   onEditableToggle,
+  onListToggle,
+  showListToggle = true,
   isPending,
   isAliasPending,
   isEditablePending,
+  isListPending,
   isSuperAdmin
 }: FieldsDataTableProps) => {
   if (isLoading) {
@@ -72,8 +87,13 @@ export const FieldsDataTable = ({
         <div className='min-w-0 flex-1 text-[11px] font-semibold uppercase tracking-[0.05em] text-text-tertiary'>
           Display Name
         </div>
+        {showListToggle && (
+          <div className='w-[60px] shrink-0 text-right text-[11px] font-semibold uppercase tracking-[0.05em] text-text-tertiary'>
+            Header
+          </div>
+        )}
         <div className='w-[60px] shrink-0 text-right text-[11px] font-semibold uppercase tracking-[0.05em] text-text-tertiary'>
-          Visible
+          Table
         </div>
       </div>
 
@@ -86,9 +106,12 @@ export const FieldsDataTable = ({
           onFieldToggle={onFieldToggle}
           onAliasSubmit={onAliasSubmit}
           onEditableToggle={onEditableToggle}
+          onListToggle={onListToggle}
+          showListToggle={showListToggle}
           isPending={isPending}
           isAliasPending={isAliasPending}
           isEditablePending={isEditablePending}
+          isListPending={isListPending}
           isSuperAdmin={isSuperAdmin}
         />
       ))}
@@ -104,9 +127,12 @@ function FieldRow({
   onFieldToggle,
   onAliasSubmit,
   onEditableToggle,
+  onListToggle,
+  showListToggle = true,
   isPending,
   isAliasPending,
   isEditablePending,
+  isListPending,
   isSuperAdmin
 }: {
   row: FieldConfigRow
@@ -114,9 +140,12 @@ function FieldRow({
   onFieldToggle: (entity: string, fieldName: string, enabled: boolean) => void
   onAliasSubmit: (entity: string, fieldName: string, alias: string) => void
   onEditableToggle: (entity: string, fieldName: string, editable: boolean) => void
+  onListToggle?: (entity: string, fieldName: string, inList: boolean) => void
+  showListToggle?: boolean
   isPending: boolean
   isAliasPending: boolean
   isEditablePending: boolean
+  isListPending?: boolean
   isSuperAdmin: boolean
 }) {
   const [aliasValue, setAliasValue] = useState(row.alias ?? '')
@@ -217,7 +246,30 @@ function FieldRow({
         )}
       </div>
 
-      {/* Visible toggle */}
+      {/* Header toggle (in_list) — independent from Table */}
+      {showListToggle && (
+        <div className='flex w-[60px] shrink-0 justify-end'>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <span className='inline-flex'>
+                <Switch
+                  checked={!!row.in_list}
+                  disabled={isListPending || !onListToggle}
+                  aria-label={row.in_list ? 'Remove from list view' : 'Add to list view'}
+                  onCheckedChange={(checked) =>
+                    onListToggle?.(entity, row.field, checked)
+                  }
+                />
+              </span>
+            </TooltipTrigger>
+            <TooltipContent>
+              {row.in_list ? 'Shown as column on the list page' : 'Not shown on the list page'}
+            </TooltipContent>
+          </Tooltip>
+        </div>
+      )}
+
+      {/* Table toggle (detail Custom tab inclusion) */}
       <div className='flex w-[60px] shrink-0 justify-end'>
         {isDefault ? (
           <Tooltip>

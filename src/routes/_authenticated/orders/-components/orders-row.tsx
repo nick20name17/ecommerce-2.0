@@ -11,6 +11,10 @@ import {
 } from 'lucide-react'
 
 import type { Order } from '@/api/order/schema'
+import {
+  CustomColumnsCells,
+  type CustomColumn
+} from '@/components/common/custom-list-columns'
 import { InitialsAvatar } from '@/components/ds'
 import {
   DropdownMenu,
@@ -29,6 +33,7 @@ import { STATUS_DOT_COLORS } from './orders-constants'
 
 export interface OrderRowProps {
   order: Order
+  customColumns?: CustomColumn[]
   isMobile: boolean
   isTablet: boolean
   canAssign: boolean
@@ -63,6 +68,7 @@ export function PendingOrderRow({ autoid, isMobile }: { autoid: string; isMobile
 
 export function OrderRow({
   order,
+  customColumns,
   isMobile,
   isTablet,
   canAssign,
@@ -247,6 +253,11 @@ export function OrderRow({
           return <span className='px-1 text-[13px] text-text-tertiary'>&mdash;</span>
         })()}
       </div>
+
+      {/* Custom columns from Data Control list_columns */}
+      {customColumns && customColumns.length > 0 && (
+        <CustomColumnsCells row={order as Record<string, unknown>} columns={customColumns} />
+      )}
 
       {/* Notes */}
       <div className='flex w-[46px] shrink-0 justify-center'>

@@ -13,6 +13,12 @@ import { StartPickingDialog } from '@/components/common/start-picking-dialog'
 import { OrderDeleteDialog } from './-components/order-delete-dialog'
 import { getFieldConfigQuery } from '@/api/field-config/query'
 import { ORDER_QUERY_KEYS, getOrderDetailQuery, getOrdersQuery } from '@/api/order/query'
+import {
+  buildCustomColumns,
+  CustomColumnsCells,
+  CustomColumnsHeader,
+  type CustomColumn
+} from '@/components/common/custom-list-columns'
 import type { Order, OrderParams } from '@/api/order/schema'
 import { orderService } from '@/api/order/service'
 import { EntityAttachmentsDialog } from '@/components/common/entity-attachments/entity-attachments-dialog'
@@ -53,6 +59,17 @@ import type { OrderSortField, SortDir } from './-components/orders-constants'
 import { OrderSortableHeader } from './-components/orders-header'
 import { OrderRow, PendingOrderRow } from './-components/orders-row'
 
+const ORDER_FIXED_FIELDS: ReadonlySet<string> = new Set([
+  'invoice',
+  'name',
+  'c_name',
+  'inv_date',
+  'total',
+  'balance',
+  'salesman',
+  'status'
+])
+
 // ── Page Component ───────────────────────────────────────────
 
 const OrdersPage = () => {
@@ -72,8 +89,15 @@ const OrdersPage = () => {
 
   const canAssign = !!user?.role && isAdmin(user.role)
 
-  const [sortField, setSortField] = useState<OrderSortField | null>('invoice')
+  const [sortField, setSortField] = useState<OrderSortField | string | null>('invoice')
   const [sortDir, setSortDir] = useState<SortDir>('asc')
+
+  const { data: fieldConfig } = useQuery(getFieldConfigQuery(projectId))
+  const customColumns: CustomColumn[] = buildCustomColumns(
+    fieldConfig,
+    'order',
+    ORDER_FIXED_FIELDS
+  )
 
   const [activeStatus, setActiveStatus] = useState<OrderStatus | null>(ORDER_STATUS.unprocessed)
   const [assignedToMe, setAssignedToMe] = useState(false)
@@ -87,7 +111,7 @@ const OrdersPage = () => {
 
   const ordering = sortField ? (sortDir === 'desc' ? `-${sortField}` : sortField) : undefined
 
-  const handleSort = (field: OrderSortField) => {
+  const handleSort = (field: OrderSortField | string) => {
     if (sortField === field) {
       if (sortDir === 'asc') setSortDir('desc')
       else {
@@ -151,15 +175,15 @@ const OrdersPage = () => {
     notes: true,
     assigned_to: assignedToMe ? 'me' : undefined,
     preset_id: activePresetId ?? undefined,
-    fields: 'salesman,notes_count',
+    fields: customColumns.length > 0
+      ? `salesman,notes_count,${customColumns.map((c) => c.field).join(',')}`
+      : 'salesman,notes_count',
   }
 
   const { data, refetch, isLoading } = useQuery({
     ...getOrdersQuery(params),
     placeholderData: keepPreviousData,
   })
-
-  const { data: _fieldConfig } = useQuery(getFieldConfigQuery(projectId))
 
   const results = data?.results ?? []
   const orderInResults =
@@ -388,6 +412,12 @@ const OrdersPage = () => {
             <div className='w-27.5 shrink-0 text-center'>Picked</div>
             {!isTablet && <div className='w-[90px] shrink-0'>Salesman</div>}
             <div className='w-[120px] shrink-0'>Responsible</div>
+            <CustomColumnsHeader
+              columns={customColumns}
+              sortField={sortField}
+              sortDir={sortDir}
+              onSort={handleSort}
+            />
             <div className='w-[46px] shrink-0' />
             <div className='w-[28px] shrink-0' />
           </div>
@@ -473,6 +503,7 @@ const OrdersPage = () => {
               <OrderRow
                 key={order.autoid}
                 order={order}
+                customColumns={customColumns}
                 isMobile={isMobile}
                 isTablet={isTablet}
                 canAssign={canAssign}
