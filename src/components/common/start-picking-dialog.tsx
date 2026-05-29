@@ -423,9 +423,10 @@ export function StartPickingDialog({
                     </div>
 
                     {/* Column header */}
-                    <div className='grid grid-cols-[20px_1fr_52px_40px_52px] items-center gap-2 border-b border-border-light bg-bg-secondary/40 px-3.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-text-quaternary'>
+                    <div className='grid grid-cols-[20px_1fr_72px_52px_40px_52px] items-center gap-2 border-b border-border-light bg-bg-secondary/40 px-3.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-text-quaternary'>
                       <span />
                       <span>Item</span>
+                      <span className='text-center'>Location</span>
                       <span className='text-center'>Qty</span>
                       <span className='text-center'>UOM</span>
                       <span className='text-center'>Pick</span>
@@ -710,7 +711,7 @@ function PickItemRow({
 
   if (isParent) {
     return (
-      <div className='grid grid-cols-[20px_1fr_52px_40px_52px] items-center gap-2 px-3.5 py-1.5'>
+      <div className='grid grid-cols-[20px_1fr_72px_52px_40px_52px] items-center gap-2 px-3.5 py-1.5'>
         <div className='flex size-5 items-center justify-center'>
           <Package className='size-4 text-foreground' />
         </div>
@@ -718,6 +719,7 @@ function PickItemRow({
           <span className='w-[90px] shrink-0 font-mono text-[12px] font-bold leading-none text-foreground'>{item.inven}</span>
           <span className='min-w-0 truncate text-[12px] font-semibold leading-none text-foreground'>{item.descr}</span>
         </div>
+        <span className='truncate text-center text-[11px] font-mono text-text-tertiary'>{item.location || '—'}</span>
         <button
           type='button'
           onClick={() => updatePickQty(item.autoid, formatQty(qty), qty)}
@@ -744,7 +746,7 @@ function PickItemRow({
 
   if (isComponent) {
     return (
-      <div className='grid grid-cols-[20px_1fr_52px_40px_52px] items-center gap-2 px-3.5 py-0.5'>
+      <div className='grid grid-cols-[20px_1fr_72px_52px_40px_52px] items-center gap-2 px-3.5 py-0.5'>
         {/* Tree connector in col 1 — vertical + horizontal lines */}
         <div className='relative flex items-center justify-center self-stretch'>
           <div className={cn(
@@ -760,6 +762,7 @@ function PickItemRow({
           <span className='min-w-0 truncate text-[11px] text-text-quaternary'>{item.descr}</span>
         </div>
 
+        <span className='truncate text-center text-[11px] font-mono text-text-quaternary'>{item.location || '—'}</span>
         <button
           type='button'
           onClick={() => {
@@ -789,7 +792,7 @@ function PickItemRow({
 
   // Normal row (no hierarchy)
   return (
-    <div className='grid grid-cols-[20px_1fr_52px_40px_52px] items-center gap-2 px-3.5 py-1'>
+    <div className='grid grid-cols-[20px_1fr_72px_52px_40px_52px] items-center gap-2 px-3.5 py-1'>
       <button
         type='button'
         className='flex size-5 items-center justify-center rounded transition-colors hover:bg-bg-active'
@@ -804,6 +807,7 @@ function PickItemRow({
         <span className='w-[90px] shrink-0 font-mono text-[12px] font-medium text-foreground'>{item.inven}</span>
         <span className='min-w-0 truncate text-[11px] text-text-tertiary'>{item.descr}</span>
       </div>
+      <span className='truncate text-center text-[11px] font-mono text-text-tertiary'>{item.location || '—'}</span>
       <button
         type='button'
         onClick={() => updatePickQty(item.autoid, formatQty(qty), qty)}

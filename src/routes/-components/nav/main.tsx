@@ -8,7 +8,6 @@ import {
   ICustomers,
   IDashboard,
   IDev,
-  ILegacyCarts,
   IOrderDesk,
   IOrders,
   IPickLists,
@@ -112,13 +111,6 @@ const WORKSPACE_ITEMS: NavItem[] = [
     adminOnly: true,
   },
   {
-    title: 'Abandoned Carts',
-    url: '/legacy-carts',
-    icon: ILegacyCarts,
-    iconBg: 'bg-yellow-500',
-    iconColor: 'text-white',
-  },
-  {
     title: 'Catalog',
     url: '/catalog',
     icon: ICatalog,
@@ -127,8 +119,8 @@ const WORKSPACE_ITEMS: NavItem[] = [
     adminOnly: true,
   },
   {
-    title: 'Storefront',
-    url: '/storefront',
+    title: 'Website',
+    url: '/website',
     icon: IStorefront,
     iconBg: 'bg-fuchsia-500',
     iconColor: 'text-white',

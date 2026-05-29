@@ -1,6 +1,7 @@
 import { createFileRoute, redirect } from '@tanstack/react-router'
 import { parseAsString, useQueryState } from 'nuqs'
 
+import { AbandonedCartsSection } from './-components/abandoned-carts-section'
 import { BannerSection } from './-components/banner-section'
 import { IStorefront, PAGE_COLORS, PageHeaderIcon } from '@/components/ds'
 import { SidebarTrigger } from '@/components/ui/sidebar'
@@ -12,19 +13,20 @@ import { cn } from '@/lib/utils'
 
 // ── Section definitions ─────────────────────────────────────
 
-type StorefrontSection = 'banner'
+type WebsiteSection = 'banner' | 'abandoned-carts'
 
-const SECTIONS: { value: StorefrontSection; label: string }[] = [
-  { value: 'banner', label: 'Banner' }
+const SECTIONS: { value: WebsiteSection; label: string }[] = [
+  { value: 'banner', label: 'Banner' },
+  { value: 'abandoned-carts', label: 'Abandoned Carts' },
 ]
 
 // ── Main component ──────────────────────────────────────────
 
-const StorefrontPage = () => {
+const WebsitePage = () => {
   const [projectId] = useProjectId()
   const [section, setSection] = useQueryState('section', parseAsString)
 
-  const currentSection = (section ?? 'banner') as StorefrontSection
+  const currentSection = (section ?? 'banner') as WebsiteSection
 
   if (!projectId) {
     return (
@@ -34,10 +36,10 @@ const StorefrontPage = () => {
         </div>
         <div className='flex flex-col items-center gap-1.5 text-center'>
           <h1 className='text-[16px] font-semibold tracking-[-0.02em] text-foreground'>
-            Storefront
+            Website
           </h1>
           <p className='max-w-[280px] text-[13px] leading-snug text-text-tertiary'>
-            Select a project in the sidebar to manage storefront content.
+            Select a project in the sidebar to manage website content.
           </p>
         </div>
       </div>
@@ -53,7 +55,7 @@ const StorefrontPage = () => {
           icon={IStorefront}
           color={PAGE_COLORS.storefront}
         />
-        <h1 className='text-[14px] font-semibold tracking-[-0.01em]'>Storefront</h1>
+        <h1 className='text-[14px] font-semibold tracking-[-0.01em]'>Website</h1>
       </header>
 
       {/* Sidebar + Content */}
@@ -81,13 +83,14 @@ const StorefrontPage = () => {
 
         <div className='flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden'>
           {currentSection === 'banner' && <BannerSection projectId={projectId} />}
+          {currentSection === 'abandoned-carts' && <AbandonedCartsSection projectId={projectId} />}
         </div>
       </div>
     </div>
   )
 }
 
-export const Route = createFileRoute('/_authenticated/storefront/')({
+export const Route = createFileRoute('/_authenticated/website/')({
   beforeLoad: () => {
     const session = getSession()
     const role = session?.user?.role as UserRole | undefined
@@ -95,8 +98,8 @@ export const Route = createFileRoute('/_authenticated/storefront/')({
       throw redirect({ to: '/', replace: true })
     }
   },
-  component: StorefrontPage,
+  component: WebsitePage,
   head: () => ({
-    meta: [{ title: 'Storefront' }]
+    meta: [{ title: 'Website' }]
   })
 })

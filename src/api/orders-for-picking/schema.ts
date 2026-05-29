@@ -7,6 +7,7 @@ export interface PickingOrderItem {
   qty_in_uom?: string
   unit_meas?: string
   descr: string
+  location?: string
   price: string
   so_amount: string
   timestamp?: string
