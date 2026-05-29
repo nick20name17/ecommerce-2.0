@@ -1,7 +1,7 @@
 'use no memo'
 
 import { Check, Lock, Pencil, Settings } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 import type { FieldConfigRow } from '@/api/field-config/schema'
 import { PageEmpty } from '@/components/common/page-empty'
@@ -149,6 +149,20 @@ function FieldRow({
   isSuperAdmin: boolean
 }) {
   const [aliasValue, setAliasValue] = useState(row.alias ?? '')
+  // When the cache updates from outside (e.g. an optimistic update on
+  // another toggle rebuilds entity entries), `row.alias` can change while
+  // the local input state lingers from the initial mount. Re-sync so the
+  // dirty indicator (Check icon) doesn't fire spuriously and a subsequent
+  // Enter doesn't clear the alias to ''. Only resync when the *committed*
+  // value changes, not while the user is mid-edit.
+  const lastSyncedAliasRef = useRef(row.alias ?? '')
+  useEffect(() => {
+    const next = row.alias ?? ''
+    if (next !== lastSyncedAliasRef.current) {
+      lastSyncedAliasRef.current = next
+      setAliasValue(next)
+    }
+  }, [row.alias])
   const isDirty = aliasValue !== (row.alias ?? '')
   const isDefault = row.default
 
