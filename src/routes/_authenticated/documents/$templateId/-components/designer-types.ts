@@ -1,0 +1,93 @@
+/**
+ * Shared types and constants for the document designer.
+ *
+ * The canonical layout shape (kept in sync with the backend) lives in
+ * `@/api/document-template/schema`. These helpers are designer-only.
+ */
+
+import type { DocumentLayout, LayoutElement } from '@/api/document-template/schema'
+
+/** Pixels per inch in the on-screen canvas. */
+export const PX_PER_INCH = 80
+
+/** Page sizes in inches. */
+export const PAGE_DIMENSIONS: Record<string, { w: number; h: number }> = {
+  letter: { w: 8.5, h: 11 },
+  a4: { w: 8.27, h: 11.69 },
+  label_4x6: { w: 4, h: 6 },
+}
+
+export function pageDims(pageSize: string, orientation: 'portrait' | 'landscape') {
+  const d = PAGE_DIMENSIONS[pageSize] ?? PAGE_DIMENSIONS.letter
+  return orientation === 'landscape' ? { w: d.h, h: d.w } : d
+}
+
+/** Element-type defaults applied when a new element is dropped on the canvas. */
+export const ELEMENT_DEFAULTS: Record<
+  LayoutElement['type'],
+  { w: number; h: number; props: Record<string, unknown> }
+> = {
+  text: {
+    w: 3,
+    h: 0.4,
+    props: {
+      text: 'Text',
+      fontSize: 12,
+      fontWeight: 'normal',
+      fontStyle: 'normal',
+      textAlign: 'left',
+      color: '#111111',
+    },
+  },
+  field: {
+    w: 3,
+    h: 0.4,
+    props: {
+      fieldKey: '',
+      fontSize: 12,
+      fontWeight: 'normal',
+      textAlign: 'left',
+      color: '#111111',
+    },
+  },
+  image: {
+    w: 2,
+    h: 1,
+    props: { src: '' },
+  },
+  table: {
+    w: 7,
+    h: 3,
+    props: { columns: [] },
+  },
+  line: {
+    w: 4,
+    h: 0,
+    props: { thickness: 1, color: '#cccccc' },
+  },
+  rect: {
+    w: 2,
+    h: 1,
+    props: { fill: '#f4f4f5', borderColor: '#e4e4e7', borderWidth: 0 },
+  },
+}
+
+/** Ensure layout has at least one page; return a normalized copy. */
+export function ensureLayout(layout: DocumentLayout | undefined): DocumentLayout {
+  const pages = layout?.pages && layout.pages.length > 0 ? layout.pages : [{ elements: [] }]
+  return { pages }
+}
+
+/** Snap a value to the nearest grid step (in inches). */
+export function snapInches(value: number, step = 0.125): number {
+  if (step <= 0) return value
+  return Math.round(value / step) * step
+}
+
+/** Browser-safe id generator. */
+export function newId(): string {
+  if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) {
+    return crypto.randomUUID()
+  }
+  return `el_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 9)}`
+}
