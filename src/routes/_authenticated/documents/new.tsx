@@ -1,9 +1,15 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { createFileRoute, redirect, useNavigate } from '@tanstack/react-router'
-import { ArrowLeft, FileText, Package, UserSquare } from 'lucide-react'
+import { ArrowLeft, FileText, Package, Sparkles, UserSquare } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
+import {
+  DOCUMENT_TEMPLATE_PRESETS,
+  type DocumentTemplatePresetKey,
+  getPresetByKey,
+  presetToCreatePayload,
+} from '@/api/document-template/presets'
 import { DOCUMENT_TEMPLATE_QUERY_KEYS } from '@/api/document-template/query'
 import type {
   AccessibleRouteKey,
@@ -73,6 +79,7 @@ function NewDocumentPage() {
     'order_detail',
   ])
   const [description, setDescription] = useState('')
+  const [presetKey, setPresetKey] = useState<DocumentTemplatePresetKey>('blank')
 
   const currentEntity = ENTITY_CHOICES.find((c) => c.value === entityType)!
 
@@ -81,6 +88,17 @@ function NewDocumentPage() {
     const entity = ENTITY_CHOICES.find((c) => c.value === next)!
     // Default to "<entity>_detail" only
     setAccessible([entity.accessRoutes[0].value])
+  }
+
+  const handlePresetChange = (key: DocumentTemplatePresetKey) => {
+    setPresetKey(key)
+    const preset = getPresetByKey(key)
+    if (!preset || key === 'blank') return
+    // Preset overrides form fields so the user sees what's being created.
+    setName(preset.defaultName)
+    setDescription(preset.description)
+    setEntityType(preset.entity_type)
+    setAccessible(preset.defaultAccessibleFrom as AccessibleRouteKey[])
   }
 
   const toggleAccess = (key: AccessibleRouteKey) => {
@@ -118,12 +136,23 @@ function NewDocumentPage() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (!canSubmit) return
-    createMutation.mutate({
-      name: name.trim(),
-      description: description.trim(),
-      entity_type: entityType,
-      accessible_from: accessible,
-    })
+    const preset = getPresetByKey(presetKey)
+    if (preset && presetKey !== 'blank') {
+      createMutation.mutate(
+        presetToCreatePayload(preset, {
+          name: name.trim(),
+          description: description.trim(),
+          accessible_from: accessible,
+        })
+      )
+    } else {
+      createMutation.mutate({
+        name: name.trim(),
+        description: description.trim(),
+        entity_type: entityType,
+        accessible_from: accessible,
+      })
+    }
   }
 
   if (!projectId) {
@@ -159,6 +188,41 @@ function NewDocumentPage() {
         className='flex-1 overflow-auto px-3.5 py-5 sm:px-6 sm:py-7'
       >
         <div className='mx-auto flex w-full max-w-xl flex-col gap-6'>
+          {/* Preset picker */}
+          <div className='flex flex-col gap-2'>
+            <label className='inline-flex items-center gap-1.5 text-[12px] font-semibold text-foreground'>
+              <Sparkles className='size-3.5 text-indigo-500' />
+              Start from a preset
+            </label>
+            <p className='text-[11.5px] leading-snug text-text-tertiary'>
+              Pick a starter to skip the blank canvas. You can edit anything
+              after creating.
+            </p>
+            <div className='grid gap-2 sm:grid-cols-2'>
+              {DOCUMENT_TEMPLATE_PRESETS.map((p) => {
+                const isActive = presetKey === p.key
+                return (
+                  <button
+                    key={p.key}
+                    type='button'
+                    onClick={() => handlePresetChange(p.key)}
+                    className={cn(
+                      'flex flex-col items-start gap-1 rounded-[8px] border p-3 text-left transition-colors duration-[80ms]',
+                      isActive
+                        ? 'border-primary bg-primary/[0.06] text-foreground'
+                        : 'border-border bg-bg-secondary text-text-secondary hover:bg-bg-active hover:text-foreground'
+                    )}
+                  >
+                    <span className='text-[13px] font-semibold'>{p.label}</span>
+                    <span className='text-[11.5px] leading-snug text-text-tertiary'>
+                      {p.description}
+                    </span>
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+
           {/* Name */}
           <div className='flex flex-col gap-1.5'>
             <label
