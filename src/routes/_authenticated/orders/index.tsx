@@ -15,7 +15,6 @@ import { getFieldConfigQuery } from '@/api/field-config/query'
 import { ORDER_QUERY_KEYS, getOrderDetailQuery, getOrdersQuery } from '@/api/order/query'
 import {
   buildCustomColumns,
-  CustomColumnsCells,
   CustomColumnsHeader,
   type CustomColumn
 } from '@/components/common/custom-list-columns'

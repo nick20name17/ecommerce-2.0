@@ -107,8 +107,8 @@ const CatalogVPDetailPage = () => {
             entityType='vp'
             entityId={vp.id}
             projectId={projectId}
-            initialTitle={(vp as Record<string, string>).meta_title}
-            initialDescription={(vp as Record<string, string>).meta_description}
+            initialTitle={(vp as unknown as Record<string, string>).meta_title}
+            initialDescription={(vp as unknown as Record<string, string>).meta_description}
           />
         </div>
 

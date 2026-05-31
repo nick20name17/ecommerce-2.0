@@ -119,7 +119,12 @@ export interface SpecParams {
 
 export interface CreateVariableProductPayload {
   name: string
-  category_id: string
+  /**
+   * Optional — VPs can be created unassigned (from the Unassigned panel or
+   * the Superinventory create dialog). When omitted, the VP lands without a
+   * category and can be assigned later.
+   */
+  category_id?: string
   description?: string
   slug?: string
   image_url?: string

@@ -16,7 +16,6 @@ import { useState } from 'react'
 import { CATALOG_QUERY_KEYS, getCatalogDetailQuery } from '@/api/catalog/query'
 import type { CatalogCategory, CatalogCategoryProduct, CatalogCategoryVP } from '@/api/catalog/schema'
 import { catalogService } from '@/api/catalog/service'
-import { ImageGallery } from '@/components/common/image-gallery'
 import { MetaTagsEditor } from '@/components/common/meta-tags-editor'
 import { StatusBadge, StatusEditor, type StatusValue } from '@/components/common/status-editor'
 import { Button } from '@/components/ui/button'
@@ -165,7 +164,6 @@ export const CategoryItemsPanel = ({
               <VPRow
                 key={vp.id}
                 vp={vp}
-                projectId={projectId}
                 onRemove={() => removeVPMutation.mutate(vp.id)}
                 onNavigate={() =>
                   navigate({
@@ -220,12 +218,10 @@ export const CategoryItemsPanel = ({
 
 function VPRow({
   vp,
-  projectId,
   onRemove,
   onNavigate,
 }: {
   vp: CatalogCategoryVP
-  projectId: number | null
   onRemove: () => void
   onNavigate: () => void
 }) {
