@@ -14,6 +14,11 @@ interface CanvasElementProps {
   /** Page width / height in inches — used to clamp positions. */
   pageW: number
   pageH: number
+  /**
+   * Resolved value for `field` elements — when present, the body renders the
+   * value instead of the `{field.key}` placeholder.
+   */
+  resolvedValue?: string
 }
 
 type DragMode =
@@ -45,6 +50,7 @@ export function CanvasElement({
   onDelete,
   pageW,
   pageH,
+  resolvedValue,
 }: CanvasElementProps) {
   const ref = useRef<HTMLDivElement>(null)
   const dragRef = useRef<DragMode | null>(null)
@@ -217,7 +223,7 @@ export function CanvasElement({
           : 'outline outline-1 outline-transparent hover:outline-primary/40'
       )}
     >
-      <ElementBody element={element} />
+      <ElementBody element={element} resolvedValue={resolvedValue} />
       {isSelected && <ResizeHandles onBegin={beginResize} />}
     </div>
   )
@@ -225,12 +231,18 @@ export function CanvasElement({
 
 // ── Element body renderers ──────────────────────────────────
 
-function ElementBody({ element }: { element: LayoutElement }) {
+function ElementBody({
+  element,
+  resolvedValue,
+}: {
+  element: LayoutElement
+  resolvedValue?: string
+}) {
   switch (element.type) {
     case 'text':
       return <TextBody element={element} />
     case 'field':
-      return <FieldBody element={element} />
+      return <FieldBody element={element} resolvedValue={resolvedValue} />
     case 'image':
       return <ImageBody element={element} />
     case 'line':
@@ -269,9 +281,19 @@ function TextBody({ element }: { element: LayoutElement }) {
   )
 }
 
-function FieldBody({ element }: { element: LayoutElement }) {
+function FieldBody({
+  element,
+  resolvedValue,
+}: {
+  element: LayoutElement
+  resolvedValue?: string
+}) {
   const p = element.props ?? {}
   const fieldKey = (p.fieldKey as string) || 'field.key'
+  const hasResolved = resolvedValue !== undefined
+  // Empty string is a valid resolved value ("no data" for that field).
+  const display = hasResolved ? resolvedValue : `{${fieldKey}}`
+
   return (
     <div
       style={{
@@ -284,13 +306,25 @@ function FieldBody({ element }: { element: LayoutElement }) {
         padding: '2px 4px',
         overflow: 'hidden',
         boxSizing: 'border-box',
-        background:
-          'repeating-linear-gradient(45deg, rgba(99,102,241,0.06) 0 6px, transparent 6px 12px)',
-        border: '1px dashed rgba(99,102,241,0.4)',
+        background: hasResolved
+          ? 'transparent'
+          : 'repeating-linear-gradient(45deg, rgba(99,102,241,0.06) 0 6px, transparent 6px 12px)',
+        border: hasResolved
+          ? '1px dashed transparent'
+          : '1px dashed rgba(99,102,241,0.4)',
         borderRadius: 3,
+        whiteSpace: 'pre-wrap',
+        wordBreak: 'break-word',
+        lineHeight: 1.25,
       }}
     >
-      <code style={{ fontFamily: 'inherit' }}>{`{${fieldKey}}`}</code>
+      {hasResolved ? (
+        display || (
+          <span style={{ fontStyle: 'italic', opacity: 0.4 }}>(empty)</span>
+        )
+      ) : (
+        <code style={{ fontFamily: 'inherit' }}>{display}</code>
+      )}
     </div>
   )
 }
