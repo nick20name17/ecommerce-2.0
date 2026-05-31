@@ -18,6 +18,8 @@ import type {
   DocumentLayout,
   ElementType,
   LayoutElement,
+  TableColumn,
+  TableColumnFormat,
 } from '@/api/document-template/schema'
 import { cn } from '@/lib/utils'
 
@@ -251,6 +253,7 @@ export function DesignerCanvas({
                 pageW={dims.w}
                 pageH={dims.h}
                 resolvedValue={resolved}
+                entityData={entityData}
               />
             )
           })}
@@ -378,6 +381,14 @@ function PropertiesPanel({
       )}
       {element.type === 'rect' && (
         <RectProps element={element} patchProps={patchProps} />
+      )}
+      {element.type === 'table' && (
+        <TableProps
+          element={element}
+          onPatch={onPatch}
+          patchProps={patchProps}
+          availableFields={availableFields}
+        />
       )}
     </div>
   )
@@ -614,6 +625,306 @@ function RectProps({
         />
       </Grid2>
     </Section>
+  )
+}
+
+// ── Table properties ────────────────────────────────────────
+
+const FORMAT_OPTIONS: TableColumnFormat[] = [
+  'string',
+  'number',
+  'integer',
+  'currency',
+  'percent',
+]
+const ALIGN_OPTIONS: ('left' | 'center' | 'right')[] = ['left', 'center', 'right']
+
+function TableProps({
+  element,
+  onPatch,
+  patchProps,
+  availableFields,
+}: {
+  element: LayoutElement
+  onPatch: (patch: Partial<LayoutElement>) => void
+  patchProps: (kv: Record<string, unknown>) => void
+  availableFields?: FieldConfigEntry[]
+}) {
+  const p = element.props ?? {}
+  const columns = (p.columns as TableColumn[] | undefined) ?? []
+
+  const updateColumns = (next: TableColumn[]) => {
+    patchProps({ columns: next })
+    void onPatch // keep parameter referenced for the typed signature
+  }
+
+  const updateColumn = (index: number, patch: Partial<TableColumn>) => {
+    updateColumns(
+      columns.map((c, i) => (i === index ? { ...c, ...patch } : c))
+    )
+  }
+
+  const moveColumn = (index: number, dir: -1 | 1) => {
+    const target = index + dir
+    if (target < 0 || target >= columns.length) return
+    const next = [...columns]
+    ;[next[index], next[target]] = [next[target], next[index]]
+    updateColumns(next)
+  }
+
+  const removeColumn = (index: number) => {
+    updateColumns(columns.filter((_, i) => i !== index))
+  }
+
+  const addColumn = () => {
+    updateColumns([
+      ...columns,
+      { fieldKey: '', label: 'Column', widthPct: 0, align: 'left', format: 'string' },
+    ])
+  }
+
+  const totalPct = columns.reduce((s, c) => s + (c.widthPct ?? 0), 0)
+
+  return (
+    <>
+      <Section title='Items source'>
+        <input
+          type='text'
+          value={(p.itemsSource as string) ?? 'items'}
+          onChange={(e) => patchProps({ itemsSource: e.target.value })}
+          placeholder='items'
+          className='h-8 w-full rounded-[5px] border border-border bg-background px-2 font-mono text-[12px] outline-none focus:border-primary focus:ring-2 focus:ring-primary/20'
+        />
+        <span className='text-[11px] text-text-tertiary'>
+          Field key of the entity's list to loop over (default <code>items</code>).
+        </span>
+      </Section>
+
+      <Section title='Columns'>
+        {columns.length === 0 ? (
+          <p className='text-[11.5px] italic text-text-tertiary'>
+            No columns yet — add one below.
+          </p>
+        ) : (
+          <div className='flex flex-col gap-2'>
+            {columns.map((c, i) => (
+              <ColumnEditor
+                key={i}
+                index={i}
+                column={c}
+                isFirst={i === 0}
+                isLast={i === columns.length - 1}
+                availableFields={availableFields}
+                onChange={(patch) => updateColumn(i, patch)}
+                onMove={(dir) => moveColumn(i, dir)}
+                onRemove={() => removeColumn(i)}
+              />
+            ))}
+          </div>
+        )}
+        <div className='flex items-center justify-between gap-2'>
+          <button
+            type='button'
+            onClick={addColumn}
+            className='inline-flex h-7 items-center gap-1 rounded-[5px] border border-dashed border-border bg-bg-secondary px-2 text-[12px] font-medium text-text-secondary transition-colors hover:bg-bg-active hover:text-foreground'
+          >
+            <Type className='size-3' />
+            Add column
+          </button>
+          <span
+            className={cn(
+              'text-[10.5px]',
+              Math.round(totalPct) === 100
+                ? 'text-text-tertiary'
+                : 'text-amber-600'
+            )}
+            title='Sum of widthPct across columns'
+          >
+            Σ width: {totalPct.toFixed(0)}%
+          </span>
+        </div>
+      </Section>
+
+      <Section title='Style'>
+        <label className='flex cursor-pointer items-center gap-2'>
+          <input
+            type='checkbox'
+            checked={p.showHeader !== false}
+            onChange={(e) => patchProps({ showHeader: e.target.checked })}
+            className='size-3.5 accent-primary'
+          />
+          <span className='text-[12.5px]'>Show header row</span>
+        </label>
+        <label className='flex cursor-pointer items-center gap-2'>
+          <input
+            type='checkbox'
+            checked={!!p.striped}
+            onChange={(e) => patchProps({ striped: e.target.checked })}
+            className='size-3.5 accent-primary'
+          />
+          <span className='text-[12.5px]'>Alternating row shading</span>
+        </label>
+        <Grid2>
+          <NumberInput
+            label='Font'
+            value={(p.fontSize as number) ?? 10}
+            min={6}
+            max={32}
+            step={0.5}
+            suffix='pt'
+            onChange={(v) => patchProps({ fontSize: v })}
+          />
+          <ColorInput
+            label='Header bg'
+            value={(p.headerBackground as string) ?? '#f4f4f5'}
+            onChange={(v) => patchProps({ headerBackground: v })}
+          />
+        </Grid2>
+        <ColorInput
+          label='Border'
+          value={(p.borderColor as string) ?? '#e4e4e7'}
+          onChange={(v) => patchProps({ borderColor: v })}
+        />
+        {!!p.striped && (
+          <ColorInput
+            label='Stripe bg'
+            value={(p.stripeBackground as string) ?? '#fafafa'}
+            onChange={(v) => patchProps({ stripeBackground: v })}
+          />
+        )}
+      </Section>
+    </>
+  )
+}
+
+function ColumnEditor({
+  index,
+  column,
+  isFirst,
+  isLast,
+  availableFields,
+  onChange,
+  onMove,
+  onRemove,
+}: {
+  index: number
+  column: TableColumn
+  isFirst: boolean
+  isLast: boolean
+  availableFields?: FieldConfigEntry[]
+  onChange: (patch: Partial<TableColumn>) => void
+  onMove: (dir: -1 | 1) => void
+  onRemove: () => void
+}) {
+  // Columns address fields on a row item — use the order_item / proposal_item
+  // schema when available. Fall back to the entity-level fields.
+  const enabledFields = (availableFields ?? []).filter(
+    (f) => f.default || f.enabled
+  )
+  const listId = `col-field-${index}`
+
+  return (
+    <div className='flex flex-col gap-1.5 rounded-[6px] border border-border bg-background p-2'>
+      <div className='flex items-center gap-1.5'>
+        <span className='text-[10px] font-semibold uppercase tracking-wider text-text-tertiary'>
+          Col {index + 1}
+        </span>
+        <div className='flex-1' />
+        <button
+          type='button'
+          disabled={isFirst}
+          onClick={() => onMove(-1)}
+          className='inline-flex size-5 items-center justify-center rounded-[4px] text-text-tertiary hover:bg-bg-hover hover:text-foreground disabled:pointer-events-none disabled:opacity-30'
+          title='Move up'
+        >
+          ↑
+        </button>
+        <button
+          type='button'
+          disabled={isLast}
+          onClick={() => onMove(1)}
+          className='inline-flex size-5 items-center justify-center rounded-[4px] text-text-tertiary hover:bg-bg-hover hover:text-foreground disabled:pointer-events-none disabled:opacity-30'
+          title='Move down'
+        >
+          ↓
+        </button>
+        <button
+          type='button'
+          onClick={onRemove}
+          className='inline-flex size-5 items-center justify-center rounded-[4px] text-text-tertiary hover:bg-bg-hover hover:text-destructive'
+          title='Remove column'
+        >
+          <X className='size-3' />
+        </button>
+      </div>
+
+      <input
+        type='text'
+        value={column.label ?? ''}
+        onChange={(e) => onChange({ label: e.target.value })}
+        placeholder='Label'
+        className='h-7 w-full rounded-[4px] border border-border bg-background px-1.5 text-[12px] outline-none focus:border-primary focus:ring-1 focus:ring-primary/20'
+      />
+      <input
+        type='text'
+        list={enabledFields.length > 0 ? listId : undefined}
+        value={column.fieldKey ?? ''}
+        onChange={(e) => onChange({ fieldKey: e.target.value })}
+        placeholder='descr / quan / unit_price'
+        className='h-7 w-full rounded-[4px] border border-border bg-background px-1.5 font-mono text-[11.5px] outline-none focus:border-primary focus:ring-1 focus:ring-primary/20'
+        autoComplete='off'
+      />
+      {enabledFields.length > 0 && (
+        <datalist id={listId}>
+          {enabledFields.map((f) => (
+            <option key={f.field} value={f.field} label={f.alias || f.field} />
+          ))}
+        </datalist>
+      )}
+
+      <div className='grid grid-cols-[1fr_auto_auto] gap-1.5'>
+        <input
+          type='number'
+          value={column.widthPct ?? 0}
+          min={0}
+          max={100}
+          step={1}
+          onChange={(e) =>
+            onChange({ widthPct: Math.max(0, Number(e.target.value) || 0) })
+          }
+          placeholder='width %'
+          className='h-7 w-full rounded-[4px] border border-border bg-background px-1.5 text-[11.5px] outline-none focus:border-primary focus:ring-1 focus:ring-primary/20'
+          title='Column width as percent of table width'
+        />
+        <select
+          value={column.align ?? 'left'}
+          onChange={(e) =>
+            onChange({ align: e.target.value as TableColumn['align'] })
+          }
+          className='h-7 rounded-[4px] border border-border bg-background px-1.5 text-[11.5px] outline-none focus:border-primary'
+        >
+          {ALIGN_OPTIONS.map((a) => (
+            <option key={a} value={a}>
+              {a}
+            </option>
+          ))}
+        </select>
+        <select
+          value={column.format ?? 'string'}
+          onChange={(e) =>
+            onChange({ format: e.target.value as TableColumnFormat })
+          }
+          className='h-7 rounded-[4px] border border-border bg-background px-1.5 text-[11.5px] outline-none focus:border-primary'
+          title='How to format the resolved value'
+        >
+          {FORMAT_OPTIONS.map((f) => (
+            <option key={f} value={f}>
+              {f}
+            </option>
+          ))}
+        </select>
+      </div>
+    </div>
   )
 }
 

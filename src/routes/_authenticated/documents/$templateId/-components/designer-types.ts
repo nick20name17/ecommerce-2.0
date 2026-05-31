@@ -58,7 +58,21 @@ export const ELEMENT_DEFAULTS: Record<
   table: {
     w: 7,
     h: 3,
-    props: { columns: [] },
+    props: {
+      columns: [
+        { fieldKey: 'quan', label: 'Qty', widthPct: 12, align: 'right', format: 'number' },
+        { fieldKey: 'descr', label: 'Description', widthPct: 55, align: 'left' },
+        { fieldKey: 'unit_price', label: 'Unit Price', widthPct: 16, align: 'right', format: 'currency' },
+        { fieldKey: 'amount', label: 'Amount', widthPct: 17, align: 'right', format: 'currency' },
+      ],
+      itemsSource: 'items',
+      showHeader: true,
+      headerBackground: '#f4f4f5',
+      fontSize: 10,
+      striped: false,
+      stripeBackground: '#fafafa',
+      borderColor: '#e4e4e7',
+    },
   },
   line: {
     w: 4,
@@ -107,9 +121,20 @@ export function resolveField(
   fieldKey: string | undefined | null,
   entity: unknown
 ): string {
-  if (!fieldKey) return ''
+  const raw = resolveFieldRaw(fieldKey, entity)
+  if (raw == null) return ''
+  if (typeof raw === 'object') return JSON.stringify(raw)
+  return String(raw)
+}
+
+/** Same lookup as `resolveField` but returns the raw value (list / dict / scalar). */
+export function resolveFieldRaw(
+  fieldKey: string | undefined | null,
+  entity: unknown
+): unknown {
+  if (!fieldKey) return null
   let key = fieldKey.trim()
-  if (!key) return ''
+  if (!key) return null
 
   const dot = key.indexOf('.')
   if (dot >= 0) {
@@ -123,10 +148,10 @@ export function resolveField(
   const parts = key.split('.')
   let cur: unknown = entity
   for (const p of parts) {
-    if (cur == null) return ''
+    if (cur == null) return null
     if (Array.isArray(cur)) {
       const idx = Number(p)
-      if (!Number.isInteger(idx) || idx < 0 || idx >= cur.length) return ''
+      if (!Number.isInteger(idx) || idx < 0 || idx >= cur.length) return null
       cur = cur[idx]
       continue
     }
@@ -135,9 +160,29 @@ export function resolveField(
       cur = p in rec ? rec[p] : rec[p.toLowerCase()]
       continue
     }
-    return ''
+    return null
   }
-  if (cur == null) return ''
-  if (typeof cur === 'object') return JSON.stringify(cur)
-  return String(cur)
+  return cur ?? null
+}
+
+/** Format a resolved cell value for display — mirrors the backend's _format_cell_value. */
+export function formatCellValue(value: string, fmt?: string | null): string {
+  if (!value) return value
+  if (!fmt || fmt === 'string') return value
+  const n = Number(value)
+  if (!Number.isFinite(n)) return value
+  switch (fmt) {
+    case 'currency':
+      return `$${n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+    case 'number':
+      return Number.isInteger(n)
+        ? n.toLocaleString()
+        : n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+    case 'integer':
+      return Math.trunc(n).toLocaleString()
+    case 'percent':
+      return `${(n * 100).toFixed(1)}%`
+    default:
+      return value
+  }
 }
