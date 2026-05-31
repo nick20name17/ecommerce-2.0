@@ -1,16 +1,26 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { createFileRoute, useNavigate, useRouter } from '@tanstack/react-router'
-import { ChevronLeft, Copy, FileText, ListTodo, Paperclip, Settings, ShoppingCart, StickyNote, Trash2, UserPlus } from 'lucide-react'
+import { ChevronLeft, Copy, FileText, ListTodo, Paperclip, Printer, Settings, ShoppingCart, StickyNote, Trash2, UserPlus } from 'lucide-react'
 import { useMemo, useState } from 'react'
 
 import { PageEmpty } from '@/components/common/page-empty'
 import { EntityAttachmentsDialog } from '@/components/common/entity-attachments/entity-attachments-dialog'
 import { EntityNotesSheet } from '@/components/common/entity-notes/entity-notes-sheet'
+import { getDocumentTemplatesQuery } from '@/api/document-template/query'
+import { documentTemplateService } from '@/api/document-template/service'
 import { getFieldConfigQuery } from '@/api/field-config/query'
 import { ORDER_QUERY_KEYS } from '@/api/order/query'
 import { getProposalDetailQuery, PROPOSAL_QUERY_KEYS } from '@/api/proposal/query'
 import { proposalService } from '@/api/proposal/service'
 import { IProposals, PAGE_COLORS, PageHeaderIcon } from '@/components/ds'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import { ProposalAssignDialog } from '@/routes/_authenticated/proposals/-components/proposal-assign-dialog'
 import { CommandBarCreate } from '@/components/tasks/command-bar-create'
 import { PROPOSAL_STATUS_CLASS, PROPOSAL_STATUS_LABELS } from '@/constants/proposal'
@@ -83,6 +93,45 @@ function ProposalDetailPage() {
       invalidatesQuery: PROPOSAL_QUERY_KEYS.lists(),
     },
     onSuccess: () => router.history.back(),
+  })
+
+  // Document templates available for the Print menu on this page.
+  const { data: printTemplates } = useQuery({
+    ...getDocumentTemplatesQuery(
+      { entity_type: 'proposal', accessible_from: 'proposal_detail', is_active: true },
+      projectId
+    ),
+    enabled: !!projectId,
+  })
+
+  const renderMutation = useMutation({
+    mutationFn: async ({ templateId }: { templateId: number; templateName: string }) =>
+      documentTemplateService.render(templateId, proposalId, projectId),
+    onSuccess: (blob, { templateName }) => {
+      const url = URL.createObjectURL(blob)
+      const w = window.open(url, '_blank', 'noopener,noreferrer')
+      setTimeout(() => URL.revokeObjectURL(url), 60_000)
+      if (!w) {
+        toast.error('Pop-up blocked. Allow pop-ups for this site to preview PDFs.')
+      } else {
+        toast.success(`Opened "${templateName}"`)
+      }
+    },
+    onError: async (err: unknown) => {
+      let msg = 'Failed to render document'
+      const e = err as { response?: { data?: unknown } }
+      const data = e.response?.data
+      if (data instanceof Blob) {
+        try {
+          const text = await data.text()
+          const parsed = JSON.parse(text) as { error?: string }
+          if (parsed.error) msg = parsed.error
+        } catch {
+          // ignore — keep default msg
+        }
+      }
+      toast.error(msg)
+    },
   })
 
   // Custom fields
@@ -264,6 +313,49 @@ function ProposalDetailPage() {
               </TooltipTrigger>
               <TooltipContent>Create order from this proposal</TooltipContent>
             </Tooltip>
+          )}
+
+          {printTemplates && printTemplates.length > 0 && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button
+                  type='button'
+                  disabled={renderMutation.isPending}
+                  className='inline-flex size-7 items-center justify-center rounded-[5px] border border-border bg-bg-secondary text-[12px] font-medium text-text-secondary transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground disabled:pointer-events-none disabled:opacity-50 lg:h-7 lg:w-auto lg:gap-1.5 lg:px-2.5'
+                  title='Print document'
+                >
+                  <Printer className='size-3.5' />
+                  <span className='hidden lg:inline'>
+                    {renderMutation.isPending ? 'Rendering…' : 'Print'}
+                  </span>
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align='end' className='w-56'>
+                <DropdownMenuLabel className='text-[11px] uppercase tracking-wider text-text-tertiary'>
+                  Choose a template
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                {printTemplates.map((t) => (
+                  <DropdownMenuItem
+                    key={t.id}
+                    onSelect={() =>
+                      renderMutation.mutate({
+                        templateId: t.id,
+                        templateName: t.name,
+                      })
+                    }
+                    className='flex flex-col items-start gap-0.5'
+                  >
+                    <span className='text-[13px] font-medium'>{t.name}</span>
+                    {t.description && (
+                      <span className='text-[11px] text-text-tertiary'>
+                        {t.description}
+                      </span>
+                    )}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
           )}
 
           <Tooltip>

@@ -22,6 +22,26 @@ export interface PageMargins {
 
 export type ElementType = 'text' | 'field' | 'image' | 'table' | 'line' | 'rect'
 
+/** Per-cell value formatter applied before HTML escape. */
+export type TableColumnFormat =
+  | 'string'
+  | 'number'
+  | 'integer'
+  | 'currency'
+  | 'percent'
+
+/** One column in a Table element. */
+export interface TableColumn {
+  /** Dotted field key relative to each item row (e.g. `descr`, `unit_price`). */
+  fieldKey: string
+  /** Header label. Falls back to fieldKey if empty. */
+  label?: string
+  /** Width as a percentage of the table element's width. */
+  widthPct?: number
+  align?: 'left' | 'right' | 'center'
+  format?: TableColumnFormat
+}
+
 /** Element common shape. type-specific config lives in `props`. */
 export interface LayoutElement {
   id: string

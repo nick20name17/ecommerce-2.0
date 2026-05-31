@@ -1,9 +1,18 @@
 import { useCallback, useEffect, useRef } from 'react'
 
-import type { LayoutElement } from '@/api/document-template/schema'
+import type {
+  LayoutElement,
+  TableColumn,
+} from '@/api/document-template/schema'
 import { cn } from '@/lib/utils'
 
-import { PX_PER_INCH, snapInches } from './designer-types'
+import {
+  PX_PER_INCH,
+  formatCellValue,
+  resolveField,
+  resolveFieldRaw,
+  snapInches,
+} from './designer-types'
 
 interface CanvasElementProps {
   element: LayoutElement
@@ -19,6 +28,10 @@ interface CanvasElementProps {
    * value instead of the `{field.key}` placeholder.
    */
   resolvedValue?: string
+  /**
+   * The current test entity (when set) — drives Table elements' row data.
+   */
+  entityData?: Record<string, unknown> | null
 }
 
 type DragMode =
@@ -51,6 +64,7 @@ export function CanvasElement({
   pageW,
   pageH,
   resolvedValue,
+  entityData,
 }: CanvasElementProps) {
   const ref = useRef<HTMLDivElement>(null)
   const dragRef = useRef<DragMode | null>(null)
@@ -223,7 +237,11 @@ export function CanvasElement({
           : 'outline outline-1 outline-transparent hover:outline-primary/40'
       )}
     >
-      <ElementBody element={element} resolvedValue={resolvedValue} />
+      <ElementBody
+        element={element}
+        resolvedValue={resolvedValue}
+        entityData={entityData}
+      />
       {isSelected && <ResizeHandles onBegin={beginResize} />}
     </div>
   )
@@ -234,9 +252,11 @@ export function CanvasElement({
 function ElementBody({
   element,
   resolvedValue,
+  entityData,
 }: {
   element: LayoutElement
   resolvedValue?: string
+  entityData?: Record<string, unknown> | null
 }) {
   switch (element.type) {
     case 'text':
@@ -250,7 +270,7 @@ function ElementBody({
     case 'rect':
       return <RectBody element={element} />
     case 'table':
-      return <PlaceholderBody label='Table' />
+      return <TableBody element={element} entityData={entityData} />
     default:
       return <PlaceholderBody label={element.type} />
   }
@@ -391,6 +411,170 @@ function RectBody({ element }: { element: LayoutElement }) {
         boxSizing: 'border-box',
       }}
     />
+  )
+}
+
+function TableBody({
+  element,
+  entityData,
+}: {
+  element: LayoutElement
+  entityData?: Record<string, unknown> | null
+}) {
+  const p = element.props ?? {}
+  const columns = ((p.columns as TableColumn[] | undefined) ?? []).map((c) => ({
+    fieldKey: c.fieldKey ?? '',
+    label: c.label ?? c.fieldKey ?? '',
+    widthPct: c.widthPct ?? 0,
+    align: (c.align ?? 'left') as 'left' | 'right' | 'center',
+    format: c.format ?? 'string',
+  }))
+  const itemsSource = (p.itemsSource as string) || 'items'
+  const showHeader = p.showHeader !== false
+  const headerBg = (p.headerBackground as string) || '#f4f4f5'
+  const fontSize = (p.fontSize as number) ?? 10
+  const striped = !!p.striped
+  const stripeBg = (p.stripeBackground as string) || '#fafafa'
+  const borderColor = (p.borderColor as string) || '#e4e4e7'
+
+  // Resolve items from test entity, or generate placeholder rows.
+  let items: Array<Record<string, unknown>> = []
+  let isPlaceholder = false
+  if (entityData) {
+    const raw = resolveFieldRaw(itemsSource, entityData)
+    items = Array.isArray(raw) ? (raw as Array<Record<string, unknown>>) : []
+  } else {
+    isPlaceholder = true
+    items = Array.from({ length: 3 }).map(() => ({}))
+  }
+
+  // Distribute widths evenly when missing.
+  const totalPct = columns.reduce((s, c) => s + (c.widthPct || 0), 0)
+  const widths = columns.map((c) => {
+    if (c.widthPct && c.widthPct > 0) return c.widthPct
+    const zeros = columns.filter((cc) => !cc.widthPct).length
+    const remaining = Math.max(0, 100 - totalPct)
+    return zeros ? remaining / zeros : 100 / columns.length
+  })
+
+  if (columns.length === 0) {
+    return (
+      <div
+        style={{
+          width: '100%',
+          height: '100%',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          background: 'rgba(99,102,241,0.06)',
+          border: '1px dashed rgba(99,102,241,0.4)',
+          color: '#6366f1',
+          fontSize: 10,
+          padding: 4,
+          boxSizing: 'border-box',
+        }}
+      >
+        Empty table — add columns in the properties panel
+      </div>
+    )
+  }
+
+  return (
+    <div
+      style={{
+        width: '100%',
+        height: '100%',
+        overflow: 'hidden',
+        fontSize: fontSize + 'pt',
+        color: '#111',
+        boxSizing: 'border-box',
+      }}
+    >
+      <table
+        style={{
+          width: '100%',
+          borderCollapse: 'collapse',
+          tableLayout: 'fixed',
+        }}
+      >
+        {showHeader && (
+          <thead>
+            <tr>
+              {columns.map((c, i) => (
+                <th
+                  key={i}
+                  style={{
+                    textAlign: c.align,
+                    background: headerBg,
+                    borderBottom: `1px solid ${borderColor}`,
+                    fontWeight: 600,
+                    padding: '3px 4px',
+                    width: widths[i] + '%',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {c.label}
+                </th>
+              ))}
+            </tr>
+          </thead>
+        )}
+        <tbody>
+          {items.map((row, rowIdx) => {
+            const rowBg = striped && rowIdx % 2 ? stripeBg : 'transparent'
+            return (
+              <tr key={rowIdx}>
+                {columns.map((c, colIdx) => {
+                  const raw = isPlaceholder
+                    ? `{${c.fieldKey || 'col'}}`
+                    : formatCellValue(resolveField(c.fieldKey, row), c.format)
+                  return (
+                    <td
+                      key={colIdx}
+                      style={{
+                        textAlign: c.align,
+                        background: rowBg,
+                        borderBottom: `1px solid ${borderColor}`,
+                        padding: '3px 4px',
+                        verticalAlign: 'top',
+                        wordBreak: 'break-word',
+                        color: isPlaceholder ? '#aaa' : undefined,
+                        fontStyle: isPlaceholder ? 'italic' : undefined,
+                        fontFamily: isPlaceholder
+                          ? 'ui-monospace, SFMono-Regular, monospace'
+                          : undefined,
+                        fontSize: isPlaceholder ? '0.9em' : undefined,
+                      }}
+                    >
+                      {raw || (
+                        <span style={{ color: '#bbb', fontStyle: 'italic' }}>—</span>
+                      )}
+                    </td>
+                  )
+                })}
+              </tr>
+            )
+          })}
+          {items.length === 0 && (
+            <tr>
+              <td
+                colSpan={columns.length}
+                style={{
+                  textAlign: 'center',
+                  padding: 8,
+                  color: '#999',
+                  fontStyle: 'italic',
+                }}
+              >
+                No items
+              </td>
+            </tr>
+          )}
+        </tbody>
+      </table>
+    </div>
   )
 }
 
