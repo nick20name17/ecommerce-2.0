@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { Check, MoreHorizontal, Pencil, Plus, Search, Trash2 } from 'lucide-react'
+import { Check, Pencil, Plus, Search, Trash2 } from 'lucide-react'
 import { useState } from 'react'
 
 import type {
@@ -20,12 +20,6 @@ import {
   DialogTitle,
   DialogDescription,
 } from '@/components/ui/dialog'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { cn } from '@/lib/utils'

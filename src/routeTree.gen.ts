@@ -12,10 +12,10 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteRouteImport } from './routes/_auth/route'
 import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
+import { Route as AuthenticatedWebsiteIndexRouteImport } from './routes/_authenticated/website/index'
 import { Route as AuthenticatedVariableProductsIndexRouteImport } from './routes/_authenticated/variable-products/index'
 import { Route as AuthenticatedUsersIndexRouteImport } from './routes/_authenticated/users/index'
 import { Route as AuthenticatedTasksIndexRouteImport } from './routes/_authenticated/tasks/index'
-import { Route as AuthenticatedStorefrontIndexRouteImport } from './routes/_authenticated/storefront/index'
 import { Route as AuthenticatedShippingIndexRouteImport } from './routes/_authenticated/shipping/index'
 import { Route as AuthenticatedSettingsIndexRouteImport } from './routes/_authenticated/settings/index'
 import { Route as AuthenticatedProposalsIndexRouteImport } from './routes/_authenticated/proposals/index'
@@ -25,7 +25,6 @@ import { Route as AuthenticatedPickListsIndexRouteImport } from './routes/_authe
 import { Route as AuthenticatedOrdersIndexRouteImport } from './routes/_authenticated/orders/index'
 import { Route as AuthenticatedOrderDeskIndexRouteImport } from './routes/_authenticated/order-desk/index'
 import { Route as AuthenticatedNavOptionsIndexRouteImport } from './routes/_authenticated/nav-options/index'
-import { Route as AuthenticatedLegacyCartsIndexRouteImport } from './routes/_authenticated/legacy-carts/index'
 import { Route as AuthenticatedDocumentsIndexRouteImport } from './routes/_authenticated/documents/index'
 import { Route as AuthenticatedDevIndexRouteImport } from './routes/_authenticated/dev/index'
 import { Route as AuthenticatedCustomersIndexRouteImport } from './routes/_authenticated/customers/index'
@@ -57,6 +56,12 @@ const AuthenticatedIndexRoute = AuthenticatedIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedWebsiteIndexRoute =
+  AuthenticatedWebsiteIndexRouteImport.update({
+    id: '/website/',
+    path: '/website/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedVariableProductsIndexRoute =
   AuthenticatedVariableProductsIndexRouteImport.update({
     id: '/variable-products/',
@@ -73,12 +78,6 @@ const AuthenticatedTasksIndexRoute = AuthenticatedTasksIndexRouteImport.update({
   path: '/tasks/',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedStorefrontIndexRoute =
-  AuthenticatedStorefrontIndexRouteImport.update({
-    id: '/storefront/',
-    path: '/storefront/',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
 const AuthenticatedShippingIndexRoute =
   AuthenticatedShippingIndexRouteImport.update({
     id: '/shipping/',
@@ -131,12 +130,6 @@ const AuthenticatedNavOptionsIndexRoute =
   AuthenticatedNavOptionsIndexRouteImport.update({
     id: '/nav-options/',
     path: '/nav-options/',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedLegacyCartsIndexRoute =
-  AuthenticatedLegacyCartsIndexRouteImport.update({
-    id: '/legacy-carts/',
-    path: '/legacy-carts/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedDocumentsIndexRoute =
@@ -250,7 +243,6 @@ export interface FileRoutesByFullPath {
   '/customers/': typeof AuthenticatedCustomersIndexRoute
   '/dev/': typeof AuthenticatedDevIndexRoute
   '/documents/': typeof AuthenticatedDocumentsIndexRoute
-  '/legacy-carts/': typeof AuthenticatedLegacyCartsIndexRoute
   '/nav-options/': typeof AuthenticatedNavOptionsIndexRoute
   '/order-desk/': typeof AuthenticatedOrderDeskIndexRoute
   '/orders/': typeof AuthenticatedOrdersIndexRoute
@@ -260,10 +252,10 @@ export interface FileRoutesByFullPath {
   '/proposals/': typeof AuthenticatedProposalsIndexRoute
   '/settings/': typeof AuthenticatedSettingsIndexRoute
   '/shipping/': typeof AuthenticatedShippingIndexRoute
-  '/storefront/': typeof AuthenticatedStorefrontIndexRoute
   '/tasks/': typeof AuthenticatedTasksIndexRoute
   '/users/': typeof AuthenticatedUsersIndexRoute
   '/variable-products/': typeof AuthenticatedVariableProductsIndexRoute
+  '/website/': typeof AuthenticatedWebsiteIndexRoute
   '/catalog/specs/': typeof AuthenticatedCatalogSpecsIndexRoute
   '/customers/$customerId/': typeof AuthenticatedCustomersCustomerIdIndexRoute
   '/documents/$templateId/': typeof AuthenticatedDocumentsTemplateIdIndexRoute
@@ -284,7 +276,6 @@ export interface FileRoutesByTo {
   '/customers': typeof AuthenticatedCustomersIndexRoute
   '/dev': typeof AuthenticatedDevIndexRoute
   '/documents': typeof AuthenticatedDocumentsIndexRoute
-  '/legacy-carts': typeof AuthenticatedLegacyCartsIndexRoute
   '/nav-options': typeof AuthenticatedNavOptionsIndexRoute
   '/order-desk': typeof AuthenticatedOrderDeskIndexRoute
   '/orders': typeof AuthenticatedOrdersIndexRoute
@@ -294,10 +285,10 @@ export interface FileRoutesByTo {
   '/proposals': typeof AuthenticatedProposalsIndexRoute
   '/settings': typeof AuthenticatedSettingsIndexRoute
   '/shipping': typeof AuthenticatedShippingIndexRoute
-  '/storefront': typeof AuthenticatedStorefrontIndexRoute
   '/tasks': typeof AuthenticatedTasksIndexRoute
   '/users': typeof AuthenticatedUsersIndexRoute
   '/variable-products': typeof AuthenticatedVariableProductsIndexRoute
+  '/website': typeof AuthenticatedWebsiteIndexRoute
   '/catalog/specs': typeof AuthenticatedCatalogSpecsIndexRoute
   '/customers/$customerId': typeof AuthenticatedCustomersCustomerIdIndexRoute
   '/documents/$templateId': typeof AuthenticatedDocumentsTemplateIdIndexRoute
@@ -321,7 +312,6 @@ export interface FileRoutesById {
   '/_authenticated/customers/': typeof AuthenticatedCustomersIndexRoute
   '/_authenticated/dev/': typeof AuthenticatedDevIndexRoute
   '/_authenticated/documents/': typeof AuthenticatedDocumentsIndexRoute
-  '/_authenticated/legacy-carts/': typeof AuthenticatedLegacyCartsIndexRoute
   '/_authenticated/nav-options/': typeof AuthenticatedNavOptionsIndexRoute
   '/_authenticated/order-desk/': typeof AuthenticatedOrderDeskIndexRoute
   '/_authenticated/orders/': typeof AuthenticatedOrdersIndexRoute
@@ -331,10 +321,10 @@ export interface FileRoutesById {
   '/_authenticated/proposals/': typeof AuthenticatedProposalsIndexRoute
   '/_authenticated/settings/': typeof AuthenticatedSettingsIndexRoute
   '/_authenticated/shipping/': typeof AuthenticatedShippingIndexRoute
-  '/_authenticated/storefront/': typeof AuthenticatedStorefrontIndexRoute
   '/_authenticated/tasks/': typeof AuthenticatedTasksIndexRoute
   '/_authenticated/users/': typeof AuthenticatedUsersIndexRoute
   '/_authenticated/variable-products/': typeof AuthenticatedVariableProductsIndexRoute
+  '/_authenticated/website/': typeof AuthenticatedWebsiteIndexRoute
   '/_authenticated/catalog/specs/': typeof AuthenticatedCatalogSpecsIndexRoute
   '/_authenticated/customers/$customerId/': typeof AuthenticatedCustomersCustomerIdIndexRoute
   '/_authenticated/documents/$templateId/': typeof AuthenticatedDocumentsTemplateIdIndexRoute
@@ -357,7 +347,6 @@ export interface FileRouteTypes {
     | '/customers/'
     | '/dev/'
     | '/documents/'
-    | '/legacy-carts/'
     | '/nav-options/'
     | '/order-desk/'
     | '/orders/'
@@ -367,10 +356,10 @@ export interface FileRouteTypes {
     | '/proposals/'
     | '/settings/'
     | '/shipping/'
-    | '/storefront/'
     | '/tasks/'
     | '/users/'
     | '/variable-products/'
+    | '/website/'
     | '/catalog/specs/'
     | '/customers/$customerId/'
     | '/documents/$templateId/'
@@ -391,7 +380,6 @@ export interface FileRouteTypes {
     | '/customers'
     | '/dev'
     | '/documents'
-    | '/legacy-carts'
     | '/nav-options'
     | '/order-desk'
     | '/orders'
@@ -401,10 +389,10 @@ export interface FileRouteTypes {
     | '/proposals'
     | '/settings'
     | '/shipping'
-    | '/storefront'
     | '/tasks'
     | '/users'
     | '/variable-products'
+    | '/website'
     | '/catalog/specs'
     | '/customers/$customerId'
     | '/documents/$templateId'
@@ -427,7 +415,6 @@ export interface FileRouteTypes {
     | '/_authenticated/customers/'
     | '/_authenticated/dev/'
     | '/_authenticated/documents/'
-    | '/_authenticated/legacy-carts/'
     | '/_authenticated/nav-options/'
     | '/_authenticated/order-desk/'
     | '/_authenticated/orders/'
@@ -437,10 +424,10 @@ export interface FileRouteTypes {
     | '/_authenticated/proposals/'
     | '/_authenticated/settings/'
     | '/_authenticated/shipping/'
-    | '/_authenticated/storefront/'
     | '/_authenticated/tasks/'
     | '/_authenticated/users/'
     | '/_authenticated/variable-products/'
+    | '/_authenticated/website/'
     | '/_authenticated/catalog/specs/'
     | '/_authenticated/customers/$customerId/'
     | '/_authenticated/documents/$templateId/'
@@ -480,6 +467,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/website/': {
+      id: '/_authenticated/website/'
+      path: '/website'
+      fullPath: '/website/'
+      preLoaderRoute: typeof AuthenticatedWebsiteIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/variable-products/': {
       id: '/_authenticated/variable-products/'
       path: '/variable-products'
@@ -499,13 +493,6 @@ declare module '@tanstack/react-router' {
       path: '/tasks'
       fullPath: '/tasks/'
       preLoaderRoute: typeof AuthenticatedTasksIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/storefront/': {
-      id: '/_authenticated/storefront/'
-      path: '/storefront'
-      fullPath: '/storefront/'
-      preLoaderRoute: typeof AuthenticatedStorefrontIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/shipping/': {
@@ -569,13 +556,6 @@ declare module '@tanstack/react-router' {
       path: '/nav-options'
       fullPath: '/nav-options/'
       preLoaderRoute: typeof AuthenticatedNavOptionsIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/legacy-carts/': {
-      id: '/_authenticated/legacy-carts/'
-      path: '/legacy-carts'
-      fullPath: '/legacy-carts/'
-      preLoaderRoute: typeof AuthenticatedLegacyCartsIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/documents/': {
@@ -721,7 +701,6 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedCustomersIndexRoute: typeof AuthenticatedCustomersIndexRoute
   AuthenticatedDevIndexRoute: typeof AuthenticatedDevIndexRoute
   AuthenticatedDocumentsIndexRoute: typeof AuthenticatedDocumentsIndexRoute
-  AuthenticatedLegacyCartsIndexRoute: typeof AuthenticatedLegacyCartsIndexRoute
   AuthenticatedNavOptionsIndexRoute: typeof AuthenticatedNavOptionsIndexRoute
   AuthenticatedOrderDeskIndexRoute: typeof AuthenticatedOrderDeskIndexRoute
   AuthenticatedOrdersIndexRoute: typeof AuthenticatedOrdersIndexRoute
@@ -731,10 +710,10 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedProposalsIndexRoute: typeof AuthenticatedProposalsIndexRoute
   AuthenticatedSettingsIndexRoute: typeof AuthenticatedSettingsIndexRoute
   AuthenticatedShippingIndexRoute: typeof AuthenticatedShippingIndexRoute
-  AuthenticatedStorefrontIndexRoute: typeof AuthenticatedStorefrontIndexRoute
   AuthenticatedTasksIndexRoute: typeof AuthenticatedTasksIndexRoute
   AuthenticatedUsersIndexRoute: typeof AuthenticatedUsersIndexRoute
   AuthenticatedVariableProductsIndexRoute: typeof AuthenticatedVariableProductsIndexRoute
+  AuthenticatedWebsiteIndexRoute: typeof AuthenticatedWebsiteIndexRoute
   AuthenticatedCatalogSpecsIndexRoute: typeof AuthenticatedCatalogSpecsIndexRoute
   AuthenticatedCustomersCustomerIdIndexRoute: typeof AuthenticatedCustomersCustomerIdIndexRoute
   AuthenticatedDocumentsTemplateIdIndexRoute: typeof AuthenticatedDocumentsTemplateIdIndexRoute
@@ -755,7 +734,6 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedCustomersIndexRoute: AuthenticatedCustomersIndexRoute,
   AuthenticatedDevIndexRoute: AuthenticatedDevIndexRoute,
   AuthenticatedDocumentsIndexRoute: AuthenticatedDocumentsIndexRoute,
-  AuthenticatedLegacyCartsIndexRoute: AuthenticatedLegacyCartsIndexRoute,
   AuthenticatedNavOptionsIndexRoute: AuthenticatedNavOptionsIndexRoute,
   AuthenticatedOrderDeskIndexRoute: AuthenticatedOrderDeskIndexRoute,
   AuthenticatedOrdersIndexRoute: AuthenticatedOrdersIndexRoute,
@@ -765,11 +743,11 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedProposalsIndexRoute: AuthenticatedProposalsIndexRoute,
   AuthenticatedSettingsIndexRoute: AuthenticatedSettingsIndexRoute,
   AuthenticatedShippingIndexRoute: AuthenticatedShippingIndexRoute,
-  AuthenticatedStorefrontIndexRoute: AuthenticatedStorefrontIndexRoute,
   AuthenticatedTasksIndexRoute: AuthenticatedTasksIndexRoute,
   AuthenticatedUsersIndexRoute: AuthenticatedUsersIndexRoute,
   AuthenticatedVariableProductsIndexRoute:
     AuthenticatedVariableProductsIndexRoute,
+  AuthenticatedWebsiteIndexRoute: AuthenticatedWebsiteIndexRoute,
   AuthenticatedCatalogSpecsIndexRoute: AuthenticatedCatalogSpecsIndexRoute,
   AuthenticatedCustomersCustomerIdIndexRoute:
     AuthenticatedCustomersCustomerIdIndexRoute,

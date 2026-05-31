@@ -282,7 +282,7 @@ export const CatalogSection = ({ projectId }: CatalogSectionProps) => {
   ])
 
   const createTablesMutation = useMutation({
-    mutationFn: (force = false) => projectService.createEcTables(projectId, force),
+    mutationFn: (force: boolean) => projectService.createEcTables(projectId, force),
     meta: { successMessage: 'EC tables created successfully' },
   })
 

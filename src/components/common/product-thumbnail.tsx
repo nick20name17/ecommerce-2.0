@@ -1,5 +1,4 @@
 import { useQuery } from '@tanstack/react-query'
-import { Package } from 'lucide-react'
 
 import { getCatalogImagesQuery } from '@/api/catalog-image/query'
 import { cn } from '@/lib/utils'
