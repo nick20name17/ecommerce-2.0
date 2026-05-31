@@ -7,6 +7,7 @@ import {
   CheckCircle2,
   ClipboardList,
   Crosshair,
+  FileSpreadsheet,
   FlaskConical,
   FolderTree,
   Home,
@@ -46,3 +47,4 @@ export const ICatalog: IC = ({ className }) => <FolderTree className={className}
 export const IVariableProducts: IC = ({ className }) => <Layers className={className} />
 export const ILegacyCarts: IC = ({ className }) => <ShoppingCart className={className} />
 export const IStorefront: IC = ({ className }) => <LayoutTemplate className={className} />
+export const IDocuments: IC = ({ className }) => <FileSpreadsheet className={className} />

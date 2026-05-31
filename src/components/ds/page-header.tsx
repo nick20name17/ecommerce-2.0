@@ -39,4 +39,5 @@ export const PAGE_COLORS = {
   variableProducts: 'bg-purple-500',
   legacyCarts: 'bg-yellow-500',
   storefront: 'bg-fuchsia-500',
+  documents: 'bg-indigo-500',
 } as const
