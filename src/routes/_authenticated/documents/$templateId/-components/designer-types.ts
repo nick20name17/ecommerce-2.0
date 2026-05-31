@@ -91,3 +91,53 @@ export function newId(): string {
   }
   return `el_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 9)}`
 }
+
+/**
+ * Resolve a dotted field key against an entity dict.
+ *
+ * Mirrors the backend's `_resolve_field`:
+ * - Drops an `ARINV.` / `ARCUST.` / `ARQT.` etc. prefix (uppercase head)
+ * - Splits the remainder on dots; integer parts index into arrays
+ * - Looks up case-insensitively (EBMS columns are uppercase upstream but
+ *   serializers lowercase them)
+ *
+ * Returns an empty string for misses.
+ */
+export function resolveField(
+  fieldKey: string | undefined | null,
+  entity: unknown
+): string {
+  if (!fieldKey) return ''
+  let key = fieldKey.trim()
+  if (!key) return ''
+
+  const dot = key.indexOf('.')
+  if (dot >= 0) {
+    const head = key.slice(0, dot)
+    // Drop EBMS table prefixes like ARINV / ARCUST / ARQT
+    if (/^[A-Z][A-Z0-9_]*$/.test(head)) {
+      key = key.slice(dot + 1)
+    }
+  }
+
+  const parts = key.split('.')
+  let cur: unknown = entity
+  for (const p of parts) {
+    if (cur == null) return ''
+    if (Array.isArray(cur)) {
+      const idx = Number(p)
+      if (!Number.isInteger(idx) || idx < 0 || idx >= cur.length) return ''
+      cur = cur[idx]
+      continue
+    }
+    if (typeof cur === 'object') {
+      const rec = cur as Record<string, unknown>
+      cur = p in rec ? rec[p] : rec[p.toLowerCase()]
+      continue
+    }
+    return ''
+  }
+  if (cur == null) return ''
+  if (typeof cur === 'object') return JSON.stringify(cur)
+  return String(cur)
+}

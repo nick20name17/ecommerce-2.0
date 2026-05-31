@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { createFileRoute, redirect, useNavigate } from '@tanstack/react-router'
-import { ArrowLeft, Eye, Save, Trash2 } from 'lucide-react'
-import { useEffect, useMemo, useState } from 'react'
+import { ArrowLeft, Eye, FlaskConical, Save, Search, Trash2, X } from 'lucide-react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
 import {
@@ -10,16 +10,25 @@ import {
 } from '@/api/document-template/query'
 import type {
   DocumentLayout,
+  EntityType,
   UpdateDocumentTemplatePayload,
 } from '@/api/document-template/schema'
 import { documentTemplateService } from '@/api/document-template/service'
+import { getFieldConfigQuery } from '@/api/field-config/query'
+import { getOrderDetailQuery, getOrdersQuery } from '@/api/order/query'
 import { IDocuments, PAGE_COLORS, PageHeaderIcon } from '@/components/ds'
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover'
 import { SidebarTrigger } from '@/components/ui/sidebar'
 import { Skeleton } from '@/components/ui/skeleton'
 import { isAdmin } from '@/constants/user'
 import type { UserRole } from '@/constants/user'
 import { getSession } from '@/helpers/auth'
 import { useProjectId } from '@/hooks/use-project-id'
+import { cn } from '@/lib/utils'
 
 import { DesignerCanvas } from './-components/designer-canvas'
 import { ensureLayout } from './-components/designer-types'
@@ -37,6 +46,31 @@ function DocumentEditorPage() {
     ...getDocumentTemplateQuery(id, projectId),
     enabled: !!id && !!projectId,
   })
+
+  // Field schema for the bound entity — drives the Field picker datalist.
+  const { data: fieldConfig } = useQuery({
+    ...getFieldConfigQuery(projectId),
+    enabled: !!projectId,
+  })
+  const availableFields = useMemo(() => {
+    if (!template || !fieldConfig) return []
+    return fieldConfig[template.entity_type] ?? []
+  }, [template, fieldConfig])
+
+  // Test-entity preview state.
+  const [testEntityId, setTestEntityId] = useState<string | null>(null)
+  const { data: testOrder } = useQuery({
+    ...getOrderDetailQuery(testEntityId ?? '', projectId),
+    enabled:
+      !!testEntityId && !!projectId && template?.entity_type === 'order',
+  })
+  const entityData = useMemo<Record<string, unknown> | null>(() => {
+    if (!testEntityId) return null
+    if (template?.entity_type === 'order') {
+      return (testOrder as Record<string, unknown> | undefined) ?? null
+    }
+    return null
+  }, [testEntityId, template, testOrder])
 
   // Editable local copy
   const [name, setName] = useState('')
@@ -116,6 +150,20 @@ function DocumentEditorPage() {
         </span>
 
         <div className='flex-1' />
+
+        <TestEntityPicker
+          entityType={template.entity_type}
+          value={testEntityId}
+          valueLabel={
+            (entityData &&
+              ((entityData.invoice as string) ||
+                (entityData.name as string) ||
+                String(entityData.id ?? ''))) ||
+            null
+          }
+          onChange={setTestEntityId}
+          projectId={projectId}
+        />
 
         <button
           type='button'
@@ -226,6 +274,8 @@ function DocumentEditorPage() {
           pageSize={template.page_size}
           orientation={template.orientation}
           pageMargins={template.page_margins}
+          availableFields={availableFields}
+          entityData={entityData}
         />
       </div>
     </div>
@@ -290,6 +340,138 @@ function NotFound({ onBack }: { onBack: () => void }) {
         Back to Documents
       </button>
     </div>
+  )
+}
+
+// ── Test entity picker ──────────────────────────────────────
+
+function TestEntityPicker({
+  entityType,
+  value,
+  valueLabel,
+  onChange,
+  projectId,
+}: {
+  entityType: EntityType
+  value: string | null
+  valueLabel: string | null
+  onChange: (id: string | null) => void
+  projectId: number | null
+}) {
+  const [open, setOpen] = useState(false)
+  const [search, setSearch] = useState('')
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  // Order list — search debounced via the query key.
+  const { data: orders, isLoading } = useQuery({
+    ...getOrdersQuery({
+      project_id: projectId ?? undefined,
+      search: search || undefined,
+      limit: 25,
+    }),
+    enabled: open && entityType === 'order' && !!projectId,
+  })
+
+  useEffect(() => {
+    if (open) setTimeout(() => inputRef.current?.focus(), 30)
+  }, [open])
+
+  // Only order is wired for live preview today.
+  const supported = entityType === 'order'
+
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <button
+          type='button'
+          disabled={!supported}
+          title={
+            supported
+              ? 'Pick a real entity to preview field values'
+              : `Live preview for ${entityType} is not wired yet`
+          }
+          className={cn(
+            'inline-flex h-7 max-w-[200px] items-center gap-1.5 truncate rounded-[5px] border px-2.5 text-[12px] font-medium transition-colors duration-[80ms] disabled:pointer-events-none disabled:opacity-50',
+            value
+              ? 'border-primary/30 bg-primary/[0.06] text-primary hover:bg-primary/[0.1]'
+              : 'border-border bg-bg-secondary text-text-secondary hover:bg-bg-active hover:text-foreground'
+          )}
+        >
+          <FlaskConical className='size-3.5 shrink-0' />
+          <span className='hidden truncate lg:inline'>
+            {value ? valueLabel ?? value : 'Test data'}
+          </span>
+          {value && (
+            <button
+              type='button'
+              onClick={(e) => {
+                e.stopPropagation()
+                onChange(null)
+              }}
+              className='-mr-1 inline-flex size-4 shrink-0 items-center justify-center rounded-[3px] text-current opacity-70 hover:opacity-100'
+              title='Clear test data'
+            >
+              <X className='size-3' />
+            </button>
+          )}
+        </button>
+      </PopoverTrigger>
+      <PopoverContent align='end' className='w-[300px] p-0'>
+        <div className='flex items-center gap-2 border-b border-border px-2.5 py-1.5'>
+          <Search className='size-3.5 text-text-tertiary' />
+          <input
+            ref={inputRef}
+            type='text'
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder={
+              entityType === 'order'
+                ? 'Search by invoice # or customer…'
+                : 'Search…'
+            }
+            className='h-7 w-full bg-transparent text-[13px] outline-none placeholder:text-text-tertiary'
+          />
+        </div>
+        <div className='max-h-[300px] overflow-y-auto py-1'>
+          {!supported ? (
+            <div className='px-3 py-4 text-[12px] text-text-tertiary'>
+              Live preview for {entityType} entities is not wired yet.
+            </div>
+          ) : isLoading ? (
+            <div className='px-3 py-4 text-[12px] text-text-tertiary'>
+              Loading…
+            </div>
+          ) : !orders?.results?.length ? (
+            <div className='px-3 py-4 text-[12px] text-text-tertiary'>
+              No matches
+            </div>
+          ) : (
+            orders.results.map((o) => (
+              <button
+                key={o.autoid}
+                type='button'
+                onClick={() => {
+                  onChange(o.autoid)
+                  setOpen(false)
+                }}
+                className={cn(
+                  'flex w-full flex-col items-start gap-0.5 px-3 py-1.5 text-left transition-colors hover:bg-bg-hover',
+                  value === o.autoid && 'bg-primary/[0.06]'
+                )}
+              >
+                <span className='text-[12.5px] font-medium text-foreground'>
+                  {o.invoice || o.autoid}
+                </span>
+                <span className='truncate text-[11px] text-text-tertiary'>
+                  {o.name}
+                  {o.status && ` · ${o.status}`}
+                </span>
+              </button>
+            ))
+          )}
+        </div>
+      </PopoverContent>
+    </Popover>
   )
 }
 

@@ -13,6 +13,7 @@ import {
 } from 'lucide-react'
 import { useCallback, useState } from 'react'
 
+import type { FieldConfigEntry } from '@/api/field-config/schema'
 import type {
   DocumentLayout,
   ElementType,
@@ -27,6 +28,7 @@ import {
   ensureLayout,
   newId,
   pageDims,
+  resolveField,
   snapInches,
 } from './designer-types'
 
@@ -36,6 +38,17 @@ interface DesignerCanvasProps {
   pageSize: string
   orientation: 'portrait' | 'landscape'
   pageMargins?: { top?: number; right?: number; bottom?: number; left?: number }
+  /**
+   * Field schema for the entity this template binds to — drives the field
+   * picker in the properties panel. Empty/undefined falls back to a free
+   * text input.
+   */
+  availableFields?: FieldConfigEntry[]
+  /**
+   * Resolved entity data to preview Field elements against. When set, Field
+   * elements render the resolved value instead of the `{field.key}` token.
+   */
+  entityData?: Record<string, unknown> | null
 }
 
 // ── Palette tools ───────────────────────────────────────────
@@ -57,6 +70,8 @@ export function DesignerCanvas({
   pageSize,
   orientation,
   pageMargins,
+  availableFields,
+  entityData,
 }: DesignerCanvasProps) {
   const normalized = ensureLayout(layout)
   const dims = pageDims(pageSize, orientation)
@@ -217,18 +232,28 @@ export function DesignerCanvas({
             </div>
           )}
 
-          {elements.map((el) => (
-            <CanvasElement
-              key={el.id}
-              element={el}
-              isSelected={selectedId === el.id}
-              onSelect={() => setSelectedId(el.id)}
-              onChange={replaceElement}
-              onDelete={() => deleteElement(el.id)}
-              pageW={dims.w}
-              pageH={dims.h}
-            />
-          ))}
+          {elements.map((el) => {
+            const resolved =
+              el.type === 'field' && entityData
+                ? resolveField(
+                    (el.props?.fieldKey as string | undefined) ?? '',
+                    entityData
+                  )
+                : undefined
+            return (
+              <CanvasElement
+                key={el.id}
+                element={el}
+                isSelected={selectedId === el.id}
+                onSelect={() => setSelectedId(el.id)}
+                onChange={replaceElement}
+                onDelete={() => deleteElement(el.id)}
+                pageW={dims.w}
+                pageH={dims.h}
+                resolvedValue={resolved}
+              />
+            )
+          })}
         </div>
       </div>
 
@@ -240,6 +265,8 @@ export function DesignerCanvas({
             onPatch={(patch) => updateElement(selected.id, patch)}
             onDelete={() => deleteElement(selected.id)}
             pageDims={dims}
+            availableFields={availableFields}
+            entityData={entityData}
           />
         ) : (
           <div className='px-4 py-6 text-[12px] leading-snug text-text-tertiary'>
@@ -259,11 +286,15 @@ function PropertiesPanel({
   onPatch,
   onDelete,
   pageDims,
+  availableFields,
+  entityData,
 }: {
   element: LayoutElement
   onPatch: (patch: Partial<LayoutElement>) => void
   onDelete: () => void
   pageDims: { w: number; h: number }
+  availableFields?: FieldConfigEntry[]
+  entityData?: Record<string, unknown> | null
 }) {
   const patchProps = (kv: Record<string, unknown>) =>
     onPatch({ props: { ...(element.props ?? {}), ...kv } })
@@ -332,7 +363,12 @@ function PropertiesPanel({
         <TextProps element={element} patchProps={patchProps} />
       )}
       {element.type === 'field' && (
-        <FieldProps element={element} patchProps={patchProps} />
+        <FieldProps
+          element={element}
+          patchProps={patchProps}
+          availableFields={availableFields}
+          entityData={entityData}
+        />
       )}
       {element.type === 'image' && (
         <ImageProps element={element} patchProps={patchProps} />
@@ -413,25 +449,68 @@ function TextProps({
 function FieldProps({
   element,
   patchProps,
+  availableFields,
+  entityData,
 }: {
   element: LayoutElement
   patchProps: (kv: Record<string, unknown>) => void
+  availableFields?: FieldConfigEntry[]
+  entityData?: Record<string, unknown> | null
 }) {
   const p = element.props ?? {}
+  const fieldKey = (p.fieldKey as string) ?? ''
+  const enabledFields = (availableFields ?? []).filter(
+    (f) => f.default || f.enabled
+  )
+  const listId = `field-picker-${element.id}`
+  const matched = enabledFields.find((f) => f.field === fieldKey.toLowerCase())
+  const resolved =
+    fieldKey && entityData ? resolveField(fieldKey, entityData) : null
+
   return (
     <Section title='Field binding'>
       <p className='text-[11px] leading-snug text-text-tertiary'>
-        Bound field placeholder — typed binding lands once the field schema
-        endpoint is wired. For now, use any EBMS column key
+        Pick from configured fields, or type any EBMS column key
         (e.g. <code>ARINV.INVOICE</code>).
       </p>
       <input
         type='text'
-        value={(p.fieldKey as string) ?? ''}
+        list={enabledFields.length > 0 ? listId : undefined}
+        value={fieldKey}
         onChange={(e) => patchProps({ fieldKey: e.target.value })}
         placeholder='ARINV.INVOICE'
         className='h-8 w-full rounded-[5px] border border-border bg-background px-2 font-mono text-[12px] outline-none focus:border-primary focus:ring-2 focus:ring-primary/20'
+        autoComplete='off'
       />
+      {enabledFields.length > 0 && (
+        <datalist id={listId}>
+          {enabledFields.map((f) => (
+            <option
+              key={f.field}
+              value={f.field}
+              label={f.alias || f.field}
+            />
+          ))}
+        </datalist>
+      )}
+      {matched && matched.alias && (
+        <span className='text-[11px] text-text-tertiary'>
+          {matched.alias}
+          {matched.type ? ` · ${matched.type}` : ''}
+        </span>
+      )}
+      {resolved !== null && (
+        <div className='flex flex-col gap-1 rounded-[5px] border border-border bg-background px-2 py-1.5'>
+          <span className='text-[10px] font-medium uppercase tracking-wider text-text-tertiary'>
+            Preview
+          </span>
+          <span className='break-words font-mono text-[11.5px] text-foreground'>
+            {resolved || (
+              <span className='italic text-text-tertiary'>(empty)</span>
+            )}
+          </span>
+        </div>
+      )}
       <Grid2>
         <NumberInput
           label='Size'
