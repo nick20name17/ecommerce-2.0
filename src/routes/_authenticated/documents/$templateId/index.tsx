@@ -1,14 +1,20 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { createFileRoute, redirect, useNavigate } from '@tanstack/react-router'
-import { ArrowLeft, Eye, FlaskConical, Redo2, Save, Search, Trash2, Undo2, X } from 'lucide-react'
+import { ArrowLeft, Eye, FlaskConical, Redo2, Save, Search, Sparkles, Trash2, Undo2, X } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
+import {
+  DOCUMENT_TEMPLATE_PRESETS,
+  type DocumentTemplatePreset,
+  materializePresetLayout,
+} from '@/api/document-template/presets'
 import {
   DOCUMENT_TEMPLATE_QUERY_KEYS,
   getDocumentTemplateQuery,
 } from '@/api/document-template/query'
 import type {
+  AccessibleRouteKey,
   DocumentLayout,
   EntityType,
   UpdateDocumentTemplatePayload,
@@ -19,6 +25,14 @@ import { getFieldConfigQuery } from '@/api/field-config/query'
 import { getOrderDetailQuery, getOrdersQuery } from '@/api/order/query'
 import { getProposalDetailQuery, getProposalsQuery } from '@/api/proposal/query'
 import { IDocuments, PAGE_COLORS, PageHeaderIcon } from '@/components/ds'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import {
   Popover,
   PopoverContent,
@@ -195,6 +209,32 @@ function DocumentEditorPage() {
     })
   }, [layout])
 
+  /**
+   * Replace this template's layout + page setup with a preset's. Undo'able,
+   * so the user can revert if they didn't mean it.
+   */
+  const applyPreset = useCallback(
+    (preset: DocumentTemplatePreset) => {
+      if (
+        !confirm(
+          `Replace this template's layout with "${preset.label}"? You can undo with ⌘Z.`
+        )
+      ) {
+        return
+      }
+      const fresh = materializePresetLayout(preset)
+      setLayout(fresh)
+      setPageSize(preset.page_size)
+      setOrientation(preset.orientation)
+      if (preset.page_margins) setPageMargins(preset.page_margins)
+      setAccessibleFrom(
+        preset.defaultAccessibleFrom as AccessibleRouteKey[]
+      )
+      toast.success(`Applied "${preset.label}"`)
+    },
+    [setLayout]
+  )
+
   // Keyboard shortcuts — Cmd/Ctrl+Z = undo, Cmd/Ctrl+Shift+Z (or Ctrl+Y) = redo.
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -331,6 +371,48 @@ function DocumentEditorPage() {
             <Redo2 className='size-3.5' />
           </button>
         </div>
+
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button
+              type='button'
+              title='Apply a preset (replaces current layout)'
+              className='inline-flex size-7 items-center justify-center rounded-[5px] border border-border bg-bg-secondary text-text-secondary transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground lg:h-7 lg:w-auto lg:gap-1.5 lg:px-2.5'
+            >
+              <Sparkles className='size-3.5 text-indigo-500' />
+              <span className='hidden lg:inline'>Apply preset</span>
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align='end' className='w-72'>
+            <DropdownMenuLabel className='text-[11px] uppercase tracking-wider text-text-tertiary'>
+              Replace current layout
+            </DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            {DOCUMENT_TEMPLATE_PRESETS.filter(
+              (p) =>
+                p.key !== 'blank' && p.entity_type === template.entity_type
+            ).map((p) => (
+              <DropdownMenuItem
+                key={p.key}
+                onSelect={() => applyPreset(p)}
+                className='flex flex-col items-start gap-0.5'
+              >
+                <span className='text-[13px] font-medium'>{p.label}</span>
+                <span className='text-[11px] text-text-tertiary'>
+                  {p.description}
+                </span>
+              </DropdownMenuItem>
+            ))}
+            {DOCUMENT_TEMPLATE_PRESETS.filter(
+              (p) =>
+                p.key !== 'blank' && p.entity_type === template.entity_type
+            ).length === 0 && (
+              <div className='px-3 py-2 text-[11.5px] italic text-text-tertiary'>
+                No presets for {template.entity_type} entities yet.
+              </div>
+            )}
+          </DropdownMenuContent>
+        </DropdownMenu>
 
         <button
           type='button'
