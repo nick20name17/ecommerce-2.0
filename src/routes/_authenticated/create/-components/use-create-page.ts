@@ -116,11 +116,23 @@ export function useCreatePage() {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   const [projectId] = useProjectId()
-  const [savedCustomerId, setSavedCustomerId] = useSelectedCustomerId()
+  const [savedCustomerId, setSavedCustomerId] = useSelectedCustomerId(projectId)
 
   const [customer, setCustomer] = useState<Customer | null>(null)
   const [billTo, setBillTo] = useState<AddressFields>(emptyAddress)
   const [shipTo, setShipTo] = useState<AddressFields>(emptyAddress)
+
+  // When the superadmin switches projects, drop the in-memory customer
+  // context — savedCustomerId is already per-project and the restore effect
+  // below will re-hydrate from the new project's saved selection (if any)
+  // as soon as customerDetail resolves. Without this, the stale customer ID
+  // from the previous project gets re-queried against the new project and
+  // 404s.
+  useEffect(() => {
+    setCustomer(null)
+    setBillTo(emptyAddress)
+    setShipTo(emptyAddress)
+  }, [projectId])
   const [catalogOpen, setCatalogOpen] = useState(false)
   const [addingProductAutoid] = useState<string | null>(null)
   const [updatingQuantityItemId, setUpdatingQuantityItemId] = useState<number | null>(null)
