@@ -84,4 +84,35 @@ export const documentTemplateService = {
     )
     return data
   },
+
+  /**
+   * Upload an image (logo or otherwise) scoped to this template. Backend
+   * stores it in S3 and returns a long-lived presigned URL the frontend can
+   * drop straight into an Image element's `src` prop.
+   */
+  uploadImage: async (
+    id: number,
+    file: File,
+    projectId?: number | null
+  ): Promise<{
+    url: string
+    s3_key: string
+    file_name: string
+    file_size: number
+    content_type: string
+  }> => {
+    const formData = new FormData()
+    formData.append('file', file)
+    const { data } = await api.post<{
+      url: string
+      s3_key: string
+      file_name: string
+      file_size: number
+      content_type: string
+    }>(`/data/document-templates/${id}/upload-image/`, formData, {
+      params: params(projectId),
+      headers: { 'Content-Type': 'multipart/form-data' },
+    })
+    return data
+  },
 }
