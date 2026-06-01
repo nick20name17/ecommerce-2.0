@@ -93,6 +93,15 @@ function DocumentEditorPage() {
   const [description, setDescription] = useState('')
   const [isActive, setIsActive] = useState(true)
   const [layout, setLayoutRaw] = useState<DocumentLayout>({ pages: [{ elements: [] }] })
+  const [pageSize, setPageSize] = useState<'letter' | 'a4' | 'label_4x6'>('letter')
+  const [orientation, setOrientation] = useState<'portrait' | 'landscape'>('portrait')
+  const [pageMargins, setPageMargins] = useState<{
+    top?: number
+    right?: number
+    bottom?: number
+    left?: number
+  }>({})
+  const [accessibleFrom, setAccessibleFrom] = useState<string[]>([])
 
   // ── Undo / redo history ──────────────────────────────────
   // Coalesces rapid layout changes (a drag fires ~30 setLayouts; with the
@@ -120,6 +129,10 @@ function DocumentEditorPage() {
       setName(template.name)
       setDescription(template.description)
       setIsActive(template.is_active)
+      setPageSize(template.page_size)
+      setOrientation(template.orientation)
+      setPageMargins(template.page_margins ?? {})
+      setAccessibleFrom(template.accessible_from ?? [])
       const initial = ensureLayout(template.layout)
       setLayoutRaw(initial)
       lastCommitRef.current = initial
@@ -216,9 +229,25 @@ function DocumentEditorPage() {
       name !== template.name ||
       description !== template.description ||
       isActive !== template.is_active ||
+      pageSize !== template.page_size ||
+      orientation !== template.orientation ||
+      JSON.stringify(pageMargins) !==
+        JSON.stringify(template.page_margins ?? {}) ||
+      JSON.stringify(accessibleFrom) !==
+        JSON.stringify(template.accessible_from ?? []) ||
       JSON.stringify(layout) !== JSON.stringify(ensureLayout(template.layout))
     )
-  }, [template, name, description, isActive, layout])
+  }, [
+    template,
+    name,
+    description,
+    isActive,
+    pageSize,
+    orientation,
+    pageMargins,
+    accessibleFrom,
+    layout,
+  ])
 
   const saveMutation = useMutation({
     mutationFn: (payload: UpdateDocumentTemplatePayload) =>
@@ -319,6 +348,11 @@ function DocumentEditorPage() {
               name: name.trim(),
               description: description.trim(),
               is_active: isActive,
+              page_size: pageSize,
+              orientation,
+              page_margins: pageMargins,
+              accessible_from:
+                accessibleFrom as UpdateDocumentTemplatePayload['accessible_from'],
               layout,
             })
           }
@@ -370,26 +404,97 @@ function DocumentEditorPage() {
             </div>
           </PropField>
           <PropField label='Page size'>
-            <div className='text-[12.5px] text-text-tertiary'>
-              {template.page_size} · {template.orientation}
+            <select
+              value={pageSize}
+              onChange={(e) =>
+                setPageSize(e.target.value as typeof pageSize)
+              }
+              className='h-8 w-full rounded-[5px] border border-border bg-background px-2 text-[12.5px] outline-none focus:border-primary focus:ring-2 focus:ring-primary/20'
+            >
+              <option value='letter'>Letter (8.5×11 in)</option>
+              <option value='a4'>A4 (210×297 mm)</option>
+              <option value='label_4x6'>Shipping Label (4×6 in)</option>
+            </select>
+          </PropField>
+
+          <PropField label='Orientation'>
+            <div className='flex overflow-hidden rounded-[5px] border border-border bg-bg-secondary'>
+              {(['portrait', 'landscape'] as const).map((o) => (
+                <button
+                  key={o}
+                  type='button'
+                  onClick={() => setOrientation(o)}
+                  className={cn(
+                    'h-7 flex-1 text-[11.5px] font-medium capitalize transition-colors duration-[80ms]',
+                    orientation === o
+                      ? 'bg-primary text-primary-foreground'
+                      : 'text-text-secondary hover:bg-bg-active hover:text-foreground'
+                  )}
+                >
+                  {o}
+                </button>
+              ))}
             </div>
           </PropField>
+
+          <PropField label='Margins (in)'>
+            <div className='grid grid-cols-2 gap-1.5'>
+              {(['top', 'right', 'bottom', 'left'] as const).map((side) => (
+                <label
+                  key={side}
+                  className='flex flex-col gap-0.5 text-[10px] font-medium uppercase tracking-wider text-text-tertiary'
+                >
+                  {side}
+                  <input
+                    type='number'
+                    step={0.125}
+                    min={0}
+                    max={4}
+                    value={pageMargins[side] ?? 0}
+                    onChange={(e) => {
+                      const v = Number(e.target.value)
+                      setPageMargins({
+                        ...pageMargins,
+                        [side]: Number.isFinite(v) && v >= 0 ? v : 0,
+                      })
+                    }}
+                    className='h-7 w-full rounded-[4px] border border-border bg-background px-1.5 text-[11.5px] outline-none focus:border-primary focus:ring-1 focus:ring-primary/20'
+                  />
+                </label>
+              ))}
+            </div>
+          </PropField>
+
           <PropField label='Print from'>
-            <div className='flex flex-wrap gap-1'>
-              {template.accessible_from.length === 0 ? (
-                <span className='text-[12px] italic text-text-tertiary'>
-                  Not yet exposed
-                </span>
-              ) : (
-                template.accessible_from.map((r) => (
-                  <span
-                    key={r}
-                    className='inline-flex items-center rounded-full bg-bg-active px-2 py-0.5 text-[10.5px] font-medium text-text-secondary'
+            <div className='flex flex-col gap-1'>
+              {accessibleFromOptions(template.entity_type).map((opt) => {
+                const checked = accessibleFrom.includes(opt.value)
+                return (
+                  <label
+                    key={opt.value}
+                    className={cn(
+                      'flex cursor-pointer items-center gap-2 rounded-[5px] border px-2 py-1 text-[12px] transition-colors',
+                      checked
+                        ? 'border-primary bg-primary/[0.06]'
+                        : 'border-border bg-bg-secondary hover:bg-bg-active'
+                    )}
                   >
-                    {r}
-                  </span>
-                ))
-              )}
+                    <input
+                      type='checkbox'
+                      checked={checked}
+                      onChange={() => {
+                        setAccessibleFrom((prev) =>
+                          prev.includes(opt.value)
+                            ? prev.filter((v) => v !== opt.value)
+                            : [...prev, opt.value]
+                        )
+                      }}
+                      className='size-3 accent-primary'
+                    />
+                    <span>{opt.label}</span>
+                  </label>
+                )
+              })}
             </div>
           </PropField>
           <PropField label='Status'>
@@ -409,9 +514,9 @@ function DocumentEditorPage() {
         <DesignerCanvas
           layout={layout}
           onChange={setLayout}
-          pageSize={template.page_size}
-          orientation={template.orientation}
-          pageMargins={template.page_margins}
+          pageSize={pageSize}
+          orientation={orientation}
+          pageMargins={pageMargins}
           availableFields={availableFields}
           entityData={entityData}
           templateId={template.id}
@@ -481,6 +586,29 @@ function NotFound({ onBack }: { onBack: () => void }) {
       </button>
     </div>
   )
+}
+
+// ── Helpers ────────────────────────────────────────────────
+
+function accessibleFromOptions(
+  entityType: EntityType
+): { value: string; label: string }[] {
+  if (entityType === 'order') {
+    return [
+      { value: 'order_detail', label: 'Order detail page' },
+      { value: 'order_list', label: 'Orders list page' },
+    ]
+  }
+  if (entityType === 'proposal') {
+    return [
+      { value: 'proposal_detail', label: 'Proposal detail page' },
+      { value: 'proposal_list', label: 'Proposals list page' },
+    ]
+  }
+  return [
+    { value: 'customer_detail', label: 'Customer detail page' },
+    { value: 'customer_list', label: 'Customers list page' },
+  ]
 }
 
 // ── Test entity picker ──────────────────────────────────────

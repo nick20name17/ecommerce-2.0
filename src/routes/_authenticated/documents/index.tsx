@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Link, createFileRoute, redirect, useNavigate } from '@tanstack/react-router'
-import { FileText, Layers, Package, Plus, Trash2, UserSquare } from 'lucide-react'
+import { Copy, FileText, Layers, Package, Plus, Trash2, UserSquare } from 'lucide-react'
 import { toast } from 'sonner'
 
 import {
@@ -54,6 +54,36 @@ function DocumentsPage() {
     onError: () => toast.error('Failed to delete template'),
   })
 
+  const duplicateMutation = useMutation({
+    mutationFn: (source: DocumentTemplate) =>
+      documentTemplateService.create(
+        {
+          name: `Copy of ${source.name}`.slice(0, 120),
+          description: source.description,
+          entity_type: source.entity_type,
+          accessible_from: source.accessible_from,
+          page_size: source.page_size,
+          orientation: source.orientation,
+          page_margins: source.page_margins,
+          logo_url: source.logo_url,
+          layout: source.layout,
+          is_active: source.is_active,
+        },
+        projectId
+      ),
+    onSuccess: (created) => {
+      queryClient.invalidateQueries({
+        queryKey: DOCUMENT_TEMPLATE_QUERY_KEYS.lists(),
+      })
+      toast.success('Template duplicated')
+      navigate({
+        to: '/documents/$templateId',
+        params: { templateId: String(created.id) },
+      })
+    },
+    onError: () => toast.error('Failed to duplicate template'),
+  })
+
   if (!projectId) {
     return <ProjectEmptyState />
   }
@@ -88,6 +118,7 @@ function DocumentsPage() {
               <TemplateRow
                 key={t.id}
                 template={t}
+                onDuplicate={() => duplicateMutation.mutate(t)}
                 onDelete={() => {
                   if (
                     confirm(
@@ -110,9 +141,11 @@ function DocumentsPage() {
 
 function TemplateRow({
   template,
+  onDuplicate,
   onDelete,
 }: {
   template: DocumentTemplate
+  onDuplicate: () => void
   onDelete: () => void
 }) {
   const meta = ENTITY_META[template.entity_type]
@@ -156,6 +189,15 @@ function TemplateRow({
         </div>
       </Link>
 
+      <button
+        type='button'
+        onClick={onDuplicate}
+        className='inline-flex size-7 shrink-0 items-center justify-center rounded-[5px] text-text-tertiary opacity-0 transition-all duration-[80ms] hover:bg-bg-hover hover:text-foreground group-hover:opacity-100'
+        aria-label='Duplicate template'
+        title='Duplicate'
+      >
+        <Copy className='size-3.5' />
+      </button>
       <button
         type='button'
         onClick={onDelete}
