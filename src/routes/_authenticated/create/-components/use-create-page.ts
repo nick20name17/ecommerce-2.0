@@ -145,8 +145,14 @@ export function useCreatePage() {
     open: false
   })
 
-  // Fetch full customer detail whenever we have a customer ID
-  const customerId = customer?.id ?? savedCustomerId ?? ''
+  // Fetch full customer detail whenever we have a customer ID.
+  // The in-state customer is treated as stale (and skipped) if its id no
+  // longer matches the per-project savedCustomerId — which happens on the
+  // first render after a project switch, before the reset effect above has
+  // had a chance to clear it. Without this guard, the previous project's
+  // customer id slips through into one query and 404s.
+  const customerStateIsStale = customer != null && customer.id !== savedCustomerId
+  const customerId = customerStateIsStale ? '' : (customer?.id ?? savedCustomerId ?? '')
   const { data: customerDetail, isLoading: customerLoading } = useQuery({
     ...getCustomerDetailQuery(customerId, projectId),
     enabled: !!customerId
@@ -164,12 +170,13 @@ export function useCreatePage() {
     }
   }, [customerDetail, customer, savedCustomerId])
 
+  const cartCustomerId = customerStateIsStale ? '' : (customer?.id ?? '')
   const {
     data: cart,
     isLoading: cartLoading,
     fetchStatus: cartFetchStatus
   } = useQuery({
-    ...getCartQuery(customer?.id ?? '', projectId)
+    ...getCartQuery(cartCustomerId, projectId)
   })
   // isLoading is true for disabled queries (pending + idle). Only treat as loading when actually fetching.
   const cartActuallyLoading = cartLoading && cartFetchStatus === 'fetching'
