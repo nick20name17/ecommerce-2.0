@@ -546,26 +546,33 @@ export function DesignerCanvas({
       </div>
       </div>
 
-      {/* Properties panel */}
-      <aside className='hidden w-[260px] shrink-0 flex-col overflow-y-auto border-l border-border bg-bg-secondary/40 md:flex'>
-        {selected ? (
-          <PropertiesPanel
-            element={selected}
-            onPatch={(patch) => updateElement(selected.id, patch)}
-            onDelete={() => deleteElement(selected.id)}
-            onMoveLayer={(dir) => moveLayer(selected.id, dir)}
-            pageDims={dims}
-            availableFields={availableFields}
-            entityData={entityData}
-            templateId={templateId}
-            projectId={projectId}
-          />
-        ) : (
-          <div className='px-4 py-6 text-[12px] leading-snug text-text-tertiary'>
-            Select an element to edit its properties, or drag a tool from the
-            palette to add a new one.
-          </div>
-        )}
+      {/* Layers + Properties panel */}
+      <aside className='hidden w-[260px] shrink-0 flex-col overflow-hidden border-l border-border bg-bg-secondary/40 md:flex'>
+        <LayersList
+          elements={elements}
+          selectedId={selectedId}
+          onSelect={setSelectedId}
+        />
+        <div className='min-h-0 flex-1 overflow-y-auto'>
+          {selected ? (
+            <PropertiesPanel
+              element={selected}
+              onPatch={(patch) => updateElement(selected.id, patch)}
+              onDelete={() => deleteElement(selected.id)}
+              onMoveLayer={(dir) => moveLayer(selected.id, dir)}
+              pageDims={dims}
+              availableFields={availableFields}
+              entityData={entityData}
+              templateId={templateId}
+              projectId={projectId}
+            />
+          ) : (
+            <div className='px-4 py-6 text-[12px] leading-snug text-text-tertiary'>
+              Select an element to edit its properties, or drag a tool from
+              the palette to add a new one.
+            </div>
+          )}
+        </div>
       </aside>
     </div>
   )
@@ -1452,6 +1459,110 @@ function ToggleRow<T extends string>({
           </button>
         )
       })}
+    </div>
+  )
+}
+
+// ── Layers panel ────────────────────────────────────────────
+
+function LayersList({
+  elements,
+  selectedId,
+  onSelect,
+}: {
+  elements: LayoutElement[]
+  selectedId: string | null
+  onSelect: (id: string | null) => void
+}) {
+  // Render front-to-back so the visually top-most element appears first in
+  // the list (matches user mental model — "this is on top").
+  const ordered = [...elements].reverse()
+
+  const labelFor = (el: LayoutElement): string => {
+    const p = el.props ?? {}
+    if (el.type === 'text') {
+      const txt = String(p.text ?? '').trim()
+      return txt || 'Text'
+    }
+    if (el.type === 'field') {
+      const key = String(p.fieldKey ?? '').trim()
+      return key ? `{${key}}` : 'Field'
+    }
+    if (el.type === 'image') return 'Image'
+    if (el.type === 'table') {
+      const cols = (p.columns as { fieldKey?: string }[] | undefined) ?? []
+      return `Table (${cols.length} col${cols.length === 1 ? '' : 's'})`
+    }
+    if (el.type === 'line') return 'Line'
+    if (el.type === 'rect') return 'Rectangle'
+    return el.type
+  }
+
+  const iconFor = (el: LayoutElement) => {
+    switch (el.type) {
+      case 'text':
+        return <Type className='size-3' />
+      case 'field':
+        return <Square className='size-3' />
+      case 'image':
+        return <ImageIcon className='size-3' />
+      case 'table':
+        return <TableIcon className='size-3' />
+      case 'line':
+        return <Minus className='size-3' />
+      case 'rect':
+        return <Square className='size-3' />
+      default:
+        return <Square className='size-3' />
+    }
+  }
+
+  return (
+    <div className='shrink-0 border-b border-border'>
+      <div className='flex items-center justify-between gap-2 border-b border-border px-3 py-2'>
+        <span className='text-[10.5px] font-semibold uppercase tracking-wider text-text-tertiary'>
+          Layers
+        </span>
+        <span className='text-[10.5px] text-text-tertiary'>
+          {elements.length}
+        </span>
+      </div>
+      <div className='max-h-[40vh] overflow-y-auto py-1'>
+        {ordered.length === 0 ? (
+          <div className='px-3 py-3 text-[11.5px] italic text-text-tertiary'>
+            Empty page — drag a tool from the palette.
+          </div>
+        ) : (
+          ordered.map((el) => {
+            const isActive = selectedId === el.id
+            return (
+              <button
+                key={el.id}
+                type='button'
+                onClick={() => onSelect(el.id)}
+                className={cn(
+                  'flex w-full items-center gap-2 px-3 py-1.5 text-left text-[12px] transition-colors duration-[80ms]',
+                  isActive
+                    ? 'bg-primary/[0.08] text-foreground'
+                    : 'text-text-secondary hover:bg-bg-hover hover:text-foreground'
+                )}
+              >
+                <span
+                  className={cn(
+                    'inline-flex size-4 shrink-0 items-center justify-center rounded-[3px]',
+                    isActive
+                      ? 'text-primary'
+                      : 'text-text-tertiary'
+                  )}
+                >
+                  {iconFor(el)}
+                </span>
+                <span className='truncate'>{labelFor(el)}</span>
+              </button>
+            )
+          })
+        )}
+      </div>
     </div>
   )
 }
