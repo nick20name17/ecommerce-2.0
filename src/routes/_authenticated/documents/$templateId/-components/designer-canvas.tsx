@@ -260,13 +260,27 @@ export function DesignerCanvas({
           target.isContentEditable)
       if (inTextField) return
 
-      // Arrow-key nudge — no modifier required.
+      // Arrow-key nudge — no modifier required, but only when no other
+      // interactive element has focus (button/select/etc.). Otherwise we'd
+      // steal arrow navigation from those controls.
+      const focusedOnInteractive =
+        target &&
+        (target.tagName === 'BUTTON' ||
+          target.tagName === 'SELECT' ||
+          target.tagName === 'A' ||
+          target.getAttribute('role') === 'menuitem' ||
+          target.getAttribute('tabindex') === '0')
       const isArrow =
         e.key === 'ArrowLeft' ||
         e.key === 'ArrowRight' ||
         e.key === 'ArrowUp' ||
         e.key === 'ArrowDown'
-      if (isArrow && selectedId && !(e.metaKey || e.ctrlKey)) {
+      if (
+        isArrow &&
+        selectedId &&
+        !(e.metaKey || e.ctrlKey) &&
+        !focusedOnInteractive
+      ) {
         const step = e.shiftKey ? 1.0 : 0.125
         let dx = 0
         let dy = 0
@@ -902,7 +916,10 @@ function ImageProps({
         file,
         projectId
       )
-      patchProps({ src: result.url })
+      // Persist the s3Key alongside the URL so the backend can regenerate
+      // a fresh presigned URL the next time this template is loaded (URLs
+      // expire after 7 days otherwise).
+      patchProps({ src: result.url, s3Key: result.s3_key })
     } catch (err: unknown) {
       const e = err as { response?: { data?: { error?: string } } }
       setUploadError(e.response?.data?.error ?? 'Upload failed')
