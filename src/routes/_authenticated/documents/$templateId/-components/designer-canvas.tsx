@@ -184,10 +184,35 @@ export function DesignerCanvas({
     [elements, updatePage, dims]
   )
 
-  // Cmd/Ctrl+D duplicates the currently selected element.
+  // ── Clipboard for copy/paste ─────────────────────────────
+  // Held in a ref so paste survives between focus changes without depending
+  // on React state.
+  const clipboardRef = useRef<LayoutElement | null>(null)
+
+  const pasteFromClipboard = useCallback(() => {
+    const source = clipboardRef.current
+    if (!source) return
+    const OFFSET = 0.25
+    const newX = snapInches(Math.min(dims.w - source.w, source.x + OFFSET))
+    const newY = snapInches(Math.min(dims.h - source.h, source.y + OFFSET))
+    const pasted: LayoutElement = {
+      ...source,
+      id: newId(),
+      x: newX,
+      y: newY,
+      props: source.props ? { ...source.props } : undefined,
+    }
+    updatePage([...elements, pasted])
+    setSelectedId(pasted.id)
+    // Update the clipboard's reference position so a second Cmd+V offsets
+    // again instead of stacking on top of the previous paste.
+    clipboardRef.current = pasted
+  }, [dims, elements, updatePage])
+
+  // Cmd/Ctrl+D duplicates, Cmd+C copies, Cmd+V pastes.
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
-      if (!(e.metaKey || e.ctrlKey) || e.key !== 'd') return
+      if (!(e.metaKey || e.ctrlKey)) return
       const target = e.target as HTMLElement | null
       if (
         target &&
@@ -197,13 +222,25 @@ export function DesignerCanvas({
       ) {
         return
       }
-      if (!selectedId) return
-      e.preventDefault()
-      duplicateElement(selectedId)
+      if (e.key === 'd') {
+        if (!selectedId) return
+        e.preventDefault()
+        duplicateElement(selectedId)
+      } else if (e.key === 'c') {
+        if (!selectedId) return
+        const el = elements.find((x) => x.id === selectedId)
+        if (!el) return
+        e.preventDefault()
+        clipboardRef.current = { ...el, props: el.props ? { ...el.props } : undefined }
+      } else if (e.key === 'v') {
+        if (!clipboardRef.current) return
+        e.preventDefault()
+        pasteFromClipboard()
+      }
     }
     window.addEventListener('keydown', handler)
     return () => window.removeEventListener('keydown', handler)
-  }, [selectedId, duplicateElement])
+  }, [selectedId, duplicateElement, elements, pasteFromClipboard])
 
   const addElement = useCallback(
     (type: ElementType, dropX: number, dropY: number) => {
