@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { createFileRoute, useRouter } from '@tanstack/react-router'
-import { ChevronLeft, Pencil, Printer, StickyNote, Trash2, UserPlus } from 'lucide-react'
+import { ChevronLeft, Pencil, StickyNote, Trash2, UserPlus } from 'lucide-react'
 import { useCallback, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
@@ -11,18 +11,9 @@ import { CustomerOrdersTab } from './-components/customer-orders-tab'
 import { CustomerProposalsTab } from './-components/customer-proposals-tab'
 import { CustomerTasksTab } from './-components/customer-tasks-tab'
 import { EntityNotesSheet } from '@/components/common/entity-notes/entity-notes-sheet'
+import { PrintMenu } from '@/components/common/print-menu'
 import { CUSTOMER_QUERY_KEYS, getCustomerDetailQuery } from '@/api/customer/query'
 import { customerService } from '@/api/customer/service'
-import { getDocumentTemplatesQuery } from '@/api/document-template/query'
-import { documentTemplateService } from '@/api/document-template/service'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
 import { getEditableFieldsQuery } from '@/api/data/query'
 import { getFieldConfigQuery } from '@/api/field-config/query'
 import { getPriceLevelsQuery } from '@/api/price-level/query'
@@ -115,44 +106,7 @@ function CustomerDetailPage() {
     meta: { errorMessage: 'Failed to update customer' },
   })
 
-  // Document templates available for the Print menu on this page.
-  const { data: printTemplates } = useQuery({
-    ...getDocumentTemplatesQuery(
-      { entity_type: 'customer', accessible_from: 'customer_detail', is_active: true },
-      projectId
-    ),
-    enabled: !!projectId,
-  })
-
-  const renderMutation = useMutation({
-    mutationFn: async ({ templateId }: { templateId: number; templateName: string }) =>
-      documentTemplateService.render(templateId, customerId, projectId),
-    onSuccess: (blob, { templateName }) => {
-      const url = URL.createObjectURL(blob)
-      const w = window.open(url, '_blank', 'noopener,noreferrer')
-      setTimeout(() => URL.revokeObjectURL(url), 60_000)
-      if (!w) {
-        toast.error('Pop-up blocked. Allow pop-ups for this site to preview PDFs.')
-      } else {
-        toast.success(`Opened "${templateName}"`)
-      }
-    },
-    onError: async (err: unknown) => {
-      let msg = 'Failed to render document'
-      const e = err as { response?: { data?: unknown } }
-      const data = e.response?.data
-      if (data instanceof Blob) {
-        try {
-          const text = await data.text()
-          const parsed = JSON.parse(text) as { error?: string }
-          if (parsed.error) msg = parsed.error
-        } catch {
-          // ignore
-        }
-      }
-      toast.error(msg)
-    },
-  })
+  // Print menu is rendered via <PrintMenu/> below.
 
   const handleFieldSave = useCallback(
     (field: string, value: string) => {
@@ -290,48 +244,12 @@ function CustomerDetailPage() {
             </Tooltip>
           )}
 
-          {printTemplates && printTemplates.length > 0 && (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <button
-                  type='button'
-                  disabled={renderMutation.isPending}
-                  className='inline-flex size-7 items-center justify-center rounded-[5px] border border-border bg-bg-secondary text-[12px] font-medium text-text-secondary transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground disabled:pointer-events-none disabled:opacity-50 lg:h-7 lg:w-auto lg:gap-1.5 lg:px-2.5'
-                  title='Print document'
-                >
-                  <Printer className='size-3.5' />
-                  <span className='hidden lg:inline'>
-                    {renderMutation.isPending ? 'Rendering…' : 'Print'}
-                  </span>
-                </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align='end' className='w-56'>
-                <DropdownMenuLabel className='text-[11px] uppercase tracking-wider text-text-tertiary'>
-                  Choose a template
-                </DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                {printTemplates.map((t) => (
-                  <DropdownMenuItem
-                    key={t.id}
-                    onSelect={() =>
-                      renderMutation.mutate({
-                        templateId: t.id,
-                        templateName: t.name,
-                      })
-                    }
-                    className='flex flex-col items-start gap-0.5'
-                  >
-                    <span className='text-[13px] font-medium'>{t.name}</span>
-                    {t.description && (
-                      <span className='text-[11px] text-text-tertiary'>
-                        {t.description}
-                      </span>
-                    )}
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
-          )}
+          <PrintMenu
+            entityType='customer'
+            accessibleFrom='customer_detail'
+            entityId={customerId}
+            projectId={projectId}
+          />
 
           <Tooltip>
             <TooltipTrigger asChild>

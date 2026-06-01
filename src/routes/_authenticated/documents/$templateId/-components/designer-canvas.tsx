@@ -160,6 +160,31 @@ export function DesignerCanvas({
     [elements, updatePage, selectedId]
   )
 
+  const moveLayer = useCallback(
+    (id: string, direction: 'front' | 'forward' | 'backward' | 'back') => {
+      const idx = elements.findIndex((el) => el.id === id)
+      if (idx < 0) return
+      const next = [...elements]
+      const [picked] = next.splice(idx, 1)
+      switch (direction) {
+        case 'back':
+          next.unshift(picked)
+          break
+        case 'backward':
+          next.splice(Math.max(0, idx - 1), 0, picked)
+          break
+        case 'forward':
+          next.splice(Math.min(next.length, idx + 1), 0, picked)
+          break
+        case 'front':
+        default:
+          next.push(picked)
+      }
+      updatePage(next)
+    },
+    [elements, updatePage]
+  )
+
   const duplicateElement = useCallback(
     (id: string) => {
       const source = elements.find((el) => el.id === id)
@@ -489,6 +514,7 @@ export function DesignerCanvas({
             element={selected}
             onPatch={(patch) => updateElement(selected.id, patch)}
             onDelete={() => deleteElement(selected.id)}
+            onMoveLayer={(dir) => moveLayer(selected.id, dir)}
             pageDims={dims}
             availableFields={availableFields}
             entityData={entityData}
@@ -512,6 +538,7 @@ function PropertiesPanel({
   element,
   onPatch,
   onDelete,
+  onMoveLayer,
   pageDims,
   availableFields,
   entityData,
@@ -521,6 +548,7 @@ function PropertiesPanel({
   element: LayoutElement
   onPatch: (patch: Partial<LayoutElement>) => void
   onDelete: () => void
+  onMoveLayer: (direction: 'front' | 'forward' | 'backward' | 'back') => void
   pageDims: { w: number; h: number }
   availableFields?: FieldConfigEntry[]
   entityData?: Record<string, unknown> | null
@@ -587,6 +615,29 @@ function PropertiesPanel({
             onChange={(v) => onPatch({ h: snapInches(v) })}
           />
         </Grid2>
+      </Section>
+
+      <Section title='Layer'>
+        <div className='flex overflow-hidden rounded-[5px] border border-border bg-bg-secondary'>
+          {(
+            [
+              { dir: 'back', label: '⤓⤓', title: 'Send to back' },
+              { dir: 'backward', label: '⤓', title: 'Send backward' },
+              { dir: 'forward', label: '⤒', title: 'Bring forward' },
+              { dir: 'front', label: '⤒⤒', title: 'Bring to front' },
+            ] as const
+          ).map((b) => (
+            <button
+              key={b.dir}
+              type='button'
+              onClick={() => onMoveLayer(b.dir)}
+              className='h-7 flex-1 text-[14px] font-medium text-text-secondary transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground'
+              title={b.title}
+            >
+              {b.label}
+            </button>
+          ))}
+        </div>
       </Section>
 
       {/* Type-specific props */}

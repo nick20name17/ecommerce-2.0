@@ -10,21 +10,12 @@ import { PanelSection, PanelRow, PanelBlock, PropertyField, SummaryCell } from '
 import { useCallback, useMemo, useState } from 'react'
 
 import { getEditableFieldsQuery } from '@/api/data/query'
-import { getDocumentTemplatesQuery } from '@/api/document-template/query'
-import { documentTemplateService } from '@/api/document-template/service'
 import { getFieldConfigQuery } from '@/api/field-config/query'
 import { getOrderDetailQuery, ORDER_QUERY_KEYS } from '@/api/order/query'
 import type { OrderPatchPayload } from '@/api/order/schema'
 import { orderService } from '@/api/order/service'
 import { IOrders, PAGE_COLORS, PageHeaderIcon } from '@/components/ds'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
+import { PrintMenu } from '@/components/common/print-menu'
 import { OrderAssignDialog } from '@/routes/_authenticated/orders/-components/order-assign-dialog'
 import { StartPickingDialog } from '@/components/common/start-picking-dialog'
 import { CommandBarCreate } from '@/components/tasks/command-bar-create'
@@ -162,47 +153,7 @@ function OrderDetailPage() {
     },
   })
 
-  // Document templates available for the Print menu on this page.
-  const { data: printTemplates } = useQuery({
-    ...getDocumentTemplatesQuery(
-      { entity_type: 'order', accessible_from: 'order_detail', is_active: true },
-      projectId
-    ),
-    enabled: !!projectId,
-  })
-
-  const renderMutation = useMutation({
-    mutationFn: async ({ templateId }: { templateId: number; templateName: string }) =>
-      documentTemplateService.render(templateId, orderId, projectId),
-    onSuccess: (blob, { templateName }) => {
-      const url = URL.createObjectURL(blob)
-      const w = window.open(url, '_blank', 'noopener,noreferrer')
-      // Revoke after the new tab has had time to load — Safari & Firefox
-      // detach the blob too eagerly otherwise.
-      setTimeout(() => URL.revokeObjectURL(url), 60_000)
-      if (!w) {
-        toast.error('Pop-up blocked. Allow pop-ups for this site to preview PDFs.')
-      } else {
-        toast.success(`Opened "${templateName}"`)
-      }
-    },
-    onError: async (err: unknown) => {
-      // Axios returns Blob errors when responseType is 'blob'; try to parse.
-      let msg = 'Failed to render document'
-      const e = err as { response?: { data?: unknown } }
-      const data = e.response?.data
-      if (data instanceof Blob) {
-        try {
-          const text = await data.text()
-          const parsed = JSON.parse(text) as { error?: string }
-          if (parsed.error) msg = parsed.error
-        } catch {
-          // ignore — keep default msg
-        }
-      }
-      toast.error(msg)
-    },
-  })
+  // Print menu is rendered via <PrintMenu/> below.
 
   // Loading
   if (isLoading) {
@@ -411,48 +362,12 @@ function OrderDetailPage() {
             <TooltipContent>{allPicked ? 'All items have been picked' : 'Start picking for this customer'}</TooltipContent>
           </Tooltip>
 
-          {printTemplates && printTemplates.length > 0 && (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <button
-                  type='button'
-                  disabled={renderMutation.isPending}
-                  className='inline-flex size-7 items-center justify-center rounded-[5px] border border-border bg-bg-secondary text-[12px] font-medium text-text-secondary transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground disabled:pointer-events-none disabled:opacity-50 lg:h-7 lg:w-auto lg:gap-1.5 lg:px-2.5'
-                  title='Print document'
-                >
-                  <Printer className='size-3.5' />
-                  <span className='hidden lg:inline'>
-                    {renderMutation.isPending ? 'Rendering…' : 'Print'}
-                  </span>
-                </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align='end' className='w-56'>
-                <DropdownMenuLabel className='text-[11px] uppercase tracking-wider text-text-tertiary'>
-                  Choose a template
-                </DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                {printTemplates.map((t) => (
-                  <DropdownMenuItem
-                    key={t.id}
-                    onSelect={() =>
-                      renderMutation.mutate({
-                        templateId: t.id,
-                        templateName: t.name,
-                      })
-                    }
-                    className='flex flex-col items-start gap-0.5'
-                  >
-                    <span className='text-[13px] font-medium'>{t.name}</span>
-                    {t.description && (
-                      <span className='text-[11px] text-text-tertiary'>
-                        {t.description}
-                      </span>
-                    )}
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
-          )}
+          <PrintMenu
+            entityType='order'
+            accessibleFrom='order_detail'
+            entityId={orderId}
+            projectId={projectId}
+          />
 
           {order.status === 'U' && (
             <>
