@@ -8,11 +8,13 @@ import { cn } from '@/lib/utils'
 
 import {
   PX_PER_INCH,
+  computeAlignment,
   formatCellValue,
   resolveField,
   resolveFieldRaw,
   snapInches,
 } from './designer-types'
+import type { AlignmentGuide } from './designer-types'
 
 interface CanvasElementProps {
   element: LayoutElement
@@ -32,6 +34,10 @@ interface CanvasElementProps {
    * The current test entity (when set) — drives Table elements' row data.
    */
   entityData?: Record<string, unknown> | null
+  /** Sibling elements on the same page — used to compute alignment guides. */
+  siblings?: LayoutElement[]
+  /** Notify the parent of the active alignment guides while dragging/resizing. */
+  onGuidesChange?: (guides: AlignmentGuide[]) => void
 }
 
 type DragMode =
@@ -65,6 +71,8 @@ export function CanvasElement({
   pageH,
   resolvedValue,
   entityData,
+  siblings,
+  onGuidesChange,
 }: CanvasElementProps) {
   const ref = useRef<HTMLDivElement>(null)
   const dragRef = useRef<DragMode | null>(null)
@@ -118,12 +126,25 @@ export function CanvasElement({
       const el = latestRef.current
 
       if (drag.kind === 'move') {
-        const nextX = snapInches(
-          Math.max(0, Math.min(pageW - el.w, drag.origX + dxIn))
-        )
-        const nextY = snapInches(
-          Math.max(0, Math.min(pageH - el.h, drag.origY + dyIn))
-        )
+        let nextX = Math.max(0, Math.min(pageW - el.w, drag.origX + dxIn))
+        let nextY = Math.max(0, Math.min(pageH - el.h, drag.origY + dyIn))
+
+        // Alignment guides — snap to sibling edges/centers before the grid snap.
+        if (siblings && siblings.length > 0) {
+          const result = computeAlignment(
+            { x: nextX, y: nextY, w: el.w, h: el.h },
+            siblings.filter((s) => s.id !== el.id)
+          )
+          nextX = result.x
+          nextY = result.y
+          onGuidesChange?.(result.guides)
+        } else {
+          onGuidesChange?.([])
+        }
+
+        nextX = snapInches(Math.max(0, Math.min(pageW - el.w, nextX)))
+        nextY = snapInches(Math.max(0, Math.min(pageH - el.h, nextY)))
+
         if (nextX !== el.x || nextY !== el.y) {
           onChange({ ...el, x: nextX, y: nextY })
         }
@@ -176,15 +197,19 @@ export function CanvasElement({
     [onChange, pageW, pageH]
   )
 
-  const endDrag = useCallback((e: React.PointerEvent) => {
-    if (!dragRef.current) return
-    dragRef.current = null
-    try {
-      ;(e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId)
-    } catch {
-      // pointer might already be released
-    }
-  }, [])
+  const endDrag = useCallback(
+    (e: React.PointerEvent) => {
+      if (!dragRef.current) return
+      dragRef.current = null
+      onGuidesChange?.([])
+      try {
+        ;(e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId)
+      } catch {
+        // pointer might already be released
+      }
+    },
+    [onGuidesChange]
+  )
 
   // Delete with keyboard when selected
   useEffect(() => {

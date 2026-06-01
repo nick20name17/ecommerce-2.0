@@ -165,6 +165,149 @@ export function resolveFieldRaw(
   return cur ?? null
 }
 
+// ── Alignment guides ────────────────────────────────────────
+
+/** A guide line drawn on the canvas while the user drags or resizes. */
+export interface AlignmentGuide {
+  axis: 'x' | 'y'
+  /** Position in inches along the guide's axis. */
+  pos: number
+  /**
+   * Span along the perpendicular axis, in inches — used to bound the line
+   * to just where it's visually meaningful (i.e. between the dragged element
+   * and the sibling it's aligning with).
+   */
+  start: number
+  end: number
+}
+
+export interface AlignmentResult {
+  x: number
+  y: number
+  guides: AlignmentGuide[]
+}
+
+/** Snap threshold in inches (≈3px at PX_PER_INCH=80). */
+const SNAP_INCHES = 0.0375
+
+interface AlignmentCandidate {
+  kind: 'left' | 'centerX' | 'right' | 'top' | 'centerY' | 'bottom'
+  value: number
+  sibling: { x: number; y: number; w: number; h: number }
+}
+
+/**
+ * Given the dragged element's current candidate position and a list of
+ * sibling elements, snap to the closest alignment along each axis (left /
+ * center-x / right and top / center-y / bottom of any sibling) within
+ * `SNAP_INCHES`, and return the set of guide lines to draw.
+ *
+ * Pure function — designed to be called from a pointer-move handler.
+ */
+export function computeAlignment(
+  candidate: { x: number; y: number; w: number; h: number },
+  siblings: Array<{ x: number; y: number; w: number; h: number }>,
+  threshold: number = SNAP_INCHES
+): AlignmentResult {
+  const { x, y, w, h } = candidate
+  const myLeft = x
+  const myCenterX = x + w / 2
+  const myRight = x + w
+  const myTop = y
+  const myCenterY = y + h / 2
+  const myBottom = y + h
+
+  // Build candidate axis values from siblings.
+  const xCandidates: AlignmentCandidate[] = []
+  const yCandidates: AlignmentCandidate[] = []
+  for (const s of siblings) {
+    xCandidates.push({ kind: 'left', value: s.x, sibling: s })
+    xCandidates.push({ kind: 'centerX', value: s.x + s.w / 2, sibling: s })
+    xCandidates.push({ kind: 'right', value: s.x + s.w, sibling: s })
+    yCandidates.push({ kind: 'top', value: s.y, sibling: s })
+    yCandidates.push({ kind: 'centerY', value: s.y + s.h / 2, sibling: s })
+    yCandidates.push({ kind: 'bottom', value: s.y + s.h, sibling: s })
+  }
+
+  // Find the closest match per axis target.
+  const findBest = (
+    targets: Array<{ kind: 'left' | 'centerX' | 'right' | 'top' | 'centerY' | 'bottom'; value: number }>,
+    candidates: AlignmentCandidate[]
+  ) => {
+    let best:
+      | { tgt: typeof targets[number]; cand: AlignmentCandidate; delta: number }
+      | null = null
+    for (const t of targets) {
+      for (const c of candidates) {
+        const delta = c.value - t.value
+        if (Math.abs(delta) > threshold) continue
+        if (best == null || Math.abs(delta) < Math.abs(best.delta)) {
+          best = { tgt: t, cand: c, delta }
+        }
+      }
+    }
+    return best
+  }
+
+  const xBest = findBest(
+    [
+      { kind: 'left', value: myLeft },
+      { kind: 'centerX', value: myCenterX },
+      { kind: 'right', value: myRight },
+    ],
+    xCandidates
+  )
+  const yBest = findBest(
+    [
+      { kind: 'top', value: myTop },
+      { kind: 'centerY', value: myCenterY },
+      { kind: 'bottom', value: myBottom },
+    ],
+    yCandidates
+  )
+
+  let snappedX = x
+  let snappedY = y
+  const guides: AlignmentGuide[] = []
+
+  if (xBest) {
+    snappedX = x + xBest.delta
+    // Collect *all* candidates within snap range at this final position to draw
+    // multiple guides when several edges align simultaneously.
+    const finalX =
+      xBest.tgt.kind === 'left'
+        ? snappedX
+        : xBest.tgt.kind === 'centerX'
+          ? snappedX + w / 2
+          : snappedX + w
+    for (const c of xCandidates) {
+      if (Math.abs(c.value - finalX) < 0.001) {
+        const top = Math.min(snappedY, c.sibling.y)
+        const bot = Math.max(snappedY + h, c.sibling.y + c.sibling.h)
+        guides.push({ axis: 'x', pos: c.value, start: top, end: bot })
+      }
+    }
+  }
+  if (yBest) {
+    snappedY = y + yBest.delta
+    const finalY =
+      yBest.tgt.kind === 'top'
+        ? snappedY
+        : yBest.tgt.kind === 'centerY'
+          ? snappedY + h / 2
+          : snappedY + h
+    for (const c of yCandidates) {
+      if (Math.abs(c.value - finalY) < 0.001) {
+        const left = Math.min(snappedX, c.sibling.x)
+        const right = Math.max(snappedX + w, c.sibling.x + c.sibling.w)
+        guides.push({ axis: 'y', pos: c.value, start: left, end: right })
+      }
+    }
+  }
+
+  return { x: snappedX, y: snappedY, guides }
+}
+
 /** Format a resolved cell value for display — mirrors the backend's _format_cell_value. */
 export function formatCellValue(value: string, fmt?: string | null): string {
   if (!value) return value

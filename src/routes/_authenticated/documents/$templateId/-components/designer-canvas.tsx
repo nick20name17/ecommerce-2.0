@@ -27,6 +27,7 @@ import type {
 import { cn } from '@/lib/utils'
 
 import { CanvasElement } from './canvas-element'
+import type { AlignmentGuide } from './designer-types'
 import {
   ELEMENT_DEFAULTS,
   PX_PER_INCH,
@@ -100,6 +101,7 @@ export function DesignerCanvas({
   const elements = pages[currentPageIndex]?.elements ?? []
 
   const [selectedId, setSelectedId] = useState<string | null>(null)
+  const [activeGuides, setActiveGuides] = useState<AlignmentGuide[]>([])
 
   const updatePage = useCallback(
     (next: LayoutElement[]) => {
@@ -157,6 +159,51 @@ export function DesignerCanvas({
     },
     [elements, updatePage, selectedId]
   )
+
+  const duplicateElement = useCallback(
+    (id: string) => {
+      const source = elements.find((el) => el.id === id)
+      if (!source) return
+      const OFFSET = 0.25 // inches
+      const newX = snapInches(
+        Math.min(dims.w - source.w, source.x + OFFSET)
+      )
+      const newY = snapInches(
+        Math.min(dims.h - source.h, source.y + OFFSET)
+      )
+      const duplicated: LayoutElement = {
+        ...source,
+        id: newId(),
+        x: newX,
+        y: newY,
+        props: source.props ? { ...source.props } : undefined,
+      }
+      updatePage([...elements, duplicated])
+      setSelectedId(duplicated.id)
+    },
+    [elements, updatePage, dims]
+  )
+
+  // Cmd/Ctrl+D duplicates the currently selected element.
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (!(e.metaKey || e.ctrlKey) || e.key !== 'd') return
+      const target = e.target as HTMLElement | null
+      if (
+        target &&
+        (target.tagName === 'INPUT' ||
+          target.tagName === 'TEXTAREA' ||
+          target.isContentEditable)
+      ) {
+        return
+      }
+      if (!selectedId) return
+      e.preventDefault()
+      duplicateElement(selectedId)
+    }
+    window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
+  }, [selectedId, duplicateElement])
 
   const addElement = useCallback(
     (type: ElementType, dropX: number, dropY: number) => {
@@ -355,6 +402,42 @@ export function DesignerCanvas({
                 pageH={dims.h}
                 resolvedValue={resolved}
                 entityData={entityData}
+                siblings={elements}
+                onGuidesChange={setActiveGuides}
+              />
+            )
+          })}
+
+          {/* Alignment guide overlays — rendered only while a drag is active */}
+          {activeGuides.map((g, i) => {
+            if (g.axis === 'x') {
+              return (
+                <div
+                  key={i}
+                  className='pointer-events-none absolute'
+                  style={{
+                    left: g.pos * PX_PER_INCH,
+                    top: g.start * PX_PER_INCH,
+                    width: 0,
+                    height: (g.end - g.start) * PX_PER_INCH,
+                    borderLeft: '1px dashed rgba(99, 102, 241, 0.85)',
+                    zIndex: 5,
+                  }}
+                />
+              )
+            }
+            return (
+              <div
+                key={i}
+                className='pointer-events-none absolute'
+                style={{
+                  top: g.pos * PX_PER_INCH,
+                  left: g.start * PX_PER_INCH,
+                  height: 0,
+                  width: (g.end - g.start) * PX_PER_INCH,
+                  borderTop: '1px dashed rgba(99, 102, 241, 0.85)',
+                  zIndex: 5,
+                }}
               />
             )
           })}
