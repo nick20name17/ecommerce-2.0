@@ -122,13 +122,17 @@ export function useCreatePage() {
   const [billTo, setBillTo] = useState<AddressFields>(emptyAddress)
   const [shipTo, setShipTo] = useState<AddressFields>(emptyAddress)
 
-  // When the superadmin switches projects, drop the in-memory customer
-  // context — savedCustomerId is already per-project and the restore effect
-  // below will re-hydrate from the new project's saved selection (if any)
-  // as soon as customerDetail resolves. Without this, the stale customer ID
-  // from the previous project gets re-queried against the new project and
-  // 404s.
+  // Track the projectId the customer/savedCustomerId state belongs to.
+  // Both useState (customer) and useLocalStorage (savedCustomerId, via
+  // usehooks-ts) are one render behind when projectId changes — useState
+  // never resets itself, and useLocalStorage re-reads in a post-render
+  // useEffect. So the first render after a project switch sees the *old*
+  // project's customer id in both, and a naive query key would 404.
+  // Comparing the ref-tracked projectId synchronously catches that render.
+  const lastProjectIdRef = useRef(projectId)
+  const projectChanged = lastProjectIdRef.current !== projectId
   useEffect(() => {
+    lastProjectIdRef.current = projectId
     setCustomer(null)
     setBillTo(emptyAddress)
     setShipTo(emptyAddress)
@@ -146,13 +150,10 @@ export function useCreatePage() {
   })
 
   // Fetch full customer detail whenever we have a customer ID.
-  // The in-state customer is treated as stale (and skipped) if its id no
-  // longer matches the per-project savedCustomerId — which happens on the
-  // first render after a project switch, before the reset effect above has
-  // had a chance to clear it. Without this guard, the previous project's
-  // customer id slips through into one query and 404s.
-  const customerStateIsStale = customer != null && customer.id !== savedCustomerId
-  const customerId = customerStateIsStale ? '' : (customer?.id ?? savedCustomerId ?? '')
+  // On the render where projectId just changed, both customer and
+  // savedCustomerId still hold the previous project's values — drop them
+  // both to avoid emitting a stale query key.
+  const customerId = projectChanged ? '' : (customer?.id ?? savedCustomerId ?? '')
   const { data: customerDetail, isLoading: customerLoading } = useQuery({
     ...getCustomerDetailQuery(customerId, projectId),
     enabled: !!customerId
@@ -170,7 +171,7 @@ export function useCreatePage() {
     }
   }, [customerDetail, customer, savedCustomerId])
 
-  const cartCustomerId = customerStateIsStale ? '' : (customer?.id ?? '')
+  const cartCustomerId = projectChanged ? '' : (customer?.id ?? '')
   const {
     data: cart,
     isLoading: cartLoading,
