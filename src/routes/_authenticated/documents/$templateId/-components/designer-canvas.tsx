@@ -13,8 +13,9 @@ import {
   Type,
   X,
 } from 'lucide-react'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
+import { documentTemplateService } from '@/api/document-template/service'
 import type { FieldConfigEntry } from '@/api/field-config/schema'
 import type {
   DocumentLayout,
@@ -53,6 +54,10 @@ interface DesignerCanvasProps {
    * elements render the resolved value instead of the `{field.key}` token.
    */
   entityData?: Record<string, unknown> | null
+  /** Template id — required for image upload (file → S3 path scope). */
+  templateId?: number
+  /** Project id — passed through to the upload endpoint. */
+  projectId?: number | null
 }
 
 // ── Palette tools ───────────────────────────────────────────
@@ -76,6 +81,8 @@ export function DesignerCanvas({
   pageMargins,
   availableFields,
   entityData,
+  templateId,
+  projectId,
 }: DesignerCanvasProps) {
   const normalized = ensureLayout(layout)
   const dims = pageDims(pageSize, orientation)
@@ -365,6 +372,8 @@ export function DesignerCanvas({
             pageDims={dims}
             availableFields={availableFields}
             entityData={entityData}
+            templateId={templateId}
+            projectId={projectId}
           />
         ) : (
           <div className='px-4 py-6 text-[12px] leading-snug text-text-tertiary'>
@@ -386,6 +395,8 @@ function PropertiesPanel({
   pageDims,
   availableFields,
   entityData,
+  templateId,
+  projectId,
 }: {
   element: LayoutElement
   onPatch: (patch: Partial<LayoutElement>) => void
@@ -393,6 +404,8 @@ function PropertiesPanel({
   pageDims: { w: number; h: number }
   availableFields?: FieldConfigEntry[]
   entityData?: Record<string, unknown> | null
+  templateId?: number
+  projectId?: number | null
 }) {
   const patchProps = (kv: Record<string, unknown>) =>
     onPatch({ props: { ...(element.props ?? {}), ...kv } })
@@ -469,7 +482,12 @@ function PropertiesPanel({
         />
       )}
       {element.type === 'image' && (
-        <ImageProps element={element} patchProps={patchProps} />
+        <ImageProps
+          element={element}
+          patchProps={patchProps}
+          templateId={templateId}
+          projectId={projectId}
+        />
       )}
       {element.type === 'line' && (
         <LineProps element={element} patchProps={patchProps} />
@@ -640,20 +658,102 @@ function FieldProps({
 function ImageProps({
   element,
   patchProps,
+  templateId,
+  projectId,
 }: {
   element: LayoutElement
   patchProps: (kv: Record<string, unknown>) => void
+  templateId?: number
+  projectId?: number | null
 }) {
   const p = element.props ?? {}
+  const src = (p.src as string) ?? ''
+  const [uploading, setUploading] = useState(false)
+  const [uploadError, setUploadError] = useState<string | null>(null)
+  const fileInputRef = useRef<HTMLInputElement | null>(null)
+
+  const handleFile = async (file: File) => {
+    if (!templateId) {
+      setUploadError('Save the template first before uploading')
+      return
+    }
+    setUploadError(null)
+    setUploading(true)
+    try {
+      const result = await documentTemplateService.uploadImage(
+        templateId,
+        file,
+        projectId
+      )
+      patchProps({ src: result.url })
+    } catch (err: unknown) {
+      const e = err as { response?: { data?: { error?: string } } }
+      setUploadError(e.response?.data?.error ?? 'Upload failed')
+    } finally {
+      setUploading(false)
+    }
+  }
+
   return (
     <Section title='Image'>
       <input
         type='url'
-        value={(p.src as string) ?? ''}
+        value={src}
         onChange={(e) => patchProps({ src: e.target.value })}
         placeholder='https://…/logo.png'
         className='h-8 w-full rounded-[5px] border border-border bg-background px-2 text-[12.5px] outline-none focus:border-primary focus:ring-2 focus:ring-primary/20'
       />
+      <div className='flex items-center gap-2'>
+        <input
+          ref={fileInputRef}
+          type='file'
+          accept='image/png,image/jpeg,image/gif,image/webp,image/svg+xml'
+          className='hidden'
+          onChange={(e) => {
+            const f = e.target.files?.[0]
+            if (f) handleFile(f)
+            // Reset so the same file can be re-picked.
+            if (e.target) e.target.value = ''
+          }}
+        />
+        <button
+          type='button'
+          onClick={() => fileInputRef.current?.click()}
+          disabled={uploading || !templateId}
+          className='inline-flex h-7 items-center gap-1 rounded-[5px] border border-border bg-bg-secondary px-2 text-[12px] font-medium text-text-secondary transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground disabled:pointer-events-none disabled:opacity-50'
+          title={
+            templateId
+              ? 'Upload a new image'
+              : 'Save the template first to enable upload'
+          }
+        >
+          <ImageIcon className='size-3.5' />
+          {uploading ? 'Uploading…' : 'Upload'}
+        </button>
+        {src && (
+          <button
+            type='button'
+            onClick={() => patchProps({ src: '' })}
+            disabled={uploading}
+            className='inline-flex h-7 items-center gap-1 rounded-[5px] px-2 text-[11.5px] font-medium text-text-tertiary transition-colors hover:bg-bg-hover hover:text-destructive disabled:pointer-events-none disabled:opacity-50'
+          >
+            <X className='size-3' />
+            Clear
+          </button>
+        )}
+      </div>
+      {uploadError && (
+        <span className='text-[11px] text-destructive'>{uploadError}</span>
+      )}
+      {src && !uploadError && (
+        // eslint-disable-next-line jsx-a11y/alt-text
+        <img
+          src={src}
+          className='mt-1 max-h-24 self-start rounded-[4px] border border-border bg-checker object-contain'
+          style={{ background: '#fff' }}
+          onError={() => setUploadError('Failed to load preview')}
+        />
+      )}
     </Section>
   )
 }

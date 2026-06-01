@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { createFileRoute, redirect, useNavigate } from '@tanstack/react-router'
-import { ArrowLeft, Eye, FlaskConical, Save, Search, Trash2, X } from 'lucide-react'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { ArrowLeft, Eye, FlaskConical, Redo2, Save, Search, Trash2, Undo2, X } from 'lucide-react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
 import {
@@ -14,8 +14,10 @@ import type {
   UpdateDocumentTemplatePayload,
 } from '@/api/document-template/schema'
 import { documentTemplateService } from '@/api/document-template/service'
+import { getCustomerDetailQuery, getCustomersQuery } from '@/api/customer/query'
 import { getFieldConfigQuery } from '@/api/field-config/query'
 import { getOrderDetailQuery, getOrdersQuery } from '@/api/order/query'
+import { getProposalDetailQuery, getProposalsQuery } from '@/api/proposal/query'
 import { IDocuments, PAGE_COLORS, PageHeaderIcon } from '@/components/ds'
 import {
   Popover,
@@ -57,35 +59,156 @@ function DocumentEditorPage() {
     return fieldConfig[template.entity_type] ?? []
   }, [template, fieldConfig])
 
-  // Test-entity preview state.
+  // Test-entity preview state. Three queries — only the one matching the
+  // template's entity_type is enabled, so the others stay idle.
   const [testEntityId, setTestEntityId] = useState<string | null>(null)
   const { data: testOrder } = useQuery({
     ...getOrderDetailQuery(testEntityId ?? '', projectId),
     enabled:
       !!testEntityId && !!projectId && template?.entity_type === 'order',
   })
+  const { data: testProposal } = useQuery({
+    ...getProposalDetailQuery(testEntityId ?? '', projectId),
+    enabled:
+      !!testEntityId && !!projectId && template?.entity_type === 'proposal',
+  })
+  const { data: testCustomer } = useQuery({
+    ...getCustomerDetailQuery(testEntityId ?? '', projectId),
+    enabled:
+      !!testEntityId && !!projectId && template?.entity_type === 'customer',
+  })
   const entityData = useMemo<Record<string, unknown> | null>(() => {
-    if (!testEntityId) return null
-    if (template?.entity_type === 'order') {
+    if (!testEntityId || !template) return null
+    if (template.entity_type === 'order')
       return (testOrder as Record<string, unknown> | undefined) ?? null
-    }
+    if (template.entity_type === 'proposal')
+      return (testProposal as Record<string, unknown> | undefined) ?? null
+    if (template.entity_type === 'customer')
+      return (testCustomer as Record<string, unknown> | undefined) ?? null
     return null
-  }, [testEntityId, template, testOrder])
+  }, [testEntityId, template, testOrder, testProposal, testCustomer])
 
   // Editable local copy
   const [name, setName] = useState('')
   const [description, setDescription] = useState('')
   const [isActive, setIsActive] = useState(true)
-  const [layout, setLayout] = useState<DocumentLayout>({ pages: [{ elements: [] }] })
+  const [layout, setLayoutRaw] = useState<DocumentLayout>({ pages: [{ elements: [] }] })
+
+  // ── Undo / redo history ──────────────────────────────────
+  // Coalesces rapid layout changes (a drag fires ~30 setLayouts; with the
+  // 300ms debounce that turns into 1 history entry per discrete edit).
+  const HISTORY_CAP = 50
+  const [past, setPast] = useState<DocumentLayout[]>([])
+  const [future, setFuture] = useState<DocumentLayout[]>([])
+  const lastCommitRef = useRef<DocumentLayout | null>(null)
+  const commitTimerRef = useRef<number | null>(null)
+
+  // Wrap setLayout so callers can pass either a value or an updater function.
+  const setLayout = useCallback(
+    (next: DocumentLayout | ((prev: DocumentLayout) => DocumentLayout)) => {
+      setLayoutRaw((prev) =>
+        typeof next === 'function'
+          ? (next as (p: DocumentLayout) => DocumentLayout)(prev)
+          : next
+      )
+    },
+    []
+  )
 
   useEffect(() => {
     if (template) {
       setName(template.name)
       setDescription(template.description)
       setIsActive(template.is_active)
-      setLayout(ensureLayout(template.layout))
+      const initial = ensureLayout(template.layout)
+      setLayoutRaw(initial)
+      lastCommitRef.current = initial
+      setPast([])
+      setFuture([])
     }
   }, [template])
+
+  // Debounced history commit. When layout settles (no changes for 300ms),
+  // the previous "committed" snapshot is pushed onto past and the future
+  // is cleared.
+  useEffect(() => {
+    if (lastCommitRef.current === null) return
+    if (commitTimerRef.current) window.clearTimeout(commitTimerRef.current)
+    commitTimerRef.current = window.setTimeout(() => {
+      const lastJson = JSON.stringify(lastCommitRef.current)
+      const currentJson = JSON.stringify(layout)
+      if (lastJson === currentJson) return
+      const prevCommit = lastCommitRef.current
+      lastCommitRef.current = layout
+      setPast((p) => [...p.slice(-(HISTORY_CAP - 1)), prevCommit as DocumentLayout])
+      setFuture([])
+    }, 300)
+    return () => {
+      if (commitTimerRef.current) window.clearTimeout(commitTimerRef.current)
+    }
+  }, [layout])
+
+  const canUndo = past.length > 0
+  const canRedo = future.length > 0
+
+  const undo = useCallback(() => {
+    setPast((p) => {
+      if (p.length === 0) return p
+      const previous = p[p.length - 1]
+      setFuture((f) => [layout, ...f].slice(0, HISTORY_CAP))
+      setLayoutRaw(previous)
+      lastCommitRef.current = previous
+      // Reset the pending commit timer — we just jumped, no debounce needed.
+      if (commitTimerRef.current) {
+        window.clearTimeout(commitTimerRef.current)
+        commitTimerRef.current = null
+      }
+      return p.slice(0, -1)
+    })
+  }, [layout])
+
+  const redo = useCallback(() => {
+    setFuture((f) => {
+      if (f.length === 0) return f
+      const next = f[0]
+      setPast((p) => [...p, layout].slice(-HISTORY_CAP))
+      setLayoutRaw(next)
+      lastCommitRef.current = next
+      if (commitTimerRef.current) {
+        window.clearTimeout(commitTimerRef.current)
+        commitTimerRef.current = null
+      }
+      return f.slice(1)
+    })
+  }, [layout])
+
+  // Keyboard shortcuts — Cmd/Ctrl+Z = undo, Cmd/Ctrl+Shift+Z (or Ctrl+Y) = redo.
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement | null
+      // Don't steal undo from text inputs / textareas — they have native undo.
+      if (
+        target &&
+        (target.tagName === 'INPUT' ||
+          target.tagName === 'TEXTAREA' ||
+          target.isContentEditable)
+      ) {
+        return
+      }
+      if (!(e.metaKey || e.ctrlKey)) return
+      if (e.key === 'z' && !e.shiftKey) {
+        if (!canUndo) return
+        e.preventDefault()
+        undo()
+      } else if ((e.key === 'z' && e.shiftKey) || e.key === 'y') {
+        if (!canRedo) return
+        e.preventDefault()
+        redo()
+      }
+    }
+    window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
+  }, [undo, redo, canUndo, canRedo])
 
   const isDirty = useMemo(() => {
     if (!template) return false
@@ -154,16 +277,31 @@ function DocumentEditorPage() {
         <TestEntityPicker
           entityType={template.entity_type}
           value={testEntityId}
-          valueLabel={
-            (entityData &&
-              ((entityData.invoice as string) ||
-                (entityData.name as string) ||
-                String(entityData.id ?? ''))) ||
-            null
-          }
+          valueLabel={pickEntityLabel(template.entity_type, entityData)}
           onChange={setTestEntityId}
           projectId={projectId}
         />
+
+        <div className='flex items-center'>
+          <button
+            type='button'
+            disabled={!canUndo}
+            onClick={undo}
+            title='Undo (⌘Z)'
+            className='inline-flex size-7 items-center justify-center rounded-l-[5px] border border-r-0 border-border bg-bg-secondary text-text-secondary transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground disabled:pointer-events-none disabled:opacity-40'
+          >
+            <Undo2 className='size-3.5' />
+          </button>
+          <button
+            type='button'
+            disabled={!canRedo}
+            onClick={redo}
+            title='Redo (⌘⇧Z)'
+            className='inline-flex size-7 items-center justify-center rounded-r-[5px] border border-border bg-bg-secondary text-text-secondary transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground disabled:pointer-events-none disabled:opacity-40'
+          >
+            <Redo2 className='size-3.5' />
+          </button>
+        </div>
 
         <button
           type='button'
@@ -276,6 +414,8 @@ function DocumentEditorPage() {
           pageMargins={template.page_margins}
           availableFields={availableFields}
           entityData={entityData}
+          templateId={template.id}
+          projectId={projectId}
         />
       </div>
     </div>
@@ -345,6 +485,45 @@ function NotFound({ onBack }: { onBack: () => void }) {
 
 // ── Test entity picker ──────────────────────────────────────
 
+/** Pretty label for the picker button when a test entity is selected. */
+function pickEntityLabel(
+  entityType: EntityType,
+  entityData: Record<string, unknown> | null
+): string | null {
+  if (!entityData) return null
+  if (entityType === 'order') {
+    return (
+      (entityData.invoice as string | undefined) ||
+      (entityData.name as string | undefined) ||
+      (entityData.autoid as string | undefined) ||
+      null
+    )
+  }
+  if (entityType === 'proposal') {
+    return (
+      (entityData.quote as string | undefined) ||
+      (entityData.b_name as string | undefined) ||
+      (entityData.autoid as string | undefined) ||
+      null
+    )
+  }
+  if (entityType === 'customer') {
+    return (
+      (entityData.id as string | undefined) ||
+      (entityData.l_name as string | undefined) ||
+      null
+    )
+  }
+  return null
+}
+
+type PickerRow = {
+  /** The id passed to onChange — autoid for order/proposal, id for customer. */
+  pickValue: string
+  primary: string
+  secondary: string
+}
+
 function TestEntityPicker({
   entityType,
   value,
@@ -362,8 +541,8 @@ function TestEntityPicker({
   const [search, setSearch] = useState('')
   const inputRef = useRef<HTMLInputElement>(null)
 
-  // Order list — search debounced via the query key.
-  const { data: orders, isLoading } = useQuery({
+  // One query per entity type — only the matching one runs.
+  const ordersQ = useQuery({
     ...getOrdersQuery({
       project_id: projectId ?? undefined,
       search: search || undefined,
@@ -371,25 +550,89 @@ function TestEntityPicker({
     }),
     enabled: open && entityType === 'order' && !!projectId,
   })
+  const proposalsQ = useQuery({
+    ...getProposalsQuery({
+      project_id: projectId ?? undefined,
+      search: search || undefined,
+      limit: 25,
+    }),
+    enabled: open && entityType === 'proposal' && !!projectId,
+  })
+  const customersQ = useQuery({
+    ...getCustomersQuery({
+      project_id: projectId ?? undefined,
+      search: search || undefined,
+      limit: 25,
+    }),
+    enabled: open && entityType === 'customer' && !!projectId,
+  })
+
+  const { rows, isLoading } = useMemo<{
+    rows: PickerRow[]
+    isLoading: boolean
+  }>(() => {
+    if (entityType === 'order') {
+      const orders = ordersQ.data?.results ?? []
+      return {
+        isLoading: ordersQ.isLoading,
+        rows: orders.map((o) => ({
+          pickValue: o.autoid,
+          primary: o.invoice || o.autoid,
+          secondary: [o.name, o.status].filter(Boolean).join(' · '),
+        })),
+      }
+    }
+    if (entityType === 'proposal') {
+      const proposals = proposalsQ.data?.results ?? []
+      return {
+        isLoading: proposalsQ.isLoading,
+        rows: proposals.map((p) => ({
+          pickValue: p.autoid,
+          primary: p.quote || p.autoid,
+          secondary: [p.b_name, p.status].filter(Boolean).join(' · '),
+        })),
+      }
+    }
+    if (entityType === 'customer') {
+      const customers = customersQ.data?.results ?? []
+      return {
+        isLoading: customersQ.isLoading,
+        rows: customers.map((c) => ({
+          // Customer endpoints key off `id` (the EBMS customer id), not autoid.
+          pickValue: c.id,
+          primary: c.id || c.autoid,
+          secondary: [c.l_name, c.city, c.state].filter(Boolean).join(' · '),
+        })),
+      }
+    }
+    return { rows: [], isLoading: false }
+  }, [
+    entityType,
+    ordersQ.data,
+    ordersQ.isLoading,
+    proposalsQ.data,
+    proposalsQ.isLoading,
+    customersQ.data,
+    customersQ.isLoading,
+  ])
 
   useEffect(() => {
     if (open) setTimeout(() => inputRef.current?.focus(), 30)
   }, [open])
 
-  // Only order is wired for live preview today.
-  const supported = entityType === 'order'
+  const placeholder =
+    entityType === 'order'
+      ? 'Search by invoice # or customer…'
+      : entityType === 'proposal'
+        ? 'Search by quote # or customer…'
+        : 'Search by customer ID or name…'
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <button
           type='button'
-          disabled={!supported}
-          title={
-            supported
-              ? 'Pick a real entity to preview field values'
-              : `Live preview for ${entityType} is not wired yet`
-          }
+          title='Pick a real entity to preview field values'
           className={cn(
             'inline-flex h-7 max-w-[200px] items-center gap-1.5 truncate rounded-[5px] border px-2.5 text-[12px] font-medium transition-colors duration-[80ms] disabled:pointer-events-none disabled:opacity-50',
             value
@@ -424,48 +667,41 @@ function TestEntityPicker({
             type='text'
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder={
-              entityType === 'order'
-                ? 'Search by invoice # or customer…'
-                : 'Search…'
-            }
+            placeholder={placeholder}
             className='h-7 w-full bg-transparent text-[13px] outline-none placeholder:text-text-tertiary'
           />
         </div>
         <div className='max-h-[300px] overflow-y-auto py-1'>
-          {!supported ? (
-            <div className='px-3 py-4 text-[12px] text-text-tertiary'>
-              Live preview for {entityType} entities is not wired yet.
-            </div>
-          ) : isLoading ? (
+          {isLoading ? (
             <div className='px-3 py-4 text-[12px] text-text-tertiary'>
               Loading…
             </div>
-          ) : !orders?.results?.length ? (
+          ) : rows.length === 0 ? (
             <div className='px-3 py-4 text-[12px] text-text-tertiary'>
               No matches
             </div>
           ) : (
-            orders.results.map((o) => (
+            rows.map((row) => (
               <button
-                key={o.autoid}
+                key={row.pickValue}
                 type='button'
                 onClick={() => {
-                  onChange(o.autoid)
+                  onChange(row.pickValue)
                   setOpen(false)
                 }}
                 className={cn(
                   'flex w-full flex-col items-start gap-0.5 px-3 py-1.5 text-left transition-colors hover:bg-bg-hover',
-                  value === o.autoid && 'bg-primary/[0.06]'
+                  value === row.pickValue && 'bg-primary/[0.06]'
                 )}
               >
                 <span className='text-[12.5px] font-medium text-foreground'>
-                  {o.invoice || o.autoid}
+                  {row.primary}
                 </span>
-                <span className='truncate text-[11px] text-text-tertiary'>
-                  {o.name}
-                  {o.status && ` · ${o.status}`}
-                </span>
+                {row.secondary && (
+                  <span className='truncate text-[11px] text-text-tertiary'>
+                    {row.secondary}
+                  </span>
+                )}
               </button>
             ))
           )}
