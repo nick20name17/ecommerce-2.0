@@ -234,19 +234,52 @@ export function DesignerCanvas({
     clipboardRef.current = pasted
   }, [dims, elements, updatePage])
 
-  // Cmd/Ctrl+D duplicates, Cmd+C copies, Cmd+V pastes.
+  // Arrow keys nudge the selected element; Shift = larger step.
+  const nudgeSelected = useCallback(
+    (dx: number, dy: number) => {
+      if (!selectedId) return
+      const el = elements.find((x) => x.id === selectedId)
+      if (!el) return
+      const nextX = snapInches(Math.max(0, Math.min(dims.w - el.w, el.x + dx)))
+      const nextY = snapInches(Math.max(0, Math.min(dims.h - el.h, el.y + dy)))
+      if (nextX === el.x && nextY === el.y) return
+      replaceElement({ ...el, x: nextX, y: nextY })
+    },
+    [selectedId, elements, dims, replaceElement]
+  )
+
+  // Cmd/Ctrl+D duplicates, Cmd+C copies, Cmd+V pastes;
+  // bare arrow keys nudge the selected element.
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
-      if (!(e.metaKey || e.ctrlKey)) return
       const target = e.target as HTMLElement | null
-      if (
+      const inTextField =
         target &&
         (target.tagName === 'INPUT' ||
           target.tagName === 'TEXTAREA' ||
           target.isContentEditable)
-      ) {
+      if (inTextField) return
+
+      // Arrow-key nudge — no modifier required.
+      const isArrow =
+        e.key === 'ArrowLeft' ||
+        e.key === 'ArrowRight' ||
+        e.key === 'ArrowUp' ||
+        e.key === 'ArrowDown'
+      if (isArrow && selectedId && !(e.metaKey || e.ctrlKey)) {
+        const step = e.shiftKey ? 1.0 : 0.125
+        let dx = 0
+        let dy = 0
+        if (e.key === 'ArrowLeft') dx = -step
+        else if (e.key === 'ArrowRight') dx = step
+        else if (e.key === 'ArrowUp') dy = -step
+        else if (e.key === 'ArrowDown') dy = step
+        e.preventDefault()
+        nudgeSelected(dx, dy)
         return
       }
+
+      if (!(e.metaKey || e.ctrlKey)) return
       if (e.key === 'd') {
         if (!selectedId) return
         e.preventDefault()
@@ -265,7 +298,13 @@ export function DesignerCanvas({
     }
     window.addEventListener('keydown', handler)
     return () => window.removeEventListener('keydown', handler)
-  }, [selectedId, duplicateElement, elements, pasteFromClipboard])
+  }, [
+    selectedId,
+    duplicateElement,
+    elements,
+    pasteFromClipboard,
+    nudgeSelected,
+  ])
 
   const addElement = useCallback(
     (type: ElementType, dropX: number, dropY: number) => {

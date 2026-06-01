@@ -125,12 +125,15 @@ export function CanvasElement({
       const dyIn = (e.clientY - drag.startY) / PX_PER_INCH
       const el = latestRef.current
 
+      // Hold Alt/Option to bypass grid + alignment snap for pixel-precise control.
+      const bypassSnap = e.altKey
+
       if (drag.kind === 'move') {
         let nextX = Math.max(0, Math.min(pageW - el.w, drag.origX + dxIn))
         let nextY = Math.max(0, Math.min(pageH - el.h, drag.origY + dyIn))
 
         // Alignment guides — snap to sibling edges/centers before the grid snap.
-        if (siblings && siblings.length > 0) {
+        if (!bypassSnap && siblings && siblings.length > 0) {
           const result = computeAlignment(
             { x: nextX, y: nextY, w: el.w, h: el.h },
             siblings.filter((s) => s.id !== el.id)
@@ -142,8 +145,14 @@ export function CanvasElement({
           onGuidesChange?.([])
         }
 
-        nextX = snapInches(Math.max(0, Math.min(pageW - el.w, nextX)))
-        nextY = snapInches(Math.max(0, Math.min(pageH - el.h, nextY)))
+        if (!bypassSnap) {
+          nextX = snapInches(Math.max(0, Math.min(pageW - el.w, nextX)))
+          nextY = snapInches(Math.max(0, Math.min(pageH - el.h, nextY)))
+        } else {
+          // Clamp without grid snap, but round to 3 decimals to avoid float drift.
+          nextX = Math.round(Math.max(0, Math.min(pageW - el.w, nextX)) * 1000) / 1000
+          nextY = Math.round(Math.max(0, Math.min(pageH - el.h, nextY)) * 1000) / 1000
+        }
 
         if (nextX !== el.x || nextY !== el.y) {
           onChange({ ...el, x: nextX, y: nextY })
@@ -179,12 +188,15 @@ export function CanvasElement({
       if (x + w > pageW) w = pageW - x
       if (y + h > pageH) h = pageH - y
 
-      const next = {
-        x: snapInches(x),
-        y: snapInches(y),
-        w: snapInches(w),
-        h: snapInches(h),
-      }
+      const round3 = (v: number) => Math.round(v * 1000) / 1000
+      const next = bypassSnap
+        ? { x: round3(x), y: round3(y), w: round3(w), h: round3(h) }
+        : {
+            x: snapInches(x),
+            y: snapInches(y),
+            w: snapInches(w),
+            h: snapInches(h),
+          }
       if (
         next.x !== el.x ||
         next.y !== el.y ||
