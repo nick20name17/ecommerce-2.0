@@ -6,12 +6,14 @@ import {
   Image as ImageIcon,
   Italic,
   Minus,
+  Plus,
   Square,
   Table as TableIcon,
+  Trash2,
   Type,
   X,
 } from 'lucide-react'
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
 import type { FieldConfigEntry } from '@/api/field-config/schema'
 import type {
@@ -78,18 +80,51 @@ export function DesignerCanvas({
   const normalized = ensureLayout(layout)
   const dims = pageDims(pageSize, orientation)
 
-  // Single-page MVP: only the first page is rendered. Multi-page lands later.
-  const elements = normalized.pages?.[0]?.elements ?? []
+  const pages = normalized.pages ?? [{ elements: [] }]
+  const [currentPageIndex, setCurrentPageIndex] = useState(0)
+
+  // Clamp when pages shrink underneath us (e.g. after a delete).
+  useEffect(() => {
+    if (currentPageIndex >= pages.length && pages.length > 0) {
+      setCurrentPageIndex(pages.length - 1)
+    }
+  }, [pages.length, currentPageIndex])
+
+  const elements = pages[currentPageIndex]?.elements ?? []
 
   const [selectedId, setSelectedId] = useState<string | null>(null)
 
   const updatePage = useCallback(
     (next: LayoutElement[]) => {
-      const nextPages = [...(normalized.pages ?? [])]
-      nextPages[0] = { ...(nextPages[0] ?? { elements: [] }), elements: next }
+      const nextPages = [...pages]
+      nextPages[currentPageIndex] = {
+        ...(nextPages[currentPageIndex] ?? { elements: [] }),
+        elements: next,
+      }
       onChange({ pages: nextPages })
     },
-    [normalized.pages, onChange]
+    [pages, currentPageIndex, onChange]
+  )
+
+  const addPage = useCallback(() => {
+    onChange({ pages: [...pages, { elements: [] }] })
+    setCurrentPageIndex(pages.length)
+    setSelectedId(null)
+  }, [pages, onChange])
+
+  const removePage = useCallback(
+    (idx: number) => {
+      if (pages.length <= 1) return
+      const nextPages = pages.filter((_, i) => i !== idx)
+      const nextIdx = Math.max(
+        0,
+        Math.min(currentPageIndex, nextPages.length - 1)
+      )
+      onChange({ pages: nextPages })
+      setCurrentPageIndex(nextIdx)
+      setSelectedId(null)
+    },
+    [pages, currentPageIndex, onChange]
   )
 
   const updateElement = useCallback(
@@ -193,11 +228,70 @@ export function DesignerCanvas({
         })}
       </aside>
 
-      {/* Canvas scroll area */}
-      <div
-        className='flex min-h-0 flex-1 items-start justify-center overflow-auto p-6'
-        onClick={() => setSelectedId(null)}
-      >
+      {/* Canvas + page bar (column) */}
+      <div className='flex min-h-0 flex-1 flex-col overflow-hidden'>
+        {/* Page selector bar */}
+        <div className='flex shrink-0 items-center gap-1 overflow-x-auto border-b border-border bg-bg-secondary/30 px-3 py-1.5'>
+          <span className='text-[10.5px] font-semibold uppercase tracking-wider text-text-tertiary'>
+            Page
+          </span>
+          {pages.map((_, idx) => {
+            const isActive = idx === currentPageIndex
+            return (
+              <button
+                key={idx}
+                type='button'
+                onClick={() => {
+                  setCurrentPageIndex(idx)
+                  setSelectedId(null)
+                }}
+                className={cn(
+                  'inline-flex h-6 min-w-[24px] items-center justify-center rounded-[4px] border px-1.5 text-[12px] font-medium transition-colors duration-[80ms]',
+                  isActive
+                    ? 'border-primary bg-primary/[0.1] text-primary'
+                    : 'border-border bg-background text-text-secondary hover:bg-bg-active hover:text-foreground'
+                )}
+              >
+                {idx + 1}
+              </button>
+            )
+          })}
+          <button
+            type='button'
+            onClick={addPage}
+            className='inline-flex h-6 items-center gap-1 rounded-[4px] border border-dashed border-border bg-background px-1.5 text-[11.5px] font-medium text-text-secondary transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground'
+            title='Add page'
+          >
+            <Plus className='size-3' />
+            Add
+          </button>
+          <div className='flex-1' />
+          {pages.length > 1 && (
+            <button
+              type='button'
+              onClick={() => {
+                if (
+                  confirm(
+                    `Delete page ${currentPageIndex + 1}? All elements on it will be lost.`
+                  )
+                ) {
+                  removePage(currentPageIndex)
+                }
+              }}
+              className='inline-flex h-6 items-center gap-1 rounded-[4px] px-1.5 text-[11.5px] font-medium text-text-tertiary transition-colors duration-[80ms] hover:bg-bg-hover hover:text-destructive'
+              title={`Delete page ${currentPageIndex + 1}`}
+            >
+              <Trash2 className='size-3' />
+              Delete page
+            </button>
+          )}
+        </div>
+
+        {/* Canvas scroll area */}
+        <div
+          className='flex min-h-0 flex-1 items-start justify-center overflow-auto p-6'
+          onClick={() => setSelectedId(null)}
+        >
         <div
           className='relative shrink-0 bg-white shadow-[0_2px_12px_rgba(0,0,0,0.08)] ring-1 ring-black/[0.04]'
           style={{
@@ -258,6 +352,7 @@ export function DesignerCanvas({
             )
           })}
         </div>
+      </div>
       </div>
 
       {/* Properties panel */}
