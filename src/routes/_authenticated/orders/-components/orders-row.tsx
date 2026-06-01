@@ -15,7 +15,9 @@ import {
   CustomColumnsCells,
   type CustomColumn
 } from '@/components/common/custom-list-columns'
+import { PrintMenu } from '@/components/common/print-menu'
 import { InitialsAvatar } from '@/components/ds'
+import { useProjectId } from '@/hooks/use-project-id'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -86,6 +88,7 @@ export function OrderRow({
   const statusLabel = getOrderStatusLabel(order.status)
   const statusClass = ORDER_STATUS_CLASS[order.status] ?? ''
   const dotColor = STATUS_DOT_COLORS[order.status] ?? 'bg-slate-400'
+  const [projectIdForRow] = useProjectId()
 
   const noteCount = typeof order.notes_count === 'number' ? order.notes_count : Array.isArray(order.notes) ? order.notes.length : 0
 
@@ -278,6 +281,21 @@ export function OrderRow({
           <StickyNote className='size-3.5' />
           {noteCount > 0 && <span>{noteCount}</span>}
         </button>
+      </div>
+
+      {/* Print menu (visible only if order_list templates exist) */}
+      <div
+        className='flex w-[28px] shrink-0 items-center justify-center'
+        onClick={(e) => e.stopPropagation()}
+      >
+        <PrintMenu
+          entityType='order'
+          accessibleFrom='order_list'
+          entityId={order.autoid}
+          projectId={projectIdForRow}
+          compact
+          stopPropagation
+        />
       </div>
 
       {/* Actions */}
