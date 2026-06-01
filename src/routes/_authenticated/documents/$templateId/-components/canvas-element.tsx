@@ -377,7 +377,9 @@ function FieldBody({
     >
       {hasResolved ? (
         display || (
-          <span style={{ fontStyle: 'italic', opacity: 0.4 }}>(empty)</span>
+          <span style={{ opacity: 0.25 }} aria-label='Empty field'>
+            —
+          </span>
         )
       ) : (
         <code style={{ fontFamily: 'inherit' }}>{display}</code>

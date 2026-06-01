@@ -425,12 +425,9 @@ const CREDIT_INVOICE_LAYOUT: DocumentLayout = {
           x: 0.4, y: 2.59, w: 3.5, h: 0.22,
           props: { fieldKey: 'city', fontSize: 9, color: COLOR_TEXT },
         },
-        {
-          id: 'preset-bill-phone',
-          type: 'text',
-          x: 0.4, y: 2.95, w: 3.5, h: 0.22,
-          props: { text: 'Phone: ', fontSize: 9, color: COLOR_TEXT },
-        },
+        // (Phone removed — Order entity doesn't carry a direct customer
+        // phone field; users who want it can add a Field element bound to a
+        // custom contact column.)
 
         {
           id: 'preset-ship-label',
@@ -506,7 +503,9 @@ const CREDIT_INVOICE_LAYOUT: DocumentLayout = {
           id: 'preset-bar-v1',
           type: 'field',
           x: 0.4, y: 3.83, w: 1.28, h: 0.22,
-          props: { fieldKey: 'c_id', fontSize: 9, textAlign: 'center', color: COLOR_TEXT },
+          // `id` is the customer code on ARINV (e.g. "BEMOR"). The mistakenly
+          // used `c_id` doesn't exist on the serialized Order.
+          props: { fieldKey: 'id', fontSize: 9, textAlign: 'center', color: COLOR_TEXT },
         },
         {
           id: 'preset-bar-v2',
