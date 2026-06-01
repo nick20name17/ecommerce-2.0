@@ -1,7 +1,8 @@
-import { ArrowDown, ArrowUp } from 'lucide-react'
+import { ArrowDown, ArrowUp, Check } from 'lucide-react'
 
 import type { FieldConfigEntry, FieldConfigResponse } from '@/api/field-config/schema'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
+import { formatDate } from '@/helpers/formatters'
 import { cn } from '@/lib/utils'
 
 /**
@@ -53,17 +54,31 @@ export const customFieldsParam = (columns: CustomColumn[]): string | undefined =
 
 const CELL_TRUNCATE = 40
 
-export const formatCellDisplay = (value: unknown, type?: string): string => {
-  if (value == null) return '—'
-  if (type === 'boolean') {
-    if (typeof value === 'boolean') return value ? 'true' : 'false'
-    const s = String(value).toLowerCase()
-    if (s === 'true' || s === '1') return 'true'
-    if (s === 'false' || s === '0' || s === '') return 'false'
-  }
-  const str = String(value).trim()
-  if (str === '') return '—'
-  return str
+const parseBoolean = (value: unknown): boolean | null => {
+  if (value == null) return null
+  if (typeof value === 'boolean') return value
+  const s = String(value).trim().toLowerCase()
+  if (s === '') return null
+  if (s === 'true' || s === '1') return true
+  if (s === 'false' || s === '0') return false
+  return null
+}
+
+const isEmpty = (value: unknown): boolean => {
+  if (value == null) return true
+  return String(value).trim() === ''
+}
+
+const formatNumeric = (value: unknown): string => {
+  if (value == null || value === '') return '—'
+  const n = typeof value === 'number' ? value : parseFloat(String(value))
+  if (Number.isNaN(n)) return String(value)
+  // Two decimals for floats, none for integers.
+  const isInt = Number.isInteger(n)
+  return new Intl.NumberFormat('en-US', {
+    minimumFractionDigits: isInt ? 0 : 2,
+    maximumFractionDigits: isInt ? 0 : 2
+  }).format(n)
 }
 
 export const CustomColumnsHeader = ({
@@ -125,31 +140,73 @@ export const CustomColumnsCells = ({
     <>
       {columns.map((col) => {
         const raw = row[col.field]
-        const display = formatCellDisplay(raw, col.type)
-        const isEmpty = display === '—'
-        const truncated = display.length > CELL_TRUNCATE
-        const shown = truncated ? `${display.slice(0, CELL_TRUNCATE)}…` : display
         return (
           <div
             key={col.field}
-            className={cn(
-              'w-[140px] shrink-0 truncate text-[13px]',
-              isEmpty ? 'text-text-tertiary' : 'text-text-secondary'
-            )}
+            className='w-[140px] shrink-0 truncate text-[13px]'
           >
-            {truncated ? (
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <span className='block truncate'>{shown}</span>
-                </TooltipTrigger>
-                <TooltipContent>{display}</TooltipContent>
-              </Tooltip>
-            ) : (
-              <span className='block truncate'>{shown}</span>
-            )}
+            <CellValue value={raw} type={col.type} />
           </div>
         )
       })}
     </>
   )
+}
+
+const EmDash = () => <span className='text-text-tertiary'>—</span>
+
+function CellValue({ value, type }: { value: unknown; type?: string }) {
+  if (type === 'boolean') {
+    const bool = parseBoolean(value)
+    if (bool === true) {
+      return (
+        <span
+          className='inline-flex h-[18px] items-center gap-1 rounded-[4px] bg-emerald-500/10 px-1.5 text-[11px] font-medium text-emerald-600'
+          title='true'
+        >
+          <Check className='size-3' />
+          Yes
+        </span>
+      )
+    }
+    if (bool === false) {
+      // Treat false as a non-event for boolean flags — most rows are
+      // "not X", showing every one as "false" is noisy.
+      return <EmDash />
+    }
+    return <EmDash />
+  }
+
+  if (isEmpty(value)) return <EmDash />
+
+  if (type === 'date') {
+    const formatted = formatDate(value as string)
+    return (
+      <span className='block truncate text-text-secondary tabular-nums'>{formatted}</span>
+    )
+  }
+
+  if (type === 'integer' || type === 'number') {
+    const formatted = formatNumeric(value)
+    return (
+      <span className='block truncate text-right text-text-secondary tabular-nums'>
+        {formatted}
+      </span>
+    )
+  }
+
+  const display = String(value).trim()
+  const truncated = display.length > CELL_TRUNCATE
+  const shown = truncated ? `${display.slice(0, CELL_TRUNCATE)}…` : display
+  if (truncated) {
+    return (
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <span className='block truncate text-text-secondary'>{shown}</span>
+        </TooltipTrigger>
+        <TooltipContent>{display}</TooltipContent>
+      </Tooltip>
+    )
+  }
+  return <span className='block truncate text-text-secondary'>{shown}</span>
 }
