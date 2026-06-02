@@ -24,7 +24,8 @@ import { cn } from '@/lib/utils'
 
 // ── Helpers ──────────────────────────────────────────────────
 
-function formatDuration(ms: number) {
+function formatDuration(ms: number | null | undefined) {
+  if (ms == null) return '—'
   if (ms < 1000) return `${ms}ms`
   return `${(ms / 1000).toFixed(1)}s`
 }
@@ -35,6 +36,7 @@ const METHOD_COLORS: Record<string, string> = {
   PATCH: 'bg-amber-500/10 text-amber-700 border-amber-200 dark:text-amber-400 dark:border-amber-800',
   PUT: 'bg-amber-500/10 text-amber-700 border-amber-200 dark:text-amber-400 dark:border-amber-800',
   DELETE: 'bg-red-500/10 text-red-700 border-red-200 dark:text-red-400 dark:border-red-800',
+  CALCULATION: 'bg-bg-secondary text-text-secondary border-border',
 }
 
 type ErrorFilter = 'all' | 'errors' | 'success'
@@ -47,7 +49,7 @@ const ERROR_OPTIONS: { value: ErrorFilter; label: string }[] = [
   { value: 'success', label: 'Success Only' },
 ]
 
-const METHOD_OPTIONS = ['GET', 'POST', 'PATCH', 'PUT', 'DELETE'] as const
+const METHOD_OPTIONS = ['GET', 'POST', 'PATCH', 'PUT', 'DELETE', 'CALCULATION'] as const
 
 const SOURCE_OPTIONS: { value: PayloadLogSource; label: string; description: string }[] = [
   { value: 'internal', label: 'Internal', description: 'Outgoing EBMS calls from ebms.app' },
@@ -76,7 +78,7 @@ const ActivityPage = () => {
   const [selectedLog, setSelectedLog] = useState<PayloadLog | null>(null)
 
   const searchUpper = deferredSearch.toUpperCase()
-  const isMethodSearch = (['GET', 'POST', 'PATCH', 'PUT', 'DELETE'] as const).includes(searchUpper as typeof METHOD_OPTIONS[number])
+  const isMethodSearch = (METHOD_OPTIONS as readonly string[]).includes(searchUpper)
 
   const params: PayloadLogParams = {
     offset,
@@ -256,24 +258,25 @@ const ActivityPage = () => {
         </div>
       )}
 
-      {/* Column headers */}
-      {!isMobile && (results.length > 0 || isLoading) && (
-        <div className='flex shrink-0 min-w-fit items-center gap-4 border-b border-border bg-bg-secondary/60 px-5 py-1.5 xl:px-6'>
-          <div className='w-[110px] shrink-0 text-[12px] font-medium text-text-tertiary'>Method</div>
-          <div className='min-w-0 flex-1 text-[12px] font-medium text-text-tertiary'>URL / Action</div>
-          <div className='w-[100px] shrink-0 text-[12px] font-medium text-text-tertiary'>Entity</div>
-          <div className='w-[80px] shrink-0 text-[12px] font-medium text-text-tertiary'>Proposal</div>
-          <div className='w-[140px] shrink-0 text-[12px] font-medium text-text-tertiary'>Autoid</div>
-          <div className='w-[80px] shrink-0 text-[12px] font-medium text-text-tertiary'>Source</div>
-          <div className='w-[50px] shrink-0 text-[12px] font-medium text-text-tertiary'>Status</div>
-          <div className='w-[70px] shrink-0 text-right text-[12px] font-medium text-text-tertiary'>Duration</div>
-          <div className='w-[140px] shrink-0 text-[12px] font-medium text-text-tertiary'>Time</div>
-          <div className='w-[20px] shrink-0' />
-        </div>
-      )}
-
       {/* Body */}
       <div className='flex-1 overflow-auto'>
+        {/* Column headers — sticky inside the scroll container so they stay
+            aligned with the rows under both the vertical scrollbar gutter and
+            horizontal scroll (when outside the scroll area they drift). */}
+        {!isMobile && (results.length > 0 || isLoading) && (
+          <div className='sticky top-0 z-10 flex min-w-fit items-center gap-4 border-b border-border bg-bg-secondary px-5 py-1.5 xl:px-6'>
+            <div className='w-[110px] shrink-0 text-[12px] font-medium text-text-tertiary'>Method</div>
+            <div className='min-w-0 flex-1 text-[12px] font-medium text-text-tertiary'>URL / Action</div>
+            <div className='w-[100px] shrink-0 text-[12px] font-medium text-text-tertiary'>Entity</div>
+            <div className='w-[80px] shrink-0 text-[12px] font-medium text-text-tertiary'>Proposal</div>
+            <div className='w-[140px] shrink-0 text-[12px] font-medium text-text-tertiary'>Autoid</div>
+            <div className='w-[80px] shrink-0 text-[12px] font-medium text-text-tertiary'>Source</div>
+            <div className='w-[50px] shrink-0 text-[12px] font-medium text-text-tertiary'>Status</div>
+            <div className='w-[70px] shrink-0 text-right text-[12px] font-medium text-text-tertiary'>Duration</div>
+            <div className='w-[140px] shrink-0 text-[12px] font-medium text-text-tertiary'>Time</div>
+            <div className='w-[20px] shrink-0' />
+          </div>
+        )}
         {isLoading ? (
           Array.from({ length: 10 }).map((_, i) => (
             <div key={i} className={cn('flex min-w-fit items-center gap-4 border-b border-border-light px-5 py-2.5 xl:px-6', isMobile && 'px-3.5')}>

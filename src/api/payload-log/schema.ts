@@ -18,7 +18,7 @@ export interface PayloadLog {
   status_code: number
   is_error: boolean
   error_message: string | null
-  duration_ms: number
+  duration_ms: number | null
   created_at: string
 }
 
