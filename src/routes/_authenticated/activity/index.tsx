@@ -61,6 +61,15 @@ const SOURCE_LABEL: Record<PayloadLogSource, string> = {
   storefront: 'Storefront',
 }
 
+// Shared column-track template applied to BOTH the header row and every data
+// row, so columns resolve to identical widths at any zoom. The old approach
+// (flex + per-cell `w-[..] shrink-0` + `min-w-fit`) let the header and rows
+// round the `flex-1` remainder / scrollbar gutter differently at 100% zoom →
+// columns drifted ("пливе"); they only lined up when zoomed out. A single grid
+// template removes that divergence entirely.
+const ROW_GRID =
+  'grid grid-cols-[110px_minmax(0,1fr)_100px_80px_140px_80px_50px_70px_140px_20px] items-center gap-4 min-w-[920px]'
+
 // ── Page Component ───────────────────────────────────────────
 
 const ActivityPage = () => {
@@ -264,17 +273,17 @@ const ActivityPage = () => {
             aligned with the rows under both the vertical scrollbar gutter and
             horizontal scroll (when outside the scroll area they drift). */}
         {!isMobile && (results.length > 0 || isLoading) && (
-          <div className='sticky top-0 z-10 flex min-w-fit items-center gap-4 border-b border-border bg-bg-secondary px-5 py-1.5 xl:px-6'>
-            <div className='w-[110px] shrink-0 text-[12px] font-medium text-text-tertiary'>Method</div>
-            <div className='min-w-0 flex-1 text-[12px] font-medium text-text-tertiary'>URL / Action</div>
-            <div className='w-[100px] shrink-0 text-[12px] font-medium text-text-tertiary'>Entity</div>
-            <div className='w-[80px] shrink-0 text-[12px] font-medium text-text-tertiary'>Proposal</div>
-            <div className='w-[140px] shrink-0 text-[12px] font-medium text-text-tertiary'>Autoid</div>
-            <div className='w-[80px] shrink-0 text-[12px] font-medium text-text-tertiary'>Source</div>
-            <div className='w-[50px] shrink-0 text-[12px] font-medium text-text-tertiary'>Status</div>
-            <div className='w-[70px] shrink-0 text-right text-[12px] font-medium text-text-tertiary'>Duration</div>
-            <div className='w-[140px] shrink-0 text-[12px] font-medium text-text-tertiary'>Time</div>
-            <div className='w-[20px] shrink-0' />
+          <div className={cn(ROW_GRID, 'sticky top-0 z-10 border-b border-border bg-bg-secondary px-5 py-1.5 xl:px-6')}>
+            <div className='text-[12px] font-medium text-text-tertiary'>Method</div>
+            <div className='min-w-0 text-[12px] font-medium text-text-tertiary'>URL / Action</div>
+            <div className='text-[12px] font-medium text-text-tertiary'>Entity</div>
+            <div className='text-[12px] font-medium text-text-tertiary'>Proposal</div>
+            <div className='text-[12px] font-medium text-text-tertiary'>Autoid</div>
+            <div className='text-[12px] font-medium text-text-tertiary'>Source</div>
+            <div className='text-[12px] font-medium text-text-tertiary'>Status</div>
+            <div className='text-right text-[12px] font-medium text-text-tertiary'>Duration</div>
+            <div className='text-[12px] font-medium text-text-tertiary'>Time</div>
+            <div />
           </div>
         )}
         {isLoading ? (
@@ -387,19 +396,20 @@ function LogRow({
   return (
     <div
       className={cn(
-        'group/row flex min-w-fit cursor-pointer items-center gap-4 border-b border-border-light px-5 py-2 transition-colors duration-100 hover:bg-bg-hover xl:px-6',
+        ROW_GRID,
+        'group/row cursor-pointer border-b border-border-light px-5 py-2 transition-colors duration-100 hover:bg-bg-hover xl:px-6',
         log.is_error && 'bg-red-500/[0.02]',
       )}
       onClick={onClick}
     >
-      <div className='w-[110px] shrink-0'>
+      <div>
         <span className={cn('rounded border px-1.5 py-0.5 font-mono text-[11px] font-semibold', methodColor)}>
           {log.method}
         </span>
       </div>
-      <div className='min-w-0 flex-1 flex items-center gap-1.5'>
+      <div className='flex min-w-0 items-center gap-1.5'>
         {log.is_error && <AlertCircle className='size-3 shrink-0 text-red-500' />}
-        <div className='min-w-0 flex flex-col'>
+        <div className='flex min-w-0 flex-col'>
           <span className={cn(
             'truncate text-[12px]',
             log.action_name ? 'font-medium text-foreground' : 'font-mono text-foreground',
@@ -411,32 +421,32 @@ function LogRow({
           )}
         </div>
       </div>
-      <div className='w-[100px] shrink-0 truncate text-[13px] text-text-tertiary'>
+      <div className='min-w-0 truncate text-[13px] text-text-tertiary'>
         {log.entity || '—'}
       </div>
-      <div className='w-[80px] shrink-0 truncate text-[13px] text-text-tertiary tabular-nums'>
+      <div className='min-w-0 truncate text-[13px] text-text-tertiary tabular-nums'>
         {log.external_ref || '—'}
       </div>
-      <div className='w-[140px] shrink-0 truncate font-mono text-[12px] text-text-tertiary' title={log.key ?? ''}>
+      <div className='min-w-0 truncate font-mono text-[12px] text-text-tertiary' title={log.key ?? ''}>
         {log.key || '—'}
       </div>
-      <div className='w-[80px] shrink-0'>
-        <span className={cn('rounded border px-1.5 py-0.5 text-[11px] font-medium', sourceColor)}>
+      <div className='min-w-0'>
+        <span className={cn('inline-block max-w-full truncate rounded border px-1.5 py-0.5 align-middle text-[11px] font-medium', sourceColor)}>
           {SOURCE_LABEL[log.source] ?? log.source}
         </span>
       </div>
-      <div className='w-[50px] shrink-0'>
+      <div>
         <span className={cn('font-mono text-[12px] font-semibold tabular-nums', statusColor)}>
           {log.status_code}
         </span>
       </div>
-      <div className='w-[70px] shrink-0 text-right text-[12px] tabular-nums text-text-tertiary'>
+      <div className='text-right text-[12px] tabular-nums text-text-tertiary'>
         {formatDuration(log.duration_ms)}
       </div>
-      <div className='w-[140px] shrink-0 text-[12px] tabular-nums text-text-tertiary'>
+      <div className='min-w-0 truncate text-[12px] tabular-nums text-text-tertiary'>
         {formatDateTimeShort(log.created_at)}
       </div>
-      <div className='w-[20px] shrink-0 text-text-tertiary opacity-0 transition-opacity group-hover/row:opacity-100'>
+      <div className='text-text-tertiary opacity-0 transition-opacity group-hover/row:opacity-100'>
         <ChevronRight className='size-3.5' />
       </div>
     </div>
