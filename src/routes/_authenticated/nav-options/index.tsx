@@ -331,30 +331,30 @@ function Panel2() {
 // Panel 3 — Alien calendar app (third from left)
 // ═══════════════════════════════════════════════════════════
 
-function Panel3() {
-  const sections = [
-    {
-      icon: IcCalendar,
-      label: 'Calendar',
-      items: ['General', 'Try calendar', 'Smart color-coding']
-    },
-    {
-      icon: IcGear,
-      label: 'Integrations',
-      items: ['Calendars', 'Rooms & contacts', 'Conferencing']
-    },
-    {
-      icon: IcClock,
-      label: 'Scheduling',
-      items: ['Working hours', 'Flexible events', 'Focus fuard', 'Scheduling links']
-    },
-    {
-      icon: User,
-      label: 'Account',
-      items: ['Profile', 'Emails', 'Plans & billing']
-    }
-  ]
+const PANEL3_SECTIONS = [
+  {
+    icon: IcCalendar,
+    label: 'Calendar',
+    items: ['General', 'Try calendar', 'Smart color-coding']
+  },
+  {
+    icon: IcGear,
+    label: 'Integrations',
+    items: ['Calendars', 'Rooms & contacts', 'Conferencing']
+  },
+  {
+    icon: IcClock,
+    label: 'Scheduling',
+    items: ['Working hours', 'Flexible events', 'Focus fuard', 'Scheduling links']
+  },
+  {
+    icon: User,
+    label: 'Account',
+    items: ['Profile', 'Emails', 'Plans & billing']
+  }
+]
 
+function Panel3() {
   return (
     <div className='flex h-full w-full flex-col bg-background'>
       {/* ── Header ── */}
@@ -376,7 +376,7 @@ function Panel3() {
 
       {/* ── Sections ── */}
       <nav className='flex flex-1 flex-col gap-5 overflow-auto px-5 py-1'>
-        {sections.map(section => (
+        {PANEL3_SECTIONS.map(section => (
           <div key={section.label}>
             {/* Section header — icon + label */}
             <div className='flex h-9 items-center gap-2.5'>
@@ -413,18 +413,18 @@ function Panel3() {
 // Panel 4 — Craftwork CMS (rightmost)
 // ═══════════════════════════════════════════════════════════
 
-function Panel4() {
-  const downloadsSubs = [
-    'Discounts',
-    'Orders',
-    'Customers',
-    'Reports',
-    'Settings',
-    'Sheed Editor',
-    'Commissions',
-    'Subscriptions'
-  ]
+const PANEL4_DOWNLOADS_SUBS = [
+  'Discounts',
+  'Orders',
+  'Customers',
+  'Reports',
+  'Settings',
+  'Sheed Editor',
+  'Commissions',
+  'Subscriptions'
+]
 
+function Panel4() {
   return (
     <div className='flex h-full w-full flex-col bg-background'>
       {/* ── Header ── */}
@@ -488,7 +488,7 @@ function Panel4() {
 
           {/* Sub-items with left border */}
           <div className='ml-3.5 flex flex-col border-l border-gray-100 pl-3.5'>
-            {downloadsSubs.map(item => {
+            {PANEL4_DOWNLOADS_SUBS.map(item => {
               const isActive = item === 'Customers'
               return (
                 <div

@@ -73,6 +73,7 @@ export function App() {
       <header className="fixed top-0 right-0 left-0 z-40 flex h-14 items-center border-b border-border bg-background/80 px-4 backdrop-blur-md lg:px-6">
         {/* Mobile hamburger */}
         <button
+          type="button"
           onClick={() => setSidebarOpen(!sidebarOpen)}
           className="mr-3 flex size-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground lg:hidden"
           aria-label="Toggle sidebar"
@@ -91,7 +92,10 @@ export function App() {
         <div className="flex-1" />
 
         {/* Search trigger */}
-        <button className="mr-2 flex h-8 items-center gap-2 rounded-lg border border-border bg-muted/50 px-3 text-xs text-muted-foreground transition-colors hover:border-border hover:bg-muted">
+        <button
+          type="button"
+          className="mr-2 flex h-8 items-center gap-2 rounded-lg border border-border bg-muted/50 px-3 text-xs text-muted-foreground transition-colors hover:border-border hover:bg-muted"
+        >
           <Search size={14} />
           <span className="hidden sm:inline">Search docs...</span>
           <kbd className="ml-2 hidden rounded border border-border bg-background px-1.5 py-0.5 font-mono text-[10px] sm:inline">
@@ -101,6 +105,7 @@ export function App() {
 
         {/* Dark mode toggle */}
         <button
+          type="button"
           onClick={() => setDark(!dark)}
           className="flex size-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
           aria-label="Toggle dark mode"

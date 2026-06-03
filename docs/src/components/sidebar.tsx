@@ -130,6 +130,7 @@ function SidebarSectionGroup({ section, onNavigate }: { section: SidebarSection;
   return (
     <div>
       <button
+        type="button"
         onClick={() => setOpen(!open)}
         className="group flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
       >

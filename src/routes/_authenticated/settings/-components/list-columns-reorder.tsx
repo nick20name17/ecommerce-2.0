@@ -122,6 +122,7 @@ function SortableColumnRow({
       )}
     >
       <button
+        type='button'
         ref={handleRef}
         className='cursor-grab touch-none text-text-tertiary'
         aria-label='Drag to reorder'

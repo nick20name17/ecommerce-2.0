@@ -22,6 +22,7 @@ export const ColumnHeader = <TData, TValue>({
 
   return (
     <button
+      type='button'
       onClick={column.getToggleSortingHandler()}
       className={cn(
         'inline-flex size-full cursor-pointer items-center justify-between gap-1.5 whitespace-nowrap transition-colors',

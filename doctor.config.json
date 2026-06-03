@@ -15,6 +15,7 @@
     ]
   },
   "rules": {
-    "react-doctor/design-no-em-dash-in-jsx-text": "off"
+    "react-doctor/design-no-em-dash-in-jsx-text": "off",
+    "react-doctor/design-no-three-period-ellipsis": "off"
   }
 }
