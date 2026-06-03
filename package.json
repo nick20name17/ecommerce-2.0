@@ -11,7 +11,6 @@
     "preview": "vite preview",
     "start": "bunx serve -s dist -l tcp://0.0.0.0:${PORT:-3000}",
     "format": "oxfmt",
-    "format:check": "oxfmt --check",
     "test": "vitest run",
     "test:watch": "vitest",
     "docs:dev": "cd docs && bun run dev",
@@ -71,7 +70,6 @@
   },
   "overrides": {
     "fast-uri": "^3.1.2",
-    "lodash": "^4.18.1",
-    "vite": "^8.0.1"
+    "lodash": "^4.18.1"
   }
 }

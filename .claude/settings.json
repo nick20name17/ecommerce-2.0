@@ -17,7 +17,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "if jq -r '.tool_input.command' | grep -q 'git commit'; then cd \"${CLAUDE_PROJECT_DIR:-$(pwd)}\" 2>/dev/null; LOG=$(mktemp); ERR=\"\"; if ! bun run format:check >\"$LOG\" 2>&1; then ERR=\"Format check failed — run: bun run format\"; elif ! bun run lint >\"$LOG\" 2>&1; then ERR=\"Lint failed — run: bun run lint:fix\"; elif ! bun run build >\"$LOG\" 2>&1; then ERR=\"Build failed — fix TypeScript errors\"; fi; if [ -n \"$ERR\" ]; then jq -n --arg e \"$ERR\" --rawfile l \"$LOG\" '{decision:\"block\",reason:($e + \"\\n\\n\" + ($l|.[-1500:]))}'; fi; rm -f \"$LOG\"; fi",
+            "command": "if jq -r '.tool_input.command' | grep -q 'git commit'; then cd \"${CLAUDE_PROJECT_DIR:-$(pwd)}\" 2>/dev/null; LOG=$(mktemp); ERR=\"\"; if ! bunx oxfmt --check >\"$LOG\" 2>&1; then ERR=\"Format check failed — run: bun run format\"; elif ! bun run lint >\"$LOG\" 2>&1; then ERR=\"Lint failed — run: bun run lint:fix\"; elif ! bun run build >\"$LOG\" 2>&1; then ERR=\"Build failed — fix TypeScript errors\"; fi; if [ -n \"$ERR\" ]; then jq -n --arg e \"$ERR\" --rawfile l \"$LOG\" '{decision:\"block\",reason:($e + \"\\n\\n\" + ($l|.[-1500:]))}'; fi; rm -f \"$LOG\"; fi",
             "timeout": 240,
             "statusMessage": "Running format + lint + build before commit..."
           }
