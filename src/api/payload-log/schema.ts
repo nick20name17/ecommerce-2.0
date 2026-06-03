@@ -46,4 +46,5 @@ export interface PayloadLogParams extends PaginationParams {
   source?: PayloadLogSource
   action_name?: string
   external_ref?: string
+  external_ref_exact?: string
 }
