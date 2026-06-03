@@ -289,6 +289,25 @@ function OrderLogTrailSheet({
   const logs = data?.results ?? []
   const lines = row?.lines ?? []
 
+  // Declutter the push log: drop non-EBMS CALCULATION snapshots, then collapse
+  // consecutive identical attempts (same method/action/status) into one row.
+  const trail: { log: PayloadLog; count: number }[] = []
+  for (const log of logs) {
+    if (log.method === 'CALCULATION') continue
+    const prev = trail[trail.length - 1]
+    if (
+      prev &&
+      prev.log.method === log.method &&
+      (prev.log.action_name || prev.log.entity) ===
+        (log.action_name || log.entity) &&
+      prev.log.status_code === log.status_code
+    ) {
+      prev.count += 1
+    } else {
+      trail.push({ log, count: 1 })
+    }
+  }
+
   return (
     <Sheet open={open} onOpenChange={(o) => !o && onClose()}>
       <SheetContent className='flex w-full flex-col gap-0 p-0 sm:max-w-xl'>
@@ -342,16 +361,21 @@ function OrderLogTrailSheet({
                 <Skeleton key={i} className='h-12 w-full rounded' />
               ))}
             </div>
-          ) : logs.length === 0 ? (
+          ) : trail.length === 0 ? (
             <PageEmpty
               icon={Send}
-              title='No push attempts logged'
-              description='This order produced no storefront push log yet — it may be queued but not picked up by the worker.'
+              title='No EBMS push attempts'
+              description='No EBMS API calls logged for this order yet — it may be queued but not picked up by the worker.'
             />
           ) : (
             <div className='divide-y divide-border-light'>
-              {logs.map((log) => (
-                <TrailRow key={log.id} log={log} onClick={() => onSelectLog(log)} />
+              {trail.map((g) => (
+                <TrailRow
+                  key={g.log.id}
+                  log={g.log}
+                  count={g.count}
+                  onClick={() => onSelectLog(g.log)}
+                />
               ))}
             </div>
           )}
@@ -361,7 +385,15 @@ function OrderLogTrailSheet({
   )
 }
 
-function TrailRow({ log, onClick }: { log: PayloadLog; onClick: () => void }) {
+function TrailRow({
+  log,
+  count,
+  onClick,
+}: {
+  log: PayloadLog
+  count: number
+  onClick: () => void
+}) {
   const methodColor =
     METHOD_COLORS[log.method] ?? 'bg-bg-secondary text-text-secondary border-border'
   const statusColor = log.is_error
@@ -390,6 +422,11 @@ function TrailRow({ log, onClick }: { log: PayloadLog; onClick: () => void }) {
           </span>
         )}
       </div>
+      {count > 1 && (
+        <span className='shrink-0 rounded bg-bg-secondary px-1.5 py-0.5 text-[11px] font-medium tabular-nums text-text-tertiary'>
+          ×{count}
+        </span>
+      )}
       <span className={cn('shrink-0 font-mono text-[12px] font-semibold tabular-nums', statusColor)}>
         {log.status_code}
       </span>
