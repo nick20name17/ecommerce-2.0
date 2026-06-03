@@ -17,13 +17,11 @@
     "docs:build": "cd docs && bun run build"
   },
   "dependencies": {
-    "@base-ui/react": "^1.5.0",
     "@dnd-kit/dom": "^0.3.2",
     "@dnd-kit/react": "^0.3.2",
     "@fontsource-variable/inter": "^5.2.8",
     "@fvilers/disable-react-devtools": "^1.3.0",
     "@hookform/resolvers": "^5.4.0",
-    "@tailwindcss/vite": "^4.3.0",
     "@tanstack/react-query": "^5.101.0",
     "@tanstack/react-router": "^1.170.11",
     "@tanstack/react-table": "^8.21.3",
@@ -40,10 +38,8 @@
     "react-day-picker": "^9.14.0",
     "react-dom": "^19.2.7",
     "react-hook-form": "^7.77.0",
-    "recharts": "2.15.4",
     "reconnecting-websocket": "^4.4.0",
     "serve": "^14.2.6",
-    "shadcn": "^3.8.5",
     "sonner": "^2.0.7",
     "tailwind-merge": "^3.6.0",
     "tailwindcss": "^4.3.0",
@@ -53,6 +49,7 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@tailwindcss/vite": "^4.3.0",
     "@tanstack/router-plugin": "^1.168.14",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
@@ -64,6 +61,7 @@
     "jsdom": "^29.1.1",
     "oxfmt": "^0.53.0",
     "oxlint": "^1.68.0",
+    "shadcn": "^3.8.5",
     "typescript": "~5.9.3",
     "vite": "^8.0.16",
     "vitest": "^4.1.8"
