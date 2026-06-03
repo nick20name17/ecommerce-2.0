@@ -1,26 +1,11 @@
-import axios, { type InternalAxiosRequestConfig } from 'axios'
+import { type InternalAxiosRequestConfig } from 'axios'
 
-import { API_BASE_URL, AUTH_REDIRECTS } from './constants'
+import { api } from './client'
+import { AUTH_REDIRECTS } from './constants'
 import { memoizedRefreshToken } from './helpers'
 import { clearSession, getSession } from '@/helpers/auth'
 
-export const api = axios.create({
-  baseURL: API_BASE_URL,
-  headers: {
-    'Content-Type': 'application/json'
-  },
-  paramsSerializer: params => {
-    const sp = new URLSearchParams()
-    for (const [key, value] of Object.entries(params)) {
-      if (Array.isArray(value)) {
-        value.forEach(v => sp.append(key, String(v)))
-      } else if (value != null) {
-        sp.append(key, String(value))
-      }
-    }
-    return sp.toString()
-  }
-})
+export { api }
 
 api.interceptors.request.use(
   config => {

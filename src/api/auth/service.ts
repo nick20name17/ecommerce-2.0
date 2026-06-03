@@ -1,4 +1,4 @@
-import { api } from '..'
+import { api } from '../client'
 
 import type { RefreshPayload, RefreshResponse, SignInPayload, SignInResponse } from './schema'
 
