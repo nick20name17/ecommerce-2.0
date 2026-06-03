@@ -152,10 +152,11 @@ export const TaskAttachments = forwardRef<TaskAttachmentsRef, TaskAttachmentsPro
 
     // Clean up recentlyUploaded once server data includes them
     useEffect(() => {
-      if (recentlyUploaded.length > 0 && recentlyUploaded.every(a => existingIds.has(a.id))) {
+      const serverIds = new Set(attachments.map(a => a.id))
+      if (recentlyUploaded.length > 0 && recentlyUploaded.every(a => serverIds.has(a.id))) {
         setRecentlyUploaded([])
       }
-    }, [existingIds, recentlyUploaded])
+    }, [attachments, recentlyUploaded])
 
     const uploadMutation = useMutation({
       mutationFn: async ({ file, tempId }: { file: File; tempId: string }) => {

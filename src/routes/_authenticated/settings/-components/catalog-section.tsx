@@ -258,7 +258,8 @@ export const CatalogSection = ({ projectId }: CatalogSectionProps) => {
       clearImgImportPolling()
       clearFullImportPolling()
     }
-  }, [clearImportPolling, clearVPImportPolling, clearImgImportPolling, clearFullImportPolling])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const createTablesMutation = useMutation({
     mutationFn: (force: boolean) => projectService.createEcTables(projectId, force),
