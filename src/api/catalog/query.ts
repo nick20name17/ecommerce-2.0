@@ -24,14 +24,6 @@ export const getCatalogTreeQuery = (params: CatalogTreeParams = {}) =>
     gcTime: GC_30M
   })
 
-export const getCatalogListQuery = (params: CatalogParams = {}) =>
-  queryOptions({
-    queryKey: CATALOG_QUERY_KEYS.list(params),
-    queryFn: () => catalogService.list(params),
-    staleTime: STALE_60S,
-    gcTime: GC_30M
-  })
-
 export const getCatalogDetailQuery = (id: string, params?: { project_id?: number }) =>
   queryOptions({
     queryKey: [...CATALOG_QUERY_KEYS.detail(id), params ?? {}] as const,

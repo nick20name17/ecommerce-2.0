@@ -13,7 +13,7 @@ import {
   SelectValue
 } from '@/components/ui/select'
 
-export const STATUS_LABEL: Record<ProductStatus, string> = {
+const STATUS_LABEL: Record<ProductStatus, string> = {
   featured: 'Featured',
   sale: 'Sale',
   new: 'New',
@@ -21,7 +21,7 @@ export const STATUS_LABEL: Record<ProductStatus, string> = {
   coming_soon: 'Coming Soon'
 }
 
-export const STATUS_BADGE_CLASS: Record<ProductStatus, string> = {
+const STATUS_BADGE_CLASS: Record<ProductStatus, string> = {
   featured: 'bg-amber-500/15 text-amber-700 dark:text-amber-400',
   sale: 'bg-rose-500/15 text-rose-700 dark:text-rose-400',
   new: 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-400',

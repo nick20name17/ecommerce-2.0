@@ -144,7 +144,7 @@ export interface TaskStatusListResponse {
   results: TaskStatus[]
 }
 
-export const CreateTaskSchema = z.object({
+const CreateTaskSchema = z.object({
   title: z
     .string()
     .check(z.minLength(1, { error: VALIDATION_MESSAGES.titleRequired }), z.maxLength(200)),
@@ -160,7 +160,7 @@ export const CreateTaskSchema = z.object({
 
 export type CreateTaskFormValues = z.infer<typeof CreateTaskSchema>
 
-export const UpdateTaskSchema = z.extend(z.partial(CreateTaskSchema), {
+const UpdateTaskSchema = z.extend(z.partial(CreateTaskSchema), {
   title: z.optional(z.string().check(z.minLength(1), z.maxLength(200))),
   description: z.optional(z.nullable(z.string().check(z.maxLength(2000)))),
   status: z.optional(z.number()),

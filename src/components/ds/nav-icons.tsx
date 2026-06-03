@@ -6,19 +6,15 @@
 import {
   CheckCircle2,
   ClipboardList,
-  Crosshair,
   FileSpreadsheet,
-  FlaskConical,
   FolderTree,
   Home,
-  Layers,
   LayoutList,
   LayoutTemplate,
   ListChecks,
   Package,
   Rocket,
   Settings,
-  ShoppingCart,
   SquarePlus,
   FileText,
   Truck,
@@ -38,13 +34,9 @@ export const ITodos: IC = ({ className }) => <CheckCircle2 className={className}
 export const IOrderDesk: IC = ({ className }) => <SquarePlus className={className} />
 export const IShipping: IC = ({ className }) => <Truck className={className} />
 export const ISettings: IC = ({ className }) => <Settings className={className} />
-export const ITesting: IC = ({ className }) => <FlaskConical className={className} />
 export const IPickLists: IC = ({ className }) => <ClipboardList className={className} />
 export const IDev: IC = ({ className }) => <Rocket className={className} />
-export const IPicking: IC = ({ className }) => <Crosshair className={className} />
 export const IActivity: IC = ({ className }) => <ListChecks className={className} />
 export const ICatalog: IC = ({ className }) => <FolderTree className={className} />
-export const IVariableProducts: IC = ({ className }) => <Layers className={className} />
-export const ILegacyCarts: IC = ({ className }) => <ShoppingCart className={className} />
 export const IStorefront: IC = ({ className }) => <LayoutTemplate className={className} />
 export const IDocuments: IC = ({ className }) => <FileSpreadsheet className={className} />

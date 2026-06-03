@@ -27,21 +27,3 @@ export const getEntityNotesQuery = (
     queryFn: () => noteService.listEntityNotes(entityType, autoid, projectId),
     enabled: !!autoid
   })
-
-export const getEntityNotesSummaryQuery = (
-  entityType: EntityNoteType,
-  autoid: string,
-  projectId?: number | null
-) =>
-  queryOptions({
-    queryKey: NOTE_QUERY_KEYS.summary(entityType, autoid, projectId),
-    queryFn: () =>
-      noteService.listNotes({
-        entity_type: entityType,
-        entity_autoid: autoid,
-        ordering: '-created_at',
-        page: 1,
-        project_id: projectId ?? undefined
-      }),
-    enabled: !!autoid
-  })

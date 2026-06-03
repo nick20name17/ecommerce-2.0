@@ -101,8 +101,6 @@ export const getCreateUserSchema = (isCurrentUserSuperAdmin: boolean) =>
     )
   )
 
-export const CreateUserSchema = getCreateUserSchema(true)
-
 export type CreateUserFormValues = z.infer<ReturnType<typeof getCreateUserSchema>>
 
 const updateUserSchemaBase = (isCurrentUserSuperAdmin: boolean) => {
@@ -135,7 +133,5 @@ const updateUserSchemaBase = (isCurrentUserSuperAdmin: boolean) => {
 
 export const getUpdateUserSchema = (isCurrentUserSuperAdmin: boolean) =>
   updateUserSchemaBase(isCurrentUserSuperAdmin)
-
-export const UpdateUserSchema = getUpdateUserSchema(true)
 
 export type UpdateUserFormValues = z.infer<ReturnType<typeof getUpdateUserSchema>>

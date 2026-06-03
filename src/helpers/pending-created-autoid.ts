@@ -36,11 +36,3 @@ export const resolvePendingCreatedAutoid = (entity: string, autoid: string): voi
   clearTimeout(waiter.timeoutId)
   waiter.resolve(autoid)
 }
-
-export const cancelPendingCreatedAutoid = (entity: Entity): void => {
-  const idx = pendingWaiters.findIndex(w => w.entity === entity)
-  if (idx === -1) return
-  const [waiter] = pendingWaiters.splice(idx, 1)
-  clearTimeout(waiter.timeoutId)
-  waiter.reject(new Error(`Cancelled: ${entity} create did not complete`))
-}

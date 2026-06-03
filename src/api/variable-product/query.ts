@@ -19,14 +19,6 @@ export const VP_QUERY_KEYS = {
 const STALE_60S = 60_000
 const GC_30M = 30 * 60 * 1000
 
-export const getVariableProductsQuery = (params: VariableProductParams = {}) =>
-  queryOptions({
-    queryKey: VP_QUERY_KEYS.list(params),
-    queryFn: () => variableProductService.list(params),
-    staleTime: STALE_60S,
-    gcTime: GC_30M
-  })
-
 export const getVariableProductDetailQuery = (
   id: string,
   params?: { customer_id?: string; project_id?: number }
@@ -47,15 +39,6 @@ export const getSpecsQuery = (params: SpecParams = {}) =>
     gcTime: GC_30M
   })
 
-export const getSpecDetailQuery = (specId: string, params: SpecParams = {}) =>
-  queryOptions({
-    queryKey: [...VP_QUERY_KEYS.specDetail(specId), params] as const,
-    queryFn: () => variableProductService.getSpec(specId, params),
-    enabled: !!specId,
-    staleTime: STALE_60S,
-    gcTime: GC_30M
-  })
-
 export const getSpecOptionsQuery = (specId: string, params: SpecParams = {}) =>
   queryOptions({
     queryKey: [...VP_QUERY_KEYS.specOptions(specId), params] as const,
@@ -63,12 +46,4 @@ export const getSpecOptionsQuery = (specId: string, params: SpecParams = {}) =>
     enabled: !!specId,
     staleTime: STALE_60S,
     gcTime: GC_30M
-  })
-
-export const getFilteredVPQuery = (filters: Record<string, string>, params: SpecParams = {}) =>
-  queryOptions({
-    queryKey: VP_QUERY_KEYS.filter(filters),
-    queryFn: () => variableProductService.filterBySpecs(filters, params),
-    enabled: Object.keys(filters).length > 0,
-    staleTime: STALE_60S
   })

@@ -1,11 +1,6 @@
 import { format } from 'date-fns'
 
-import {
-  CURRENCY_DEFAULT,
-  DATE_FORMATS,
-  LOCALE_DEFAULT,
-  TEXT_TRUNCATE_LENGTH
-} from '@/constants/app'
+import { CURRENCY_DEFAULT, DATE_FORMATS, LOCALE_DEFAULT } from '@/constants/app'
 import { localDateStringToDate } from '@/helpers/date'
 
 const currencyFormat = new Intl.NumberFormat(LOCALE_DEFAULT, {
@@ -54,15 +49,6 @@ export const formatQuantity = (
   }
 }
 
-export const formatPercentage = (value: number, decimals: number = 0): string => {
-  return (
-    new Intl.NumberFormat(LOCALE_DEFAULT, {
-      minimumFractionDigits: decimals,
-      maximumFractionDigits: decimals
-    }).format(value * 100) + '%'
-  )
-}
-
 export const formatDate = (
   value: Date | string | null | undefined,
   formatKey: keyof typeof DATE_FORMATS = 'display'
@@ -76,15 +62,6 @@ export const formatDate = (
       : value
   if (isNaN(date.getTime())) return '—'
   return format(date, DATE_FORMATS[formatKey])
-}
-
-export const truncateText = (
-  text: string | null | undefined,
-  maxLength: number = TEXT_TRUNCATE_LENGTH.default
-): string => {
-  if (!text) return ''
-  if (text.length <= maxLength) return text
-  return text.slice(0, maxLength) + '...'
 }
 
 export const formatResponseTime = (ms: number | null | undefined): string => {

@@ -141,7 +141,7 @@ export interface PickListParams extends PaginationParams {
 
 // ── Zod schemas ─────────────────────────────────────────────
 
-export const ShipToSchema = z.object({
+const ShipToSchema = z.object({
   name: RequiredStringSchema,
   phone: OptionalStringSchema,
   address1: RequiredStringSchema,

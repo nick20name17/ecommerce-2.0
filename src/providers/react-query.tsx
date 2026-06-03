@@ -31,7 +31,7 @@ declare module '@tanstack/react-query' {
   }
 }
 
-export const queryClient = new QueryClient({
+const queryClient = new QueryClient({
   queryCache: new QueryCache({
     onError(error, query) {
       if (query.meta?.suppressErrorToast) return

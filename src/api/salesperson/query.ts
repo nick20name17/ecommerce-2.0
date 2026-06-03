@@ -2,7 +2,7 @@ import { queryOptions } from '@tanstack/react-query'
 
 import { salespersonService } from './service'
 
-export const SALESPERSON_QUERY_KEYS = {
+const SALESPERSON_QUERY_KEYS = {
   all: (projectId?: number | null) => ['salespersons', projectId] as const
 }
 

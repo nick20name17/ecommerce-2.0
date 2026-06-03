@@ -30,5 +30,3 @@ export const updateSessionUser = (user: Partial<Session['user']>) => {
 }
 
 export const clearSession = () => localStorage.removeItem(STORAGE_KEYS.session)
-
-export const isLoggedIn = () => !!getSession()

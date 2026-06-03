@@ -3,7 +3,7 @@ import { queryOptions } from '@tanstack/react-query'
 import type { PayloadLogParams } from './schema'
 import { payloadLogService } from './service'
 
-export const PAYLOAD_LOG_QUERY_KEYS = {
+const PAYLOAD_LOG_QUERY_KEYS = {
   all: () => ['payload-logs'] as const,
   lists: () => [...PAYLOAD_LOG_QUERY_KEYS.all(), 'list'] as const,
   list: (params: PayloadLogParams = {}) => [...PAYLOAD_LOG_QUERY_KEYS.lists(), params] as const,

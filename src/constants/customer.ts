@@ -7,7 +7,7 @@ export const CUSTOMER_TABS = [
 
 export const CUSTOMER_TAB_VALUES = CUSTOMER_TABS.map(t => t.value) as [string, ...string[]]
 
-export const CUSTOMER_TYPES = {
+const CUSTOMER_TYPES = {
   retail: 'R',
   wholesale: 'W',
   distributor: 'D',

@@ -17,7 +17,7 @@ export interface ProjectHealthStatus {
   has_sync_config?: boolean
 }
 
-export const getServiceStatus = (
+const getServiceStatus = (
   health: ProjectHealthStatus | null | undefined,
   service: ProjectHealthService
 ): 'healthy' | 'unhealthy' | null => {

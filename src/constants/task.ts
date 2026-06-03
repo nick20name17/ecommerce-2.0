@@ -27,9 +27,3 @@ export const TASK_PRIORITY_COLORS: Record<TaskPriority, string> = {
   [TASK_PRIORITY.high]: 'var(--priority-high)',
   [TASK_PRIORITY.urgent]: 'var(--priority-urgent)'
 }
-
-export const getTaskPriorityLabel = (priority: TaskPriority): string =>
-  TASK_PRIORITY_LABELS[priority] ?? priority
-
-export const getTaskPriorityColor = (priority: TaskPriority): string =>
-  TASK_PRIORITY_COLORS[priority] ?? 'var(--priority-low)'

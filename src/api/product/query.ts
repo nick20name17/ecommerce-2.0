@@ -8,7 +8,7 @@ export type ProductListParams = ProductParams & {
   project_id?: number
 }
 
-export const PRODUCT_QUERY_KEYS = {
+const PRODUCT_QUERY_KEYS = {
   all: () => ['products'] as const,
   lists: () => [...PRODUCT_QUERY_KEYS.all(), 'list'] as const,
   list: (params: ProductListParams = {}) => [...PRODUCT_QUERY_KEYS.lists(), params] as const,

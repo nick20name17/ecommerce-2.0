@@ -38,20 +38,6 @@ export const getTaskStatusesQuery = (projectId?: number | null) =>
     staleTime: 1000 * 60 * 30
   })
 
-export const getTaskAttachmentsQuery = (taskId: number) =>
-  queryOptions({
-    queryKey: TASK_QUERY_KEYS.attachments(taskId),
-    queryFn: () => taskService.getAttachments(taskId),
-    enabled: !!taskId
-  })
-
-export const getTaskAttachmentQuery = (taskId: number, attachmentId: number) =>
-  queryOptions({
-    queryKey: TASK_QUERY_KEYS.attachment(taskId, attachmentId),
-    queryFn: () => taskService.getAttachment(taskId, attachmentId),
-    enabled: !!taskId && !!attachmentId
-  })
-
 export const getTaskNotesQuery = (taskId: number, projectId?: number | null) =>
   queryOptions({
     queryKey: TASK_QUERY_KEYS.notes(taskId, projectId),
