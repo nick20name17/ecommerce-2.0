@@ -3,6 +3,7 @@ import { parseAsString, useQueryState } from 'nuqs'
 
 import { AbandonedCartsSection } from './-components/abandoned-carts-section'
 import { BannerSection } from './-components/banner-section'
+import { PushStatusSection } from './-components/push-status-section'
 import { IStorefront, PAGE_COLORS, PageHeaderIcon } from '@/components/ds'
 import { SidebarTrigger } from '@/components/ui/sidebar'
 import { isAdmin } from '@/constants/user'
@@ -13,11 +14,12 @@ import { cn } from '@/lib/utils'
 
 // ── Section definitions ─────────────────────────────────────
 
-type WebsiteSection = 'banner' | 'abandoned-carts'
+type WebsiteSection = 'banner' | 'abandoned-carts' | 'push-status'
 
 const SECTIONS: { value: WebsiteSection; label: string }[] = [
   { value: 'banner', label: 'Banner' },
   { value: 'abandoned-carts', label: 'Abandoned Carts' },
+  { value: 'push-status', label: 'Push Status' },
 ]
 
 // ── Main component ──────────────────────────────────────────
@@ -84,6 +86,7 @@ const WebsitePage = () => {
         <div className='flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden'>
           {currentSection === 'banner' && <BannerSection projectId={projectId} />}
           {currentSection === 'abandoned-carts' && <AbandonedCartsSection projectId={projectId} />}
+          {currentSection === 'push-status' && <PushStatusSection projectId={projectId} />}
         </div>
       </div>
     </div>

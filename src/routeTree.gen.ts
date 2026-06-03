@@ -18,7 +18,6 @@ import { Route as AuthenticatedUsersIndexRouteImport } from './routes/_authentic
 import { Route as AuthenticatedTasksIndexRouteImport } from './routes/_authenticated/tasks/index'
 import { Route as AuthenticatedShippingIndexRouteImport } from './routes/_authenticated/shipping/index'
 import { Route as AuthenticatedSettingsIndexRouteImport } from './routes/_authenticated/settings/index'
-import { Route as AuthenticatedPushStatusIndexRouteImport } from './routes/_authenticated/push-status/index'
 import { Route as AuthenticatedProposalsIndexRouteImport } from './routes/_authenticated/proposals/index'
 import { Route as AuthenticatedProjectsIndexRouteImport } from './routes/_authenticated/projects/index'
 import { Route as AuthenticatedProfileIndexRouteImport } from './routes/_authenticated/profile/index'
@@ -89,12 +88,6 @@ const AuthenticatedSettingsIndexRoute =
   AuthenticatedSettingsIndexRouteImport.update({
     id: '/settings/',
     path: '/settings/',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedPushStatusIndexRoute =
-  AuthenticatedPushStatusIndexRouteImport.update({
-    id: '/push-status/',
-    path: '/push-status/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedProposalsIndexRoute =
@@ -257,7 +250,6 @@ export interface FileRoutesByFullPath {
   '/profile/': typeof AuthenticatedProfileIndexRoute
   '/projects/': typeof AuthenticatedProjectsIndexRoute
   '/proposals/': typeof AuthenticatedProposalsIndexRoute
-  '/push-status/': typeof AuthenticatedPushStatusIndexRoute
   '/settings/': typeof AuthenticatedSettingsIndexRoute
   '/shipping/': typeof AuthenticatedShippingIndexRoute
   '/tasks/': typeof AuthenticatedTasksIndexRoute
@@ -291,7 +283,6 @@ export interface FileRoutesByTo {
   '/profile': typeof AuthenticatedProfileIndexRoute
   '/projects': typeof AuthenticatedProjectsIndexRoute
   '/proposals': typeof AuthenticatedProposalsIndexRoute
-  '/push-status': typeof AuthenticatedPushStatusIndexRoute
   '/settings': typeof AuthenticatedSettingsIndexRoute
   '/shipping': typeof AuthenticatedShippingIndexRoute
   '/tasks': typeof AuthenticatedTasksIndexRoute
@@ -328,7 +319,6 @@ export interface FileRoutesById {
   '/_authenticated/profile/': typeof AuthenticatedProfileIndexRoute
   '/_authenticated/projects/': typeof AuthenticatedProjectsIndexRoute
   '/_authenticated/proposals/': typeof AuthenticatedProposalsIndexRoute
-  '/_authenticated/push-status/': typeof AuthenticatedPushStatusIndexRoute
   '/_authenticated/settings/': typeof AuthenticatedSettingsIndexRoute
   '/_authenticated/shipping/': typeof AuthenticatedShippingIndexRoute
   '/_authenticated/tasks/': typeof AuthenticatedTasksIndexRoute
@@ -364,7 +354,6 @@ export interface FileRouteTypes {
     | '/profile/'
     | '/projects/'
     | '/proposals/'
-    | '/push-status/'
     | '/settings/'
     | '/shipping/'
     | '/tasks/'
@@ -398,7 +387,6 @@ export interface FileRouteTypes {
     | '/profile'
     | '/projects'
     | '/proposals'
-    | '/push-status'
     | '/settings'
     | '/shipping'
     | '/tasks'
@@ -434,7 +422,6 @@ export interface FileRouteTypes {
     | '/_authenticated/profile/'
     | '/_authenticated/projects/'
     | '/_authenticated/proposals/'
-    | '/_authenticated/push-status/'
     | '/_authenticated/settings/'
     | '/_authenticated/shipping/'
     | '/_authenticated/tasks/'
@@ -520,13 +507,6 @@ declare module '@tanstack/react-router' {
       path: '/settings'
       fullPath: '/settings/'
       preLoaderRoute: typeof AuthenticatedSettingsIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/push-status/': {
-      id: '/_authenticated/push-status/'
-      path: '/push-status'
-      fullPath: '/push-status/'
-      preLoaderRoute: typeof AuthenticatedPushStatusIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/proposals/': {
@@ -728,7 +708,6 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedProfileIndexRoute: typeof AuthenticatedProfileIndexRoute
   AuthenticatedProjectsIndexRoute: typeof AuthenticatedProjectsIndexRoute
   AuthenticatedProposalsIndexRoute: typeof AuthenticatedProposalsIndexRoute
-  AuthenticatedPushStatusIndexRoute: typeof AuthenticatedPushStatusIndexRoute
   AuthenticatedSettingsIndexRoute: typeof AuthenticatedSettingsIndexRoute
   AuthenticatedShippingIndexRoute: typeof AuthenticatedShippingIndexRoute
   AuthenticatedTasksIndexRoute: typeof AuthenticatedTasksIndexRoute
@@ -762,7 +741,6 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedProfileIndexRoute: AuthenticatedProfileIndexRoute,
   AuthenticatedProjectsIndexRoute: AuthenticatedProjectsIndexRoute,
   AuthenticatedProposalsIndexRoute: AuthenticatedProposalsIndexRoute,
-  AuthenticatedPushStatusIndexRoute: AuthenticatedPushStatusIndexRoute,
   AuthenticatedSettingsIndexRoute: AuthenticatedSettingsIndexRoute,
   AuthenticatedShippingIndexRoute: AuthenticatedShippingIndexRoute,
   AuthenticatedTasksIndexRoute: AuthenticatedTasksIndexRoute,
