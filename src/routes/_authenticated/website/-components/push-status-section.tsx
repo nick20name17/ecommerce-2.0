@@ -1,6 +1,6 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import { AlertCircle, Check, ChevronRight, Inbox, Search, Send, X } from 'lucide-react'
-import { useState } from 'react'
+import { Fragment, useState } from 'react'
 import { useDebouncedCallback } from 'use-debounce'
 
 import { getPayloadLogsQuery } from '@/api/payload-log/query'
@@ -9,14 +9,6 @@ import { getPushStatusQuery } from '@/api/push-status/query'
 import type { PushStatusItem } from '@/api/push-status/schema'
 import { Pagination } from '@/components/common/filters/pagination'
 import { PageEmpty } from '@/components/common/page-empty'
-import { ScrollArea } from '@/components/ui/scroll-area'
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-} from '@/components/ui/sheet'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Spinner } from '@/components/ui/spinner'
 import { formatDateTimeShort } from '@/helpers/formatters'
@@ -64,21 +56,29 @@ function statusStyle(s: string) {
   )
 }
 
+// Left accent on the inline detail panel, tinted by the row's status so the
+// expanded block reads as "belongs to the row above".
+const ACCENT_BORDER: Record<string, string> = {
+  error: 'border-l-red-400 dark:border-l-red-700',
+  'in process': 'border-l-amber-400 dark:border-l-amber-700',
+  'before process': 'border-l-violet-400 dark:border-l-violet-700',
+}
+
 export function PushStatusSection({ projectId }: { projectId: number }) {
   const bp = useBreakpoint()
   const isMobile = bp === 'mobile'
 
   const [search, setSearch] = useSearchParam()
-  const handleSearch = useDebouncedCallback(
-    (value: string) => setSearch(value || null),
-    300,
-  )
+  // Drill-down: click a row -> expand inline detail beneath it (single-open
+  // accordion); click a trail row inside -> full payload detail dialog.
+  const [expandedId, setExpandedId] = useState<number | null>(null)
+  const [selectedLog, setSelectedLog] = useState<PayloadLog | null>(null)
+  const handleSearch = useDebouncedCallback((value: string) => {
+    setExpandedId(null) // a filtered-out row's panel shouldn't linger
+    setSearch(value || null)
+  }, 300)
   const [offset] = useOffsetParam()
   const [limit] = useLimitParam(PUSH_STATUS_DEFAULT_LIMIT)
-
-  // Drill-down: click a row -> log trail for that proposal; click a trail row -> detail.
-  const [drillRow, setDrillRow] = useState<PushStatusItem | null>(null)
-  const [selectedLog, setSelectedLog] = useState<PayloadLog | null>(null)
 
   const { data, isLoading, isPlaceholderData, error } = useQuery({
     ...getPushStatusQuery({
@@ -210,15 +210,31 @@ export function PushStatusSection({ projectId }: { projectId: number }) {
                 )}
                 aria-busy={isPlaceholderData}
               >
-                {results.map((row) => (
-                  <PushRow
-                    key={row.proposal_id}
-                    row={row}
-                    bp={bp}
-                    isMobile={isMobile}
-                    onClick={() => setDrillRow(row)}
-                  />
-                ))}
+                {results.map((row) => {
+                  const expanded = expandedId === row.proposal_id
+                  return (
+                    <Fragment key={row.proposal_id}>
+                      <PushRow
+                        row={row}
+                        bp={bp}
+                        isMobile={isMobile}
+                        expanded={expanded}
+                        onClick={() =>
+                          setExpandedId(expanded ? null : row.proposal_id)
+                        }
+                      />
+                      {expanded && (
+                        <OrderDetailPanel
+                          projectId={projectId}
+                          row={row}
+                          bp={bp}
+                          isMobile={isMobile}
+                          onSelectLog={setSelectedLog}
+                        />
+                      )}
+                    </Fragment>
+                  )
+                })}
               </div>
             )}
           </>
@@ -236,13 +252,6 @@ export function PushStatusSection({ projectId }: { projectId: number }) {
         </div>
       )}
 
-      {/* Per-order push-log trail (PayloadLog enrich for this entity) */}
-      <OrderLogTrailSheet
-        projectId={projectId}
-        row={drillRow}
-        onClose={() => setDrillRow(null)}
-        onSelectLog={setSelectedLog}
-      />
       <PayloadLogDetailDialog
         log={selectedLog}
         open={!!selectedLog}
@@ -261,33 +270,36 @@ const METHOD_COLORS: Record<string, string> = {
   DELETE: 'bg-red-500/10 text-red-700 border-red-200 dark:text-red-400 dark:border-red-800',
 }
 
-function OrderLogTrailSheet({
+function OrderDetailPanel({
   projectId,
   row,
-  onClose,
+  bp,
+  isMobile,
   onSelectLog,
 }: {
   projectId: number
-  row: PushStatusItem | null
-  onClose: () => void
+  row: PushStatusItem
+  bp: string
+  isMobile: boolean
   onSelectLog: (log: PayloadLog) => void
 }) {
-  const open = row != null
-  const proposalId = row?.proposal_id ?? null
-
+  // Only mounted while the row is expanded, so the query fires on open and is
+  // torn down on collapse — no need for an `enabled` flag.
   const { data, isLoading } = useQuery({
     ...getPayloadLogsQuery({
       source: 'storefront',
-      external_ref_exact: proposalId != null ? String(proposalId) : undefined,
+      external_ref_exact: String(row.proposal_id),
       project_id: projectId,
       ordering: '-created_at',
       limit: 500,
     }),
-    enabled: open,
   })
 
   const logs = data?.results ?? []
-  const lines = row?.lines ?? []
+  const lines = row.lines ?? []
+  const padX = isMobile ? 'px-3.5' : bp === 'tablet' ? 'px-5' : 'px-6'
+  // Two columns only have room on desktop; tablet/mobile stack vertically.
+  const stacked = isMobile || bp === 'tablet'
 
   // Declutter the push log: drop non-EBMS CALCULATION snapshots, then collapse
   // consecutive identical attempts (same method/action/status) into one row.
@@ -309,89 +321,110 @@ function OrderLogTrailSheet({
   }
 
   return (
-    <Sheet open={open} onOpenChange={(o) => !o && onClose()}>
-      <SheetContent side='bottom' className='flex max-h-[85vh] w-full flex-col gap-0 p-0'>
-        <SheetHeader className='border-b border-border px-5 py-4'>
-          <SheetTitle>Order #{proposalId}</SheetTitle>
-          <SheetDescription>
-            Line items and EBMS push attempts for this order.
-          </SheetDescription>
-        </SheetHeader>
-
-        <ScrollArea className='min-h-0 flex-1'>
-          {/* Items — which lines pushed (sendedEbms) vs not */}
-          <div className='flex items-center justify-between border-b border-border bg-bg-secondary px-5 py-1.5 text-[12px] font-medium text-text-tertiary'>
-            <span>Items</span>
-            <span className='tabular-nums'>
-              {row?.items_pushed ?? 0}/{row?.items_total ?? 0} pushed
-            </span>
-          </div>
-          {lines.length === 0 ? (
-            <div className='border-b border-border-light px-5 py-3 text-[12px] text-text-tertiary'>
-              No line items.
-            </div>
-          ) : (
-            <div className='divide-y divide-border-light border-b border-border'>
-              {lines.map((ln, i) => (
-                <div key={i} className='flex items-center gap-2.5 px-5 py-2'>
-                  {ln.pushed ? (
-                    <Check className='size-3.5 shrink-0 text-emerald-600 dark:text-emerald-400' />
-                  ) : (
-                    <X className='size-3.5 shrink-0 text-red-500' />
-                  )}
-                  <span className='min-w-0 flex-1 truncate text-[13px] text-foreground'>
-                    {ln.name || ln.sn || '—'}
-                  </span>
-                  <span className='shrink-0 text-[12px] tabular-nums text-text-tertiary'>
-                    {ln.qty ?? '—'}
-                    {ln.unit ? ` ${ln.unit}` : ''}
-                  </span>
-                </div>
-              ))}
-            </div>
+    <div
+      className={cn(
+        'border-b border-l-2 border-border bg-bg-secondary',
+        ACCENT_BORDER[row.arinv_status] ?? 'border-l-border',
+        stacked ? 'flex flex-col' : 'flex items-stretch',
+      )}
+    >
+      {/* Items — which lines pushed (sendedEbms) vs not */}
+      <div
+        className={cn(
+          'min-w-0',
+          stacked
+            ? 'w-full border-b border-border'
+            : 'w-[42%] shrink-0 border-r border-border',
+        )}
+      >
+        <div
+          className={cn(
+            'flex items-center justify-between border-b border-border-light py-1.5 text-[12px] font-medium text-text-tertiary',
+            padX,
           )}
-
-          {/* Push log */}
-          <div className='border-b border-border bg-bg-secondary px-5 py-1.5 text-[12px] font-medium text-text-tertiary'>
-            Push log
+        >
+          <span>Items</span>
+          <span className='tabular-nums'>
+            {row.items_pushed ?? 0}/{row.items_total ?? 0} pushed
+          </span>
+        </div>
+        {lines.length === 0 ? (
+          <div className={cn('py-3 text-[12px] text-text-tertiary', padX)}>
+            No line items.
           </div>
-          {isLoading ? (
-            <div className='flex flex-col gap-2 p-4'>
-              {Array.from({ length: 6 }).map((_, i) => (
-                <Skeleton key={i} className='h-12 w-full rounded' />
-              ))}
-            </div>
-          ) : trail.length === 0 ? (
-            <PageEmpty
-              icon={Send}
-              title='No EBMS push attempts'
-              description='No EBMS API calls logged for this order yet — it may be queued but not picked up by the worker.'
-            />
-          ) : (
-            <div className='divide-y divide-border-light'>
-              {trail.map((g) => (
-                <TrailRow
-                  key={g.log.id}
-                  log={g.log}
-                  count={g.count}
-                  onClick={() => onSelectLog(g.log)}
-                />
-              ))}
-            </div>
+        ) : (
+          <div className='max-h-[320px] divide-y divide-border-light overflow-y-auto'>
+            {lines.map((ln, i) => (
+              <div
+                key={i}
+                className={cn('flex items-center gap-2.5 py-2', padX)}
+              >
+                {ln.pushed ? (
+                  <Check className='size-3.5 shrink-0 text-emerald-600 dark:text-emerald-400' />
+                ) : (
+                  <X className='size-3.5 shrink-0 text-red-500' />
+                )}
+                <span className='min-w-0 flex-1 truncate text-[13px] text-foreground'>
+                  {ln.name || ln.sn || '—'}
+                </span>
+                <span className='shrink-0 text-[12px] tabular-nums text-text-tertiary'>
+                  {ln.qty ?? '—'}
+                  {ln.unit ? ` ${ln.unit}` : ''}
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Push log */}
+      <div className='min-w-0 flex-1'>
+        <div
+          className={cn(
+            'border-b border-border-light py-1.5 text-[12px] font-medium text-text-tertiary',
+            padX,
           )}
-        </ScrollArea>
-      </SheetContent>
-    </Sheet>
+        >
+          Push log
+        </div>
+        {isLoading ? (
+          <div className={cn('flex flex-col gap-2 py-3', padX)}>
+            {Array.from({ length: 3 }).map((_, i) => (
+              <Skeleton key={i} className='h-9 w-full rounded' />
+            ))}
+          </div>
+        ) : trail.length === 0 ? (
+          <div className={cn('py-3 text-[12px] text-text-tertiary', padX)}>
+            No EBMS push attempts logged yet — queued but not yet picked up by
+            the worker.
+          </div>
+        ) : (
+          <div className='max-h-[320px] divide-y divide-border-light overflow-y-auto'>
+            {trail.map((g) => (
+              <TrailRow
+                key={g.log.id}
+                log={g.log}
+                count={g.count}
+                padX={padX}
+                onClick={() => onSelectLog(g.log)}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
   )
 }
 
 function TrailRow({
   log,
   count,
+  padX,
   onClick,
 }: {
   log: PayloadLog
   count: number
+  padX: string
   onClick: () => void
 }) {
   const methodColor =
@@ -406,7 +439,10 @@ function TrailRow({
     <button
       type='button'
       onClick={onClick}
-      className='group/trail flex w-full items-center gap-3 px-5 py-2.5 text-left transition-colors duration-100 hover:bg-bg-hover'
+      className={cn(
+        'group/trail flex w-full items-center gap-3 py-2.5 text-left transition-colors duration-100 hover:bg-bg-hover',
+        padX,
+      )}
     >
       <span className={cn('shrink-0 rounded border px-1.5 py-0.5 font-mono text-[11px] font-semibold', methodColor)}>
         {log.method}
@@ -444,11 +480,13 @@ function PushRow({
   row,
   bp,
   isMobile,
+  expanded,
   onClick,
 }: {
   row: PushStatusItem
   bp: string
   isMobile: boolean
+  expanded: boolean
   onClick: () => void
 }) {
   const st = statusStyle(row.arinv_status)
@@ -461,7 +499,10 @@ function PushRow({
   if (isMobile) {
     return (
       <div
-        className='cursor-pointer border-b border-border-light px-3.5 py-2.5 transition-colors duration-100 hover:bg-bg-hover'
+        className={cn(
+          'cursor-pointer border-b border-border-light px-3.5 py-2.5 transition-colors duration-100 hover:bg-bg-hover',
+          expanded && 'bg-bg-hover',
+        )}
         onClick={onClick}
       >
         <div className='mb-1.5 flex items-center gap-2'>
@@ -474,6 +515,12 @@ function PushRow({
           <span className='ml-auto text-[12px] tabular-nums text-text-tertiary'>
             {money(row.total)}
           </span>
+          <ChevronRight
+            className={cn(
+              'size-3.5 shrink-0 text-text-tertiary transition-transform',
+              expanded && 'rotate-90',
+            )}
+          />
         </div>
         <div className='mb-1 truncate text-[12px] text-foreground'>{row.email || '—'}</div>
         <div className='flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[11px] tabular-nums text-text-tertiary'>
@@ -502,6 +549,7 @@ function PushRow({
         'group/row flex cursor-pointer items-center border-b border-border-light transition-colors duration-100 hover:bg-bg-hover',
         bp === 'tablet' ? 'gap-4 px-5 py-2.5' : 'gap-6 px-6 py-2.5',
         isError && 'bg-red-500/[0.02]',
+        expanded && 'bg-bg-hover',
       )}
       onClick={onClick}
     >
@@ -542,8 +590,15 @@ function PushRow({
           <span className='font-mono'>{row.arinv_autoid || '—'}</span>
         )}
       </div>
-      <div className='w-[20px] shrink-0 text-text-tertiary opacity-0 transition-opacity group-hover/row:opacity-100'>
-        <ChevronRight className='size-3.5' />
+      <div
+        className={cn(
+          'w-[20px] shrink-0 text-text-tertiary transition-opacity',
+          expanded ? 'opacity-100' : 'opacity-0 group-hover/row:opacity-100',
+        )}
+      >
+        <ChevronRight
+          className={cn('size-3.5 transition-transform', expanded && 'rotate-90')}
+        />
       </div>
     </div>
   )
