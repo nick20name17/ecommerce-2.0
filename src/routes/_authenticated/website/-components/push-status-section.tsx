@@ -279,8 +279,8 @@ function OrderLogTrailSheet({
       source: 'storefront',
       external_ref_exact: proposalId != null ? String(proposalId) : undefined,
       project_id: projectId,
-      ordering: 'created_at',
-      limit: 200,
+      ordering: '-created_at',
+      limit: 500,
     }),
     enabled: open,
   })
@@ -293,7 +293,7 @@ function OrderLogTrailSheet({
         <SheetHeader className='border-b border-border px-5 py-4'>
           <SheetTitle>Order #{proposalId} — push log</SheetTitle>
           <SheetDescription>
-            Every EBMS push attempt for this order, oldest first. Click a row for
+            Every EBMS push attempt for this order, newest first. Click a row for
             payload / response.
           </SheetDescription>
         </SheetHeader>
