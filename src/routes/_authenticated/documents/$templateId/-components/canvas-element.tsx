@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef } from 'react'
+import { useCallback, useEffect, useEffectEvent, useRef } from 'react'
 
 import type { LayoutElement, TableColumn } from '@/api/document-template/schema'
 import { cn } from '@/lib/utils'
@@ -216,6 +216,7 @@ export function CanvasElement({
   )
 
   // Delete with keyboard when selected
+  const onDeleteKey = useEffectEvent(() => onDelete())
   useEffect(() => {
     if (!isSelected) return
     const onKey = (e: KeyboardEvent) => {
@@ -228,12 +229,12 @@ export function CanvasElement({
           return
         }
         e.preventDefault()
-        onDelete()
+        onDeleteKey()
       }
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [isSelected, onDelete])
+  }, [isSelected])
 
   // --- render --------------------------------------------------------------
 

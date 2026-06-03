@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query'
+import { useQueries } from '@tanstack/react-query'
 
 import { getOrdersQuery } from '@/api/order/query'
 import type { OrderStatus } from '@/api/order/schema'
@@ -19,17 +19,16 @@ interface DashboardOrdersTableProps {
 }
 
 export function DashboardOrdersTable({ projectId, customerId }: DashboardOrdersTableProps) {
-  const queries = TRACKED_STATUSES.map(status => {
-    const params = {
-      status,
-      limit: 1,
-      project_id: projectId ?? undefined,
-      customer_id: customerId
-    }
-    return useQuery({
-      ...getOrdersQuery(params),
+  const queries = useQueries({
+    queries: TRACKED_STATUSES.map(status => ({
+      ...getOrdersQuery({
+        status,
+        limit: 1,
+        project_id: projectId ?? undefined,
+        customer_id: customerId
+      }),
       enabled: projectId != null
-    })
+    }))
   })
 
   const isLoading = queries.some(q => q.isLoading)

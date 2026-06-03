@@ -12,7 +12,7 @@ import {
   Undo2,
   X
 } from 'lucide-react'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useEffectEvent, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
 import {
@@ -226,30 +226,32 @@ function DocumentEditorPage() {
   }
 
   // Keyboard shortcuts — Cmd/Ctrl+Z = undo, Cmd/Ctrl+Shift+Z (or Ctrl+Y) = redo.
-  useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-      const target = e.target as HTMLElement | null
-      // Don't steal undo from text inputs / textareas — they have native undo.
-      if (
-        target &&
-        (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)
-      ) {
-        return
-      }
-      if (!(e.metaKey || e.ctrlKey)) return
-      if (e.key === 'z' && !e.shiftKey) {
-        if (!canUndo) return
-        e.preventDefault()
-        undo()
-      } else if ((e.key === 'z' && e.shiftKey) || e.key === 'y') {
-        if (!canRedo) return
-        e.preventDefault()
-        redo()
-      }
+  const onUndoRedoKey = useEffectEvent((e: KeyboardEvent) => {
+    const target = e.target as HTMLElement | null
+    // Don't steal undo from text inputs / textareas — they have native undo.
+    if (
+      target &&
+      (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)
+    ) {
+      return
     }
+    if (!(e.metaKey || e.ctrlKey)) return
+    if (e.key === 'z' && !e.shiftKey) {
+      if (!canUndo) return
+      e.preventDefault()
+      undo()
+    } else if ((e.key === 'z' && e.shiftKey) || e.key === 'y') {
+      if (!canRedo) return
+      e.preventDefault()
+      redo()
+    }
+  })
+
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => onUndoRedoKey(e)
     window.addEventListener('keydown', handler)
     return () => window.removeEventListener('keydown', handler)
-  }, [undo, redo, canUndo, canRedo])
+  }, [])
 
   const isDirty = (() => {
     if (!template) return false
@@ -771,7 +773,9 @@ function TestEntityPicker({
   })()
 
   useEffect(() => {
-    if (open) setTimeout(() => inputRef.current?.focus(), 30)
+    if (!open) return
+    const t = setTimeout(() => inputRef.current?.focus(), 30)
+    return () => clearTimeout(t)
   }, [open])
 
   const placeholder =

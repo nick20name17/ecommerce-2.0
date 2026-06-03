@@ -1,6 +1,6 @@
 import { ChevronLeftIcon, ChevronRightIcon, DownloadIcon, XIcon } from 'lucide-react'
 import { Dialog as DialogPrimitive } from 'radix-ui'
-import { useEffect } from 'react'
+import { useEffect, useEffectEvent } from 'react'
 
 import type { TaskAttachment } from '@/api/task/schema'
 import { Button } from '@/components/ui/button'
@@ -30,14 +30,16 @@ export function AttachmentLightbox({
     onIndexChange((currentIndex - 1 + images.length) % images.length)
   }
 
+  const onKeyDown = useEffectEvent((e: KeyboardEvent) => {
+    if (e.key === 'ArrowRight') goNext()
+    else if (e.key === 'ArrowLeft') goPrev()
+  })
+
   useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'ArrowRight') goNext()
-      else if (e.key === 'ArrowLeft') goPrev()
-    }
+    const handleKeyDown = (e: KeyboardEvent) => onKeyDown(e)
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [goNext, goPrev])
+  }, [])
 
   if (!current) return null
 

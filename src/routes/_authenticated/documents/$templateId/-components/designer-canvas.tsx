@@ -13,7 +13,7 @@ import {
   Type,
   X
 } from 'lucide-react'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useEffectEvent, useRef, useState } from 'react'
 
 import { documentTemplateService } from '@/api/document-template/service'
 import type { FieldConfigEntry } from '@/api/field-config/schema'
@@ -241,62 +241,64 @@ export function DesignerCanvas({
 
   // Cmd/Ctrl+D duplicates, Cmd+C copies, Cmd+V pastes;
   // bare arrow keys nudge the selected element.
-  useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-      const target = e.target as HTMLElement | null
-      const inTextField =
-        target &&
-        (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)
-      if (inTextField) return
+  const onCanvasKey = useEffectEvent((e: KeyboardEvent) => {
+    const target = e.target as HTMLElement | null
+    const inTextField =
+      target &&
+      (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)
+    if (inTextField) return
 
-      // Arrow-key nudge — no modifier required, but only when no other
-      // interactive element has focus (button/select/etc.). Otherwise we'd
-      // steal arrow navigation from those controls.
-      const focusedOnInteractive =
-        target &&
-        (target.tagName === 'BUTTON' ||
-          target.tagName === 'SELECT' ||
-          target.tagName === 'A' ||
-          target.getAttribute('role') === 'menuitem' ||
-          target.getAttribute('tabindex') === '0')
-      const isArrow =
-        e.key === 'ArrowLeft' ||
-        e.key === 'ArrowRight' ||
-        e.key === 'ArrowUp' ||
-        e.key === 'ArrowDown'
-      if (isArrow && selectedId && !(e.metaKey || e.ctrlKey) && !focusedOnInteractive) {
-        const step = e.shiftKey ? 1.0 : 0.125
-        let dx = 0
-        let dy = 0
-        if (e.key === 'ArrowLeft') dx = -step
-        else if (e.key === 'ArrowRight') dx = step
-        else if (e.key === 'ArrowUp') dy = -step
-        else if (e.key === 'ArrowDown') dy = step
-        e.preventDefault()
-        nudgeSelected(dx, dy)
-        return
-      }
-
-      if (!(e.metaKey || e.ctrlKey)) return
-      if (e.key === 'd') {
-        if (!selectedId) return
-        e.preventDefault()
-        duplicateElement(selectedId)
-      } else if (e.key === 'c') {
-        if (!selectedId) return
-        const el = elements.find(x => x.id === selectedId)
-        if (!el) return
-        e.preventDefault()
-        clipboardRef.current = { ...el, props: el.props ? { ...el.props } : undefined }
-      } else if (e.key === 'v') {
-        if (!clipboardRef.current) return
-        e.preventDefault()
-        pasteFromClipboard()
-      }
+    // Arrow-key nudge — no modifier required, but only when no other
+    // interactive element has focus (button/select/etc.). Otherwise we'd
+    // steal arrow navigation from those controls.
+    const focusedOnInteractive =
+      target &&
+      (target.tagName === 'BUTTON' ||
+        target.tagName === 'SELECT' ||
+        target.tagName === 'A' ||
+        target.getAttribute('role') === 'menuitem' ||
+        target.getAttribute('tabindex') === '0')
+    const isArrow =
+      e.key === 'ArrowLeft' ||
+      e.key === 'ArrowRight' ||
+      e.key === 'ArrowUp' ||
+      e.key === 'ArrowDown'
+    if (isArrow && selectedId && !(e.metaKey || e.ctrlKey) && !focusedOnInteractive) {
+      const step = e.shiftKey ? 1.0 : 0.125
+      let dx = 0
+      let dy = 0
+      if (e.key === 'ArrowLeft') dx = -step
+      else if (e.key === 'ArrowRight') dx = step
+      else if (e.key === 'ArrowUp') dy = -step
+      else if (e.key === 'ArrowDown') dy = step
+      e.preventDefault()
+      nudgeSelected(dx, dy)
+      return
     }
+
+    if (!(e.metaKey || e.ctrlKey)) return
+    if (e.key === 'd') {
+      if (!selectedId) return
+      e.preventDefault()
+      duplicateElement(selectedId)
+    } else if (e.key === 'c') {
+      if (!selectedId) return
+      const el = elements.find(x => x.id === selectedId)
+      if (!el) return
+      e.preventDefault()
+      clipboardRef.current = { ...el, props: el.props ? { ...el.props } : undefined }
+    } else if (e.key === 'v') {
+      if (!clipboardRef.current) return
+      e.preventDefault()
+      pasteFromClipboard()
+    }
+  })
+
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => onCanvasKey(e)
     window.addEventListener('keydown', handler)
     return () => window.removeEventListener('keydown', handler)
-  }, [selectedId, duplicateElement, elements, pasteFromClipboard, nudgeSelected])
+  }, [])
 
   const addElement = useCallback(
     (type: ElementType, dropX: number, dropY: number) => {
