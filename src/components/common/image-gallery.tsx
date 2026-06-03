@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { GripVertical, ImagePlus, Pencil, Star, Trash2, Upload } from 'lucide-react'
-import { useCallback, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 
 import {
   CATALOG_IMAGE_QUERY_KEYS,
@@ -57,8 +57,7 @@ export const ImageGallery = ({
   const invalidate = () =>
     queryClient.invalidateQueries({ queryKey })
 
-  const uploadFiles = useCallback(
-    async (files: FileList | File[]) => {
+  const uploadFiles = async (files: FileList | File[]) => {
       setUploading(true)
       try {
         for (const file of Array.from(files)) {
@@ -95,9 +94,7 @@ export const ImageGallery = ({
       } finally {
         setUploading(false)
       }
-    },
-    [entityType, entityId, projectId]
-  )
+    }
 
   const deleteMutation = useMutation({
     mutationFn: (imageId: number) =>
@@ -140,15 +137,12 @@ export const ImageGallery = ({
     onSuccess: invalidate,
   })
 
-  const handleFileDrop = useCallback(
-    (e: React.DragEvent) => {
+  const handleFileDrop = (e: React.DragEvent) => {
       e.preventDefault()
       setDragOver(false)
       const files = e.dataTransfer.files
       if (files.length > 0) uploadFiles(files)
-    },
-    [uploadFiles]
-  )
+    }
 
   const handleImageDragStart = (e: React.DragEvent, imageId: number) => {
     e.dataTransfer.effectAllowed = 'move'

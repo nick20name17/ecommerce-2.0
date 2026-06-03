@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { createFileRoute, useNavigate, useRouter } from '@tanstack/react-router'
 import { ChevronLeft, Copy, FileText, ListTodo, Paperclip, Settings, ShoppingCart, StickyNote, Trash2, UserPlus } from 'lucide-react'
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 
 import { PageEmpty } from '@/components/common/page-empty'
 import { EntityAttachmentsDialog } from '@/components/common/entity-attachments/entity-attachments-dialog'
@@ -92,10 +92,10 @@ function ProposalDetailPage() {
   const customFields = (fieldConfig?.proposal ?? []).filter((e) => !e.default && e.enabled)
 
   // Line item custom columns from proposal_item field config
-  const itemCustomCols = useMemo(() => {
+  const itemCustomCols = (() => {
     const entries = fieldConfig?.proposal_item ?? []
     return entries.filter((e: { default: boolean; enabled: boolean }) => !e.default && e.enabled)
-  }, [fieldConfig])
+  })()
 
   // Loading
   if (isLoading) {

@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { AlertCircle, ArrowLeft, FolderTree, Layers, Plus } from 'lucide-react'
-import { useCallback, useMemo, useState } from 'react'
+import { useState } from 'react'
 import { parseAsString, useQueryState } from 'nuqs'
 
 import { CategoryDeleteDialog } from './-components/category-delete-dialog'
@@ -50,15 +50,9 @@ const CatalogPage = () => {
   // Selection state — synced to URL so it persists on reload and is shareable
   const [selectedCategoryId, setSelectedCategoryId] = useQueryState('category', parseAsString)
 
-  const selectedCategory = useMemo(
-    () => (selectedCategoryId && tree.length > 0 ? findCategoryById(tree, selectedCategoryId) : null),
-    [selectedCategoryId, tree]
-  )
+  const selectedCategory = selectedCategoryId && tree.length > 0 ? findCategoryById(tree, selectedCategoryId) : null
 
-  const setSelectedCategory = useCallback(
-    (cat: CatalogCategory | null) => setSelectedCategoryId(cat?.id ?? null),
-    [setSelectedCategoryId]
-  )
+  const setSelectedCategory = (cat: CatalogCategory | null) => setSelectedCategoryId(cat?.id ?? null)
 
   const showDetail = isMobile && selectedCategory !== null
 

@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Check, ChevronDown, MapPin, Pencil, Truck } from 'lucide-react'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
 import { PICK_LIST_QUERY_KEYS } from '@/api/pick-list/query'
@@ -86,13 +86,13 @@ export function ShippingDialog({ pickList, open, onOpenChange }: ShippingDialogP
   const items = pickList.items ?? []
 
   // Auto-calculate weight from items (sum picked_quantity as proxy — real weight comes from item data)
-  const autoWeight = useMemo(() => {
+  const autoWeight = (() => {
     const total = items.reduce((sum, item) => {
       const qty = parseFloat(item.picked_quantity) || 0
       return sum + qty
     }, 0)
     return Math.max(Math.round(total * 100) / 100, 0.01)
-  }, [items])
+  })()
 
   // Set auto weight on first open
   useEffect(() => {

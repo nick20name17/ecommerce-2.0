@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { ArrowLeft, ArrowRight, Check, ChevronDown, Package } from 'lucide-react'
-import { useCallback, useMemo, useState } from 'react'
+import { useState } from 'react'
 
 import { getOrdersForPickingQuery } from '@/api/orders-for-picking/query'
 import type { PickingOrder, PickingOrderItem } from '@/api/orders-for-picking/schema'
@@ -50,13 +50,10 @@ export function AddItemsModal({ pickListId, customerId, existingDetailAutoids, o
   const groups = data?.results ?? []
   const orders = groups[0]?.orders ?? []
 
-  const selectedOrders = useMemo(
-    () => orders.filter((o) => selectedOrderIds.has(o.autoid)),
-    [orders, selectedOrderIds],
-  )
+  const selectedOrders = orders.filter((o) => selectedOrderIds.has(o.autoid))
 
   // All items from selected orders, excluding already-in-pick-list items
-  const allItems = useMemo(() => {
+  const allItems = (() => {
     const items: (PickingOrderItem & { orderAutoid: string; orderInvoice: string })[] = []
     for (const order of selectedOrders) {
       for (const item of order.items ?? []) {
@@ -67,20 +64,20 @@ export function AddItemsModal({ pickListId, customerId, existingDetailAutoids, o
       }
     }
     return items
-  }, [selectedOrders, existingDetailAutoids])
+  })()
 
-  const toggleOrder = useCallback((autoid: string) => {
+  const toggleOrder = (autoid: string) => {
     setSelectedOrderIds((prev) => {
       const next = new Set(prev)
       if (next.has(autoid)) next.delete(autoid)
       else next.add(autoid)
       return next
     })
-  }, [])
+  }
 
-  const selectAll = useCallback(() => {
+  const selectAll = () => {
     setSelectedOrderIds(new Set(orders.map((o) => o.autoid)))
-  }, [orders])
+  }
 
   const formatQty = (raw: string) => {
     const n = parseFloat(raw)
@@ -88,16 +85,16 @@ export function AddItemsModal({ pickListId, customerId, existingDetailAutoids, o
     return n % 1 === 0 ? n.toFixed(0) : String(parseFloat(n.toFixed(4)))
   }
 
-  const goToQuantities = useCallback(() => {
+  const goToQuantities = () => {
     const qty = new Map<string, string>()
     for (const item of allItems) {
       qty.set(item.autoid, '0')
     }
     setPickQuantities(qty)
     setStep('set-quantities')
-  }, [allItems])
+  }
 
-  const updatePickQty = useCallback((itemAutoid: string, value: string, maxQuan: string) => {
+  const updatePickQty = (itemAutoid: string, value: string, maxQuan: string) => {
     const max = parseFloat(maxQuan)
     const num = parseFloat(value)
     const clamped = isNaN(num) ? '' : num > max ? formatQty(maxQuan) : value
@@ -106,7 +103,7 @@ export function AddItemsModal({ pickListId, customerId, existingDetailAutoids, o
       next.set(itemAutoid, clamped)
       return next
     })
-  }, [])
+  }
 
   const hasAnyPicked = Array.from(pickQuantities.values()).some((v) => parseFloat(v) > 0)
 
@@ -140,13 +137,10 @@ export function AddItemsModal({ pickListId, customerId, existingDetailAutoids, o
   }
 
   // Count existing items per order for badge
-  const existingCountPerOrder = useCallback(
-    (order: PickingOrder) => {
-      const items = order.items ?? []
-      return items.filter((i) => existingDetailAutoids.has(i.autoid)).length
-    },
-    [existingDetailAutoids],
-  )
+  const existingCountPerOrder = (order: PickingOrder) => {
+    const items = order.items ?? []
+    return items.filter((i) => existingDetailAutoids.has(i.autoid)).length
+  }
 
   return (
     <Dialog

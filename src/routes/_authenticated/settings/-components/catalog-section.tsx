@@ -9,7 +9,7 @@ import {
   Package,
   Sparkles,
 } from 'lucide-react'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 import { CATALOG_QUERY_KEYS } from '@/api/catalog/query'
 import type { ImportStatusResponse } from '@/api/catalog/schema'
@@ -71,39 +71,38 @@ export const CatalogSection = ({ projectId }: CatalogSectionProps) => {
   const [advancedOpen, setAdvancedOpen] = useState(false)
   const queryClient = useQueryClient()
 
-  const clearImportPolling = useCallback(() => {
+  const clearImportPolling = () => {
     if (importIntervalRef.current) {
       clearInterval(importIntervalRef.current)
       importIntervalRef.current = null
     }
-  }, [])
+  }
 
-  const clearVPImportPolling = useCallback(() => {
+  const clearVPImportPolling = () => {
     if (vpImportIntervalRef.current) {
       clearInterval(vpImportIntervalRef.current)
       vpImportIntervalRef.current = null
     }
-  }, [])
+  }
 
-  const clearImgImportPolling = useCallback(() => {
+  const clearImgImportPolling = () => {
     if (imgImportIntervalRef.current) {
       clearInterval(imgImportIntervalRef.current)
       imgImportIntervalRef.current = null
     }
-  }, [])
+  }
 
-  const clearFullImportPolling = useCallback(() => {
+  const clearFullImportPolling = () => {
     if (fullImportIntervalRef.current) {
       clearInterval(fullImportIntervalRef.current)
       fullImportIntervalRef.current = null
     }
-  }, [])
+  }
 
   // Poll the full-import task. The backend reports stage transitions and
   // detailed progress through the same task_id; on completion we invalidate
   // both catalog and VP query caches since the pipeline writes both.
-  const startFullImportPolling = useCallback(
-    (taskId: string) => {
+  const startFullImportPolling = (taskId: string) => {
       clearFullImportPolling()
       setFullImportStatus({ taskId, status: 'running' })
       saveTask('full', projectId, taskId)
@@ -136,13 +135,10 @@ export const CatalogSection = ({ projectId }: CatalogSectionProps) => {
           )
         }
       }, 2000)
-    },
-    [clearFullImportPolling, projectId, queryClient]
-  )
+    }
 
   // Start polling for category import
-  const startCategoryPolling = useCallback(
-    (taskId: string) => {
+  const startCategoryPolling = (taskId: string) => {
       clearImportPolling()
       setImportStatus({ taskId, status: 'running' })
       saveTask('cat', projectId, taskId)
@@ -174,13 +170,10 @@ export const CatalogSection = ({ projectId }: CatalogSectionProps) => {
           )
         }
       }, 2000)
-    },
-    [clearImportPolling, projectId, queryClient]
-  )
+    }
 
   // Start polling for VP import
-  const startVPPolling = useCallback(
-    (taskId: string) => {
+  const startVPPolling = (taskId: string) => {
       clearVPImportPolling()
       setVPImportStatus({ taskId, status: 'running' })
       saveTask('vp', projectId, taskId)
@@ -212,12 +205,9 @@ export const CatalogSection = ({ projectId }: CatalogSectionProps) => {
           )
         }
       }, 2000)
-    },
-    [clearVPImportPolling, projectId, queryClient]
-  )
+    }
 
-  const startImgPolling = useCallback(
-    (taskId: string) => {
+  const startImgPolling = (taskId: string) => {
       clearImgImportPolling()
       setImgImportStatus({ taskId, status: 'running' })
       saveTask('img', projectId, taskId)
@@ -246,9 +236,7 @@ export const CatalogSection = ({ projectId }: CatalogSectionProps) => {
           )
         }
       }, 2000)
-    },
-    [clearImgImportPolling, projectId]
-  )
+    }
 
   // Resume polling on mount if tasks are saved in localStorage
   useEffect(() => {

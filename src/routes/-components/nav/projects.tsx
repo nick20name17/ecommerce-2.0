@@ -1,6 +1,6 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Check, ChevronDown } from 'lucide-react'
-import { useCallback, useEffect } from 'react'
+import { useEffect } from 'react'
 import { useLocalStorage } from 'usehooks-ts'
 
 import { DEFAULT_LIMIT } from '@/api/constants'
@@ -65,8 +65,7 @@ export const NavProjects = () => {
   // Switching projects: drop every cached query whose params include
   // project_id so pages don't briefly show the previous project's data.
   // Queries without project_id (auth/user/projects-list/profile) stay.
-  const switchProject = useCallback(
-    (nextId: number) => {
+  const switchProject = (nextId: number) => {
       if (nextId !== projectId) {
         queryClient.removeQueries({
           predicate: (query) =>
@@ -79,9 +78,7 @@ export const NavProjects = () => {
         })
       }
       setProjectId(nextId)
-    },
-    [projectId, queryClient, setProjectId],
-  )
+    }
 
   const { data, isLoading } = useQuery({
     ...getProjectsQuery({ limit: DEFAULT_LIMIT, offset: 0 }),

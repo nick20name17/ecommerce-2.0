@@ -1,7 +1,6 @@
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { TriangleAlert } from 'lucide-react'
 import { parseAsString, useQueryState } from 'nuqs'
-import { useMemo } from 'react'
 
 import { PageEmpty } from '@/components/common/page-empty'
 import { FieldsDataTable } from './fields-data-table'
@@ -156,13 +155,10 @@ export const DataControlSection = ({ projectId }: { projectId: number }) => {
 
   // Filter out top-level meta keys (e.g. _list_columns) when building the
   // entity-tab list. Without this the meta key would show up as a tab.
-  const entities = useMemo(
-    () => Object.keys(data ?? {}).filter((k) => !k.startsWith('_')),
-    [data]
-  )
+  const entities = Object.keys(data ?? {}).filter((k) => !k.startsWith('_'))
   const currentTab = activeTab ?? entities[0] ?? ''
 
-  const fields: FieldConfigRow[] = useMemo(() => {
+  const fields: FieldConfigRow[] = (() => {
     const entityFields = data?.[currentTab]
     if (!entityFields) return []
     return entityFields.map((entry) => ({
@@ -175,12 +171,9 @@ export const DataControlSection = ({ projectId }: { projectId: number }) => {
       type: entry.type,
       entity: currentTab
     }))
-  }, [data, currentTab])
+  })()
 
-  const currentListColumns = useMemo(
-    () => data?._list_columns?.[currentTab] ?? [],
-    [data, currentTab]
-  )
+  const currentListColumns = data?._list_columns?.[currentTab] ?? []
 
   const editableMutation = useMutation({
     mutationFn: ({

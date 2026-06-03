@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { createFileRoute, redirect, useNavigate } from '@tanstack/react-router'
 import { ArrowLeft, Eye, FlaskConical, Redo2, Save, Search, Sparkles, Trash2, Undo2, X } from 'lucide-react'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
 import {
@@ -68,10 +68,10 @@ function DocumentEditorPage() {
     ...getFieldConfigQuery(projectId),
     enabled: !!projectId,
   })
-  const availableFields = useMemo(() => {
+  const availableFields = (() => {
     if (!template || !fieldConfig) return []
     return fieldConfig[template.entity_type] ?? []
-  }, [template, fieldConfig])
+  })()
 
   // Test-entity preview state. Three queries — only the one matching the
   // template's entity_type is enabled, so the others stay idle.
@@ -91,7 +91,7 @@ function DocumentEditorPage() {
     enabled:
       !!testEntityId && !!projectId && template?.entity_type === 'customer',
   })
-  const entityData = useMemo<Record<string, unknown> | null>(() => {
+  const entityData = ((): Record<string, unknown> | null => {
     if (!testEntityId || !template) return null
     if (template.entity_type === 'order')
       return (testOrder as Record<string, unknown> | undefined) ?? null
@@ -100,7 +100,7 @@ function DocumentEditorPage() {
     if (template.entity_type === 'customer')
       return (testCustomer as Record<string, unknown> | undefined) ?? null
     return null
-  }, [testEntityId, template, testOrder, testProposal, testCustomer])
+  })()
 
   // Editable local copy
   const [name, setName] = useState('')
@@ -127,16 +127,13 @@ function DocumentEditorPage() {
   const commitTimerRef = useRef<number | null>(null)
 
   // Wrap setLayout so callers can pass either a value or an updater function.
-  const setLayout = useCallback(
-    (next: DocumentLayout | ((prev: DocumentLayout) => DocumentLayout)) => {
-      setLayoutRaw((prev) =>
-        typeof next === 'function'
-          ? (next as (p: DocumentLayout) => DocumentLayout)(prev)
-          : next
-      )
-    },
-    []
-  )
+  const setLayout = (next: DocumentLayout | ((prev: DocumentLayout) => DocumentLayout)) => {
+    setLayoutRaw((prev) =>
+      typeof next === 'function'
+        ? (next as (p: DocumentLayout) => DocumentLayout)(prev)
+        : next
+    )
+  }
 
   useEffect(() => {
     if (template) {
@@ -178,7 +175,7 @@ function DocumentEditorPage() {
   const canUndo = past.length > 0
   const canRedo = future.length > 0
 
-  const undo = useCallback(() => {
+  const undo = () => {
     setPast((p) => {
       if (p.length === 0) return p
       const previous = p[p.length - 1]
@@ -192,9 +189,9 @@ function DocumentEditorPage() {
       }
       return p.slice(0, -1)
     })
-  }, [layout])
+  }
 
-  const redo = useCallback(() => {
+  const redo = () => {
     setFuture((f) => {
       if (f.length === 0) return f
       const next = f[0]
@@ -207,33 +204,30 @@ function DocumentEditorPage() {
       }
       return f.slice(1)
     })
-  }, [layout])
+  }
 
   /**
    * Replace this template's layout + page setup with a preset's. Undo'able,
    * so the user can revert if they didn't mean it.
    */
-  const applyPreset = useCallback(
-    (preset: DocumentTemplatePreset) => {
-      if (
-        !confirm(
-          `Replace this template's layout with "${preset.label}"? You can undo with ⌘Z.`
-        )
-      ) {
-        return
-      }
-      const fresh = materializePresetLayout(preset)
-      setLayout(fresh)
-      setPageSize(preset.page_size)
-      setOrientation(preset.orientation)
-      if (preset.page_margins) setPageMargins(preset.page_margins)
-      setAccessibleFrom(
-        preset.defaultAccessibleFrom as AccessibleRouteKey[]
+  const applyPreset = (preset: DocumentTemplatePreset) => {
+    if (
+      !confirm(
+        `Replace this template's layout with "${preset.label}"? You can undo with ⌘Z.`
       )
-      toast.success(`Applied "${preset.label}"`)
-    },
-    [setLayout]
-  )
+    ) {
+      return
+    }
+    const fresh = materializePresetLayout(preset)
+    setLayout(fresh)
+    setPageSize(preset.page_size)
+    setOrientation(preset.orientation)
+    if (preset.page_margins) setPageMargins(preset.page_margins)
+    setAccessibleFrom(
+      preset.defaultAccessibleFrom as AccessibleRouteKey[]
+    )
+    toast.success(`Applied "${preset.label}"`)
+  }
 
   // Keyboard shortcuts — Cmd/Ctrl+Z = undo, Cmd/Ctrl+Shift+Z (or Ctrl+Y) = redo.
   useEffect(() => {
@@ -263,7 +257,7 @@ function DocumentEditorPage() {
     return () => window.removeEventListener('keydown', handler)
   }, [undo, redo, canUndo, canRedo])
 
-  const isDirty = useMemo(() => {
+  const isDirty = (() => {
     if (!template) return false
     return (
       name !== template.name ||
@@ -277,17 +271,7 @@ function DocumentEditorPage() {
         JSON.stringify(template.accessible_from ?? []) ||
       JSON.stringify(layout) !== JSON.stringify(ensureLayout(template.layout))
     )
-  }, [
-    template,
-    name,
-    description,
-    isActive,
-    pageSize,
-    orientation,
-    pageMargins,
-    accessibleFrom,
-    layout,
-  ])
+  })()
 
   const saveMutation = useMutation({
     mutationFn: (payload: UpdateDocumentTemplatePayload) =>
@@ -777,10 +761,10 @@ function TestEntityPicker({
     enabled: open && entityType === 'customer' && !!projectId,
   })
 
-  const { rows, isLoading } = useMemo<{
+  const { rows, isLoading } = ((): {
     rows: PickerRow[]
     isLoading: boolean
-  }>(() => {
+  } => {
     if (entityType === 'order') {
       const orders = ordersQ.data?.results ?? []
       return {
@@ -816,15 +800,7 @@ function TestEntityPicker({
       }
     }
     return { rows: [], isLoading: false }
-  }, [
-    entityType,
-    ordersQ.data,
-    ordersQ.isLoading,
-    proposalsQ.data,
-    proposalsQ.isLoading,
-    customersQ.data,
-    customersQ.isLoading,
-  ])
+  })()
 
   useEffect(() => {
     if (open) setTimeout(() => inputRef.current?.focus(), 30)

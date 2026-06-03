@@ -13,7 +13,7 @@ import {
   Truck,
   TriangleAlert,
 } from 'lucide-react'
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 
 import { useAuth } from '@/providers/auth'
 import { PICK_LIST_QUERY_KEYS, getPickListDetailQuery } from '@/api/pick-list/query'
@@ -81,10 +81,10 @@ const PickListDetailPage = () => {
 
   const items = pickList?.items ?? []
   const hasPushedItems = items.some((i) => i.push_status === 'success')
-  const existingDetailAutoids = useMemo(() => new Set(items.map((i) => i.detail_autoid)), [items])
+  const existingDetailAutoids = new Set(items.map((i) => i.detail_autoid))
 
   // Build description lookup from orders data
-  const descrMap = useMemo(() => {
+  const descrMap = (() => {
     const map = new Map<string, string>()
     for (const order of pickList?.orders ?? []) {
       for (const oi of order.items) {
@@ -92,19 +92,19 @@ const PickListDetailPage = () => {
       }
     }
     return map
-  }, [pickList?.orders])
+  })()
 
   // Build order invoice lookup
-  const orderInvoiceMap = useMemo(() => {
+  const orderInvoiceMap = (() => {
     const map = new Map<string, string>()
     for (const order of pickList?.orders ?? []) {
       if (order.invoice) map.set(order.autoid, order.invoice)
     }
     return map
-  }, [pickList?.orders])
+  })()
 
   // Group items by order
-  const orderGroups = useMemo(() => {
+  const orderGroups = (() => {
     const map = new Map<string, typeof items>()
     for (const item of items) {
       const key = item.order_autoid
@@ -113,7 +113,7 @@ const PickListDetailPage = () => {
       map.set(key, arr)
     }
     return Array.from(map.entries())
-  }, [items])
+  })()
 
   const allShipments = pickList?.shipments ?? []
 

@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { ArrowLeft, ArrowRight, Check, ChevronDown, Loader2, Package } from 'lucide-react'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { useNavigate } from '@tanstack/react-router'
 
@@ -80,11 +80,11 @@ export function StartPickingDialog({
     ...getShippingAddressesQuery(projectId),
     enabled: open,
   })
-  const defaultShippingAddressId = useMemo(() => {
+  const defaultShippingAddressId = (() => {
     const list = Array.isArray(shippingAddresses) ? shippingAddresses : []
     const def = list.find((a) => a.is_default) ?? list[0]
     return def?.id ?? null
-  }, [shippingAddresses])
+  })()
 
   // Find the matching customer group
   const groups = data?.results ?? []
@@ -106,12 +106,9 @@ export function StartPickingDialog({
     }
   }, [open, orderAutoid, orders])
 
-  const selectedOrders = useMemo(
-    () => orders.filter((o) => selectedOrderIds.has(o.autoid)),
-    [orders, selectedOrderIds],
-  )
+  const selectedOrders = orders.filter((o) => selectedOrderIds.has(o.autoid))
 
-  const allItems = useMemo(() => {
+  const allItems = (() => {
     const items: (PickingOrderItem & { orderAutoid: string; orderInvoice: string })[] = []
     for (const order of selectedOrders) {
       for (const item of order.items ?? []) {
@@ -122,20 +119,20 @@ export function StartPickingDialog({
       }
     }
     return items
-  }, [selectedOrders])
+  })()
 
-  const toggleOrder = useCallback((autoid: string) => {
+  const toggleOrder = (autoid: string) => {
     setSelectedOrderIds((prev) => {
       const next = new Set(prev)
       if (next.has(autoid)) next.delete(autoid)
       else next.add(autoid)
       return next
     })
-  }, [])
+  }
 
-  const selectAll = useCallback(() => {
+  const selectAll = () => {
     setSelectedOrderIds(new Set(orders.map((o) => o.autoid)))
-  }, [orders])
+  }
 
   const formatQty = (raw: string) => {
     const n = parseFloat(raw)
@@ -143,16 +140,16 @@ export function StartPickingDialog({
     return n % 1 === 0 ? n.toFixed(0) : String(parseFloat(n.toFixed(4)))
   }
 
-  const goToQuantities = useCallback(() => {
+  const goToQuantities = () => {
     const qty = new Map<string, string>()
     for (const item of allItems) {
       qty.set(item.autoid, '0')
     }
     setPickQuantities(qty)
     setStep('set-quantities')
-  }, [allItems])
+  }
 
-  const updatePickQty = useCallback((itemAutoid: string, value: string, maxQuan: string) => {
+  const updatePickQty = (itemAutoid: string, value: string, maxQuan: string) => {
     const max = parseFloat(maxQuan)
     const num = parseFloat(value)
     const clamped = isNaN(num) ? '' : num > max ? formatQty(maxQuan) : value
@@ -161,10 +158,10 @@ export function StartPickingDialog({
       next.set(itemAutoid, clamped)
       return next
     })
-  }, [])
+  }
 
   // Get ship-to from first selected order
-  const shipTo = useMemo(() => {
+  const shipTo = (() => {
     const o = selectedOrders[0]
     if (!o) return null
     return {
@@ -176,7 +173,7 @@ export function StartPickingDialog({
       postal: (o.c_zip as string) || '',
       country: (o.c_country as string) || (o.country as string) || '',
     }
-  }, [selectedOrders])
+  })()
 
   const createMutation = useMutation({
     mutationFn: async (pushToEbms: boolean) => {

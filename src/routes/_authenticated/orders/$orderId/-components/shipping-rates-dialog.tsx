@@ -1,6 +1,6 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Check, ChevronDown, ChevronLeft, ChevronRight, GripVertical, Loader2, Package, Pencil, Plus } from 'lucide-react'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
 import type { Order, OrderItem, OrderPatchPayload, ShippingPackagePayload, ShippingRate, ShippingRatesResponse, ShippingSelectionRequest } from '@/api/order/schema'
@@ -80,10 +80,7 @@ export function ShippingRatesDialog({
 
   const { data: shippingAddresses = [] } = useQuery(getShippingAddressesQuery(projectId))
 
-  const selectedAddress = useMemo(
-    () => shippingAddresses.find((a) => a.id === selectedAddressId) ?? null,
-    [shippingAddresses, selectedAddressId],
-  )
+  const selectedAddress = shippingAddresses.find((a) => a.id === selectedAddressId) ?? null
 
   // Initialize when dialog opens
   const prevOpenRef = useRef(false)
@@ -132,25 +129,22 @@ export function ShippingRatesDialog({
 
   const hasAddress = address.c_address1.trim() || address.c_city.trim()
 
-  const itemMap = useMemo(() => {
+  const itemMap = (() => {
     const map = new Map<string, OrderItem>()
     for (const item of items) map.set(item.autoid, item)
     return map
-  }, [items])
+  })()
 
   // Which package each item belongs to
-  const itemPackageMap = useMemo(() => {
+  const itemPackageMap = (() => {
     const map = new Map<string, string>() // item autoid -> package id
     for (const pkg of packages) {
       for (const id of pkg.items) map.set(id, pkg.id)
     }
     return map
-  }, [packages])
+  })()
 
-  const unassignedItems = useMemo(
-    () => items.filter((i) => !itemPackageMap.has(i.autoid)),
-    [items, itemPackageMap]
-  )
+  const unassignedItems = items.filter((i) => !itemPackageMap.has(i.autoid))
 
   // ── Package management ──
 
@@ -172,17 +166,17 @@ export function ShippingRatesDialog({
   }
 
   // Compute weight from assigned items (sum of item weights, min 0.01)
-  const computePackageWeight = useCallback((itemIds: string[]) => {
+  const computePackageWeight = (itemIds: string[]) => {
     const total = itemIds.reduce((sum, id) => {
       const item = itemMap.get(id)
       const w = item?.weight ? parseFloat(item.weight) : 0
       return sum + (isNaN(w) ? 0 : w)
     }, 0)
     return Math.max(Math.round(total * 100) / 100, 0.01)
-  }, [itemMap])
+  }
 
   // Move item to a package (removing from any other)
-  const moveItemToPackage = useCallback((itemAutoid: string, targetPkgId: string) => {
+  const moveItemToPackage = (itemAutoid: string, targetPkgId: string) => {
     setPackages((prev) => {
       const updated = prev.map((p) => {
         const without = p.items.filter((id) => id !== itemAutoid)
@@ -195,17 +189,17 @@ export function ShippingRatesDialog({
       // Recompute weights for affected packages
       return updated.map((p) => ({ ...p, weight: computePackageWeight(p.items) }))
     })
-  }, [computePackageWeight])
+  }
 
   // Remove item from its package (back to unassigned)
-  const unassignItem = useCallback((itemAutoid: string) => {
+  const unassignItem = (itemAutoid: string) => {
     setPackages((prev) =>
       prev.map((p) => {
         const newItems = p.items.filter((id) => id !== itemAutoid)
         return { ...p, items: newItems, weight: computePackageWeight(newItems) }
       })
     )
-  }, [computePackageWeight])
+  }
 
   // ── Drag and drop ──
 

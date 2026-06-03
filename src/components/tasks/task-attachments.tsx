@@ -12,7 +12,7 @@ import {
   UploadIcon,
   VideoIcon
 } from 'lucide-react'
-import { forwardRef, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react'
+import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react'
 
 import { TASK_QUERY_KEYS } from '@/api/task/query'
 import type { TaskAttachment } from '@/api/task/schema'
@@ -100,10 +100,7 @@ export const TaskAttachments = forwardRef<TaskAttachmentsRef, TaskAttachmentsPro
     const allAttachments = [...attachments, ...optimisticAttachments]
     const [previewIndex, setPreviewIndex] = useState<number | null>(null)
 
-    const imageAttachments = useMemo(
-      () => allAttachments.filter((a) => a.file_type.startsWith('image/')),
-      [allAttachments]
-    )
+    const imageAttachments = allAttachments.filter((a) => a.file_type.startsWith('image/'))
 
     const openPreview = (attachment: TaskAttachment) => {
       const idx = imageAttachments.findIndex((a) => a.id === attachment.id)

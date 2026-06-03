@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { ChevronRight, Folder, FolderOpen, Search } from 'lucide-react'
-import { useCallback, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useDebouncedCallback } from 'use-debounce'
 
 import { categoryService } from '@/api/category/service'
@@ -68,15 +68,12 @@ export const ProductBrowserDialog = ({
     }
   }, [open, defaultCategoryId])
 
-  const handleSearchChange = useCallback(
-    (val: string) => {
+  const handleSearchChange = (val: string) => {
       setSearch(val)
       debouncedSetSearch(val)
-    },
-    [debouncedSetSearch]
-  )
+    }
 
-  const toggleProduct = useCallback((product: ProductRow) => {
+  const toggleProduct = (product: ProductRow) => {
     setSelected((prev) => {
       const next = new Map(prev)
       if (next.has(product.autoid)) {
@@ -86,7 +83,7 @@ export const ProductBrowserDialog = ({
       }
       return next
     })
-  }, [])
+  }
 
   const handleAdd = () => {
     onSelect(Array.from(selected.values()))

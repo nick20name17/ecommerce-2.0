@@ -7,7 +7,7 @@ import { EntityAttachmentsDialog } from '@/components/common/entity-attachments/
 import { EntityNotesSheet } from '@/components/common/entity-notes/entity-notes-sheet'
 import { ShippingRatesDialog } from './-components/shipping-rates-dialog'
 import { PanelSection, PanelRow, PanelBlock, PropertyField, SummaryCell } from './-components/order-properties'
-import { useCallback, useMemo, useState } from 'react'
+import { useState } from 'react'
 
 import { getEditableFieldsQuery } from '@/api/data/query'
 import { getFieldConfigQuery } from '@/api/field-config/query'
@@ -97,27 +97,24 @@ function OrderDetailPage() {
     },
   })
 
-  const handleFieldSave = useCallback(
-    (field: string, value: string) => {
-      if (!order) return
-      const current = (order[field] as string | null) ?? ''
-      if (value === current) return
-      patchMutation.mutate({ [field]: value || null })
-    },
-    [order, patchMutation],
-  )
+  const handleFieldSave = (field: string, value: string) => {
+    if (!order) return
+    const current = (order[field] as string | null) ?? ''
+    if (value === current) return
+    patchMutation.mutate({ [field]: value || null })
+  }
 
   // Custom fields: enabled non-default fields from field config
-  const customFields = useMemo(() => {
+  const customFields = (() => {
     const entries = fieldConfig?.order ?? []
     return entries.filter((e) => !e.default && e.enabled)
-  }, [fieldConfig])
+  })()
 
   // Line item custom columns from order_item field config
-  const itemCustomCols = useMemo(() => {
+  const itemCustomCols = (() => {
     const entries = fieldConfig?.order_item ?? []
     return entries.filter((e) => !e.default && e.enabled)
-  }, [fieldConfig])
+  })()
 
   const [assignOpen, setAssignOpen] = useState(false)
   const [pickingOpen, setPickingOpen] = useState(false)

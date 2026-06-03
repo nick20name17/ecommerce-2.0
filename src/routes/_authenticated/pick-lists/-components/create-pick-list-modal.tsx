@@ -1,7 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
-import { useMemo } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 
 import { PICK_LIST_QUERY_KEYS } from '@/api/pick-list/query'
@@ -34,11 +33,11 @@ export function CreatePickListModal({ open, onOpenChange }: Props) {
     ...getShippingAddressesQuery(projectId),
     enabled: open,
   })
-  const defaultShippingAddressId = useMemo(() => {
+  const defaultShippingAddressId = (() => {
     const list = Array.isArray(shippingAddresses) ? shippingAddresses : []
     const def = list.find((a) => a.is_default) ?? list[0]
     return def?.id ?? null
-  }, [shippingAddresses])
+  })()
 
   const form = useForm<CreatePickListFormValues>({
     resolver: zodResolver(CreatePickListSchema),

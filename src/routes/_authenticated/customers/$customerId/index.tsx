@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { createFileRoute, useRouter } from '@tanstack/react-router'
 import { ChevronLeft, Pencil, StickyNote, Trash2, UserPlus } from 'lucide-react'
-import { useCallback, useMemo, useState } from 'react'
+import { useState } from 'react'
 import { toast } from 'sonner'
 
 import { PropertyField } from '@/routes/_authenticated/orders/$orderId/-components/order-properties'
@@ -60,10 +60,10 @@ function CustomerDetailPage() {
   const editableCustomerFields = editableFields?.customer ?? []
   const { data: priceLevels } = useQuery(getPriceLevelsQuery(projectId))
 
-  const customFields = useMemo(() => {
+  const customFields = (() => {
     const entries = fieldConfig?.customer ?? []
     return entries.filter((e) => !e.default && e.enabled)
-  }, [fieldConfig])
+  })()
 
   const detailKey = [...CUSTOMER_QUERY_KEYS.detail(customerId), projectId] as const
 
@@ -108,15 +108,12 @@ function CustomerDetailPage() {
 
   // Print menu is rendered via <PrintMenu/> below.
 
-  const handleFieldSave = useCallback(
-    (field: string, value: string) => {
+  const handleFieldSave = (field: string, value: string) => {
       if (!customer) return
       const current = (customer[field] as string | null) ?? ''
       if (value === current) return
       patchMutation.mutate({ [field]: value || null })
-    },
-    [customer, patchMutation],
-  )
+    }
 
   // Loading
   if (isLoading) {

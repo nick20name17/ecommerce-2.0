@@ -9,7 +9,7 @@ import {
   User,
   XIcon,
 } from 'lucide-react'
-import { useCallback, useMemo, useState } from 'react'
+import { useState } from 'react'
 import { toast } from 'sonner'
 
 import { CartEditableTable } from '../create/-components/cart-editable-table'
@@ -117,24 +117,21 @@ const OrderDeskPage = () => {
     meta: { errorMessage: 'Failed to update customer' },
   })
 
-  const handleFieldSave = useCallback(
-    (field: string, value: string) => {
-      if (!customerDetail) return
-      const current = (customerDetail[field] as string | null) ?? ''
-      if (value === current) return
-      patchMutation.mutate({ [field]: value || null })
-    },
-    [customerDetail, patchMutation],
-  )
+  const handleFieldSave = (field: string, value: string) => {
+    if (!customerDetail) return
+    const current = (customerDetail[field] as string | null) ?? ''
+    if (value === current) return
+    patchMutation.mutate({ [field]: value || null })
+  }
 
   const savingField = patchMutation.isPending
     ? Object.keys(patchMutation.variables ?? {})[0] ?? null
     : null
 
-  const customerCustomFields = useMemo(() => {
+  const customerCustomFields = (() => {
     const entries = fieldConfig?.customer ?? []
     return entries.filter((e) => !e.default && e.enabled && e.field !== 'salesman')
-  }, [fieldConfig])
+  })()
 
   const isCreating = busy.creatingProposal || busy.creatingOrder
   const canSubmit = !!customer && cartItems.length > 0 && !isBusy && !isCreating

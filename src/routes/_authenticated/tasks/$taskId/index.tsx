@@ -8,7 +8,7 @@ import {
   Paperclip,
   Trash2
 } from 'lucide-react'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 import { TASK_QUERY_KEYS, getTaskDetailQuery, getTaskNotesQuery, getTaskStatusesQuery } from '@/api/task/query'
 import type { Task, TaskNote } from '@/api/task/schema'
@@ -124,13 +124,13 @@ function TaskDetailPage() {
   const [noteText, setNoteText] = useState('')
   const titleRef = useRef<HTMLTextAreaElement>(null)
 
-  const autoResizeTitle = useCallback(() => {
+  const autoResizeTitle = () => {
     const el = titleRef.current
     if (el) {
       el.style.height = 'auto'
       el.style.height = `${el.scrollHeight}px`
     }
-  }, [])
+  }
 
   // Fetch task
   const { data: task, isLoading } = useQuery({

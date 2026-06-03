@@ -1,7 +1,5 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import { ChevronLeft, ChevronRight, Folder, FolderOpen, ImageOff } from 'lucide-react'
-import { useMemo } from 'react'
-
 import { getCategoriesQuery } from '@/api/category/query'
 import type { Category } from '@/api/category/schema'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -43,11 +41,11 @@ export const CatalogCategorySidebar = ({
   })
 
   const results = data?.results ?? []
-  const currentLabel = useMemo(() => {
+  const currentLabel = (() => {
     const fromPath = path.length > 0 ? path[path.length - 1]?.tree_descr : null
     if (fromPath) return fromPath
     return getLabelForTreeId(results, value)
-  }, [path, results, value])
+  })()
 
   const setTreeId = (treeId: string | null, treeDescr: string) => {
     onChange({ treeId, treeDescr })

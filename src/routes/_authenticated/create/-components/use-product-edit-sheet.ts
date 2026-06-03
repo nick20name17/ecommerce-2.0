@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useReducer, useRef } from 'react'
+import { useEffect, useReducer, useRef } from 'react'
 
 import {
   type ConfigPath,
@@ -373,48 +373,35 @@ export const useProductEditSheet = (
     }
   }, [configs, product, projectId, customerId])
 
-  const activeConfigurations = useMemo(() => buildActivePayload(configs), [configs])
-  const hasUncheckedRequired = useMemo(() => hasAnyUncheckedRequired(configs), [configs])
-  const totalPrice = useMemo(
-    () => (Number(configData?.base_price) || 0) + sumActivePriceField(configs, 'price'),
-    [configs, configData?.base_price]
-  )
-  const totalOldPrice = useMemo(
-    () =>
-      (Number(configData?.base_old_price) || 0) + sumActivePriceField(configs, 'old_price'),
-    [configs, configData?.base_old_price]
-  )
+  const activeConfigurations = buildActivePayload(configs)
+  const hasUncheckedRequired = hasAnyUncheckedRequired(configs)
+  const totalPrice = (Number(configData?.base_price) || 0) + sumActivePriceField(configs, 'price')
+  const totalOldPrice =
+    (Number(configData?.base_old_price) || 0) + sumActivePriceField(configs, 'old_price')
 
   // Wizard mode is decided once per product from the source data — flipping after fetches
   // settled would jump the layout mid-interaction.
-  const wizardMode = useMemo(
-    () => (configData?.configurations ? containsCTOItem(configData.configurations) : false),
-    [configData]
-  )
+  const wizardMode = configData?.configurations
+    ? containsCTOItem(configData.configurations)
+    : false
 
   const activeStepIndex = wizardMode ? configs.findIndex((c) => c.name === state.activeTab) : -1
 
   // `requireSelection` distinguishes the lenient validity check (Next-step button: allownone
   // empty is OK) from the strict completion check (auto-advance: must have an active item).
-  const isStepDone = useCallback(
-    (step: Configuration | undefined, requireSelection: boolean): boolean => {
-      if (!step) return false
-      const activeItem = step.items.find((i) => i.active)
-      if (!activeItem) return !requireSelection && step.allownone
-      if (activeItem.subConfigsLoading) return false
-      if (activeItem.subConfigurations?.length) {
-        if (requireSelection && isAnythingLoadingDeep(activeItem.subConfigurations)) return false
-        if (hasAnyUncheckedRequired(activeItem.subConfigurations)) return false
-      }
-      return true
-    },
-    []
-  )
+  const isStepDone = (step: Configuration | undefined, requireSelection: boolean): boolean => {
+    if (!step) return false
+    const activeItem = step.items.find((i) => i.active)
+    if (!activeItem) return !requireSelection && step.allownone
+    if (activeItem.subConfigsLoading) return false
+    if (activeItem.subConfigurations?.length) {
+      if (requireSelection && isAnythingLoadingDeep(activeItem.subConfigurations)) return false
+      if (hasAnyUncheckedRequired(activeItem.subConfigurations)) return false
+    }
+    return true
+  }
 
-  const isStepFullyDone = useCallback(
-    (step: Configuration | undefined) => isStepDone(step, true),
-    [isStepDone]
-  )
+  const isStepFullyDone = (step: Configuration | undefined) => isStepDone(step, true)
 
   const canGoNext = (() => {
     if (!wizardMode || activeStepIndex < 0 || activeStepIndex >= configs.length - 1) return false
@@ -446,7 +433,7 @@ export const useProductEditSheet = (
     }
   }, [configs, wizardMode, activeStepIndex, isStepFullyDone, userInteractionTick])
 
-  const hasChanges = useMemo(() => {
+  const hasChanges = (() => {
     if (state.quantity !== state.initialQuantity) return true
     const currentIds = collectActiveIds(configs)
     if (currentIds.size !== state.initialConfigIds.size) return true
@@ -454,7 +441,7 @@ export const useProductEditSheet = (
       if (!state.initialConfigIds.has(id)) return true
     }
     return false
-  }, [configs, state.quantity, state.initialQuantity, state.initialConfigIds])
+  })()
 
   return {
     state,

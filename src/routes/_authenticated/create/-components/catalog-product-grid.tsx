@@ -10,7 +10,7 @@ import {
   Settings2,
   X
 } from 'lucide-react'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useDebouncedCallback } from 'use-debounce'
 
 import { PageEmpty } from '@/components/common/page-empty'
@@ -48,17 +48,14 @@ export const CatalogProductGrid = ({
     setOffset(0)
   }, [categoryId, debouncedSearch])
 
-  const params = useMemo(
-    () => ({
+  const params = {
       limit: DEFAULT_LIMIT,
       offset,
       search: debouncedSearch || undefined,
       category: categoryId ?? undefined,
       customer_id: customerId,
       project_id: projectId ?? undefined
-    }),
-    [categoryId, customerId, debouncedSearch, offset, projectId]
-  )
+    }
 
   const { data, isLoading, isFetching } = useQuery({
     ...getProductsQuery(params),

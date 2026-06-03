@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
 import { ArrowRight, Package, Search, Users } from 'lucide-react'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 
 import { getCustomersQuery } from '@/api/customer/query'
@@ -79,8 +79,7 @@ export const GlobalSearch = () => {
     }
   }, [activeIdx])
 
-  const handleSelect = useCallback(
-    (result: Result) => {
+  const handleSelect = (result: Result) => {
       setOpen(false)
       setQuery('')
       if (result.type === 'order') {
@@ -88,9 +87,7 @@ export const GlobalSearch = () => {
       } else {
         navigate({ to: '/customers/$customerId', params: { customerId: result.id } })
       }
-    },
-    [navigate],
-  )
+    }
 
   // Keyboard shortcut to open
   useEffect(() => {
