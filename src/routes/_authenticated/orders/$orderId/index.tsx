@@ -182,7 +182,6 @@ function OrderDetailPage() {
   if (isLoading) {
     return (
       <div className='flex h-full flex-col overflow-hidden'>
-        {/* Header skeleton */}
         <header className='flex h-12 shrink-0 items-center gap-2.5 border-b border-border px-3.5 sm:px-6'>
           <SidebarTrigger className='-ml-1' />
           <Skeleton className='h-4 w-12' />
@@ -195,9 +194,7 @@ function OrderDetailPage() {
         </header>
 
         <div className='flex min-h-0 flex-1 flex-col lg:flex-row'>
-          {/* Table skeleton */}
           <div className='flex min-h-0 flex-1 flex-col overflow-hidden'>
-            {/* Table header */}
             <div className='flex items-center gap-3 border-b border-border bg-bg-secondary/60 py-1.5 pr-6 pl-6'>
               <Skeleton className='h-3 w-10' />
               <Skeleton className='h-3 w-16' />
@@ -208,7 +205,6 @@ function OrderDetailPage() {
               <Skeleton className='h-3 w-12' />
               <Skeleton className='h-3 w-14' />
             </div>
-            {/* Table rows */}
             <div className='flex-1'>
               {Array.from({ length: 6 }).map((_, i) => (
                 <div
@@ -226,7 +222,6 @@ function OrderDetailPage() {
                 </div>
               ))}
             </div>
-            {/* Summary footer skeleton */}
             <div className='flex shrink-0 items-center gap-5 border-t border-border bg-bg-secondary/40 px-6 py-2'>
               <Skeleton className='h-3 w-14' />
               <Skeleton className='h-3 w-14' />
@@ -239,7 +234,6 @@ function OrderDetailPage() {
             </div>
           </div>
 
-          {/* Right panel skeleton */}
           <div className='hidden shrink-0 border-l border-border bg-bg-secondary/50 lg:block lg:w-95'>
             <div className='flex items-center gap-0 border-b border-border px-4'>
               <Skeleton className='my-2 h-4 w-14' />
@@ -353,7 +347,6 @@ function OrderDetailPage() {
           {statusLabel}
         </span>
 
-        {/* Assignee */}
         <div className='hidden shrink-0 items-center gap-1.5 md:flex'>
           <button
             type='button'
@@ -628,7 +621,6 @@ function OrderDetailPage() {
             )}
           </div>
 
-          {/* Summary footer */}
           <div className='flex shrink-0 items-center justify-end gap-4 border-t border-border bg-bg-secondary/40 px-4 py-2 sm:px-6'>
             <SummaryCell label='Subtotal' value={formatCurrency(order.subtotal)} />
             <SummaryCell label='Tax' value={formatCurrency(order.tax)} />
@@ -649,7 +641,6 @@ function OrderDetailPage() {
             'border-t border-border lg:w-95 lg:border-t-0 lg:border-l'
           )}
         >
-          {/* Panel tabs */}
           <div className='flex shrink-0 items-center justify-between border-b border-border px-1'>
             <div className='flex items-center gap-0'>
               {(['general', 'custom', 'shipments'] as const).map(tab => {
@@ -721,11 +712,9 @@ function OrderDetailPage() {
             </div>
           </div>
 
-          {/* Panel content */}
           <div className='flex-1 overflow-y-auto'>
             {panelTab === 'general' ? (
               <>
-                {/* Bill To */}
                 <PanelSection title='Bill To'>
                   <PropertyField
                     label='Name'
@@ -748,7 +737,6 @@ function OrderDetailPage() {
                   </PanelBlock>
                 </PanelSection>
 
-                {/* Ship To */}
                 <PanelSection title='Ship To'>
                   <PropertyField
                     label='Name'
@@ -771,7 +759,6 @@ function OrderDetailPage() {
                   </PanelBlock>
                 </PanelSection>
 
-                {/* Contact */}
                 <PanelSection title='Contact'>
                   <PropertyField
                     label='Email'
@@ -789,7 +776,6 @@ function OrderDetailPage() {
                   />
                 </PanelSection>
 
-                {/* Order Details */}
                 <PanelSection title='Order Details'>
                   <PanelRow label='Invoice'>
                     <span className='tabular-nums'>{order.invoice || '—'}</span>
@@ -854,7 +840,6 @@ function OrderDetailPage() {
                   />
                 </PanelSection>
 
-                {/* Notes */}
                 <PanelSection title='Notes' last>
                   <PropertyField
                     label='Memo'

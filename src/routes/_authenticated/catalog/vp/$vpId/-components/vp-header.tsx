@@ -205,7 +205,6 @@ export const VPHeader = ({ vp, projectId, onBack, isMobile, isTablet }: VPHeader
         </DialogContent>
       </Dialog>
 
-      {/* Delete confirmation dialog */}
       <Dialog open={deleteOpen} onOpenChange={setDeleteOpen}>
         <DialogContent className='sm:max-w-sm'>
           <DialogHeader>

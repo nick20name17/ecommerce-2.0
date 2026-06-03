@@ -53,7 +53,6 @@ export const ProfileInfoCard = ({ user }: ProfileInfoCardProps) => {
         <ProfileRow label='Email' value={user.email} />
         <ProfileRow label='Member Since' value={formatDate(user.date_joined)} />
 
-        {/* Editable fields */}
         <form id='profile-form' onSubmit={handleSubmit}>
           <Controller
             name='first_name'
@@ -81,17 +80,14 @@ export const ProfileInfoCard = ({ user }: ProfileInfoCardProps) => {
           />
         </form>
 
-        {/* Role */}
         <ProfileRow label='Role'>
           <RoleBadge role={user.role} />
         </ProfileRow>
 
-        {/* Project */}
         {user.project_id && (
           <ProfileRow label='Project' value={user.project_name || `Project #${user.project_id}`} />
         )}
 
-        {/* Save bar */}
         {form.formState.isDirty && (
           <div className='flex items-center justify-end gap-2 bg-bg-secondary/40 px-5 py-2.5'>
             <button

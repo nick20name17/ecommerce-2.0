@@ -93,7 +93,6 @@ export const CategoryItemsPanel = ({
 
   return (
     <div className={cn('flex h-full flex-col overflow-hidden', isMobile ? 'px-3.5' : 'px-6')}>
-      {/* Category header */}
       <div className='shrink-0 border-b border-border py-4'>
         <div className='mb-2 flex items-center gap-2'>
           <h2 className='text-[15px] font-semibold tracking-[-0.01em]'>{category.name}</h2>
@@ -104,10 +103,8 @@ export const CategoryItemsPanel = ({
           )}
         </div>
 
-        {/* Meta tags */}
         <MetaTagsEditor entityType='category' entityId={category.id} projectId={projectId} />
 
-        {/* Images */}
         <div className='mt-3'>
           <ImageStrip
             entityType='category'
@@ -118,7 +115,6 @@ export const CategoryItemsPanel = ({
         </div>
       </div>
 
-      {/* Actions */}
       <div className='flex shrink-0 items-center gap-1.5 border-b border-border py-2'>
         <Button size='xs' variant='outline' onClick={() => setAddProductOpen(true)}>
           <Plus className='size-3' />
@@ -134,7 +130,6 @@ export const CategoryItemsPanel = ({
         </Button>
       </div>
 
-      {/* Items list */}
       <div className='flex-1 overflow-y-auto py-2'>
         {isLoading ? (
           <div className='flex flex-col gap-2'>
@@ -150,7 +145,6 @@ export const CategoryItemsPanel = ({
           </div>
         ) : (
           <div className='flex flex-col gap-1'>
-            {/* Variable Products */}
             {vps.map(vp => (
               <VPRow
                 key={vp.id}
@@ -166,7 +160,6 @@ export const CategoryItemsPanel = ({
               />
             ))}
 
-            {/* Standalone Products */}
             {products.map(product => (
               <ProductRow
                 key={product.id}

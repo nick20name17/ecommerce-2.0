@@ -100,7 +100,6 @@ export function CreatePickListModal({ open, onOpenChange }: Props) {
 
         <DialogBody className='min-h-0 flex-1 overflow-y-auto px-5 py-4'>
           <form id='create-pick-list' onSubmit={onSubmit} className='flex flex-col gap-4'>
-            {/* Optional name & notes */}
             <div className='grid grid-cols-2 gap-3'>
               <Controller
                 name='name'

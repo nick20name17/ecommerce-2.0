@@ -216,7 +216,6 @@ export function TaskRow({
 
       {/* Right-aligned metadata */}
       <div className={cn('flex shrink-0 items-center', isTablet ? 'gap-3' : 'gap-5')}>
-        {/* Priority */}
         <Popover>
           <PopoverTrigger asChild>
             <button
@@ -262,7 +261,6 @@ export function TaskRow({
           </PopoverContent>
         </Popover>
 
-        {/* Assignee */}
         {!isTablet && (
           <div
             className='w-40 min-w-0'
@@ -285,7 +283,6 @@ export function TaskRow({
           </div>
         )}
 
-        {/* Due date */}
         <div onClick={e => e.stopPropagation()} onKeyDown={e => e.stopPropagation()}>
           <Popover>
             <PopoverTrigger asChild>
@@ -314,7 +311,6 @@ export function TaskRow({
         </div>
       </div>
 
-      {/* Actions */}
       <div
         className='flex justify-center opacity-0 transition-opacity group-hover/row:opacity-100'
         onClick={e => e.stopPropagation()}

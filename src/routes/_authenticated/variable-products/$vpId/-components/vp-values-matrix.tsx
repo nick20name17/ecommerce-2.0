@@ -252,7 +252,6 @@ export const VPValuesMatrix = ({ vp, projectId, isMobile, isTablet }: VPValuesMa
         </table>
       </div>
 
-      {/* Link option dialog */}
       <Dialog
         open={!!linkDialog}
         onOpenChange={v => {

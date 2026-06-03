@@ -230,7 +230,6 @@ const ProposalsPage = () => {
 
   return (
     <div className='flex h-full flex-col overflow-hidden'>
-      {/* Header */}
       <header
         className={cn(
           'flex h-12 shrink-0 items-center gap-2.5 border-b border-border',
@@ -331,7 +330,6 @@ const ProposalsPage = () => {
         </div>
       </header>
 
-      {/* Active filter chips */}
       {(hasFilters || autoidFromUrl) && (
         <div
           className={cn(
@@ -375,9 +373,7 @@ const ProposalsPage = () => {
         </div>
       )}
 
-      {/* Proposal list */}
       <div className='flex-1 overflow-y-auto'>
-        {/* Column labels */}
         {!isMobile && (results.length > 0 || isLoading) && (
           <div
             className={cn(
@@ -507,12 +503,10 @@ const ProposalsPage = () => {
         )}
       </div>
 
-      {/* Footer */}
       <div className={cn('shrink-0 border-t border-border py-2', isMobile ? 'px-3.5' : 'px-6')}>
         <Pagination totalCount={data?.count ?? 0} />
       </div>
 
-      {/* Dialogs */}
       <ProposalDeleteDialog
         proposal={proposalToDelete}
         projectId={projectId}
@@ -652,7 +646,6 @@ function ProposalRow({
       onClick={onClick}
       onMouseEnter={onMouseEnter}
     >
-      {/* Quote + customer */}
       <div className='flex min-w-0 flex-1 items-center gap-2'>
         <Tooltip>
           <TooltipTrigger asChild>
@@ -667,7 +660,6 @@ function ProposalRow({
         </span>
       </div>
 
-      {/* Status */}
       <div className='w-22 shrink-0'>
         <span
           className={cn(
@@ -679,7 +671,6 @@ function ProposalRow({
         </span>
       </div>
 
-      {/* Date */}
       {!isTablet && (
         <div className='w-23 shrink-0 text-[13px] text-text-secondary tabular-nums'>
           {proposal.qt_date ? (
@@ -690,12 +681,10 @@ function ProposalRow({
         </div>
       )}
 
-      {/* Total */}
       <div className='w-25 shrink-0 text-right text-[13px] font-medium text-foreground tabular-nums'>
         {formatCurrency(proposal.total, '—')}
       </div>
 
-      {/* Responsible */}
       <div className='w-30 shrink-0'>
         {(() => {
           const assigned = proposal.assigned_users?.length
@@ -766,7 +755,6 @@ function ProposalRow({
       {/* Custom columns from Data Control list_columns */}
       <CustomColumnsCells row={proposal as Record<string, unknown>} columns={customColumns} />
 
-      {/* Notes */}
       <div className='flex w-11.5 shrink-0 justify-center'>
         <button
           type='button'
@@ -787,7 +775,6 @@ function ProposalRow({
         </button>
       </div>
 
-      {/* Actions */}
       <div
         className='flex w-7 shrink-0 items-center justify-center'
         onClick={e => e.stopPropagation()}

@@ -134,7 +134,6 @@ export function OrderRow({
       onClick={onClick}
       onMouseEnter={onMouseEnter}
     >
-      {/* Invoice + customer */}
       <div className='flex min-w-0 flex-1 items-center gap-2'>
         <span className='shrink-0 text-[13px] font-medium tabular-nums'>{invoice}</span>
         <span className='min-w-0 flex-1 truncate text-[13px] text-text-tertiary'>
@@ -142,7 +141,6 @@ export function OrderRow({
         </span>
       </div>
 
-      {/* Status */}
       <div className='w-22 shrink-0'>
         <span
           className={cn(
@@ -154,7 +152,6 @@ export function OrderRow({
         </span>
       </div>
 
-      {/* Date */}
       {!isTablet && (
         <div className='w-25 shrink-0 text-right text-[13px] text-text-secondary tabular-nums'>
           {order.inv_date ? (
@@ -165,7 +162,6 @@ export function OrderRow({
         </div>
       )}
 
-      {/* Total */}
       <div
         className={cn(
           'shrink-0 text-right text-[13px] font-medium text-foreground tabular-nums',
@@ -175,7 +171,6 @@ export function OrderRow({
         {formatCurrency(order.total, '—')}
       </div>
 
-      {/* Balance */}
       {!isTablet && (
         <div
           className={cn(
@@ -187,7 +182,6 @@ export function OrderRow({
         </div>
       )}
 
-      {/* Pick / Packed status */}
       {!isTablet && (
         <div className='flex w-27.5 shrink-0 items-center justify-center gap-1'>
           <PickBadge pickStatus={order.pick_status} />
@@ -195,14 +189,12 @@ export function OrderRow({
         </div>
       )}
 
-      {/* Salesman */}
       {!isTablet && (
         <div className='w-22.5 shrink-0 truncate text-[13px] text-text-secondary'>
           {order.salesman || <span className='text-text-tertiary'>&mdash;</span>}
         </div>
       )}
 
-      {/* Responsible */}
       <div className={cn('shrink-0', isTablet ? 'w-11.5' : 'w-30')}>
         {(() => {
           const assigned = order.assigned_users?.length
@@ -275,7 +267,6 @@ export function OrderRow({
         <CustomColumnsCells row={order as Record<string, unknown>} columns={customColumns} />
       )}
 
-      {/* Notes */}
       <div className='flex w-11.5 shrink-0 justify-center'>
         <button
           type='button'
@@ -311,7 +302,6 @@ export function OrderRow({
         />
       </div>
 
-      {/* Actions */}
       <div
         className='flex w-7 shrink-0 items-center justify-center'
         onClick={e => e.stopPropagation()}

@@ -51,7 +51,6 @@ export function AttachmentLightbox({
           className='fixed inset-0 z-50 flex flex-col outline-none'
           onPointerDownOutside={e => e.preventDefault()}
         >
-          {/* Header */}
           <div className='flex items-center justify-between px-4 py-3'>
             <div className='flex min-w-0 items-center gap-3'>
               <p className='truncate text-sm font-medium text-white/90'>{current.file_name}</p>
@@ -89,7 +88,6 @@ export function AttachmentLightbox({
             </div>
           </div>
 
-          {/* Image area */}
           <div
             className='flex min-h-0 flex-1 items-center justify-center px-16 pb-6'
             onClick={onClose}
@@ -137,7 +135,6 @@ export function AttachmentLightbox({
             </>
           )}
 
-          {/* Hidden title for accessibility */}
           <DialogPrimitive.Title className='sr-only'>{current.file_name}</DialogPrimitive.Title>
           <DialogPrimitive.Description className='sr-only'>
             Image preview

@@ -17,7 +17,6 @@ export const ProductImageGallery = ({
 }: ProductImageGalleryProps) => {
   return (
     <div className='flex flex-col gap-2'>
-      {/* Main image */}
       <div className='group relative'>
         {photos?.length ? (
           <div className='relative aspect-square w-full overflow-hidden rounded-lg border border-border bg-bg-secondary/30'>
@@ -59,7 +58,6 @@ export const ProductImageGallery = ({
         )}
       </div>
 
-      {/* Thumbnails */}
       {photos && photos.length > 1 && (
         <div className='flex gap-1.5 overflow-x-auto'>
           {photos.map((photo, i) => (

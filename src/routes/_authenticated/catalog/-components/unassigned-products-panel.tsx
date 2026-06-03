@@ -110,7 +110,6 @@ export const UnassignedProductsPanel = ({ projectId, isMobile }: UnassignedProdu
 
   return (
     <div className='flex h-full flex-col'>
-      {/* Header */}
       <div
         className={cn(
           'flex items-center gap-2 border-b border-border py-3',
@@ -126,7 +125,6 @@ export const UnassignedProductsPanel = ({ projectId, isMobile }: UnassignedProdu
         </h2>
       </div>
 
-      {/* Search */}
       <div className={cn('border-b border-border py-2', isMobile ? 'px-3.5' : 'px-6')}>
         <div className='relative'>
           <Search className='absolute top-1/2 left-2.5 size-3.5 -translate-y-1/2 text-text-tertiary' />
@@ -142,7 +140,6 @@ export const UnassignedProductsPanel = ({ projectId, isMobile }: UnassignedProdu
         </p>
       </div>
 
-      {/* List */}
       <div className='flex-1 overflow-y-auto'>
         {isLoading ? (
           <div className={cn('flex flex-col gap-1 py-3', isMobile ? 'px-3.5' : 'px-6')}>
@@ -193,7 +190,6 @@ export const UnassignedProductsPanel = ({ projectId, isMobile }: UnassignedProdu
                         </span>
                       )}
 
-                      {/* Context menu */}
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button
@@ -288,7 +284,6 @@ export const UnassignedProductsPanel = ({ projectId, isMobile }: UnassignedProdu
               })}
             </div>
 
-            {/* Pagination */}
             {(hasMore || offset > 0) && (
               <div
                 className={cn(
@@ -323,7 +318,6 @@ export const UnassignedProductsPanel = ({ projectId, isMobile }: UnassignedProdu
         )}
       </div>
 
-      {/* Category picker dialog */}
       <CategoryPickerDialog
         open={!!pickerProduct}
         onOpenChange={v => !v && setPickerProduct(null)}

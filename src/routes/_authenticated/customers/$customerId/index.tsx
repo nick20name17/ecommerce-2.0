@@ -293,7 +293,6 @@ function CustomerDetailPage() {
       <div className='flex min-h-0 flex-1 flex-col lg:flex-row'>
         {/* Main content — scrollable */}
         <div className='flex flex-1 flex-col overflow-hidden'>
-          {/* Tabs */}
           <div className='flex shrink-0 gap-1 border-b border-border px-3.5 sm:px-6'>
             {CUSTOMER_TABS.map(tab => (
               <button
@@ -315,7 +314,6 @@ function CustomerDetailPage() {
             ))}
           </div>
 
-          {/* Tab content */}
           <div className='flex min-h-0 flex-1 flex-col overflow-hidden'>
             {activeTab === 'orders' && (
               <CustomerOrdersTab customerId={customerId} customerName={customer.l_name ?? ''} />
@@ -334,7 +332,6 @@ function CustomerDetailPage() {
 
         {/* Right panel — properties */}
         <div className='flex shrink-0 flex-col overflow-hidden border-t border-border bg-bg-secondary/50 lg:w-95 lg:border-t-0 lg:border-l'>
-          {/* Panel tabs */}
           <div className='flex shrink-0 items-center gap-0 border-b border-border px-1'>
             {(['general', 'custom'] as const).map(tab => {
               const label =
@@ -362,7 +359,6 @@ function CustomerDetailPage() {
             })}
           </div>
 
-          {/* Panel content */}
           <div className='flex-1 scrollbar-none overflow-y-auto [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden'>
             {panelTab === 'general' ? (
               <CustomerInfoPanel
@@ -416,7 +412,6 @@ function CustomerDetailPage() {
         </div>
       </div>
 
-      {/* Notes sheet */}
       <EntityNotesSheet
         open={notesOpen}
         onOpenChange={setNotesOpen}
@@ -426,7 +421,6 @@ function CustomerDetailPage() {
         projectId={projectId}
       />
 
-      {/* Edit modal */}
       <CustomerModal
         key={customer.id}
         open={editOpen}
@@ -434,7 +428,6 @@ function CustomerDetailPage() {
         customer={customer}
       />
 
-      {/* Delete confirmation */}
       <CustomerDeleteDialog
         customer={deleteOpen ? customer : null}
         open={deleteOpen}
@@ -444,7 +437,6 @@ function CustomerDetailPage() {
         }}
       />
 
-      {/* Assign user */}
       <CustomerAssignDialog
         customer={assignOpen ? customer : null}
         open={assignOpen}

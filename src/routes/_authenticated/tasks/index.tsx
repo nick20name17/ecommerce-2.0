@@ -396,7 +396,6 @@ function Todos2Page() {
         </div>
       </header>
 
-      {/* Active filter chips */}
       {hasFilters && (
         <div className='flex shrink-0 flex-wrap items-center gap-1.5 border-b border-border px-3.5 py-1.5 sm:px-6'>
           <button
@@ -485,7 +484,6 @@ function Todos2Page() {
               const collapsed = collapsedGroups.has(status.name)
               return (
                 <div key={status.id}>
-                  {/* Status Group Header */}
                   <button
                     type='button'
                     className='flex w-full items-center gap-2 border-b border-border bg-bg-secondary px-3.5 py-1.5 transition-colors duration-80 hover:bg-bg-hover sm:px-6'
@@ -504,7 +502,6 @@ function Todos2Page() {
                     />
                   </button>
 
-                  {/* Tasks in this group */}
                   <div
                     className='grid transition-[grid-template-rows] duration-200 ease-in-out'
                     style={{ gridTemplateRows: collapsed ? '0fr' : '1fr' }}
@@ -530,10 +527,8 @@ function Todos2Page() {
         </div>
       )}
 
-      {/* Command bar create */}
       {showCreate && <CommandBarCreate onClose={() => setShowCreate(false)} />}
 
-      {/* Delete confirmation */}
       {taskToDelete && (
         <>
           <div className='fixed inset-0 z-40 bg-black/40' onClick={() => setTaskToDelete(null)} />
@@ -568,7 +563,6 @@ function Todos2Page() {
         </>
       )}
 
-      {/* Footer */}
       {tasks.length > 0 && (
         <div className='shrink-0 border-t border-border px-3.5 py-2 sm:px-6'>
           <p className='text-[13px] text-text-tertiary tabular-nums'>

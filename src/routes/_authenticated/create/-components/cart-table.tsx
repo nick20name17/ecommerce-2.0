@@ -66,7 +66,6 @@ export const CartTable = ({
             className='group/item border-b border-border-light px-5 py-2.5 transition-colors duration-75 hover:bg-bg-hover/50'
           >
             <div className='flex items-start gap-3'>
-              {/* Thumbnail */}
               <div className='flex size-9 shrink-0 items-center justify-center overflow-hidden rounded-[5px] bg-bg-secondary'>
                 {item.photo ? (
                   <img
@@ -80,7 +79,6 @@ export const CartTable = ({
                 )}
               </div>
 
-              {/* Info */}
               <div className='min-w-0 flex-1'>
                 <div className='flex items-center gap-2'>
                   <span className='text-[13px] font-semibold text-foreground'>
@@ -111,7 +109,6 @@ export const CartTable = ({
                   </span>
                 </div>
 
-                {/* Selected configurations */}
                 {hasConfigs && (
                   <div className='mt-1.5 flex flex-wrap items-center gap-1'>
                     <Settings2 className='size-3 shrink-0 text-text-tertiary' />
@@ -132,7 +129,6 @@ export const CartTable = ({
                 )}
               </div>
 
-              {/* Amount + actions */}
               <div className='flex flex-col items-end gap-1'>
                 <span
                   className={cn(

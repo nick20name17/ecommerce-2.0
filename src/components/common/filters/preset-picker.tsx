@@ -45,7 +45,6 @@ export function PresetPicker({ entityType, value, onChange }: PresetPickerProps)
         align='start'
         style={{ boxShadow: 'var(--dropdown-shadow)' }}
       >
-        {/* Clear option */}
         {value != null && (
           <button
             type='button'

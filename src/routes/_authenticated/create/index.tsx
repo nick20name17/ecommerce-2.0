@@ -171,7 +171,6 @@ const CreatePage = () => {
 
         <div className='flex-1' />
 
-        {/* Catalog */}
         <button
           type='button'
           className={cn(
@@ -184,7 +183,6 @@ const CreatePage = () => {
           <span className='hidden sm:inline'>Catalog</span>
         </button>
 
-        {/* Clear */}
         <Tooltip>
           <TooltipTrigger asChild>
             <button
@@ -223,7 +221,6 @@ const CreatePage = () => {
             />
           </div>
 
-          {/* Cart summary footer */}
           {(cart || loading) && (
             <div className='shrink-0 border-t border-border px-6 py-2.5'>
               <CartSummary cart={cart ?? null} loading={loading} updating={busy.cartUpdating} />
@@ -248,7 +245,6 @@ const CreatePage = () => {
             />
           </div>
 
-          {/* Scrollable middle area */}
           <div className='min-h-0 flex-1 scrollbar-none overflow-y-auto [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden'>
             {/* Customer details — same as customer detail page */}
             {customer && customerDetail && (
@@ -265,7 +261,6 @@ const CreatePage = () => {
                   savingPriceLevel={priceLevelMutation.isPending}
                 />
 
-                {/* Custom fields */}
                 {customerCustomFields.length > 0 && (
                   <div className='border-b border-border'>
                     <div className='bg-bg-secondary/60 px-4 py-2'>
@@ -298,7 +293,6 @@ const CreatePage = () => {
               </>
             )}
 
-            {/* Bill To / Ship To */}
             {customer && (
               <>
                 <AddressCard title='Bill To' address={billTo} onChange={setBillTo} />
@@ -306,7 +300,6 @@ const CreatePage = () => {
               </>
             )}
 
-            {/* Attachments */}
             <div className='border-b border-border p-4'>
               <button
                 type='button'
@@ -454,7 +447,6 @@ const CreatePage = () => {
         removingItemId={removingItemId}
       />
 
-      {/* Attachments dialog */}
       <Dialog open={attachmentsOpen} onOpenChange={setAttachmentsOpen}>
         <DialogContent className='flex max-h-[85vh] flex-col gap-0 overflow-hidden p-0 sm:max-w-md'>
           <DialogHeader className='border-b border-border px-5 py-3'>

@@ -278,28 +278,24 @@ export const ImageGallery = ({ entityType, entityId, projectId }: ImageGalleryPr
                 loading='lazy'
               />
 
-              {/* Drag handle */}
               <div className='absolute top-1 right-1 opacity-0 transition-opacity group-hover:opacity-100'>
                 <div className='rounded bg-black/50 p-0.5'>
                   <GripVertical className='size-3 text-white' />
                 </div>
               </div>
 
-              {/* Primary badge */}
               {img.is_primary && (
                 <div className='absolute top-1 left-1 rounded-full bg-amber-400 p-0.5'>
                   <Star className='size-3 fill-white text-white' />
                 </div>
               )}
 
-              {/* Alt text indicator */}
               {img.alt && (
                 <div className='absolute right-0 bottom-0 left-0 truncate bg-black/60 px-1.5 py-0.5 text-[10px] text-white'>
                   {img.alt}
                 </div>
               )}
 
-              {/* Actions overlay */}
               <div className='absolute inset-0 flex items-center justify-center gap-1 bg-black/0 opacity-0 transition-colors group-hover:bg-black/30 group-hover:opacity-100'>
                 {!img.is_primary && (
                   <Button
@@ -337,7 +333,6 @@ export const ImageGallery = ({ entityType, entityId, projectId }: ImageGalleryPr
             </div>
           ))}
 
-          {/* Upload placeholder tile */}
           <button
             type='button'
             className='text-text-quaternary flex aspect-square flex-col items-center justify-center rounded-lg border-2 border-dashed border-border transition-colors hover:border-primary/50 hover:text-primary/50'
@@ -349,7 +344,6 @@ export const ImageGallery = ({ entityType, entityId, projectId }: ImageGalleryPr
         </div>
       )}
 
-      {/* Edit alt dialog */}
       <Dialog open={!!editImage} onOpenChange={v => !v && setEditImage(null)}>
         <DialogContent className='sm:max-w-sm'>
           <form

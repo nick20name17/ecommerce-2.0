@@ -21,7 +21,6 @@ export function LegacyCartRow({ cart, isMobile }: LegacyCartRowProps) {
 
   return (
     <div className='border-b border-border-light'>
-      {/* Summary row */}
       <button
         type='button'
         onClick={() => setOpen(v => !v)}
@@ -86,7 +85,6 @@ export function LegacyCartRow({ cart, isMobile }: LegacyCartRowProps) {
         </div>
       </button>
 
-      {/* Expanded items */}
       {open && (
         <div
           className={cn(

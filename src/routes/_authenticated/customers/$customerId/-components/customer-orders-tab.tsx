@@ -64,7 +64,6 @@ export const CustomerOrdersTab = ({ customerId, customerName }: CustomerOrdersTa
 
   return (
     <div className='flex h-full flex-col overflow-hidden'>
-      {/* Search bar */}
       <div className='flex shrink-0 items-center gap-2 border-b border-border px-5 py-2 sm:px-6'>
         <div className='flex flex-1 items-center gap-1.5 rounded-md border border-border bg-background px-2.5 py-1.5'>
           <Search className='size-3.5 shrink-0 text-text-tertiary' />
@@ -88,9 +87,7 @@ export const CustomerOrdersTab = ({ customerId, customerName }: CustomerOrdersTa
         </button>
       </div>
 
-      {/* Table */}
       <div className='flex-1 overflow-auto'>
-        {/* Column headers */}
         {!isMobile && (orders.length > 0 || isLoading) && (
           <div className='sticky top-0 z-10 flex min-w-fit items-center gap-4 border-b border-border bg-bg-secondary/60 px-5 py-1.5 xl:px-6'>
             <div className='min-w-0 flex-1 text-[12px] font-medium tracking-[0.04em] text-text-tertiary uppercase'>
@@ -169,7 +166,6 @@ export const CustomerOrdersTab = ({ customerId, customerName }: CustomerOrdersTa
         )}
       </div>
 
-      {/* Footer */}
       {orders.length > 0 && (
         <div className='shrink-0 border-t border-border px-5 py-1.5 sm:px-6'>
           <p className='text-[13px] text-text-tertiary tabular-nums'>
@@ -249,7 +245,6 @@ function OrderRow({
       className='group/row flex min-w-fit cursor-pointer items-center gap-4 border-b border-border-light px-5 py-1.5 transition-colors duration-100 hover:bg-bg-hover xl:px-6'
       onClick={onClick}
     >
-      {/* Invoice / ID */}
       <div className='flex min-w-0 flex-1 items-center gap-2'>
         <Tooltip>
           <TooltipTrigger asChild>
@@ -267,22 +262,18 @@ function OrderRow({
         />
       </div>
 
-      {/* Date */}
       <div className='w-20 shrink-0 text-right text-[13px] text-text-tertiary tabular-nums'>
         {invoiceDate}
       </div>
 
-      {/* Qty */}
       <div className='w-12.5 shrink-0 text-right text-[13px] text-text-secondary tabular-nums'>
         {order.total_quan ?? '—'}
       </div>
 
-      {/* Total */}
       <div className='w-20 shrink-0 text-right text-[13px] font-medium text-foreground tabular-nums'>
         {total}
       </div>
 
-      {/* Actions */}
       <div
         className='flex w-6.5 shrink-0 justify-center opacity-0 transition-opacity group-hover/row:opacity-100'
         onClick={e => e.stopPropagation()}

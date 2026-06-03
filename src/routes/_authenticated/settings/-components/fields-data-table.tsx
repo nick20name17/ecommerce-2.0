@@ -84,7 +84,6 @@ export const FieldsDataTable = ({
 
   return (
     <div>
-      {/* Table header */}
       <div className='sticky top-0 z-10 flex items-center gap-4 border-b border-border bg-bg-secondary px-6 py-1.5'>
         <div className='w-50 shrink-0 text-[11px] font-semibold tracking-wider text-text-tertiary uppercase'>
           Field
@@ -102,7 +101,6 @@ export const FieldsDataTable = ({
         </div>
       </div>
 
-      {/* Rows */}
       {fields.map(row => (
         <FieldRow
           key={row.field}
@@ -178,9 +176,7 @@ function FieldRow({
         !row.enabled && !isDefault && 'opacity-50'
       )}
     >
-      {/* Field name + editable indicator */}
       <div className='flex w-50 shrink-0 items-center gap-1.5'>
-        {/* Editable indicator */}
         {isSuperAdmin ? (
           <Tooltip>
             <TooltipTrigger asChild>
@@ -239,7 +235,6 @@ function FieldRow({
         )}
       </div>
 
-      {/* Alias input */}
       <div className='flex min-w-0 flex-1 items-center gap-1.5'>
         <input
           value={aliasValue}

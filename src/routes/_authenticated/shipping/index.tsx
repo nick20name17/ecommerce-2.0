@@ -137,7 +137,6 @@ const ShippingPage = () => {
 
   return (
     <div className='flex h-full flex-col overflow-hidden'>
-      {/* Header */}
       <header
         className={cn(
           'flex h-12 shrink-0 items-center gap-2.5 border-b border-border',
@@ -210,7 +209,6 @@ const ShippingPage = () => {
         </FilterPopover>
       </header>
 
-      {/* Active filter chips */}
       {hasFilters && (
         <div
           className={cn(
@@ -233,7 +231,6 @@ const ShippingPage = () => {
         </div>
       )}
 
-      {/* Table header */}
       {!isMobile && (
         <div
           className={cn(
@@ -257,7 +254,6 @@ const ShippingPage = () => {
         </div>
       )}
 
-      {/* Table body */}
       <div className='flex-1 overflow-y-auto'>
         {isLoading ? (
           Array.from({ length: 8 }).map((_, i) => (
@@ -295,12 +291,10 @@ const ShippingPage = () => {
         )}
       </div>
 
-      {/* Footer */}
       <div className={cn('shrink-0 border-t border-border py-1.5', isMobile ? 'px-3.5' : 'px-6')}>
         <Pagination totalCount={totalCount} />
       </div>
 
-      {/* Detail dialog */}
       {selected && (
         <ShipmentDetailDialog
           shipment={selected}
@@ -463,7 +457,6 @@ function ShipmentDetailDialog({
         </DialogHeader>
 
         <div className='min-h-0 flex-1 overflow-y-auto'>
-          {/* Label action */}
           {shipment.label_url && !shipment.voided && (
             <div className='flex items-center justify-between border-b border-border bg-foreground/[0.02] px-5 py-2.5'>
               <div className='flex items-center gap-2'>
@@ -501,7 +494,6 @@ function ShipmentDetailDialog({
             </div>
           )}
 
-          {/* Info grid */}
           <div className='grid grid-cols-2 gap-x-4'>
             <PropertyCell label='Order' value={getOrderDisplay(shipment)} />
             <PropertyCell label='Customer' value={getCustomerDisplay(shipment)} />

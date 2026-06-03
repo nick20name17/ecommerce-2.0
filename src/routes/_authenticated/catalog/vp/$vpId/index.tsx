@@ -123,10 +123,8 @@ const CatalogVPDetailPage = () => {
 
         {/* ── Main content ── */}
         <div className={cn('flex flex-col gap-5', isMobile ? 'p-3.5' : 'p-5')}>
-          {/* Specs + Variants unified header */}
           <SpecsBar vp={vp} projectId={projectId} onAddProducts={() => setAddProductsOpen(true)} />
 
-          {/* Variants table */}
           <VariantsTable
             vp={vp}
             projectId={projectId}
@@ -157,7 +155,6 @@ const CatalogVPDetailPage = () => {
         </div>
       </div>
 
-      {/* Delete confirmation */}
       <Dialog open={deleteOpen} onOpenChange={setDeleteOpen}>
         <DialogContent className='sm:max-w-sm'>
           <DialogHeader>

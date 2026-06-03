@@ -118,7 +118,6 @@ export const ProductConfigurations = ({
 
   return (
     <div className='flex flex-col'>
-      {/* Header */}
       <div className='flex shrink-0 items-center justify-between border-b border-border px-4 py-2'>
         <div className='flex items-center gap-2'>
           <span className='text-[13px] font-semibold'>Components</span>
@@ -146,7 +145,6 @@ export const ProductConfigurations = ({
         </div>
       </div>
 
-      {/* Configuration groups */}
       <div>
         {configs.map((config, index) => {
           const isActive = wizardMode ? config.name === activeStep : true
@@ -289,7 +287,6 @@ const ConfigGroup = ({
         isNested && 'rounded-lg border border-primary/15 bg-background'
       )}
     >
-      {/* Group header */}
       <button
         type='button'
         className={cn(
@@ -307,7 +304,6 @@ const ConfigGroup = ({
           {hasSelected && <span className='size-1 rounded-full bg-white' />}
         </span>
 
-        {/* Step label */}
         <span
           className={cn(
             'flex shrink-0 items-center justify-center rounded-full border font-semibold tabular-nums',
@@ -348,7 +344,6 @@ const ConfigGroup = ({
         />
       </button>
 
-      {/* Body */}
       {!collapsed && (
         <div>
           {/* If something is selected, show "selected preview" with X to clear */}
@@ -387,7 +382,6 @@ const ConfigGroup = ({
             />
           )}
 
-          {/* Wizard prev/next buttons */}
           {wizardFooter}
         </div>
       )}
@@ -501,7 +495,6 @@ const ConfigCard = ({
       className='group flex flex-col overflow-hidden rounded-lg border border-border bg-background text-left transition-all duration-100 hover:border-primary/50 hover:shadow-sm'
       onClick={onClick}
     >
-      {/* Photo */}
       <div className='relative flex aspect-square w-full items-center justify-center overflow-hidden bg-bg-secondary/50'>
         {photosLoading ? (
           <Spinner className='size-3.5 text-text-tertiary' />
@@ -523,7 +516,6 @@ const ConfigCard = ({
         )}
       </div>
 
-      {/* Info */}
       <div className='flex min-h-9 flex-col justify-center gap-0.5 px-1.5 py-1'>
         <span className='line-clamp-2 text-[11px] leading-tight font-medium text-foreground'>
           {item.descr_1}

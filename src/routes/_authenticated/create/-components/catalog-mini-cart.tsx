@@ -33,7 +33,6 @@ export const CatalogMiniCart = ({
 
   return (
     <div className={cn('flex flex-col border-l border-border bg-bg-secondary/20', className)}>
-      {/* Header */}
       <div className='flex shrink-0 items-center gap-2 border-b border-border px-4 py-2'>
         <ShoppingBag className='size-3.5 text-text-tertiary' />
         <span className='text-[12px] font-semibold tracking-[0.04em] text-text-tertiary uppercase'>
@@ -78,7 +77,6 @@ export const CatalogMiniCart = ({
         </div>
       )}
 
-      {/* Footer total */}
       {!isLoading && items.length > 0 && (
         <div className='shrink-0 border-t border-border px-4 py-2.5'>
           {hasDiscount && (
@@ -111,7 +109,6 @@ function MiniCartItemRow({
   const lineTotal = (item.price ?? 0) * (item.quantity ?? 0)
   return (
     <div className='group/item flex items-center gap-2.5 border-b border-border-light px-4 py-1.5 transition-colors duration-75 hover:bg-bg-hover/50'>
-      {/* Thumbnail */}
       <div className='flex size-7 shrink-0 items-center justify-center overflow-hidden rounded-sm bg-bg-secondary'>
         {item.photo ? (
           <img src={item.photo} alt={item.name} className='size-full object-cover' loading='lazy' />
@@ -120,7 +117,6 @@ function MiniCartItemRow({
         )}
       </div>
 
-      {/* Info */}
       <div className='min-w-0 flex-1'>
         <Tooltip>
           <TooltipTrigger asChild>
@@ -135,12 +131,10 @@ function MiniCartItemRow({
         </p>
       </div>
 
-      {/* Amount */}
       <span className='shrink-0 text-[12px] font-medium text-text-secondary tabular-nums'>
         {formatCurrency(lineTotal)}
       </span>
 
-      {/* Remove */}
       {onRemove && (
         <button
           type='button'

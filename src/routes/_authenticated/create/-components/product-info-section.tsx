@@ -44,10 +44,8 @@ export const ProductInfoSection = ({
 }: ProductInfoSectionProps) => {
   return (
     <div className='flex flex-col gap-4'>
-      {/* Product name */}
       <h3 className='text-[15px] leading-tight font-semibold tracking-[-0.01em]'>{displayName}</h3>
 
-      {/* Price */}
       {configLoading ? (
         <div className='space-y-1.5'>
           <Skeleton className='h-6 w-24' />
@@ -78,7 +76,6 @@ export const ProductInfoSection = ({
         )
       )}
 
-      {/* Quantity */}
       {!configLoading && (
         <div>
           <span className='mb-1.5 block text-[12px] font-medium tracking-[0.04em] text-text-tertiary uppercase'>
@@ -97,7 +94,6 @@ export const ProductInfoSection = ({
         </div>
       )}
 
-      {/* Units */}
       {!configLoading && hasMultipleUnits && units && (
         <div>
           <span className='mb-1.5 block text-[12px] font-medium tracking-[0.04em] text-text-tertiary uppercase'>
@@ -140,7 +136,6 @@ export const ProductInfoSection = ({
         </div>
       )}
 
-      {/* Specifications */}
       {!configLoading && specs.length > 0 && (
         <div>
           <span className='mb-1.5 block text-[12px] font-medium tracking-[0.04em] text-text-tertiary uppercase'>

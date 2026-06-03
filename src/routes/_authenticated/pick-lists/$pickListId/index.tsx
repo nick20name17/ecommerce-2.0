@@ -203,7 +203,6 @@ const PickListDetailPage = () => {
   const statusClass = PICK_LIST_STATUS_CLASS[pickList.status] ?? ''
   return (
     <div className='flex h-full flex-col overflow-hidden'>
-      {/* Header */}
       <header className='flex h-12 shrink-0 items-center gap-2.5 border-b border-border px-3.5 sm:px-6'>
         <SidebarTrigger className='-ml-1' />
         <Link
@@ -227,7 +226,6 @@ const PickListDetailPage = () => {
 
         <div className='flex-1' />
 
-        {/* Actions */}
         <div className='flex items-center gap-1.5'>
           {isEditable && (
             <Button size='sm' variant='outline' onClick={() => setAddItemsOpen(true)}>
@@ -281,10 +279,8 @@ const PickListDetailPage = () => {
         </div>
       </header>
 
-      {/* Content */}
       <div className='flex-1 overflow-y-auto'>
         <div className='px-3.5 py-4 sm:px-6 sm:py-5'>
-          {/* Summary card */}
           <div className='mb-6 overflow-hidden rounded-lg border border-border'>
             <div className='grid md:grid-cols-2'>
               {/* Left: Details */}
@@ -341,7 +337,6 @@ const PickListDetailPage = () => {
             </div>
           </div>
 
-          {/* Orders & Items */}
           <div className='mb-6'>
             <div className='mb-3 flex items-center gap-2'>
               <Package className='size-4 text-text-tertiary' />
@@ -467,7 +462,6 @@ const PickListDetailPage = () => {
             </div>
           </div>
 
-          {/* Shipments */}
           {shippingEnabled && allShipments.length > 0 && (
             <div className='mb-6'>
               <div className='mb-3 flex items-center gap-2'>
@@ -527,7 +521,6 @@ const PickListDetailPage = () => {
         </div>
       </div>
 
-      {/* Dialogs */}
       <AddItemsModal
         pickListId={id}
         customerId={pickList.customer_id ?? ''}

@@ -215,7 +215,6 @@ export const VPSpecsSection = ({ vp, projectId }: VPSpecsSectionProps) => {
         isPending={isPending}
       />
 
-      {/* Edit dialog */}
       <Dialog
         open={!!editSpec}
         onOpenChange={v => {
@@ -329,7 +328,6 @@ export const VPSpecsSection = ({ vp, projectId }: VPSpecsSectionProps) => {
         </DialogContent>
       </Dialog>
 
-      {/* Delete confirmation */}
       <Dialog open={!!deleteSpec} onOpenChange={v => !v && setDeleteSpec(null)}>
         <DialogContent className='sm:max-w-sm'>
           <DialogHeader>
@@ -420,7 +418,6 @@ function AddSpecDialog({
           <DialogTitle>Add Spec</DialogTitle>
         </div>
 
-        {/* Tabs */}
         <div className='flex gap-1 border-b border-border px-5'>
           {[
             { key: 'existing' as const, label: 'Use Existing' },

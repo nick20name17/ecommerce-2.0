@@ -289,7 +289,6 @@ export const EntityAttachments = forwardRef<EntityAttachmentsRef, EntityAttachme
 
     return (
       <div>
-        {/* Drop zone */}
         <div
           className={cn(
             'flex items-center justify-center gap-2 border-b px-5 py-3 transition-colors',
@@ -333,9 +332,7 @@ export const EntityAttachments = forwardRef<EntityAttachmentsRef, EntityAttachme
           </div>
         )}
 
-        {/* File list */}
         <div>
-          {/* Loading skeleton */}
           {isLoading && (
             <div>
               {[1, 2].map(i => (
@@ -352,7 +349,6 @@ export const EntityAttachments = forwardRef<EntityAttachmentsRef, EntityAttachme
             </div>
           )}
 
-          {/* Uploading files */}
           {uploadingFiles.map(file => {
             const typeInfo = getFileTypeInfo(file.type)
             return (
@@ -427,7 +423,6 @@ export const EntityAttachments = forwardRef<EntityAttachmentsRef, EntityAttachme
               )
             })}
 
-          {/* Existing attachments */}
           {!isLoading &&
             allAttachments.map(attachment => {
               const isDeleting = deletingIds.has(attachment.id)
@@ -495,7 +490,6 @@ export const EntityAttachments = forwardRef<EntityAttachmentsRef, EntityAttachme
               )
             })}
 
-          {/* Empty state */}
           {!isLoading &&
             allAttachments.length === 0 &&
             uploadingFiles.length === 0 &&

@@ -231,7 +231,6 @@ export function AddItemsModal({
                 </div>
               ) : (
                 <>
-                  {/* Global actions */}
                   <div className='flex items-center gap-3'>
                     <button
                       type='button'

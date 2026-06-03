@@ -115,7 +115,6 @@ export function DashboardRecentOrders({ projectId, customerId }: DashboardRecent
         </table>
       </div>
 
-      {/* Mobile stacked list */}
       <div className='divide-y divide-border sm:hidden'>
         {orders.map(order => (
           <Link

@@ -181,7 +181,6 @@ export function ShippingDialog({ pickList, open, onOpenChange }: ShippingDialogP
           <DialogBody className='flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto'>
             {step === 'package' && (
               <>
-                {/* Ship From address */}
                 <div>
                   <span className='text-text-quaternary mb-2 flex items-center gap-1.5 text-[11px] font-semibold tracking-wider uppercase'>
                     <MapPin className='size-3' /> Ship From
@@ -194,7 +193,6 @@ export function ShippingDialog({ pickList, open, onOpenChange }: ShippingDialogP
                     </p>
                   ) : (
                     <>
-                      {/* Selected address display + change button */}
                       <Popover>
                         <PopoverTrigger asChild>
                           <button
@@ -266,7 +264,6 @@ export function ShippingDialog({ pickList, open, onOpenChange }: ShippingDialogP
                   )}
                 </div>
 
-                {/* Ship To */}
                 <div>
                   <span className='text-text-quaternary mb-2 flex items-center gap-1.5 text-[11px] font-semibold tracking-wider uppercase'>
                     <MapPin className='size-3' /> Ship To
@@ -288,7 +285,6 @@ export function ShippingDialog({ pickList, open, onOpenChange }: ShippingDialogP
                   </button>
                 </div>
 
-                {/* Package dimensions */}
                 <div>
                   <span className='text-text-quaternary mb-2 block text-[11px] font-semibold tracking-wider uppercase'>
                     Package Dimensions
@@ -353,7 +349,6 @@ export function ShippingDialog({ pickList, open, onOpenChange }: ShippingDialogP
                   </div>
                 </div>
 
-                {/* Summary */}
                 <div className='rounded-lg bg-bg-secondary/50 px-3 py-2 text-[12px] text-text-tertiary'>
                   Package covers <span className='font-medium text-foreground'>{items.length}</span>{' '}
                   item{items.length !== 1 && 's'} from pick list #{pickList.id}
@@ -440,7 +435,6 @@ export function ShippingDialog({ pickList, open, onOpenChange }: ShippingDialogP
         </DialogContent>
       </Dialog>
 
-      {/* Ship To edit dialog */}
       <ShipToEditDialog
         open={shipToEditOpen}
         onOpenChange={setShipToEditOpen}

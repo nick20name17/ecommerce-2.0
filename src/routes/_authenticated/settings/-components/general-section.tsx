@@ -112,7 +112,6 @@ const GeneralSettingsForm = ({
           </p>
         </div>
 
-        {/* Unit System */}
         <div>
           <div className='mb-1.5 block text-[12px] font-medium text-text-tertiary'>Unit System</div>
           <div className='flex gap-2'>
@@ -141,7 +140,6 @@ const GeneralSettingsForm = ({
           </div>
         </div>
 
-        {/* Toggle switches */}
         <div className='space-y-3'>
           <div className='mb-1.5 block text-[12px] font-medium text-text-tertiary'>Web Filters</div>
 

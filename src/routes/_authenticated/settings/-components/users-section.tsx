@@ -95,7 +95,6 @@ export const UsersSection = () => {
 
   return (
     <div className='flex min-h-0 flex-1 flex-col'>
-      {/* Toolbar */}
       <div className='flex shrink-0 items-center gap-2 border-b border-border px-6 py-1.5'>
         <div className='flex h-7 w-55 items-center gap-1.5 rounded-[5px] border border-border bg-background px-2 transition-[border-color,box-shadow] focus-within:border-ring focus-within:ring-2 focus-within:ring-ring/50'>
           <Search className='size-3 shrink-0 text-text-tertiary' />
@@ -117,7 +116,6 @@ export const UsersSection = () => {
         </button>
       </div>
 
-      {/* Table header */}
       <div className='sticky top-0 z-10 flex shrink-0 items-center gap-4 border-b border-border bg-bg-secondary px-6 py-1.5'>
         <div className='min-w-0 flex-1 text-[11px] font-semibold tracking-wider text-text-tertiary uppercase'>
           User
@@ -134,7 +132,6 @@ export const UsersSection = () => {
         <div className='w-14 shrink-0' />
       </div>
 
-      {/* Table body */}
       <div className='min-h-0 flex-1 overflow-auto'>
         {loading && !users.length ? (
           <div>
@@ -182,7 +179,6 @@ export const UsersSection = () => {
                   loading && 'opacity-60'
                 )}
               >
-                {/* Name + avatar */}
                 <div className='flex min-w-0 flex-1 items-center gap-2.5'>
                   <InitialsAvatar initials={initials} size={26} />
                   <span className='truncate text-[13px] font-medium text-foreground'>
@@ -195,22 +191,18 @@ export const UsersSection = () => {
                   )}
                 </div>
 
-                {/* Email */}
                 <div className='hidden min-w-0 flex-1 sm:block'>
                   <span className='block text-[13px] text-text-tertiary'>{user.email}</span>
                 </div>
 
-                {/* Role */}
                 <div className='w-20 shrink-0'>
                   <RoleBadge role={user.role} />
                 </div>
 
-                {/* Active toggle */}
                 <div className='flex w-15 shrink-0 justify-center'>
                   <UserStatusToggle user={user} currentUserId={currentUser?.id} />
                 </div>
 
-                {/* Actions */}
                 <div className='flex w-14 shrink-0 items-center justify-end gap-1 opacity-0 transition-opacity duration-75 group-hover/row:opacity-100'>
                   <Tooltip>
                     <TooltipTrigger asChild>

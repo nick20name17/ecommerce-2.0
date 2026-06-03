@@ -428,7 +428,6 @@ export const TaskAttachments = forwardRef<TaskAttachmentsRef, TaskAttachmentsPro
           </div>
         )}
 
-        {/* Existing + uploading files */}
         {(allAttachments.length > 0 || uploadingFiles.length > 0 || isLoading) && (
           <div className='divide-y divide-border-light rounded-lg border border-border'>
             {isLoading && (

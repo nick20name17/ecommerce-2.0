@@ -134,7 +134,6 @@ export function PackageCard({
         </div>
       </div>
 
-      {/* Assigned items */}
       {hasItems && (
         <div className='space-y-0.5 border-t border-border/60 p-2'>
           {pkg.items.map(autoid => {
@@ -165,7 +164,6 @@ export function PackageCard({
         </div>
       )}
 
-      {/* Drop zone */}
       {!hasItems && (
         <div
           className={cn(

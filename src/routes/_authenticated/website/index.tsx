@@ -55,7 +55,6 @@ const WebsitePage = () => {
         <h1 className='text-[14px] font-semibold tracking-[-0.01em]'>Website</h1>
       </header>
 
-      {/* Sidebar + Content */}
       <div className='flex min-h-0 flex-1 flex-col overflow-hidden md:flex-row'>
         <nav className='flex shrink-0 gap-px overflow-x-auto border-b border-border bg-bg-secondary/40 px-3 py-1.5 md:w-45 md:flex-col md:overflow-x-visible md:border-r md:border-b-0 md:py-3'>
           {SECTIONS.map(s => {

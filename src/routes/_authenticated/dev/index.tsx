@@ -253,7 +253,6 @@ const DevPage = () => {
 
   return (
     <div className='flex h-full flex-col overflow-hidden'>
-      {/* Header */}
       <header className='flex h-12 shrink-0 items-center gap-2.5 border-b border-border px-6'>
         <SidebarTrigger className='-ml-1' />
         <PageHeaderIcon icon={IDev} color={PAGE_COLORS.dev} />
@@ -263,9 +262,7 @@ const DevPage = () => {
         </span>
       </header>
 
-      {/* List */}
       <div className='flex-1 overflow-y-auto'>
-        {/* In Progress */}
         {inProgressEntries.length > 0 && (
           <>
             <div className='flex items-center gap-2 border-b border-border bg-bg-secondary/60 px-6 py-1.5'>
@@ -280,7 +277,6 @@ const DevPage = () => {
           </>
         )}
 
-        {/* Completed */}
         <div className='flex items-center gap-2 border-b border-border bg-bg-secondary/60 px-6 py-1.5'>
           <Check className='size-3.5 text-emerald-500' />
           <span className='text-[11px] font-semibold tracking-wider text-text-tertiary uppercase'>
@@ -292,7 +288,6 @@ const DevPage = () => {
         ))}
       </div>
 
-      {/* Footer */}
       <div className='shrink-0 border-t border-border px-6 py-1.5'>
         <p className='text-[13px] text-text-tertiary tabular-nums'>
           {doneEntries.length} done · {inProgressEntries.length} in progress
@@ -310,7 +305,6 @@ function EntryRow({ entry }: { entry: ChangelogEntry }) {
 
   return (
     <div className='flex items-center gap-4 border-b border-border-light px-6 py-2 transition-colors duration-100 hover:bg-bg-hover'>
-      {/* Status indicator */}
       <div className='shrink-0'>
         {entry.status === 'done' ? (
           <div className='flex size-5 items-center justify-center rounded-full bg-emerald-500'>
@@ -323,7 +317,6 @@ function EntryRow({ entry }: { entry: ChangelogEntry }) {
         )}
       </div>
 
-      {/* Content */}
       <div className='min-w-0 flex-1'>
         <div className='flex items-center gap-2'>
           <span className='text-[13px] font-medium text-foreground'>{entry.title}</span>

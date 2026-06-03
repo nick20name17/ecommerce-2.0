@@ -79,7 +79,6 @@ export function PickListItemsTable({ pickListId, items, isEditable, isMobile, de
 
   return (
     <>
-      {/* Header */}
       {!isMobile && (
         <div className='flex items-center gap-4 border-b border-border bg-bg-secondary/60 px-4 py-1.5 text-[12px] font-medium tracking-[0.04em] text-text-tertiary uppercase'>
           <div className='w-30 shrink-0'>Order</div>
@@ -90,7 +89,6 @@ export function PickListItemsTable({ pickListId, items, isEditable, isMobile, de
         </div>
       )}
 
-      {/* Rows */}
       {items.map(item => {
         const isEditing = editingItem === item.id
 
@@ -201,7 +199,6 @@ export function PickListItemsTable({ pickListId, items, isEditable, isMobile, de
         )
       })}
 
-      {/* Remove confirmation */}
       <AlertDialog open={!!itemToRemove} onOpenChange={open => !open && setItemToRemove(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>

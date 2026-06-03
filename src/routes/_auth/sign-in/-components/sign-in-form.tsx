@@ -27,7 +27,6 @@ export const SignInForm = () => {
   return (
     <div className='rounded-xl border border-border bg-background p-6 shadow-sm'>
       <form onSubmit={handleSignIn} className='space-y-4'>
-        {/* Email field */}
         <Controller
           name='email'
           control={form.control}
@@ -61,7 +60,6 @@ export const SignInForm = () => {
           )}
         />
 
-        {/* Password field */}
         <Controller
           name='password'
           control={form.control}
@@ -105,7 +103,6 @@ export const SignInForm = () => {
           )}
         />
 
-        {/* Submit */}
         <button
           type='submit'
           disabled={signInMutation.isPending}

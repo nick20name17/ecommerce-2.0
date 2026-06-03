@@ -133,7 +133,6 @@ const CatalogPage = () => {
 
   return (
     <div className='flex h-full flex-col overflow-hidden'>
-      {/* Header */}
       <header className='flex h-12 shrink-0 items-center gap-2 border-b border-border px-3.5 sm:px-6'>
         <SidebarTrigger className='-ml-1' />
 
@@ -209,7 +208,6 @@ const CatalogPage = () => {
           >
             {isLoading ? (
               <div className='flex flex-col gap-0.5 px-1.5 py-2'>
-                {/* Mimic tree structure with indented skeleton rows */}
                 {[0, 1, 2, 2, 2, 1, 2, 1, 1, 0, 1, 1].map((indent, i) => (
                   <div
                     key={i}
@@ -296,7 +294,6 @@ const CatalogPage = () => {
         )}
       </div>
 
-      {/* Dialogs */}
       <CategoryFormDialog
         open={formDialogOpen}
         onOpenChange={v => {

@@ -269,7 +269,6 @@ export const VPItemsSection = ({ vp, projectId, isMobile, isTablet }: VPItemsSec
         </div>
       )}
 
-      {/* Add item dialog */}
       <Dialog open={addOpen} onOpenChange={setAddOpen}>
         <DialogContent className='sm:max-w-sm'>
           <form

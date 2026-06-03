@@ -90,7 +90,6 @@ function DocumentsPage() {
 
   return (
     <div className='flex h-full flex-col overflow-hidden'>
-      {/* Header */}
       <header className='flex h-12 shrink-0 items-center gap-2.5 border-b border-border px-3.5 sm:px-6'>
         <SidebarTrigger className='-ml-1' />
         <PageHeaderIcon icon={IDocuments} color={PAGE_COLORS.documents} />
@@ -106,7 +105,6 @@ function DocumentsPage() {
         </button>
       </header>
 
-      {/* Body */}
       <div className='flex-1 overflow-auto'>
         {isLoading ? (
           <ListSkeleton />

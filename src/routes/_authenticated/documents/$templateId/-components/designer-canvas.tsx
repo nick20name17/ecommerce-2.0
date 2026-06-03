@@ -354,7 +354,6 @@ export function DesignerCanvas({
 
   return (
     <div className='flex min-h-0 flex-1 overflow-hidden bg-bg-secondary/20'>
-      {/* Palette */}
       <aside className='hidden w-16 shrink-0 flex-col gap-1 overflow-y-auto border-r border-border bg-bg-secondary/40 py-2 md:flex'>
         {TOOLS.map(t => {
           const Icon = t.icon
@@ -379,7 +378,6 @@ export function DesignerCanvas({
 
       {/* Canvas + page bar (column) */}
       <div className='flex min-h-0 flex-1 flex-col overflow-hidden'>
-        {/* Page selector bar */}
         <div className='flex shrink-0 items-center gap-1 overflow-x-auto border-b border-border bg-bg-secondary/30 px-3 py-1.5'>
           <span className='text-[10.5px] font-semibold tracking-wider text-text-tertiary uppercase'>
             Page
@@ -434,7 +432,6 @@ export function DesignerCanvas({
           )}
         </div>
 
-        {/* Canvas scroll area */}
         <div
           className='flex min-h-0 flex-1 items-start justify-center overflow-auto p-6'
           onClick={() => setSelectedId(null)}
@@ -535,7 +532,6 @@ export function DesignerCanvas({
         </div>
       </div>
 
-      {/* Layers + Properties panel */}
       <aside className='hidden w-65 shrink-0 flex-col overflow-hidden border-l border-border bg-bg-secondary/40 md:flex'>
         <LayersList elements={elements} selectedId={selectedId} onSelect={setSelectedId} />
         <div className='min-h-0 flex-1 overflow-y-auto'>
@@ -591,7 +587,6 @@ function PropertiesPanel({
 
   return (
     <div className='flex flex-col'>
-      {/* Header */}
       <div className='flex items-center justify-between gap-2 border-b border-border px-3 py-2'>
         <span className='text-[11px] font-semibold tracking-wider text-text-tertiary uppercase'>
           {element.type} element
@@ -606,7 +601,6 @@ function PropertiesPanel({
         </button>
       </div>
 
-      {/* Position & size */}
       <Section title='Position & size'>
         <Grid2>
           <NumberInput

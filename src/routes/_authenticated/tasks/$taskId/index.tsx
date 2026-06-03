@@ -357,7 +357,6 @@ function TaskDetailPage() {
 
   return (
     <div className='flex h-full flex-col overflow-hidden'>
-      {/* Top bar */}
       <header
         className={cn(
           'flex shrink-0 items-center justify-between border-b border-border py-2',
@@ -393,7 +392,6 @@ function TaskDetailPage() {
       <div className={cn('flex min-h-0 flex-1', isMobile && 'flex-col')}>
         {/* Main content — scrollable */}
         <div className='flex flex-1 flex-col overflow-hidden'>
-          {/* Tabs */}
           <div
             className={cn('flex shrink-0 gap-1 border-b border-border', isMobile ? 'px-4' : 'px-4')}
           >
@@ -435,7 +433,6 @@ function TaskDetailPage() {
             </button>
           </div>
 
-          {/* Tab content */}
           <div className={cn('flex-1 overflow-y-auto', isMobile ? 'px-4 pt-5' : 'px-4 pt-6')}>
             <div className='mx-auto max-w-160 pb-16'>
               {activeTab === 'details' ? (
@@ -464,7 +461,6 @@ function TaskDetailPage() {
                     placeholder='Task title'
                   />
 
-                  {/* Description */}
                   <div className='mb-8'>
                     <div className='mb-3 text-[13px] font-semibold tracking-[0.06em] text-text-tertiary uppercase'>
                       Description
@@ -502,7 +498,6 @@ function TaskDetailPage() {
             isMobile ? 'border-t border-border' : 'w-[320px] border-l border-border'
           )}
         >
-          {/* Panel tabs */}
           <div className='flex shrink-0 items-center gap-0 border-b border-border px-1'>
             {(['properties', 'activity'] as const).map(tab => (
               <button
@@ -529,11 +524,9 @@ function TaskDetailPage() {
             ))}
           </div>
 
-          {/* Panel content */}
           {panelTab === 'properties' ? (
             <div className='flex-1 scrollbar-none overflow-y-auto [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden'>
               <div className={cn(isMobile ? 'px-4 py-4' : 'p-5')}>
-                {/* Status */}
                 <PropertyRow label='Status'>
                   <Popover open={statusOpen} onOpenChange={setStatusOpen}>
                     <PopoverTrigger asChild>
@@ -581,7 +574,6 @@ function TaskDetailPage() {
                   </Popover>
                 </PropertyRow>
 
-                {/* Priority */}
                 <PropertyRow label='Priority'>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -624,7 +616,6 @@ function TaskDetailPage() {
                   </DropdownMenu>
                 </PropertyRow>
 
-                {/* Due date */}
                 <PropertyRow label='Due date'>
                   <div className='flex items-center'>
                     <DueDatePicker
@@ -634,7 +625,6 @@ function TaskDetailPage() {
                   </div>
                 </PropertyRow>
 
-                {/* Assignee */}
                 <PropertyRow label='Assignee'>
                   <UserCombobox
                     value={task.responsible_user ?? null}
@@ -649,7 +639,6 @@ function TaskDetailPage() {
                   />
                 </PropertyRow>
 
-                {/* Reference section */}
                 <div className='mt-4 border-t border-border-light pt-3'>
                   <div className='mb-4 text-[13px] font-semibold tracking-[0.06em] text-text-tertiary uppercase'>
                     Reference
@@ -706,7 +695,6 @@ function TaskDetailPage() {
                   </PropertyRow>
                 </div>
 
-                {/* Created by metadata */}
                 <div className='mt-4 border-t border-border-light pt-3'>
                   <div className='text-[13px] text-text-tertiary'>
                     <span>Created by </span>
@@ -722,7 +710,6 @@ function TaskDetailPage() {
             </div>
           ) : (
             <>
-              {/* Activity notes list */}
               <div className='min-h-0 flex-1 scrollbar-none overflow-y-auto [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden'>
                 {notesLoading ? (
                   <div className='flex flex-col'>
@@ -844,7 +831,6 @@ function TaskDetailPage() {
         </div>
       </div>
 
-      {/* Delete confirmation */}
       {deleteOpen && (
         <>
           <div className='fixed inset-0 z-40 bg-black/40' onClick={() => setDeleteOpen(false)} />
@@ -944,7 +930,6 @@ function DueDatePicker({
         collisionPadding={16}
         style={{ boxShadow: 'var(--dropdown-shadow)' }}
       >
-        {/* Quick presets */}
         <div className='border-b border-border-light p-1.5'>
           {DATE_PRESETS.map(preset => (
             <button
@@ -973,7 +958,6 @@ function DueDatePicker({
           )}
         </div>
 
-        {/* Calendar */}
         <Calendar
           mode='single'
           selected={value ? new Date(value) : undefined}

@@ -103,7 +103,6 @@ export const CustomerDashboardTab = ({ customerId, projectId }: CustomerDashboar
 
   return (
     <div className='flex min-w-0 flex-col gap-5'>
-      {/* KPI cards */}
       <div className='grid min-w-0 grid-cols-2 gap-2 sm:gap-3 lg:grid-cols-3'>
         {KPI_CONFIG.map(config => {
           const value = config.value(data)
@@ -142,7 +141,6 @@ export const CustomerDashboardTab = ({ customerId, projectId }: CustomerDashboar
         })}
       </div>
 
-      {/* Orders chart */}
       <div className='rounded-lg border border-border bg-background'>
         <div className='flex flex-wrap items-center gap-2 px-4 py-3 sm:gap-2.5'>
           <h2 className='text-[13px] font-semibold sm:text-[14px]'>
@@ -163,7 +161,6 @@ export const CustomerDashboardTab = ({ customerId, projectId }: CustomerDashboar
 function DashboardSkeleton() {
   return (
     <div className='flex flex-col gap-5'>
-      {/* KPI skeletons */}
       <div className='grid min-w-0 grid-cols-2 gap-2 sm:gap-3 lg:grid-cols-3'>
         {Array.from({ length: 6 }).map((_, i) => (
           <div
@@ -175,7 +172,6 @@ function DashboardSkeleton() {
           </div>
         ))}
       </div>
-      {/* Chart skeleton */}
       <div className='rounded-lg border border-border bg-background'>
         <div className='flex items-center gap-2.5 px-4 py-3'>
           <Skeleton className='h-4 w-48' />

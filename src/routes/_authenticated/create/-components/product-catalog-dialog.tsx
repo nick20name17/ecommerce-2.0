@@ -68,7 +68,6 @@ export const ProductCatalogDialog = ({
           'flex h-[95vh] w-[98vw] max-w-none! flex-col gap-0 overflow-hidden rounded-xl border p-0 shadow-2xl'
         )}
       >
-        {/* Header */}
         <div className='shrink-0 border-b border-border'>
           <div className='flex h-12 items-center gap-2.5 px-5'>
             <div className='flex size-6 items-center justify-center rounded-md bg-primary text-white'>
@@ -87,7 +86,6 @@ export const ProductCatalogDialog = ({
             </button>
           </div>
 
-          {/* Breadcrumbs */}
           <div className='flex items-center gap-0.5 px-5 pb-2.5'>
             <button
               type='button'
@@ -122,7 +120,6 @@ export const ProductCatalogDialog = ({
           </div>
         </div>
 
-        {/* Body */}
         <div
           className={cn(
             'grid min-h-0 flex-1 grid-cols-1',

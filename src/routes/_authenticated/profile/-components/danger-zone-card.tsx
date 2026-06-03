@@ -85,7 +85,6 @@ export const DangerZoneCard = ({ user }: DangerZoneCardProps) => {
           </span>
         </div>
         <div className='space-y-0 text-[13px]'>
-          {/* Deactivate */}
           <div className='flex items-center justify-between gap-4 border-b border-border-light px-5 py-3'>
             <div className='min-w-0'>
               <p className='font-medium text-foreground'>Deactivate Account</p>
@@ -102,7 +101,6 @@ export const DangerZoneCard = ({ user }: DangerZoneCardProps) => {
             </button>
           </div>
 
-          {/* Delete */}
           <div className='flex items-center justify-between gap-4 px-5 py-3'>
             <div className='min-w-0'>
               <p className='font-medium text-foreground'>Delete Account</p>
@@ -121,7 +119,6 @@ export const DangerZoneCard = ({ user }: DangerZoneCardProps) => {
         </div>
       </div>
 
-      {/* Deactivate confirmation */}
       <AlertDialog open={deactivateOpen} onOpenChange={setDeactivateOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -147,7 +144,6 @@ export const DangerZoneCard = ({ user }: DangerZoneCardProps) => {
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Delete confirmation */}
       <Dialog open={deleteOpen} onOpenChange={handleDeleteClose}>
         <DialogContent className='sm:max-w-md'>
           <DialogHeader className='border-b bg-background px-6 py-4'>

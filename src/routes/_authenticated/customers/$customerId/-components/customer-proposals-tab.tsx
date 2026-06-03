@@ -52,7 +52,6 @@ export const CustomerProposalsTab = ({ customerId }: CustomerProposalsTabProps) 
 
   return (
     <div className='flex h-full flex-col overflow-hidden'>
-      {/* Search bar */}
       <div className='flex shrink-0 items-center gap-2 border-b border-border px-5 py-2 sm:px-6'>
         <div className='flex flex-1 items-center gap-1.5 rounded-md border border-border bg-background px-2.5 py-1.5'>
           <Search className='size-3.5 shrink-0 text-text-tertiary' />
@@ -65,9 +64,7 @@ export const CustomerProposalsTab = ({ customerId }: CustomerProposalsTabProps) 
         </div>
       </div>
 
-      {/* Table */}
       <div className='flex-1 overflow-auto'>
-        {/* Column headers */}
         {!isMobile && (proposals.length > 0 || isLoading) && (
           <div className='sticky top-0 z-10 flex min-w-fit items-center gap-4 border-b border-border bg-bg-secondary/60 px-5 py-1.5 xl:px-6'>
             <div className='min-w-0 flex-1 text-[12px] font-medium tracking-[0.04em] text-text-tertiary uppercase'>
@@ -137,7 +134,6 @@ export const CustomerProposalsTab = ({ customerId }: CustomerProposalsTabProps) 
         )}
       </div>
 
-      {/* Footer */}
       {proposals.length > 0 && (
         <div className='shrink-0 border-t border-border px-5 py-1.5 sm:px-6'>
           <p className='text-[13px] text-text-tertiary tabular-nums'>
@@ -194,7 +190,6 @@ function ProposalRow({
       className='group/row flex min-w-fit cursor-pointer items-center gap-4 border-b border-border-light px-5 py-1.5 transition-colors duration-100 hover:bg-bg-hover xl:px-6'
       onClick={onClick}
     >
-      {/* Quote + Status */}
       <div className='flex min-w-0 flex-1 items-center gap-2'>
         <Tooltip>
           <TooltipTrigger asChild>
@@ -205,12 +200,10 @@ function ProposalRow({
         <StatusBadge label={statusLabel} statusClass={statusClass} dotColor={dotColor} />
       </div>
 
-      {/* Date */}
       <div className='w-20 shrink-0 text-right text-[13px] text-text-tertiary tabular-nums'>
         {proposal.qt_date ? formatDate(proposal.qt_date) : '—'}
       </div>
 
-      {/* Total */}
       <div className='w-20 shrink-0 text-right text-[13px] font-medium text-foreground tabular-nums'>
         {formatCurrency(proposal.total, '—')}
       </div>

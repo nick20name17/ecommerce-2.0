@@ -130,7 +130,6 @@ export const GlobalSearch = () => {
 
   return (
     <>
-      {/* Trigger button in sidebar */}
       <button
         type='button'
         onClick={e => {
@@ -159,7 +158,6 @@ export const GlobalSearch = () => {
               style={{ boxShadow: 'var(--dropdown-shadow)', animation: 'dropIn 120ms ease-out' }}
               onClick={e => e.stopPropagation()}
             >
-              {/* Search input */}
               <div className='flex items-center gap-2.5 px-4 py-3'>
                 <Search className='size-4 shrink-0 text-text-tertiary' />
                 <input
@@ -175,7 +173,6 @@ export const GlobalSearch = () => {
                 )}
               </div>
 
-              {/* Results */}
               <div ref={listRef} className='max-h-90 overflow-y-auto overscroll-contain p-1.5'>
                 {!enabled && (
                   <div className='px-3 py-10 text-center text-[13px] text-text-tertiary'>
@@ -282,7 +279,6 @@ export const GlobalSearch = () => {
                 )}
               </div>
 
-              {/* Footer with keyboard hints */}
               <div className='flex items-center gap-3 border-t border-border px-4 py-2'>
                 {hasResults && (
                   <>

@@ -29,7 +29,6 @@ export const SpecsBar = ({ vp, projectId, onAddProducts }: SpecsBarProps) => {
   return (
     <>
       <div className='flex flex-col gap-2'>
-        {/* Title row */}
         <div className='flex items-center gap-2'>
           <h3 className='text-[14px] font-semibold text-foreground'>
             Variants
@@ -53,7 +52,6 @@ export const SpecsBar = ({ vp, projectId, onAddProducts }: SpecsBarProps) => {
           </Button>
         </div>
 
-        {/* Spec pills */}
         {specs.length > 0 && (
           <div className='flex flex-wrap items-center gap-1.5'>
             {specs.map(spec => (

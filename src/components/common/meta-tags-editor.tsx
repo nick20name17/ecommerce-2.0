@@ -126,7 +126,6 @@ export const MetaTagsEditor = ({ entityType, entityId, projectId }: MetaTagsEdit
                 </span>
               </div>
 
-              {/* Preview */}
               <div className='rounded-md border border-border bg-bg-secondary p-3'>
                 <p className='text-text-quaternary mb-1 text-[11px]'>Search preview</p>
                 <p className='truncate text-[14px] text-blue-600 dark:text-blue-400'>

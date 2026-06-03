@@ -103,7 +103,6 @@ const DashboardPage = () => {
         />
         <div className='flex-1 overflow-y-auto px-4 py-4 sm:px-6 sm:py-5'>
           <div className='flex flex-col gap-5'>
-            {/* KPI skeletons */}
             <div className='grid min-w-0 grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-3 lg:grid-cols-6'>
               {['sk-1', 'sk-2', 'sk-3', 'sk-4', 'sk-5', 'sk-6'].map(id => (
                 <div
@@ -115,7 +114,6 @@ const DashboardPage = () => {
                 </div>
               ))}
             </div>
-            {/* Chart skeleton */}
             <div className='rounded-lg border border-border bg-background'>
               <div className='flex items-center gap-2.5 px-4 py-3'>
                 <Skeleton className='h-4 w-48' />
@@ -125,7 +123,6 @@ const DashboardPage = () => {
                 <Skeleton className='h-8 w-1/4 rounded-md' />
               </div>
             </div>
-            {/* Table skeleton */}
             <div className='rounded-lg border border-border bg-background'>
               <div className='px-4 py-3'>
                 <Skeleton className='h-4 w-28' />
@@ -160,7 +157,6 @@ const DashboardPage = () => {
         <div className='flex flex-col gap-5'>
           <DashboardKpis metrics={data} />
 
-          {/* Orders chart */}
           <div className='rounded-lg border border-border bg-background'>
             <div className='flex flex-wrap items-center gap-2 px-4 py-3 sm:gap-2.5'>
               <h2 className='text-[13px] font-semibold sm:text-[14px]'>
@@ -173,7 +169,6 @@ const DashboardPage = () => {
             </div>
           </div>
 
-          {/* Recent orders */}
           <DashboardRecentOrders projectId={projectId} customerId={customerId || undefined} />
         </div>
       </div>

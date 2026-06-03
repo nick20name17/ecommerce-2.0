@@ -115,7 +115,6 @@ const ActivityPage = () => {
 
   return (
     <div className='flex h-full flex-col overflow-hidden'>
-      {/* Header */}
       <header className='flex h-12 shrink-0 items-center gap-2.5 border-b border-border px-3.5 sm:px-6'>
         <SidebarTrigger className='-ml-1' />
         <PageHeaderIcon icon={IActivity} color={PAGE_COLORS.activity} />
@@ -139,7 +138,6 @@ const ActivityPage = () => {
           />
         </div>
 
-        {/* Error filter */}
         <FilterPopover
           label='Status'
           active={errorFilter !== 'all'}
@@ -185,7 +183,6 @@ const ActivityPage = () => {
           })}
         </FilterPopover>
 
-        {/* Method filter */}
         <FilterPopover label='Method' active={methodFilter !== null}>
           {METHOD_OPTIONS.map(m => {
             const selected_ = methodFilter === m
@@ -223,7 +220,6 @@ const ActivityPage = () => {
           })}
         </FilterPopover>
 
-        {/* Source filter */}
         <FilterPopover label='Source' active={sourceFilter !== null}>
           {SOURCE_OPTIONS.map(opt => {
             const selected_ = sourceFilter === opt.value
@@ -260,7 +256,6 @@ const ActivityPage = () => {
         </FilterPopover>
       </header>
 
-      {/* Active filter chips */}
       {hasFilters && (
         <div className='flex shrink-0 flex-wrap items-center gap-1.5 border-b border-border px-3.5 py-1.5 sm:px-6'>
           <button
@@ -306,7 +301,6 @@ const ActivityPage = () => {
         </div>
       )}
 
-      {/* Body */}
       <div className='flex-1 overflow-auto'>
         {/* Column headers — sticky inside the scroll container so they stay
             aligned with the rows under both the vertical scrollbar gutter and
@@ -365,12 +359,10 @@ const ActivityPage = () => {
         )}
       </div>
 
-      {/* Pagination footer */}
       <div className='shrink-0 border-t border-border px-3.5 py-1.5 sm:px-6'>
         <Pagination totalCount={totalCount} />
       </div>
 
-      {/* Detail dialog */}
       <PayloadLogDetailDialog
         log={selectedLog}
         open={!!selectedLog}

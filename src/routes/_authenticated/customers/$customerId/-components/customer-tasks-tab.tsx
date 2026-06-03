@@ -124,7 +124,6 @@ export const CustomerTasksTab = ({ customerId, customerName }: CustomerTasksTabP
 
   return (
     <div className='flex h-full flex-col overflow-hidden'>
-      {/* Search + create */}
       <div className='flex shrink-0 items-center gap-2 border-b border-border px-5 py-2 sm:px-6'>
         <div className='flex flex-1 items-center gap-1.5 rounded-md border border-border bg-background px-2.5 py-1.5'>
           <Search className='size-3.5 shrink-0 text-text-tertiary' />
@@ -145,7 +144,6 @@ export const CustomerTasksTab = ({ customerId, customerName }: CustomerTasksTabP
         </button>
       </div>
 
-      {/* Task list */}
       <div className='flex-1 overflow-y-auto'>
         {isLoading ? (
           <div className='space-y-0'>
@@ -183,7 +181,6 @@ export const CustomerTasksTab = ({ customerId, customerName }: CustomerTasksTabP
         )}
       </div>
 
-      {/* Footer */}
       {tasks.length > 0 && (
         <div className='shrink-0 border-t border-border px-5 py-1.5 sm:px-6'>
           <p className='text-[13px] text-text-tertiary tabular-nums'>
@@ -288,7 +285,6 @@ function TaskRow({
       )}
       onClick={onClick}
     >
-      {/* Status + ID + title */}
       <div className='flex min-w-0 flex-1 items-center gap-2'>
         <Popover open={statusOpen} onOpenChange={setStatusOpen}>
           <PopoverTrigger asChild>
@@ -338,7 +334,6 @@ function TaskRow({
         </Tooltip>
       </div>
 
-      {/* Metadata */}
       <div className='flex shrink-0 items-center gap-4'>
         <div className='flex w-17.5 items-center gap-1.5'>
           <PriorityIcon priority={task.priority} color={priorityColor} size={14} />
@@ -367,7 +362,6 @@ function TaskRow({
         </div>
       </div>
 
-      {/* Actions */}
       <div
         className='flex justify-center opacity-0 transition-opacity group-hover/row:opacity-100'
         onClick={e => e.stopPropagation()}

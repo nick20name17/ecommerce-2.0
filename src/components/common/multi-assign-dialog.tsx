@@ -136,7 +136,6 @@ export function MultiAssignDialog({
             <span className='font-medium text-foreground'>{entityLabel}</span>.
           </p>
 
-          {/* Currently assigned */}
           {localAssigned.length > 0 && (
             <div className='flex flex-col gap-1.5'>
               <span className='text-text-quaternary text-[11px] font-medium tracking-wider uppercase'>
@@ -171,7 +170,6 @@ export function MultiAssignDialog({
             </div>
           )}
 
-          {/* Search & add */}
           <div className='overflow-hidden rounded-lg border border-border'>
             <div className='flex items-center gap-1.5 border-b border-border px-2.5 py-1.5'>
               {loading ? (

@@ -77,7 +77,6 @@ const PickListsPage = () => {
 
   return (
     <div className='flex h-full flex-col overflow-hidden'>
-      {/* Header */}
       <header className='flex h-12 shrink-0 items-center gap-2.5 border-b border-border px-3.5 sm:px-6'>
         <SidebarTrigger className='-ml-1' />
         <PageHeaderIcon icon={IPickLists} color={PAGE_COLORS.pickLists} />
@@ -88,7 +87,6 @@ const PickListsPage = () => {
 
         <div className='flex-1' />
 
-        {/* Search */}
         <div className='flex items-center gap-1.5 rounded-md border border-border bg-background px-2.5 py-1.5'>
           <Search className='size-3.5 shrink-0 text-text-tertiary' />
           <input
@@ -102,7 +100,6 @@ const PickListsPage = () => {
           />
         </div>
 
-        {/* Status filter */}
         <FilterPopover
           label='Status'
           active={hasFilters}
@@ -143,7 +140,6 @@ const PickListsPage = () => {
         </FilterPopover>
       </header>
 
-      {/* Active filters */}
       {hasFilters && (
         <div className='flex shrink-0 flex-wrap items-center gap-1.5 border-b border-border px-3.5 py-1.5 sm:px-6'>
           <button
@@ -163,9 +159,7 @@ const PickListsPage = () => {
         </div>
       )}
 
-      {/* List */}
       <div className='flex-1 overflow-auto'>
-        {/* Column headers */}
         {!isMobile && (results.length > 0 || isLoading) && (
           <div className='sticky top-0 z-10 flex min-w-fit shrink-0 items-center gap-4 border-b border-border bg-bg-secondary/60 px-5 py-1.5 text-[13px] font-medium text-text-tertiary xl:px-6'>
             <div className='w-15 shrink-0'>ID</div>
@@ -215,7 +209,6 @@ const PickListsPage = () => {
         )}
       </div>
 
-      {/* Footer */}
       <div className='shrink-0 border-t border-border px-3.5 py-2 sm:px-6'>
         <Pagination totalCount={data?.count ?? 0} />
       </div>

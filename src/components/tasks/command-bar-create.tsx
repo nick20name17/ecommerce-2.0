@@ -186,12 +186,10 @@ function CommandBarCreateInner({
 
   return (
     <>
-      {/* Backdrop */}
       <div
         className='fixed inset-0 z-40 bg-black/40 transition-opacity duration-150'
         onClick={onClose}
       />
-      {/* Command bar */}
       <div className='fixed inset-x-0 top-[20%] z-50 mx-auto w-full max-w-145 px-4'>
         <div
           className='animate-in overflow-hidden rounded-xl border border-border bg-background duration-150 zoom-in-95 fade-in'
@@ -207,7 +205,6 @@ function CommandBarCreateInner({
             }
           }}
         >
-          {/* Input area */}
           <div className='px-5 pt-4 pb-3'>
             <div className='flex items-center gap-3'>
               <Plus className='size-5 shrink-0 text-primary' />
@@ -236,12 +233,10 @@ function CommandBarCreateInner({
             />
           </div>
 
-          {/* Divider */}
           <div className='border-t border-border' />
 
           {/* Quick-set fields */}
           <div className='flex flex-wrap items-center gap-2 px-5 py-3'>
-            {/* Status */}
             <Popover open={statusOpen} onOpenChange={setStatusOpen}>
               <PopoverTrigger asChild>
                 <button
@@ -285,7 +280,6 @@ function CommandBarCreateInner({
               </PopoverContent>
             </Popover>
 
-            {/* Priority */}
             <Popover open={priorityOpen} onOpenChange={setPriorityOpen}>
               <PopoverTrigger asChild>
                 <button
@@ -331,7 +325,6 @@ function CommandBarCreateInner({
               </PopoverContent>
             </Popover>
 
-            {/* Assignee */}
             <UserCombobox
               value={selectedAssignee}
               onChange={setSelectedAssignee}
@@ -340,7 +333,6 @@ function CommandBarCreateInner({
               triggerClassName='inline-flex items-center gap-1.5 rounded-[6px] bg-bg-secondary px-2.5 py-1.5 text-[13px] font-medium text-text-tertiary transition-colors duration-[80ms] hover:bg-bg-hover cursor-pointer'
             />
 
-            {/* Due date */}
             <Popover open={dateOpen} onOpenChange={setDateOpen}>
               <PopoverTrigger asChild>
                 <button
@@ -401,7 +393,6 @@ function CommandBarCreateInner({
             </Popover>
           </div>
 
-          {/* Reference */}
           <div className='border-t border-border-light px-5 py-2.5'>
             <div className='mb-2 text-[13px] font-semibold tracking-[0.06em] text-text-tertiary uppercase'>
               Reference
@@ -461,10 +452,8 @@ function CommandBarCreateInner({
             </div>
           </div>
 
-          {/* Divider */}
           <div className='border-t border-border' />
 
-          {/* Footer hints */}
           <div className='flex items-center justify-between px-5 py-2.5'>
             <div className='flex items-center gap-3'>
               <button

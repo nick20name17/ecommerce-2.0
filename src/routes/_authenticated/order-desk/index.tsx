@@ -136,7 +136,6 @@ const OrderDeskPage = () => {
 
         <div className='flex-1' />
 
-        {/* Catalog */}
         <button
           type='button'
           className={cn(
@@ -149,7 +148,6 @@ const OrderDeskPage = () => {
           <span className='hidden sm:inline'>Catalog</span>
         </button>
 
-        {/* Clear */}
         <Tooltip>
           <TooltipTrigger asChild>
             <button
@@ -188,7 +186,6 @@ const OrderDeskPage = () => {
             />
           </div>
 
-          {/* Cart summary footer */}
           {(cart || loading) && (
             <div className='shrink-0 border-t border-border px-6 py-2.5'>
               <CartSummary cart={cart ?? null} loading={loading} updating={busy.cartUpdating} />
@@ -213,7 +210,6 @@ const OrderDeskPage = () => {
             />
           </div>
 
-          {/* Scrollable middle area */}
           <div className='min-h-0 flex-1 scrollbar-none overflow-y-auto [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden'>
             {/* Customer details — same panel as customer detail page */}
             {customer && customerDetail && (
@@ -230,7 +226,6 @@ const OrderDeskPage = () => {
                   savingPriceLevel={priceLevelMutation.isPending}
                 />
 
-                {/* Custom fields */}
                 {customerCustomFields.length > 0 && (
                   <div className='border-b border-border'>
                     <div className='bg-bg-secondary/60 px-4 py-2'>
@@ -263,7 +258,6 @@ const OrderDeskPage = () => {
               </>
             )}
 
-            {/* Attachments */}
             <div className='border-b border-border p-4'>
               <button
                 type='button'

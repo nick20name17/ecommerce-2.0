@@ -139,7 +139,6 @@ export const NotificationBell = () => {
         sideOffset={6}
         style={{ boxShadow: 'var(--dropdown-shadow)' }}
       >
-        {/* Header */}
         <div className='flex items-center justify-between border-b border-border px-3 py-2'>
           <span className='text-[13px] font-semibold'>Notifications</span>
           <div className='flex items-center gap-1'>
@@ -166,7 +165,6 @@ export const NotificationBell = () => {
           </div>
         </div>
 
-        {/* List */}
         <div className='max-h-90 overflow-y-auto'>
           {notifications.length === 0 ? (
             <div className='flex flex-col items-center justify-center py-8'>

@@ -155,7 +155,6 @@ function KanbanColumn({
 
   return (
     <div className={cn('flex shrink-0 flex-col rounded-lg', columnWidth)}>
-      {/* Column header */}
       <div className='mb-3 flex items-center gap-2 px-1'>
         <div className='size-2.5 rounded-full' style={{ backgroundColor: status.color }} />
         <span className='text-[13px] font-semibold text-foreground'>{status.name}</span>
@@ -173,7 +172,6 @@ function KanbanColumn({
         </button>
       </div>
 
-      {/* Droppable area */}
       <div
         ref={ref}
         className={cn(
@@ -195,7 +193,6 @@ function KanbanColumn({
           </div>
         )}
 
-        {/* Inline create */}
         {isCreating && (
           <div className='rounded-lg border border-primary/40 bg-background p-2.5'>
             <input
@@ -278,12 +275,10 @@ function KanbanCardContent({ task, isDragging }: { task: TaskListItem; isDraggin
       }}
       style={isDragging ? { width: 290 } : undefined}
     >
-      {/* Title */}
       <p className='mb-2 line-clamp-2 text-[13px] leading-snug font-medium text-foreground'>
         {task.title}
       </p>
 
-      {/* Meta row */}
       <div className='flex items-center gap-2'>
         <span className='text-[13px] text-text-tertiary tabular-nums'>
           TSK-{task.id.toString().padStart(3, '0')}

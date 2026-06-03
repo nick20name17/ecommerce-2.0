@@ -245,7 +245,6 @@ export const FilterGroupsSection = () => {
     <div className='flex min-h-0 flex-1 flex-col'>
       <div className='flex-1 overflow-y-scroll'>
         <div className='mx-auto max-w-170 px-8 py-6'>
-          {/* Description */}
           <div className='mb-6'>
             <h2 className='text-[14px] font-semibold text-foreground'>Filter Presets</h2>
             <p className='mt-1 text-[13px] leading-relaxed text-text-tertiary'>
@@ -254,7 +253,6 @@ export const FilterGroupsSection = () => {
             </p>
           </div>
 
-          {/* Add button */}
           <div className='mb-4'>
             <button
               type='button'
@@ -266,7 +264,6 @@ export const FilterGroupsSection = () => {
             </button>
           </div>
 
-          {/* Loading */}
           {isLoading && (
             <div className='space-y-4'>
               {[1, 2, 3].map(i => (
@@ -282,7 +279,6 @@ export const FilterGroupsSection = () => {
             </div>
           )}
 
-          {/* Grouped by entity */}
           {!isLoading &&
             entityGroups.map(({ entityType, config, presets: entityPresets }) => {
               const Icon = config.icon
@@ -321,7 +317,6 @@ export const FilterGroupsSection = () => {
                               i < entityPresets.length - 1 && 'border-b border-border-light'
                             )}
                           >
-                            {/* Row header */}
                             <div
                               className='flex cursor-pointer items-center gap-3 px-3 py-2.5 transition-colors duration-75 hover:bg-bg-hover/40'
                               onClick={() => setExpandedId(isExpanded ? null : preset.id)}
@@ -396,7 +391,6 @@ export const FilterGroupsSection = () => {
                               </div>
                             </div>
 
-                            {/* Expanded detail */}
                             {isExpanded && (
                               <div className='border-t border-border-light bg-foreground/[0.015] px-4 py-3'>
                                 <span className='text-[11px] font-semibold tracking-wider text-text-tertiary uppercase'>
@@ -439,7 +433,6 @@ export const FilterGroupsSection = () => {
         </div>
       </div>
 
-      {/* Create / Edit dialog */}
       {editingPreset !== null && (
         <FilterPresetDialog
           preset={editingPreset === 'create' ? null : editingPreset}
@@ -625,7 +618,6 @@ function FilterPresetDialog({
 
         <div className='min-h-0 flex-1 overflow-y-auto'>
           <div className='space-y-5 px-5 py-4'>
-            {/* Name */}
             <div>
               <label className='mb-1.5 block text-[12px] font-medium text-text-secondary'>
                 Name
@@ -637,7 +629,6 @@ function FilterPresetDialog({
               />
             </div>
 
-            {/* Entity selector */}
             {isNew && (
               <div>
                 <label className='mb-1.5 block text-[12px] font-medium text-text-secondary'>
@@ -668,7 +659,6 @@ function FilterPresetDialog({
               </div>
             )}
 
-            {/* Conditions */}
             <div>
               <label className='mb-1.5 block text-[12px] font-medium text-text-secondary'>
                 Conditions
@@ -688,7 +678,6 @@ function FilterPresetDialog({
                       )}
                       {i === 0 && rows.length > 1 && <div className='w-8 shrink-0' />}
 
-                      {/* Field */}
                       <Select
                         value={row.field}
                         onValueChange={v => {
@@ -713,7 +702,6 @@ function FilterPresetDialog({
                         </SelectContent>
                       </Select>
 
-                      {/* Operator */}
                       <Select
                         value={row.op}
                         onValueChange={v => updateRow(row.id, { op: v as FilterOp })}
@@ -847,7 +835,6 @@ function FilterPresetDialog({
                           />
                         ))}
 
-                      {/* Remove */}
                       <button
                         type='button'
                         className='text-text-quaternary inline-flex size-6 shrink-0 items-center justify-center rounded-[5px] transition-colors duration-75 hover:bg-destructive/10 hover:text-destructive'
@@ -870,7 +857,6 @@ function FilterPresetDialog({
               </div>
             </div>
 
-            {/* Visibility */}
             <div>
               <label className='mb-1.5 block text-[12px] font-medium text-text-secondary'>
                 Visibility
@@ -880,7 +866,6 @@ function FilterPresetDialog({
               </p>
 
               <div className='space-y-3'>
-                {/* Shared toggle */}
                 <div className='flex items-center justify-between'>
                   <span className='text-[13px] text-text-secondary'>Shared with everyone</span>
                   <button
@@ -900,7 +885,6 @@ function FilterPresetDialog({
                   </button>
                 </div>
 
-                {/* Visible to roles */}
                 {!shared && (
                   <div>
                     <span className='mb-1 block text-[12px] text-text-tertiary'>
@@ -935,7 +919,6 @@ function FilterPresetDialog({
                   </div>
                 )}
 
-                {/* Visible to users */}
                 {!shared && (
                   <div>
                     <span className='mb-1 block text-[12px] text-text-tertiary'>
@@ -972,7 +955,6 @@ function FilterPresetDialog({
               </div>
             </div>
 
-            {/* Preview */}
             {validRows.length > 0 && (
               <div>
                 <label className='mb-1.5 block text-[12px] font-medium text-text-secondary'>
@@ -1004,7 +986,6 @@ function FilterPresetDialog({
           </div>
         </div>
 
-        {/* Footer */}
         <div className='flex items-center justify-end gap-2 border-t border-border px-5 py-3'>
           <button
             type='button'

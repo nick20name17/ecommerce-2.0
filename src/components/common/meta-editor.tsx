@@ -131,7 +131,6 @@ export const MetaEditor = ({
               </p>
             </DialogHeader>
             <DialogBody className='flex flex-col gap-3'>
-              {/* Google preview */}
               <div className='rounded-lg border border-border bg-bg-secondary/40 p-3'>
                 <div className='truncate text-[14px] font-medium text-blue-700'>
                   {title || 'Page Title'}

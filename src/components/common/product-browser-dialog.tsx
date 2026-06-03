@@ -93,7 +93,6 @@ export const ProductBrowserDialog = ({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className='flex h-[80vh] flex-col gap-0 p-0 sm:max-w-4xl'>
-        {/* Header with search */}
         <div className='flex shrink-0 flex-col gap-3 border-b border-border px-5 pt-5 pb-3'>
           <div className='flex items-center gap-2'>
             <DialogTitle className='flex-1 text-[15px]'>{title}</DialogTitle>
@@ -164,7 +163,6 @@ export const ProductBrowserDialog = ({
           </div>
         </div>
 
-        {/* Footer */}
         <div className='flex shrink-0 items-center gap-2 border-t border-border px-5 py-3'>
           <div className='flex-1' />
           <Button variant='outline' onClick={() => onOpenChange(false)}>
@@ -356,7 +354,6 @@ function ProductList({
 
   return (
     <div className='flex flex-col'>
-      {/* Header */}
       <div className='sticky top-0 flex items-center gap-3 border-b border-border bg-bg-secondary px-3 py-1.5 text-[11px] font-medium text-text-tertiary'>
         <div className='w-5 shrink-0' />
         <div className='w-30 shrink-0'>Product ID</div>
@@ -383,7 +380,6 @@ function ProductList({
         )
       })}
 
-      {/* Pagination */}
       {(hasMore || offset > 0) && (
         <div className='flex items-center justify-between border-t border-border bg-bg-secondary px-3 py-2'>
           <span className='text-[11px] text-text-tertiary'>

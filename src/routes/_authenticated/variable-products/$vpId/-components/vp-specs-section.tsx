@@ -180,7 +180,6 @@ export const VPSpecsSection = ({ vp, projectId }: VPSpecsSectionProps) => {
         </div>
       )}
 
-      {/* Add / Edit dialog */}
       <Dialog
         open={isFormOpen}
         onOpenChange={v => {
@@ -265,7 +264,6 @@ export const VPSpecsSection = ({ vp, projectId }: VPSpecsSectionProps) => {
         </DialogContent>
       </Dialog>
 
-      {/* Delete confirmation */}
       <Dialog open={!!deleteSpec} onOpenChange={v => !v && setDeleteSpec(null)}>
         <DialogContent className='sm:max-w-sm'>
           <DialogHeader>

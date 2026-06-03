@@ -363,7 +363,6 @@ export const CatalogSection = ({ projectId }: CatalogSectionProps) => {
   return (
     <div className='flex-1 overflow-y-auto p-4 sm:p-6'>
       <div className='flex max-w-xl flex-col gap-6 sm:gap-8'>
-        {/* Header */}
         <div>
           <h2 className='text-[15px] font-semibold tracking-[-0.01em]'>
             Custom Catalog & Superinventory

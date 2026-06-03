@@ -73,7 +73,6 @@ export const CatalogCategorySidebar = ({
 
   return (
     <div className={cn('flex h-full min-h-0 flex-col', className)}>
-      {/* Header */}
       <div className='flex shrink-0 items-center justify-between gap-2 border-b border-border px-4 py-2'>
         <div className='min-w-0'>
           <span className='text-[11px] font-semibold tracking-wider text-text-tertiary uppercase'>
@@ -95,7 +94,6 @@ export const CatalogCategorySidebar = ({
         )}
       </div>
 
-      {/* Category list */}
       <div className='min-h-0 flex-1 overflow-y-auto'>
         {loading ? (
           <div className='space-y-0'>
@@ -145,7 +143,6 @@ export const CatalogCategorySidebar = ({
                 )}
                 onClick={() => handleEnterCategory(category)}
               >
-                {/* Thumbnail */}
                 <div
                   className={cn(
                     'flex size-8 shrink-0 items-center justify-center overflow-hidden rounded-[5px] border',
@@ -164,7 +161,6 @@ export const CatalogCategorySidebar = ({
                   )}
                 </div>
 
-                {/* Info */}
                 <div className='min-w-0 flex-1'>
                   <p className='truncate text-[13px] font-medium' title={category.tree_descr}>
                     {category.tree_descr}
@@ -177,7 +173,6 @@ export const CatalogCategorySidebar = ({
                   </p>
                 </div>
 
-                {/* Right side */}
                 <div className='text-text-quaternary flex shrink-0 items-center gap-1.5'>
                   {!category.show_web && (
                     <span className='rounded-sm border border-border px-1.5 py-px text-[10px] font-medium text-text-tertiary'>

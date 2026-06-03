@@ -77,7 +77,6 @@ export const CustomerInfoPanel = ({
 
   return (
     <div>
-      {/* Details */}
       <PanelSection title='Details'>
         <PanelRow label='Status'>
           <div className='flex items-center gap-1.5'>
@@ -175,7 +174,6 @@ export const CustomerInfoPanel = ({
         </PanelRow>
       </PanelSection>
 
-      {/* Contact */}
       <PanelSection title='Contact'>
         {onFieldSave ? (
           <EditablePanelRow
@@ -218,7 +216,6 @@ export const CustomerInfoPanel = ({
         )}
       </PanelSection>
 
-      {/* Address */}
       {hasAddress && (
         <PanelSection title='Address'>
           <div className='space-y-0.5 px-4 py-3 text-[13px] text-text-secondary'>
@@ -229,7 +226,6 @@ export const CustomerInfoPanel = ({
         </PanelSection>
       )}
 
-      {/* Assigned To */}
       <PanelSection title='Assigned To' last>
         {allAssigned.length > 0 ? (
           <button

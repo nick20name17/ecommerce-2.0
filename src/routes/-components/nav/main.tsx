@@ -276,7 +276,6 @@ export const NavMain = () => {
 
   return (
     <div className='flex flex-1 flex-col px-3'>
-      {/* Global search */}
       <div className='pt-2 pb-2'>
         <GlobalSearch />
       </div>
@@ -305,7 +304,6 @@ export const NavMain = () => {
         ))}
       </div>
 
-      {/* Spacer */}
       <div className='flex-1' />
 
       {/* Bottom utility items — plain gray icons */}

@@ -190,7 +190,6 @@ const OrdersPage = () => {
 
   return (
     <div className='flex h-full flex-col overflow-hidden'>
-      {/* Header */}
       <header
         className={cn(
           'flex h-12 shrink-0 items-center gap-2.5 border-b border-border',
@@ -291,7 +290,6 @@ const OrdersPage = () => {
         </div>
       </header>
 
-      {/* Active filter chips */}
       {(hasFilters || autoidFromUrl) && (
         <div
           className={cn(
@@ -335,9 +333,7 @@ const OrdersPage = () => {
         </div>
       )}
 
-      {/* Order list */}
       <div className='flex-1 overflow-y-auto'>
-        {/* Column labels */}
         {!isMobile && (results.length > 0 || isLoading) && (
           <div
             className={cn(
@@ -494,12 +490,10 @@ const OrdersPage = () => {
         )}
       </div>
 
-      {/* Footer */}
       <div className={cn('shrink-0 border-t border-border py-2', isMobile ? 'px-3.5' : 'px-6')}>
         <Pagination totalCount={data?.count ?? 0} />
       </div>
 
-      {/* Dialogs */}
       <OrderDeleteDialog
         order={orderToDelete}
         projectId={projectId}

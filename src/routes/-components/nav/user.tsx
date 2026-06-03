@@ -92,7 +92,6 @@ export const NavUser = () => {
         </DropdownMenuContent>
       </DropdownMenu>
 
-      {/* Theme toggle */}
       <button
         type='button'
         onClick={() => setTheme(isDark ? 'light' : 'dark')}

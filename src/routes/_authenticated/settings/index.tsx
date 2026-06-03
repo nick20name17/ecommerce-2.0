@@ -79,7 +79,6 @@ const SettingsPage = () => {
         <h1 className='text-[14px] font-semibold tracking-[-0.01em]'>Settings</h1>
       </header>
 
-      {/* Sidebar + Content */}
       <div className='flex min-h-0 flex-1 flex-col overflow-hidden md:flex-row'>
         {/* Horizontal tabs on narrow, vertical sidebar on md+ */}
         <nav className='flex shrink-0 gap-px overflow-x-auto border-b border-border bg-bg-secondary/40 px-3 py-1.5 md:w-45 md:flex-col md:overflow-x-visible md:border-r md:border-b-0 md:py-3'>
@@ -103,7 +102,6 @@ const SettingsPage = () => {
           })}
         </nav>
 
-        {/* Content */}
         <div className='flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden'>
           {currentSection === 'general' && <GeneralSection projectId={projectId} />}
           {currentSection === 'data-control' && <DataControlSection projectId={projectId} />}

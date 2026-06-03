@@ -111,7 +111,6 @@ export const SpecOptionsPanel = ({ spec, projectId }: SpecOptionsPanelProps) => 
 
   return (
     <div className='flex h-full w-full flex-col'>
-      {/* Panel header */}
       <div className='flex shrink-0 items-center gap-3 border-b border-border px-6 py-3'>
         <div
           className={cn(
@@ -144,7 +143,6 @@ export const SpecOptionsPanel = ({ spec, projectId }: SpecOptionsPanelProps) => 
         </Button>
       </div>
 
-      {/* Options list */}
       <div className='flex-1 overflow-y-auto'>
         {isLoading ? (
           <div className='flex flex-col gap-1 p-4'>
@@ -174,7 +172,6 @@ export const SpecOptionsPanel = ({ spec, projectId }: SpecOptionsPanelProps) => 
                 key={opt.id}
                 className='group flex items-center gap-3 border-b border-border-light px-6 py-2.5 transition-colors hover:bg-bg-hover'
               >
-                {/* Swatch preview */}
                 {spec.display_type === 'swatch' && (
                   <div
                     className='size-6 shrink-0 rounded-full border border-border'

@@ -246,7 +246,6 @@ function ProposalDetailPage() {
           {statusLabel}
         </span>
 
-        {/* Assignee */}
         <div className='hidden shrink-0 items-center gap-1.5 md:flex'>
           <button
             type='button'
@@ -268,7 +267,6 @@ function ProposalDetailPage() {
         <div className='flex-1' />
 
         <div className='flex shrink-0 items-center gap-1.5'>
-          {/* Convert to Order */}
           {projectId && (
             <Tooltip>
               <TooltipTrigger asChild>
@@ -428,7 +426,6 @@ function ProposalDetailPage() {
             )}
           </div>
 
-          {/* Summary footer */}
           <div className='flex shrink-0 items-center justify-between border-t border-border bg-bg-secondary/40 px-4 py-2 sm:px-6'>
             <SummaryCell label='Items' value={String(items.length)} />
             <div className='flex items-center gap-4'>
@@ -446,7 +443,6 @@ function ProposalDetailPage() {
             'border-t border-border lg:w-95 lg:border-t-0 lg:border-l'
           )}
         >
-          {/* Panel tabs */}
           <div className='flex shrink-0 items-center gap-0 border-b border-border px-1'>
             {(['general', 'custom'] as const).map(tab => (
               <button
@@ -473,7 +469,6 @@ function ProposalDetailPage() {
             ))}
           </div>
 
-          {/* Panel content */}
           <div className='flex-1 overflow-y-auto'>
             {panelTab === 'general' ? (
               <>

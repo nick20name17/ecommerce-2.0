@@ -162,7 +162,6 @@ export const ShippingSection = ({ projectId }: { projectId: number }) => {
       {/* Addresses section — only when shipping is enabled */}
       {!shippingEnabled && userIsSuperAdmin ? null : (
         <>
-          {/* Column labels + Add button */}
           <div className='sticky top-0 z-10 flex items-center gap-6 border-b border-border bg-bg-secondary px-6 py-1 select-none'>
             <div className='min-w-0 flex-1 text-[11px] font-semibold tracking-wider text-text-tertiary uppercase'>
               Address
@@ -223,7 +222,6 @@ export const ShippingSection = ({ projectId }: { projectId: number }) => {
                   key={addr.id}
                   className='group/row flex items-center gap-6 border-b border-border-light px-6 py-1.5 transition-colors duration-100 hover:bg-bg-hover'
                 >
-                  {/* Title + default badge */}
                   <div className='flex min-w-0 flex-1 items-center gap-2'>
                     <span className='truncate text-[13px] font-medium text-foreground'>
                       {addr.title}
@@ -236,7 +234,6 @@ export const ShippingSection = ({ projectId }: { projectId: number }) => {
                     )}
                   </div>
 
-                  {/* Location */}
                   <div className='hidden w-40 shrink-0 sm:block'>
                     <Tooltip>
                       <TooltipTrigger asChild>
@@ -254,12 +251,10 @@ export const ShippingSection = ({ projectId }: { projectId: number }) => {
                     </Tooltip>
                   </div>
 
-                  {/* Contact */}
                   <div className='hidden w-30 shrink-0 truncate text-[13px] text-text-tertiary md:block'>
                     {addr.name || addr.phone || '—'}
                   </div>
 
-                  {/* Actions */}
                   <div className='flex w-7 shrink-0 items-center justify-center'>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>

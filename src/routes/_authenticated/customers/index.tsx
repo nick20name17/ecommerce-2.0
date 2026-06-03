@@ -183,7 +183,6 @@ function CustomersPage() {
 
         <div className='flex-1' />
 
-        {/* Search */}
         <div className='hidden h-7 w-full max-w-65 items-center gap-1.5 rounded-[5px] border border-border bg-background px-2 transition-[border-color,box-shadow] focus-within:border-ring focus-within:ring-2 focus-within:ring-ring/50 sm:flex'>
           <Search className='size-3 shrink-0 text-text-tertiary' />
           <input
@@ -221,7 +220,6 @@ function CustomersPage() {
         </div>
       </header>
 
-      {/* Active filter chips */}
       {(assignedToMe || activePresetId !== null) && (
         <div
           className={cn(
@@ -248,9 +246,7 @@ function CustomersPage() {
         </div>
       )}
 
-      {/* Customer list */}
       <div className='flex-1 overflow-y-auto'>
-        {/* Column labels */}
         {!isMobile && (customers.length > 0 || isLoading) && (
           <div
             className={cn(
@@ -377,12 +373,10 @@ function CustomersPage() {
         )}
       </div>
 
-      {/* Footer */}
       <div className={cn('shrink-0 border-t border-border py-2', isMobile ? 'px-3.5' : 'px-6')}>
         <Pagination totalCount={totalCount} />
       </div>
 
-      {/* Dialogs */}
       <CustomerModal
         key={editingCustomer?.id ?? 'create'}
         open={modalCustomer !== null}
@@ -544,12 +538,10 @@ function CustomerRow({
         </span>
       </div>
 
-      {/* Phone */}
       <div className='w-32.5 shrink-0 truncate text-[13px] text-text-secondary'>
         {phone ?? <span className='text-text-tertiary'>&mdash;</span>}
       </div>
 
-      {/* Email */}
       {!isTablet && (
         <div className='w-40 shrink-0'>
           {email ? (
@@ -565,7 +557,6 @@ function CustomerRow({
         </div>
       )}
 
-      {/* Type */}
       <div className='w-25 shrink-0'>
         {typeLabel !== '—' ? (
           <span className='inline-flex items-center rounded-sm bg-bg-secondary px-1.5 py-0.5 text-[13px] font-medium text-text-secondary'>
@@ -576,7 +567,6 @@ function CustomerRow({
         )}
       </div>
 
-      {/* Assign */}
       <div className='w-30 shrink-0'>
         {(() => {
           const assigned = customer.assigned_users?.length
@@ -647,7 +637,6 @@ function CustomerRow({
       {/* Custom columns from Data Control list_columns */}
       <CustomColumnsCells row={customer as Record<string, unknown>} columns={customColumns} />
 
-      {/* Notes */}
       <div className='flex w-11.5 shrink-0 justify-center'>
         <button
           type='button'
@@ -668,7 +657,6 @@ function CustomerRow({
         </button>
       </div>
 
-      {/* Actions */}
       <div
         className='flex w-7 shrink-0 items-center justify-center'
         onClick={e => e.stopPropagation()}

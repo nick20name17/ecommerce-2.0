@@ -378,7 +378,6 @@ export function ShippingRatesDialog({
 
               <div className='mx-1 h-4 w-px bg-border' />
 
-              {/* Steps indicator */}
               <div className='flex items-center gap-0.5'>
                 {(['configure', 'rates'] as const).map((s, i) => (
                   <span key={s} className='flex items-center gap-0.5'>
@@ -411,7 +410,6 @@ export function ShippingRatesDialog({
             <>
               {/* Route: Origin → Destination */}
               <div className='grid grid-cols-1 gap-3 border-b border-border px-4 py-4 sm:grid-cols-2 sm:px-5'>
-                {/* Origin */}
                 <div className='min-w-0'>
                   <div className='mb-1.5 text-[12px] font-medium text-text-tertiary'>Ship from</div>
                   <Popover open={addressPopoverOpen} onOpenChange={setAddressPopoverOpen}>
@@ -500,7 +498,6 @@ export function ShippingRatesDialog({
                   </Popover>
                 </div>
 
-                {/* Destination */}
                 <div className='min-w-0'>
                   <div className='mb-1.5 text-[12px] font-medium text-text-tertiary'>Ship to</div>
                   <button
@@ -702,7 +699,6 @@ export function ShippingRatesDialog({
                 </div>
               </div>
 
-              {/* Footer */}
               <div className='flex items-center justify-between border-t border-border px-4 py-3 sm:px-5'>
                 <div className='text-[12px] text-text-tertiary max-sm:hidden'>
                   {packages.length} package(s) · {items.length - unassignedItems.length} of{' '}
@@ -734,7 +730,6 @@ export function ShippingRatesDialog({
             </>
           ) : (
             <>
-              {/* Rates view */}
               <div className='max-h-[60vh] overflow-y-auto'>
                 <RatesResultStep
                   data={ratesData!}
@@ -785,7 +780,6 @@ export function ShippingRatesDialog({
         </DialogContent>
       </Dialog>
 
-      {/* Ship To edit dialog */}
       <ShipToEditDialog
         open={shipToExpanded}
         onOpenChange={setShipToExpanded}

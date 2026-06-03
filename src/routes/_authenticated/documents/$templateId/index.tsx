@@ -297,7 +297,6 @@ function DocumentEditorPage() {
 
   return (
     <div className='flex h-full flex-col overflow-hidden'>
-      {/* Header */}
       <header className='flex h-12 shrink-0 items-center gap-2.5 border-b border-border px-3.5 sm:px-6'>
         <SidebarTrigger className='-ml-1' />
         <button
@@ -429,7 +428,6 @@ function DocumentEditorPage() {
 
       {/* Body — properties form + designer canvas placeholder */}
       <div className='flex min-h-0 flex-1 overflow-hidden'>
-        {/* Properties sidebar */}
         <aside className='hidden w-70 shrink-0 flex-col gap-4 overflow-y-auto border-r border-border bg-bg-secondary/40 px-4 py-5 md:flex'>
           <PropField label='Name'>
             <input
@@ -558,7 +556,6 @@ function DocumentEditorPage() {
           </PropField>
         </aside>
 
-        {/* Designer canvas */}
         <DesignerCanvas
           layout={layout}
           onChange={setLayout}

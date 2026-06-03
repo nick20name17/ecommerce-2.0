@@ -130,10 +130,8 @@ const SortableStatusRow = ({
         !isDragging && 'hover:bg-bg-hover/40'
       )}
     >
-      {/* Color dot */}
       <div className='size-4 shrink-0 rounded-full' style={{ backgroundColor: statusColor }} />
 
-      {/* Name */}
       <span className='min-w-0 flex-1 truncate text-[13px] font-medium text-foreground'>
         {status.name}
       </span>
@@ -389,7 +387,6 @@ export const TasksSection = ({ projectId }: { projectId: number }) => {
         </div>
       </div>
 
-      {/* Delete confirmation */}
       <AlertDialog open={!!deleteTarget} onOpenChange={open => !open && setDeleteTarget(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>

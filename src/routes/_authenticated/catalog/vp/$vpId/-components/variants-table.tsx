@@ -267,7 +267,6 @@ export const VariantsTable = ({
                       !isActive && 'opacity-50'
                     )}
                   >
-                    {/* Product cell */}
                     <td className='sticky left-0 z-10 bg-background py-2 pr-2 pl-3 group-hover:bg-bg-hover'>
                       <div className='flex items-center gap-2.5'>
                         <ProductThumbnail
@@ -295,12 +294,10 @@ export const VariantsTable = ({
                       </div>
                     </td>
 
-                    {/* Stock cell */}
                     <td className='px-3 py-2 text-text-secondary tabular-nums'>
                       {item.available_stock ?? '—'}
                     </td>
 
-                    {/* Spec value cells */}
                     {specs.map(spec => {
                       const val = getSpecValue(item, spec.slug)
                       const allOpts = getOptions(spec)
@@ -345,7 +342,6 @@ export const VariantsTable = ({
                       )
                     })}
 
-                    {/* Actions */}
                     <td className='p-2'>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
@@ -628,7 +624,6 @@ function OptionPicker({
             />
           </div>
         )}
-        {/* Options list */}
         <div className='max-h-45 overflow-y-auto p-1'>
           {filtered.length === 0 ? (
             <div className='p-2 text-center text-[11px] text-text-tertiary'>No matches</div>
@@ -663,7 +658,6 @@ function OptionPicker({
             })
           )}
         </div>
-        {/* Remove */}
         {onRemove && (
           <div className='border-t border-border p-1'>
             <button

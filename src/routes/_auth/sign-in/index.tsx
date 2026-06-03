@@ -6,7 +6,6 @@ const SignInPage = () => {
   return (
     <div className='flex min-h-screen items-center justify-center bg-bg-secondary/50 px-4'>
       <div className='w-full max-w-95'>
-        {/* Logo / brand mark */}
         <div className='mb-8 flex flex-col items-center gap-3'>
           <div className='flex size-11 items-center justify-center rounded-[10px] bg-foreground'>
             <span className='text-[18px] leading-none font-bold text-background'>E</span>
@@ -19,7 +18,6 @@ const SignInPage = () => {
           </div>
         </div>
 
-        {/* Form card */}
         <SignInForm />
       </div>
     </div>

@@ -300,7 +300,6 @@ export const VPValuesMatrix = ({ vp, projectId, isMobile, isTablet }: VPValuesMa
         </table>
       </div>
 
-      {/* Link option dialog */}
       <Dialog
         open={!!linkDialog}
         onOpenChange={v => {
@@ -420,7 +419,6 @@ export const VPValuesMatrix = ({ vp, projectId, isMobile, isTablet }: VPValuesMa
         </DialogContent>
       </Dialog>
 
-      {/* Edit option dialog */}
       <EditOptionDialog
         option={editOption}
         onClose={() => setEditOption(null)}

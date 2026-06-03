@@ -81,7 +81,6 @@ export const BannerSection = ({ projectId }: BannerSectionProps) => {
             </p>
           </div>
 
-          {/* Authorized users only */}
           <div className='flex items-start gap-3'>
             <Checkbox
               id='banner-authorized-only'
@@ -99,7 +98,6 @@ export const BannerSection = ({ projectId }: BannerSectionProps) => {
             </div>
           </div>
 
-          {/* Message */}
           <div className='space-y-1.5'>
             <Label
               htmlFor='banner-text'
@@ -124,7 +122,6 @@ export const BannerSection = ({ projectId }: BannerSectionProps) => {
             />
           </div>
 
-          {/* Font size */}
           <div className='space-y-1.5'>
             <Label
               htmlFor='banner-font-size'
@@ -142,7 +139,6 @@ export const BannerSection = ({ projectId }: BannerSectionProps) => {
             />
           </div>
 
-          {/* Height */}
           <div className='space-y-1.5'>
             <Label htmlFor='banner-height' className='text-[12px] font-medium text-text-tertiary'>
               Height
@@ -157,7 +153,6 @@ export const BannerSection = ({ projectId }: BannerSectionProps) => {
             />
           </div>
 
-          {/* Text color */}
           <div className='space-y-1.5'>
             <Label className='text-[12px] font-medium text-text-tertiary'>Text color</Label>
             <div className='flex items-center gap-3'>
@@ -172,7 +167,6 @@ export const BannerSection = ({ projectId }: BannerSectionProps) => {
             </div>
           </div>
 
-          {/* Background color */}
           <div className='space-y-1.5'>
             <Label className='text-[12px] font-medium text-text-tertiary'>Background color</Label>
             <div className='flex items-center gap-3'>
@@ -187,7 +181,6 @@ export const BannerSection = ({ projectId }: BannerSectionProps) => {
             </div>
           </div>
 
-          {/* Save */}
           <div className='pt-2'>
             <Button
               type='button'

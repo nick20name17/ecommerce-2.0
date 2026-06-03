@@ -84,7 +84,6 @@ export const CatalogProductGrid = ({
 
   return (
     <div className='flex h-full min-h-0 flex-col'>
-      {/* Search + pagination bar */}
       <div className='flex shrink-0 items-center gap-2 border-b border-border px-4 py-2'>
         <div className='flex flex-1 items-center gap-1.5 rounded-md border border-border bg-background px-2.5 py-1.5'>
           {isFetching ? (
@@ -132,7 +131,6 @@ export const CatalogProductGrid = ({
         </div>
       </div>
 
-      {/* Table header */}
       <div className='flex shrink-0 items-center gap-3 border-b border-border bg-bg-secondary/60 px-4 py-1.5'>
         <div className='w-10 shrink-0' />
         <div className='min-w-0 flex-1 text-[11px] font-semibold tracking-wider text-text-tertiary uppercase'>
@@ -144,7 +142,6 @@ export const CatalogProductGrid = ({
         <div className='w-15 shrink-0' />
       </div>
 
-      {/* Product rows */}
       <div className='min-h-0 flex-1 overflow-y-auto'>
         {loading ? (
           <div className='space-y-0'>
@@ -190,7 +187,6 @@ export const CatalogProductGrid = ({
                 key={product.autoid}
                 className='group/row flex items-center gap-3 border-b border-border-light px-4 py-1.5 transition-colors duration-75 hover:bg-bg-hover/50'
               >
-                {/* Thumbnail */}
                 <div className='flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-md bg-bg-secondary'>
                   {photo ? (
                     <img
@@ -204,7 +200,6 @@ export const CatalogProductGrid = ({
                   )}
                 </div>
 
-                {/* Product info */}
                 <div className='min-w-0 flex-1'>
                   <div className='flex items-center gap-2'>
                     <span className='shrink-0 text-[13px] font-semibold text-foreground tabular-nums'>
@@ -238,7 +233,6 @@ export const CatalogProductGrid = ({
                   )}
                 </div>
 
-                {/* Price */}
                 <div className='hidden w-20 shrink-0 text-right sm:block'>
                   {hasDiscount && (
                     <p className='text-[11px] text-text-tertiary tabular-nums line-through'>
@@ -255,7 +249,6 @@ export const CatalogProductGrid = ({
                   </p>
                 </div>
 
-                {/* Add button */}
                 <div className='w-15 shrink-0 text-right'>
                   <button
                     type='button'

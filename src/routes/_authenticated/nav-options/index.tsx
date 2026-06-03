@@ -156,7 +156,6 @@ function Panel1() {
 
       {/* ── Top nav items ── */}
       <div className='flex flex-col px-5'>
-        {/* Updates */}
         <div className='flex h-9.5 items-center gap-3'>
           <Circle className='size-4 text-gray-400' />
           <span className='flex-1 text-[14px] text-gray-600'>Updates</span>
@@ -164,7 +163,6 @@ function Panel1() {
             16
           </span>
         </div>
-        {/* Members */}
         <div className='group flex h-9.5 items-center gap-3'>
           <Users className='size-4 text-gray-400' />
           <span className='flex-1 text-[14px] text-gray-600'>Members</span>
@@ -173,7 +171,6 @@ function Panel1() {
             <Plus className='size-3.5 text-gray-300' />
           </span>
         </div>
-        {/* Settings */}
         <div className='flex h-9.5 items-center gap-3'>
           <Settings className='size-4 text-gray-400' />
           <span className='text-[14px] text-gray-600'>Settings</span>
@@ -185,7 +182,6 @@ function Panel1() {
         <p className='mb-2 px-5 text-[11px] font-semibold text-gray-400'>Teamspaces</p>
 
         <div className='flex flex-col px-5'>
-          {/* Team tasks */}
           <div className='flex h-8.5 items-center gap-3'>
             <Star className='size-4 text-gray-400' />
             <span className='text-[14px] text-gray-600'>Team tasks</span>
@@ -208,7 +204,6 @@ function Panel1() {
             <div className='flex h-8 items-center text-[14px] text-gray-500'>Authors</div>
           </div>
 
-          {/* Storytale */}
           <div className='flex h-8.5 items-center gap-3'>
             <Globe className='size-4 text-gray-400' />
             <span className='text-[14px] text-gray-600'>Storytale</span>
@@ -454,7 +449,6 @@ function Panel4() {
 
       {/* ── Top items ── */}
       <div className='flex flex-col px-5'>
-        {/* Posts */}
         <div className='flex h-9.5 items-center gap-3'>
           <IcPen className='size-4 text-gray-400' />
           <span className='flex-1 text-[14px] text-gray-600'>Posts</span>
@@ -462,7 +456,6 @@ function Panel4() {
             16
           </span>
         </div>
-        {/* Media */}
         <div className='group flex h-9.5 items-center gap-3'>
           <Image className='size-4 text-gray-400' />
           <span className='flex-1 text-[14px] text-gray-600'>Media</span>
@@ -471,7 +464,6 @@ function Panel4() {
             <Plus className='size-3.5 text-gray-300' />
           </span>
         </div>
-        {/* Links */}
         <div className='flex h-9.5 items-center gap-3'>
           <Link2 className='size-4 text-gray-400' />
           <span className='text-[14px] text-gray-600'>Links</span>
@@ -483,7 +475,6 @@ function Panel4() {
         <p className='mb-1 px-5 text-[11px] font-semibold text-gray-400'>Workflow</p>
 
         <div className='flex flex-col px-5'>
-          {/* Pages */}
           <div className='flex h-9.5 items-center gap-3'>
             <IcFile className='size-4 text-gray-400' />
             <span className='text-[14px] text-gray-600'>Pages</span>
@@ -516,13 +507,11 @@ function Panel4() {
             })}
           </div>
 
-          {/* Comments */}
           <div className='flex h-9.5 items-center gap-3'>
             <MessageSquare className='size-4 text-gray-400' />
             <span className='text-[14px] text-gray-600'>Comments</span>
           </div>
 
-          {/* News */}
           <div className='flex h-9.5 items-center gap-3'>
             <Newspaper className='size-4 text-gray-400' />
             <span className='text-[14px] text-gray-600'>News</span>

@@ -161,7 +161,6 @@ function NewDocumentPage() {
 
   return (
     <div className='flex h-full flex-col overflow-hidden'>
-      {/* Header */}
       <header className='flex h-12 shrink-0 items-center gap-2.5 border-b border-border px-3.5 sm:px-6'>
         <SidebarTrigger className='-ml-1' />
         <button
@@ -176,10 +175,8 @@ function NewDocumentPage() {
         <h1 className='truncate text-[14px] font-semibold tracking-[-0.01em]'>New template</h1>
       </header>
 
-      {/* Form */}
       <form onSubmit={handleSubmit} className='flex-1 overflow-auto px-3.5 py-5 sm:px-6 sm:py-7'>
         <div className='mx-auto flex w-full max-w-xl flex-col gap-6'>
-          {/* Preset picker */}
           <div className='flex flex-col gap-2'>
             <label className='inline-flex items-center gap-1.5 text-[12px] font-semibold text-foreground'>
               <Sparkles className='size-3.5 text-indigo-500' />
@@ -213,7 +210,6 @@ function NewDocumentPage() {
             </div>
           </div>
 
-          {/* Name */}
           <div className='flex flex-col gap-1.5'>
             <label htmlFor='tpl-name' className='text-[12px] font-semibold text-foreground'>
               Name
@@ -231,7 +227,6 @@ function NewDocumentPage() {
             />
           </div>
 
-          {/* Description */}
           <div className='flex flex-col gap-1.5'>
             <label htmlFor='tpl-desc' className='text-[12px] font-semibold text-foreground'>
               Description <span className='font-normal text-text-tertiary'>(optional)</span>
@@ -246,7 +241,6 @@ function NewDocumentPage() {
             />
           </div>
 
-          {/* Entity type */}
           <div className='flex flex-col gap-2'>
             <label className='text-[12px] font-semibold text-foreground'>Entity type</label>
             <p className='text-[11.5px] leading-snug text-text-tertiary'>
@@ -280,7 +274,6 @@ function NewDocumentPage() {
             </div>
           </div>
 
-          {/* Accessible from */}
           <div className='flex flex-col gap-2'>
             <label className='text-[12px] font-semibold text-foreground'>Print from</label>
             <p className='text-[11.5px] leading-snug text-text-tertiary'>
@@ -312,7 +305,6 @@ function NewDocumentPage() {
             </div>
           </div>
 
-          {/* Actions */}
           <div className='flex items-center justify-end gap-2 pt-2'>
             <button
               type='button'

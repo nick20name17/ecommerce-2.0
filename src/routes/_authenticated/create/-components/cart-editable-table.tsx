@@ -174,7 +174,6 @@ export function CartEditableTable({
               ))
             ) : (
               <>
-                {/* Real cart items */}
                 {items.map(item => {
                   const isUpdating = updatingQuantityItemId === item.id
                   return (
@@ -182,7 +181,6 @@ export function CartEditableTable({
                       key={item.id}
                       className='group/row border-b border-border-light transition-colors duration-100 hover:bg-bg-hover'
                     >
-                      {/* Thumbnail */}
                       <td className='w-9 py-1.5 pr-0 pl-5'>
                         <div className='flex size-7 items-center justify-center overflow-hidden rounded-sm bg-bg-secondary'>
                           {item.photo ? (
@@ -197,9 +195,7 @@ export function CartEditableTable({
                           )}
                         </div>
                       </td>
-                      {/* Inventory */}
                       <td className='px-3 py-1.5 font-medium text-foreground'>{item.product_id}</td>
-                      {/* Description */}
                       <td className='max-w-75 px-3 py-1.5 text-text-secondary'>
                         <Tooltip>
                           <TooltipTrigger asChild>
@@ -208,7 +204,6 @@ export function CartEditableTable({
                           <TooltipContent className='max-w-75'>{item.name}</TooltipContent>
                         </Tooltip>
                       </td>
-                      {/* Qty */}
                       <td className='px-3 py-1.5 text-right'>
                         <div className='flex justify-end'>
                           <NumberInput
@@ -222,13 +217,10 @@ export function CartEditableTable({
                           />
                         </div>
                       </td>
-                      {/* Unit */}
                       <td className='px-3 py-1.5 text-text-tertiary'>{item.unit || '—'}</td>
-                      {/* Price */}
                       <td className='px-3 py-1.5 text-right text-text-secondary tabular-nums'>
                         {formatCurrency(item.price)}
                       </td>
-                      {/* Amount */}
                       <td
                         className={cn(
                           'px-3 py-1.5 text-right font-medium text-foreground tabular-nums',
@@ -237,7 +229,6 @@ export function CartEditableTable({
                       >
                         {formatCurrency((item.price || 0) * (item.quantity || 0))}
                       </td>
-                      {/* Actions */}
                       <td className='py-1.5 pr-5 pl-2'>
                         <div className='flex items-center gap-1'>
                           <button
@@ -371,7 +362,6 @@ export function CartEditableTable({
         </table>
       </div>
 
-      {/* Error message */}
       {error && (
         <div className='flex items-center gap-1.5 border-t border-border px-5 py-2 text-[12px] text-destructive'>
           <AlertCircle className='size-3 shrink-0' />

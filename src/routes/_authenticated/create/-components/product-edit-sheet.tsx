@@ -199,7 +199,6 @@ export const ProductEditSheet = ({
           showCloseButton={false}
           className={`flex ${showConfigs ? 'h-[92vh] w-[94vw] max-w-300!' : 'h-auto max-h-[92vh] w-[94vw] max-w-125!'} flex-col gap-0 overflow-hidden rounded-xl border p-0 shadow-2xl`}
         >
-          {/* Header */}
           <div className='flex h-12 shrink-0 items-center gap-2.5 border-b border-border px-5'>
             <h2 className='shrink-0 text-[14px] font-semibold tracking-[-0.01em]'>
               {mode === 'add' ? 'Add Product' : 'Edit Product'}
@@ -292,7 +291,6 @@ export const ProductEditSheet = ({
             /* Compact single-column layout — no configurations */
             <div className='overflow-y-auto'>
               <div className='flex gap-4 p-4'>
-                {/* Small thumbnail */}
                 {photos && photos.length > 0 && (
                   <div className='size-20 shrink-0 overflow-hidden rounded-lg border border-border bg-background'>
                     <img
@@ -312,7 +310,6 @@ export const ProductEditSheet = ({
               </div>
 
               <div className='flex flex-col gap-4 border-t border-border px-4 py-3'>
-                {/* Quantity */}
                 <div>
                   <span className='mb-1.5 block text-[12px] font-medium tracking-[0.04em] text-text-tertiary uppercase'>
                     Quantity
@@ -329,7 +326,6 @@ export const ProductEditSheet = ({
                   </div>
                 </div>
 
-                {/* Units */}
                 {hasMultipleUnits && units && (
                   <div>
                     <span className='mb-1.5 block text-[12px] font-medium tracking-[0.04em] text-text-tertiary uppercase'>
@@ -369,7 +365,6 @@ export const ProductEditSheet = ({
             </div>
           )}
 
-          {/* Footer */}
           <div className='flex shrink-0 items-center justify-between gap-4 border-t border-border px-5 py-3'>
             <div>
               <span className='text-[12px] font-medium tracking-[0.04em] text-text-tertiary uppercase'>

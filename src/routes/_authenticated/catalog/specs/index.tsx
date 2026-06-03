@@ -146,7 +146,6 @@ const SpecsManagerPage = () => {
 
   return (
     <div className='flex h-full flex-col overflow-hidden'>
-      {/* Header */}
       <header className='flex h-12 shrink-0 items-center gap-2.5 border-b border-border px-3.5 sm:px-6'>
         <SidebarTrigger className='-ml-1' />
         <button
@@ -179,7 +178,6 @@ const SpecsManagerPage = () => {
       <div className='flex min-h-0 flex-1 overflow-hidden'>
         {/* Left: Specs list */}
         <div className='flex w-full flex-col overflow-hidden border-r border-border sm:w-[320px] lg:w-90'>
-          {/* Search */}
           <div className='shrink-0 border-b border-border px-4 py-2'>
             <div className='flex items-center gap-1.5 rounded-md border border-border bg-background px-2.5 py-1.5'>
               <Search className='size-3.5 shrink-0 text-text-tertiary' />
@@ -192,7 +190,6 @@ const SpecsManagerPage = () => {
             </div>
           </div>
 
-          {/* Specs list */}
           <div className='flex-1 overflow-y-auto'>
             {isLoading ? (
               <div className='flex flex-col gap-1 p-3'>

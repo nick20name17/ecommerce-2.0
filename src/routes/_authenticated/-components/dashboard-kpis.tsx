@@ -89,12 +89,10 @@ export const DashboardKpis = ({ metrics }: DashboardKpisProps) => {
               </div>
             </div>
 
-            {/* Value */}
             <div className='mt-3 truncate text-[18px] leading-none font-bold tracking-tight tabular-nums sm:text-[22px]'>
               {config.format(value)}
             </div>
 
-            {/* Change indicator */}
             <div className='mt-2 h-3.5'>
               {change ? (
                 <div
