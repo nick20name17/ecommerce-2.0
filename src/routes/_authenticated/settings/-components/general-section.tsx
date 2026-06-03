@@ -11,10 +11,7 @@ import { useAuth } from '@/providers/auth'
 
 export const GeneralSection = ({ projectId }: { projectId: number }) => {
   const { user } = useAuth()
-  // The /settings route is already gated to admins (beforeLoad → isAdmin). Load the
-  // project for every admin (not just superadmins) so the editable controls below are
-  // seeded from real server values — otherwise a non-superadmin admin would see the
-  // hardcoded `??` fallbacks and silently overwrite real settings on the first click.
+  // Load for all admins so the toggles seed from real values, not defaults.
   const isAdminUser = !!user?.role && isAdmin(user.role)
   const isSuperAdminUser = !!user?.role && isSuperAdmin(user.role)
   const { data: project } = useQuery({
@@ -23,12 +20,7 @@ export const GeneralSection = ({ projectId }: { projectId: number }) => {
     retry: false
   })
 
-  // Remount the form once project data first arrives so the editable fields are
-  // seeded from it via lazy initial state — no setState-in-effect / prop mirroring.
-  // The key is keyed on projectId (not the project object identity), so background
-  // refetches don't remount and clobber in-progress edits; it only reseeds when a
-  // different project is loaded. (Safe only because getProjectByIdQuery sets no
-  // placeholderData/keepPreviousData — otherwise `project` could lag behind projectId.)
+  // Key on projectId so the form seeds once via lazy initial state and refetches don't clobber edits.
   return (
     <GeneralSettingsForm
       key={project ? `loaded-${projectId}` : 'pending'}
@@ -58,12 +50,9 @@ const GeneralSettingsForm = ({
   const [oosField, setOosField] = useState(project?.oos_field ?? '')
   const [salesTotalField, setSalesTotalField] = useState(project?.sales_total_field ?? '')
 
-  // Last values committed to the server — used to skip no-op saves on blur/Enter.
   const oosSavedRef = useRef(oosField)
   const salesSavedRef = useRef(salesTotalField)
 
-  // Controls are interactive only once real data has loaded. Until then (loading, or a
-  // query error) editing is blocked so a hardcoded default can never be written back.
   const isReady = !!project
 
   const updateMutation = useMutation({
@@ -74,7 +63,6 @@ const GeneralSettingsForm = ({
       queryClient.invalidateQueries({ queryKey: PROJECT_QUERY_KEYS.detail(projectId) })
     },
     onError: (_error, variables) => {
-      // Revert the optimistic local change so the UI stays in sync with the server.
       variables.rollback()
     },
     meta: { errorMessage: 'Failed to update settings' }
