@@ -7,7 +7,6 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 import { formatCurrency } from '@/helpers/formatters'
 import { cn } from '@/lib/utils'
 
-
 interface CatalogMiniCartProps {
   customerId: string
   projectId?: number | null
@@ -28,8 +27,8 @@ export const CatalogMiniCart = ({
   })
 
   const items = cart?.items ?? []
-  const total = Number(cart?.total) ?? 0
-  const oldTotal = Number(cart?.old_total) ?? 0
+  const total = Number(cart?.total) || 0
+  const oldTotal = Number(cart?.old_total) || 0
   const hasDiscount = oldTotal - total > 0.01
 
   return (
@@ -37,10 +36,10 @@ export const CatalogMiniCart = ({
       {/* Header */}
       <div className='flex shrink-0 items-center gap-2 border-b border-border px-4 py-2'>
         <ShoppingBag className='size-3.5 text-text-tertiary' />
-        <span className='text-[12px] font-semibold uppercase tracking-[0.04em] text-text-tertiary'>
+        <span className='text-[12px] font-semibold tracking-[0.04em] text-text-tertiary uppercase'>
           Cart
         </span>
-        <span className='text-[12px] tabular-nums text-text-tertiary'>
+        <span className='text-[12px] text-text-tertiary tabular-nums'>
           {isLoading ? '…' : `${items.length} item${items.length !== 1 ? 's' : ''}`}
         </span>
       </div>
@@ -64,11 +63,11 @@ export const CatalogMiniCart = ({
         <div className='flex flex-1 flex-col items-center justify-center gap-1.5 px-4 py-10'>
           <ShoppingBag className='size-5 text-text-tertiary opacity-30' />
           <p className='text-[13px] font-medium text-text-secondary'>Empty cart</p>
-          <p className='text-[12px] text-text-quaternary'>Add products from the catalog</p>
+          <p className='text-text-quaternary text-[12px]'>Add products from the catalog</p>
         </div>
       ) : (
         <div className='min-h-0 flex-1 overflow-y-auto'>
-          {items.map((item) => (
+          {items.map(item => (
             <MiniCartItemRow
               key={item.id}
               item={item}
@@ -89,7 +88,7 @@ export const CatalogMiniCart = ({
             </div>
           )}
           <div className='flex items-center justify-between'>
-            <span className='text-[12px] font-medium uppercase tracking-[0.04em] text-text-tertiary'>
+            <span className='text-[12px] font-medium tracking-[0.04em] text-text-tertiary uppercase'>
               Total
             </span>
             <span className='text-[14px] font-bold tabular-nums'>{formatCurrency(total)}</span>
@@ -117,7 +116,7 @@ function MiniCartItemRow({
         {item.photo ? (
           <img src={item.photo} alt={item.name} className='size-full object-cover' loading='lazy' />
         ) : (
-          <Image className='size-3 text-text-quaternary' />
+          <Image className='text-text-quaternary size-3' />
         )}
       </div>
 
@@ -137,7 +136,7 @@ function MiniCartItemRow({
       </div>
 
       {/* Amount */}
-      <span className='shrink-0 text-[12px] font-medium tabular-nums text-text-secondary'>
+      <span className='shrink-0 text-[12px] font-medium text-text-secondary tabular-nums'>
         {formatCurrency(lineTotal)}
       </span>
 
@@ -145,16 +144,12 @@ function MiniCartItemRow({
       {onRemove && (
         <button
           type='button'
-          className='inline-flex size-6 shrink-0 items-center justify-center rounded-[4px] text-text-quaternary opacity-0 transition-all duration-75 hover:bg-bg-active hover:text-destructive group-hover/item:opacity-100'
+          className='text-text-quaternary inline-flex size-6 shrink-0 items-center justify-center rounded-[4px] opacity-0 transition-all duration-75 group-hover/item:opacity-100 hover:bg-bg-active hover:text-destructive'
           disabled={removing}
           onClick={() => onRemove(item.id)}
           aria-label='Remove'
         >
-          {removing ? (
-            <Loader2 className='size-3 animate-spin' />
-          ) : (
-            <Trash2 className='size-3' />
-          )}
+          {removing ? <Loader2 className='size-3 animate-spin' /> : <Trash2 className='size-3' />}
         </button>
       )}
     </div>

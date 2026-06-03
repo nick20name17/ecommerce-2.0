@@ -60,9 +60,7 @@ const applyFieldToggle = (
   if (!prev?.[entity]) return prev
   return {
     ...prev,
-    [entity]: prev[entity].map((entry) =>
-      entry.field === fieldName ? { ...entry, enabled } : entry
-    )
+    [entity]: prev[entity].map(entry => (entry.field === fieldName ? { ...entry, enabled } : entry))
   }
 }
 
@@ -75,7 +73,7 @@ const applyEditableToggle = (
   if (!prev?.[entity]) return prev
   return {
     ...prev,
-    [entity]: prev[entity].map((entry) =>
+    [entity]: prev[entity].map(entry =>
       entry.field === fieldName ? { ...entry, editable } : entry
     )
   }
@@ -93,12 +91,12 @@ const applyListColumns = (
   // sibling fights the literal. Cast at the boundary.
   const updated = { ...prev } as FieldConfigResponse
   updated._list_columns = {
-    ...(prev._list_columns ?? {}),
+    ...prev._list_columns,
     [entity]: next
   }
   const entityEntries = prev[entity]
   if (entityEntries) {
-    updated[entity] = entityEntries.map((entry) => ({
+    updated[entity] = entityEntries.map(entry => ({
       ...entry,
       in_list: inListSet.has(entry.field)
     }))
@@ -155,13 +153,13 @@ export const DataControlSection = ({ projectId }: { projectId: number }) => {
 
   // Filter out top-level meta keys (e.g. _list_columns) when building the
   // entity-tab list. Without this the meta key would show up as a tab.
-  const entities = Object.keys(data ?? {}).filter((k) => !k.startsWith('_'))
+  const entities = Object.keys(data ?? {}).filter(k => !k.startsWith('_'))
   const currentTab = activeTab ?? entities[0] ?? ''
 
   const fields: FieldConfigRow[] = (() => {
     const entityFields = data?.[currentTab]
     if (!entityFields) return []
-    return entityFields.map((entry) => ({
+    return entityFields.map(entry => ({
       field: entry.field,
       alias: entry.alias,
       default: entry.default,
@@ -183,7 +181,11 @@ export const DataControlSection = ({ projectId }: { projectId: number }) => {
       entity: string
       fieldName: string
       editable: boolean
-    }) => fieldConfigService.patchFieldConfig(projectId, payload as unknown as Record<string, string[]>),
+    }) =>
+      fieldConfigService.patchFieldConfig(
+        projectId,
+        payload as unknown as Record<string, string[]>
+      ),
     onMutate: async ({ entity, fieldName, editable }) => {
       const key = FIELD_CONFIG_QUERY_KEYS.fieldConfig(projectId)
       await client.cancelQueries({ queryKey: key })
@@ -250,7 +252,7 @@ export const DataControlSection = ({ projectId }: { projectId: number }) => {
       ? current.includes(fieldName)
         ? current
         : [...current, fieldName]
-      : current.filter((f) => f !== fieldName)
+      : current.filter(f => f !== fieldName)
     setListColumns(entity, next)
   }
 
@@ -262,7 +264,7 @@ export const DataControlSection = ({ projectId }: { projectId: number }) => {
     const current = data?._list_columns?.[entity] ?? []
     setListColumns(
       entity,
-      current.filter((f) => f !== fieldName)
+      current.filter(f => f !== fieldName)
     )
   }
 
@@ -270,8 +272,8 @@ export const DataControlSection = ({ projectId }: { projectId: number }) => {
     if (!data?.[entity]) return
     const entityFields = data[entity]
     const newEditable = entityFields
-      .filter((e) => (e.field === fieldName ? editable : !!e.editable))
-      .map((e) => e.field)
+      .filter(e => (e.field === fieldName ? editable : !!e.editable))
+      .map(e => e.field)
     editableMutation.mutate({
       payload: { _editable: { [entity]: newEditable } },
       entity,
@@ -282,7 +284,10 @@ export const DataControlSection = ({ projectId }: { projectId: number }) => {
 
   const handleAliasSubmit = (entity: string, fieldName: string, alias: string) => {
     patchMutation.mutate({
-      payload: { _aliases: { [entity]: { [fieldName]: alias } } } as unknown as Record<string, string[]>,
+      payload: { _aliases: { [entity]: { [fieldName]: alias } } } as unknown as Record<
+        string,
+        string[]
+      >,
       entity,
       fieldName,
       enabled: true
@@ -292,10 +297,10 @@ export const DataControlSection = ({ projectId }: { projectId: number }) => {
   const handleFieldToggle = (entity: string, fieldName: string, enabled: boolean) => {
     if (!data?.[entity]) return
     const entityFields = data[entity]
-    const nonDefaultFields = entityFields.filter((e) => !e.default)
+    const nonDefaultFields = entityFields.filter(e => !e.default)
     const newEnabled = nonDefaultFields
-      .filter((e) => (e.field === fieldName ? enabled : e.enabled))
-      .map((e) => e.field)
+      .filter(e => (e.field === fieldName ? enabled : e.enabled))
+      .map(e => e.field)
     patchMutation.mutate({
       payload: { [entity]: newEnabled },
       entity,
@@ -307,18 +312,14 @@ export const DataControlSection = ({ projectId }: { projectId: number }) => {
   const showTabSkeleton = isLoading && !data
 
   return (
-    <Tabs
-      value={currentTab}
-      onValueChange={setActiveTab}
-      className='flex min-h-0 flex-1 flex-col'
-    >
+    <Tabs value={currentTab} onValueChange={setActiveTab} className='flex min-h-0 flex-1 flex-col'>
       <div className='shrink-0 border-b border-border px-6'>
         <TabsList variant='line' className='flex-wrap'>
           {showTabSkeleton
             ? Array.from({ length: 4 }).map((_, i) => (
                 <Skeleton key={i} className='h-4 w-20 rounded' />
               ))
-            : entities.map((entity) => (
+            : entities.map(entity => (
                 <TabsTrigger key={entity} value={entity}>
                   {getTableLabel(entity)}
                 </TabsTrigger>
@@ -342,12 +343,16 @@ export const DataControlSection = ({ projectId }: { projectId: number }) => {
             isSuperAdmin={userIsSuperAdmin}
           />
         ) : entities.length === 0 ? (
-          <PageEmpty icon={TriangleAlert} title='No field configuration' description='No field configuration is available for this project.' />
+          <PageEmpty
+            icon={TriangleAlert}
+            title='No field configuration'
+            description='No field configuration is available for this project.'
+          />
         ) : (
-          entities.map((entity) => {
+          entities.map(entity => {
             const showList = LIST_VIEW_ENTITIES.has(entity)
             const listColumns =
-              entity === currentTab ? currentListColumns : data?._list_columns?.[entity] ?? []
+              entity === currentTab ? currentListColumns : (data?._list_columns?.[entity] ?? [])
             const entityEntries = data?.[entity] ?? []
             return (
               <TabsContent key={entity} value={entity}>
@@ -369,14 +374,14 @@ export const DataControlSection = ({ projectId }: { projectId: number }) => {
                 />
                 {showList && listColumns.length > 0 && (
                   <div className='border-t border-border'>
-                    <div className='border-b border-border-light px-6 py-2 text-[11px] font-semibold uppercase tracking-[0.05em] text-text-tertiary'>
+                    <div className='border-b border-border-light px-6 py-2 text-[11px] font-semibold tracking-[0.05em] text-text-tertiary uppercase'>
                       List column order — drag to rearrange
                     </div>
                     <ListColumnsReorder
                       orderedFields={listColumns}
                       entries={entityEntries}
-                      onReorder={(next) => handleListReorder(entity, next)}
-                      onRemove={(field) => handleListRemove(entity, field)}
+                      onReorder={next => handleListReorder(entity, next)}
+                      onRemove={field => handleListRemove(entity, field)}
                       disabled={listColumnsMutation.isPending}
                     />
                   </div>

@@ -12,7 +12,7 @@ import {
   DialogContent,
   DialogFooter,
   DialogHeader,
-  DialogTitle,
+  DialogTitle
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -39,7 +39,9 @@ export const SpecOptionsPanel = ({ spec, projectId }: SpecOptionsPanelProps) => 
   const [formSort, setFormSort] = useState(0)
 
   const { data: rawData, isLoading } = useQuery(getSpecOptionsQuery(spec.id, params))
-  const options: SpecOption[] = Array.isArray(rawData) ? rawData : (rawData as unknown as { results?: SpecOption[] })?.results ?? []
+  const options: SpecOption[] = Array.isArray(rawData)
+    ? rawData
+    : ((rawData as unknown as { results?: SpecOption[] })?.results ?? [])
 
   const invalidate = () => {
     queryClient.invalidateQueries({ queryKey: VP_QUERY_KEYS.specOptions(spec.id) })
@@ -48,31 +50,50 @@ export const SpecOptionsPanel = ({ spec, projectId }: SpecOptionsPanelProps) => 
 
   const createMutation = useMutation({
     mutationFn: () =>
-      variableProductService.createSpecOption(spec.id, {
-        value: formValue,
-        color_hex: formColor || undefined,
-        sort_order: formSort,
-      }, params),
+      variableProductService.createSpecOption(
+        spec.id,
+        {
+          value: formValue,
+          color_hex: formColor || undefined,
+          sort_order: formSort
+        },
+        params
+      ),
     meta: { successMessage: 'Option created' },
-    onSuccess: () => { invalidate(); setCreateOpen(false); resetForm() },
+    onSuccess: () => {
+      invalidate()
+      setCreateOpen(false)
+      resetForm()
+    }
   })
 
   const updateMutation = useMutation({
     mutationFn: () =>
-      variableProductService.updateSpecOption(spec.id, editOption!.id, {
-        value: formValue,
-        color_hex: formColor || undefined,
-        sort_order: formSort,
-      }, params),
+      variableProductService.updateSpecOption(
+        spec.id,
+        editOption!.id,
+        {
+          value: formValue,
+          color_hex: formColor || undefined,
+          sort_order: formSort
+        },
+        params
+      ),
     meta: { successMessage: 'Option updated' },
-    onSuccess: () => { invalidate(); setEditOption(null); resetForm() },
+    onSuccess: () => {
+      invalidate()
+      setEditOption(null)
+      resetForm()
+    }
   })
 
   const deleteMutation = useMutation({
-    mutationFn: () =>
-      variableProductService.deleteSpecOption(spec.id, deleteOption!.id, params),
+    mutationFn: () => variableProductService.deleteSpecOption(spec.id, deleteOption!.id, params),
     meta: { successMessage: 'Option deleted' },
-    onSuccess: () => { invalidate(); setDeleteOption(null) },
+    onSuccess: () => {
+      invalidate()
+      setDeleteOption(null)
+    }
   })
 
   const resetForm = () => {
@@ -92,12 +113,16 @@ export const SpecOptionsPanel = ({ spec, projectId }: SpecOptionsPanelProps) => 
     <div className='flex h-full w-full flex-col'>
       {/* Panel header */}
       <div className='flex shrink-0 items-center gap-3 border-b border-border px-6 py-3'>
-        <div className={cn(
-          'flex size-8 shrink-0 items-center justify-center rounded-md text-[11px] font-bold uppercase',
-          spec.display_type === 'swatch' ? 'bg-pink-500/10 text-pink-500'
-            : spec.display_type === 'button' ? 'bg-blue-500/10 text-blue-500'
-            : 'bg-amber-500/10 text-amber-500'
-        )}>
+        <div
+          className={cn(
+            'flex size-8 shrink-0 items-center justify-center rounded-md text-[11px] font-bold uppercase',
+            spec.display_type === 'swatch'
+              ? 'bg-pink-500/10 text-pink-500'
+              : spec.display_type === 'button'
+                ? 'bg-blue-500/10 text-blue-500'
+                : 'bg-amber-500/10 text-amber-500'
+          )}
+        >
           {spec.display_type === 'swatch' ? '🎨' : spec.display_type === 'button' ? 'Btn' : '▾'}
         </div>
         <div className='min-w-0 flex-1'>
@@ -107,7 +132,13 @@ export const SpecOptionsPanel = ({ spec, projectId }: SpecOptionsPanelProps) => 
             {(spec.vp_count ?? 0) > 0 && ` · used by ${spec.vp_count} superinventory items`}
           </p>
         </div>
-        <Button size='sm' onClick={() => { resetForm(); setCreateOpen(true) }}>
+        <Button
+          size='sm'
+          onClick={() => {
+            resetForm()
+            setCreateOpen(true)
+          }}
+        >
           <Plus className='size-3.5' />
           Add Option
         </Button>
@@ -124,14 +155,21 @@ export const SpecOptionsPanel = ({ spec, projectId }: SpecOptionsPanelProps) => 
         ) : options.length === 0 ? (
           <div className='flex flex-col items-center gap-2 py-12 text-center'>
             <p className='text-[13px] text-text-tertiary'>No options yet</p>
-            <Button variant='outline' size='sm' onClick={() => { resetForm(); setCreateOpen(true) }}>
+            <Button
+              variant='outline'
+              size='sm'
+              onClick={() => {
+                resetForm()
+                setCreateOpen(true)
+              }}
+            >
               <Plus className='size-3.5' />
               Add first option
             </Button>
           </div>
         ) : (
           <div className='flex flex-col'>
-            {options.map((opt) => (
+            {options.map(opt => (
               <div
                 key={opt.id}
                 className='group flex items-center gap-3 border-b border-border-light px-6 py-2.5 transition-colors hover:bg-bg-hover'
@@ -147,29 +185,39 @@ export const SpecOptionsPanel = ({ spec, projectId }: SpecOptionsPanelProps) => 
                 <div className='min-w-0 flex-1'>
                   <span className='text-[13px] font-medium text-foreground'>{opt.value}</span>
                   {opt.color_hex && (
-                    <span className='ml-2 font-mono text-[11px] text-text-quaternary'>{opt.color_hex}</span>
+                    <span className='text-text-quaternary ml-2 font-mono text-[11px]'>
+                      {opt.color_hex}
+                    </span>
                   )}
                 </div>
 
                 <input
                   type='number'
                   defaultValue={opt.sort_order}
-                  className='w-12 rounded border border-transparent bg-transparent px-1 py-0.5 text-right text-[11px] tabular-nums text-text-quaternary outline-none transition-colors hover:border-border focus:border-primary focus:text-foreground'
-                  onBlur={(e) => {
+                  className='text-text-quaternary w-12 rounded border border-transparent bg-transparent px-1 py-0.5 text-right text-[11px] tabular-nums transition-colors outline-none hover:border-border focus:border-primary focus:text-foreground'
+                  onBlur={e => {
                     const val = Number(e.target.value)
                     if (val !== opt.sort_order) {
-                      variableProductService.updateSpecOption(spec.id, opt.id, { sort_order: val }, params)
+                      variableProductService
+                        .updateSpecOption(spec.id, opt.id, { sort_order: val }, params)
                         .then(() => invalidate())
                     }
                   }}
-                  onKeyDown={(e) => { if (e.key === 'Enter') (e.target as HTMLInputElement).blur() }}
+                  onKeyDown={e => {
+                    if (e.key === 'Enter') (e.target as HTMLInputElement).blur()
+                  }}
                 />
 
                 <div className='flex items-center gap-0.5 opacity-0 transition-opacity group-hover:opacity-100'>
                   <Button variant='ghost' size='icon-xs' onClick={() => openEdit(opt)}>
                     <Pencil className='size-3' />
                   </Button>
-                  <Button variant='ghost' size='icon-xs' className='hover:text-destructive' onClick={() => setDeleteOption(opt)}>
+                  <Button
+                    variant='ghost'
+                    size='icon-xs'
+                    className='hover:text-destructive'
+                    onClick={() => setDeleteOption(opt)}
+                  >
                     <Trash2 className='size-3' />
                   </Button>
                 </div>
@@ -182,27 +230,41 @@ export const SpecOptionsPanel = ({ spec, projectId }: SpecOptionsPanelProps) => 
       {/* ── Create/Edit Option Dialog ── */}
       <Dialog
         open={createOpen || !!editOption}
-        onOpenChange={(v) => { if (!v) { setCreateOpen(false); setEditOption(null) } }}
+        onOpenChange={v => {
+          if (!v) {
+            setCreateOpen(false)
+            setEditOption(null)
+          }
+        }}
       >
         <DialogContent className='sm:max-w-xs'>
-          <form onSubmit={(e) => { e.preventDefault(); editOption ? updateMutation.mutate() : createMutation.mutate() }}>
+          <form
+            onSubmit={e => {
+              e.preventDefault()
+              if (editOption) updateMutation.mutate()
+              else createMutation.mutate()
+            }}
+          >
             <DialogHeader>
               <DialogTitle>{editOption ? 'Edit Option' : 'New Option'}</DialogTitle>
             </DialogHeader>
             <DialogBody className='flex flex-col gap-3'>
               <div className='flex flex-col gap-1.5'>
                 <Label className='text-[12px]'>Value</Label>
-                <Input value={formValue} onChange={(e) => setFormValue(e.target.value)} placeholder='e.g. Red, Large, Cotton' required autoFocus />
+                <Input
+                  value={formValue}
+                  onChange={e => setFormValue(e.target.value)}
+                  placeholder='e.g. Red, Large, Cotton'
+                  required
+                  autoFocus
+                />
               </div>
               {spec.display_type === 'swatch' && (
                 <div className='flex flex-col gap-2'>
                   <Label className='text-[12px]'>Color</Label>
                   <div className='rounded-xl border border-border'>
-                    <div className='p-2 [&_.react-colorful]:!w-full [&_.react-colorful]:!h-[140px] [&_.react-colorful]:rounded-lg [&_.react-colorful\_\_saturation]:!rounded-t-lg [&_.react-colorful\_\_hue]:!rounded-b-lg [&_.react-colorful\_\_pointer]:!h-5 [&_.react-colorful\_\_pointer]:!w-5'>
-                      <HexColorPicker
-                        color={formColor || '#3B82F6'}
-                        onChange={setFormColor}
-                      />
+                    <div className='p-2 [&_.react-colorful]:!h-[140px] [&_.react-colorful]:!w-full [&_.react-colorful]:rounded-lg [&_.react-colorful\_\_hue]:!rounded-b-lg [&_.react-colorful\_\_pointer]:!h-5 [&_.react-colorful\_\_pointer]:!w-5 [&_.react-colorful\_\_saturation]:!rounded-t-lg'>
+                      <HexColorPicker color={formColor || '#3B82F6'} onChange={setFormColor} />
                     </div>
                     <div className='flex items-center gap-2 border-t border-border bg-bg-secondary/40 px-3 py-2'>
                       <div
@@ -211,9 +273,9 @@ export const SpecOptionsPanel = ({ spec, projectId }: SpecOptionsPanelProps) => 
                       />
                       <input
                         value={formColor}
-                        onChange={(e) => setFormColor(e.target.value)}
+                        onChange={e => setFormColor(e.target.value)}
                         placeholder='#3B82F6'
-                        className='flex-1 bg-transparent font-mono text-[13px] text-foreground outline-none placeholder:text-text-quaternary'
+                        className='placeholder:text-text-quaternary flex-1 bg-transparent font-mono text-[13px] text-foreground outline-none'
                       />
                     </div>
                   </div>
@@ -221,12 +283,28 @@ export const SpecOptionsPanel = ({ spec, projectId }: SpecOptionsPanelProps) => 
               )}
               <div className='flex flex-col gap-1.5'>
                 <Label className='text-[12px]'>Sort Order</Label>
-                <Input type='number' value={formSort} onChange={(e) => setFormSort(Number(e.target.value))} />
+                <Input
+                  type='number'
+                  value={formSort}
+                  onChange={e => setFormSort(Number(e.target.value))}
+                />
               </div>
             </DialogBody>
             <DialogFooter>
-              <Button type='button' variant='outline' onClick={() => { setCreateOpen(false); setEditOption(null) }}>Cancel</Button>
-              <Button type='submit' isPending={editOption ? updateMutation.isPending : createMutation.isPending}>
+              <Button
+                type='button'
+                variant='outline'
+                onClick={() => {
+                  setCreateOpen(false)
+                  setEditOption(null)
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                type='submit'
+                isPending={editOption ? updateMutation.isPending : createMutation.isPending}
+              >
                 {editOption ? 'Save' : 'Create'}
               </Button>
             </DialogFooter>
@@ -235,14 +313,20 @@ export const SpecOptionsPanel = ({ spec, projectId }: SpecOptionsPanelProps) => 
       </Dialog>
 
       {/* ── Delete Option Confirmation ── */}
-      <Dialog open={!!deleteOption} onOpenChange={(v) => !v && setDeleteOption(null)}>
+      <Dialog open={!!deleteOption} onOpenChange={v => !v && setDeleteOption(null)}>
         <DialogContent className='sm:max-w-xs'>
           <DialogHeader>
             <DialogTitle>Delete "{deleteOption?.value}"?</DialogTitle>
           </DialogHeader>
           <DialogFooter>
-            <Button variant='outline' onClick={() => setDeleteOption(null)}>Cancel</Button>
-            <Button variant='destructive' onClick={() => deleteMutation.mutate()} isPending={deleteMutation.isPending}>
+            <Button variant='outline' onClick={() => setDeleteOption(null)}>
+              Cancel
+            </Button>
+            <Button
+              variant='destructive'
+              onClick={() => deleteMutation.mutate()}
+              isPending={deleteMutation.isPending}
+            >
               Delete
             </Button>
           </DialogFooter>
