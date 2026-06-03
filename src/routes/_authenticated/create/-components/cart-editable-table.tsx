@@ -171,9 +171,9 @@ export function CartEditableTable({
                     >
                       {/* Thumbnail */}
                       <td className='w-[36px] py-1.5 pl-5 pr-0'>
-                        <div className='flex h-7 w-7 items-center justify-center overflow-hidden rounded-[4px] bg-bg-secondary'>
+                        <div className='flex size-7 items-center justify-center overflow-hidden rounded-[4px] bg-bg-secondary'>
                           {item.photo ? (
-                            <img src={item.photo} alt={item.name} className='h-7 w-7 object-cover' loading='lazy' />
+                            <img src={item.photo} alt={item.name} className='size-7 object-cover' loading='lazy' />
                           ) : (
                             <Image className='size-3 text-text-quaternary' />
                           )}
@@ -255,9 +255,9 @@ export function CartEditableTable({
                       className='border-b border-border-light animate-pulse'
                     >
                       <td className='w-[36px] py-1.5 pl-5 pr-0'>
-                        <div className='flex h-7 w-7 items-center justify-center overflow-hidden rounded-[4px] bg-bg-secondary'>
+                        <div className='flex size-7 items-center justify-center overflow-hidden rounded-[4px] bg-bg-secondary'>
                           {product?.photo ? (
-                            <img src={product.photo} alt={product.descr_1} className='h-7 w-7 object-cover' loading='lazy' />
+                            <img src={product.photo} alt={product.descr_1} className='size-7 object-cover' loading='lazy' />
                           ) : (
                             <Image className='size-3 text-text-quaternary' />
                           )}

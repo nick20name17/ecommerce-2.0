@@ -1361,7 +1361,7 @@ function ColumnEditor({
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <section className='flex flex-col gap-2 border-b border-border px-3 py-3 last:border-b-0'>
+    <section className='flex flex-col gap-2 border-b border-border p-3 last:border-b-0'>
       <h3 className='text-[11px] font-semibold uppercase tracking-wider text-text-tertiary'>
         {title}
       </h3>
@@ -1546,7 +1546,7 @@ function LayersList({
       </div>
       <div className='max-h-[40vh] overflow-y-auto py-1'>
         {ordered.length === 0 ? (
-          <div className='px-3 py-3 text-[11.5px] italic text-text-tertiary'>
+          <div className='p-3 text-[11.5px] italic text-text-tertiary'>
             Empty page — drag a tool from the palette.
           </div>
         ) : (

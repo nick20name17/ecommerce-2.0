@@ -238,12 +238,12 @@ const SortableStatusRow = ({
           ref={handleRef}
           className='text-text-tertiary cursor-grab touch-none'
         >
-          <GripVertical className='h-4 w-4' />
+          <GripVertical className='size-4' />
         </button>
       )}
 
       <div
-        className='h-3 w-3 shrink-0 rounded-full'
+        className='size-3 shrink-0 rounded-full'
         style={{ backgroundColor: status.color ?? 'var(--status-default)' }}
       />
       <span className='flex-1 text-sm'>{status.name}</span>
@@ -267,11 +267,11 @@ const SortableStatusRow = ({
             <Button
               variant='ghost'
               size='icon'
-              className='h-6 w-6'
+              className='size-6'
               onClick={onDelete}
               disabled={isDeleting}
             >
-              <Trash2 className='h-3 w-3' />
+              <Trash2 className='size-3' />
             </Button>
           )}
         </>
@@ -401,11 +401,11 @@ const AddStatusRow = ({
       <Button
         variant='ghost'
         size='icon'
-        className='h-6 w-6'
+        className='size-6'
         onClick={handleAdd}
         disabled={disabled}
       >
-        <Plus className='h-3 w-3' />
+        <Plus className='size-3' />
       </Button>
     </div>
   )

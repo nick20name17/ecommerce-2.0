@@ -122,7 +122,7 @@ export function PackageCard({
 
       {/* Assigned items */}
       {hasItems && (
-        <div className='border-t border-border/60 px-2 py-2 space-y-0.5'>
+        <div className='border-t border-border/60 p-2 space-y-0.5'>
           {pkg.items.map((autoid) => {
             const item = itemMap.get(autoid)
             if (!item) return null

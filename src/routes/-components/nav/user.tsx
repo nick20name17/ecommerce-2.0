@@ -58,7 +58,7 @@ export const NavUser = () => {
           sideOffset={6}
           style={{ boxShadow: 'var(--dropdown-shadow)' }}
         >
-          <div className='flex items-center gap-2.5 px-2 py-2'>
+          <div className='flex items-center gap-2.5 p-2'>
             <div className='flex size-7 items-center justify-center rounded-full bg-black/[0.08] text-[13px] font-semibold text-text-secondary dark:bg-white/[0.12]'>
               {userInitials}
             </div>

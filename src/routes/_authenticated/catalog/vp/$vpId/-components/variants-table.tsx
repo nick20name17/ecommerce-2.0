@@ -215,7 +215,7 @@ export const VariantsTable = ({ vp, projectId, addProductsOpen, onAddProductsCha
                     </span>
                   </th>
                 ))}
-                <th className='w-8 px-2 py-2' />
+                <th className='w-8 p-2' />
               </tr>
             </thead>
             <tbody>
@@ -300,7 +300,7 @@ export const VariantsTable = ({ vp, projectId, addProductsOpen, onAddProductsCha
                     })}
 
                     {/* Actions */}
-                    <td className='px-2 py-2'>
+                    <td className='p-2'>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button
@@ -575,7 +575,7 @@ function OptionPicker({
         {/* Options list */}
         <div className='max-h-[180px] overflow-y-auto p-1'>
           {filtered.length === 0 ? (
-            <div className='px-2 py-2 text-center text-[11px] text-text-tertiary'>No matches</div>
+            <div className='p-2 text-center text-[11px] text-text-tertiary'>No matches</div>
           ) : (
             filtered.map((opt) => {
               const isActive = opt.id === currentOptionId

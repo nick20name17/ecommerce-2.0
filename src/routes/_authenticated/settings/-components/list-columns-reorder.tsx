@@ -132,7 +132,7 @@ function SortableColumnRow({
         aria-label='Drag to reorder'
         disabled={disabled}
       >
-        <GripVertical className='h-4 w-4' />
+        <GripVertical className='size-4' />
       </button>
       <span className='flex-1 truncate text-[13px]'>{label}</span>
       {label !== field && (
@@ -147,7 +147,7 @@ function SortableColumnRow({
             disabled={disabled}
             aria-label='Remove from list columns'
           >
-            <X className='h-3.5 w-3.5' />
+            <X className='size-3.5' />
           </button>
         </TooltipTrigger>
         <TooltipContent>Remove from list columns</TooltipContent>

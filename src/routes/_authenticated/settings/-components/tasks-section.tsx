@@ -285,7 +285,7 @@ export const TasksSection = ({ projectId }: { projectId: number }) => {
   return (
     <div className='flex min-h-0 flex-1 flex-col'>
       <div className='flex-1 overflow-auto'>
-        <div className='mx-auto max-w-[560px] px-8 py-8'>
+        <div className='mx-auto max-w-[560px] p-8'>
           {isLoading ? (
             <div className='overflow-hidden rounded-[10px] border border-border'>
               {Array.from({ length: 6 }).map((_, i) => (

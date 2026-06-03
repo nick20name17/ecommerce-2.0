@@ -314,7 +314,7 @@ function CommandBarCreateInner({
                 </button>
               </PopoverTrigger>
               <PopoverContent className='w-auto gap-0 p-0' align='start'>
-                <div className='flex flex-col gap-0.5 border-b border-border px-1 py-1'>
+                <div className='flex flex-col gap-0.5 border-b border-border p-1'>
                   {CMD_DATE_PRESETS.map((preset) => {
                     const resolved = preset.getDate()
                     return (

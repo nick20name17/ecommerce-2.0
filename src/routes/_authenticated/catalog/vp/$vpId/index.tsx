@@ -54,7 +54,7 @@ const CatalogVPDetailPage = () => {
     return (
       <div className='flex h-full flex-col overflow-hidden'>
         <div className={cn('flex items-center gap-3 border-b border-border py-3', isMobile ? 'px-3.5' : 'px-6')}>
-          <Skeleton className='h-7 w-7 rounded-md' />
+          <Skeleton className='size-7 rounded-md' />
           <Skeleton className='h-5 w-48 rounded' />
         </div>
         <div className={cn('flex-1', isMobile ? 'p-3.5' : 'p-6')}>
