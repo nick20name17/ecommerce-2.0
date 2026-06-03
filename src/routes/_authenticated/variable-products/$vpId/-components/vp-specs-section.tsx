@@ -1,6 +1,6 @@
 import { useMutation } from '@tanstack/react-query'
 import { MoreHorizontal, Pencil, Plus, Trash2 } from 'lucide-react'
-import { useState } from 'react'
+import { useReducer, useState } from 'react'
 
 import type {
   GlobalSpecDefinition,
@@ -45,18 +45,27 @@ interface VPSpecsSectionProps {
   projectId: number | null
 }
 
+interface SpecForm {
+  name: string
+  displayType: SpecDisplayType
+  sortOrder: number
+}
+
+const SPEC_FORM_INITIAL: SpecForm = { name: '', displayType: 'dropdown', sortOrder: 0 }
+
 export const VPSpecsSection = ({ vp, projectId }: VPSpecsSectionProps) => {
   const [addOpen, setAddOpen] = useState(false)
   const [editSpec, setEditSpec] = useState<GlobalSpecDefinition | null>(null)
   const [deleteSpec, setDeleteSpec] = useState<GlobalSpecDefinition | null>(null)
-  const [specName, setSpecName] = useState('')
-  const [displayType, setDisplayType] = useState<SpecDisplayType>('dropdown')
-  const [sortOrder, setSortOrder] = useState(0)
+  const [form, patchForm] = useReducer(
+    (state: SpecForm, patch: Partial<SpecForm>) => ({ ...state, ...patch }),
+    SPEC_FORM_INITIAL
+  )
 
   const addSpecMutation = useMutation({
     mutationFn: () =>
       variableProductService.createSpec(
-        { name: specName, display_type: displayType, sort_order: sortOrder },
+        { name: form.name, display_type: form.displayType, sort_order: form.sortOrder },
         { project_id: projectId ?? undefined }
       ),
     meta: {
@@ -73,7 +82,7 @@ export const VPSpecsSection = ({ vp, projectId }: VPSpecsSectionProps) => {
     mutationFn: () =>
       variableProductService.updateSpec(
         editSpec!.id,
-        { name: specName, display_type: displayType, sort_order: sortOrder },
+        { name: form.name, display_type: form.displayType, sort_order: form.sortOrder },
         { project_id: projectId ?? undefined }
       ),
     meta: {
@@ -98,16 +107,10 @@ export const VPSpecsSection = ({ vp, projectId }: VPSpecsSectionProps) => {
     onSuccess: () => setDeleteSpec(null)
   })
 
-  const resetForm = () => {
-    setSpecName('')
-    setDisplayType('dropdown')
-    setSortOrder(0)
-  }
+  const resetForm = () => patchForm(SPEC_FORM_INITIAL)
 
   const openEdit = (spec: GlobalSpecDefinition) => {
-    setSpecName(spec.name)
-    setDisplayType(spec.display_type)
-    setSortOrder(spec.sort_order)
+    patchForm({ name: spec.name, displayType: spec.display_type, sortOrder: spec.sort_order })
     setEditSpec(spec)
   }
 
@@ -209,8 +212,8 @@ export const VPSpecsSection = ({ vp, projectId }: VPSpecsSectionProps) => {
                 <Label htmlFor='spec-name'>Name</Label>
                 <Input
                   id='spec-name'
-                  value={specName}
-                  onChange={e => setSpecName(e.target.value)}
+                  value={form.name}
+                  onChange={e => patchForm({ name: e.target.value })}
                   placeholder='e.g. Color, Size'
                   required
                   autoFocus
@@ -219,8 +222,8 @@ export const VPSpecsSection = ({ vp, projectId }: VPSpecsSectionProps) => {
               <div className='flex flex-col gap-1.5'>
                 <Label>Display Type</Label>
                 <Select
-                  value={displayType}
-                  onValueChange={v => setDisplayType(v as SpecDisplayType)}
+                  value={form.displayType}
+                  onValueChange={v => patchForm({ displayType: v as SpecDisplayType })}
                 >
                   <SelectTrigger>
                     <SelectValue />
@@ -239,8 +242,8 @@ export const VPSpecsSection = ({ vp, projectId }: VPSpecsSectionProps) => {
                 <Input
                   id='spec-sort'
                   type='number'
-                  value={sortOrder}
-                  onChange={e => setSortOrder(Number(e.target.value))}
+                  value={form.sortOrder}
+                  onChange={e => patchForm({ sortOrder: Number(e.target.value) })}
                 />
               </div>
             </DialogBody>

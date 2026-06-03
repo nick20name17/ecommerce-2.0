@@ -1,6 +1,6 @@
 import { useMutation } from '@tanstack/react-query'
 import { ArrowLeft, Pencil, Trash2 } from 'lucide-react'
-import { useState } from 'react'
+import { useReducer, useState } from 'react'
 
 import type { VariableProduct, UpdateVariableProductPayload } from '@/api/variable-product/schema'
 import { variableProductService } from '@/api/variable-product/service'
@@ -29,16 +29,28 @@ interface VPHeaderProps {
   isTablet?: boolean
 }
 
+interface VPEditForm {
+  name: string
+  description: string
+  slug: string
+  imageUrl: string
+  status: StatusValue
+  statusExpiresAt: string | null
+}
+
 export const VPHeader = ({ vp, projectId, onBack, isMobile, isTablet }: VPHeaderProps) => {
   const [editOpen, setEditOpen] = useState(false)
   const [deleteOpen, setDeleteOpen] = useState(false)
-  const [name, setName] = useState(vp.name)
-  const [description, setDescription] = useState(vp.description)
-  const [slug, setSlug] = useState(vp.slug)
-  const [imageUrl, setImageUrl] = useState(vp.image_url)
-  const [status, setStatus] = useState<StatusValue>(vp.status ?? '')
-  const [statusExpiresAt, setStatusExpiresAt] = useState<string | null>(
-    vp.status_expires_at ?? null
+  const [form, patchForm] = useReducer(
+    (state: VPEditForm, patch: Partial<VPEditForm>) => ({ ...state, ...patch }),
+    {
+      name: vp.name,
+      description: vp.description,
+      slug: vp.slug,
+      imageUrl: vp.image_url,
+      status: vp.status ?? '',
+      statusExpiresAt: vp.status_expires_at ?? null
+    }
   )
 
   const updateMutation = useMutation({
@@ -144,12 +156,12 @@ export const VPHeader = ({ vp, projectId, onBack, isMobile, isTablet }: VPHeader
             onSubmit={e => {
               e.preventDefault()
               updateMutation.mutate({
-                name,
-                description: description || undefined,
-                slug: slug || undefined,
-                image_url: imageUrl || undefined,
-                status,
-                status_expires_at: statusExpiresAt
+                name: form.name,
+                description: form.description || undefined,
+                slug: form.slug || undefined,
+                image_url: form.imageUrl || undefined,
+                status: form.status,
+                status_expires_at: form.statusExpiresAt
               })
             }}
           >
@@ -161,8 +173,8 @@ export const VPHeader = ({ vp, projectId, onBack, isMobile, isTablet }: VPHeader
                 <Label htmlFor='vp-edit-name'>Name</Label>
                 <Input
                   id='vp-edit-name'
-                  value={name}
-                  onChange={e => setName(e.target.value)}
+                  value={form.name}
+                  onChange={e => patchForm({ name: e.target.value })}
                   required
                 />
               </div>
@@ -170,27 +182,31 @@ export const VPHeader = ({ vp, projectId, onBack, isMobile, isTablet }: VPHeader
                 <Label htmlFor='vp-edit-desc'>Description</Label>
                 <Input
                   id='vp-edit-desc'
-                  value={description}
-                  onChange={e => setDescription(e.target.value)}
+                  value={form.description}
+                  onChange={e => patchForm({ description: e.target.value })}
                 />
               </div>
               <div className='flex flex-col gap-1.5'>
                 <Label htmlFor='vp-edit-slug'>Slug</Label>
-                <Input id='vp-edit-slug' value={slug} onChange={e => setSlug(e.target.value)} />
+                <Input
+                  id='vp-edit-slug'
+                  value={form.slug}
+                  onChange={e => patchForm({ slug: e.target.value })}
+                />
               </div>
               <div className='flex flex-col gap-1.5'>
                 <Label htmlFor='vp-edit-image'>Image URL</Label>
                 <Input
                   id='vp-edit-image'
-                  value={imageUrl}
-                  onChange={e => setImageUrl(e.target.value)}
+                  value={form.imageUrl}
+                  onChange={e => patchForm({ imageUrl: e.target.value })}
                 />
               </div>
               <StatusEditor
-                status={status}
-                expiresAt={statusExpiresAt}
-                onStatusChange={setStatus}
-                onExpiresAtChange={setStatusExpiresAt}
+                status={form.status}
+                expiresAt={form.statusExpiresAt}
+                onStatusChange={status => patchForm({ status })}
+                onExpiresAtChange={statusExpiresAt => patchForm({ statusExpiresAt })}
               />
             </DialogBody>
             <DialogFooter>
