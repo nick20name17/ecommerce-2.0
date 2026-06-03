@@ -74,7 +74,7 @@ export function App() {
         {/* Mobile hamburger */}
         <button
           onClick={() => setSidebarOpen(!sidebarOpen)}
-          className="mr-3 flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground lg:hidden"
+          className="mr-3 flex size-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground lg:hidden"
           aria-label="Toggle sidebar"
         >
           {sidebarOpen ? <X size={18} /> : <Menu size={18} />}
@@ -82,7 +82,7 @@ export function App() {
 
         {/* Logo */}
         <div className="flex items-center gap-2.5">
-          <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-accent text-primary-foreground">
+          <div className="flex size-7 items-center justify-center rounded-lg bg-accent text-primary-foreground">
             <BookOpen size={14} />
           </div>
           <span className="text-sm font-semibold tracking-tight">EBMS Docs</span>
@@ -102,7 +102,7 @@ export function App() {
         {/* Dark mode toggle */}
         <button
           onClick={() => setDark(!dark)}
-          className="flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+          className="flex size-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
           aria-label="Toggle dark mode"
         >
           {dark ? <Sun size={16} /> : <Moon size={16} />}

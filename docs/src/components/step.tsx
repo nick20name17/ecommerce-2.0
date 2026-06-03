@@ -19,7 +19,7 @@ export function Step({ number, title, children }: StepProps) {
       <div className="absolute top-10 bottom-0 left-[15px] w-px bg-border last:hidden" />
 
       {/* Numbered circle */}
-      <div className="relative z-10 flex h-8 w-8 shrink-0 items-center justify-center rounded-full border-2 border-accent bg-background text-xs font-bold text-accent">
+      <div className="relative z-10 flex size-8 shrink-0 items-center justify-center rounded-full border-2 border-accent bg-background text-xs font-bold text-accent">
         {number}
       </div>
 

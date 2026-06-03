@@ -22,7 +22,7 @@ export function VideoSlot({ title, description }: VideoSlotProps) {
 
         {/* Play button and text */}
         <div className="relative flex flex-col items-center gap-3">
-          <div className="flex h-14 w-14 items-center justify-center rounded-full bg-accent/10 text-accent transition-colors">
+          <div className="flex size-14 items-center justify-center rounded-full bg-accent/10 text-accent transition-colors">
             <Play size={24} className="ml-0.5" fill="currentColor" />
           </div>
           <div className="text-center">
