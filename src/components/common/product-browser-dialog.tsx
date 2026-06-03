@@ -305,10 +305,11 @@ function ProductList({
   const [offset, setOffset] = useState(0)
   const limit = 50
 
-  // Reset offset when filters change
-  useEffect(() => {
+  const [prevFilters, setPrevFilters] = useState({ categoryId, search })
+  if (prevFilters.categoryId !== categoryId || prevFilters.search !== search) {
+    setPrevFilters({ categoryId, search })
     setOffset(0)
-  }, [categoryId, search])
+  }
 
   const { data, isLoading } = useQuery({
     queryKey: ['product-browse', projectId, categoryId, search, offset],

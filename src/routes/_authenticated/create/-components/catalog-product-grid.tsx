@@ -10,7 +10,7 @@ import {
   Settings2,
   X
 } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useDebouncedCallback } from 'use-debounce'
 
 import { PageEmpty } from '@/components/common/page-empty'
@@ -44,9 +44,11 @@ export const CatalogProductGrid = ({
 
   const updateDebouncedSearch = useDebouncedCallback((q: string) => setDebouncedSearch(q), 250)
 
-  useEffect(() => {
+  const [prevFilters, setPrevFilters] = useState({ categoryId, debouncedSearch })
+  if (prevFilters.categoryId !== categoryId || prevFilters.debouncedSearch !== debouncedSearch) {
+    setPrevFilters({ categoryId, debouncedSearch })
     setOffset(0)
-  }, [categoryId, debouncedSearch])
+  }
 
   const params = {
     limit: DEFAULT_LIMIT,

@@ -68,8 +68,11 @@ export const GlobalSearch = () => {
     }))
   ]
 
-  // Reset active index when results change
-  useEffect(() => setActiveIdx(0), [results.length])
+  const [prevResultCount, setPrevResultCount] = useState(results.length)
+  if (prevResultCount !== results.length) {
+    setPrevResultCount(results.length)
+    setActiveIdx(0)
+  }
 
   // Scroll active result into view on keyboard navigation
   useEffect(() => {

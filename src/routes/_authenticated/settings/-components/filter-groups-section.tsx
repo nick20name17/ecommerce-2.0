@@ -12,7 +12,7 @@ import {
   Users,
   X
 } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
 import { FILTER_PRESET_QUERY_KEYS, getFilterPresetsQuery } from '@/api/filter-preset/query'
 import type {
@@ -511,11 +511,6 @@ function FilterPresetDialog({
     }, [])
   const entityFields = [...configFields, ...extraFields]
 
-  // Reset rows when entity type changes (only for new presets)
-  useEffect(() => {
-    if (isNew) setRows([])
-  }, [entityType, isNew])
-
   const addRow = () => {
     const firstField = entityFields[0]?.field ?? 'status'
     setRows(prev => [...prev, { id: `r-${Date.now()}`, field: firstField, op: 'eq', value: '' }])
@@ -648,7 +643,12 @@ function FilterPresetDialog({
                             ? 'border-primary/30 bg-primary/[0.08] text-primary'
                             : 'border-border bg-background text-text-secondary hover:bg-bg-hover'
                         )}
-                        onClick={() => setEntityType(e)}
+                        onClick={() => {
+                          if (e !== entityType) {
+                            setEntityType(e)
+                            if (isNew) setRows([])
+                          }
+                        }}
                       >
                         <Icon className='size-3.5' />
                         {cfg.pluralLabel}
