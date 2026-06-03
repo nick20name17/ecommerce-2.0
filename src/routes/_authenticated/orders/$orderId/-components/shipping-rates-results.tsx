@@ -50,7 +50,7 @@ export function RatesResultStep({
             {data.packages.map((pkg, i) => (
               <div
                 key={i}
-                className='rounded-[6px] border border-border-light bg-bg-secondary/50 px-3 py-2'
+                className='rounded-md border border-border-light bg-bg-secondary/50 px-3 py-2'
               >
                 <div className='flex items-center gap-2'>
                   <Package className='size-3.5 text-text-tertiary' />
@@ -97,7 +97,7 @@ export function RateCard({
     <button
       type='button'
       className={cn(
-        'flex w-full items-center gap-3 rounded-[6px] border px-3 py-2.5 text-left transition-colors duration-75',
+        'flex w-full items-center gap-3 rounded-md border px-3 py-2.5 text-left transition-colors duration-75',
         selected
           ? 'border-primary bg-primary/[0.06]'
           : 'border-border hover:border-primary/40 hover:bg-primary/[0.04]'

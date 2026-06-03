@@ -83,10 +83,7 @@ export const DashboardKpis = ({ metrics }: DashboardKpisProps) => {
                 <div className='text-text-quaternary mt-0.5 text-[11px]'>{config.subtitle}</div>
               </div>
               <div
-                className={cn(
-                  'flex size-8 items-center justify-center rounded-[8px]',
-                  config.iconBg
-                )}
+                className={cn('flex size-8 items-center justify-center rounded-lg', config.iconBg)}
               >
                 <Icon className={cn('size-4', config.iconColor)} strokeWidth={2} />
               </div>

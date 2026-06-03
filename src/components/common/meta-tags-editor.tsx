@@ -77,7 +77,7 @@ export const MetaTagsEditor = ({ entityType, entityId, projectId }: MetaTagsEdit
             <Pencil className='size-2.5 shrink-0 opacity-0 group-hover:opacity-100' />
           </button>
           {hasMeta && data!.meta_description && (
-            <p className='text-text-quaternary truncate pl-[18px] text-[11px]'>
+            <p className='text-text-quaternary truncate pl-4.5 text-[11px]'>
               {data!.meta_description}
             </p>
           )}

@@ -113,7 +113,7 @@ export const CustomerDashboardTab = ({ customerId, projectId }: CustomerDashboar
           return (
             <div
               key={config.key}
-              className='rounded-[8px] border border-border bg-background px-3 py-3 sm:px-4 sm:py-4'
+              className='rounded-lg border border-border bg-background px-3 py-3 sm:px-4 sm:py-4'
             >
               <div className='truncate text-[11px] font-medium tracking-[0.04em] text-text-tertiary uppercase sm:text-[12px]'>
                 {config.title}
@@ -143,7 +143,7 @@ export const CustomerDashboardTab = ({ customerId, projectId }: CustomerDashboar
       </div>
 
       {/* Orders chart */}
-      <div className='rounded-[8px] border border-border bg-background'>
+      <div className='rounded-lg border border-border bg-background'>
         <div className='flex flex-wrap items-center gap-2 px-4 py-3 sm:gap-2.5'>
           <h2 className='text-[13px] font-semibold sm:text-[14px]'>
             Orders — this month vs last month
@@ -168,7 +168,7 @@ function DashboardSkeleton() {
         {Array.from({ length: 6 }).map((_, i) => (
           <div
             key={i}
-            className='rounded-[8px] border border-border bg-background px-3 py-3 sm:px-4 sm:py-4'
+            className='rounded-lg border border-border bg-background px-3 py-3 sm:px-4 sm:py-4'
           >
             <Skeleton className='h-3 w-16' />
             <Skeleton className='mt-2.5 h-6 w-14' />
@@ -176,13 +176,13 @@ function DashboardSkeleton() {
         ))}
       </div>
       {/* Chart skeleton */}
-      <div className='rounded-[8px] border border-border bg-background'>
+      <div className='rounded-lg border border-border bg-background'>
         <div className='flex items-center gap-2.5 px-4 py-3'>
           <Skeleton className='h-4 w-48' />
         </div>
         <div className='space-y-3 p-4'>
-          <Skeleton className='h-8 w-full rounded-[6px]' />
-          <Skeleton className='h-8 w-1/4 rounded-[6px]' />
+          <Skeleton className='h-8 w-full rounded-md' />
+          <Skeleton className='h-8 w-1/4 rounded-md' />
         </div>
       </div>
     </div>

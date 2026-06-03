@@ -30,7 +30,7 @@ export function PresetPicker({ entityType, value, onChange }: PresetPickerProps)
           type='button'
           className={cn(
             'inline-flex h-7 items-center gap-1 rounded-[5px] border px-2 text-[13px] font-medium',
-            'transition-colors duration-[80ms] hover:bg-bg-hover',
+            'transition-colors duration-80 hover:bg-bg-hover',
             value != null
               ? 'border-primary/30 bg-primary/5 text-foreground'
               : 'border-border bg-background text-text-secondary'
@@ -41,7 +41,7 @@ export function PresetPicker({ entityType, value, onChange }: PresetPickerProps)
         </button>
       </PopoverTrigger>
       <PopoverContent
-        className='w-[220px] gap-0 overflow-hidden rounded-[8px] border-border p-1'
+        className='w-55 gap-0 overflow-hidden rounded-lg border-border p-1'
         align='start'
         style={{ boxShadow: 'var(--dropdown-shadow)' }}
       >
@@ -50,8 +50,8 @@ export function PresetPicker({ entityType, value, onChange }: PresetPickerProps)
           <button
             type='button'
             className={cn(
-              'flex w-full items-center gap-2 rounded-[5px] px-2 py-[5px] text-left text-[13px] font-medium',
-              'text-text-tertiary transition-colors duration-[80ms] hover:bg-bg-hover'
+              'flex w-full items-center gap-2 rounded-[5px] px-2 py-1.25 text-left text-[13px] font-medium',
+              'text-text-tertiary transition-colors duration-80 hover:bg-bg-hover'
             )}
             onClick={() => onChange(null)}
           >
@@ -66,14 +66,14 @@ export function PresetPicker({ entityType, value, onChange }: PresetPickerProps)
               key={preset.id}
               type='button'
               className={cn(
-                'flex w-full items-center gap-2 rounded-[5px] px-2 py-[5px] text-left text-[13px] font-medium',
-                'transition-colors duration-[80ms] hover:bg-bg-hover'
+                'flex w-full items-center gap-2 rounded-[5px] px-2 py-1.25 text-left text-[13px] font-medium',
+                'transition-colors duration-80 hover:bg-bg-hover'
               )}
               onClick={() => onChange(isSelected ? null : preset.id)}
             >
               <div
                 className={cn(
-                  'flex size-3.5 items-center justify-center rounded-full border transition-colors duration-[80ms]',
+                  'flex size-3.5 items-center justify-center rounded-full border transition-colors duration-80',
                   isSelected ? 'border-primary bg-primary' : 'border-border'
                 )}
               >

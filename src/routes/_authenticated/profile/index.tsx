@@ -25,7 +25,7 @@ const ProfilePage = () => {
       </header>
 
       <div className='flex-1 overflow-y-auto'>
-        <div className='mx-auto max-w-[560px] px-4 py-6'>
+        <div className='mx-auto max-w-140 px-4 py-6'>
           <div className='overflow-hidden rounded-[10px] border border-border bg-background'>
             <ProfileInfoCard user={user} />
             <div className='border-t border-border'>

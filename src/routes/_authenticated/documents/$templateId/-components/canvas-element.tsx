@@ -259,7 +259,7 @@ export function CanvasElement({
         onSelect()
       }}
       className={cn(
-        'cursor-move transition-shadow duration-[80ms] select-none',
+        'cursor-move transition-shadow duration-80 select-none',
         isSelected
           ? 'outline outline-2 outline-primary'
           : 'outline outline-1 outline-transparent hover:outline-primary/40'

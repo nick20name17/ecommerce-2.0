@@ -166,7 +166,7 @@ function NewDocumentPage() {
         <SidebarTrigger className='-ml-1' />
         <button
           type='button'
-          className='inline-flex h-7 shrink-0 items-center gap-0.5 rounded-[6px] border border-border bg-bg-secondary pr-2.5 pl-1.5 text-[13px] font-medium text-text-secondary transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground'
+          className='inline-flex h-7 shrink-0 items-center gap-0.5 rounded-md border border-border bg-bg-secondary pr-2.5 pl-1.5 text-[13px] font-medium text-text-secondary transition-colors duration-80 hover:bg-bg-active hover:text-foreground'
           onClick={() => navigate({ to: '/documents' })}
         >
           <ArrowLeft className='size-3.5' />
@@ -197,7 +197,7 @@ function NewDocumentPage() {
                     type='button'
                     onClick={() => handlePresetChange(p.key)}
                     className={cn(
-                      'flex flex-col items-start gap-1 rounded-[8px] border p-3 text-left transition-colors duration-[80ms]',
+                      'flex flex-col items-start gap-1 rounded-lg border p-3 text-left transition-colors duration-80',
                       isActive
                         ? 'border-primary bg-primary/[0.06] text-foreground'
                         : 'border-border bg-bg-secondary text-text-secondary hover:bg-bg-active hover:text-foreground'
@@ -224,7 +224,7 @@ function NewDocumentPage() {
               value={name}
               onChange={e => setName(e.target.value)}
               placeholder='e.g. Plain Paper Invoice'
-              className='h-9 rounded-[6px] border border-border bg-background px-2.5 text-[13px] text-foreground transition-colors duration-[80ms] outline-none focus:border-primary focus:ring-2 focus:ring-primary/20'
+              className='h-9 rounded-md border border-border bg-background px-2.5 text-[13px] text-foreground transition-colors duration-80 outline-none focus:border-primary focus:ring-2 focus:ring-primary/20'
               autoFocus
               required
               maxLength={120}
@@ -241,7 +241,7 @@ function NewDocumentPage() {
               value={description}
               onChange={e => setDescription(e.target.value)}
               placeholder='What is this template used for?'
-              className='min-h-16 resize-y rounded-[6px] border border-border bg-background px-2.5 py-1.5 text-[13px] text-foreground transition-colors duration-[80ms] outline-none focus:border-primary focus:ring-2 focus:ring-primary/20'
+              className='min-h-16 resize-y rounded-md border border-border bg-background px-2.5 py-1.5 text-[13px] text-foreground transition-colors duration-80 outline-none focus:border-primary focus:ring-2 focus:ring-primary/20'
               maxLength={500}
             />
           </div>
@@ -263,7 +263,7 @@ function NewDocumentPage() {
                     type='button'
                     onClick={() => handleEntityChange(c.value)}
                     className={cn(
-                      'flex flex-col items-start gap-1.5 rounded-[8px] border p-3 text-left transition-colors duration-[80ms]',
+                      'flex flex-col items-start gap-1.5 rounded-lg border p-3 text-left transition-colors duration-80',
                       isActive
                         ? 'border-primary bg-primary/[0.06] text-foreground'
                         : 'border-border bg-bg-secondary text-text-secondary hover:bg-bg-active hover:text-foreground'
@@ -293,7 +293,7 @@ function NewDocumentPage() {
                   <label
                     key={r.value}
                     className={cn(
-                      'flex cursor-pointer items-center gap-2.5 rounded-[6px] border px-3 py-2 transition-colors duration-[80ms]',
+                      'flex cursor-pointer items-center gap-2.5 rounded-md border px-3 py-2 transition-colors duration-80',
                       checked
                         ? 'border-primary bg-primary/[0.06]'
                         : 'border-border bg-bg-secondary hover:bg-bg-active'
@@ -317,14 +317,14 @@ function NewDocumentPage() {
             <button
               type='button'
               onClick={() => navigate({ to: '/documents' })}
-              className='inline-flex h-8 items-center rounded-[6px] border border-border bg-bg-secondary px-3 text-[12.5px] font-medium text-text-secondary transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground'
+              className='inline-flex h-8 items-center rounded-md border border-border bg-bg-secondary px-3 text-[12.5px] font-medium text-text-secondary transition-colors duration-80 hover:bg-bg-active hover:text-foreground'
             >
               Cancel
             </button>
             <button
               type='submit'
               disabled={!canSubmit}
-              className='inline-flex h-8 items-center rounded-[6px] bg-primary px-3 text-[12.5px] font-medium text-primary-foreground transition-colors duration-[80ms] hover:bg-primary/90 disabled:pointer-events-none disabled:opacity-50'
+              className='inline-flex h-8 items-center rounded-md bg-primary px-3 text-[12.5px] font-medium text-primary-foreground transition-colors duration-80 hover:bg-primary/90 disabled:pointer-events-none disabled:opacity-50'
             >
               {createMutation.isPending ? 'Creating…' : 'Create template'}
             </button>

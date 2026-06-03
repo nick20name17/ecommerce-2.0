@@ -97,7 +97,7 @@ export const UsersSection = () => {
     <div className='flex min-h-0 flex-1 flex-col'>
       {/* Toolbar */}
       <div className='flex shrink-0 items-center gap-2 border-b border-border px-6 py-1.5'>
-        <div className='flex h-7 w-[220px] items-center gap-1.5 rounded-[5px] border border-border bg-background px-2 transition-[border-color,box-shadow] focus-within:border-ring focus-within:ring-2 focus-within:ring-ring/50'>
+        <div className='flex h-7 w-55 items-center gap-1.5 rounded-[5px] border border-border bg-background px-2 transition-[border-color,box-shadow] focus-within:border-ring focus-within:ring-2 focus-within:ring-ring/50'>
           <Search className='size-3 shrink-0 text-text-tertiary' />
           <input
             defaultValue={search}
@@ -109,7 +109,7 @@ export const UsersSection = () => {
         <div className='flex-1' />
         <button
           type='button'
-          className='inline-flex h-7 items-center gap-1 rounded-[5px] bg-primary px-2.5 text-[13px] font-semibold text-primary-foreground transition-opacity duration-[80ms] hover:opacity-90'
+          className='inline-flex h-7 items-center gap-1 rounded-[5px] bg-primary px-2.5 text-[13px] font-semibold text-primary-foreground transition-opacity duration-80 hover:opacity-90'
           onClick={() => setModalUser('create')}
         >
           <Plus className='size-3.5' />
@@ -119,19 +119,19 @@ export const UsersSection = () => {
 
       {/* Table header */}
       <div className='sticky top-0 z-10 flex shrink-0 items-center gap-4 border-b border-border bg-bg-secondary px-6 py-1.5'>
-        <div className='min-w-0 flex-1 text-[11px] font-semibold tracking-[0.05em] text-text-tertiary uppercase'>
+        <div className='min-w-0 flex-1 text-[11px] font-semibold tracking-wider text-text-tertiary uppercase'>
           User
         </div>
-        <div className='hidden min-w-0 flex-1 text-[11px] font-semibold tracking-[0.05em] text-text-tertiary uppercase sm:block'>
+        <div className='hidden min-w-0 flex-1 text-[11px] font-semibold tracking-wider text-text-tertiary uppercase sm:block'>
           Email
         </div>
-        <div className='w-[80px] shrink-0 text-[11px] font-semibold tracking-[0.05em] text-text-tertiary uppercase'>
+        <div className='w-20 shrink-0 text-[11px] font-semibold tracking-wider text-text-tertiary uppercase'>
           Role
         </div>
-        <div className='w-[60px] shrink-0 text-center text-[11px] font-semibold tracking-[0.05em] text-text-tertiary uppercase'>
+        <div className='w-15 shrink-0 text-center text-[11px] font-semibold tracking-wider text-text-tertiary uppercase'>
           Active
         </div>
-        <div className='w-[56px] shrink-0' />
+        <div className='w-14 shrink-0' />
       </div>
 
       {/* Table body */}
@@ -150,13 +150,13 @@ export const UsersSection = () => {
                 <div className='hidden min-w-0 flex-1 sm:block'>
                   <Skeleton className='h-3.5 w-36' />
                 </div>
-                <div className='w-[80px] shrink-0'>
-                  <Skeleton className='h-5 w-14 rounded-[4px]' />
+                <div className='w-20 shrink-0'>
+                  <Skeleton className='h-5 w-14 rounded-sm' />
                 </div>
-                <div className='flex w-[60px] shrink-0 justify-center'>
+                <div className='flex w-15 shrink-0 justify-center'>
                   <Skeleton className='h-5 w-9 rounded-full' />
                 </div>
-                <div className='w-[56px] shrink-0' />
+                <div className='w-14 shrink-0' />
               </div>
             ))}
           </div>
@@ -189,7 +189,7 @@ export const UsersSection = () => {
                     {fullName}
                   </span>
                   {isSelf && (
-                    <span className='shrink-0 rounded-[4px] bg-primary/10 px-1.5 py-[1px] text-[10px] font-semibold text-primary'>
+                    <span className='shrink-0 rounded-sm bg-primary/10 px-1.5 py-px text-[10px] font-semibold text-primary'>
                       You
                     </span>
                   )}
@@ -201,22 +201,22 @@ export const UsersSection = () => {
                 </div>
 
                 {/* Role */}
-                <div className='w-[80px] shrink-0'>
+                <div className='w-20 shrink-0'>
                   <RoleBadge role={user.role} />
                 </div>
 
                 {/* Active toggle */}
-                <div className='flex w-[60px] shrink-0 justify-center'>
+                <div className='flex w-15 shrink-0 justify-center'>
                   <UserStatusToggle user={user} currentUserId={currentUser?.id} />
                 </div>
 
                 {/* Actions */}
-                <div className='flex w-[56px] shrink-0 items-center justify-end gap-1 opacity-0 transition-opacity duration-75 group-hover/row:opacity-100'>
+                <div className='flex w-14 shrink-0 items-center justify-end gap-1 opacity-0 transition-opacity duration-75 group-hover/row:opacity-100'>
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <button
                         type='button'
-                        className='text-text-quaternary inline-flex size-7 items-center justify-center rounded-[6px] transition-colors duration-75 hover:bg-bg-active hover:text-foreground'
+                        className='text-text-quaternary inline-flex size-7 items-center justify-center rounded-md transition-colors duration-75 hover:bg-bg-active hover:text-foreground'
                         onClick={() => setModalUser(user)}
                       >
                         <Pencil className='size-3.5' />
@@ -229,7 +229,7 @@ export const UsersSection = () => {
                       <TooltipTrigger asChild>
                         <button
                           type='button'
-                          className='text-text-quaternary inline-flex size-7 items-center justify-center rounded-[6px] transition-colors duration-75 hover:bg-destructive/10 hover:text-destructive'
+                          className='text-text-quaternary inline-flex size-7 items-center justify-center rounded-md transition-colors duration-75 hover:bg-destructive/10 hover:text-destructive'
                           onClick={() => setDeleteUser(user)}
                         >
                           <Trash2 className='size-3.5' />

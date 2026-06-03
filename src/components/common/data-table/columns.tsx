@@ -13,7 +13,7 @@ export const createExpanderColumn = <TData,>(): AccessorKeyColumnDef<TData> => (
       <div className='flex items-center justify-center'>
         <button
           type='button'
-          className='inline-flex size-6 items-center justify-center rounded-[5px] text-text-tertiary transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground'
+          className='inline-flex size-6 items-center justify-center rounded-[5px] text-text-tertiary transition-colors duration-80 hover:bg-bg-active hover:text-foreground'
           onClick={row.getToggleExpandedHandler()}
         >
           <ChevronDown

@@ -22,7 +22,7 @@ export function PickBadge({ pickStatus }: { pickStatus?: string }) {
       <TooltipTrigger asChild>
         <span
           className={cn(
-            'inline-flex items-center gap-1 rounded-[4px] px-1.5 py-0.5 text-[11px] leading-none font-semibold tabular-nums',
+            'inline-flex items-center gap-1 rounded-sm px-1.5 py-0.5 text-[11px] leading-none font-semibold tabular-nums',
             allPicked
               ? 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400'
               : picked > 0
@@ -60,7 +60,7 @@ export function PackedBadge({ packedStatus }: { packedStatus?: string }) {
       <TooltipTrigger asChild>
         <span
           className={cn(
-            'inline-flex items-center gap-1 rounded-[4px] px-1.5 py-0.5 text-[11px] leading-none font-semibold tabular-nums',
+            'inline-flex items-center gap-1 rounded-sm px-1.5 py-0.5 text-[11px] leading-none font-semibold tabular-nums',
             allPacked
               ? 'bg-violet-500/10 text-violet-700 dark:text-violet-400'
               : 'bg-violet-500/10 text-violet-600 dark:text-violet-400'

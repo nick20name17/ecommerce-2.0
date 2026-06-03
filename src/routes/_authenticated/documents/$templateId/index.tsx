@@ -302,7 +302,7 @@ function DocumentEditorPage() {
         <SidebarTrigger className='-ml-1' />
         <button
           type='button'
-          className='inline-flex h-7 shrink-0 items-center gap-0.5 rounded-[6px] border border-border bg-bg-secondary pr-2.5 pl-1.5 text-[13px] font-medium text-text-secondary transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground'
+          className='inline-flex h-7 shrink-0 items-center gap-0.5 rounded-md border border-border bg-bg-secondary pr-2.5 pl-1.5 text-[13px] font-medium text-text-secondary transition-colors duration-80 hover:bg-bg-active hover:text-foreground'
           onClick={() => navigate({ to: '/documents' })}
         >
           <ArrowLeft className='size-3.5' />
@@ -330,7 +330,7 @@ function DocumentEditorPage() {
             disabled={!canUndo}
             onClick={undo}
             title='Undo (⌘Z)'
-            className='inline-flex size-7 items-center justify-center rounded-l-[5px] border border-r-0 border-border bg-bg-secondary text-text-secondary transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground disabled:pointer-events-none disabled:opacity-40'
+            className='inline-flex size-7 items-center justify-center rounded-l-[5px] border border-r-0 border-border bg-bg-secondary text-text-secondary transition-colors duration-80 hover:bg-bg-active hover:text-foreground disabled:pointer-events-none disabled:opacity-40'
           >
             <Undo2 className='size-3.5' />
           </button>
@@ -339,7 +339,7 @@ function DocumentEditorPage() {
             disabled={!canRedo}
             onClick={redo}
             title='Redo (⌘⇧Z)'
-            className='inline-flex size-7 items-center justify-center rounded-r-[5px] border border-border bg-bg-secondary text-text-secondary transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground disabled:pointer-events-none disabled:opacity-40'
+            className='inline-flex size-7 items-center justify-center rounded-r-[5px] border border-border bg-bg-secondary text-text-secondary transition-colors duration-80 hover:bg-bg-active hover:text-foreground disabled:pointer-events-none disabled:opacity-40'
           >
             <Redo2 className='size-3.5' />
           </button>
@@ -350,7 +350,7 @@ function DocumentEditorPage() {
             <button
               type='button'
               title='Apply a preset (replaces current layout)'
-              className='inline-flex size-7 items-center justify-center rounded-[5px] border border-border bg-bg-secondary text-text-secondary transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground lg:h-7 lg:w-auto lg:gap-1.5 lg:px-2.5'
+              className='inline-flex size-7 items-center justify-center rounded-[5px] border border-border bg-bg-secondary text-text-secondary transition-colors duration-80 hover:bg-bg-active hover:text-foreground lg:h-7 lg:w-auto lg:gap-1.5 lg:px-2.5'
             >
               <Sparkles className='size-3.5 text-indigo-500' />
               <span className='hidden lg:inline'>Apply preset</span>
@@ -407,7 +407,7 @@ function DocumentEditorPage() {
             })
           }
           disabled={saveMutation.isPending || !isDirty}
-          className='inline-flex size-7 items-center justify-center rounded-[5px] bg-primary text-primary-foreground transition-colors duration-[80ms] hover:bg-primary/90 disabled:opacity-50 lg:h-7 lg:w-auto lg:gap-1.5 lg:px-2.5'
+          className='inline-flex size-7 items-center justify-center rounded-[5px] bg-primary text-primary-foreground transition-colors duration-80 hover:bg-primary/90 disabled:opacity-50 lg:h-7 lg:w-auto lg:gap-1.5 lg:px-2.5'
         >
           <Save className='size-3.5' />
           <span className='hidden lg:inline'>
@@ -421,7 +421,7 @@ function DocumentEditorPage() {
               deleteMutation.mutate()
             }
           }}
-          className='inline-flex size-7 items-center justify-center rounded-[5px] text-text-tertiary transition-colors duration-[80ms] hover:bg-bg-hover hover:text-destructive'
+          className='inline-flex size-7 items-center justify-center rounded-[5px] text-text-tertiary transition-colors duration-80 hover:bg-bg-hover hover:text-destructive'
         >
           <Trash2 className='size-3.5' />
         </button>
@@ -430,7 +430,7 @@ function DocumentEditorPage() {
       {/* Body — properties form + designer canvas placeholder */}
       <div className='flex min-h-0 flex-1 overflow-hidden'>
         {/* Properties sidebar */}
-        <aside className='hidden w-[280px] shrink-0 flex-col gap-4 overflow-y-auto border-r border-border bg-bg-secondary/40 px-4 py-5 md:flex'>
+        <aside className='hidden w-70 shrink-0 flex-col gap-4 overflow-y-auto border-r border-border bg-bg-secondary/40 px-4 py-5 md:flex'>
           <PropField label='Name'>
             <input
               type='text'
@@ -473,7 +473,7 @@ function DocumentEditorPage() {
                   type='button'
                   onClick={() => setOrientation(o)}
                   className={cn(
-                    'h-7 flex-1 text-[11.5px] font-medium capitalize transition-colors duration-[80ms]',
+                    'h-7 flex-1 text-[11.5px] font-medium capitalize transition-colors duration-80',
                     orientation === o
                       ? 'bg-primary text-primary-foreground'
                       : 'text-text-secondary hover:bg-bg-active hover:text-foreground'
@@ -506,7 +506,7 @@ function DocumentEditorPage() {
                         [side]: Number.isFinite(v) && v >= 0 ? v : 0
                       })
                     }}
-                    className='h-7 w-full rounded-[4px] border border-border bg-background px-1.5 text-[11.5px] outline-none focus:border-primary focus:ring-1 focus:ring-primary/20'
+                    className='h-7 w-full rounded-sm border border-border bg-background px-1.5 text-[11.5px] outline-none focus:border-primary focus:ring-1 focus:ring-primary/20'
                   />
                 </label>
               ))}
@@ -594,15 +594,15 @@ function EditorSkeleton() {
       <header className='flex h-12 shrink-0 items-center gap-2.5 border-b border-border px-3.5 sm:px-6'>
         <Skeleton className='size-5' />
         <Skeleton className='h-6 w-20' />
-        <Skeleton className='size-5 rounded-[6px]' />
+        <Skeleton className='size-5 rounded-md' />
         <Skeleton className='h-4 w-40' />
       </header>
       <div className='flex flex-1'>
-        <aside className='hidden w-[280px] border-r border-border p-4 md:block'>
+        <aside className='hidden w-70 border-r border-border p-4 md:block'>
           <Skeleton className='h-32 w-full' />
         </aside>
         <div className='flex-1 p-8'>
-          <Skeleton className='h-full w-full rounded-[12px]' />
+          <Skeleton className='h-full w-full rounded-xl' />
         </div>
       </div>
     </div>
@@ -619,7 +619,7 @@ function NotFound({ onBack }: { onBack: () => void }) {
       <button
         type='button'
         onClick={onBack}
-        className='mt-2 inline-flex h-8 items-center gap-1.5 rounded-[6px] border border-border bg-bg-secondary px-3 text-[12.5px] font-medium text-text-secondary hover:bg-bg-active hover:text-foreground'
+        className='mt-2 inline-flex h-8 items-center gap-1.5 rounded-md border border-border bg-bg-secondary px-3 text-[12.5px] font-medium text-text-secondary hover:bg-bg-active hover:text-foreground'
       >
         <ArrowLeft className='size-3.5' />
         Back to Documents
@@ -792,7 +792,7 @@ function TestEntityPicker({
           type='button'
           title='Pick a real entity to preview field values'
           className={cn(
-            'inline-flex h-7 max-w-[200px] items-center gap-1.5 truncate rounded-[5px] border px-2.5 text-[12px] font-medium transition-colors duration-[80ms] disabled:pointer-events-none disabled:opacity-50',
+            'inline-flex h-7 max-w-50 items-center gap-1.5 truncate rounded-[5px] border px-2.5 text-[12px] font-medium transition-colors duration-80 disabled:pointer-events-none disabled:opacity-50',
             value
               ? 'border-primary/30 bg-primary/[0.06] text-primary hover:bg-primary/[0.1]'
               : 'border-border bg-bg-secondary text-text-secondary hover:bg-bg-active hover:text-foreground'
@@ -817,7 +817,7 @@ function TestEntityPicker({
           )}
         </button>
       </PopoverTrigger>
-      <PopoverContent align='end' className='w-[300px] p-0'>
+      <PopoverContent align='end' className='w-75 p-0'>
         <div className='flex items-center gap-2 border-b border-border px-2.5 py-1.5'>
           <Search className='size-3.5 text-text-tertiary' />
           <input
@@ -829,7 +829,7 @@ function TestEntityPicker({
             className='h-7 w-full bg-transparent text-[13px] outline-none placeholder:text-text-tertiary'
           />
         </div>
-        <div className='max-h-[300px] overflow-y-auto py-1'>
+        <div className='max-h-75 overflow-y-auto py-1'>
           {isLoading ? (
             <div className='px-3 py-4 text-[12px] text-text-tertiary'>Loading…</div>
           ) : rows.length === 0 ? (

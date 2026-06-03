@@ -184,7 +184,7 @@ function CustomersPage() {
         <div className='flex-1' />
 
         {/* Search */}
-        <div className='hidden h-7 w-full max-w-[260px] items-center gap-1.5 rounded-[5px] border border-border bg-background px-2 transition-[border-color,box-shadow] focus-within:border-ring focus-within:ring-2 focus-within:ring-ring/50 sm:flex'>
+        <div className='hidden h-7 w-full max-w-65 items-center gap-1.5 rounded-[5px] border border-border bg-background px-2 transition-[border-color,box-shadow] focus-within:border-ring focus-within:ring-2 focus-within:ring-ring/50 sm:flex'>
           <Search className='size-3 shrink-0 text-text-tertiary' />
           <input
             value={search}
@@ -199,7 +199,7 @@ function CustomersPage() {
             type='button'
             className={cn(
               'inline-flex h-7 items-center gap-1 rounded-[5px] border px-2 text-[13px] font-medium',
-              'transition-colors duration-[80ms] hover:bg-bg-hover',
+              'transition-colors duration-80 hover:bg-bg-hover',
               assignedToMe
                 ? 'border-primary/30 bg-primary/5 text-foreground'
                 : 'border-border bg-background text-text-secondary'
@@ -212,7 +212,7 @@ function CustomersPage() {
 
           <button
             type='button'
-            className='inline-flex h-7 items-center gap-1 rounded-[5px] bg-primary px-2 text-[13px] font-semibold text-primary-foreground transition-colors duration-[80ms] hover:opacity-90 sm:px-2.5'
+            className='inline-flex h-7 items-center gap-1 rounded-[5px] bg-primary px-2 text-[13px] font-semibold text-primary-foreground transition-colors duration-80 hover:opacity-90 sm:px-2.5'
             onClick={() => setModalCustomer('create')}
           >
             <Plus className='size-3.5' />
@@ -231,7 +231,7 @@ function CustomersPage() {
         >
           <button
             type='button'
-            className='text-[13px] font-medium text-text-tertiary transition-colors duration-[80ms] hover:text-foreground'
+            className='text-[13px] font-medium text-text-tertiary transition-colors duration-80 hover:text-foreground'
             onClick={() => {
               setAssignedToMe(false)
               setActivePresetId(null)
@@ -266,7 +266,7 @@ function CustomersPage() {
               onSort={handleSort}
               className='min-w-0 flex-1'
             />
-            <div className='w-[130px] shrink-0'>Phone</div>
+            <div className='w-32.5 shrink-0'>Phone</div>
             {bp !== 'tablet' && (
               <SortableHeader
                 field='contact_3'
@@ -274,7 +274,7 @@ function CustomersPage() {
                 sortField={sortField}
                 sortDir={sortDir}
                 onSort={handleSort}
-                className='w-[160px] shrink-0'
+                className='w-40 shrink-0'
               />
             )}
             <SortableHeader
@@ -283,17 +283,17 @@ function CustomersPage() {
               sortField={sortField}
               sortDir={sortDir}
               onSort={handleSort}
-              className='w-[100px] shrink-0'
+              className='w-25 shrink-0'
             />
-            <div className='w-[120px] shrink-0'>Responsible</div>
+            <div className='w-30 shrink-0'>Responsible</div>
             <CustomColumnsHeader
               columns={customColumns}
               sortField={sortField}
               sortDir={sortDir}
               onSort={handleSort}
             />
-            <div className='w-[46px] shrink-0' />
-            <div className='w-[28px] shrink-0' />
+            <div className='w-11.5 shrink-0' />
+            <div className='w-7 shrink-0' />
           </div>
         )}
 
@@ -305,7 +305,7 @@ function CustomersPage() {
                   <Skeleton className='size-5 shrink-0 rounded-full' />
                   <Skeleton className='h-3.5 w-28 rounded' />
                 </div>
-                <div className='flex items-center gap-2 pl-[28px]'>
+                <div className='flex items-center gap-2 pl-7'>
                   <Skeleton className='h-3.5 w-14 rounded' />
                   <Skeleton className='h-3.5 w-20 rounded' />
                 </div>
@@ -323,22 +323,22 @@ function CustomersPage() {
                   <Skeleton className='h-3.5 w-28 rounded' />
                   <Skeleton className='h-3.5 w-12 rounded' />
                 </div>
-                <div className='w-[130px] shrink-0'>
-                  <Skeleton className='h-3.5 w-[90px] rounded' />
+                <div className='w-32.5 shrink-0'>
+                  <Skeleton className='h-3.5 w-22.5 rounded' />
                 </div>
                 {bp !== 'tablet' && (
-                  <div className='w-[160px] shrink-0'>
-                    <Skeleton className='h-3.5 w-[120px] rounded' />
+                  <div className='w-40 shrink-0'>
+                    <Skeleton className='h-3.5 w-30 rounded' />
                   </div>
                 )}
-                <div className='w-[100px] shrink-0'>
-                  <Skeleton className='h-[18px] w-[50px] rounded-[4px]' />
+                <div className='w-25 shrink-0'>
+                  <Skeleton className='h-4.5 w-12.5 rounded-sm' />
                 </div>
-                <div className='w-[120px] shrink-0'>
-                  <Skeleton className='h-3.5 w-[70px] rounded' />
+                <div className='w-30 shrink-0'>
+                  <Skeleton className='h-3.5 w-17.5 rounded' />
                 </div>
-                <div className='w-[46px] shrink-0' />
-                <div className='w-[28px] shrink-0' />
+                <div className='w-11.5 shrink-0' />
+                <div className='w-7 shrink-0' />
               </div>
             )
           )
@@ -436,7 +436,7 @@ function SortableHeader({
     <button
       type='button'
       className={cn(
-        'group inline-flex items-center gap-1 text-left transition-colors duration-[80ms] hover:text-foreground',
+        'group inline-flex items-center gap-1 text-left transition-colors duration-80 hover:text-foreground',
         active && 'text-foreground',
         className
       )}
@@ -508,11 +508,11 @@ function CustomerRow({
             {customer.l_name}
           </span>
         </div>
-        <div className='flex flex-wrap items-center gap-2 pl-[28px]'>
+        <div className='flex flex-wrap items-center gap-2 pl-7'>
           <span className='text-[13px] text-text-tertiary tabular-nums'>CUS-{customer.id}</span>
           {phone && <span className='text-[13px] text-text-tertiary'>{phone}</span>}
           {typeLabel !== '—' && (
-            <span className='inline-flex items-center rounded-[4px] bg-bg-secondary px-1.5 py-0.5 text-[13px] font-medium text-text-tertiary'>
+            <span className='inline-flex items-center rounded-sm bg-bg-secondary px-1.5 py-0.5 text-[13px] font-medium text-text-tertiary'>
               {typeLabel}
             </span>
           )}
@@ -545,13 +545,13 @@ function CustomerRow({
       </div>
 
       {/* Phone */}
-      <div className='w-[130px] shrink-0 truncate text-[13px] text-text-secondary'>
+      <div className='w-32.5 shrink-0 truncate text-[13px] text-text-secondary'>
         {phone ?? <span className='text-text-tertiary'>&mdash;</span>}
       </div>
 
       {/* Email */}
       {!isTablet && (
-        <div className='w-[160px] shrink-0'>
+        <div className='w-40 shrink-0'>
           {email ? (
             <Tooltip>
               <TooltipTrigger asChild>
@@ -566,9 +566,9 @@ function CustomerRow({
       )}
 
       {/* Type */}
-      <div className='w-[100px] shrink-0'>
+      <div className='w-25 shrink-0'>
         {typeLabel !== '—' ? (
-          <span className='inline-flex items-center rounded-[4px] bg-bg-secondary px-1.5 py-0.5 text-[13px] font-medium text-text-secondary'>
+          <span className='inline-flex items-center rounded-sm bg-bg-secondary px-1.5 py-0.5 text-[13px] font-medium text-text-secondary'>
             {typeLabel}
           </span>
         ) : (
@@ -577,7 +577,7 @@ function CustomerRow({
       </div>
 
       {/* Assign */}
-      <div className='w-[120px] shrink-0'>
+      <div className='w-30 shrink-0'>
         {(() => {
           const assigned = customer.assigned_users?.length
             ? customer.assigned_users
@@ -648,11 +648,11 @@ function CustomerRow({
       <CustomColumnsCells row={customer as Record<string, unknown>} columns={customColumns} />
 
       {/* Notes */}
-      <div className='flex w-[46px] shrink-0 justify-center'>
+      <div className='flex w-11.5 shrink-0 justify-center'>
         <button
           type='button'
           className={cn(
-            'inline-flex h-[26px] w-[46px] items-center justify-center gap-1 rounded-[6px] border text-[12px] font-medium tabular-nums transition-colors duration-[80ms]',
+            'inline-flex h-6.5 w-11.5 items-center justify-center gap-1 rounded-md border text-[12px] font-medium tabular-nums transition-colors duration-80',
             noteCount > 0
               ? 'border-border bg-bg-secondary text-text-secondary hover:bg-bg-active'
               : 'text-text-quaternary border-transparent hover:bg-bg-hover hover:text-text-tertiary'
@@ -670,7 +670,7 @@ function CustomerRow({
 
       {/* Actions */}
       <div
-        className='flex w-[28px] shrink-0 items-center justify-center'
+        className='flex w-7 shrink-0 items-center justify-center'
         onClick={e => e.stopPropagation()}
         onKeyDown={e => e.stopPropagation()}
         role='group'
@@ -679,7 +679,7 @@ function CustomerRow({
           <DropdownMenuTrigger asChild>
             <button
               type='button'
-              className='inline-flex size-6 items-center justify-center rounded-[6px] text-text-tertiary transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground'
+              className='inline-flex size-6 items-center justify-center rounded-md text-text-tertiary transition-colors duration-80 hover:bg-bg-active hover:text-foreground'
               aria-label='Customer actions'
             >
               <MoreHorizontal className='size-4' />
@@ -687,12 +687,12 @@ function CustomerRow({
           </DropdownMenuTrigger>
           <DropdownMenuContent
             align='end'
-            className='w-[180px] rounded-[8px] p-1'
+            className='w-45 rounded-lg p-1'
             style={{ boxShadow: 'var(--dropdown-shadow)' }}
           >
             {canAssign && (
               <DropdownMenuItem
-                className='cursor-pointer gap-2 rounded-[6px] px-2 py-1 text-[13px]'
+                className='cursor-pointer gap-2 rounded-md px-2 py-1 text-[13px]'
                 onClick={() => onAssign(customer)}
               >
                 <UserPlus className='size-3.5' />
@@ -700,7 +700,7 @@ function CustomerRow({
               </DropdownMenuItem>
             )}
             <DropdownMenuItem
-              className='cursor-pointer gap-2 rounded-[6px] px-2 py-1 text-[13px]'
+              className='cursor-pointer gap-2 rounded-md px-2 py-1 text-[13px]'
               onClick={() => onEdit(customer)}
             >
               <Pencil className='size-3.5' />
@@ -708,7 +708,7 @@ function CustomerRow({
             </DropdownMenuItem>
             <DropdownMenuItem
               variant='destructive'
-              className='cursor-pointer gap-2 rounded-[6px] px-2 py-1 text-[13px]'
+              className='cursor-pointer gap-2 rounded-md px-2 py-1 text-[13px]'
               onClick={() => onDelete(customer)}
             >
               <Trash2 className='size-3.5' />

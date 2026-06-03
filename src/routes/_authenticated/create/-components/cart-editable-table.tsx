@@ -132,24 +132,16 @@ export function CartEditableTable({
         <table className='w-full text-[13px]'>
           <thead className='sticky top-0 z-10 bg-bg-secondary select-none'>
             <tr className='border-b border-border text-left'>
-              <th className='w-[36px] py-1.5 pr-0 pl-5 font-medium text-text-tertiary'></th>
-              <th className='min-w-[110px] px-3 py-1.5 font-medium text-text-tertiary'>
-                Inventory
-              </th>
-              <th className='min-w-[160px] px-3 py-1.5 font-medium text-text-tertiary'>
-                Description
-              </th>
-              <th className='w-[80px] px-3 py-1.5 text-right font-medium text-text-tertiary'>
-                Qty
-              </th>
-              <th className='w-[60px] px-3 py-1.5 font-medium text-text-tertiary'>Unit</th>
-              <th className='w-[90px] px-3 py-1.5 text-right font-medium text-text-tertiary'>
+              <th className='w-9 py-1.5 pr-0 pl-5 font-medium text-text-tertiary'></th>
+              <th className='min-w-27.5 px-3 py-1.5 font-medium text-text-tertiary'>Inventory</th>
+              <th className='min-w-40 px-3 py-1.5 font-medium text-text-tertiary'>Description</th>
+              <th className='w-20 px-3 py-1.5 text-right font-medium text-text-tertiary'>Qty</th>
+              <th className='w-15 px-3 py-1.5 font-medium text-text-tertiary'>Unit</th>
+              <th className='w-22.5 px-3 py-1.5 text-right font-medium text-text-tertiary'>
                 Price
               </th>
-              <th className='w-[100px] px-3 py-1.5 text-right font-medium text-text-tertiary'>
-                Amount
-              </th>
-              <th className='w-[60px] py-1.5 pr-5 pl-2 font-medium text-text-tertiary'></th>
+              <th className='w-25 px-3 py-1.5 text-right font-medium text-text-tertiary'>Amount</th>
+              <th className='w-15 py-1.5 pr-5 pl-2 font-medium text-text-tertiary'></th>
             </tr>
           </thead>
           <tbody>
@@ -157,7 +149,7 @@ export function CartEditableTable({
               Array.from({ length: 4 }).map((_, i) => (
                 <tr key={i} className='border-b border-border-light'>
                   <td className='py-2 pr-0 pl-5'>
-                    <Skeleton className='size-7 rounded-[4px]' />
+                    <Skeleton className='size-7 rounded-sm' />
                   </td>
                   <td className='px-3 py-2'>
                     <Skeleton className='h-4 w-16' />
@@ -191,8 +183,8 @@ export function CartEditableTable({
                       className='group/row border-b border-border-light transition-colors duration-100 hover:bg-bg-hover'
                     >
                       {/* Thumbnail */}
-                      <td className='w-[36px] py-1.5 pr-0 pl-5'>
-                        <div className='flex size-7 items-center justify-center overflow-hidden rounded-[4px] bg-bg-secondary'>
+                      <td className='w-9 py-1.5 pr-0 pl-5'>
+                        <div className='flex size-7 items-center justify-center overflow-hidden rounded-sm bg-bg-secondary'>
                           {item.photo ? (
                             <img
                               src={item.photo}
@@ -208,12 +200,12 @@ export function CartEditableTable({
                       {/* Inventory */}
                       <td className='px-3 py-1.5 font-medium text-foreground'>{item.product_id}</td>
                       {/* Description */}
-                      <td className='max-w-[300px] px-3 py-1.5 text-text-secondary'>
+                      <td className='max-w-75 px-3 py-1.5 text-text-secondary'>
                         <Tooltip>
                           <TooltipTrigger asChild>
                             <span className='block truncate'>{item.name || '—'}</span>
                           </TooltipTrigger>
-                          <TooltipContent className='max-w-[300px]'>{item.name}</TooltipContent>
+                          <TooltipContent className='max-w-75'>{item.name}</TooltipContent>
                         </Tooltip>
                       </td>
                       {/* Qty */}
@@ -275,8 +267,8 @@ export function CartEditableTable({
                   const price = product ? Number(product.price) || 0 : 0
                   return (
                     <tr key={pe.key} className='animate-pulse border-b border-border-light'>
-                      <td className='w-[36px] py-1.5 pr-0 pl-5'>
-                        <div className='flex size-7 items-center justify-center overflow-hidden rounded-[4px] bg-bg-secondary'>
+                      <td className='w-9 py-1.5 pr-0 pl-5'>
+                        <div className='flex size-7 items-center justify-center overflow-hidden rounded-sm bg-bg-secondary'>
                           {product?.photo ? (
                             <img
                               src={product.photo}
@@ -292,7 +284,7 @@ export function CartEditableTable({
                       <td className='px-3 py-1.5 font-medium text-foreground/60'>
                         {product?.id ?? pe.id}
                       </td>
-                      <td className='max-w-[300px] px-3 py-1.5 text-text-secondary/60'>
+                      <td className='max-w-75 px-3 py-1.5 text-text-secondary/60'>
                         <span className='block truncate'>
                           {product ? product.descr_1 || '—' : 'Looking up…'}
                         </span>
@@ -365,7 +357,7 @@ export function CartEditableTable({
                   {inputValue.trim() && !searching && (
                     <button
                       type='button'
-                      className='rounded-[4px] bg-bg-secondary px-1.5 py-0.5 text-[11px] font-medium text-text-tertiary transition-colors duration-75 hover:bg-bg-active hover:text-foreground'
+                      className='rounded-sm bg-bg-secondary px-1.5 py-0.5 text-[11px] font-medium text-text-tertiary transition-colors duration-75 hover:bg-bg-active hover:text-foreground'
                       onClick={handleSubmit}
                       tabIndex={-1}
                     >

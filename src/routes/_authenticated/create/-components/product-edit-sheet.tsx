@@ -197,7 +197,7 @@ export const ProductEditSheet = ({
       <Dialog open={open} onOpenChange={v => (!v ? handleClose() : onOpenChange(v))}>
         <DialogContent
           showCloseButton={false}
-          className={`flex ${showConfigs ? 'h-[92vh] w-[94vw] max-w-[1200px]!' : 'h-auto max-h-[92vh] w-[94vw] max-w-[500px]!'} flex-col gap-0 overflow-hidden rounded-[12px] border p-0 shadow-2xl`}
+          className={`flex ${showConfigs ? 'h-[92vh] w-[94vw] max-w-300!' : 'h-auto max-h-[92vh] w-[94vw] max-w-125!'} flex-col gap-0 overflow-hidden rounded-xl border p-0 shadow-2xl`}
         >
           {/* Header */}
           <div className='flex h-12 shrink-0 items-center gap-2.5 border-b border-border px-5'>
@@ -210,7 +210,7 @@ export const ProductEditSheet = ({
             <div className='flex-1' />
             <button
               type='button'
-              className='inline-flex size-7 shrink-0 items-center justify-center rounded-[5px] text-text-tertiary transition-colors duration-[80ms] hover:bg-bg-hover hover:text-foreground'
+              className='inline-flex size-7 shrink-0 items-center justify-center rounded-[5px] text-text-tertiary transition-colors duration-80 hover:bg-bg-hover hover:text-foreground'
               onClick={handleClose}
             >
               <X className='size-4' />
@@ -221,7 +221,7 @@ export const ProductEditSheet = ({
             /* Full two-panel layout for products with configurations */
             <div className='flex min-h-0 flex-1'>
               {/* Left panel: image + info */}
-              <div className='flex w-[380px] shrink-0 [scrollbar-width:none] flex-col overflow-y-auto border-r border-border bg-bg-secondary/30 [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden'>
+              <div className='flex w-95 shrink-0 scrollbar-none flex-col overflow-y-auto border-r border-border bg-bg-secondary/30 [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden'>
                 <div className='p-4'>
                   <ProductImageGallery
                     photos={photos}
@@ -294,7 +294,7 @@ export const ProductEditSheet = ({
               <div className='flex gap-4 p-4'>
                 {/* Small thumbnail */}
                 {photos && photos.length > 0 && (
-                  <div className='size-[80px] shrink-0 overflow-hidden rounded-[8px] border border-border bg-background'>
+                  <div className='size-20 shrink-0 overflow-hidden rounded-lg border border-border bg-background'>
                     <img
                       src={photos[0]}
                       alt={displayName}
@@ -343,7 +343,7 @@ export const ProductEditSheet = ({
                             key={u.autoid}
                             type='button'
                             className={cn(
-                              'flex items-center gap-1.5 rounded-[6px] border px-2.5 py-1.5 text-[13px] transition-colors duration-[80ms]',
+                              'flex items-center gap-1.5 rounded-md border px-2.5 py-1.5 text-[13px] transition-colors duration-80',
                               isSelected
                                 ? 'border-primary bg-primary/10 font-semibold text-primary'
                                 : 'border-border hover:border-primary/40'
@@ -390,14 +390,14 @@ export const ProductEditSheet = ({
             <div className='flex items-center gap-2'>
               <button
                 type='button'
-                className='inline-flex h-8 items-center rounded-[6px] px-3 text-[13px] font-medium text-text-secondary transition-colors duration-[80ms] hover:bg-bg-hover hover:text-foreground'
+                className='inline-flex h-8 items-center rounded-md px-3 text-[13px] font-medium text-text-secondary transition-colors duration-80 hover:bg-bg-hover hover:text-foreground'
                 onClick={handleClose}
               >
                 Cancel
               </button>
               <button
                 type='button'
-                className='inline-flex h-8 items-center gap-1.5 rounded-[6px] bg-primary px-4 text-[13px] font-medium text-primary-foreground transition-opacity duration-[80ms] hover:opacity-90 disabled:pointer-events-none disabled:opacity-50'
+                className='inline-flex h-8 items-center gap-1.5 rounded-md bg-primary px-4 text-[13px] font-medium text-primary-foreground transition-opacity duration-80 hover:opacity-90 disabled:pointer-events-none disabled:opacity-50'
                 disabled={
                   hasUncheckedRequired ||
                   configLoading ||
@@ -426,7 +426,7 @@ export const ProductEditSheet = ({
         open={confirmClose}
         onOpenChange={v => dispatch({ type: 'SET_CONFIRM_CLOSE', value: v })}
       >
-        <AlertDialogContent className='rounded-[12px]'>
+        <AlertDialogContent className='rounded-xl'>
           <AlertDialogHeader>
             <AlertDialogTitle>Discard changes?</AlertDialogTitle>
             <AlertDialogDescription>

@@ -126,7 +126,7 @@ const ActivityPage = () => {
 
         <div className='flex-1' />
 
-        <div className='flex items-center gap-1.5 rounded-[6px] border border-border bg-background px-2.5 py-1.5'>
+        <div className='flex items-center gap-1.5 rounded-md border border-border bg-background px-2.5 py-1.5'>
           <Search className='size-3.5 shrink-0 text-text-tertiary' />
           <input
             value={search}
@@ -135,7 +135,7 @@ const ActivityPage = () => {
               setOffset(null)
             }}
             placeholder='Search URL or method...'
-            className='w-[140px] bg-transparent text-[13px] outline-none placeholder:text-text-tertiary sm:w-[200px]'
+            className='w-35 bg-transparent text-[13px] outline-none placeholder:text-text-tertiary sm:w-50'
           />
         </div>
 
@@ -163,8 +163,8 @@ const ActivityPage = () => {
                 key={opt.value}
                 type='button'
                 className={cn(
-                  'flex w-full items-center gap-2 rounded-[5px] px-2 py-[3px] text-left text-[13px] font-medium',
-                  'transition-colors duration-[80ms] hover:bg-bg-hover'
+                  'flex w-full items-center gap-2 rounded-[5px] px-2 py-0.75 text-left text-[13px] font-medium',
+                  'transition-colors duration-80 hover:bg-bg-hover'
                 )}
                 onClick={() => {
                   setErrorFilter(opt.value === errorFilter ? 'all' : opt.value)
@@ -173,7 +173,7 @@ const ActivityPage = () => {
               >
                 <div
                   className={cn(
-                    'flex size-3.5 items-center justify-center rounded-full border transition-colors duration-[80ms]',
+                    'flex size-3.5 items-center justify-center rounded-full border transition-colors duration-80',
                     selected_ ? 'border-primary bg-primary' : 'border-border'
                   )}
                 >
@@ -194,8 +194,8 @@ const ActivityPage = () => {
                 key={m}
                 type='button'
                 className={cn(
-                  'flex w-full items-center gap-2 rounded-[5px] px-2 py-[3px] text-left text-[13px] font-medium',
-                  'transition-colors duration-[80ms] hover:bg-bg-hover'
+                  'flex w-full items-center gap-2 rounded-[5px] px-2 py-0.75 text-left text-[13px] font-medium',
+                  'transition-colors duration-80 hover:bg-bg-hover'
                 )}
                 onClick={() => {
                   setMethodFilter(selected_ ? null : m)
@@ -204,7 +204,7 @@ const ActivityPage = () => {
               >
                 <div
                   className={cn(
-                    'flex size-3.5 items-center justify-center rounded-full border transition-colors duration-[80ms]',
+                    'flex size-3.5 items-center justify-center rounded-full border transition-colors duration-80',
                     selected_ ? 'border-primary bg-primary' : 'border-border'
                   )}
                 >
@@ -232,8 +232,8 @@ const ActivityPage = () => {
                 key={opt.value}
                 type='button'
                 className={cn(
-                  'flex w-full items-start gap-2 rounded-[5px] px-2 py-[3px] text-left text-[13px] font-medium',
-                  'transition-colors duration-[80ms] hover:bg-bg-hover'
+                  'flex w-full items-start gap-2 rounded-[5px] px-2 py-0.75 text-left text-[13px] font-medium',
+                  'transition-colors duration-80 hover:bg-bg-hover'
                 )}
                 onClick={() => {
                   setSourceFilter(selected_ ? null : opt.value)
@@ -242,7 +242,7 @@ const ActivityPage = () => {
               >
                 <div
                   className={cn(
-                    'mt-[3px] flex size-3.5 items-center justify-center rounded-full border transition-colors duration-[80ms]',
+                    'mt-0.75 flex size-3.5 items-center justify-center rounded-full border transition-colors duration-80',
                     selected_ ? 'border-primary bg-primary' : 'border-border'
                   )}
                 >
@@ -265,7 +265,7 @@ const ActivityPage = () => {
         <div className='flex shrink-0 flex-wrap items-center gap-1.5 border-b border-border px-3.5 py-1.5 sm:px-6'>
           <button
             type='button'
-            className='text-[13px] font-medium text-text-tertiary transition-colors duration-[80ms] hover:text-foreground'
+            className='text-[13px] font-medium text-text-tertiary transition-colors duration-80 hover:text-foreground'
             onClick={clearAllFilters}
           >
             Clear
@@ -466,7 +466,7 @@ function LogRow({
       className={cn(
         ROW_GRID,
         'group/row cursor-pointer border-b border-border-light px-5 py-2 transition-colors duration-100 hover:bg-bg-hover xl:px-6',
-        log.is_error && 'bg-red-500/[0.02]'
+        log.is_error && 'bg-red-500/2'
       )}
       onClick={onClick}
     >

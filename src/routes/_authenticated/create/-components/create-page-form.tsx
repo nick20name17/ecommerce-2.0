@@ -68,7 +68,7 @@ export const CreatePageForm = ({
             </Button>
             <button
               type='button'
-              className='inline-flex h-9 items-center gap-1.5 rounded-[6px] border border-border bg-bg-secondary px-3 text-[13px] font-medium text-text-secondary transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground disabled:pointer-events-none disabled:opacity-50'
+              className='inline-flex h-9 items-center gap-1.5 rounded-md border border-border bg-bg-secondary px-3 text-[13px] font-medium text-text-secondary transition-colors duration-80 hover:bg-bg-active hover:text-foreground disabled:pointer-events-none disabled:opacity-50'
               disabled={!customer}
               onClick={() => setAttachmentsOpen(true)}
             >

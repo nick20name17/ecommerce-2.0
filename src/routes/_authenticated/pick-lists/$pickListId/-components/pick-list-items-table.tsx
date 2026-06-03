@@ -82,11 +82,11 @@ export function PickListItemsTable({ pickListId, items, isEditable, isMobile, de
       {/* Header */}
       {!isMobile && (
         <div className='flex items-center gap-4 border-b border-border bg-bg-secondary/60 px-4 py-1.5 text-[12px] font-medium tracking-[0.04em] text-text-tertiary uppercase'>
-          <div className='w-[120px] shrink-0'>Order</div>
+          <div className='w-30 shrink-0'>Order</div>
           <div className='min-w-0 flex-1'>Detail ID</div>
-          <div className='w-[100px] shrink-0 text-right'>Quantity</div>
-          {items.some(i => i.push_status) && <div className='w-[100px] shrink-0'>Push Status</div>}
-          {isEditable && <div className='w-[60px] shrink-0' />}
+          <div className='w-25 shrink-0 text-right'>Quantity</div>
+          {items.some(i => i.push_status) && <div className='w-25 shrink-0'>Push Status</div>}
+          {isEditable && <div className='w-15 shrink-0' />}
         </div>
       )}
 
@@ -138,19 +138,19 @@ export function PickListItemsTable({ pickListId, items, isEditable, isMobile, de
             key={item.id}
             className='group/row flex items-center gap-4 border-b border-border-light px-4 py-2 transition-colors duration-100 hover:bg-bg-hover'
           >
-            <div className='w-[120px] shrink-0 text-[13px] font-semibold text-foreground tabular-nums'>
+            <div className='w-30 shrink-0 text-[13px] font-semibold text-foreground tabular-nums'>
               {item.order_autoid}
             </div>
             <div className='min-w-0 flex-1 truncate text-[13px] text-text-secondary'>
               {descrMap?.get(item.detail_autoid) || item.descr || item.detail_autoid}
             </div>
-            <div className='w-[100px] shrink-0 text-right'>
+            <div className='w-25 shrink-0 text-right'>
               {isEditing && isEditable ? (
                 <div className='flex items-center justify-end gap-1'>
                   <Input
                     value={editQty}
                     onChange={e => setEditQty(e.target.value)}
-                    className='h-7 w-[70px] text-right text-[13px]'
+                    className='h-7 w-17.5 text-right text-[13px]'
                     onKeyDown={e => {
                       if (e.key === 'Enter') commitEdit(item.id)
                       if (e.key === 'Escape') setEditingItem(null)
@@ -179,14 +179,14 @@ export function PickListItemsTable({ pickListId, items, isEditable, isMobile, de
               )}
             </div>
             {items.some(i => i.push_status) && (
-              <div className='w-[100px] shrink-0'>
+              <div className='w-25 shrink-0'>
                 {item.push_status && (
                   <PushStatusBadge status={item.push_status} error={item.push_error} />
                 )}
               </div>
             )}
             {isEditable && (
-              <div className='flex w-[60px] shrink-0 justify-end'>
+              <div className='flex w-15 shrink-0 justify-end'>
                 <Button
                   size='icon-xs'
                   variant='ghost'

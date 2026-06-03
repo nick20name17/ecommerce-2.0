@@ -374,7 +374,7 @@ export const DataControlSection = ({ projectId }: { projectId: number }) => {
                 />
                 {showList && listColumns.length > 0 && (
                   <div className='border-t border-border'>
-                    <div className='border-b border-border-light px-6 py-2 text-[11px] font-semibold tracking-[0.05em] text-text-tertiary uppercase'>
+                    <div className='border-b border-border-light px-6 py-2 text-[11px] font-semibold tracking-wider text-text-tertiary uppercase'>
                       List column order — drag to rearrange
                     </div>
                     <ListColumnsReorder

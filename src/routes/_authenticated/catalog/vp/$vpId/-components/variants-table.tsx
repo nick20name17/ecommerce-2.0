@@ -244,9 +244,9 @@ export const VariantsTable = ({
                 <th className='sticky left-0 z-10 w-auto bg-bg-secondary py-2 pr-2 pl-3'>
                   Product
                 </th>
-                <th className='w-[70px] px-3 py-2'>Stock</th>
+                <th className='w-17.5 px-3 py-2'>Stock</th>
                 {specs.map(spec => (
-                  <th key={spec.id} className='w-[150px] px-3 py-2 whitespace-nowrap'>
+                  <th key={spec.id} className='w-37.5 px-3 py-2 whitespace-nowrap'>
                     {spec.name}
                     <span className='text-text-quaternary ml-1 text-[10px] capitalize'>
                       ({spec.display_type})
@@ -590,7 +590,7 @@ function OptionPicker({
         <button
           type='button'
           className={cn(
-            'inline-flex h-7 max-w-[150px] items-center gap-1.5 rounded-md border px-2 text-[12px] transition-colors',
+            'inline-flex h-7 max-w-37.5 items-center gap-1.5 rounded-md border px-2 text-[12px] transition-colors',
             currentValue
               ? 'border-border bg-bg-secondary/60 hover:bg-bg-active'
               : 'border-dashed border-border text-text-tertiary hover:border-primary/40 hover:text-primary'
@@ -615,7 +615,7 @@ function OptionPicker({
           )}
         </button>
       </PopoverTrigger>
-      <PopoverContent align='start' sideOffset={4} className='w-[180px] p-0'>
+      <PopoverContent align='start' sideOffset={4} className='w-45 p-0'>
         {/* Search — only show if more than 6 options */}
         {options.length > 6 && (
           <div className='border-b border-border px-2.5 py-1.5'>
@@ -629,7 +629,7 @@ function OptionPicker({
           </div>
         )}
         {/* Options list */}
-        <div className='max-h-[180px] overflow-y-auto p-1'>
+        <div className='max-h-45 overflow-y-auto p-1'>
           {filtered.length === 0 ? (
             <div className='p-2 text-center text-[11px] text-text-tertiary'>No matches</div>
           ) : (

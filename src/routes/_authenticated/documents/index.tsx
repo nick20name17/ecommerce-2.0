@@ -99,7 +99,7 @@ function DocumentsPage() {
         <button
           type='button'
           onClick={() => navigate({ to: '/documents/new' })}
-          className='inline-flex h-7 items-center gap-1.5 rounded-[5px] bg-primary px-2.5 text-[12px] font-medium text-primary-foreground transition-colors duration-[80ms] hover:bg-primary/90'
+          className='inline-flex h-7 items-center gap-1.5 rounded-[5px] bg-primary px-2.5 text-[12px] font-medium text-primary-foreground transition-colors duration-80 hover:bg-primary/90'
         >
           <Plus className='size-3.5' />
           New template
@@ -148,9 +148,7 @@ function TemplateRow({
   const Icon = meta.icon
   return (
     <li className='group flex items-center gap-3 px-3.5 py-2.5 transition-colors hover:bg-bg-hover sm:px-6'>
-      <div
-        className={cn('flex size-8 shrink-0 items-center justify-center rounded-[6px]', meta.tint)}
-      >
+      <div className={cn('flex size-8 shrink-0 items-center justify-center rounded-md', meta.tint)}>
         <Icon className='size-4' />
       </div>
 
@@ -183,7 +181,7 @@ function TemplateRow({
       <button
         type='button'
         onClick={onDuplicate}
-        className='inline-flex size-7 shrink-0 items-center justify-center rounded-[5px] text-text-tertiary opacity-0 transition-all duration-[80ms] group-hover:opacity-100 hover:bg-bg-hover hover:text-foreground'
+        className='inline-flex size-7 shrink-0 items-center justify-center rounded-[5px] text-text-tertiary opacity-0 transition-all duration-80 group-hover:opacity-100 hover:bg-bg-hover hover:text-foreground'
         aria-label='Duplicate template'
         title='Duplicate'
       >
@@ -192,7 +190,7 @@ function TemplateRow({
       <button
         type='button'
         onClick={onDelete}
-        className='inline-flex size-7 shrink-0 items-center justify-center rounded-[5px] text-text-tertiary opacity-0 transition-all duration-[80ms] group-hover:opacity-100 hover:bg-bg-hover hover:text-destructive'
+        className='inline-flex size-7 shrink-0 items-center justify-center rounded-[5px] text-text-tertiary opacity-0 transition-all duration-80 group-hover:opacity-100 hover:bg-bg-hover hover:text-destructive'
         aria-label='Delete template'
       >
         <Trash2 className='size-3.5' />
@@ -206,7 +204,7 @@ function TemplateRow({
 function EmptyState() {
   return (
     <div className='flex h-full flex-col items-center justify-center gap-5 px-6 py-12'>
-      <div className='flex size-12 items-center justify-center rounded-[12px] bg-indigo-500/10 text-indigo-500'>
+      <div className='flex size-12 items-center justify-center rounded-xl bg-indigo-500/10 text-indigo-500'>
         <Layers className='size-6' />
       </div>
       <div className='flex max-w-[320px] flex-col items-center gap-1.5 text-center'>
@@ -220,7 +218,7 @@ function EmptyState() {
       </div>
       <Link
         to='/documents/new'
-        className='inline-flex h-8 items-center gap-1.5 rounded-[6px] bg-primary px-3 text-[12.5px] font-medium text-primary-foreground transition-colors duration-[80ms] hover:bg-primary/90'
+        className='inline-flex h-8 items-center gap-1.5 rounded-md bg-primary px-3 text-[12.5px] font-medium text-primary-foreground transition-colors duration-80 hover:bg-primary/90'
       >
         <Plus className='size-3.5' />
         Create your first template
@@ -232,12 +230,12 @@ function EmptyState() {
 function ProjectEmptyState() {
   return (
     <div className='flex h-full flex-col items-center justify-center gap-5'>
-      <div className='flex size-12 items-center justify-center rounded-[12px] bg-indigo-500/10 text-indigo-500'>
+      <div className='flex size-12 items-center justify-center rounded-xl bg-indigo-500/10 text-indigo-500'>
         <IDocuments className='size-6' />
       </div>
       <div className='flex flex-col items-center gap-1.5 text-center'>
         <h1 className='text-[16px] font-semibold tracking-[-0.02em] text-foreground'>Documents</h1>
-        <p className='max-w-[280px] text-[13px] leading-snug text-text-tertiary'>
+        <p className='max-w-70 text-[13px] leading-snug text-text-tertiary'>
           Select a project in the sidebar to manage document templates.
         </p>
       </div>
@@ -250,7 +248,7 @@ function ListSkeleton() {
     <ul className='divide-y divide-border'>
       {Array.from({ length: 4 }).map((_, i) => (
         <li key={i} className='flex items-center gap-3 px-3.5 py-2.5 sm:px-6'>
-          <Skeleton className='size-8 rounded-[6px]' />
+          <Skeleton className='size-8 rounded-md' />
           <div className='flex flex-1 flex-col gap-1.5'>
             <Skeleton className='h-3.5 w-44' />
             <Skeleton className='h-3 w-64' />

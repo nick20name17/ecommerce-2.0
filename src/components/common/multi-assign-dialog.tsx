@@ -156,7 +156,7 @@ export function MultiAssignDialog({
                       className='inline-flex items-center gap-1.5 rounded-full border border-border bg-bg-secondary py-0.5 pr-1.5 pl-0.5 text-[12px] font-medium text-foreground'
                     >
                       <InitialsAvatar initials={initials} size={18} />
-                      <span className='max-w-[120px] truncate'>{name}</span>
+                      <span className='max-w-30 truncate'>{name}</span>
                       <button
                         type='button'
                         className='inline-flex size-4 items-center justify-center rounded-full text-text-tertiary transition-colors hover:bg-destructive/10 hover:text-destructive'
@@ -173,7 +173,7 @@ export function MultiAssignDialog({
 
           {/* Search & add */}
           <div className='overflow-hidden rounded-lg border border-border'>
-            <div className='flex items-center gap-1.5 border-b border-border px-2.5 py-[6px]'>
+            <div className='flex items-center gap-1.5 border-b border-border px-2.5 py-1.5'>
               {loading ? (
                 <Spinner className='size-3.5 shrink-0' />
               ) : (
@@ -192,7 +192,7 @@ export function MultiAssignDialog({
               {loading && users.length === 0 ? (
                 <div className='space-y-1'>
                   {Array.from({ length: 4 }).map((_, i) => (
-                    <Skeleton key={i} className='h-8 w-full rounded-[6px]' />
+                    <Skeleton key={i} className='h-8 w-full rounded-md' />
                   ))}
                 </div>
               ) : users.length === 0 ? (
@@ -213,7 +213,7 @@ export function MultiAssignDialog({
                       key={u.id}
                       type='button'
                       disabled={isAssigned}
-                      className='flex w-full items-center gap-2 rounded-[6px] px-2.5 py-[7px] text-left text-[13px] font-medium transition-colors duration-[80ms] hover:bg-bg-hover disabled:opacity-50'
+                      className='flex w-full items-center gap-2 rounded-md px-2.5 py-1.75 text-left text-[13px] font-medium transition-colors duration-80 hover:bg-bg-hover disabled:opacity-50'
                       onClick={() => handleAssign(u.id)}
                     >
                       <InitialsAvatar initials={initials} size={20} />

@@ -247,7 +247,7 @@ const ProposalsPage = () => {
 
         <div className='flex-1' />
 
-        <div className='hidden h-7 w-full max-w-[260px] items-center gap-1.5 rounded-[5px] border border-border bg-background px-2 transition-[border-color,box-shadow] focus-within:border-ring focus-within:ring-2 focus-within:ring-ring/50 sm:flex'>
+        <div className='hidden h-7 w-full max-w-65 items-center gap-1.5 rounded-[5px] border border-border bg-background px-2 transition-[border-color,box-shadow] focus-within:border-ring focus-within:ring-2 focus-within:ring-ring/50 sm:flex'>
           <Search className='size-3 shrink-0 text-text-tertiary' />
           <input
             value={search}
@@ -280,14 +280,14 @@ const ProposalsPage = () => {
                   key={s.value}
                   type='button'
                   className={cn(
-                    'flex w-full items-center gap-2 rounded-[5px] px-2 py-[3px] text-left text-[13px] font-medium',
-                    'transition-colors duration-[80ms] hover:bg-bg-hover'
+                    'flex w-full items-center gap-2 rounded-[5px] px-2 py-0.75 text-left text-[13px] font-medium',
+                    'transition-colors duration-80 hover:bg-bg-hover'
                   )}
                   onClick={() => selectStatus(s.value)}
                 >
                   <div
                     className={cn(
-                      'flex size-3.5 items-center justify-center rounded-full border transition-colors duration-[80ms]',
+                      'flex size-3.5 items-center justify-center rounded-full border transition-colors duration-80',
                       selected ? 'border-primary bg-primary' : 'border-border'
                     )}
                   >
@@ -309,7 +309,7 @@ const ProposalsPage = () => {
             type='button'
             className={cn(
               'inline-flex h-7 items-center gap-1 rounded-[5px] border px-2 text-[13px] font-medium',
-              'transition-colors duration-[80ms] hover:bg-bg-hover',
+              'transition-colors duration-80 hover:bg-bg-hover',
               assignedToMe
                 ? 'border-primary/30 bg-primary/5 text-foreground'
                 : 'border-border bg-background text-text-secondary'
@@ -322,7 +322,7 @@ const ProposalsPage = () => {
 
           <button
             type='button'
-            className='inline-flex h-7 items-center gap-1 rounded-[5px] bg-primary px-2 text-[13px] font-semibold text-primary-foreground transition-colors duration-[80ms] hover:opacity-90 sm:px-2.5'
+            className='inline-flex h-7 items-center gap-1 rounded-[5px] bg-primary px-2 text-[13px] font-semibold text-primary-foreground transition-colors duration-80 hover:opacity-90 sm:px-2.5'
             onClick={() => navigate({ to: '/create' })}
           >
             <Plus className='size-3.5' />
@@ -342,7 +342,7 @@ const ProposalsPage = () => {
           {hasFilters && (
             <button
               type='button'
-              className='text-[13px] font-medium text-text-tertiary transition-colors duration-[80ms] hover:text-foreground'
+              className='text-[13px] font-medium text-text-tertiary transition-colors duration-80 hover:text-foreground'
               onClick={clearAllFilters}
             >
               Clear
@@ -393,7 +393,7 @@ const ProposalsPage = () => {
               onSort={handleSort}
               className='min-w-0 flex-1'
             />
-            <div className='w-[88px] shrink-0'>Status</div>
+            <div className='w-22 shrink-0'>Status</div>
             {!isTablet && (
               <ProposalSortableHeader
                 field='qt_date'
@@ -401,7 +401,7 @@ const ProposalsPage = () => {
                 sortField={sortField}
                 sortDir={sortDir}
                 onSort={handleSort}
-                className='w-[92px] shrink-0'
+                className='w-23 shrink-0'
               />
             )}
             <ProposalSortableHeader
@@ -410,17 +410,17 @@ const ProposalsPage = () => {
               sortField={sortField}
               sortDir={sortDir}
               onSort={handleSort}
-              className='w-[100px] shrink-0 justify-end text-right'
+              className='w-25 shrink-0 justify-end text-right'
             />
-            <div className='w-[120px] shrink-0'>Responsible</div>
+            <div className='w-30 shrink-0'>Responsible</div>
             <CustomColumnsHeader
               columns={customColumns}
               sortField={sortField}
               sortDir={sortDir}
               onSort={handleSort}
             />
-            <div className='w-[46px] shrink-0' />
-            <div className='w-[28px] shrink-0' />
+            <div className='w-11.5 shrink-0' />
+            <div className='w-7 shrink-0' />
           </div>
         )}
 
@@ -434,7 +434,7 @@ const ProposalsPage = () => {
                   <div className='flex-1' />
                   <Skeleton className='h-3.5 w-16 rounded' />
                 </div>
-                <div className='flex items-center gap-2 pl-[20px]'>
+                <div className='flex items-center gap-2 pl-5'>
                   <Skeleton className='h-3.5 w-20 rounded' />
                   <Skeleton className='h-3.5 w-16 rounded' />
                 </div>
@@ -451,22 +451,22 @@ const ProposalsPage = () => {
                   <Skeleton className='h-3.5 w-16 rounded' />
                   <Skeleton className='h-3.5 w-24 rounded' />
                 </div>
-                <div className='w-[88px] shrink-0'>
-                  <Skeleton className='h-[18px] w-[60px] rounded-[4px]' />
+                <div className='w-22 shrink-0'>
+                  <Skeleton className='h-4.5 w-15 rounded-sm' />
                 </div>
                 {!isTablet && (
-                  <div className='w-[92px] shrink-0'>
-                    <Skeleton className='h-3.5 w-[70px] rounded' />
+                  <div className='w-23 shrink-0'>
+                    <Skeleton className='h-3.5 w-17.5 rounded' />
                   </div>
                 )}
-                <div className='w-[100px] shrink-0'>
-                  <Skeleton className='ml-auto h-3.5 w-[60px] rounded' />
+                <div className='w-25 shrink-0'>
+                  <Skeleton className='ml-auto h-3.5 w-15 rounded' />
                 </div>
-                <div className='w-[120px] shrink-0'>
-                  <Skeleton className='h-3.5 w-[70px] rounded' />
+                <div className='w-30 shrink-0'>
+                  <Skeleton className='h-3.5 w-17.5 rounded' />
                 </div>
-                <div className='w-[46px] shrink-0' />
-                <div className='w-[28px] shrink-0' />
+                <div className='w-11.5 shrink-0' />
+                <div className='w-7 shrink-0' />
               </div>
             )
           )
@@ -630,7 +630,7 @@ function ProposalRow({
             {formatCurrency(proposal.total, '—')}
           </span>
         </div>
-        <div className='flex flex-wrap items-center gap-2 pl-[20px]'>
+        <div className='flex flex-wrap items-center gap-2 pl-5'>
           <span className='text-[13px] text-text-tertiary'>{proposal.b_name || '—'}</span>
           <span className='text-[13px] text-text-tertiary'>{statusLabel}</span>
           {proposal.qt_date && (
@@ -668,10 +668,10 @@ function ProposalRow({
       </div>
 
       {/* Status */}
-      <div className='w-[88px] shrink-0'>
+      <div className='w-22 shrink-0'>
         <span
           className={cn(
-            'inline-flex items-center rounded-[4px] border px-1.5 py-0.5 text-[11px] leading-none font-semibold',
+            'inline-flex items-center rounded-sm border px-1.5 py-0.5 text-[11px] leading-none font-semibold',
             statusClass
           )}
         >
@@ -681,7 +681,7 @@ function ProposalRow({
 
       {/* Date */}
       {!isTablet && (
-        <div className='w-[92px] shrink-0 text-[13px] text-text-secondary tabular-nums'>
+        <div className='w-23 shrink-0 text-[13px] text-text-secondary tabular-nums'>
           {proposal.qt_date ? (
             formatDate(proposal.qt_date)
           ) : (
@@ -691,12 +691,12 @@ function ProposalRow({
       )}
 
       {/* Total */}
-      <div className='w-[100px] shrink-0 text-right text-[13px] font-medium text-foreground tabular-nums'>
+      <div className='w-25 shrink-0 text-right text-[13px] font-medium text-foreground tabular-nums'>
         {formatCurrency(proposal.total, '—')}
       </div>
 
       {/* Responsible */}
-      <div className='w-[120px] shrink-0'>
+      <div className='w-30 shrink-0'>
         {(() => {
           const assigned = proposal.assigned_users?.length
             ? proposal.assigned_users
@@ -767,11 +767,11 @@ function ProposalRow({
       <CustomColumnsCells row={proposal as Record<string, unknown>} columns={customColumns} />
 
       {/* Notes */}
-      <div className='flex w-[46px] shrink-0 justify-center'>
+      <div className='flex w-11.5 shrink-0 justify-center'>
         <button
           type='button'
           className={cn(
-            'inline-flex h-[26px] w-[46px] items-center justify-center gap-1 rounded-[6px] border text-[12px] font-medium tabular-nums transition-colors duration-[80ms]',
+            'inline-flex h-6.5 w-11.5 items-center justify-center gap-1 rounded-md border text-[12px] font-medium tabular-nums transition-colors duration-80',
             noteCount > 0
               ? 'border-border bg-bg-secondary text-text-secondary hover:bg-bg-active'
               : 'text-text-quaternary border-transparent hover:bg-bg-hover hover:text-text-tertiary'
@@ -789,7 +789,7 @@ function ProposalRow({
 
       {/* Actions */}
       <div
-        className='flex w-[28px] shrink-0 items-center justify-center'
+        className='flex w-7 shrink-0 items-center justify-center'
         onClick={e => e.stopPropagation()}
         onKeyDown={e => e.stopPropagation()}
         role='group'
@@ -798,7 +798,7 @@ function ProposalRow({
           <DropdownMenuTrigger asChild>
             <button
               type='button'
-              className='inline-flex size-6 items-center justify-center rounded-[6px] text-text-tertiary transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground'
+              className='inline-flex size-6 items-center justify-center rounded-md text-text-tertiary transition-colors duration-80 hover:bg-bg-active hover:text-foreground'
               aria-label='Proposal actions'
             >
               <MoreHorizontal className='size-4' />
@@ -806,12 +806,12 @@ function ProposalRow({
           </DropdownMenuTrigger>
           <DropdownMenuContent
             align='end'
-            className='w-[200px] rounded-[8px] p-1'
+            className='w-50 rounded-lg p-1'
             style={{ boxShadow: 'var(--dropdown-shadow)' }}
           >
             {canAssign && (
               <DropdownMenuItem
-                className='cursor-pointer gap-2 rounded-[6px] px-2 py-1 text-[13px]'
+                className='cursor-pointer gap-2 rounded-md px-2 py-1 text-[13px]'
                 onClick={() => onAssign(proposal)}
               >
                 <UserPlus className='size-3.5' />
@@ -819,14 +819,14 @@ function ProposalRow({
               </DropdownMenuItem>
             )}
             <DropdownMenuItem
-              className='cursor-pointer gap-2 rounded-[6px] px-2 py-1 text-[13px]'
+              className='cursor-pointer gap-2 rounded-md px-2 py-1 text-[13px]'
               onClick={() => onCreateTask(proposal)}
             >
               <ListTodo className='size-3.5' />
               Create Task
             </DropdownMenuItem>
             <DropdownMenuItem
-              className='cursor-pointer gap-2 rounded-[6px] px-2 py-1 text-[13px]'
+              className='cursor-pointer gap-2 rounded-md px-2 py-1 text-[13px]'
               onClick={() => onAttachments(proposal)}
             >
               <Paperclip className='size-3.5' />
@@ -834,7 +834,7 @@ function ProposalRow({
             </DropdownMenuItem>
             <DropdownMenuItem
               variant='destructive'
-              className='cursor-pointer gap-2 rounded-[6px] px-2 py-1 text-[13px]'
+              className='cursor-pointer gap-2 rounded-md px-2 py-1 text-[13px]'
               onClick={() => onDelete(proposal)}
             >
               <Trash2 className='size-3.5' />
@@ -869,7 +869,7 @@ function ProposalSortableHeader({
     <button
       type='button'
       className={cn(
-        'group inline-flex items-center gap-1 text-left transition-colors duration-[80ms] hover:text-foreground',
+        'group inline-flex items-center gap-1 text-left transition-colors duration-80 hover:text-foreground',
         active && 'text-foreground',
         className
       )}

@@ -419,7 +419,7 @@ export const EntityAttachments = forwardRef<EntityAttachmentsRef, EntityAttachme
                   <button
                     type='button'
                     onClick={() => removeFile(fileItem.id)}
-                    className='text-text-quaternary shrink-0 rounded-[4px] p-1 opacity-0 transition-all duration-75 group-hover/file:opacity-100 hover:bg-bg-active hover:text-destructive'
+                    className='text-text-quaternary shrink-0 rounded-sm p-1 opacity-0 transition-all duration-75 group-hover/file:opacity-100 hover:bg-bg-active hover:text-destructive'
                   >
                     <Trash2Icon className='size-3' />
                   </button>
@@ -468,7 +468,7 @@ export const EntityAttachments = forwardRef<EntityAttachmentsRef, EntityAttachme
                       download={attachment.file_name}
                       target='_blank'
                       rel='noopener noreferrer'
-                      className='text-text-quaternary inline-flex size-6 items-center justify-center rounded-[4px] transition-colors hover:bg-bg-active hover:text-foreground'
+                      className='text-text-quaternary inline-flex size-6 items-center justify-center rounded-sm transition-colors hover:bg-bg-active hover:text-foreground'
                     >
                       <DownloadIcon className='size-3' />
                     </a>
@@ -482,7 +482,7 @@ export const EntityAttachments = forwardRef<EntityAttachmentsRef, EntityAttachme
                         })
                       }
                       disabled={isDeleting}
-                      className='text-text-quaternary inline-flex size-6 items-center justify-center rounded-[4px] transition-colors hover:bg-bg-active hover:text-destructive'
+                      className='text-text-quaternary inline-flex size-6 items-center justify-center rounded-sm transition-colors hover:bg-bg-active hover:text-destructive'
                     >
                       {isDeleting ? (
                         <Loader2 className='size-3 animate-spin' />

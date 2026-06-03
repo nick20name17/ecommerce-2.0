@@ -133,21 +133,21 @@ function Panel1() {
         <div className='flex flex-1 flex-col'>
           <div className='flex items-center gap-1.5'>
             <span className='text-[14px] font-bold text-gray-900'>Craftwork</span>
-            <span className='rounded bg-amber-400/20 px-1.5 py-[1px] text-[9px] font-bold text-amber-700'>
+            <span className='rounded bg-amber-400/20 px-1.5 py-px text-[9px] font-bold text-amber-700'>
               Pro
             </span>
           </div>
           <span className='text-[11px] text-gray-400'>20 employees</span>
         </div>
-        <Bell className='size-[15px] text-gray-400' />
-        <MoreHorizontal className='size-[15px] text-gray-400' />
+        <Bell className='size-3.75 text-gray-400' />
+        <MoreHorizontal className='size-3.75 text-gray-400' />
       </div>
 
       {/* ── Add new button ── */}
       <div className='px-5 pb-4'>
         <button
           type='button'
-          className='flex h-[34px] w-full items-center justify-center gap-1.5 rounded-[8px] border border-gray-200 text-[13px] font-medium text-gray-500'
+          className='flex h-8.5 w-full items-center justify-center gap-1.5 rounded-lg border border-gray-200 text-[13px] font-medium text-gray-500'
         >
           <Plus className='size-3.5' />
           Add new
@@ -157,15 +157,15 @@ function Panel1() {
       {/* ── Top nav items ── */}
       <div className='flex flex-col px-5'>
         {/* Updates */}
-        <div className='flex h-[38px] items-center gap-3'>
+        <div className='flex h-9.5 items-center gap-3'>
           <Circle className='size-4 text-gray-400' />
           <span className='flex-1 text-[14px] text-gray-600'>Updates</span>
-          <span className='rounded-[5px] bg-red-50 px-1.5 py-[1px] text-[11px] font-semibold text-red-500'>
+          <span className='rounded-[5px] bg-red-50 px-1.5 py-px text-[11px] font-semibold text-red-500'>
             16
           </span>
         </div>
         {/* Members */}
-        <div className='group flex h-[38px] items-center gap-3'>
+        <div className='group flex h-9.5 items-center gap-3'>
           <Users className='size-4 text-gray-400' />
           <span className='flex-1 text-[14px] text-gray-600'>Members</span>
           <span className='flex items-center gap-1.5 opacity-0 group-hover:opacity-100'>
@@ -174,7 +174,7 @@ function Panel1() {
           </span>
         </div>
         {/* Settings */}
-        <div className='flex h-[38px] items-center gap-3'>
+        <div className='flex h-9.5 items-center gap-3'>
           <Settings className='size-4 text-gray-400' />
           <span className='text-[14px] text-gray-600'>Settings</span>
         </div>
@@ -186,36 +186,36 @@ function Panel1() {
 
         <div className='flex flex-col px-5'>
           {/* Team tasks */}
-          <div className='flex h-[34px] items-center gap-3'>
+          <div className='flex h-8.5 items-center gap-3'>
             <Star className='size-4 text-gray-400' />
             <span className='text-[14px] text-gray-600'>Team tasks</span>
           </div>
 
           {/* Craftwork — expanded */}
-          <div className='flex h-[34px] items-center gap-3'>
+          <div className='flex h-8.5 items-center gap-3'>
             <ChevronDown className='size-3.5 text-gray-400' />
             <span className='text-[14px] text-gray-600'>Craftwork</span>
           </div>
 
           {/* Sub-items — indented under Craftwork */}
-          <div className='ml-[14px] flex flex-col border-l border-gray-100 pl-[18px]'>
-            <div className='flex h-[32px] items-center text-[14px] text-gray-500'>Orders</div>
-            <div className='flex h-[32px] items-center text-[14px] text-gray-500'>Mails</div>
-            <div className='-ml-[19px] flex h-[34px] items-center rounded-[8px] bg-gray-50 pl-[19px] text-[14px] font-semibold text-gray-900'>
+          <div className='ml-3.5 flex flex-col border-l border-gray-100 pl-4.5'>
+            <div className='flex h-8 items-center text-[14px] text-gray-500'>Orders</div>
+            <div className='flex h-8 items-center text-[14px] text-gray-500'>Mails</div>
+            <div className='-ml-4.75 flex h-8.5 items-center rounded-lg bg-gray-50 pl-4.75 text-[14px] font-semibold text-gray-900'>
               Stuff
             </div>
-            <div className='flex h-[32px] items-center text-[14px] text-gray-500'>Affiliates</div>
-            <div className='flex h-[32px] items-center text-[14px] text-gray-500'>Authors</div>
+            <div className='flex h-8 items-center text-[14px] text-gray-500'>Affiliates</div>
+            <div className='flex h-8 items-center text-[14px] text-gray-500'>Authors</div>
           </div>
 
           {/* Storytale */}
-          <div className='flex h-[34px] items-center gap-3'>
+          <div className='flex h-8.5 items-center gap-3'>
             <Globe className='size-4 text-gray-400' />
             <span className='text-[14px] text-gray-600'>Storytale</span>
           </div>
 
           {/* Circa [dev] */}
-          <div className='flex h-[34px] items-center gap-3'>
+          <div className='flex h-8.5 items-center gap-3'>
             <IcCode className='size-4 text-gray-400' />
             <span className='text-[14px] text-gray-600'>Circa [dev]</span>
           </div>
@@ -224,15 +224,15 @@ function Panel1() {
 
       {/* ── Footer ── */}
       <div className='flex flex-col gap-0.5 border-t border-gray-100 px-5 py-3'>
-        <div className='flex h-[34px] items-center gap-3'>
+        <div className='flex h-8.5 items-center gap-3'>
           <IcGrid className='size-4 text-gray-400' />
           <span className='text-[14px] text-gray-500'>Templates</span>
         </div>
-        <div className='flex h-[34px] items-center gap-3'>
+        <div className='flex h-8.5 items-center gap-3'>
           <IcImport className='size-4 text-gray-400' />
           <span className='text-[14px] text-gray-500'>Import</span>
         </div>
-        <div className='flex h-[34px] items-center gap-3'>
+        <div className='flex h-8.5 items-center gap-3'>
           <Trash2 className='size-4 text-gray-400' />
           <span className='text-[14px] text-gray-500'>Trash</span>
         </div>
@@ -250,12 +250,12 @@ function Panel2() {
     <div className='flex h-full w-full flex-col bg-background'>
       {/* ── Header ── */}
       <div className='flex items-center gap-3.5 px-5 pt-5 pb-3'>
-        <div className='flex size-9 items-center justify-center rounded-full bg-gradient-to-br from-red-400 to-orange-400'>
+        <div className='flex size-9 items-center justify-center rounded-full bg-linear-to-br from-red-400 to-orange-400'>
           <span className='text-[14px] font-black text-white'>f</span>
         </div>
         <div className='flex-1' />
-        <Search className='size-[15px] text-gray-400' />
-        <Bell className='size-[15px] text-gray-400' />
+        <Search className='size-3.75 text-gray-400' />
+        <Bell className='size-3.75 text-gray-400' />
       </div>
 
       {/* ── Nav items ── */}
@@ -276,7 +276,7 @@ function Panel2() {
           <div
             key={item.title}
             className={cn(
-              'flex h-[38px] items-center gap-3',
+              'flex h-9.5 items-center gap-3',
               'active' in item && item.active ? 'font-medium text-gray-900' : 'text-gray-600'
             )}
           >
@@ -299,12 +299,12 @@ function Panel2() {
           <span className='text-[13px] font-medium text-gray-700'>Free trial</span>
           <span className='text-[13px] text-gray-400'>15 days left</span>
         </div>
-        <div className='h-[5px] rounded-full bg-gray-100'>
+        <div className='h-1.25 rounded-full bg-gray-100'>
           <div className='h-full w-[55%] rounded-full bg-emerald-500' />
         </div>
         <button
           type='button'
-          className='flex h-[36px] w-full items-center justify-center rounded-[8px] border border-gray-200 text-[13px] font-medium text-gray-600'
+          className='flex h-9 w-full items-center justify-center rounded-lg border border-gray-200 text-[13px] font-medium text-gray-600'
         >
           Upgrade
         </button>
@@ -316,11 +316,11 @@ function Panel2() {
 
       {/* ── Help + User ── */}
       <div className='border-t border-gray-100 px-5 py-3'>
-        <div className='flex h-[38px] items-center gap-3'>
+        <div className='flex h-9.5 items-center gap-3'>
           <MessageSquare className='size-4 text-gray-400' />
           <span className='text-[14px] text-gray-600'>Help & Support</span>
         </div>
-        <div className='mt-1 flex h-[42px] items-center gap-3'>
+        <div className='mt-1 flex h-10.5 items-center gap-3'>
           <div className='flex size-8 items-center justify-center rounded-full bg-blue-100 text-[12px] font-bold text-blue-600'>
             J
           </div>
@@ -370,7 +370,7 @@ function Panel3() {
         <div className='flex flex-1 flex-col'>
           <div className='flex items-center gap-2'>
             <span className='text-[15px] font-bold text-gray-900'>Alien</span>
-            <span className='rounded bg-violet-100 px-1.5 py-[1px] text-[9px] font-bold text-violet-600'>
+            <span className='rounded bg-violet-100 px-1.5 py-px text-[9px] font-bold text-violet-600'>
               Pro
             </span>
           </div>
@@ -384,8 +384,8 @@ function Panel3() {
         {sections.map(section => (
           <div key={section.label}>
             {/* Section header — icon + label */}
-            <div className='flex h-[36px] items-center gap-2.5'>
-              <section.icon className='size-[15px] text-gray-400' />
+            <div className='flex h-9 items-center gap-2.5'>
+              <section.icon className='size-3.75 text-gray-400' />
               <span className='text-[14px] font-semibold text-gray-800'>{section.label}</span>
             </div>
             {/* Sub-items — indented, no icons */}
@@ -393,7 +393,7 @@ function Panel3() {
               {section.items.map(item => (
                 <div
                   key={item}
-                  className='flex h-[34px] items-center pl-[27px] text-[14px] text-gray-500'
+                  className='flex h-8.5 items-center pl-6.75 text-[14px] text-gray-500'
                 >
                   {item}
                 </div>
@@ -405,7 +405,7 @@ function Panel3() {
 
       {/* ── Footer ── */}
       <div className='border-t border-gray-100 px-5 py-3'>
-        <div className='flex h-[38px] items-center gap-3'>
+        <div className='flex h-9.5 items-center gap-3'>
           <LogOut className='size-4 text-gray-400' />
           <span className='text-[14px] text-gray-600'>Log out</span>
         </div>
@@ -438,14 +438,14 @@ function Panel4() {
           C
         </div>
         <span className='flex-1 text-[14px] font-bold text-gray-900'>Craftwork</span>
-        <Bell className='size-[15px] text-gray-400' />
+        <Bell className='size-3.75 text-gray-400' />
       </div>
 
       {/* ── Add new ── */}
       <div className='px-5 pb-3'>
         <button
           type='button'
-          className='flex h-[34px] w-full items-center justify-center gap-1.5 rounded-[8px] border border-gray-200 text-[13px] font-medium text-gray-500'
+          className='flex h-8.5 w-full items-center justify-center gap-1.5 rounded-lg border border-gray-200 text-[13px] font-medium text-gray-500'
         >
           <Plus className='size-3.5' />
           Add new
@@ -455,15 +455,15 @@ function Panel4() {
       {/* ── Top items ── */}
       <div className='flex flex-col px-5'>
         {/* Posts */}
-        <div className='flex h-[38px] items-center gap-3'>
+        <div className='flex h-9.5 items-center gap-3'>
           <IcPen className='size-4 text-gray-400' />
           <span className='flex-1 text-[14px] text-gray-600'>Posts</span>
-          <span className='rounded-[5px] bg-orange-50 px-1.5 py-[1px] text-[11px] font-semibold text-orange-500'>
+          <span className='rounded-[5px] bg-orange-50 px-1.5 py-px text-[11px] font-semibold text-orange-500'>
             16
           </span>
         </div>
         {/* Media */}
-        <div className='group flex h-[38px] items-center gap-3'>
+        <div className='group flex h-9.5 items-center gap-3'>
           <Image className='size-4 text-gray-400' />
           <span className='flex-1 text-[14px] text-gray-600'>Media</span>
           <span className='flex items-center gap-1.5 opacity-0 group-hover:opacity-100'>
@@ -472,7 +472,7 @@ function Panel4() {
           </span>
         </div>
         {/* Links */}
-        <div className='flex h-[38px] items-center gap-3'>
+        <div className='flex h-9.5 items-center gap-3'>
           <Link2 className='size-4 text-gray-400' />
           <span className='text-[14px] text-gray-600'>Links</span>
         </div>
@@ -484,31 +484,31 @@ function Panel4() {
 
         <div className='flex flex-col px-5'>
           {/* Pages */}
-          <div className='flex h-[38px] items-center gap-3'>
+          <div className='flex h-9.5 items-center gap-3'>
             <IcFile className='size-4 text-gray-400' />
             <span className='text-[14px] text-gray-600'>Pages</span>
           </div>
 
           {/* Downloads — expanded */}
-          <div className='flex h-[38px] items-center gap-3'>
+          <div className='flex h-9.5 items-center gap-3'>
             <IcFile className='size-4 text-gray-400' />
             <span className='text-[14px] text-gray-600'>Downloads</span>
           </div>
 
           {/* Sub-items with left border */}
-          <div className='ml-[14px] flex flex-col border-l border-gray-100 pl-[14px]'>
+          <div className='ml-3.5 flex flex-col border-l border-gray-100 pl-3.5'>
             {downloadsSubs.map(item => {
               const isActive = item === 'Customers'
               return (
                 <div
                   key={item}
                   className={cn(
-                    'relative flex h-[32px] items-center text-[14px]',
+                    'relative flex h-8 items-center text-[14px]',
                     isActive ? 'font-semibold text-gray-900' : 'text-gray-500'
                   )}
                 >
                   {isActive && (
-                    <div className='absolute top-[8px] bottom-[8px] -left-[15px] w-[2px] rounded-r bg-orange-400' />
+                    <div className='absolute top-2 bottom-2 -left-3.75 w-0.5 rounded-r bg-orange-400' />
                   )}
                   {item}
                 </div>
@@ -517,13 +517,13 @@ function Panel4() {
           </div>
 
           {/* Comments */}
-          <div className='flex h-[38px] items-center gap-3'>
+          <div className='flex h-9.5 items-center gap-3'>
             <MessageSquare className='size-4 text-gray-400' />
             <span className='text-[14px] text-gray-600'>Comments</span>
           </div>
 
           {/* News */}
-          <div className='flex h-[38px] items-center gap-3'>
+          <div className='flex h-9.5 items-center gap-3'>
             <Newspaper className='size-4 text-gray-400' />
             <span className='text-[14px] text-gray-600'>News</span>
           </div>
@@ -532,15 +532,15 @@ function Panel4() {
 
       {/* ── Footer ── */}
       <div className='flex flex-col border-t border-gray-100 px-5 py-3'>
-        <div className='flex h-[36px] items-center gap-3'>
+        <div className='flex h-9 items-center gap-3'>
           <User className='size-4 text-gray-400' />
           <span className='text-[14px] text-gray-500'>Profile</span>
         </div>
-        <div className='flex h-[36px] items-center gap-3'>
+        <div className='flex h-9 items-center gap-3'>
           <Wrench className='size-4 text-gray-400' />
           <span className='text-[14px] text-gray-500'>Tools</span>
         </div>
-        <div className='flex h-[36px] items-center gap-3'>
+        <div className='flex h-9 items-center gap-3'>
           <Settings className='size-4 text-gray-400' />
           <span className='text-[14px] text-gray-500'>Settings</span>
         </div>
@@ -614,7 +614,7 @@ function NavOptionsPage() {
                     : 'border-border hover:border-foreground/20 hover:shadow-md'
                 )}
               >
-                <div className='relative h-[540px] overflow-hidden'>
+                <div className='relative h-135 overflow-hidden'>
                   <Component />
                   {isSelected && (
                     <div className='absolute top-2.5 right-2.5 flex size-5 items-center justify-center rounded-full bg-primary'>

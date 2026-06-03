@@ -119,9 +119,20 @@ export interface CreateProjectPayload {
   storefront_token?: string
 }
 
+export type ProjectSettingsPayload = Partial<
+  Pick<
+    Project,
+    | 'unit_system'
+    | 'category_show_web_filter'
+    | 'product_show_web_filter'
+    | 'oos_field'
+    | 'sales_total_field'
+  >
+>
+
 export interface UpdateProjectPayload {
   id: number
-  payload: Partial<CreateProjectPayload>
+  payload: Partial<CreateProjectPayload> & ProjectSettingsPayload
 }
 
 export type ProjectResponse = ApiResponse<Project>

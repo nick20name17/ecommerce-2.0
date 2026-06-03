@@ -126,7 +126,7 @@ export const CustomerTasksTab = ({ customerId, customerName }: CustomerTasksTabP
     <div className='flex h-full flex-col overflow-hidden'>
       {/* Search + create */}
       <div className='flex shrink-0 items-center gap-2 border-b border-border px-5 py-2 sm:px-6'>
-        <div className='flex flex-1 items-center gap-1.5 rounded-[6px] border border-border bg-background px-2.5 py-1.5'>
+        <div className='flex flex-1 items-center gap-1.5 rounded-md border border-border bg-background px-2.5 py-1.5'>
           <Search className='size-3.5 shrink-0 text-text-tertiary' />
           <input
             value={search}
@@ -137,7 +137,7 @@ export const CustomerTasksTab = ({ customerId, customerName }: CustomerTasksTabP
         </div>
         <button
           type='button'
-          className='inline-flex h-8 shrink-0 items-center gap-1.5 rounded-[6px] bg-primary px-3 text-[13px] font-medium text-primary-foreground transition-colors duration-[80ms] hover:opacity-90'
+          className='inline-flex h-8 shrink-0 items-center gap-1.5 rounded-md bg-primary px-3 text-[13px] font-medium text-primary-foreground transition-colors duration-80 hover:opacity-90'
           onClick={() => setShowCreate(true)}
         >
           <Plus className='size-4' />
@@ -248,7 +248,7 @@ function TaskRow({
         <div className='flex items-center gap-2'>
           <button
             type='button'
-            className='shrink-0 rounded-[4px] transition-opacity duration-[80ms] hover:opacity-70'
+            className='shrink-0 rounded-sm transition-opacity duration-80 hover:opacity-70'
             onClick={e => {
               e.stopPropagation()
               setStatusOpen(true)
@@ -260,7 +260,7 @@ function TaskRow({
             {task.title}
           </span>
         </div>
-        <div className='mt-0.5 flex items-center gap-2 pl-[22px]'>
+        <div className='mt-0.5 flex items-center gap-2 pl-5.5'>
           <span className='text-[13px] text-text-tertiary tabular-nums'>
             TSK-{task.id.toString().padStart(3, '0')}
           </span>
@@ -294,14 +294,14 @@ function TaskRow({
           <PopoverTrigger asChild>
             <button
               type='button'
-              className='shrink-0 rounded-[4px] transition-opacity duration-[80ms] hover:opacity-70'
+              className='shrink-0 rounded-sm transition-opacity duration-80 hover:opacity-70'
               onClick={e => e.stopPropagation()}
             >
               <StatusIcon status={task.status_name} color={task.status_color} size={14} />
             </button>
           </PopoverTrigger>
           <PopoverContent
-            className='w-[180px] gap-0 overflow-hidden rounded-[8px] border-border p-1'
+            className='w-45 gap-0 overflow-hidden rounded-lg border-border p-1'
             align='start'
             style={{ boxShadow: 'var(--dropdown-shadow)' }}
             onOpenAutoFocus={e => e.preventDefault()}
@@ -311,8 +311,8 @@ function TaskRow({
                 key={s.id}
                 type='button'
                 className={cn(
-                  'flex w-full items-center gap-2 rounded-[6px] px-2 py-1 text-left text-[13px] font-medium',
-                  'transition-colors duration-[80ms]',
+                  'flex w-full items-center gap-2 rounded-md px-2 py-1 text-left text-[13px] font-medium',
+                  'transition-colors duration-80',
                   s.id === task.status ? 'bg-accent-bg' : 'hover:bg-bg-hover'
                 )}
                 onClick={e => {
@@ -340,13 +340,13 @@ function TaskRow({
 
       {/* Metadata */}
       <div className='flex shrink-0 items-center gap-4'>
-        <div className='flex w-[70px] items-center gap-1.5'>
+        <div className='flex w-17.5 items-center gap-1.5'>
           <PriorityIcon priority={task.priority} color={priorityColor} size={14} />
           <span className='text-[13px] font-medium'>{priorityLabel}</span>
         </div>
 
         {!isTablet && (
-          <div className='flex w-[90px] min-w-0 items-center gap-1.5'>
+          <div className='flex w-22.5 min-w-0 items-center gap-1.5'>
             {assigneeInitials ? (
               <>
                 <InitialsAvatar initials={assigneeInitials} size={18} />
@@ -358,7 +358,7 @@ function TaskRow({
           </div>
         )}
 
-        <div className='w-[60px] text-[13px] text-text-tertiary'>
+        <div className='w-15 text-[13px] text-text-tertiary'>
           {dueDateLabel ? (
             <span className={cn(overdue && 'font-medium text-destructive')}>{dueDateLabel}</span>
           ) : (
@@ -378,7 +378,7 @@ function TaskRow({
           <DropdownMenuTrigger asChild>
             <button
               type='button'
-              className='inline-flex size-6 items-center justify-center rounded-[6px] text-text-tertiary transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground'
+              className='inline-flex size-6 items-center justify-center rounded-md text-text-tertiary transition-colors duration-80 hover:bg-bg-active hover:text-foreground'
               aria-label='Task actions'
             >
               <svg width='15' height='15' viewBox='0 0 15 15' fill='none'>
@@ -390,12 +390,12 @@ function TaskRow({
           </DropdownMenuTrigger>
           <DropdownMenuContent
             align='end'
-            className='w-[180px] rounded-[8px] p-1'
+            className='w-45 rounded-lg p-1'
             style={{ boxShadow: 'var(--dropdown-shadow)' }}
           >
             <DropdownMenuItem
               variant='destructive'
-              className='cursor-pointer gap-2 rounded-[6px] px-2 py-1 text-[13px]'
+              className='cursor-pointer gap-2 rounded-md px-2 py-1 text-[13px]'
               onClick={() => onDelete(task)}
             >
               <Trash2 className='size-3.5' />

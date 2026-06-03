@@ -147,11 +147,7 @@ export const VPValuesMatrix = ({ vp, projectId, isMobile, isTablet }: VPValuesMa
               <th
                 className={cn(
                   'sticky left-0 z-10 bg-bg-secondary py-1.5 text-left font-medium',
-                  isMobile
-                    ? 'min-w-[100px] px-2'
-                    : isTablet
-                      ? 'min-w-[140px] px-2.5'
-                      : 'min-w-[180px] px-3'
+                  isMobile ? 'min-w-25 px-2' : isTablet ? 'min-w-35 px-2.5' : 'min-w-45 px-3'
                 )}
               >
                 Product
@@ -161,11 +157,7 @@ export const VPValuesMatrix = ({ vp, projectId, isMobile, isTablet }: VPValuesMa
                   key={spec.id}
                   className={cn(
                     'py-1.5 text-left font-medium whitespace-nowrap',
-                    isMobile
-                      ? 'min-w-[80px] px-2'
-                      : isTablet
-                        ? 'min-w-[100px] px-2.5'
-                        : 'min-w-[120px] px-3'
+                    isMobile ? 'min-w-20 px-2' : isTablet ? 'min-w-25 px-2.5' : 'min-w-30 px-3'
                   )}
                 >
                   {spec.name}
@@ -193,7 +185,7 @@ export const VPValuesMatrix = ({ vp, projectId, isMobile, isTablet }: VPValuesMa
                   <div
                     className={cn(
                       'truncate',
-                      isMobile ? 'max-w-[90px]' : isTablet ? 'max-w-[130px]' : 'max-w-[200px]'
+                      isMobile ? 'max-w-22.5' : isTablet ? 'max-w-32.5' : 'max-w-50'
                     )}
                     title={item.descr_1}
                   >

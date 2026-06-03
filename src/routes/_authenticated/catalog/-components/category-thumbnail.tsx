@@ -35,7 +35,7 @@ export const CategoryIcon = ({
 
   // Still fetching image list — show a small neutral placeholder to avoid folder→image flash
   if (isLoading) {
-    return <div className='size-5 shrink-0 rounded-[4px] bg-bg-secondary/60' />
+    return <div className='size-5 shrink-0 rounded-sm bg-bg-secondary/60' />
   }
 
   // No images for this category — show folder icon
@@ -45,7 +45,7 @@ export const CategoryIcon = ({
 
   // Has image — show thumbnail with fade-in
   return (
-    <div className='size-5 shrink-0 overflow-hidden rounded-[4px] border border-border/50 bg-bg-secondary shadow-sm'>
+    <div className='size-5 shrink-0 overflow-hidden rounded-sm border border-border/50 bg-bg-secondary shadow-sm'>
       <img
         src={url}
         alt=''

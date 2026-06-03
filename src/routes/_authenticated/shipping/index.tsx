@@ -155,7 +155,7 @@ const ShippingPage = () => {
 
         <div className='flex-1' />
 
-        <div className='flex items-center gap-1.5 rounded-[6px] border border-border bg-background px-2.5 py-1.5'>
+        <div className='flex items-center gap-1.5 rounded-md border border-border bg-background px-2.5 py-1.5'>
           <Search className='size-3.5 shrink-0 text-text-tertiary' />
           <input
             value={search}
@@ -164,7 +164,7 @@ const ShippingPage = () => {
               setOffset(null)
             }}
             placeholder='Search shipments...'
-            className='w-[140px] bg-transparent text-[13px] outline-none placeholder:text-text-tertiary sm:w-[200px]'
+            className='w-35 bg-transparent text-[13px] outline-none placeholder:text-text-tertiary sm:w-50'
           />
         </div>
 
@@ -187,14 +187,14 @@ const ShippingPage = () => {
                 key={opt.value}
                 type='button'
                 className={cn(
-                  'flex w-full items-center gap-2 rounded-[5px] px-2 py-[3px] text-left text-[13px] font-medium',
-                  'transition-colors duration-[80ms] hover:bg-bg-hover'
+                  'flex w-full items-center gap-2 rounded-[5px] px-2 py-0.75 text-left text-[13px] font-medium',
+                  'transition-colors duration-80 hover:bg-bg-hover'
                 )}
                 onClick={() => selectStatus(opt.value)}
               >
                 <div
                   className={cn(
-                    'flex size-3.5 items-center justify-center rounded-full border transition-colors duration-[80ms]',
+                    'flex size-3.5 items-center justify-center rounded-full border transition-colors duration-80',
                     selected_ ? 'border-primary bg-primary' : 'border-border'
                   )}
                 >
@@ -220,7 +220,7 @@ const ShippingPage = () => {
         >
           <button
             type='button'
-            className='text-[13px] font-medium text-text-tertiary transition-colors duration-[80ms] hover:text-foreground'
+            className='text-[13px] font-medium text-text-tertiary transition-colors duration-80 hover:text-foreground'
             onClick={() => setVoidedFilter('all')}
           >
             Clear
@@ -241,21 +241,19 @@ const ShippingPage = () => {
             isTablet ? 'px-5' : 'px-6'
           )}
         >
-          <div className='w-[80px] shrink-0 text-[13px] font-medium text-text-tertiary'>Order</div>
+          <div className='w-20 shrink-0 text-[13px] font-medium text-text-tertiary'>Order</div>
           <div className='min-w-0 flex-1 text-[13px] font-medium text-text-tertiary'>Customer</div>
-          <div className='hidden w-[120px] shrink-0 text-[13px] font-medium text-text-tertiary lg:block'>
+          <div className='hidden w-30 shrink-0 text-[13px] font-medium text-text-tertiary lg:block'>
             Service
           </div>
-          <div className='w-[110px] shrink-0 text-[13px] font-medium text-text-tertiary'>
-            Status
-          </div>
-          <div className='hidden w-[80px] shrink-0 text-right text-[13px] font-medium text-text-tertiary sm:block'>
+          <div className='w-27.5 shrink-0 text-[13px] font-medium text-text-tertiary'>Status</div>
+          <div className='hidden w-20 shrink-0 text-right text-[13px] font-medium text-text-tertiary sm:block'>
             Cost
           </div>
-          <div className='hidden w-[100px] shrink-0 text-[13px] font-medium text-text-tertiary lg:block'>
+          <div className='hidden w-25 shrink-0 text-[13px] font-medium text-text-tertiary lg:block'>
             Date
           </div>
-          <div className='w-[20px] shrink-0' />
+          <div className='w-5 shrink-0' />
         </div>
       )}
 
@@ -365,7 +363,7 @@ function ShipmentRow({
       )}
       onClick={onClick}
     >
-      <div className='w-[80px] shrink-0'>
+      <div className='w-20 shrink-0'>
         <span className='text-[13px] font-semibold text-foreground tabular-nums'>
           {getOrderDisplay(shipment)}
         </span>
@@ -373,19 +371,19 @@ function ShipmentRow({
       <div className='min-w-0 flex-1 truncate text-[13px] font-medium text-foreground'>
         {customerName}
       </div>
-      <div className='hidden w-[120px] shrink-0 truncate text-[13px] text-text-tertiary lg:block'>
+      <div className='hidden w-30 shrink-0 truncate text-[13px] text-text-tertiary lg:block'>
         {shipment.service_name}
       </div>
-      <div className='w-[110px] shrink-0'>
+      <div className='w-27.5 shrink-0'>
         <StatusBadge voided={shipment.voided} />
       </div>
-      <div className='hidden w-[80px] shrink-0 text-right text-[13px] font-medium text-foreground tabular-nums sm:block'>
+      <div className='hidden w-20 shrink-0 text-right text-[13px] font-medium text-foreground tabular-nums sm:block'>
         ${parseFloat(shipment.cost).toFixed(2)}
       </div>
-      <div className='hidden w-[100px] shrink-0 text-[13px] text-text-tertiary tabular-nums lg:block'>
+      <div className='hidden w-25 shrink-0 text-[13px] text-text-tertiary tabular-nums lg:block'>
         {formatDateMedium(shipment.created_at)}
       </div>
-      <div className='w-[20px] shrink-0 text-text-tertiary opacity-0 transition-opacity group-hover/row:opacity-100'>
+      <div className='w-5 shrink-0 text-text-tertiary opacity-0 transition-opacity group-hover/row:opacity-100'>
         <ChevronRight className='size-3.5' />
       </div>
     </div>
@@ -455,7 +453,7 @@ function ShipmentDetailDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className='flex max-h-[85vh] flex-col gap-0 overflow-hidden p-0 sm:max-w-[560px]'>
+      <DialogContent className='flex max-h-[85vh] flex-col gap-0 overflow-hidden p-0 sm:max-w-140'>
         <DialogHeader className='border-b border-border px-5 py-3'>
           <DialogTitle className='flex items-center gap-2 text-[14px]'>
             <Truck className='size-4 text-text-tertiary' />
@@ -469,7 +467,7 @@ function ShipmentDetailDialog({
           {shipment.label_url && !shipment.voided && (
             <div className='flex items-center justify-between border-b border-border bg-foreground/[0.02] px-5 py-2.5'>
               <div className='flex items-center gap-2'>
-                <div className='flex size-7 items-center justify-center rounded-[6px] bg-primary/10'>
+                <div className='flex size-7 items-center justify-center rounded-md bg-primary/10'>
                   <Package className='size-3.5 text-primary' />
                 </div>
                 <div>
@@ -484,7 +482,7 @@ function ShipmentDetailDialog({
                   <button
                     type='button'
                     onClick={() => setVoidConfirmOpen(true)}
-                    className='inline-flex h-7 items-center gap-1.5 rounded-[6px] border border-red-300 bg-red-500/10 px-3 text-[12px] font-medium text-red-700 shadow-xs transition-colors duration-[80ms] hover:bg-red-500/20 dark:border-red-600 dark:text-red-400'
+                    className='inline-flex h-7 items-center gap-1.5 rounded-md border border-red-300 bg-red-500/10 px-3 text-[12px] font-medium text-red-700 shadow-xs transition-colors duration-80 hover:bg-red-500/20 dark:border-red-600 dark:text-red-400'
                   >
                     <Ban className='size-3' />
                     Void
@@ -494,7 +492,7 @@ function ShipmentDetailDialog({
                   href={shipment.label_url}
                   target='_blank'
                   rel='noopener noreferrer'
-                  className='inline-flex h-7 items-center gap-1.5 rounded-[6px] border border-border bg-background px-3 text-[12px] font-medium text-text-secondary shadow-xs transition-colors duration-[80ms] hover:bg-bg-hover hover:text-foreground'
+                  className='inline-flex h-7 items-center gap-1.5 rounded-md border border-border bg-background px-3 text-[12px] font-medium text-text-secondary shadow-xs transition-colors duration-80 hover:bg-bg-hover hover:text-foreground'
                 >
                   <ExternalLink className='size-3' />
                   View Label
@@ -541,7 +539,7 @@ function ShipmentDetailDialog({
               <div className='mb-2 text-[12px] font-medium text-text-tertiary'>
                 Package Contents
               </div>
-              <div className='divide-y divide-border-light rounded-[6px] border border-border'>
+              <div className='divide-y divide-border-light rounded-md border border-border'>
                 {Array.from({ length: 3 }).map((_, i) => (
                   <div key={i} className='flex items-center gap-3 px-3 py-2'>
                     <Skeleton className='h-4 flex-1' />
@@ -557,7 +555,7 @@ function ShipmentDetailDialog({
                 <div className='mb-2 text-[12px] font-medium text-text-tertiary'>
                   Package Contents ({shipment.items?.length || pickListItems.length})
                 </div>
-                <div className='divide-y divide-border-light rounded-[6px] border border-border'>
+                <div className='divide-y divide-border-light rounded-md border border-border'>
                   {(shipment.items?.length ?? 0) > 0
                     ? shipment.items!.map(item => (
                         <div key={item.detail_autoid} className='flex items-center gap-3 px-3 py-2'>

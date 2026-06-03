@@ -117,7 +117,7 @@ function ProposalDetailPage() {
           <Skeleton className='h-4 w-12' />
           <Skeleton className='size-5 rounded-[5px]' />
           <Skeleton className='h-4 w-20' />
-          <Skeleton className='h-5 w-[72px] rounded-full' />
+          <Skeleton className='h-5 w-18 rounded-full' />
           <div className='flex-1' />
           <Skeleton className='size-7 rounded-[5px]' />
           <Skeleton className='size-7 rounded-[5px]' />
@@ -158,7 +158,7 @@ function ProposalDetailPage() {
             </div>
           </div>
 
-          <div className='hidden shrink-0 border-l border-border bg-bg-secondary/50 lg:block lg:w-[380px]'>
+          <div className='hidden shrink-0 border-l border-border bg-bg-secondary/50 lg:block lg:w-95'>
             <div className='flex items-center gap-0 border-b border-border px-4'>
               <Skeleton className='my-2 h-4 w-14' />
               <Skeleton className='my-2 ml-4 h-4 w-14' />
@@ -207,7 +207,7 @@ function ProposalDetailPage() {
         <SidebarTrigger className='-ml-1' />
         <button
           type='button'
-          className='inline-flex h-7 shrink-0 items-center gap-0.5 rounded-[6px] border border-border bg-bg-secondary pr-2.5 pl-1.5 text-[13px] font-medium text-text-secondary transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground'
+          className='inline-flex h-7 shrink-0 items-center gap-0.5 rounded-md border border-border bg-bg-secondary pr-2.5 pl-1.5 text-[13px] font-medium text-text-secondary transition-colors duration-80 hover:bg-bg-active hover:text-foreground'
           onClick={() => router.history.back()}
         >
           <ChevronLeft className='size-3.5' />
@@ -223,7 +223,7 @@ function ProposalDetailPage() {
             <TooltipTrigger asChild>
               <button
                 type='button'
-                className='inline-flex size-6 shrink-0 items-center justify-center rounded-[5px] text-text-tertiary transition-colors duration-[80ms] hover:bg-bg-hover hover:text-foreground'
+                className='inline-flex size-6 shrink-0 items-center justify-center rounded-[5px] text-text-tertiary transition-colors duration-80 hover:bg-bg-hover hover:text-foreground'
                 onClick={() => {
                   navigator.clipboard.writeText(proposal.quote)
                   toast.success('Quote # copied')
@@ -251,7 +251,7 @@ function ProposalDetailPage() {
           <button
             type='button'
             className={cn(
-              'inline-flex h-7 items-center gap-1.5 rounded-[5px] border px-2.5 text-[12px] font-medium transition-colors duration-[80ms]',
+              'inline-flex h-7 items-center gap-1.5 rounded-[5px] border px-2.5 text-[12px] font-medium transition-colors duration-80',
               assignedUsers.length > 0
                 ? 'border-primary/20 bg-primary/[0.06] text-primary hover:bg-primary/[0.1]'
                 : 'border-border bg-bg-secondary text-text-secondary hover:bg-bg-active hover:text-foreground'
@@ -274,7 +274,7 @@ function ProposalDetailPage() {
               <TooltipTrigger asChild>
                 <button
                   type='button'
-                  className='inline-flex size-7 items-center justify-center rounded-[5px] border border-border bg-bg-secondary text-[13px] font-medium text-text-secondary transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground lg:h-7 lg:w-auto lg:gap-1.5 lg:px-2.5'
+                  className='inline-flex size-7 items-center justify-center rounded-[5px] border border-border bg-bg-secondary text-[13px] font-medium text-text-secondary transition-colors duration-80 hover:bg-bg-active hover:text-foreground lg:h-7 lg:w-auto lg:gap-1.5 lg:px-2.5'
                   onClick={() => toOrderMutation.mutate()}
                   disabled={toOrderMutation.isPending}
                 >
@@ -299,7 +299,7 @@ function ProposalDetailPage() {
             <TooltipTrigger asChild>
               <button
                 type='button'
-                className='inline-flex size-7 items-center justify-center rounded-[5px] border border-border bg-bg-secondary text-text-secondary transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground'
+                className='inline-flex size-7 items-center justify-center rounded-[5px] border border-border bg-bg-secondary text-text-secondary transition-colors duration-80 hover:bg-bg-active hover:text-foreground'
                 onClick={() => setTaskModalOpen(true)}
               >
                 <ListTodo className='size-3.5' />
@@ -312,7 +312,7 @@ function ProposalDetailPage() {
             <TooltipTrigger asChild>
               <button
                 type='button'
-                className='inline-flex size-7 items-center justify-center rounded-[5px] border border-border bg-bg-secondary text-text-secondary transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground'
+                className='inline-flex size-7 items-center justify-center rounded-[5px] border border-border bg-bg-secondary text-text-secondary transition-colors duration-80 hover:bg-bg-active hover:text-foreground'
                 onClick={() => setNotesOpen(true)}
               >
                 <StickyNote className='size-3.5' />
@@ -325,7 +325,7 @@ function ProposalDetailPage() {
             <TooltipTrigger asChild>
               <button
                 type='button'
-                className='inline-flex size-7 items-center justify-center rounded-[5px] border border-border bg-bg-secondary text-text-secondary transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground'
+                className='inline-flex size-7 items-center justify-center rounded-[5px] border border-border bg-bg-secondary text-text-secondary transition-colors duration-80 hover:bg-bg-active hover:text-foreground'
                 onClick={() => setAttachmentsOpen(true)}
               >
                 <Paperclip className='size-3.5' />
@@ -338,7 +338,7 @@ function ProposalDetailPage() {
             <TooltipTrigger asChild>
               <button
                 type='button'
-                className='inline-flex size-7 items-center justify-center rounded-[5px] text-text-tertiary transition-colors duration-[80ms] hover:bg-bg-hover hover:text-destructive'
+                className='inline-flex size-7 items-center justify-center rounded-[5px] text-text-tertiary transition-colors duration-80 hover:bg-bg-hover hover:text-destructive'
                 onClick={() => setDeleteOpen(true)}
               >
                 <Trash2 className='size-3.5' />
@@ -360,27 +360,27 @@ function ProposalDetailPage() {
               <table className='w-full text-[13px]'>
                 <thead className='sticky top-0 z-10 bg-bg-secondary select-none'>
                   <tr className='border-b border-border text-left'>
-                    <th className='min-w-[100px] py-1.5 pr-3 pl-6 font-medium text-text-tertiary'>
+                    <th className='min-w-25 py-1.5 pr-3 pl-6 font-medium text-text-tertiary'>
                       Inventory
                     </th>
-                    <th className='min-w-[200px] px-3 py-1.5 font-medium text-text-tertiary'>
+                    <th className='min-w-50 px-3 py-1.5 font-medium text-text-tertiary'>
                       Description
                     </th>
-                    <th className='w-[70px] px-3 py-1.5 text-right font-medium text-text-tertiary'>
+                    <th className='w-17.5 px-3 py-1.5 text-right font-medium text-text-tertiary'>
                       Qty
                     </th>
-                    <th className='w-[60px] px-3 py-1.5 text-right font-medium text-text-tertiary'>
+                    <th className='w-15 px-3 py-1.5 text-right font-medium text-text-tertiary'>
                       Unit
                     </th>
                     {itemCustomCols.map(col => (
                       <th
                         key={col.field}
-                        className='min-w-[80px] px-3 py-1.5 font-medium text-text-tertiary'
+                        className='min-w-20 px-3 py-1.5 font-medium text-text-tertiary'
                       >
                         {getColumnLabel(col.field, 'proposal_item', fieldConfig)}
                       </th>
                     ))}
-                    <th className='w-[100px] py-1.5 pr-6 pl-3 text-right font-medium text-text-tertiary'>
+                    <th className='w-25 py-1.5 pr-6 pl-3 text-right font-medium text-text-tertiary'>
                       Amount
                     </th>
                   </tr>
@@ -394,14 +394,12 @@ function ProposalDetailPage() {
                       <td className='py-1.5 pr-3 pl-6 font-medium text-foreground'>
                         {item.inven || '—'}
                       </td>
-                      <td className='max-w-[400px] px-3 py-1.5 text-text-secondary'>
+                      <td className='max-w-100 px-3 py-1.5 text-text-secondary'>
                         <Tooltip>
                           <TooltipTrigger asChild>
                             <span className='block truncate'>{item.descr || '—'}</span>
                           </TooltipTrigger>
-                          <TooltipContent className='max-w-[300px]'>
-                            {item.descr || '—'}
-                          </TooltipContent>
+                          <TooltipContent className='max-w-75'>{item.descr || '—'}</TooltipContent>
                         </Tooltip>
                       </td>
                       <td className='px-3 py-1.5 text-right text-text-secondary tabular-nums'>
@@ -414,7 +412,7 @@ function ProposalDetailPage() {
                         const val = item[col.field]
                         return (
                           <td key={col.field} className='px-3 py-1.5 text-text-secondary'>
-                            <span className='block max-w-[160px] truncate'>
+                            <span className='block max-w-40 truncate'>
                               {val != null ? String(val) : '—'}
                             </span>
                           </td>
@@ -445,7 +443,7 @@ function ProposalDetailPage() {
         <div
           className={cn(
             'flex shrink-0 flex-col overflow-hidden bg-bg-secondary/50',
-            'border-t border-border lg:w-[380px] lg:border-t-0 lg:border-l'
+            'border-t border-border lg:w-95 lg:border-t-0 lg:border-l'
           )}
         >
           {/* Panel tabs */}
@@ -469,7 +467,7 @@ function ProposalDetailPage() {
                   </span>
                 )}
                 {panelTab === tab && (
-                  <span className='absolute right-3 bottom-0 left-3 h-[2px] rounded-full bg-primary' />
+                  <span className='absolute right-3 bottom-0 left-3 h-0.5 rounded-full bg-primary' />
                 )}
               </button>
             ))}
@@ -570,7 +568,7 @@ function ProposalDetailPage() {
           <div className='fixed inset-0 z-40 bg-black/40' onClick={() => setDeleteOpen(false)} />
           <div className='fixed inset-0 z-50 flex items-center justify-center px-4'>
             <div
-              className='w-full max-w-[400px] rounded-[12px] border border-border bg-background p-6'
+              className='w-full max-w-100 rounded-xl border border-border bg-background p-6'
               style={{ boxShadow: 'var(--dropdown-shadow)' }}
             >
               <h3 className='mb-2 text-[15px] font-semibold'>Delete proposal</h3>
@@ -581,14 +579,14 @@ function ProposalDetailPage() {
               <div className='flex justify-end gap-2'>
                 <button
                   type='button'
-                  className='rounded-[6px] border border-border px-3 py-1.5 text-[13px] font-medium transition-colors duration-[80ms] hover:bg-bg-hover'
+                  className='rounded-md border border-border px-3 py-1.5 text-[13px] font-medium transition-colors duration-80 hover:bg-bg-hover'
                   onClick={() => setDeleteOpen(false)}
                 >
                   Cancel
                 </button>
                 <button
                   type='button'
-                  className='rounded-[6px] bg-destructive px-3 py-1.5 text-[13px] font-medium text-white transition-colors duration-[80ms] hover:opacity-90'
+                  className='rounded-md bg-destructive px-3 py-1.5 text-[13px] font-medium text-white transition-colors duration-80 hover:opacity-90'
                   onClick={() => deleteMutation.mutate()}
                   disabled={deleteMutation.isPending}
                 >

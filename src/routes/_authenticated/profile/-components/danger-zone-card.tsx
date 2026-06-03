@@ -95,7 +95,7 @@ export const DangerZoneCard = ({ user }: DangerZoneCardProps) => {
             </div>
             <button
               type='button'
-              className='inline-flex h-7 shrink-0 items-center rounded-[5px] border border-border bg-background px-2.5 text-[13px] font-medium text-text-secondary transition-colors duration-[80ms] hover:bg-bg-hover hover:text-foreground'
+              className='inline-flex h-7 shrink-0 items-center rounded-[5px] border border-border bg-background px-2.5 text-[13px] font-medium text-text-secondary transition-colors duration-80 hover:bg-bg-hover hover:text-foreground'
               onClick={() => setDeactivateOpen(true)}
             >
               Deactivate
@@ -112,7 +112,7 @@ export const DangerZoneCard = ({ user }: DangerZoneCardProps) => {
             </div>
             <button
               type='button'
-              className='inline-flex h-7 shrink-0 items-center rounded-[5px] border border-destructive/30 bg-destructive/5 px-2.5 text-[13px] font-medium text-destructive transition-colors duration-[80ms] hover:bg-destructive/10'
+              className='inline-flex h-7 shrink-0 items-center rounded-[5px] border border-destructive/30 bg-destructive/5 px-2.5 text-[13px] font-medium text-destructive transition-colors duration-80 hover:bg-destructive/10'
               onClick={() => setDeleteOpen(true)}
             >
               Delete

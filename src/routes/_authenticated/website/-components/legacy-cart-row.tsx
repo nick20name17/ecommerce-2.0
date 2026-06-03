@@ -38,7 +38,7 @@ export function LegacyCartRow({ cart, isMobile }: LegacyCartRowProps) {
                 {cart.ebms_id || '—'}
               </span>
               <span className='text-[12px] text-text-tertiary tabular-nums'>#{cart.user_id}</span>
-              <span className='inline-flex items-center rounded-[4px] bg-bg-secondary px-1.5 py-0.5 text-[12px] font-medium text-text-secondary'>
+              <span className='inline-flex items-center rounded-sm bg-bg-secondary px-1.5 py-0.5 text-[12px] font-medium text-text-secondary'>
                 {cart.in_level || '—'}
               </span>
               <span className='ml-auto text-[13px] font-semibold text-foreground tabular-nums'>
@@ -50,15 +50,15 @@ export function LegacyCartRow({ cart, isMobile }: LegacyCartRowProps) {
           </div>
         ) : (
           <>
-            <div className='w-[70px] shrink-0 text-[13px] text-text-tertiary tabular-nums'>
+            <div className='w-17.5 shrink-0 text-[13px] text-text-tertiary tabular-nums'>
               #{cart.user_id}
             </div>
-            <div className='w-[100px] shrink-0 truncate text-[13px] font-medium tabular-nums'>
+            <div className='w-25 shrink-0 truncate text-[13px] font-medium tabular-nums'>
               {cart.ebms_id || '—'}
             </div>
-            <div className='w-[110px] shrink-0'>
+            <div className='w-27.5 shrink-0'>
               {cart.in_level ? (
-                <span className='inline-flex items-center rounded-[4px] bg-bg-secondary px-1.5 py-0.5 text-[13px] font-medium whitespace-nowrap text-text-secondary'>
+                <span className='inline-flex items-center rounded-sm bg-bg-secondary px-1.5 py-0.5 text-[13px] font-medium whitespace-nowrap text-text-secondary'>
                   {cart.in_level}
                 </span>
               ) : (
@@ -68,15 +68,15 @@ export function LegacyCartRow({ cart, isMobile }: LegacyCartRowProps) {
             <div className='min-w-0 flex-1 truncate text-[13px] text-text-secondary'>
               {cart.email || <span className='text-text-tertiary'>—</span>}
             </div>
-            <div className='w-[180px] shrink-0 text-[13px] text-text-secondary tabular-nums'>
+            <div className='w-45 shrink-0 text-[13px] text-text-secondary tabular-nums'>
               {updatedAt}
             </div>
-            <div className='w-[110px] shrink-0 text-right text-[13px] font-semibold text-foreground tabular-nums'>
+            <div className='w-27.5 shrink-0 text-right text-[13px] font-semibold text-foreground tabular-nums'>
               {formatCurrency(cart.cart_total)}
             </div>
           </>
         )}
-        <div className='flex w-[28px] shrink-0 items-center justify-center'>
+        <div className='flex w-7 shrink-0 items-center justify-center'>
           <ChevronDown
             className={cn(
               'size-4 text-text-tertiary transition-transform duration-150',
@@ -127,7 +127,7 @@ export function LegacyCartRow({ cart, isMobile }: LegacyCartRowProps) {
                     {item.quantity.current} ×{' '}
                     <span className='text-text-tertiary'>{formatCurrency(item.price)}</span>
                   </div>
-                  <div className='w-[100px] shrink-0 text-right text-[13px] font-semibold text-foreground tabular-nums'>
+                  <div className='w-25 shrink-0 text-right text-[13px] font-semibold text-foreground tabular-nums'>
                     {formatCurrency(item.amount)}
                   </div>
                 </li>

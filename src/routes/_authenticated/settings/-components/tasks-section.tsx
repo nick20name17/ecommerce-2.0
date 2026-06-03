@@ -87,7 +87,7 @@ const SortableStatusRow = ({
         <ColorPicker
           value={editColor}
           onChange={setEditColor}
-          className='!size-4 !min-h-0 !min-w-0 !rounded-full !border-0 !p-0 !shadow-none ring-2 ring-border'
+          className='size-4! min-h-0! min-w-0! rounded-full! border-0! p-0! shadow-none! ring-2 ring-border'
         />
         <input
           value={editName}
@@ -96,20 +96,20 @@ const SortableStatusRow = ({
             if (e.key === 'Enter') handleSave()
             if (e.key === 'Escape') setEditing(false)
           }}
-          className='h-7 min-w-0 flex-1 rounded-[6px] border border-border bg-background px-2.5 text-[13px] font-medium transition-[border-color,box-shadow] outline-none focus:border-primary focus:ring-2 focus:ring-primary/20'
+          className='h-7 min-w-0 flex-1 rounded-md border border-border bg-background px-2.5 text-[13px] font-medium transition-[border-color,box-shadow] outline-none focus:border-primary focus:ring-2 focus:ring-primary/20'
           autoFocus
         />
         <div className='flex shrink-0 items-center gap-1.5'>
           <button
             type='button'
-            className='inline-flex h-7 items-center rounded-[6px] px-2.5 text-[12px] font-medium text-text-tertiary transition-colors duration-[80ms] hover:bg-bg-hover hover:text-foreground'
+            className='inline-flex h-7 items-center rounded-md px-2.5 text-[12px] font-medium text-text-tertiary transition-colors duration-80 hover:bg-bg-hover hover:text-foreground'
             onClick={() => setEditing(false)}
           >
             Cancel
           </button>
           <button
             type='button'
-            className='inline-flex h-7 items-center rounded-[6px] bg-primary px-3 text-[12px] font-medium text-primary-foreground transition-opacity duration-[80ms] hover:opacity-90 disabled:opacity-40'
+            className='inline-flex h-7 items-center rounded-md bg-primary px-3 text-[12px] font-medium text-primary-foreground transition-opacity duration-80 hover:opacity-90 disabled:opacity-40'
             onClick={handleSave}
             disabled={updateMutation.isPending || !editName.trim()}
           >
@@ -144,7 +144,7 @@ const SortableStatusRow = ({
           <TooltipTrigger asChild>
             <button
               type='button'
-              className='text-text-quaternary inline-flex size-7 items-center justify-center rounded-[6px] transition-colors duration-75 hover:bg-bg-active hover:text-foreground'
+              className='text-text-quaternary inline-flex size-7 items-center justify-center rounded-md transition-colors duration-75 hover:bg-bg-active hover:text-foreground'
               onClick={e => {
                 e.stopPropagation()
                 setEditName(status.name)
@@ -161,7 +161,7 @@ const SortableStatusRow = ({
           <TooltipTrigger asChild>
             <button
               type='button'
-              className='text-text-quaternary inline-flex size-7 items-center justify-center rounded-[6px] transition-colors duration-75 hover:bg-destructive/10 hover:text-destructive'
+              className='text-text-quaternary inline-flex size-7 items-center justify-center rounded-md transition-colors duration-75 hover:bg-destructive/10 hover:text-destructive'
               onClick={e => {
                 e.stopPropagation()
                 onDelete()
@@ -289,7 +289,7 @@ export const TasksSection = ({ projectId }: { projectId: number }) => {
   return (
     <div className='flex min-h-0 flex-1 flex-col'>
       <div className='flex-1 overflow-auto'>
-        <div className='mx-auto max-w-[560px] p-8'>
+        <div className='mx-auto max-w-140 p-8'>
           {isLoading ? (
             <div className='overflow-hidden rounded-[10px] border border-border'>
               {Array.from({ length: 6 }).map((_, i) => (
@@ -312,7 +312,7 @@ export const TasksSection = ({ projectId }: { projectId: number }) => {
                 <ColorPicker
                   value={newColor}
                   onChange={setNewColor}
-                  className='!size-4 !min-h-0 !min-w-0 !rounded-full !border-0 !p-0 !shadow-none ring-2 ring-border'
+                  className='size-4! min-h-0! min-w-0! rounded-full! border-0! p-0! shadow-none! ring-2 ring-border'
                 />
                 <input
                   value={newName}
@@ -324,7 +324,7 @@ export const TasksSection = ({ projectId }: { projectId: number }) => {
                 {newName.trim() && (
                   <button
                     type='button'
-                    className='inline-flex h-7 shrink-0 items-center gap-1.5 rounded-[6px] bg-primary px-3 text-[12px] font-medium text-primary-foreground transition-opacity duration-[80ms] hover:opacity-90 disabled:opacity-40'
+                    className='inline-flex h-7 shrink-0 items-center gap-1.5 rounded-md bg-primary px-3 text-[12px] font-medium text-primary-foreground transition-opacity duration-80 hover:opacity-90 disabled:opacity-40'
                     disabled={createMutation.isPending}
                     onClick={handleAddStatus}
                   >
@@ -346,7 +346,7 @@ export const TasksSection = ({ projectId }: { projectId: number }) => {
                   <span className='min-w-0 flex-1 truncate text-[13px] font-medium text-foreground'>
                     {status.name}
                   </span>
-                  <span className='text-text-quaternary shrink-0 rounded-[5px] bg-bg-secondary/80 px-2 py-[3px] text-[11px] font-medium'>
+                  <span className='text-text-quaternary shrink-0 rounded-[5px] bg-bg-secondary/80 px-2 py-0.75 text-[11px] font-medium'>
                     Default
                   </span>
                 </div>
@@ -379,7 +379,7 @@ export const TasksSection = ({ projectId }: { projectId: number }) => {
                   <span className='min-w-0 flex-1 truncate text-[13px] font-medium text-foreground'>
                     {doneStatus.name}
                   </span>
-                  <span className='text-text-quaternary shrink-0 rounded-[5px] bg-bg-secondary/80 px-2 py-[3px] text-[11px] font-medium'>
+                  <span className='text-text-quaternary shrink-0 rounded-[5px] bg-bg-secondary/80 px-2 py-0.75 text-[11px] font-medium'>
                     Default
                   </span>
                 </div>

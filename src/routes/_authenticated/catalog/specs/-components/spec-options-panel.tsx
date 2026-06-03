@@ -263,7 +263,7 @@ export const SpecOptionsPanel = ({ spec, projectId }: SpecOptionsPanelProps) => 
                 <div className='flex flex-col gap-2'>
                   <Label className='text-[12px]'>Color</Label>
                   <div className='rounded-xl border border-border'>
-                    <div className='p-2 [&_.react-colorful]:!h-[140px] [&_.react-colorful]:!w-full [&_.react-colorful]:rounded-lg [&_.react-colorful\_\_hue]:!rounded-b-lg [&_.react-colorful\_\_pointer]:!h-5 [&_.react-colorful\_\_pointer]:!w-5 [&_.react-colorful\_\_saturation]:!rounded-t-lg'>
+                    <div className='p-2 [&_.react-colorful]:h-35! [&_.react-colorful]:w-full! [&_.react-colorful]:rounded-lg [&_.react-colorful\_\_hue]:rounded-b-lg! [&_.react-colorful\_\_pointer]:h-5! [&_.react-colorful\_\_pointer]:w-5! [&_.react-colorful\_\_saturation]:rounded-t-lg!'>
                       <HexColorPicker color={formColor || '#3B82F6'} onChange={setFormColor} />
                     </div>
                     <div className='flex items-center gap-2 border-t border-border bg-bg-secondary/40 px-3 py-2'>

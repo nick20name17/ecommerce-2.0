@@ -61,10 +61,7 @@ export const OrderExpandedRow = ({ row }: { row: Row<Order> }) => {
             <TableHeader className='bg-bg-secondary'>
               <TableRow className='border-none'>
                 {keys.map(key => (
-                  <TableHead
-                    key={key}
-                    className='min-w-[80px] shadow-[inset_0_-1px_0_var(--border)]'
-                  >
+                  <TableHead key={key} className='min-w-20 shadow-[inset_0_-1px_0_var(--border)]'>
                     {humanizeKey(key)}
                   </TableHead>
                 ))}
@@ -77,11 +74,11 @@ export const OrderExpandedRow = ({ row }: { row: Row<Order> }) => {
                     const val = formatItemCellValue(key, item[key])
                     const isTruncate = key === 'descr' || key === 'inven'
                     return (
-                      <TableCell key={key} className='min-w-[80px] border-b'>
+                      <TableCell key={key} className='min-w-20 border-b'>
                         {isTruncate ? (
                           <Tooltip>
                             <TooltipTrigger asChild>
-                              <span className='block max-w-[240px] truncate'>{val}</span>
+                              <span className='block max-w-60 truncate'>{val}</span>
                             </TooltipTrigger>
                             <TooltipContent>{val}</TooltipContent>
                           </Tooltip>

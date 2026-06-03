@@ -65,13 +65,13 @@ export const ProductCatalogDialog = ({
       <DialogContent
         showCloseButton={false}
         className={cn(
-          'flex h-[95vh] w-[98vw] max-w-none! flex-col gap-0 overflow-hidden rounded-[12px] border p-0 shadow-2xl'
+          'flex h-[95vh] w-[98vw] max-w-none! flex-col gap-0 overflow-hidden rounded-xl border p-0 shadow-2xl'
         )}
       >
         {/* Header */}
         <div className='shrink-0 border-b border-border'>
           <div className='flex h-12 items-center gap-2.5 px-5'>
-            <div className='flex size-6 items-center justify-center rounded-[6px] bg-primary text-white'>
+            <div className='flex size-6 items-center justify-center rounded-md bg-primary text-white'>
               <PackageFill className='size-3.5' />
             </div>
             <h2 className='text-[14px] font-semibold tracking-[-0.01em]'>Product Catalog</h2>
@@ -80,7 +80,7 @@ export const ProductCatalogDialog = ({
 
             <button
               type='button'
-              className='inline-flex size-7 items-center justify-center rounded-[5px] text-text-tertiary transition-colors duration-[80ms] hover:bg-bg-hover hover:text-foreground'
+              className='inline-flex size-7 items-center justify-center rounded-[5px] text-text-tertiary transition-colors duration-80 hover:bg-bg-hover hover:text-foreground'
               onClick={() => onOpenChange(false)}
             >
               <X className='size-4' />
@@ -92,7 +92,7 @@ export const ProductCatalogDialog = ({
             <button
               type='button'
               className={cn(
-                'shrink-0 rounded-[5px] px-1.5 py-0.5 text-[12px] font-medium transition-colors duration-[80ms]',
+                'shrink-0 rounded-[5px] px-1.5 py-0.5 text-[12px] font-medium transition-colors duration-80',
                 path.length === 0
                   ? 'bg-primary/10 text-primary'
                   : 'text-text-tertiary hover:bg-bg-hover hover:text-foreground'
@@ -108,7 +108,7 @@ export const ProductCatalogDialog = ({
                 <button
                   type='button'
                   className={cn(
-                    'shrink-0 rounded-[5px] px-1.5 py-0.5 text-[12px] font-medium transition-colors duration-[80ms]',
+                    'shrink-0 rounded-[5px] px-1.5 py-0.5 text-[12px] font-medium transition-colors duration-80',
                     index === path.length - 1
                       ? 'bg-primary/10 text-primary'
                       : 'text-text-tertiary hover:bg-bg-hover hover:text-foreground'

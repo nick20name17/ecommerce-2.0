@@ -109,7 +109,7 @@ export function PushStatusSection({ projectId }: { projectId: number }) {
         </div>
         <div className='flex-1' />
         {supported && (
-          <div className='hidden h-7 w-full max-w-[260px] items-center gap-1.5 rounded-[5px] border border-border bg-background px-2 transition-[border-color,box-shadow] focus-within:border-ring focus-within:ring-2 focus-within:ring-ring/50 sm:flex'>
+          <div className='hidden h-7 w-full max-w-65 items-center gap-1.5 rounded-[5px] border border-border bg-background px-2 transition-[border-color,box-shadow] focus-within:border-ring focus-within:ring-2 focus-within:ring-ring/50 sm:flex'>
             <Search className='size-3 shrink-0 text-text-tertiary' />
             <input
               defaultValue={search}
@@ -147,15 +147,15 @@ export function PushStatusSection({ projectId }: { projectId: number }) {
                   bp === 'tablet' ? 'gap-4 px-5 py-1' : 'gap-6 px-6 py-1'
                 )}
               >
-                <div className='w-[64px] shrink-0'>Proposal</div>
-                <div className='w-[120px] shrink-0'>Status</div>
-                <div className='w-[180px] shrink-0'>Customer</div>
-                <div className='w-[64px] shrink-0'>Items</div>
-                <div className='w-[90px] shrink-0 text-right'>Total</div>
-                <div className='w-[140px] shrink-0'>Last attempt</div>
-                <div className='w-[120px] shrink-0'>Next retry</div>
+                <div className='w-16 shrink-0'>Proposal</div>
+                <div className='w-30 shrink-0'>Status</div>
+                <div className='w-45 shrink-0'>Customer</div>
+                <div className='w-16 shrink-0'>Items</div>
+                <div className='w-22.5 shrink-0 text-right'>Total</div>
+                <div className='w-35 shrink-0'>Last attempt</div>
+                <div className='w-30 shrink-0'>Next retry</div>
                 <div className='min-w-0 flex-1'>Last error</div>
-                <div className='w-[20px] shrink-0' />
+                <div className='w-5 shrink-0' />
               </div>
             )}
 
@@ -168,14 +168,14 @@ export function PushStatusSection({ projectId }: { projectId: number }) {
                     bp === 'tablet' ? 'gap-4 px-5 py-2.5' : 'gap-6 px-6 py-2.5'
                   )}
                 >
-                  <Skeleton className='h-3.5 w-[40px] rounded' />
-                  <Skeleton className='h-[18px] w-[80px] rounded-[4px]' />
-                  <Skeleton className='h-3.5 w-[150px] rounded' />
-                  <Skeleton className='h-3.5 w-[40px] rounded' />
-                  <Skeleton className='ml-auto h-3.5 w-[70px] rounded' />
-                  <Skeleton className='h-3.5 w-[120px] rounded' />
-                  <Skeleton className='h-3.5 w-[100px] rounded' />
-                  <Skeleton className='h-3.5 w-[160px] flex-1 rounded' />
+                  <Skeleton className='h-3.5 w-10 rounded' />
+                  <Skeleton className='h-4.5 w-20 rounded-sm' />
+                  <Skeleton className='h-3.5 w-37.5 rounded' />
+                  <Skeleton className='h-3.5 w-10 rounded' />
+                  <Skeleton className='ml-auto h-3.5 w-17.5 rounded' />
+                  <Skeleton className='h-3.5 w-30 rounded' />
+                  <Skeleton className='h-3.5 w-25 rounded' />
+                  <Skeleton className='h-3.5 w-40 flex-1 rounded' />
                 </div>
               ))
             ) : results.length === 0 ? (
@@ -418,14 +418,14 @@ function PushRow({
       className={cn(
         'group/row flex cursor-pointer items-center border-b border-border-light transition-colors duration-100 hover:bg-bg-hover',
         bp === 'tablet' ? 'gap-4 px-5 py-2.5' : 'gap-6 px-6 py-2.5',
-        isError && 'bg-red-500/[0.02]'
+        isError && 'bg-red-500/2'
       )}
       onClick={onClick}
     >
-      <div className='w-[64px] shrink-0 font-mono text-[12px] text-text-secondary tabular-nums'>
+      <div className='w-16 shrink-0 font-mono text-[12px] text-text-secondary tabular-nums'>
         #{row.proposal_id}
       </div>
-      <div className='w-[120px] shrink-0'>
+      <div className='w-30 shrink-0'>
         <span
           className={cn(
             'inline-block max-w-full truncate rounded border px-1.5 py-0.5 text-[11px] font-medium',
@@ -435,25 +435,25 @@ function PushRow({
           {st.label}
         </span>
       </div>
-      <div className='flex w-[180px] shrink-0 items-center gap-1.5'>
+      <div className='flex w-45 shrink-0 items-center gap-1.5'>
         {isError && <AlertCircle className='size-3 shrink-0 text-red-500' />}
         <span className='truncate text-[13px] text-foreground'>{row.email || '—'}</span>
       </div>
       <div
         className={cn(
-          'w-[64px] shrink-0 text-[13px] tabular-nums',
+          'w-16 shrink-0 text-[13px] tabular-nums',
           partial ? 'text-amber-700 dark:text-amber-400' : 'text-text-tertiary'
         )}
       >
         {row.items_pushed ?? 0}/{row.items_total ?? 0}
       </div>
-      <div className='w-[90px] shrink-0 text-right text-[13px] text-text-tertiary tabular-nums'>
+      <div className='w-22.5 shrink-0 text-right text-[13px] text-text-tertiary tabular-nums'>
         {money(row.total)}
       </div>
-      <div className='w-[140px] shrink-0 truncate text-[12px] text-text-tertiary tabular-nums'>
+      <div className='w-35 shrink-0 truncate text-[12px] text-text-tertiary tabular-nums'>
         {dt(row.last_attempt_at)}
       </div>
-      <div className='w-[120px] shrink-0 truncate text-[12px] text-text-tertiary tabular-nums'>
+      <div className='w-30 shrink-0 truncate text-[12px] text-text-tertiary tabular-nums'>
         {row.next_retry_at ? `~${dt(row.next_retry_at)}` : '—'}
       </div>
       <div
@@ -462,7 +462,7 @@ function PushRow({
       >
         {row.last_error_message || <span className='font-mono'>{row.arinv_autoid || '—'}</span>}
       </div>
-      <div className='w-[20px] shrink-0 text-text-tertiary opacity-0 transition-opacity group-hover/row:opacity-100'>
+      <div className='w-5 shrink-0 text-text-tertiary opacity-0 transition-opacity group-hover/row:opacity-100'>
         <ChevronRight className='size-3.5' />
       </div>
     </div>

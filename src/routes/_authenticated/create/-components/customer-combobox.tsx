@@ -106,7 +106,7 @@ export function CustomerCombobox({
           )}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className='w-(--radix-popover-trigger-width) min-w-[400px] p-0' align='start'>
+      <PopoverContent className='w-(--radix-popover-trigger-width) min-w-100 p-0' align='start'>
         <div className='flex items-center gap-2 border-b px-3 py-2'>
           {loading ? (
             <Spinner className='size-3.5 shrink-0' />

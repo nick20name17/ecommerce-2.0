@@ -58,7 +58,7 @@ export function ShipToEditDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className='gap-0 p-0 sm:max-w-[400px]'>
+      <DialogContent className='gap-0 p-0 sm:max-w-100'>
         <DialogHeader className='border-b border-border px-5 py-3'>
           <DialogTitle className='text-[14px] font-semibold'>Ship To Address</DialogTitle>
         </DialogHeader>
@@ -91,14 +91,14 @@ export function ShipToEditDialog({
         <div className='flex items-center justify-end gap-2 border-t border-border px-5 py-3'>
           <button
             type='button'
-            className='rounded-[6px] border border-border px-3 py-1.5 text-[13px] font-medium transition-colors hover:bg-bg-hover'
+            className='rounded-md border border-border px-3 py-1.5 text-[13px] font-medium transition-colors hover:bg-bg-hover'
             onClick={() => onOpenChange(false)}
           >
             Cancel
           </button>
           <button
             type='button'
-            className='rounded-[6px] bg-primary px-3 py-1.5 text-[13px] font-semibold text-primary-foreground transition-colors hover:opacity-90'
+            className='rounded-md bg-primary px-3 py-1.5 text-[13px] font-semibold text-primary-foreground transition-colors hover:opacity-90'
             onClick={handleSave}
           >
             Save
@@ -128,7 +128,7 @@ export function ShipToField({
         onChange={e => onChange(e.target.value)}
         placeholder={label}
         inputMode={inputMode}
-        className='placeholder:text-text-quaternary h-8 w-full rounded-[6px] border border-border bg-background px-2.5 text-[13px] text-foreground transition-colors duration-[80ms] outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20'
+        className='placeholder:text-text-quaternary h-8 w-full rounded-md border border-border bg-background px-2.5 text-[13px] text-foreground transition-colors duration-80 outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20'
       />
     </div>
   )

@@ -244,7 +244,7 @@ export const FilterGroupsSection = () => {
   return (
     <div className='flex min-h-0 flex-1 flex-col'>
       <div className='flex-1 overflow-y-scroll'>
-        <div className='mx-auto max-w-[680px] px-8 py-6'>
+        <div className='mx-auto max-w-170 px-8 py-6'>
           {/* Description */}
           <div className='mb-6'>
             <h2 className='text-[14px] font-semibold text-foreground'>Filter Presets</h2>
@@ -258,7 +258,7 @@ export const FilterGroupsSection = () => {
           <div className='mb-4'>
             <button
               type='button'
-              className='inline-flex h-8 w-full items-center justify-center gap-1.5 rounded-[6px] border border-dashed border-border text-[13px] font-medium text-text-secondary transition-colors duration-75 hover:border-primary/30 hover:bg-primary/[0.04] hover:text-primary'
+              className='inline-flex h-8 w-full items-center justify-center gap-1.5 rounded-md border border-dashed border-border text-[13px] font-medium text-text-secondary transition-colors duration-75 hover:border-primary/30 hover:bg-primary/[0.04] hover:text-primary'
               onClick={() => setEditingPreset('create')}
             >
               <Plus className='size-3.5' />
@@ -270,9 +270,9 @@ export const FilterGroupsSection = () => {
           {isLoading && (
             <div className='space-y-4'>
               {[1, 2, 3].map(i => (
-                <div key={i} className='rounded-[8px] border border-border p-3'>
+                <div key={i} className='rounded-lg border border-border p-3'>
                   <div className='flex items-center gap-3'>
-                    <Skeleton className='size-5 rounded-[4px]' />
+                    <Skeleton className='size-5 rounded-sm' />
                     <Skeleton className='h-4 w-32 rounded' />
                     <div className='flex-1' />
                     <Skeleton className='h-5 w-16 rounded-full' />
@@ -291,13 +291,13 @@ export const FilterGroupsSection = () => {
                   <div className='mb-2 flex items-center gap-2'>
                     <div
                       className={cn(
-                        'flex size-5 items-center justify-center rounded-[4px]',
+                        'flex size-5 items-center justify-center rounded-sm',
                         config.color
                       )}
                     >
                       <Icon className='size-3' />
                     </div>
-                    <span className='text-[12px] font-semibold tracking-[0.05em] text-text-tertiary uppercase'>
+                    <span className='text-[12px] font-semibold tracking-wider text-text-tertiary uppercase'>
                       {config.pluralLabel}
                     </span>
                     <span className='text-text-quaternary text-[11px] tabular-nums'>
@@ -306,11 +306,11 @@ export const FilterGroupsSection = () => {
                   </div>
 
                   {entityPresets.length === 0 ? (
-                    <div className='text-text-quaternary rounded-[8px] border border-dashed border-border px-4 py-5 text-center text-[13px]'>
+                    <div className='text-text-quaternary rounded-lg border border-dashed border-border px-4 py-5 text-center text-[13px]'>
                       No filter presets for {config.pluralLabel.toLowerCase()}
                     </div>
                   ) : (
-                    <div className='overflow-hidden rounded-[8px] border border-border'>
+                    <div className='overflow-hidden rounded-lg border border-border'>
                       {entityPresets.map((preset, i) => {
                         const isExpanded = expandedId === preset.id
                         const leaves = flattenLeaves(preset.conditions)
@@ -337,7 +337,7 @@ export const FilterGroupsSection = () => {
 
                               <span
                                 className={cn(
-                                  'inline-flex items-center gap-1 rounded-[4px] px-1.5 py-0.5 text-[11px] font-medium',
+                                  'inline-flex items-center gap-1 rounded-sm px-1.5 py-0.5 text-[11px] font-medium',
                                   preset.shared
                                     ? 'bg-blue-500/10 text-blue-600 dark:text-blue-400'
                                     : preset.visible_to_roles?.length > 0 ||
@@ -399,7 +399,7 @@ export const FilterGroupsSection = () => {
                             {/* Expanded detail */}
                             {isExpanded && (
                               <div className='border-t border-border-light bg-foreground/[0.015] px-4 py-3'>
-                                <span className='text-[11px] font-semibold tracking-[0.05em] text-text-tertiary uppercase'>
+                                <span className='text-[11px] font-semibold tracking-wider text-text-tertiary uppercase'>
                                   Conditions
                                 </span>
                                 <div className='mt-1.5 flex flex-wrap gap-1.5'>
@@ -616,7 +616,7 @@ function FilterPresetDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className='flex max-h-[85vh] flex-col gap-0 overflow-hidden p-0 sm:max-w-[560px]'>
+      <DialogContent className='flex max-h-[85vh] flex-col gap-0 overflow-hidden p-0 sm:max-w-140'>
         <DialogHeader className='border-b border-border px-5 py-3'>
           <DialogTitle className='text-[14px]'>
             {isNew ? 'New Filter Preset' : 'Edit Filter Preset'}
@@ -652,7 +652,7 @@ function FilterPresetDialog({
                         key={e}
                         type='button'
                         className={cn(
-                          'inline-flex h-8 items-center gap-1.5 rounded-[6px] border px-3 text-[13px] font-medium transition-colors duration-75',
+                          'inline-flex h-8 items-center gap-1.5 rounded-md border px-3 text-[13px] font-medium transition-colors duration-75',
                           entityType === e
                             ? 'border-primary/30 bg-primary/[0.08] text-primary'
                             : 'border-border bg-background text-text-secondary hover:bg-bg-hover'
@@ -682,11 +682,11 @@ function FilterPresetDialog({
                   return (
                     <div key={row.id} className='flex items-center gap-1.5'>
                       {i > 0 && (
-                        <span className='text-text-quaternary w-[32px] shrink-0 text-center text-[11px] font-medium'>
+                        <span className='text-text-quaternary w-8 shrink-0 text-center text-[11px] font-medium'>
                           AND
                         </span>
                       )}
-                      {i === 0 && rows.length > 1 && <div className='w-[32px] shrink-0' />}
+                      {i === 0 && rows.length > 1 && <div className='w-8 shrink-0' />}
 
                       {/* Field */}
                       <Select
@@ -700,7 +700,7 @@ function FilterPresetDialog({
                           })
                         }}
                       >
-                        <SelectTrigger size='sm' className='w-[130px] shrink-0'>
+                        <SelectTrigger size='sm' className='w-32.5 shrink-0'>
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -718,7 +718,7 @@ function FilterPresetDialog({
                         value={row.op}
                         onValueChange={v => updateRow(row.id, { op: v as FilterOp })}
                       >
-                        <SelectTrigger size='sm' className='w-[110px] shrink-0'>
+                        <SelectTrigger size='sm' className='w-27.5 shrink-0'>
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -759,7 +759,7 @@ function FilterPresetDialog({
                           <button
                             type='button'
                             className={cn(
-                              'relative inline-flex h-7 w-[52px] shrink-0 items-center rounded-full border transition-colors duration-200',
+                              'relative inline-flex h-7 w-13 shrink-0 items-center rounded-full border transition-colors duration-200',
                               row.value === 'true'
                                 ? 'border-emerald-300 bg-emerald-500 dark:border-emerald-600'
                                 : 'border-border bg-bg-active'
@@ -771,7 +771,7 @@ function FilterPresetDialog({
                             <span
                               className={cn(
                                 'inline-block size-5 rounded-full bg-background shadow-sm transition-transform duration-200',
-                                row.value === 'true' ? 'translate-x-[27px]' : 'translate-x-[3px]'
+                                row.value === 'true' ? 'translate-x-6.75' : 'translate-x-0.75'
                               )}
                             />
                           </button>
@@ -782,14 +782,14 @@ function FilterPresetDialog({
                             onChange={e => updateRow(row.id, { value: e.target.value })}
                             placeholder='0'
                             step={fType === 'integer' ? '1' : 'any'}
-                            className='h-7 w-[100px] shrink-0 text-[13px] tabular-nums'
+                            className='h-7 w-25 shrink-0 text-[13px] tabular-nums'
                           />
                         ) : fType === 'date' ? (
                           <div className='flex min-w-0 flex-1 items-center gap-1.5'>
                             {row.value === '$today' || row.value === '$tomorrow' ? (
                               <button
                                 type='button'
-                                className='flex h-7 items-center gap-1.5 rounded-[6px] border border-primary/30 bg-primary/5 px-2.5 text-[12px] font-medium text-primary'
+                                className='flex h-7 items-center gap-1.5 rounded-md border border-primary/30 bg-primary/5 px-2.5 text-[12px] font-medium text-primary'
                                 onClick={() => updateRow(row.id, { value: '' })}
                               >
                                 {row.value === '$today' ? 'Today' : 'Tomorrow'}
@@ -886,7 +886,7 @@ function FilterPresetDialog({
                   <button
                     type='button'
                     className={cn(
-                      'relative inline-flex h-[18px] w-[30px] shrink-0 items-center rounded-full transition-colors duration-150',
+                      'relative inline-flex h-4.5 w-7.5 shrink-0 items-center rounded-full transition-colors duration-150',
                       shared ? 'bg-primary' : 'bg-foreground/15'
                     )}
                     onClick={() => setShared(v => !v)}
@@ -894,7 +894,7 @@ function FilterPresetDialog({
                     <span
                       className={cn(
                         'inline-block size-3.5 rounded-full bg-background shadow-sm transition-transform duration-150',
-                        shared ? 'translate-x-[14px]' : 'translate-x-[2px]'
+                        shared ? 'translate-x-3.5' : 'translate-x-0.5'
                       )}
                     />
                   </button>
@@ -978,7 +978,7 @@ function FilterPresetDialog({
                 <label className='mb-1.5 block text-[12px] font-medium text-text-secondary'>
                   Preview
                 </label>
-                <div className='rounded-[8px] border border-border bg-foreground/[0.02] px-3 py-2.5'>
+                <div className='rounded-lg border border-border bg-foreground/[0.02] px-3 py-2.5'>
                   <div className='flex flex-wrap items-center gap-1.5 text-[12px]'>
                     <span className='text-text-tertiary'>
                       Show {ENTITY_META[entityType].pluralLabel.toLowerCase()} where
@@ -991,7 +991,7 @@ function FilterPresetDialog({
                         </span>
                         <span className='text-text-quaternary'>{getOpLabel(row.op)}</span>
                         {!NO_VALUE_OPS.includes(row.op) && (
-                          <span className='rounded-[4px] bg-primary/[0.08] px-1.5 py-0.5 font-medium text-primary'>
+                          <span className='rounded-sm bg-primary/[0.08] px-1.5 py-0.5 font-medium text-primary'>
                             {getValueLabel(row.field, row.value, entityType)}
                           </span>
                         )}
@@ -1008,14 +1008,14 @@ function FilterPresetDialog({
         <div className='flex items-center justify-end gap-2 border-t border-border px-5 py-3'>
           <button
             type='button'
-            className='inline-flex h-8 items-center rounded-[6px] border border-border px-3 text-[13px] font-medium text-text-secondary transition-colors duration-75 hover:bg-bg-hover'
+            className='inline-flex h-8 items-center rounded-md border border-border px-3 text-[13px] font-medium text-text-secondary transition-colors duration-75 hover:bg-bg-hover'
             onClick={() => onOpenChange(false)}
           >
             Cancel
           </button>
           <button
             type='button'
-            className='inline-flex h-8 items-center gap-1.5 rounded-[6px] bg-primary px-4 text-[13px] font-semibold text-primary-foreground transition-opacity duration-[80ms] hover:opacity-90 disabled:opacity-40'
+            className='inline-flex h-8 items-center gap-1.5 rounded-md bg-primary px-4 text-[13px] font-semibold text-primary-foreground transition-opacity duration-80 hover:opacity-90 disabled:opacity-40'
             disabled={!name.trim() || validRows.length === 0 || isPending}
             onClick={handleSubmit}
           >

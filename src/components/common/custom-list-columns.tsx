@@ -109,7 +109,7 @@ export const CustomColumnsHeader = ({
             key={col.field}
             type='button'
             className={cn(
-              'group inline-flex w-[140px] shrink-0 items-center gap-1 truncate text-left transition-colors duration-[80ms] hover:text-foreground',
+              'group inline-flex w-35 shrink-0 items-center gap-1 truncate text-left transition-colors duration-80 hover:text-foreground',
               active && 'text-foreground',
               className
             )}
@@ -146,7 +146,7 @@ export const CustomColumnsCells = ({
       {columns.map(col => {
         const raw = row[col.field]
         return (
-          <div key={col.field} className='w-[140px] shrink-0 truncate text-[13px]'>
+          <div key={col.field} className='w-35 shrink-0 truncate text-[13px]'>
             <CellValue value={raw} type={col.type} />
           </div>
         )
@@ -163,7 +163,7 @@ function CellValue({ value, type }: { value: unknown; type?: string }) {
     if (bool === true) {
       return (
         <span
-          className='inline-flex h-[18px] items-center gap-1 rounded-[4px] bg-emerald-500/10 px-1.5 text-[11px] font-medium text-emerald-600'
+          className='inline-flex h-4.5 items-center gap-1 rounded-sm bg-emerald-500/10 px-1.5 text-[11px] font-medium text-emerald-600'
           title='true'
         >
           <Check className='size-3' />

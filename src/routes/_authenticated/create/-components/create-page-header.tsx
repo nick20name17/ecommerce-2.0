@@ -32,7 +32,7 @@ export const CreatePageHeader = ({
       <div className='flex items-center gap-2'>
         <button
           type='button'
-          className='flex items-center gap-1 text-[13px] font-medium text-text-secondary transition-colors duration-[80ms] hover:text-foreground'
+          className='flex items-center gap-1 text-[13px] font-medium text-text-secondary transition-colors duration-80 hover:text-foreground'
           onClick={() => router.history.back()}
         >
           <ArrowLeft className='size-3.5' />

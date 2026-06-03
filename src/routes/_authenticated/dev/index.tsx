@@ -270,7 +270,7 @@ const DevPage = () => {
           <>
             <div className='flex items-center gap-2 border-b border-border bg-bg-secondary/60 px-6 py-1.5'>
               <CircleDot className='size-3.5 text-amber-500' />
-              <span className='text-[11px] font-semibold tracking-[0.05em] text-text-tertiary uppercase'>
+              <span className='text-[11px] font-semibold tracking-wider text-text-tertiary uppercase'>
                 In Progress ({inProgressEntries.length})
               </span>
             </div>
@@ -283,7 +283,7 @@ const DevPage = () => {
         {/* Completed */}
         <div className='flex items-center gap-2 border-b border-border bg-bg-secondary/60 px-6 py-1.5'>
           <Check className='size-3.5 text-emerald-500' />
-          <span className='text-[11px] font-semibold tracking-[0.05em] text-text-tertiary uppercase'>
+          <span className='text-[11px] font-semibold tracking-wider text-text-tertiary uppercase'>
             Completed ({doneEntries.length})
           </span>
         </div>

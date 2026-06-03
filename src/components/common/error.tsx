@@ -13,7 +13,7 @@ export const Error = ({ error, reset, className }: ErrorProps) => {
 
   return (
     <div className={cn('flex min-h-svh flex-col items-center justify-center gap-5 p-6', className)}>
-      <div className='flex size-12 items-center justify-center rounded-[12px] bg-destructive/10 text-destructive'>
+      <div className='flex size-12 items-center justify-center rounded-xl bg-destructive/10 text-destructive'>
         <TriangleAlert className='size-6' strokeWidth={1.75} />
       </div>
 
@@ -27,7 +27,7 @@ export const Error = ({ error, reset, className }: ErrorProps) => {
       <button
         type='button'
         onClick={() => reset()}
-        className='inline-flex h-8 items-center gap-1.5 rounded-[6px] border border-border bg-background px-3 text-[13px] font-medium text-foreground shadow-xs transition-colors duration-100 hover:bg-bg-hover active:scale-[0.98]'
+        className='inline-flex h-8 items-center gap-1.5 rounded-md border border-border bg-background px-3 text-[13px] font-medium text-foreground shadow-xs transition-colors duration-100 hover:bg-bg-hover active:scale-[0.98]'
       >
         <RotateCw className='size-3.5' />
         Try again

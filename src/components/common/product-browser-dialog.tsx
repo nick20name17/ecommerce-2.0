@@ -117,7 +117,7 @@ export const ProductBrowserDialog = ({
         {/* Body: categories + products */}
         <div className='flex min-h-0 flex-1 overflow-hidden'>
           {/* Left: EBMS categories */}
-          <div className='w-[240px] shrink-0 overflow-y-auto border-r border-border bg-bg-secondary/30'>
+          <div className='w-60 shrink-0 overflow-y-auto border-r border-border bg-bg-secondary/30'>
             <div className='p-1.5'>
               <button
                 type='button'
@@ -359,7 +359,7 @@ function ProductList({
       {/* Header */}
       <div className='sticky top-0 flex items-center gap-3 border-b border-border bg-bg-secondary px-3 py-1.5 text-[11px] font-medium text-text-tertiary'>
         <div className='w-5 shrink-0' />
-        <div className='w-[120px] shrink-0'>Product ID</div>
+        <div className='w-30 shrink-0'>Product ID</div>
         <div className='flex-1'>Description</div>
       </div>
 
@@ -375,7 +375,7 @@ function ProductList({
             onClick={() => onToggle(product)}
           >
             <Checkbox checked={isSelected} className='shrink-0' />
-            <div className='w-[120px] shrink-0 truncate font-mono text-[12px] text-text-secondary'>
+            <div className='w-30 shrink-0 truncate font-mono text-[12px] text-text-secondary'>
               {product.id}
             </div>
             <div className='min-w-0 flex-1 truncate text-[13px]'>{product.descr_1}</div>

@@ -20,7 +20,7 @@ export const ProductImageGallery = ({
       {/* Main image */}
       <div className='group relative'>
         {photos?.length ? (
-          <div className='relative aspect-square w-full overflow-hidden rounded-[8px] border border-border bg-bg-secondary/30'>
+          <div className='relative aspect-square w-full overflow-hidden rounded-lg border border-border bg-bg-secondary/30'>
             <img
               src={photos[photoIndex]}
               alt={displayName}
@@ -45,14 +45,14 @@ export const ProductImageGallery = ({
                 >
                   <ChevronRight className='size-3' />
                 </button>
-                <span className='absolute right-1.5 bottom-1.5 rounded-[4px] bg-foreground/70 px-1.5 py-0.5 text-[10px] font-medium text-background tabular-nums'>
+                <span className='absolute right-1.5 bottom-1.5 rounded-sm bg-foreground/70 px-1.5 py-0.5 text-[10px] font-medium text-background tabular-nums'>
                   {photoIndex + 1}/{photos.length}
                 </span>
               </>
             )}
           </div>
         ) : (
-          <div className='flex aspect-square w-full flex-col items-center justify-center gap-1.5 rounded-[8px] border border-border bg-bg-secondary/30'>
+          <div className='flex aspect-square w-full flex-col items-center justify-center gap-1.5 rounded-lg border border-border bg-bg-secondary/30'>
             <ImageIcon className='size-8 text-text-tertiary/30' />
             <span className='text-[12px] text-text-tertiary'>No images</span>
           </div>

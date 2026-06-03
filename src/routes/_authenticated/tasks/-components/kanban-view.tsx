@@ -163,7 +163,7 @@ function KanbanColumn({
         <div className='flex-1' />
         <button
           type='button'
-          className='rounded-[5px] p-0.5 text-text-tertiary transition-colors duration-[80ms] hover:bg-bg-hover hover:text-foreground'
+          className='rounded-[5px] p-0.5 text-text-tertiary transition-colors duration-80 hover:bg-bg-hover hover:text-foreground'
           onClick={() => {
             setIsCreating(true)
             queueMicrotask(() => inputRef.current?.focus())
@@ -213,7 +213,7 @@ function KanbanColumn({
             <div className='mt-2 flex items-center justify-end gap-1.5'>
               <button
                 type='button'
-                className='rounded-[5px] p-1 text-text-tertiary transition-colors duration-[80ms] hover:bg-bg-hover hover:text-foreground'
+                className='rounded-[5px] p-1 text-text-tertiary transition-colors duration-80 hover:bg-bg-hover hover:text-foreground'
                 onClick={handleCancel}
               >
                 <X className='size-3.5' />
@@ -221,7 +221,7 @@ function KanbanColumn({
               <button
                 type='button'
                 className={cn(
-                  'rounded-[6px] bg-primary px-2.5 py-1 text-[13px] font-medium text-primary-foreground transition-colors duration-[80ms]',
+                  'rounded-md bg-primary px-2.5 py-1 text-[13px] font-medium text-primary-foreground transition-colors duration-80',
                   !newTitle.trim() ? 'opacity-40' : 'hover:opacity-90'
                 )}
                 disabled={!newTitle.trim()}
@@ -268,7 +268,7 @@ function KanbanCardContent({ task, isDragging }: { task: TaskListItem; isDraggin
       className={cn(
         'cursor-pointer rounded-lg border border-border bg-background p-3 transition-all duration-100',
         isDragging
-          ? 'rotate-[2deg] shadow-lg ring-1 ring-primary/20'
+          ? 'rotate-2 shadow-lg ring-1 ring-primary/20'
           : 'hover:border-foreground/15 hover:bg-bg-hover/50 hover:shadow-md'
       )}
       onClick={e => {

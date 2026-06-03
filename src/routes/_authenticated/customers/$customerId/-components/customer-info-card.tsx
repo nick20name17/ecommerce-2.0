@@ -97,7 +97,7 @@ export const CustomerInfoPanel = ({
                 <button
                   type='button'
                   disabled={savingPriceLevel}
-                  className='inline-flex items-center gap-1 rounded-[4px] bg-bg-secondary px-1.5 py-0.5 text-[12px] font-medium text-text-secondary transition-colors duration-75 hover:bg-bg-active disabled:opacity-70'
+                  className='inline-flex items-center gap-1 rounded-sm bg-bg-secondary px-1.5 py-0.5 text-[12px] font-medium text-text-secondary transition-colors duration-75 hover:bg-bg-active disabled:opacity-70'
                 >
                   {savingPriceLevel && (
                     <Loader2 className='size-3 animate-spin text-text-tertiary' />
@@ -119,7 +119,7 @@ export const CustomerInfoPanel = ({
               </DropdownMenuContent>
             </DropdownMenu>
           ) : typeLabel !== '—' ? (
-            <span className='inline-flex items-center rounded-[4px] bg-bg-secondary px-1.5 py-0.5 text-[12px] font-medium text-text-secondary'>
+            <span className='inline-flex items-center rounded-sm bg-bg-secondary px-1.5 py-0.5 text-[12px] font-medium text-text-secondary'>
               {typeLabel}
             </span>
           ) : (
@@ -133,7 +133,7 @@ export const CustomerInfoPanel = ({
                 <button
                   type='button'
                   disabled={savingField === 'salesman'}
-                  className='inline-flex items-center gap-1 rounded-[4px] bg-bg-secondary px-1.5 py-0.5 text-[12px] font-medium text-text-secondary transition-colors duration-75 hover:bg-bg-active disabled:opacity-70'
+                  className='inline-flex items-center gap-1 rounded-sm bg-bg-secondary px-1.5 py-0.5 text-[12px] font-medium text-text-secondary transition-colors duration-75 hover:bg-bg-active disabled:opacity-70'
                 >
                   {savingField === 'salesman' && (
                     <Loader2 className='size-3 animate-spin text-text-tertiary' />
@@ -144,7 +144,7 @@ export const CustomerInfoPanel = ({
                   )}
                 </button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align='end' className='max-h-[240px] overflow-y-auto'>
+              <DropdownMenuContent align='end' className='max-h-60 overflow-y-auto'>
                 <DropdownMenuItem
                   onClick={() => onFieldSave!('salesman', '')}
                   className={cn(!salesman && 'font-semibold')}
@@ -163,7 +163,7 @@ export const CustomerInfoPanel = ({
               </DropdownMenuContent>
             </DropdownMenu>
           ) : salesman ? (
-            <span className='inline-flex items-center rounded-[4px] bg-bg-secondary px-1.5 py-0.5 text-[12px] font-medium text-text-secondary'>
+            <span className='inline-flex items-center rounded-sm bg-bg-secondary px-1.5 py-0.5 text-[12px] font-medium text-text-secondary'>
               {salesman}
             </span>
           ) : (
@@ -207,7 +207,7 @@ export const CustomerInfoPanel = ({
             {email ? (
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <span className='block max-w-[180px] truncate'>{email}</span>
+                  <span className='block max-w-45 truncate'>{email}</span>
                 </TooltipTrigger>
                 <TooltipContent>{email}</TooltipContent>
               </Tooltip>

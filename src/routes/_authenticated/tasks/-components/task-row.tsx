@@ -53,7 +53,7 @@ export function StatusChangeButton({
       <PopoverTrigger asChild>
         <button
           type='button'
-          className='shrink-0 rounded-[4px] transition-opacity duration-[80ms] hover:opacity-70'
+          className='shrink-0 rounded-sm transition-opacity duration-80 hover:opacity-70'
           onClick={e => e.stopPropagation()}
           aria-label='Change status'
         >
@@ -61,7 +61,7 @@ export function StatusChangeButton({
         </button>
       </PopoverTrigger>
       <PopoverContent
-        className='w-[180px] gap-0 overflow-hidden rounded-[8px] border-border p-1'
+        className='w-45 gap-0 overflow-hidden rounded-lg border-border p-1'
         align='start'
         style={{ boxShadow: 'var(--dropdown-shadow)' }}
         onOpenAutoFocus={e => e.preventDefault()}
@@ -73,8 +73,8 @@ export function StatusChangeButton({
               key={s.id}
               type='button'
               className={cn(
-                'flex w-full items-center gap-2 rounded-[6px] px-2 py-1 text-left text-[13px] font-medium',
-                'transition-colors duration-[80ms]',
+                'flex w-full items-center gap-2 rounded-md px-2 py-1 text-left text-[13px] font-medium',
+                'transition-colors duration-80',
                 selected ? 'bg-accent-bg' : 'hover:bg-bg-hover'
               )}
               onClick={e => {
@@ -150,7 +150,7 @@ export function TaskRow({
             {task.title}
           </span>
         </div>
-        <div className='flex flex-wrap items-center gap-2 pl-[24px]'>
+        <div className='flex flex-wrap items-center gap-2 pl-6'>
           <span className='text-[13px] text-text-tertiary tabular-nums'>
             TSK-{task.id.toString().padStart(3, '0')}
           </span>
@@ -223,7 +223,7 @@ export function TaskRow({
               type='button'
               className={cn(
                 'flex items-center gap-1.5 rounded-[5px] px-1 py-0.5 transition-colors duration-75 hover:bg-bg-active',
-                isTablet ? 'w-auto' : 'w-[90px]'
+                isTablet ? 'w-auto' : 'w-22.5'
               )}
               onClick={e => e.stopPropagation()}
             >
@@ -232,7 +232,7 @@ export function TaskRow({
             </button>
           </PopoverTrigger>
           <PopoverContent
-            className='w-[160px] gap-0 overflow-hidden rounded-[8px] border-border p-1'
+            className='w-40 gap-0 overflow-hidden rounded-lg border-border p-1'
             align='start'
             style={{ boxShadow: 'var(--dropdown-shadow)' }}
             onOpenAutoFocus={e => e.preventDefault()}
@@ -242,8 +242,8 @@ export function TaskRow({
                 key={key}
                 type='button'
                 className={cn(
-                  'flex w-full items-center gap-2 rounded-[6px] px-2 py-1 text-left text-[13px] font-medium',
-                  'transition-colors duration-[80ms]',
+                  'flex w-full items-center gap-2 rounded-md px-2 py-1 text-left text-[13px] font-medium',
+                  'transition-colors duration-80',
                   task.priority === key ? 'bg-accent-bg' : 'hover:bg-bg-hover'
                 )}
                 onClick={e => {
@@ -265,7 +265,7 @@ export function TaskRow({
         {/* Assignee */}
         {!isTablet && (
           <div
-            className='w-[160px] min-w-0'
+            className='w-40 min-w-0'
             onClick={e => e.stopPropagation()}
             onKeyDown={e => e.stopPropagation()}
           >
@@ -292,7 +292,7 @@ export function TaskRow({
               <button
                 type='button'
                 className={cn(
-                  'flex w-[80px] items-center gap-1 rounded-[5px] px-1 py-0.5 text-sm transition-colors duration-75 hover:bg-bg-active',
+                  'flex w-20 items-center gap-1 rounded-[5px] px-1 py-0.5 text-sm transition-colors duration-75 hover:bg-bg-active',
                   overdue ? 'font-medium text-destructive' : 'text-text-tertiary'
                 )}
               >
@@ -325,7 +325,7 @@ export function TaskRow({
           <DropdownMenuTrigger asChild>
             <button
               type='button'
-              className='inline-flex size-6 items-center justify-center rounded-[6px] text-text-tertiary transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground'
+              className='inline-flex size-6 items-center justify-center rounded-md text-text-tertiary transition-colors duration-80 hover:bg-bg-active hover:text-foreground'
               aria-label='Task actions'
             >
               <svg width='15' height='15' viewBox='0 0 15 15' fill='none'>
@@ -337,12 +337,12 @@ export function TaskRow({
           </DropdownMenuTrigger>
           <DropdownMenuContent
             align='end'
-            className='w-[180px] rounded-[8px] p-1'
+            className='w-45 rounded-lg p-1'
             style={{ boxShadow: 'var(--dropdown-shadow)' }}
           >
             <DropdownMenuItem
               variant='destructive'
-              className='cursor-pointer gap-2 rounded-[6px] px-2 py-1 text-[13px]'
+              className='cursor-pointer gap-2 rounded-md px-2 py-1 text-[13px]'
               onClick={() => onDelete(task)}
             >
               <Trash2 className='size-3.5' />

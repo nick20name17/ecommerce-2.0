@@ -310,7 +310,7 @@ export const TaskAttachments = forwardRef<TaskAttachmentsRef, TaskAttachmentsPro
         {showDropZone ? (
           <div
             className={cn(
-              'relative flex items-center gap-3 rounded-[8px] border border-dashed px-4 py-3 transition-colors',
+              'relative flex items-center gap-3 rounded-lg border border-dashed px-4 py-3 transition-colors',
               isDragging ? 'border-primary bg-primary/5' : 'hover:border-border-heavy border-border'
             )}
             onDragEnter={handleDragEnter}
@@ -349,7 +349,7 @@ export const TaskAttachments = forwardRef<TaskAttachmentsRef, TaskAttachmentsPro
             <button
               type='button'
               onClick={openFileDialog}
-              className='inline-flex w-full items-center justify-center gap-1.5 rounded-[6px] border border-dashed border-border px-2.5 py-2 text-[13px] font-medium text-text-secondary transition-colors duration-[80ms] hover:bg-bg-hover hover:text-foreground'
+              className='inline-flex w-full items-center justify-center gap-1.5 rounded-md border border-dashed border-border px-2.5 py-2 text-[13px] font-medium text-text-secondary transition-colors duration-80 hover:bg-bg-hover hover:text-foreground'
             >
               <UploadIcon className='size-3.5' />
               Add attachment
@@ -358,7 +358,7 @@ export const TaskAttachments = forwardRef<TaskAttachmentsRef, TaskAttachmentsPro
         )}
 
         {errors.length > 0 && (
-          <div className='flex items-start gap-2 rounded-[6px] border border-red-200 bg-red-500/5 px-3 py-2 text-[12px] text-destructive dark:border-red-800'>
+          <div className='flex items-start gap-2 rounded-md border border-red-200 bg-red-500/5 px-3 py-2 text-[12px] text-destructive dark:border-red-800'>
             <CircleAlertIcon className='mt-0.5 size-3.5 shrink-0' />
             <div className='min-w-0 flex-1 space-y-0.5'>
               {errors.map(error => (
@@ -381,7 +381,7 @@ export const TaskAttachments = forwardRef<TaskAttachmentsRef, TaskAttachmentsPro
             <p className='text-[12px] text-text-tertiary'>
               {pendingFiles.length} file{pendingFiles.length > 1 ? 's' : ''} ready to upload
             </p>
-            <div className='divide-y divide-border-light rounded-[8px] border border-border'>
+            <div className='divide-y divide-border-light rounded-lg border border-border'>
               {pendingFiles.map(fileItem => {
                 const file = fileItem.file
                 const fileName = file instanceof File ? file.name : file.name
@@ -417,7 +417,7 @@ export const TaskAttachments = forwardRef<TaskAttachmentsRef, TaskAttachmentsPro
                     <button
                       type='button'
                       onClick={() => removeFile(fileItem.id)}
-                      className='shrink-0 rounded-[4px] p-1 text-text-tertiary transition-colors duration-75 hover:bg-bg-hover hover:text-destructive'
+                      className='shrink-0 rounded-sm p-1 text-text-tertiary transition-colors duration-75 hover:bg-bg-hover hover:text-destructive'
                     >
                       <Trash2Icon className='size-3' />
                     </button>
@@ -430,7 +430,7 @@ export const TaskAttachments = forwardRef<TaskAttachmentsRef, TaskAttachmentsPro
 
         {/* Existing + uploading files */}
         {(allAttachments.length > 0 || uploadingFiles.length > 0 || isLoading) && (
-          <div className='divide-y divide-border-light rounded-[8px] border border-border'>
+          <div className='divide-y divide-border-light rounded-lg border border-border'>
             {isLoading && (
               <>
                 {[1, 2].map(k => (
@@ -487,7 +487,7 @@ export const TaskAttachments = forwardRef<TaskAttachmentsRef, TaskAttachmentsPro
                       <img
                         src={attachment.download_url}
                         alt={attachment.file_name}
-                        className='size-7 shrink-0 cursor-pointer rounded-[4px] object-cover'
+                        className='size-7 shrink-0 cursor-pointer rounded-sm object-cover'
                         onClick={() => openPreview(attachment)}
                         loading='lazy'
                       />
@@ -527,7 +527,7 @@ export const TaskAttachments = forwardRef<TaskAttachmentsRef, TaskAttachmentsPro
                         download={attachment.file_name}
                         target='_blank'
                         rel='noopener noreferrer'
-                        className='rounded-[4px] p-1 text-text-tertiary transition-colors duration-75 hover:bg-bg-active hover:text-foreground'
+                        className='rounded-sm p-1 text-text-tertiary transition-colors duration-75 hover:bg-bg-active hover:text-foreground'
                       >
                         <DownloadIcon className='size-3' />
                       </a>
@@ -535,7 +535,7 @@ export const TaskAttachments = forwardRef<TaskAttachmentsRef, TaskAttachmentsPro
                         type='button'
                         onClick={() => deleteMutation.mutate(attachment.id)}
                         disabled={isDeleting}
-                        className='rounded-[4px] p-1 text-text-tertiary transition-colors duration-75 hover:bg-bg-active hover:text-destructive disabled:pointer-events-none'
+                        className='rounded-sm p-1 text-text-tertiary transition-colors duration-75 hover:bg-bg-active hover:text-destructive disabled:pointer-events-none'
                       >
                         {isDeleting ? (
                           <LoaderIcon className='size-3 animate-spin' />

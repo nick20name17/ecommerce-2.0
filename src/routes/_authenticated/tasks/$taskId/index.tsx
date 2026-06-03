@@ -323,7 +323,7 @@ function TaskDetailPage() {
         </header>
         <div className='flex min-h-0 flex-1'>
           <div className={cn('flex-1 overflow-y-auto', isMobile ? 'px-4 pt-5' : 'px-4 pt-6')}>
-            <div className='mx-auto max-w-[640px]'>
+            <div className='mx-auto max-w-160'>
               <Skeleton className='mb-6 h-8 w-3/4' />
               <Skeleton className='mb-8 h-32 w-full' />
             </div>
@@ -368,7 +368,7 @@ function TaskDetailPage() {
           <SidebarTrigger className='-ml-1' />
           <button
             type='button'
-            className='inline-flex h-7 items-center gap-0.5 rounded-[6px] border border-border bg-bg-secondary pr-2.5 pl-1.5 text-[13px] font-medium text-text-secondary transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground'
+            className='inline-flex h-7 items-center gap-0.5 rounded-md border border-border bg-bg-secondary pr-2.5 pl-1.5 text-[13px] font-medium text-text-secondary transition-colors duration-80 hover:bg-bg-active hover:text-foreground'
             onClick={() => router.history.back()}
           >
             <ChevronLeft className='size-3.5' />
@@ -381,7 +381,7 @@ function TaskDetailPage() {
         </div>
         <button
           type='button'
-          className='inline-flex items-center gap-1.5 rounded-[6px] px-2.5 py-1.5 text-[13px] leading-none font-medium text-text-tertiary transition-colors duration-[80ms] hover:bg-bg-hover hover:text-destructive'
+          className='inline-flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-[13px] leading-none font-medium text-text-tertiary transition-colors duration-80 hover:bg-bg-hover hover:text-destructive'
           onClick={() => setDeleteOpen(true)}
         >
           <Trash2 className='size-3.5' />
@@ -400,7 +400,7 @@ function TaskDetailPage() {
             <button
               type='button'
               className={cn(
-                'relative px-3 py-2.5 text-[13px] font-medium transition-colors duration-[80ms]',
+                'relative px-3 py-2.5 text-[13px] font-medium transition-colors duration-80',
                 activeTab === 'details'
                   ? 'text-foreground'
                   : 'text-text-tertiary hover:text-text-secondary'
@@ -409,13 +409,13 @@ function TaskDetailPage() {
             >
               Details
               {activeTab === 'details' && (
-                <div className='absolute inset-x-3 -bottom-px h-[2px] rounded-full bg-foreground' />
+                <div className='absolute inset-x-3 -bottom-px h-0.5 rounded-full bg-foreground' />
               )}
             </button>
             <button
               type='button'
               className={cn(
-                'relative flex items-center gap-1.5 px-3 py-2.5 text-[13px] font-medium transition-colors duration-[80ms]',
+                'relative flex items-center gap-1.5 px-3 py-2.5 text-[13px] font-medium transition-colors duration-80',
                 activeTab === 'attachments'
                   ? 'text-foreground'
                   : 'text-text-tertiary hover:text-text-secondary'
@@ -430,14 +430,14 @@ function TaskDetailPage() {
                 </span>
               )}
               {activeTab === 'attachments' && (
-                <div className='absolute inset-x-3 -bottom-px h-[2px] rounded-full bg-foreground' />
+                <div className='absolute inset-x-3 -bottom-px h-0.5 rounded-full bg-foreground' />
               )}
             </button>
           </div>
 
           {/* Tab content */}
           <div className={cn('flex-1 overflow-y-auto', isMobile ? 'px-4 pt-5' : 'px-4 pt-6')}>
-            <div className='mx-auto max-w-[640px] pb-16'>
+            <div className='mx-auto max-w-160 pb-16'>
               {activeTab === 'details' ? (
                 <>
                   {/* Title — editable, auto-resizing */}
@@ -475,7 +475,7 @@ function TaskDetailPage() {
                       onBlur={handleDescriptionBlur}
                       placeholder='Add a description...'
                       rows={5}
-                      className='w-full resize-none rounded-[6px] border border-border bg-transparent px-3 py-2.5 text-sm leading-relaxed text-text-secondary placeholder:text-text-tertiary focus:border-primary focus:outline-none'
+                      className='w-full resize-none rounded-md border border-border bg-transparent px-3 py-2.5 text-sm leading-relaxed text-text-secondary placeholder:text-text-tertiary focus:border-primary focus:outline-none'
                     />
                     {task.updated_at && (
                       <p className='mt-2 text-[13px] text-text-tertiary'>
@@ -518,12 +518,12 @@ function TaskDetailPage() {
               >
                 {tab === 'properties' ? 'Properties' : 'Activity'}
                 {tab === 'activity' && notes.length > 0 && (
-                  <span className='inline-flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-bg-active px-1 text-[11px] font-semibold text-text-secondary tabular-nums'>
+                  <span className='inline-flex h-4.5 min-w-4.5 items-center justify-center rounded-full bg-bg-active px-1 text-[11px] font-semibold text-text-secondary tabular-nums'>
                     {notes.length}
                   </span>
                 )}
                 {panelTab === tab && (
-                  <span className='absolute right-3 bottom-0 left-3 h-[2px] rounded-full bg-primary' />
+                  <span className='absolute right-3 bottom-0 left-3 h-0.5 rounded-full bg-primary' />
                 )}
               </button>
             ))}
@@ -531,7 +531,7 @@ function TaskDetailPage() {
 
           {/* Panel content */}
           {panelTab === 'properties' ? (
-            <div className='flex-1 [scrollbar-width:none] overflow-y-auto [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden'>
+            <div className='flex-1 scrollbar-none overflow-y-auto [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden'>
               <div className={cn(isMobile ? 'px-4 py-4' : 'p-5')}>
                 {/* Status */}
                 <PropertyRow label='Status'>
@@ -539,7 +539,7 @@ function TaskDetailPage() {
                     <PopoverTrigger asChild>
                       <button
                         type='button'
-                        className='-mx-2 -my-1 inline-flex cursor-pointer items-center gap-1.5 rounded-[5px] px-2 py-1 text-[13px] font-medium transition-colors duration-[80ms] hover:bg-bg-hover'
+                        className='-mx-2 -my-1 inline-flex cursor-pointer items-center gap-1.5 rounded-[5px] px-2 py-1 text-[13px] font-medium transition-colors duration-80 hover:bg-bg-hover'
                       >
                         <StatusIcon
                           status={task.status_name}
@@ -553,7 +553,7 @@ function TaskDetailPage() {
                       </button>
                     </PopoverTrigger>
                     <PopoverContent
-                      className='w-[220px] gap-0 overflow-hidden rounded-[8px] border-border p-[3px]'
+                      className='w-55 gap-0 overflow-hidden rounded-lg border-border p-0.75'
                       align='start'
                       onOpenAutoFocus={e => e.preventDefault()}
                       style={{ boxShadow: 'var(--dropdown-shadow)' }}
@@ -563,8 +563,8 @@ function TaskDetailPage() {
                           key={s.id}
                           type='button'
                           className={cn(
-                            'flex w-full cursor-pointer items-center gap-2 rounded-[5px] px-2 py-[5px] text-left text-[13px] font-medium',
-                            'transition-colors duration-[80ms]',
+                            'flex w-full cursor-pointer items-center gap-2 rounded-[5px] px-2 py-1.25 text-left text-[13px] font-medium',
+                            'transition-colors duration-80',
                             s.id === task.status ? 'bg-accent-bg' : 'hover:bg-bg-hover'
                           )}
                           onClick={e => {
@@ -587,7 +587,7 @@ function TaskDetailPage() {
                     <DropdownMenuTrigger asChild>
                       <button
                         type='button'
-                        className='-mx-2 -my-1 inline-flex cursor-pointer items-center gap-1.5 rounded-[5px] px-2 py-1 text-[13px] font-medium transition-colors duration-[80ms] hover:bg-bg-hover'
+                        className='-mx-2 -my-1 inline-flex cursor-pointer items-center gap-1.5 rounded-[5px] px-2 py-1 text-[13px] font-medium transition-colors duration-80 hover:bg-bg-hover'
                       >
                         <PriorityIcon
                           priority={task.priority}
@@ -600,14 +600,14 @@ function TaskDetailPage() {
                     </DropdownMenuTrigger>
                     <DropdownMenuContent
                       align='start'
-                      className='w-[180px] p-0.5'
+                      className='w-45 p-0.5'
                       style={{ boxShadow: 'var(--dropdown-shadow)' }}
                     >
                       {Object.entries(TASK_PRIORITY_LABELS).map(([key, label]) => (
                         <DropdownMenuItem
                           key={key}
                           className={cn(
-                            'cursor-pointer gap-2 rounded-[6px] px-2 py-[5px] text-[13px] font-medium hover:!bg-bg-hover hover:!text-foreground',
+                            'cursor-pointer gap-2 rounded-md px-2 py-1.25 text-[13px] font-medium hover:bg-bg-hover! hover:text-foreground!',
                             task.priority === key && 'bg-accent-bg'
                           )}
                           onSelect={() => updateMutation.mutate({ priority: key as TaskPriority })}
@@ -723,7 +723,7 @@ function TaskDetailPage() {
           ) : (
             <>
               {/* Activity notes list */}
-              <div className='min-h-0 flex-1 [scrollbar-width:none] overflow-y-auto [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden'>
+              <div className='min-h-0 flex-1 scrollbar-none overflow-y-auto [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden'>
                 {notesLoading ? (
                   <div className='flex flex-col'>
                     {[1, 2, 3].map(k => (
@@ -783,7 +783,7 @@ function TaskDetailPage() {
                                 {canDeleteNote(note) && (
                                   <button
                                     type='button'
-                                    className='ml-auto shrink-0 rounded-[4px] p-0.5 text-text-tertiary opacity-0 transition-all duration-[80ms] group-hover:opacity-100 hover:text-destructive'
+                                    className='ml-auto shrink-0 rounded-sm p-0.5 text-text-tertiary opacity-0 transition-all duration-80 group-hover:opacity-100 hover:text-destructive'
                                     onClick={() => deleteNoteMutation.mutate(note.id)}
                                     disabled={deleteNoteMutation.isPending}
                                   >
@@ -826,14 +826,14 @@ function TaskDetailPage() {
                   }}
                   placeholder='Write a comment...'
                   rows={2}
-                  className='w-full resize-none rounded-[6px] border border-border bg-transparent px-3 py-2 text-[13px] leading-relaxed placeholder:text-text-tertiary focus:border-ring focus:ring-1 focus:ring-ring/50 focus:outline-none'
+                  className='w-full resize-none rounded-md border border-border bg-transparent px-3 py-2 text-[13px] leading-relaxed placeholder:text-text-tertiary focus:border-ring focus:ring-1 focus:ring-ring/50 focus:outline-none'
                   disabled={createNoteMutation.isPending}
                 />
                 <div className='mt-2 flex justify-end'>
                   <button
                     type='submit'
                     disabled={!noteText.trim() || createNoteMutation.isPending}
-                    className='inline-flex h-7 items-center rounded-[6px] bg-primary px-3 text-[12px] font-semibold text-primary-foreground transition-colors duration-[80ms] hover:opacity-90 disabled:opacity-40'
+                    className='inline-flex h-7 items-center rounded-md bg-primary px-3 text-[12px] font-semibold text-primary-foreground transition-colors duration-80 hover:opacity-90 disabled:opacity-40'
                   >
                     {createNoteMutation.isPending ? 'Sending...' : 'Comment'}
                   </button>
@@ -850,7 +850,7 @@ function TaskDetailPage() {
           <div className='fixed inset-0 z-40 bg-black/40' onClick={() => setDeleteOpen(false)} />
           <div className='fixed inset-0 z-50 flex items-center justify-center px-4'>
             <div
-              className='w-full max-w-[400px] rounded-[12px] border border-border bg-background p-6'
+              className='w-full max-w-100 rounded-xl border border-border bg-background p-6'
               style={{ boxShadow: 'var(--dropdown-shadow)' }}
             >
               <h3 className='mb-2 text-[15px] font-semibold'>Delete task</h3>
@@ -861,14 +861,14 @@ function TaskDetailPage() {
               <div className='flex justify-end gap-2'>
                 <button
                   type='button'
-                  className='rounded-[6px] border border-border px-3 py-1.5 text-[13px] font-medium transition-colors duration-[80ms] hover:bg-bg-hover'
+                  className='rounded-md border border-border px-3 py-1.5 text-[13px] font-medium transition-colors duration-80 hover:bg-bg-hover'
                   onClick={() => setDeleteOpen(false)}
                 >
                   Cancel
                 </button>
                 <button
                   type='button'
-                  className='rounded-[6px] bg-destructive px-3 py-1.5 text-[13px] font-medium text-white transition-colors duration-[80ms] hover:opacity-90'
+                  className='rounded-md bg-destructive px-3 py-1.5 text-[13px] font-medium text-white transition-colors duration-80 hover:opacity-90'
                   onClick={() => deleteMutation.mutate()}
                   disabled={deleteMutation.isPending}
                 >
@@ -929,7 +929,7 @@ function DueDatePicker({
         <button
           type='button'
           className={cn(
-            '-mx-2 -my-1 inline-flex cursor-pointer items-center gap-1.5 rounded-[5px] px-2 py-1 text-[13px] font-medium transition-colors duration-[80ms] hover:bg-bg-hover',
+            '-mx-2 -my-1 inline-flex cursor-pointer items-center gap-1.5 rounded-[5px] px-2 py-1 text-[13px] font-medium transition-colors duration-80 hover:bg-bg-hover',
             !value && 'text-text-tertiary'
           )}
         >
@@ -950,7 +950,7 @@ function DueDatePicker({
             <button
               key={preset.label}
               type='button'
-              className='flex w-full items-center justify-between rounded-[6px] px-2.5 py-[5px] text-[13px] transition-colors duration-[80ms] hover:bg-bg-hover'
+              className='flex w-full items-center justify-between rounded-md px-2.5 py-1.25 text-[13px] transition-colors duration-80 hover:bg-bg-hover'
               onClick={() => handlePreset(preset.getDate)}
             >
               <span className='font-medium'>{preset.label}</span>
@@ -962,7 +962,7 @@ function DueDatePicker({
           {value && (
             <button
               type='button'
-              className='flex w-full items-center rounded-[6px] px-2.5 py-[5px] text-[13px] font-medium text-text-tertiary transition-colors duration-[80ms] hover:bg-bg-hover hover:text-foreground'
+              className='flex w-full items-center rounded-md px-2.5 py-1.25 text-[13px] font-medium text-text-tertiary transition-colors duration-80 hover:bg-bg-hover hover:text-foreground'
               onClick={() => {
                 onChange(null)
                 setOpen(false)

@@ -92,7 +92,7 @@ const PROPOSAL_FORMATTERS: Partial<Record<string, DynamicCellFormatter<ProposalR
     return (
       <Tooltip>
         <TooltipTrigger asChild>
-          <span className='block max-w-[120px] truncate'>{String(val)}</span>
+          <span className='block max-w-30 truncate'>{String(val)}</span>
         </TooltipTrigger>
         <TooltipContent>{String(val)}</TooltipContent>
       </Tooltip>
@@ -147,7 +147,7 @@ export const getProposalColumns = ({
       if (row.original._pending || !onNotes) return null
       return (
         <div
-          className='max-w-[140px] min-w-0'
+          className='max-w-35 min-w-0'
           role='button'
           tabIndex={0}
           onClick={e => e.stopPropagation()}

@@ -200,7 +200,7 @@ export const EntityNotesSheet = ({
       >
         <SheetHeader className='flex h-12 shrink-0 flex-row items-center gap-2 border-b border-border px-5'>
           <SheetTitle className='text-[14px] font-semibold tracking-[-0.01em]'>Notes</SheetTitle>
-          <SheetDescription className='!mt-0 text-[13px] text-text-tertiary'>
+          <SheetDescription className='mt-0! text-[13px] text-text-tertiary'>
             {entityLabel}
           </SheetDescription>
         </SheetHeader>
@@ -220,7 +220,7 @@ export const EntityNotesSheet = ({
                 </EmptyMedia>
                 <EmptyTitle className='font-medium text-foreground'>No notes yet</EmptyTitle>
                 <EmptyContent>
-                  <p className='max-w-[220px] text-[13px] leading-relaxed text-text-tertiary'>
+                  <p className='max-w-55 text-[13px] leading-relaxed text-text-tertiary'>
                     Add a note below to keep context for this record.
                   </p>
                 </EmptyContent>
@@ -270,14 +270,14 @@ export const EntityNotesSheet = ({
               onKeyDown={handleKeyDown}
               placeholder='Write a note...'
               rows={2}
-              className='w-full resize-none rounded-[6px] border border-border bg-transparent px-3 py-2 pr-10 text-[13px] leading-relaxed placeholder:text-text-tertiary focus:border-ring focus:ring-1 focus:ring-ring/50 focus:outline-none'
+              className='w-full resize-none rounded-md border border-border bg-transparent px-3 py-2 pr-10 text-[13px] leading-relaxed placeholder:text-text-tertiary focus:border-ring focus:ring-1 focus:ring-ring/50 focus:outline-none'
               disabled={createMutation.isPending}
             />
             <button
               type='submit'
               disabled={!text.trim() || createMutation.isPending}
               className={cn(
-                'absolute right-2.5 bottom-2.5 flex size-6 items-center justify-center rounded-[5px] transition-colors duration-[80ms]',
+                'absolute right-2.5 bottom-2.5 flex size-6 items-center justify-center rounded-[5px] transition-colors duration-80',
                 text.trim()
                   ? 'bg-primary text-primary-foreground hover:opacity-90'
                   : 'text-text-tertiary'
@@ -332,7 +332,7 @@ function NoteRow({
           {canDelete && (
             <button
               type='button'
-              className='ml-auto shrink-0 rounded-[4px] p-0.5 text-text-tertiary opacity-0 transition-all duration-[80ms] group-hover:opacity-100 hover:text-destructive'
+              className='ml-auto shrink-0 rounded-sm p-0.5 text-text-tertiary opacity-0 transition-all duration-80 group-hover:opacity-100 hover:text-destructive'
               onClick={onDelete}
               aria-label='Delete note'
             >
@@ -340,7 +340,7 @@ function NoteRow({
             </button>
           )}
         </div>
-        <p className='mt-0.5 text-[13px] leading-relaxed break-words whitespace-pre-wrap text-text-secondary'>
+        <p className='mt-0.5 text-[13px] leading-relaxed wrap-break-word whitespace-pre-wrap text-text-secondary'>
           {note.text}
         </p>
       </div>

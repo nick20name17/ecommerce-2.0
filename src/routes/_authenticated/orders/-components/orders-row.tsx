@@ -143,10 +143,10 @@ export function OrderRow({
       </div>
 
       {/* Status */}
-      <div className='w-[88px] shrink-0'>
+      <div className='w-22 shrink-0'>
         <span
           className={cn(
-            'inline-flex items-center rounded-[4px] border px-1.5 py-0.5 text-[11px] leading-none font-semibold',
+            'inline-flex items-center rounded-sm border px-1.5 py-0.5 text-[11px] leading-none font-semibold',
             statusClass
           )}
         >
@@ -156,7 +156,7 @@ export function OrderRow({
 
       {/* Date */}
       {!isTablet && (
-        <div className='w-[100px] shrink-0 text-right text-[13px] text-text-secondary tabular-nums'>
+        <div className='w-25 shrink-0 text-right text-[13px] text-text-secondary tabular-nums'>
           {order.inv_date ? (
             formatDate(order.inv_date)
           ) : (
@@ -169,7 +169,7 @@ export function OrderRow({
       <div
         className={cn(
           'shrink-0 text-right text-[13px] font-medium text-foreground tabular-nums',
-          isTablet ? 'w-[80px]' : 'w-[100px]'
+          isTablet ? 'w-20' : 'w-25'
         )}
       >
         {formatCurrency(order.total, '—')}
@@ -179,7 +179,7 @@ export function OrderRow({
       {!isTablet && (
         <div
           className={cn(
-            'w-[100px] shrink-0 text-right text-[13px] font-medium tabular-nums',
+            'w-25 shrink-0 text-right text-[13px] font-medium tabular-nums',
             Number(order.balance) > 0 ? 'text-amber-600 dark:text-amber-400' : 'text-text-tertiary'
           )}
         >
@@ -197,13 +197,13 @@ export function OrderRow({
 
       {/* Salesman */}
       {!isTablet && (
-        <div className='w-[90px] shrink-0 truncate text-[13px] text-text-secondary'>
+        <div className='w-22.5 shrink-0 truncate text-[13px] text-text-secondary'>
           {order.salesman || <span className='text-text-tertiary'>&mdash;</span>}
         </div>
       )}
 
       {/* Responsible */}
-      <div className={cn('shrink-0', isTablet ? 'w-[46px]' : 'w-[120px]')}>
+      <div className={cn('shrink-0', isTablet ? 'w-11.5' : 'w-30')}>
         {(() => {
           const assigned = order.assigned_users?.length
             ? order.assigned_users
@@ -276,11 +276,11 @@ export function OrderRow({
       )}
 
       {/* Notes */}
-      <div className='flex w-[46px] shrink-0 justify-center'>
+      <div className='flex w-11.5 shrink-0 justify-center'>
         <button
           type='button'
           className={cn(
-            'inline-flex h-[26px] w-[46px] items-center justify-center gap-1 rounded-[6px] border text-[12px] font-medium tabular-nums transition-colors duration-[80ms]',
+            'inline-flex h-6.5 w-11.5 items-center justify-center gap-1 rounded-md border text-[12px] font-medium tabular-nums transition-colors duration-80',
             noteCount > 0
               ? 'border-border bg-bg-secondary text-text-secondary hover:bg-bg-active'
               : 'text-text-quaternary border-transparent hover:bg-bg-hover hover:text-text-tertiary'
@@ -298,7 +298,7 @@ export function OrderRow({
 
       {/* Print menu (visible only if order_list templates exist) */}
       <div
-        className='flex w-[28px] shrink-0 items-center justify-center'
+        className='flex w-7 shrink-0 items-center justify-center'
         onClick={e => e.stopPropagation()}
       >
         <PrintMenu
@@ -313,7 +313,7 @@ export function OrderRow({
 
       {/* Actions */}
       <div
-        className='flex w-[28px] shrink-0 items-center justify-center'
+        className='flex w-7 shrink-0 items-center justify-center'
         onClick={e => e.stopPropagation()}
         onKeyDown={e => e.stopPropagation()}
         role='group'
@@ -322,7 +322,7 @@ export function OrderRow({
           <DropdownMenuTrigger asChild>
             <button
               type='button'
-              className='inline-flex size-6 items-center justify-center rounded-[6px] text-text-tertiary transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground'
+              className='inline-flex size-6 items-center justify-center rounded-md text-text-tertiary transition-colors duration-80 hover:bg-bg-active hover:text-foreground'
               aria-label='Order actions'
             >
               <MoreHorizontal className='size-4' />
@@ -330,12 +330,12 @@ export function OrderRow({
           </DropdownMenuTrigger>
           <DropdownMenuContent
             align='end'
-            className='w-[200px] rounded-[8px] p-1'
+            className='w-50 rounded-lg p-1'
             style={{ boxShadow: 'var(--dropdown-shadow)' }}
           >
             {canAssign && (
               <DropdownMenuItem
-                className='cursor-pointer gap-2 rounded-[6px] px-2 py-1 text-[13px]'
+                className='cursor-pointer gap-2 rounded-md px-2 py-1 text-[13px]'
                 onClick={() => onAssign(order)}
               >
                 <UserPlus className='size-3.5' />
@@ -344,7 +344,7 @@ export function OrderRow({
             )}
             {order.status === ORDER_STATUS.unprocessed && onPick && (
               <DropdownMenuItem
-                className='cursor-pointer gap-2 rounded-[6px] px-2 py-1 text-[13px]'
+                className='cursor-pointer gap-2 rounded-md px-2 py-1 text-[13px]'
                 onClick={() => onPick(order)}
               >
                 <ClipboardList className='size-3.5' />
@@ -352,14 +352,14 @@ export function OrderRow({
               </DropdownMenuItem>
             )}
             <DropdownMenuItem
-              className='cursor-pointer gap-2 rounded-[6px] px-2 py-1 text-[13px]'
+              className='cursor-pointer gap-2 rounded-md px-2 py-1 text-[13px]'
               onClick={() => onCreateTask(order)}
             >
               <ListTodo className='size-3.5' />
               Create Task
             </DropdownMenuItem>
             <DropdownMenuItem
-              className='cursor-pointer gap-2 rounded-[6px] px-2 py-1 text-[13px]'
+              className='cursor-pointer gap-2 rounded-md px-2 py-1 text-[13px]'
               onClick={() => onAttachments(order)}
             >
               <Paperclip className='size-3.5' />
@@ -368,7 +368,7 @@ export function OrderRow({
             {order.external_id && (
               <DropdownMenuItem
                 variant='destructive'
-                className='cursor-pointer gap-2 rounded-[6px] px-2 py-1 text-[13px]'
+                className='cursor-pointer gap-2 rounded-md px-2 py-1 text-[13px]'
                 onClick={() => onDeleteLinkedProposal(order)}
               >
                 <Link2Off className='size-3.5' />
@@ -377,7 +377,7 @@ export function OrderRow({
             )}
             <DropdownMenuItem
               variant='destructive'
-              className='cursor-pointer gap-2 rounded-[6px] px-2 py-1 text-[13px]'
+              className='cursor-pointer gap-2 rounded-md px-2 py-1 text-[13px]'
               onClick={() => onDelete(order)}
             >
               <Trash2 className='size-3.5' />

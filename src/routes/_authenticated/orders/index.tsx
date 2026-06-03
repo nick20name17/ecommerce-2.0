@@ -207,7 +207,7 @@ const OrdersPage = () => {
 
         <div className='flex-1' />
 
-        <div className='hidden h-7 w-full max-w-[260px] items-center gap-1.5 rounded-[5px] border border-border bg-background px-2 transition-[border-color,box-shadow] focus-within:border-ring focus-within:ring-2 focus-within:ring-ring/50 sm:flex'>
+        <div className='hidden h-7 w-full max-w-65 items-center gap-1.5 rounded-[5px] border border-border bg-background px-2 transition-[border-color,box-shadow] focus-within:border-ring focus-within:ring-2 focus-within:ring-ring/50 sm:flex'>
           <Search className='size-3 shrink-0 text-text-tertiary' />
           <input
             value={search}
@@ -240,14 +240,14 @@ const OrdersPage = () => {
                   key={s.value}
                   type='button'
                   className={cn(
-                    'flex w-full items-center gap-2 rounded-[5px] px-2 py-[3px] text-left text-[13px] font-medium whitespace-nowrap',
-                    'transition-colors duration-[80ms] hover:bg-bg-hover'
+                    'flex w-full items-center gap-2 rounded-[5px] px-2 py-0.75 text-left text-[13px] font-medium whitespace-nowrap',
+                    'transition-colors duration-80 hover:bg-bg-hover'
                   )}
                   onClick={() => selectStatus(s.value)}
                 >
                   <div
                     className={cn(
-                      'flex size-3.5 shrink-0 items-center justify-center rounded-full border transition-colors duration-[80ms]',
+                      'flex size-3.5 shrink-0 items-center justify-center rounded-full border transition-colors duration-80',
                       selected ? 'border-primary bg-primary' : 'border-border'
                     )}
                   >
@@ -269,7 +269,7 @@ const OrdersPage = () => {
             type='button'
             className={cn(
               'inline-flex h-7 items-center gap-1 rounded-[5px] border px-2 text-[13px] font-medium',
-              'transition-colors duration-[80ms] hover:bg-bg-hover',
+              'transition-colors duration-80 hover:bg-bg-hover',
               assignedToMe
                 ? 'border-primary/30 bg-primary/5 text-foreground'
                 : 'border-border bg-background text-text-secondary'
@@ -282,7 +282,7 @@ const OrdersPage = () => {
 
           <button
             type='button'
-            className='inline-flex h-7 items-center gap-1 rounded-[5px] bg-primary px-2 text-[13px] font-semibold text-primary-foreground transition-colors duration-[80ms] hover:opacity-90 sm:px-2.5'
+            className='inline-flex h-7 items-center gap-1 rounded-[5px] bg-primary px-2 text-[13px] font-semibold text-primary-foreground transition-colors duration-80 hover:opacity-90 sm:px-2.5'
             onClick={() => navigate({ to: '/create' })}
           >
             <Plus className='size-3.5' />
@@ -302,7 +302,7 @@ const OrdersPage = () => {
           {hasFilters && (
             <button
               type='button'
-              className='text-[13px] font-medium text-text-tertiary transition-colors duration-[80ms] hover:text-foreground'
+              className='text-[13px] font-medium text-text-tertiary transition-colors duration-80 hover:text-foreground'
               onClick={clearAllFilters}
             >
               Clear
@@ -353,7 +353,7 @@ const OrdersPage = () => {
               onSort={handleSort}
               className='min-w-0 flex-1'
             />
-            <div className='w-[88px] shrink-0'>Status</div>
+            <div className='w-22 shrink-0'>Status</div>
             {!isTablet && (
               <OrderSortableHeader
                 field='inv_date'
@@ -361,7 +361,7 @@ const OrdersPage = () => {
                 sortField={sortField}
                 sortDir={sortDir}
                 onSort={handleSort}
-                className='w-[100px] shrink-0 justify-end text-right'
+                className='w-25 shrink-0 justify-end text-right'
               />
             )}
             <OrderSortableHeader
@@ -370,7 +370,7 @@ const OrdersPage = () => {
               sortField={sortField}
               sortDir={sortDir}
               onSort={handleSort}
-              className='w-[100px] shrink-0 justify-end text-right'
+              className='w-25 shrink-0 justify-end text-right'
             />
             {!isTablet && (
               <OrderSortableHeader
@@ -379,20 +379,20 @@ const OrdersPage = () => {
                 sortField={sortField}
                 sortDir={sortDir}
                 onSort={handleSort}
-                className='w-[100px] shrink-0 justify-end text-right'
+                className='w-25 shrink-0 justify-end text-right'
               />
             )}
             <div className='w-27.5 shrink-0 text-center'>Picked</div>
-            {!isTablet && <div className='w-[90px] shrink-0'>Salesman</div>}
-            <div className='w-[120px] shrink-0'>Responsible</div>
+            {!isTablet && <div className='w-22.5 shrink-0'>Salesman</div>}
+            <div className='w-30 shrink-0'>Responsible</div>
             <CustomColumnsHeader
               columns={customColumns}
               sortField={sortField}
               sortDir={sortDir}
               onSort={handleSort}
             />
-            <div className='w-[46px] shrink-0' />
-            <div className='w-[28px] shrink-0' />
+            <div className='w-11.5 shrink-0' />
+            <div className='w-7 shrink-0' />
           </div>
         )}
 
@@ -423,35 +423,35 @@ const OrdersPage = () => {
                   <Skeleton className='h-3.5 w-16 rounded' />
                   <Skeleton className='h-3.5 w-24 rounded' />
                 </div>
-                <div className='w-[88px] shrink-0'>
-                  <Skeleton className='h-[18px] w-[60px] rounded-[4px]' />
+                <div className='w-22 shrink-0'>
+                  <Skeleton className='h-4.5 w-15 rounded-sm' />
                 </div>
                 {!isTablet && (
-                  <div className='w-[100px] shrink-0'>
-                    <Skeleton className='ml-auto h-3.5 w-[70px] rounded' />
+                  <div className='w-25 shrink-0'>
+                    <Skeleton className='ml-auto h-3.5 w-17.5 rounded' />
                   </div>
                 )}
-                <div className='w-[100px] shrink-0'>
-                  <Skeleton className='ml-auto h-3.5 w-[60px] rounded' />
+                <div className='w-25 shrink-0'>
+                  <Skeleton className='ml-auto h-3.5 w-15 rounded' />
                 </div>
                 {!isTablet && (
-                  <div className='w-[100px] shrink-0'>
-                    <Skeleton className='ml-auto h-3.5 w-[60px] rounded' />
+                  <div className='w-25 shrink-0'>
+                    <Skeleton className='ml-auto h-3.5 w-15 rounded' />
                   </div>
                 )}
                 <div className='w-27.5 shrink-0'>
                   <Skeleton className='mx-auto h-3.5 w-15 rounded' />
                 </div>
                 {!isTablet && (
-                  <div className='w-[90px] shrink-0'>
-                    <Skeleton className='h-3.5 w-[50px] rounded' />
+                  <div className='w-22.5 shrink-0'>
+                    <Skeleton className='h-3.5 w-12.5 rounded' />
                   </div>
                 )}
-                <div className='w-[120px] shrink-0'>
-                  <Skeleton className='h-3.5 w-[70px] rounded' />
+                <div className='w-30 shrink-0'>
+                  <Skeleton className='h-3.5 w-17.5 rounded' />
                 </div>
-                <div className='w-[46px] shrink-0' />
-                <div className='w-[28px] shrink-0' />
+                <div className='w-11.5 shrink-0' />
+                <div className='w-7 shrink-0' />
               </div>
             )
           )

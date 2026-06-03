@@ -140,7 +140,7 @@ const OrderDeskPage = () => {
         <button
           type='button'
           className={cn(
-            'inline-flex h-7 items-center gap-1.5 rounded-[5px] border border-border bg-bg-secondary px-2.5 text-[12px] font-medium text-text-secondary transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground disabled:pointer-events-none disabled:opacity-40'
+            'inline-flex h-7 items-center gap-1.5 rounded-[5px] border border-border bg-bg-secondary px-2.5 text-[12px] font-medium text-text-secondary transition-colors duration-80 hover:bg-bg-active hover:text-foreground disabled:pointer-events-none disabled:opacity-40'
           )}
           disabled={!customer || isBusy}
           onClick={() => setCatalogOpen(true)}
@@ -154,7 +154,7 @@ const OrderDeskPage = () => {
           <TooltipTrigger asChild>
             <button
               type='button'
-              className='inline-flex size-7 items-center justify-center rounded-[5px] text-text-tertiary transition-colors duration-[80ms] hover:bg-bg-hover hover:text-destructive disabled:pointer-events-none disabled:opacity-40'
+              className='inline-flex size-7 items-center justify-center rounded-[5px] text-text-tertiary transition-colors duration-80 hover:bg-bg-hover hover:text-destructive disabled:pointer-events-none disabled:opacity-40'
               disabled={cartItems.length === 0 || isBusy || isCreating}
               onClick={handleClearAll}
             >
@@ -214,7 +214,7 @@ const OrderDeskPage = () => {
           </div>
 
           {/* Scrollable middle area */}
-          <div className='min-h-0 flex-1 [scrollbar-width:none] overflow-y-auto [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden'>
+          <div className='min-h-0 flex-1 scrollbar-none overflow-y-auto [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden'>
             {/* Customer details — same panel as customer detail page */}
             {customer && customerDetail && (
               <>
@@ -267,7 +267,7 @@ const OrderDeskPage = () => {
             <div className='border-b border-border p-4'>
               <button
                 type='button'
-                className='inline-flex h-8 w-full items-center justify-center gap-1.5 rounded-[6px] border border-border bg-background text-[13px] font-medium text-text-secondary transition-colors duration-[80ms] hover:bg-bg-hover hover:text-foreground disabled:pointer-events-none disabled:opacity-50'
+                className='inline-flex h-8 w-full items-center justify-center gap-1.5 rounded-md border border-border bg-background text-[13px] font-medium text-text-secondary transition-colors duration-80 hover:bg-bg-hover hover:text-foreground disabled:pointer-events-none disabled:opacity-50'
                 disabled={!customer}
                 onClick={() => setAttachmentsOpen(true)}
               >
@@ -284,7 +284,7 @@ const OrderDeskPage = () => {
                 <TooltipTrigger asChild>
                   <button
                     type='button'
-                    className='inline-flex h-9 w-full items-center justify-center gap-2 rounded-[6px] bg-primary text-[13px] font-semibold text-primary-foreground transition-opacity duration-[80ms] hover:opacity-90 disabled:pointer-events-none disabled:opacity-40'
+                    className='inline-flex h-9 w-full items-center justify-center gap-2 rounded-md bg-primary text-[13px] font-semibold text-primary-foreground transition-opacity duration-80 hover:opacity-90 disabled:pointer-events-none disabled:opacity-40'
                     disabled={!canSubmit}
                     onClick={handleCreateProposal}
                   >
@@ -311,7 +311,7 @@ const OrderDeskPage = () => {
                 <TooltipTrigger asChild>
                   <button
                     type='button'
-                    className='inline-flex h-9 w-full items-center justify-center gap-2 rounded-[6px] border border-border bg-background text-[13px] font-medium text-foreground transition-colors duration-[80ms] hover:bg-bg-hover disabled:pointer-events-none disabled:opacity-40'
+                    className='inline-flex h-9 w-full items-center justify-center gap-2 rounded-md border border-border bg-background text-[13px] font-medium text-foreground transition-colors duration-80 hover:bg-bg-hover disabled:pointer-events-none disabled:opacity-40'
                     disabled={!canSubmit}
                     onClick={handleCreateOrder}
                   >
@@ -343,7 +343,7 @@ const OrderDeskPage = () => {
         <div className='flex items-center gap-2'>
           <button
             type='button'
-            className='inline-flex h-8 items-center gap-1.5 rounded-[6px] border border-border bg-background px-2.5 text-[12px] font-medium text-text-secondary'
+            className='inline-flex h-8 items-center gap-1.5 rounded-md border border-border bg-background px-2.5 text-[12px] font-medium text-text-secondary'
             disabled={!customer}
             onClick={() => setAttachmentsOpen(true)}
           >
@@ -353,7 +353,7 @@ const OrderDeskPage = () => {
         <div className='flex items-center gap-2'>
           <button
             type='button'
-            className='inline-flex h-8 items-center gap-1.5 rounded-[6px] border border-border bg-background px-3 text-[12px] font-medium text-foreground disabled:opacity-40'
+            className='inline-flex h-8 items-center gap-1.5 rounded-md border border-border bg-background px-3 text-[12px] font-medium text-foreground disabled:opacity-40'
             disabled={!canSubmit}
             onClick={handleCreateOrder}
           >
@@ -362,7 +362,7 @@ const OrderDeskPage = () => {
           </button>
           <button
             type='button'
-            className='inline-flex h-8 items-center gap-1.5 rounded-[6px] bg-primary px-3 text-[12px] font-semibold text-primary-foreground disabled:opacity-40'
+            className='inline-flex h-8 items-center gap-1.5 rounded-md bg-primary px-3 text-[12px] font-semibold text-primary-foreground disabled:opacity-40'
             disabled={!canSubmit}
             onClick={handleCreateProposal}
           >

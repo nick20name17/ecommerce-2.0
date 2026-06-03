@@ -37,7 +37,7 @@ export const PageEmpty = ({
           iconClassName ?? 'bg-primary/[0.08] text-primary dark:bg-primary/15'
         )}
       >
-        <Icon className={compact ? 'size-[18px]' : 'size-5'} strokeWidth={1.75} />
+        <Icon className={compact ? 'size-4.5' : 'size-5'} strokeWidth={1.75} />
       </div>
       <h3
         className={cn(
@@ -48,9 +48,7 @@ export const PageEmpty = ({
         {title}
       </h3>
       {description && (
-        <p className='mt-0.5 max-w-[280px] text-[13px] leading-snug text-text-tertiary'>
-          {description}
-        </p>
+        <p className='mt-0.5 max-w-70 text-[13px] leading-snug text-text-tertiary'>{description}</p>
       )}
       {action && <div className='mt-3'>{action}</div>}
     </div>

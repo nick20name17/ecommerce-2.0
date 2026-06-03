@@ -114,7 +114,7 @@ export const OrderCombobox = ({
         align='start'
         style={{ boxShadow: 'var(--dropdown-shadow)' }}
       >
-        <div className='flex items-center gap-1.5 border-b border-border px-2.5 py-[6px]'>
+        <div className='flex items-center gap-1.5 border-b border-border px-2.5 py-1.5'>
           {loading ? (
             <Spinner className='size-3.5 shrink-0' />
           ) : (
@@ -135,7 +135,7 @@ export const OrderCombobox = ({
           {loading && orders.length === 0 ? (
             <div className='space-y-1'>
               {Array.from({ length: 5 }).map((_, i) => (
-                <Skeleton key={i} className='h-8 w-full rounded-[6px]' />
+                <Skeleton key={i} className='h-8 w-full rounded-md' />
               ))}
             </div>
           ) : orders.length === 0 ? (
@@ -150,7 +150,7 @@ export const OrderCombobox = ({
               {value && (
                 <button
                   type='button'
-                  className='flex w-full items-center gap-2 rounded-[6px] px-2.5 py-[7px] text-left text-[13px] font-medium text-text-secondary transition-colors duration-[80ms] hover:bg-destructive/10 hover:text-destructive'
+                  className='flex w-full items-center gap-2 rounded-md px-2.5 py-1.75 text-left text-[13px] font-medium text-text-secondary transition-colors duration-80 hover:bg-destructive/10 hover:text-destructive'
                   onClick={() => {
                     onChange(null)
                     setOpen(false)
@@ -164,7 +164,7 @@ export const OrderCombobox = ({
                 <button
                   key={o.autoid}
                   type='button'
-                  className='flex w-full flex-col gap-0.5 rounded-[6px] px-2.5 py-[7px] text-left text-[13px] font-medium transition-colors duration-[80ms] hover:bg-bg-hover'
+                  className='flex w-full flex-col gap-0.5 rounded-md px-2.5 py-1.75 text-left text-[13px] font-medium transition-colors duration-80 hover:bg-bg-hover'
                   onClick={() => handleSelect(o)}
                 >
                   <span className='font-medium'>{o.invoice}</span>

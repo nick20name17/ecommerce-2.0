@@ -100,7 +100,7 @@ export const ShippingSection = ({ projectId }: { projectId: number }) => {
               </p>
             </div>
 
-            <div className='flex items-center justify-between rounded-[8px] border border-border px-3.5 py-2.5'>
+            <div className='flex items-center justify-between rounded-lg border border-border px-3.5 py-2.5'>
               <div>
                 <span className='text-[13px] font-medium text-foreground'>Enable Shipping</span>
                 <p className='text-[12px] text-text-tertiary'>
@@ -123,14 +123,14 @@ export const ShippingSection = ({ projectId }: { projectId: number }) => {
                 <span
                   className={cn(
                     'inline-block size-3.5 rounded-full bg-background shadow-sm transition-transform duration-200',
-                    shippingEnabled ? 'translate-x-[18px]' : 'translate-x-[3px]'
+                    shippingEnabled ? 'translate-x-4.5' : 'translate-x-0.75'
                   )}
                 />
               </button>
             </div>
 
             {shippingEnabled && (
-              <div className='rounded-[8px] border border-border px-3.5 py-2.5'>
+              <div className='rounded-lg border border-border px-3.5 py-2.5'>
                 <div className='mb-1'>
                   <span className='text-[13px] font-medium text-foreground'>
                     ShipEngine Test API Key
@@ -151,7 +151,7 @@ export const ShippingSection = ({ projectId }: { projectId: number }) => {
                   }}
                   placeholder='TEST_...'
                   disabled={updateProjectMutation.isPending}
-                  className='placeholder:text-text-quaternary h-8 w-full rounded-[6px] border border-border bg-background px-2.5 font-mono text-[13px] outline-none focus:border-primary'
+                  className='placeholder:text-text-quaternary h-8 w-full rounded-md border border-border bg-background px-2.5 font-mono text-[13px] outline-none focus:border-primary'
                 />
               </div>
             )}
@@ -164,21 +164,21 @@ export const ShippingSection = ({ projectId }: { projectId: number }) => {
         <>
           {/* Column labels + Add button */}
           <div className='sticky top-0 z-10 flex items-center gap-6 border-b border-border bg-bg-secondary px-6 py-1 select-none'>
-            <div className='min-w-0 flex-1 text-[11px] font-semibold tracking-[0.05em] text-text-tertiary uppercase'>
+            <div className='min-w-0 flex-1 text-[11px] font-semibold tracking-wider text-text-tertiary uppercase'>
               Address
             </div>
-            <div className='hidden w-[160px] shrink-0 text-[11px] font-semibold tracking-[0.05em] text-text-tertiary uppercase sm:block'>
+            <div className='hidden w-40 shrink-0 text-[11px] font-semibold tracking-wider text-text-tertiary uppercase sm:block'>
               Location
             </div>
-            <div className='hidden w-[120px] shrink-0 text-[11px] font-semibold tracking-[0.05em] text-text-tertiary uppercase md:block'>
+            <div className='hidden w-30 shrink-0 text-[11px] font-semibold tracking-wider text-text-tertiary uppercase md:block'>
               Contact
             </div>
-            <div className='w-[28px] shrink-0'>
+            <div className='w-7 shrink-0'>
               <Tooltip>
                 <TooltipTrigger asChild>
                   <button
                     type='button'
-                    className='inline-flex size-6 items-center justify-center rounded-[5px] bg-primary text-primary-foreground transition-opacity duration-[80ms] hover:opacity-90'
+                    className='inline-flex size-6 items-center justify-center rounded-[5px] bg-primary text-primary-foreground transition-opacity duration-80 hover:opacity-90'
                     onClick={() => setModalAddress('create')}
                   >
                     <Plus className='size-3.5' />
@@ -199,15 +199,15 @@ export const ShippingSection = ({ projectId }: { projectId: number }) => {
                   >
                     <div className='flex min-w-0 flex-1 items-center gap-2'>
                       <Skeleton className='h-3.5 w-24' />
-                      <Skeleton className='h-[18px] w-14 rounded-[4px]' />
+                      <Skeleton className='h-4.5 w-14 rounded-sm' />
                     </div>
-                    <div className='hidden w-[160px] shrink-0 sm:block'>
+                    <div className='hidden w-40 shrink-0 sm:block'>
                       <Skeleton className='h-3.5 w-28' />
                     </div>
-                    <div className='hidden w-[120px] shrink-0 md:block'>
+                    <div className='hidden w-30 shrink-0 md:block'>
                       <Skeleton className='h-3.5 w-20' />
                     </div>
-                    <div className='w-[28px] shrink-0' />
+                    <div className='w-7 shrink-0' />
                   </div>
                 ))}
               </div>
@@ -229,7 +229,7 @@ export const ShippingSection = ({ projectId }: { projectId: number }) => {
                       {addr.title}
                     </span>
                     {addr.is_default && (
-                      <span className='inline-flex shrink-0 items-center gap-1 rounded-[4px] bg-amber-500/10 px-1.5 py-0.5 text-[11px] leading-none font-medium text-amber-700 dark:text-amber-300'>
+                      <span className='inline-flex shrink-0 items-center gap-1 rounded-sm bg-amber-500/10 px-1.5 py-0.5 text-[11px] leading-none font-medium text-amber-700 dark:text-amber-300'>
                         <Star className='size-2.5' />
                         Default
                       </span>
@@ -237,7 +237,7 @@ export const ShippingSection = ({ projectId }: { projectId: number }) => {
                   </div>
 
                   {/* Location */}
-                  <div className='hidden w-[160px] shrink-0 sm:block'>
+                  <div className='hidden w-40 shrink-0 sm:block'>
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <span className='block truncate text-[13px] text-text-secondary'>
@@ -255,12 +255,12 @@ export const ShippingSection = ({ projectId }: { projectId: number }) => {
                   </div>
 
                   {/* Contact */}
-                  <div className='hidden w-[120px] shrink-0 truncate text-[13px] text-text-tertiary md:block'>
+                  <div className='hidden w-30 shrink-0 truncate text-[13px] text-text-tertiary md:block'>
                     {addr.name || addr.phone || '—'}
                   </div>
 
                   {/* Actions */}
-                  <div className='flex w-[28px] shrink-0 items-center justify-center'>
+                  <div className='flex w-7 shrink-0 items-center justify-center'>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <button
@@ -272,11 +272,11 @@ export const ShippingSection = ({ projectId }: { projectId: number }) => {
                       </DropdownMenuTrigger>
                       <DropdownMenuContent
                         align='end'
-                        className='w-[180px] rounded-[8px] p-1'
+                        className='w-45 rounded-lg p-1'
                         style={{ boxShadow: 'var(--dropdown-shadow)' }}
                       >
                         <DropdownMenuItem
-                          className='cursor-pointer gap-2 rounded-[6px] px-2 py-1 text-[13px]'
+                          className='cursor-pointer gap-2 rounded-md px-2 py-1 text-[13px]'
                           onClick={() => setModalAddress(addr)}
                         >
                           <Pencil className='size-3.5' />
@@ -284,7 +284,7 @@ export const ShippingSection = ({ projectId }: { projectId: number }) => {
                         </DropdownMenuItem>
                         <DropdownMenuItem
                           variant='destructive'
-                          className='cursor-pointer gap-2 rounded-[6px] px-2 py-1 text-[13px]'
+                          className='cursor-pointer gap-2 rounded-md px-2 py-1 text-[13px]'
                           onClick={() => setDeleteAddress(addr)}
                         >
                           <Trash2 className='size-3.5' />

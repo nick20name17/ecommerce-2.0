@@ -355,7 +355,7 @@ export function DesignerCanvas({
   return (
     <div className='flex min-h-0 flex-1 overflow-hidden bg-bg-secondary/20'>
       {/* Palette */}
-      <aside className='hidden w-[64px] shrink-0 flex-col gap-1 overflow-y-auto border-r border-border bg-bg-secondary/40 py-2 md:flex'>
+      <aside className='hidden w-16 shrink-0 flex-col gap-1 overflow-y-auto border-r border-border bg-bg-secondary/40 py-2 md:flex'>
         {TOOLS.map(t => {
           const Icon = t.icon
           return (
@@ -367,7 +367,7 @@ export function DesignerCanvas({
                 e.dataTransfer.effectAllowed = 'copy'
                 e.dataTransfer.setData('application/x-doc-element', t.type)
               }}
-              className='mx-2 flex flex-col items-center gap-1 rounded-[6px] border border-transparent px-1.5 py-2 text-[10px] font-medium text-text-secondary transition-colors duration-[80ms] hover:border-border hover:bg-bg-active hover:text-foreground active:opacity-70'
+              className='mx-2 flex flex-col items-center gap-1 rounded-md border border-transparent px-1.5 py-2 text-[10px] font-medium text-text-secondary transition-colors duration-80 hover:border-border hover:bg-bg-active hover:text-foreground active:opacity-70'
               title={`Drag onto canvas: ${t.label}`}
             >
               <Icon className='size-4' />
@@ -395,7 +395,7 @@ export function DesignerCanvas({
                   setSelectedId(null)
                 }}
                 className={cn(
-                  'inline-flex h-6 min-w-[24px] items-center justify-center rounded-[4px] border px-1.5 text-[12px] font-medium transition-colors duration-[80ms]',
+                  'inline-flex h-6 min-w-6 items-center justify-center rounded-sm border px-1.5 text-[12px] font-medium transition-colors duration-80',
                   isActive
                     ? 'border-primary bg-primary/[0.1] text-primary'
                     : 'border-border bg-background text-text-secondary hover:bg-bg-active hover:text-foreground'
@@ -408,7 +408,7 @@ export function DesignerCanvas({
           <button
             type='button'
             onClick={addPage}
-            className='inline-flex h-6 items-center gap-1 rounded-[4px] border border-dashed border-border bg-background px-1.5 text-[11.5px] font-medium text-text-secondary transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground'
+            className='inline-flex h-6 items-center gap-1 rounded-sm border border-dashed border-border bg-background px-1.5 text-[11.5px] font-medium text-text-secondary transition-colors duration-80 hover:bg-bg-active hover:text-foreground'
             title='Add page'
           >
             <Plus className='size-3' />
@@ -425,7 +425,7 @@ export function DesignerCanvas({
                   removePage(currentPageIndex)
                 }
               }}
-              className='inline-flex h-6 items-center gap-1 rounded-[4px] px-1.5 text-[11.5px] font-medium text-text-tertiary transition-colors duration-[80ms] hover:bg-bg-hover hover:text-destructive'
+              className='inline-flex h-6 items-center gap-1 rounded-sm px-1.5 text-[11.5px] font-medium text-text-tertiary transition-colors duration-80 hover:bg-bg-hover hover:text-destructive'
               title={`Delete page ${currentPageIndex + 1}`}
             >
               <Trash2 className='size-3' />
@@ -440,7 +440,7 @@ export function DesignerCanvas({
           onClick={() => setSelectedId(null)}
         >
           <div
-            className='relative shrink-0 bg-white shadow-[0_2px_12px_rgba(0,0,0,0.08)] ring-1 ring-black/[0.04]'
+            className='relative shrink-0 bg-white shadow-[0_2px_12px_rgba(0,0,0,0.08)] ring-1 ring-black/4'
             style={{
               width: dims.w * PX_PER_INCH,
               height: dims.h * PX_PER_INCH
@@ -536,7 +536,7 @@ export function DesignerCanvas({
       </div>
 
       {/* Layers + Properties panel */}
-      <aside className='hidden w-[260px] shrink-0 flex-col overflow-hidden border-l border-border bg-bg-secondary/40 md:flex'>
+      <aside className='hidden w-65 shrink-0 flex-col overflow-hidden border-l border-border bg-bg-secondary/40 md:flex'>
         <LayersList elements={elements} selectedId={selectedId} onSelect={setSelectedId} />
         <div className='min-h-0 flex-1 overflow-y-auto'>
           {selected ? (
@@ -662,7 +662,7 @@ function PropertiesPanel({
               key={b.dir}
               type='button'
               onClick={() => onMoveLayer(b.dir)}
-              className='h-7 flex-1 text-[14px] font-medium text-text-secondary transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground'
+              className='h-7 flex-1 text-[14px] font-medium text-text-secondary transition-colors duration-80 hover:bg-bg-active hover:text-foreground'
               title={b.title}
             >
               {b.label}
@@ -816,7 +816,7 @@ function FieldProps({
           <span className='text-[10px] font-medium tracking-wider text-text-tertiary uppercase'>
             Preview
           </span>
-          <span className='font-mono text-[11.5px] break-words text-foreground'>
+          <span className='font-mono text-[11.5px] wrap-break-word text-foreground'>
             {resolved || <span className='text-text-tertiary italic'>(empty)</span>}
           </span>
         </div>
@@ -905,7 +905,7 @@ function ImageProps({
           type='button'
           onClick={() => fileInputRef.current?.click()}
           disabled={uploading || !templateId}
-          className='inline-flex h-7 items-center gap-1 rounded-[5px] border border-border bg-bg-secondary px-2 text-[12px] font-medium text-text-secondary transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground disabled:pointer-events-none disabled:opacity-50'
+          className='inline-flex h-7 items-center gap-1 rounded-[5px] border border-border bg-bg-secondary px-2 text-[12px] font-medium text-text-secondary transition-colors duration-80 hover:bg-bg-active hover:text-foreground disabled:pointer-events-none disabled:opacity-50'
           title={templateId ? 'Upload a new image' : 'Save the template first to enable upload'}
         >
           <ImageIcon className='size-3.5' />
@@ -929,7 +929,7 @@ function ImageProps({
           // eslint-disable-next-line jsx-a11y/alt-text
           <img
             src={src}
-            className='bg-checker mt-1 max-h-24 self-start rounded-[4px] border border-border object-contain'
+            className='bg-checker mt-1 max-h-24 self-start rounded-sm border border-border object-contain'
             style={{ background: '#fff' }}
             onError={() => setUploadError('Failed to load preview')}
           />
@@ -1185,7 +1185,7 @@ function ColumnEditor({
   const listId = `col-field-${index}`
 
   return (
-    <div className='flex flex-col gap-1.5 rounded-[6px] border border-border bg-background p-2'>
+    <div className='flex flex-col gap-1.5 rounded-md border border-border bg-background p-2'>
       <div className='flex items-center gap-1.5'>
         <span className='text-[10px] font-semibold tracking-wider text-text-tertiary uppercase'>
           Col {index + 1}
@@ -1195,7 +1195,7 @@ function ColumnEditor({
           type='button'
           disabled={isFirst}
           onClick={() => onMove(-1)}
-          className='inline-flex size-5 items-center justify-center rounded-[4px] text-text-tertiary hover:bg-bg-hover hover:text-foreground disabled:pointer-events-none disabled:opacity-30'
+          className='inline-flex size-5 items-center justify-center rounded-sm text-text-tertiary hover:bg-bg-hover hover:text-foreground disabled:pointer-events-none disabled:opacity-30'
           title='Move up'
         >
           ↑
@@ -1204,7 +1204,7 @@ function ColumnEditor({
           type='button'
           disabled={isLast}
           onClick={() => onMove(1)}
-          className='inline-flex size-5 items-center justify-center rounded-[4px] text-text-tertiary hover:bg-bg-hover hover:text-foreground disabled:pointer-events-none disabled:opacity-30'
+          className='inline-flex size-5 items-center justify-center rounded-sm text-text-tertiary hover:bg-bg-hover hover:text-foreground disabled:pointer-events-none disabled:opacity-30'
           title='Move down'
         >
           ↓
@@ -1212,7 +1212,7 @@ function ColumnEditor({
         <button
           type='button'
           onClick={onRemove}
-          className='inline-flex size-5 items-center justify-center rounded-[4px] text-text-tertiary hover:bg-bg-hover hover:text-destructive'
+          className='inline-flex size-5 items-center justify-center rounded-sm text-text-tertiary hover:bg-bg-hover hover:text-destructive'
           title='Remove column'
         >
           <X className='size-3' />
@@ -1224,7 +1224,7 @@ function ColumnEditor({
         value={column.label ?? ''}
         onChange={e => onChange({ label: e.target.value })}
         placeholder='Label'
-        className='h-7 w-full rounded-[4px] border border-border bg-background px-1.5 text-[12px] outline-none focus:border-primary focus:ring-1 focus:ring-primary/20'
+        className='h-7 w-full rounded-sm border border-border bg-background px-1.5 text-[12px] outline-none focus:border-primary focus:ring-1 focus:ring-primary/20'
       />
       <input
         type='text'
@@ -1232,7 +1232,7 @@ function ColumnEditor({
         value={column.fieldKey ?? ''}
         onChange={e => onChange({ fieldKey: e.target.value })}
         placeholder='descr / quan / unit_price'
-        className='h-7 w-full rounded-[4px] border border-border bg-background px-1.5 font-mono text-[11.5px] outline-none focus:border-primary focus:ring-1 focus:ring-primary/20'
+        className='h-7 w-full rounded-sm border border-border bg-background px-1.5 font-mono text-[11.5px] outline-none focus:border-primary focus:ring-1 focus:ring-primary/20'
         autoComplete='off'
       />
       {enabledFields.length > 0 && (
@@ -1252,13 +1252,13 @@ function ColumnEditor({
           step={1}
           onChange={e => onChange({ widthPct: Math.max(0, Number(e.target.value) || 0) })}
           placeholder='width %'
-          className='h-7 w-full rounded-[4px] border border-border bg-background px-1.5 text-[11.5px] outline-none focus:border-primary focus:ring-1 focus:ring-primary/20'
+          className='h-7 w-full rounded-sm border border-border bg-background px-1.5 text-[11.5px] outline-none focus:border-primary focus:ring-1 focus:ring-primary/20'
           title='Column width as percent of table width'
         />
         <select
           value={column.align ?? 'left'}
           onChange={e => onChange({ align: e.target.value as TableColumn['align'] })}
-          className='h-7 rounded-[4px] border border-border bg-background px-1.5 text-[11.5px] outline-none focus:border-primary'
+          className='h-7 rounded-sm border border-border bg-background px-1.5 text-[11.5px] outline-none focus:border-primary'
         >
           {ALIGN_OPTIONS.map(a => (
             <option key={a} value={a}>
@@ -1269,7 +1269,7 @@ function ColumnEditor({
         <select
           value={column.format ?? 'string'}
           onChange={e => onChange({ format: e.target.value as TableColumnFormat })}
-          className='h-7 rounded-[4px] border border-border bg-background px-1.5 text-[11.5px] outline-none focus:border-primary'
+          className='h-7 rounded-sm border border-border bg-background px-1.5 text-[11.5px] outline-none focus:border-primary'
           title='How to format the resolved value'
         >
           {FORMAT_OPTIONS.map(f => (
@@ -1392,7 +1392,7 @@ function ToggleRow<T extends string>({
             title={o.label}
             onClick={() => onChange(o.value)}
             className={cn(
-              'flex h-7 flex-1 items-center justify-center transition-colors duration-[80ms]',
+              'flex h-7 flex-1 items-center justify-center transition-colors duration-80',
               isActive
                 ? 'bg-primary text-primary-foreground'
                 : 'text-text-tertiary hover:bg-bg-active hover:text-foreground'
@@ -1482,7 +1482,7 @@ function LayersList({
                 type='button'
                 onClick={() => onSelect(el.id)}
                 className={cn(
-                  'flex w-full items-center gap-2 px-3 py-1.5 text-left text-[12px] transition-colors duration-[80ms]',
+                  'flex w-full items-center gap-2 px-3 py-1.5 text-left text-[12px] transition-colors duration-80',
                   isActive
                     ? 'bg-primary/[0.08] text-foreground'
                     : 'text-text-secondary hover:bg-bg-hover hover:text-foreground'

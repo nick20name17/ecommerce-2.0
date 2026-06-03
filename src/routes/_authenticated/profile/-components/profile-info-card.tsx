@@ -96,7 +96,7 @@ export const ProfileInfoCard = ({ user }: ProfileInfoCardProps) => {
           <div className='flex items-center justify-end gap-2 bg-bg-secondary/40 px-5 py-2.5'>
             <button
               type='button'
-              className='inline-flex h-7 items-center gap-1 rounded-[5px] border border-border bg-background px-2.5 text-[13px] font-medium text-text-secondary transition-colors duration-[80ms] hover:bg-bg-hover'
+              className='inline-flex h-7 items-center gap-1 rounded-[5px] border border-border bg-background px-2.5 text-[13px] font-medium text-text-secondary transition-colors duration-80 hover:bg-bg-hover'
               onClick={() => form.reset({ first_name: user.first_name, last_name: user.last_name })}
               disabled={mutation.isPending}
             >
@@ -105,7 +105,7 @@ export const ProfileInfoCard = ({ user }: ProfileInfoCardProps) => {
             <button
               type='submit'
               form='profile-form'
-              className='inline-flex h-7 items-center gap-1 rounded-[5px] bg-primary px-2.5 text-[13px] font-medium text-primary-foreground transition-colors duration-[80ms] hover:opacity-90 disabled:opacity-50'
+              className='inline-flex h-7 items-center gap-1 rounded-[5px] bg-primary px-2.5 text-[13px] font-medium text-primary-foreground transition-colors duration-80 hover:opacity-90 disabled:opacity-50'
               disabled={mutation.isPending}
             >
               {mutation.isPending ? 'Saving...' : 'Save Changes'}

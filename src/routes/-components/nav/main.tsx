@@ -196,32 +196,32 @@ const ColoredNavLink = ({
   <Link
     to={item.url}
     className={cn(
-      'group/nav flex h-[30px] items-center gap-2.5 rounded-md px-2.5 text-[13px]',
+      'group/nav flex h-7.5 items-center gap-2.5 rounded-md px-2.5 text-[13px]',
       'transition-[background-color,color,transform] duration-100',
-      '[&.active]:bg-black/[0.06] [&.active]:font-medium [&.active]:text-foreground',
-      'dark:[&.active]:bg-white/[0.08]',
-      '[&:not(.active)]:text-foreground/90 [&:not(.active)]:hover:bg-black/[0.04]',
-      'dark:[&:not(.active)]:hover:bg-white/[0.04]',
+      '[&.active]:bg-black/6 [&.active]:font-medium [&.active]:text-foreground',
+      'dark:[&.active]:bg-white/8',
+      '[&:not(.active)]:text-foreground/90 [&:not(.active)]:hover:bg-black/4',
+      'dark:[&:not(.active)]:hover:bg-white/4',
       'active:scale-[0.98]'
     )}
   >
     <div
       className={cn(
-        'flex size-[20px] shrink-0 items-center justify-center rounded-[5px]',
+        'flex size-5 shrink-0 items-center justify-center rounded-[5px]',
         item.iconBg,
         item.iconColor
       )}
     >
-      <item.icon className='size-[13px]' />
+      <item.icon className='size-3.25' />
     </div>
     <span className='flex-1 truncate'>{item.title}</span>
     {loading && (
-      <span className='flex size-[20px] items-center justify-center'>
+      <span className='flex size-5 items-center justify-center'>
         <span className='size-3 animate-spin rounded-full border-2 border-orange-500/30 border-t-orange-500' />
       </span>
     )}
     {badge != null && badge > 0 && !loading && (
-      <span className='min-w-[20px] rounded-full bg-violet-500/15 px-1.5 text-center text-[13px] font-semibold text-violet-600 tabular-nums dark:bg-violet-500/20 dark:text-violet-400'>
+      <span className='min-w-5 rounded-full bg-violet-500/15 px-1.5 text-center text-[13px] font-semibold text-violet-600 tabular-nums dark:bg-violet-500/20 dark:text-violet-400'>
         {badge}
       </span>
     )}
@@ -234,17 +234,17 @@ const PlainNavLink = ({ item }: { item: NavItem }) => (
   <Link
     to={item.url}
     className={cn(
-      'group/nav flex h-[30px] items-center gap-2.5 rounded-md px-2.5 text-[13px]',
+      'group/nav flex h-7.5 items-center gap-2.5 rounded-md px-2.5 text-[13px]',
       'transition-[background-color,color,transform] duration-100',
-      '[&.active]:bg-black/[0.06] [&.active]:font-medium [&.active]:text-foreground',
-      'dark:[&.active]:bg-white/[0.08]',
-      '[&:not(.active)]:text-foreground/90 [&:not(.active)]:hover:bg-black/[0.04]',
-      'dark:[&:not(.active)]:hover:bg-white/[0.04]',
+      '[&.active]:bg-black/6 [&.active]:font-medium [&.active]:text-foreground',
+      'dark:[&.active]:bg-white/8',
+      '[&:not(.active)]:text-foreground/90 [&:not(.active)]:hover:bg-black/4',
+      'dark:[&:not(.active)]:hover:bg-white/4',
       'active:scale-[0.98]'
     )}
   >
-    <div className='flex size-[20px] shrink-0 items-center justify-center'>
-      <item.icon className='size-[15px] text-text-tertiary group-[.active]/nav:text-foreground/70' />
+    <div className='flex size-5 shrink-0 items-center justify-center'>
+      <item.icon className='size-3.75 text-text-tertiary group-[.active]/nav:text-foreground/70' />
     </div>
     <span className='flex-1 truncate'>{item.title}</span>
   </Link>

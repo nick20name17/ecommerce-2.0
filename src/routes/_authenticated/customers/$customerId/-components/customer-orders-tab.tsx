@@ -66,7 +66,7 @@ export const CustomerOrdersTab = ({ customerId, customerName }: CustomerOrdersTa
     <div className='flex h-full flex-col overflow-hidden'>
       {/* Search bar */}
       <div className='flex shrink-0 items-center gap-2 border-b border-border px-5 py-2 sm:px-6'>
-        <div className='flex flex-1 items-center gap-1.5 rounded-[6px] border border-border bg-background px-2.5 py-1.5'>
+        <div className='flex flex-1 items-center gap-1.5 rounded-md border border-border bg-background px-2.5 py-1.5'>
           <Search className='size-3.5 shrink-0 text-text-tertiary' />
           <input
             value={search}
@@ -77,7 +77,7 @@ export const CustomerOrdersTab = ({ customerId, customerName }: CustomerOrdersTa
         </div>
         <button
           type='button'
-          className='inline-flex h-7 shrink-0 items-center gap-1 rounded-[5px] bg-primary px-2.5 text-[12px] font-semibold text-primary-foreground transition-colors duration-[80ms] hover:opacity-90'
+          className='inline-flex h-7 shrink-0 items-center gap-1 rounded-[5px] bg-primary px-2.5 text-[12px] font-semibold text-primary-foreground transition-colors duration-80 hover:opacity-90'
           onClick={() => {
             localStorage.setItem(STORAGE_KEYS.selectedCustomerId, JSON.stringify(customerId))
             navigate({ to: '/create' })
@@ -96,16 +96,16 @@ export const CustomerOrdersTab = ({ customerId, customerName }: CustomerOrdersTa
             <div className='min-w-0 flex-1 text-[12px] font-medium tracking-[0.04em] text-text-tertiary uppercase'>
               Invoice
             </div>
-            <div className='w-[80px] shrink-0 text-right text-[12px] font-medium tracking-[0.04em] text-text-tertiary uppercase'>
+            <div className='w-20 shrink-0 text-right text-[12px] font-medium tracking-[0.04em] text-text-tertiary uppercase'>
               Date
             </div>
-            <div className='w-[50px] shrink-0 text-right text-[12px] font-medium tracking-[0.04em] text-text-tertiary uppercase'>
+            <div className='w-12.5 shrink-0 text-right text-[12px] font-medium tracking-[0.04em] text-text-tertiary uppercase'>
               Qty
             </div>
-            <div className='w-[80px] shrink-0 text-right text-[12px] font-medium tracking-[0.04em] text-text-tertiary uppercase'>
+            <div className='w-20 shrink-0 text-right text-[12px] font-medium tracking-[0.04em] text-text-tertiary uppercase'>
               Total
             </div>
-            <div className='w-[26px] shrink-0' />
+            <div className='w-6.5 shrink-0' />
           </div>
         )}
 
@@ -117,7 +117,7 @@ export const CustomerOrdersTab = ({ customerId, customerName }: CustomerOrdersTa
                   <div className='flex items-center justify-between gap-2'>
                     <div className='flex items-center gap-2'>
                       <Skeleton className='h-3.5 w-20 rounded' />
-                      <Skeleton className='h-[18px] w-[52px] rounded-full' />
+                      <Skeleton className='h-4.5 w-13 rounded-full' />
                     </div>
                     <Skeleton className='h-3.5 w-14 rounded' />
                   </div>
@@ -133,12 +133,12 @@ export const CustomerOrdersTab = ({ customerId, customerName }: CustomerOrdersTa
                 >
                   <div className='flex min-w-0 flex-1 items-center gap-2'>
                     <Skeleton className='h-3.5 w-20 rounded' />
-                    <Skeleton className='h-[18px] w-[52px] rounded-full' />
+                    <Skeleton className='h-4.5 w-13 rounded-full' />
                   </div>
                   <Skeleton className='h-3.5 w-16 rounded' />
                   <Skeleton className='ml-auto h-3.5 w-8 rounded' />
                   <Skeleton className='ml-auto h-3.5 w-14 rounded' />
-                  <div className='w-[26px]' />
+                  <div className='w-6.5' />
                 </div>
               )
             )}
@@ -268,23 +268,23 @@ function OrderRow({
       </div>
 
       {/* Date */}
-      <div className='w-[80px] shrink-0 text-right text-[13px] text-text-tertiary tabular-nums'>
+      <div className='w-20 shrink-0 text-right text-[13px] text-text-tertiary tabular-nums'>
         {invoiceDate}
       </div>
 
       {/* Qty */}
-      <div className='w-[50px] shrink-0 text-right text-[13px] text-text-secondary tabular-nums'>
+      <div className='w-12.5 shrink-0 text-right text-[13px] text-text-secondary tabular-nums'>
         {order.total_quan ?? '—'}
       </div>
 
       {/* Total */}
-      <div className='w-[80px] shrink-0 text-right text-[13px] font-medium text-foreground tabular-nums'>
+      <div className='w-20 shrink-0 text-right text-[13px] font-medium text-foreground tabular-nums'>
         {total}
       </div>
 
       {/* Actions */}
       <div
-        className='flex w-[26px] shrink-0 justify-center opacity-0 transition-opacity group-hover/row:opacity-100'
+        className='flex w-6.5 shrink-0 justify-center opacity-0 transition-opacity group-hover/row:opacity-100'
         onClick={e => e.stopPropagation()}
         onKeyDown={e => e.stopPropagation()}
         role='group'
@@ -293,7 +293,7 @@ function OrderRow({
           <DropdownMenuTrigger asChild>
             <button
               type='button'
-              className='inline-flex size-6 items-center justify-center rounded-[6px] text-text-tertiary transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground'
+              className='inline-flex size-6 items-center justify-center rounded-md text-text-tertiary transition-colors duration-80 hover:bg-bg-active hover:text-foreground'
               aria-label='Order actions'
             >
               <svg width='15' height='15' viewBox='0 0 15 15' fill='none'>
@@ -305,12 +305,12 @@ function OrderRow({
           </DropdownMenuTrigger>
           <DropdownMenuContent
             align='end'
-            className='w-[180px] rounded-[8px] p-1'
+            className='w-45 rounded-lg p-1'
             style={{ boxShadow: 'var(--dropdown-shadow)' }}
           >
             {order.status === 'U' && (
               <DropdownMenuItem
-                className='cursor-pointer gap-2 rounded-[6px] px-2 py-1 text-[13px]'
+                className='cursor-pointer gap-2 rounded-md px-2 py-1 text-[13px]'
                 onClick={() => onPick(order)}
               >
                 <PackageCheck className='size-3.5' />
@@ -319,7 +319,7 @@ function OrderRow({
             )}
             <DropdownMenuItem
               variant='destructive'
-              className='cursor-pointer gap-2 rounded-[6px] px-2 py-1 text-[13px]'
+              className='cursor-pointer gap-2 rounded-md px-2 py-1 text-[13px]'
               onClick={() => onDelete(order)}
             >
               <Trash2 className='size-3.5' />

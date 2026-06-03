@@ -64,7 +64,7 @@ export function QuickAddInput({
     <div className='flex flex-col gap-1'>
       <div
         className={cn(
-          'flex h-9 items-center gap-2 rounded-[6px] border bg-background px-3 transition-[border-color,box-shadow] duration-[80ms]',
+          'flex h-9 items-center gap-2 rounded-md border bg-background px-3 transition-[border-color,box-shadow] duration-80',
           error
             ? 'border-destructive/50 focus-within:border-destructive focus-within:ring-2 focus-within:ring-destructive/20'
             : 'border-border focus-within:border-ring focus-within:ring-2 focus-within:ring-ring/50',
@@ -96,7 +96,7 @@ export function QuickAddInput({
         ) : value.trim() ? (
           <button
             type='button'
-            className='flex shrink-0 items-center gap-1 rounded-[4px] bg-bg-secondary px-1.5 py-0.5 text-[11px] font-medium text-text-tertiary transition-colors duration-75 hover:bg-bg-active hover:text-foreground'
+            className='flex shrink-0 items-center gap-1 rounded-sm bg-bg-secondary px-1.5 py-0.5 text-[11px] font-medium text-text-tertiary transition-colors duration-75 hover:bg-bg-active hover:text-foreground'
             onClick={handleSubmit}
             tabIndex={-1}
           >
@@ -104,7 +104,7 @@ export function QuickAddInput({
             Add
           </button>
         ) : (
-          <kbd className='text-text-quaternary shrink-0 rounded-[4px] border border-border bg-bg-secondary px-1.5 py-0.5 text-[11px]'>
+          <kbd className='text-text-quaternary shrink-0 rounded-sm border border-border bg-bg-secondary px-1.5 py-0.5 text-[11px]'>
             Enter
           </kbd>
         )}

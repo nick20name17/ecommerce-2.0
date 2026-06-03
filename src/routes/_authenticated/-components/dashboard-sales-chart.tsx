@@ -41,7 +41,7 @@ export const DashboardSalesChart = ({ metrics }: DashboardSalesChartProps) => {
   ]
 
   return (
-    <ChartContainer config={chartConfig} className='h-[280px] w-full'>
+    <ChartContainer config={chartConfig} className='h-70 w-full'>
       <BarChart data={data} margin={{ top: 8, right: 8, bottom: 8, left: 8 }}>
         <CartesianGrid strokeDasharray='3 3' vertical={false} className='stroke-border/50' />
         <XAxis dataKey='name' tickLine={false} axisLine={false} tickMargin={8} />

@@ -301,7 +301,7 @@ function Todos2Page() {
 
         <div className='flex-1' />
 
-        <div className='flex h-7 w-full max-w-[140px] items-center gap-1.5 rounded-[5px] border border-border bg-background px-2 transition-[border-color,box-shadow] focus-within:border-ring focus-within:ring-2 focus-within:ring-ring/50 sm:max-w-[260px]'>
+        <div className='flex h-7 w-full max-w-35 items-center gap-1.5 rounded-[5px] border border-border bg-background px-2 transition-[border-color,box-shadow] focus-within:border-ring focus-within:ring-2 focus-within:ring-ring/50 sm:max-w-65'>
           <Search className='size-3 shrink-0 text-text-tertiary' />
           <input
             value={search}
@@ -325,14 +325,14 @@ function Todos2Page() {
                   key={s.id}
                   type='button'
                   className={cn(
-                    'flex w-full items-center gap-2 rounded-[5px] px-2 py-[3px] text-left text-[13px] font-medium',
-                    'transition-colors duration-[80ms] hover:bg-bg-hover'
+                    'flex w-full items-center gap-2 rounded-[5px] px-2 py-0.75 text-left text-[13px] font-medium',
+                    'transition-colors duration-80 hover:bg-bg-hover'
                   )}
                   onClick={() => toggleStatus(s.id)}
                 >
                   <div
                     className={cn(
-                      'flex size-3.5 items-center justify-center rounded-[3px] border transition-colors duration-[80ms]',
+                      'flex size-3.5 items-center justify-center rounded-[3px] border transition-colors duration-80',
                       selected ? 'border-primary bg-primary' : 'border-border'
                     )}
                   >
@@ -359,14 +359,14 @@ function Todos2Page() {
                   key={key}
                   type='button'
                   className={cn(
-                    'flex w-full items-center gap-2 rounded-[5px] px-2 py-[3px] text-left text-[13px] font-medium',
-                    'transition-colors duration-[80ms] hover:bg-bg-hover'
+                    'flex w-full items-center gap-2 rounded-[5px] px-2 py-0.75 text-left text-[13px] font-medium',
+                    'transition-colors duration-80 hover:bg-bg-hover'
                   )}
                   onClick={() => togglePriority(key as TaskPriority)}
                 >
                   <div
                     className={cn(
-                      'flex size-3.5 items-center justify-center rounded-[3px] border transition-colors duration-[80ms]',
+                      'flex size-3.5 items-center justify-center rounded-[3px] border transition-colors duration-80',
                       selected ? 'border-primary bg-primary' : 'border-border'
                     )}
                   >
@@ -387,7 +387,7 @@ function Todos2Page() {
 
           <button
             type='button'
-            className='inline-flex h-7 items-center gap-1 rounded-[5px] bg-primary px-2 text-[13px] font-semibold text-primary-foreground transition-colors duration-[80ms] hover:opacity-90 sm:px-2.5'
+            className='inline-flex h-7 items-center gap-1 rounded-[5px] bg-primary px-2 text-[13px] font-semibold text-primary-foreground transition-colors duration-80 hover:opacity-90 sm:px-2.5'
             onClick={() => setShowCreate(true)}
           >
             <Plus className='size-3.5' />
@@ -401,7 +401,7 @@ function Todos2Page() {
         <div className='flex shrink-0 flex-wrap items-center gap-1.5 border-b border-border px-3.5 py-1.5 sm:px-6'>
           <button
             type='button'
-            className='text-[13px] font-medium text-text-tertiary transition-colors duration-[80ms] hover:text-foreground'
+            className='text-[13px] font-medium text-text-tertiary transition-colors duration-80 hover:text-foreground'
             onClick={clearAllFilters}
           >
             Clear
@@ -433,7 +433,7 @@ function Todos2Page() {
           {isLoading ? (
             <div className='flex h-full gap-4 px-3.5 py-4 sm:px-6'>
               {Array.from({ length: 4 }).map((_, i) => (
-                <div key={i} className='w-[300px] shrink-0'>
+                <div key={i} className='w-75 shrink-0'>
                   <div className='mb-3 flex items-center gap-2 px-1'>
                     <div className='size-2.5 animate-pulse rounded-full bg-border' />
                     <div className='h-3.5 w-20 animate-pulse rounded bg-border' />
@@ -488,7 +488,7 @@ function Todos2Page() {
                   {/* Status Group Header */}
                   <button
                     type='button'
-                    className='flex w-full items-center gap-2 border-b border-border bg-bg-secondary px-3.5 py-1.5 transition-colors duration-[80ms] hover:bg-bg-hover sm:px-6'
+                    className='flex w-full items-center gap-2 border-b border-border bg-bg-secondary px-3.5 py-1.5 transition-colors duration-80 hover:bg-bg-hover sm:px-6'
                     onClick={() => toggleGroup(status.name)}
                   >
                     <StatusIcon status={status.name} color={status.color} size={14} />
@@ -539,7 +539,7 @@ function Todos2Page() {
           <div className='fixed inset-0 z-40 bg-black/40' onClick={() => setTaskToDelete(null)} />
           <div className='fixed inset-0 z-50 flex items-center justify-center px-4'>
             <div
-              className='w-full max-w-[400px] rounded-[12px] border border-border bg-background p-6'
+              className='w-full max-w-100 rounded-xl border border-border bg-background p-6'
               style={{ boxShadow: 'var(--dropdown-shadow)' }}
             >
               <h3 className='mb-2 text-[15px] font-semibold'>Delete task</h3>
@@ -550,14 +550,14 @@ function Todos2Page() {
               <div className='flex justify-end gap-2'>
                 <button
                   type='button'
-                  className='rounded-[6px] border border-border px-3 py-1.5 text-[13px] font-medium transition-colors duration-[80ms] hover:bg-bg-hover'
+                  className='rounded-md border border-border px-3 py-1.5 text-[13px] font-medium transition-colors duration-80 hover:bg-bg-hover'
                   onClick={() => setTaskToDelete(null)}
                 >
                   Cancel
                 </button>
                 <button
                   type='button'
-                  className='rounded-[6px] bg-destructive px-3 py-1.5 text-[13px] font-medium text-white transition-colors duration-[80ms] hover:opacity-90'
+                  className='rounded-md bg-destructive px-3 py-1.5 text-[13px] font-medium text-white transition-colors duration-80 hover:opacity-90'
                   onClick={confirmDelete}
                 >
                   Delete

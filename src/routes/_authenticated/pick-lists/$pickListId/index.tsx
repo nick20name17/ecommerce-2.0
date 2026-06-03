@@ -370,7 +370,7 @@ const PickListDetailPage = () => {
                         <div
                           key={item.id}
                           className={cn(
-                            'group/item flex items-center gap-3 px-3.5 py-[6px]',
+                            'group/item flex items-center gap-3 px-3.5 py-1.5',
                             i < orderItems.length - 1 && 'border-b border-border-light/50'
                           )}
                         >
@@ -385,7 +385,7 @@ const PickListDetailPage = () => {
                               <input
                                 value={editQty}
                                 onChange={e => setEditQty(e.target.value)}
-                                className='h-6 w-[60px] rounded border border-border bg-background px-1.5 text-right text-[12px] tabular-nums outline-none focus:border-primary'
+                                className='h-6 w-15 rounded border border-border bg-background px-1.5 text-right text-[12px] tabular-nums outline-none focus:border-primary'
                                 onKeyDown={e => {
                                   if (e.key === 'Enter')
                                     updateItemMutation.mutate({

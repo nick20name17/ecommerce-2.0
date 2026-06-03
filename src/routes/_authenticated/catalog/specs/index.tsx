@@ -151,7 +151,7 @@ const SpecsManagerPage = () => {
         <SidebarTrigger className='-ml-1' />
         <button
           type='button'
-          className='inline-flex h-7 shrink-0 items-center gap-0.5 rounded-[6px] border border-border bg-bg-secondary pr-2.5 pl-1.5 text-[13px] font-medium text-text-secondary transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground'
+          className='inline-flex h-7 shrink-0 items-center gap-0.5 rounded-md border border-border bg-bg-secondary pr-2.5 pl-1.5 text-[13px] font-medium text-text-secondary transition-colors duration-80 hover:bg-bg-active hover:text-foreground'
           onClick={() => router.history.back()}
         >
           <ArrowLeft className='size-3.5' />
@@ -178,10 +178,10 @@ const SpecsManagerPage = () => {
       {/* Content: two-panel layout */}
       <div className='flex min-h-0 flex-1 overflow-hidden'>
         {/* Left: Specs list */}
-        <div className='flex w-full flex-col overflow-hidden border-r border-border sm:w-[320px] lg:w-[360px]'>
+        <div className='flex w-full flex-col overflow-hidden border-r border-border sm:w-[320px] lg:w-90'>
           {/* Search */}
           <div className='shrink-0 border-b border-border px-4 py-2'>
-            <div className='flex items-center gap-1.5 rounded-[6px] border border-border bg-background px-2.5 py-1.5'>
+            <div className='flex items-center gap-1.5 rounded-md border border-border bg-background px-2.5 py-1.5'>
               <Search className='size-3.5 shrink-0 text-text-tertiary' />
               <input
                 value={search}

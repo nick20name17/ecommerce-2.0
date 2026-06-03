@@ -18,7 +18,7 @@ export function OrdersChangeBadge({ metrics }: DashboardOrdersChartProps) {
   return (
     <span
       className={cn(
-        'inline-flex items-center gap-1 rounded-[6px] px-2 py-0.5 text-[13px] font-medium tabular-nums',
+        'inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[13px] font-medium tabular-nums',
         direction === 'same' && 'bg-bg-secondary text-text-tertiary',
         direction === 'up' && 'bg-green-500/10 text-green-600 dark:text-green-400',
         direction === 'down' && 'bg-red-500/10 text-destructive'
@@ -63,9 +63,9 @@ function BarRow({
       <span className='w-16 shrink-0 text-[12px] text-text-tertiary sm:w-20 sm:text-[13px]'>
         {label}
       </span>
-      <div className='relative h-8 flex-1 overflow-hidden rounded-[6px] bg-border/30'>
+      <div className='relative h-8 flex-1 overflow-hidden rounded-md bg-border/30'>
         <div
-          className='absolute inset-y-0 left-0 rounded-[6px]'
+          className='absolute inset-y-0 left-0 rounded-md'
           style={{ width: `${pct}%`, backgroundColor: color }}
         />
       </div>

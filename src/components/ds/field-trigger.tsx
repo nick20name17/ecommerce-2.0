@@ -24,7 +24,7 @@ export const FieldTrigger = forwardRef<HTMLButtonElement, FieldTriggerProps>(
         type='button'
         className={cn(
           '-mx-2 -my-1 inline-flex items-center gap-1.5 rounded-[5px] px-2 py-1',
-          'transition-colors duration-[80ms] hover:bg-bg-hover',
+          'transition-colors duration-80 hover:bg-bg-hover',
           'text-[13px] font-medium text-foreground',
           'cursor-pointer disabled:cursor-default disabled:opacity-50',
           className

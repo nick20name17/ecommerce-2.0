@@ -51,7 +51,7 @@ export const CatalogMiniCart = ({
               key={i}
               className='flex items-center gap-2.5 border-b border-border-light px-4 py-2'
             >
-              <div className='size-7 shrink-0 animate-pulse rounded-[4px] bg-border' />
+              <div className='size-7 shrink-0 animate-pulse rounded-sm bg-border' />
               <div className='min-w-0 flex-1 space-y-1'>
                 <div className='h-3 w-14 animate-pulse rounded bg-border' />
                 <div className='h-3 w-20 animate-pulse rounded bg-border' />
@@ -112,7 +112,7 @@ function MiniCartItemRow({
   return (
     <div className='group/item flex items-center gap-2.5 border-b border-border-light px-4 py-1.5 transition-colors duration-75 hover:bg-bg-hover/50'>
       {/* Thumbnail */}
-      <div className='flex size-7 shrink-0 items-center justify-center overflow-hidden rounded-[4px] bg-bg-secondary'>
+      <div className='flex size-7 shrink-0 items-center justify-center overflow-hidden rounded-sm bg-bg-secondary'>
         {item.photo ? (
           <img src={item.photo} alt={item.name} className='size-full object-cover' loading='lazy' />
         ) : (
@@ -144,7 +144,7 @@ function MiniCartItemRow({
       {onRemove && (
         <button
           type='button'
-          className='text-text-quaternary inline-flex size-6 shrink-0 items-center justify-center rounded-[4px] opacity-0 transition-all duration-75 group-hover/item:opacity-100 hover:bg-bg-active hover:text-destructive'
+          className='text-text-quaternary inline-flex size-6 shrink-0 items-center justify-center rounded-sm opacity-0 transition-all duration-75 group-hover/item:opacity-100 hover:bg-bg-active hover:text-destructive'
           disabled={removing}
           onClick={() => onRemove(item.id)}
           aria-label='Remove'

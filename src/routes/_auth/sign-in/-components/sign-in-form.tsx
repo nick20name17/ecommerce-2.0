@@ -25,7 +25,7 @@ export const SignInForm = () => {
   })
 
   return (
-    <div className='rounded-[12px] border border-border bg-background p-6 shadow-sm'>
+    <div className='rounded-xl border border-border bg-background p-6 shadow-sm'>
       <form onSubmit={handleSignIn} className='space-y-4'>
         {/* Email field */}
         <Controller
@@ -38,7 +38,7 @@ export const SignInForm = () => {
               </label>
               <div
                 className={cn(
-                  'flex items-center gap-2 rounded-[8px] border bg-background px-3 py-2 transition-colors duration-[80ms] focus-within:border-primary focus-within:ring-1 focus-within:ring-primary/20',
+                  'flex items-center gap-2 rounded-lg border bg-background px-3 py-2 transition-colors duration-80 focus-within:border-primary focus-within:ring-1 focus-within:ring-primary/20',
                   fieldState.invalid
                     ? 'border-destructive focus-within:border-destructive focus-within:ring-destructive/20'
                     : 'border-border'
@@ -75,7 +75,7 @@ export const SignInForm = () => {
               </label>
               <div
                 className={cn(
-                  'flex items-center gap-2 rounded-[8px] border bg-background px-3 py-2 transition-colors duration-[80ms] focus-within:border-primary focus-within:ring-1 focus-within:ring-primary/20',
+                  'flex items-center gap-2 rounded-lg border bg-background px-3 py-2 transition-colors duration-80 focus-within:border-primary focus-within:ring-1 focus-within:ring-primary/20',
                   fieldState.invalid
                     ? 'border-destructive focus-within:border-destructive focus-within:ring-destructive/20'
                     : 'border-border'
@@ -91,7 +91,7 @@ export const SignInForm = () => {
                 />
                 <button
                   type='button'
-                  className='text-text-quaternary inline-flex size-5 shrink-0 items-center justify-center rounded-[4px] transition-colors hover:text-text-secondary'
+                  className='text-text-quaternary inline-flex size-5 shrink-0 items-center justify-center rounded-sm transition-colors hover:text-text-secondary'
                   onClick={() => setShowPassword(!showPassword)}
                   tabIndex={-1}
                 >
@@ -109,7 +109,7 @@ export const SignInForm = () => {
         <button
           type='submit'
           disabled={signInMutation.isPending}
-          className='inline-flex h-9 w-full items-center justify-center gap-2 rounded-[8px] bg-primary text-[13px] font-semibold text-primary-foreground transition-opacity duration-[80ms] hover:opacity-90 disabled:pointer-events-none disabled:opacity-50'
+          className='inline-flex h-9 w-full items-center justify-center gap-2 rounded-lg bg-primary text-[13px] font-semibold text-primary-foreground transition-opacity duration-80 hover:opacity-90 disabled:pointer-events-none disabled:opacity-50'
         >
           {signInMutation.isPending ? (
             <>

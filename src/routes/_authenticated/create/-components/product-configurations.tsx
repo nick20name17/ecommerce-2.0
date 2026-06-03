@@ -128,7 +128,7 @@ export const ProductConfigurations = ({
         </div>
         <div className='flex items-center gap-2'>
           {hasUncheckedRequired && (
-            <span className='flex items-center gap-1 rounded-[4px] bg-destructive/10 px-1.5 py-0.5 text-[11px] font-semibold text-destructive'>
+            <span className='flex items-center gap-1 rounded-sm bg-destructive/10 px-1.5 py-0.5 text-[11px] font-semibold text-destructive'>
               <AlertCircle className='size-2.5' />
               Required
             </span>
@@ -136,7 +136,7 @@ export const ProductConfigurations = ({
           {selectedConfigCount > 0 && onResetConfigurations && (
             <button
               type='button'
-              className='flex items-center gap-1 rounded-[5px] px-2 py-1 text-[12px] font-medium text-text-tertiary transition-colors duration-[80ms] hover:bg-bg-hover hover:text-foreground'
+              className='flex items-center gap-1 rounded-[5px] px-2 py-1 text-[12px] font-medium text-text-tertiary transition-colors duration-80 hover:bg-bg-hover hover:text-foreground'
               onClick={onResetConfigurations}
             >
               <RotateCcw className='size-3' />
@@ -286,7 +286,7 @@ const ConfigGroup = ({
     <div
       className={cn(
         depth === 0 && 'border-b border-border',
-        isNested && 'rounded-[8px] border border-primary/15 bg-background'
+        isNested && 'rounded-lg border border-primary/15 bg-background'
       )}
     >
       {/* Group header */}
@@ -312,7 +312,7 @@ const ConfigGroup = ({
           className={cn(
             'flex shrink-0 items-center justify-center rounded-full border font-semibold tabular-nums',
             isNested
-              ? 'h-4 min-w-[28px] border-primary/30 bg-primary/10 px-1 text-[9px] text-primary'
+              ? 'h-4 min-w-7 border-primary/30 bg-primary/10 px-1 text-[9px] text-primary'
               : 'size-5 border-border text-[10px] text-text-tertiary',
             hasSelected && !isNested && 'border-primary/50 bg-primary/10 text-primary'
           )}
@@ -414,7 +414,7 @@ const SelectedPreview = ({
 
   return (
     <div className='flex items-center gap-3 border-t border-border-light bg-primary/[0.04] px-4 py-2'>
-      <div className='flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-[6px] border border-primary/30 bg-background'>
+      <div className='flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-md border border-primary/30 bg-background'>
         {photosLoading ? (
           <Spinner className='size-3 text-text-tertiary' />
         ) : photo ? (
@@ -443,7 +443,7 @@ const SelectedPreview = ({
           e.stopPropagation()
           onClear()
         }}
-        className='inline-flex size-7 shrink-0 items-center justify-center rounded-full text-text-tertiary transition-colors duration-[80ms] hover:bg-bg-hover hover:text-foreground'
+        className='inline-flex size-7 shrink-0 items-center justify-center rounded-full text-text-tertiary transition-colors duration-80 hover:bg-bg-hover hover:text-foreground'
         aria-label='Clear selection'
       >
         <X className='size-4' />
@@ -498,7 +498,7 @@ const ConfigCard = ({
   return (
     <button
       type='button'
-      className='group flex flex-col overflow-hidden rounded-[8px] border border-border bg-background text-left transition-all duration-100 hover:border-primary/50 hover:shadow-sm'
+      className='group flex flex-col overflow-hidden rounded-lg border border-border bg-background text-left transition-all duration-100 hover:border-primary/50 hover:shadow-sm'
       onClick={onClick}
     >
       {/* Photo */}
@@ -524,7 +524,7 @@ const ConfigCard = ({
       </div>
 
       {/* Info */}
-      <div className='flex min-h-[36px] flex-col justify-center gap-0.5 px-1.5 py-1'>
+      <div className='flex min-h-9 flex-col justify-center gap-0.5 px-1.5 py-1'>
         <span className='line-clamp-2 text-[11px] leading-tight font-medium text-foreground'>
           {item.descr_1}
         </span>

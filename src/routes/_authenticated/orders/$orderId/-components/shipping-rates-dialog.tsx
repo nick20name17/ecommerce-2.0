@@ -369,7 +369,7 @@ export function ShippingRatesDialog({
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className='gap-0 p-0 max-sm:max-w-full max-sm:rounded-none max-sm:border-0 sm:max-w-[960px]'>
+        <DialogContent className='gap-0 p-0 max-sm:max-w-full max-sm:rounded-none max-sm:border-0 sm:max-w-240'>
           <DialogHeader className='border-b border-border px-4 py-3 sm:px-5'>
             <div className='flex items-center gap-3'>
               <DialogTitle className='text-[14px] font-semibold text-foreground'>
@@ -386,7 +386,7 @@ export function ShippingRatesDialog({
                     <button
                       type='button'
                       className={cn(
-                        'rounded-[4px] px-2 py-0.5 text-[12px] font-medium transition-colors',
+                        'rounded-sm px-2 py-0.5 text-[12px] font-medium transition-colors',
                         step === s
                           ? 'bg-primary/10 text-primary'
                           : s === 'rates' && !ratesData
@@ -419,7 +419,7 @@ export function ShippingRatesDialog({
                       <button
                         type='button'
                         className={cn(
-                          'flex h-9 w-full items-center gap-2 rounded-[6px] border px-3 text-left transition-colors duration-75',
+                          'flex h-9 w-full items-center gap-2 rounded-md border px-3 text-left transition-colors duration-75',
                           selectedAddress
                             ? 'border-border hover:bg-bg-hover'
                             : 'border-border-heavy/40 hover:border-border-heavy border-dashed hover:bg-bg-hover'
@@ -447,7 +447,7 @@ export function ShippingRatesDialog({
                     </PopoverTrigger>
                     <PopoverContent
                       align='start'
-                      className='w-[var(--radix-popover-trigger-width)] gap-0 p-1'
+                      className='w-(--radix-popover-trigger-width) gap-0 p-1'
                     >
                       {shippingAddresses.length === 0 ? (
                         <div className='px-3 py-4 text-center text-[13px] text-text-tertiary'>
@@ -506,7 +506,7 @@ export function ShippingRatesDialog({
                   <button
                     type='button'
                     className={cn(
-                      'flex h-9 w-full items-center gap-2 rounded-[6px] border px-3 text-left transition-colors hover:bg-bg-hover',
+                      'flex h-9 w-full items-center gap-2 rounded-md border px-3 text-left transition-colors hover:bg-bg-hover',
                       hasAddress ? 'border-border' : 'border-border-heavy/40 border-dashed'
                     )}
                     onClick={() => setShipToExpanded(true)}
@@ -536,16 +536,16 @@ export function ShippingRatesDialog({
               </div>
 
               {/* Two-panel layout — stacks on mobile */}
-              <div className='flex max-h-[70vh] min-h-0 flex-1 max-md:flex-col md:min-h-[480px]'>
+              <div className='flex max-h-[70vh] min-h-0 flex-1 max-md:flex-col md:min-h-120'>
                 {/* Left: Packages */}
-                <div className='flex shrink-0 flex-col border-b border-border max-md:max-h-[40vh] md:w-[380px] md:border-r md:border-b-0'>
+                <div className='flex shrink-0 flex-col border-b border-border max-md:max-h-[40vh] md:w-95 md:border-r md:border-b-0'>
                   <div className='flex items-center justify-between border-b border-border bg-bg-secondary/60 px-4 py-2'>
                     <span className='text-[12px] font-semibold tracking-[0.06em] text-text-tertiary uppercase'>
                       Packages ({packages.length})
                     </span>
                     <button
                       type='button'
-                      className='inline-flex items-center gap-1 rounded-[4px] px-2 py-0.5 text-[12px] font-medium text-text-tertiary transition-colors hover:bg-bg-hover hover:text-text-secondary'
+                      className='inline-flex items-center gap-1 rounded-sm px-2 py-0.5 text-[12px] font-medium text-text-tertiary transition-colors hover:bg-bg-hover hover:text-text-secondary'
                       onClick={addPackage}
                     >
                       <Plus className='size-3' />
@@ -589,7 +589,7 @@ export function ShippingRatesDialog({
                     {packages.length > 0 && (
                       <button
                         type='button'
-                        className='hover:border-border-heavy flex w-full items-center justify-center gap-1.5 rounded-[6px] border border-dashed border-border py-2 text-[12px] font-medium text-text-tertiary transition-colors hover:bg-bg-hover hover:text-text-secondary'
+                        className='hover:border-border-heavy flex w-full items-center justify-center gap-1.5 rounded-md border border-dashed border-border py-2 text-[12px] font-medium text-text-tertiary transition-colors hover:bg-bg-hover hover:text-text-secondary'
                         onClick={addPackage}
                       >
                         <Plus className='size-3.5' />
@@ -616,20 +616,20 @@ export function ShippingRatesDialog({
                     <table className='w-full text-[13px]'>
                       <thead className='sticky top-0 z-10 bg-bg-secondary'>
                         <tr className='border-b border-border text-left'>
-                          <th className='w-[28px] py-1.5 pr-0 pl-2'></th>
-                          <th className='min-w-[90px] px-3 py-1.5 font-medium text-text-tertiary'>
+                          <th className='w-7 py-1.5 pr-0 pl-2'></th>
+                          <th className='min-w-22.5 px-3 py-1.5 font-medium text-text-tertiary'>
                             Inventory
                           </th>
-                          <th className='min-w-[120px] px-3 py-1.5 font-medium text-text-tertiary max-sm:hidden'>
+                          <th className='min-w-30 px-3 py-1.5 font-medium text-text-tertiary max-sm:hidden'>
                             Description
                           </th>
-                          <th className='w-[50px] px-3 py-1.5 text-right font-medium text-text-tertiary'>
+                          <th className='w-12.5 px-3 py-1.5 text-right font-medium text-text-tertiary'>
                             Qty
                           </th>
-                          <th className='w-[70px] px-3 py-1.5 font-medium text-text-tertiary max-sm:hidden'>
+                          <th className='w-17.5 px-3 py-1.5 font-medium text-text-tertiary max-sm:hidden'>
                             Status
                           </th>
-                          <th className='w-[80px] py-1.5 pr-4 pl-3 font-medium text-text-tertiary'>
+                          <th className='w-20 py-1.5 pr-4 pl-3 font-medium text-text-tertiary'>
                             Pkg
                           </th>
                         </tr>
@@ -661,7 +661,7 @@ export function ShippingRatesDialog({
                               <td className='px-3 py-1.5 font-medium text-foreground'>
                                 {item.inven || '—'}
                               </td>
-                              <td className='max-w-[200px] px-3 py-1.5 text-text-secondary max-sm:hidden'>
+                              <td className='max-w-50 px-3 py-1.5 text-text-secondary max-sm:hidden'>
                                 <span className='block truncate'>{item.descr || '—'}</span>
                               </td>
                               <td className='px-3 py-1.5 text-right text-text-secondary tabular-nums'>
@@ -677,7 +677,7 @@ export function ShippingRatesDialog({
                                     <span className='text-text-quaternary text-[11px]'>—</span>
                                   )}
                                   {item.packed && (
-                                    <span className='inline-flex items-center gap-1 rounded-[4px] bg-violet-500/10 px-1.5 py-0.5 text-[11px] font-medium text-violet-600 dark:text-violet-400'>
+                                    <span className='inline-flex items-center gap-1 rounded-sm bg-violet-500/10 px-1.5 py-0.5 text-[11px] font-medium text-violet-600 dark:text-violet-400'>
                                       Packed
                                     </span>
                                   )}
@@ -714,7 +714,7 @@ export function ShippingRatesDialog({
                 </div>
                 <button
                   type='button'
-                  className='inline-flex h-8 items-center gap-1.5 rounded-[6px] bg-primary px-3 text-[13px] font-semibold text-primary-foreground transition-colors hover:opacity-90 disabled:opacity-40'
+                  className='inline-flex h-8 items-center gap-1.5 rounded-md bg-primary px-3 text-[13px] font-semibold text-primary-foreground transition-colors hover:opacity-90 disabled:opacity-40'
                   disabled={loading || packages.length === 0 || !selectedAddressId}
                   onClick={getShippingRates}
                 >
@@ -747,7 +747,7 @@ export function ShippingRatesDialog({
                 <div className='flex items-center gap-2'>
                   <button
                     type='button'
-                    className='inline-flex h-8 items-center gap-1.5 rounded-[6px] border border-border px-3 text-[13px] font-medium text-text-secondary transition-colors hover:bg-bg-hover'
+                    className='inline-flex h-8 items-center gap-1.5 rounded-md border border-border px-3 text-[13px] font-medium text-text-secondary transition-colors hover:bg-bg-hover'
                     onClick={() => setStep('configure')}
                     disabled={selecting}
                   >
@@ -760,7 +760,7 @@ export function ShippingRatesDialog({
                 </div>
                 <button
                   type='button'
-                  className='inline-flex h-8 items-center gap-1.5 rounded-[6px] bg-primary px-3 text-[13px] font-semibold text-primary-foreground transition-colors hover:opacity-90 disabled:opacity-40'
+                  className='inline-flex h-8 items-center gap-1.5 rounded-md bg-primary px-3 text-[13px] font-semibold text-primary-foreground transition-colors hover:opacity-90 disabled:opacity-40'
                   disabled={!selectedRate || selecting}
                   onClick={confirmRate}
                 >

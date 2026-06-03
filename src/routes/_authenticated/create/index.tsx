@@ -157,15 +157,15 @@ const CreatePage = () => {
         <SidebarTrigger className='-ml-1' />
         <button
           type='button'
-          className='inline-flex h-7 items-center gap-0.5 rounded-[6px] border border-border bg-bg-secondary pr-2.5 pl-1.5 text-[13px] font-medium text-text-secondary transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground'
+          className='inline-flex h-7 items-center gap-0.5 rounded-md border border-border bg-bg-secondary pr-2.5 pl-1.5 text-[13px] font-medium text-text-secondary transition-colors duration-80 hover:bg-bg-active hover:text-foreground'
           onClick={() => router.history.back()}
         >
           <ChevronLeft className='size-3.5' />
           <span className='hidden sm:inline'>Back</span>
         </button>
 
-        <div className='flex size-[22px] shrink-0 items-center justify-center rounded-[6px] bg-teal-500'>
-          <FilePlus2 className='size-[13px] text-white' />
+        <div className='flex size-5.5 shrink-0 items-center justify-center rounded-md bg-teal-500'>
+          <FilePlus2 className='size-3.25 text-white' />
         </div>
         <h1 className='text-[14px] font-semibold tracking-[-0.01em]'>Create</h1>
 
@@ -175,7 +175,7 @@ const CreatePage = () => {
         <button
           type='button'
           className={cn(
-            'inline-flex h-7 items-center gap-1.5 rounded-[5px] border border-border bg-bg-secondary px-2.5 text-[12px] font-medium text-text-secondary transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground disabled:pointer-events-none disabled:opacity-40'
+            'inline-flex h-7 items-center gap-1.5 rounded-[5px] border border-border bg-bg-secondary px-2.5 text-[12px] font-medium text-text-secondary transition-colors duration-80 hover:bg-bg-active hover:text-foreground disabled:pointer-events-none disabled:opacity-40'
           )}
           disabled={!customer || isBusy}
           onClick={() => setCatalogOpen(true)}
@@ -189,7 +189,7 @@ const CreatePage = () => {
           <TooltipTrigger asChild>
             <button
               type='button'
-              className='inline-flex size-7 items-center justify-center rounded-[5px] text-text-tertiary transition-colors duration-[80ms] hover:bg-bg-hover hover:text-destructive disabled:pointer-events-none disabled:opacity-40'
+              className='inline-flex size-7 items-center justify-center rounded-[5px] text-text-tertiary transition-colors duration-80 hover:bg-bg-hover hover:text-destructive disabled:pointer-events-none disabled:opacity-40'
               disabled={cartItems.length === 0 || isBusy || isCreating}
               onClick={handleClearAll}
             >
@@ -249,7 +249,7 @@ const CreatePage = () => {
           </div>
 
           {/* Scrollable middle area */}
-          <div className='min-h-0 flex-1 [scrollbar-width:none] overflow-y-auto [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden'>
+          <div className='min-h-0 flex-1 scrollbar-none overflow-y-auto [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden'>
             {/* Customer details — same as customer detail page */}
             {customer && customerDetail && (
               <>
@@ -310,7 +310,7 @@ const CreatePage = () => {
             <div className='border-b border-border p-4'>
               <button
                 type='button'
-                className='inline-flex h-8 w-full items-center justify-center gap-1.5 rounded-[6px] border border-border bg-background text-[13px] font-medium text-text-secondary transition-colors duration-[80ms] hover:bg-bg-hover hover:text-foreground disabled:pointer-events-none disabled:opacity-50'
+                className='inline-flex h-8 w-full items-center justify-center gap-1.5 rounded-md border border-border bg-background text-[13px] font-medium text-text-secondary transition-colors duration-80 hover:bg-bg-hover hover:text-foreground disabled:pointer-events-none disabled:opacity-50'
                 disabled={!customer}
                 onClick={() => setAttachmentsOpen(true)}
               >
@@ -327,7 +327,7 @@ const CreatePage = () => {
                 <TooltipTrigger asChild>
                   <button
                     type='button'
-                    className='inline-flex h-9 w-full items-center justify-center gap-2 rounded-[6px] bg-primary text-[13px] font-semibold text-primary-foreground transition-opacity duration-[80ms] hover:opacity-90 disabled:pointer-events-none disabled:opacity-40'
+                    className='inline-flex h-9 w-full items-center justify-center gap-2 rounded-md bg-primary text-[13px] font-semibold text-primary-foreground transition-opacity duration-80 hover:opacity-90 disabled:pointer-events-none disabled:opacity-40'
                     disabled={!canSubmit}
                     onClick={handleCreateProposal}
                   >
@@ -354,7 +354,7 @@ const CreatePage = () => {
                 <TooltipTrigger asChild>
                   <button
                     type='button'
-                    className='inline-flex h-9 w-full items-center justify-center gap-2 rounded-[6px] border border-border bg-background text-[13px] font-medium text-foreground transition-colors duration-[80ms] hover:bg-bg-hover disabled:pointer-events-none disabled:opacity-40'
+                    className='inline-flex h-9 w-full items-center justify-center gap-2 rounded-md border border-border bg-background text-[13px] font-medium text-foreground transition-colors duration-80 hover:bg-bg-hover disabled:pointer-events-none disabled:opacity-40'
                     disabled={!canSubmit}
                     onClick={handleCreateOrder}
                   >
@@ -393,7 +393,7 @@ const CreatePage = () => {
           </div>
           <button
             type='button'
-            className='inline-flex h-8 shrink-0 items-center gap-1.5 rounded-[6px] border border-border bg-background px-2.5 text-[12px] font-medium text-text-secondary'
+            className='inline-flex h-8 shrink-0 items-center gap-1.5 rounded-md border border-border bg-background px-2.5 text-[12px] font-medium text-text-secondary'
             disabled={!customer}
             onClick={() => setAttachmentsOpen(true)}
           >
@@ -403,7 +403,7 @@ const CreatePage = () => {
         <div className='flex shrink-0 items-center gap-2'>
           <button
             type='button'
-            className='inline-flex h-8 items-center gap-1.5 rounded-[6px] border border-border bg-background px-3 text-[12px] font-medium text-foreground disabled:opacity-40'
+            className='inline-flex h-8 items-center gap-1.5 rounded-md border border-border bg-background px-3 text-[12px] font-medium text-foreground disabled:opacity-40'
             disabled={!canSubmit}
             onClick={handleCreateOrder}
           >
@@ -412,7 +412,7 @@ const CreatePage = () => {
           </button>
           <button
             type='button'
-            className='inline-flex h-8 items-center gap-1.5 rounded-[6px] bg-primary px-3 text-[12px] font-semibold text-primary-foreground disabled:opacity-40'
+            className='inline-flex h-8 items-center gap-1.5 rounded-md bg-primary px-3 text-[12px] font-semibold text-primary-foreground disabled:opacity-40'
             disabled={!canSubmit}
             onClick={handleCreateProposal}
           >
@@ -521,19 +521,19 @@ function AddressCard({
           </span>
         </div>
         {hasAddress ? (
-          <div className='pl-[18px] text-[12px] leading-relaxed text-text-secondary'>
+          <div className='pl-4.5 text-[12px] leading-relaxed text-text-secondary'>
             {address.name && <div className='font-medium text-foreground'>{address.name}</div>}
             {address.address1 && <div>{address.address1}</div>}
             {address.address2 && <div>{address.address2}</div>}
             {cityStateZip && <div>{cityStateZip}</div>}
           </div>
         ) : (
-          <div className='text-text-quaternary pl-[18px] text-[12px]'>No address set</div>
+          <div className='text-text-quaternary pl-4.5 text-[12px]'>No address set</div>
         )}
       </div>
 
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className='gap-0 overflow-hidden p-0 sm:max-w-[380px]'>
+        <DialogContent className='gap-0 overflow-hidden p-0 sm:max-w-95'>
           <DialogHeader className='border-b border-border px-5 py-3'>
             <DialogTitle className='flex items-center gap-2 text-[14px]'>
               <MapPin className='size-4 text-text-tertiary' />
@@ -578,14 +578,14 @@ function AddressCard({
           <div className='flex justify-end gap-2 border-t border-border px-5 py-3'>
             <button
               type='button'
-              className='inline-flex h-7 items-center rounded-[6px] border border-border px-3 text-[12px] font-medium text-text-secondary transition-colors duration-[80ms] hover:bg-bg-hover hover:text-foreground'
+              className='inline-flex h-7 items-center rounded-md border border-border px-3 text-[12px] font-medium text-text-secondary transition-colors duration-80 hover:bg-bg-hover hover:text-foreground'
               onClick={() => setOpen(false)}
             >
               Cancel
             </button>
             <button
               type='button'
-              className='inline-flex h-7 items-center rounded-[6px] bg-primary px-3 text-[12px] font-semibold text-primary-foreground transition-opacity duration-[80ms] hover:opacity-90'
+              className='inline-flex h-7 items-center rounded-md bg-primary px-3 text-[12px] font-semibold text-primary-foreground transition-opacity duration-80 hover:opacity-90'
               onClick={handleSave}
             >
               Save
@@ -616,7 +616,7 @@ function AddressDialogField({
         onChange={e => onChange(e.target.value)}
         placeholder={label}
         autoFocus={autoFocus}
-        className='placeholder:text-text-quaternary h-8 w-full rounded-[6px] border border-border bg-background px-2.5 text-[13px] text-foreground transition-colors duration-[80ms] outline-none focus:border-primary focus:ring-1 focus:ring-primary/20'
+        className='placeholder:text-text-quaternary h-8 w-full rounded-md border border-border bg-background px-2.5 text-[13px] text-foreground transition-colors duration-80 outline-none focus:border-primary focus:ring-1 focus:ring-primary/20'
       />
     </div>
   )

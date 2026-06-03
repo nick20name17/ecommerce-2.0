@@ -64,7 +64,7 @@ export const getCustomerColumns = ({
       if (!onNotes) return null
       return (
         <div
-          className='max-w-[140px] min-w-0'
+          className='max-w-35 min-w-0'
           role='button'
           tabIndex={0}
           onClick={e => e.stopPropagation()}

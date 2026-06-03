@@ -137,11 +137,11 @@ export const GlobalSearch = () => {
           ;(e.currentTarget as HTMLButtonElement).blur()
           setOpen(true)
         }}
-        className='flex h-[32px] w-full items-center gap-2 rounded-[6px] border border-black/[0.06] bg-black/[0.025] px-2.5 text-[13px] text-text-tertiary transition-[background-color,color,border-color,transform] duration-100 hover:border-black/[0.1] hover:bg-black/[0.04] hover:text-text-secondary focus:outline-none focus-visible:outline-none active:scale-[0.98] dark:border-white/[0.08] dark:bg-white/[0.03] dark:hover:border-white/[0.12] dark:hover:bg-white/[0.06]'
+        className='flex h-8 w-full items-center gap-2 rounded-md border border-black/6 bg-black/2.5 px-2.5 text-[13px] text-text-tertiary transition-[background-color,color,border-color,transform] duration-100 hover:border-black/10 hover:bg-black/4 hover:text-text-secondary focus:outline-none focus-visible:outline-none active:scale-[0.98] dark:border-white/8 dark:bg-white/3 dark:hover:border-white/12 dark:hover:bg-white/6'
       >
-        <Search className='size-[14px] shrink-0' />
+        <Search className='size-3.5 shrink-0' />
         <span className='flex-1 text-left'>Search</span>
-        <kbd className='hidden rounded-[4px] border border-black/[0.08] bg-white/50 px-1.5 py-0.5 text-[10px] font-medium text-text-tertiary sm:inline-block dark:border-white/[0.1] dark:bg-white/[0.06]'>
+        <kbd className='hidden rounded-sm border border-black/8 bg-white/50 px-1.5 py-0.5 text-[10px] font-medium text-text-tertiary sm:inline-block dark:border-white/10 dark:bg-white/6'>
           ⌘K
         </kbd>
       </button>
@@ -155,7 +155,7 @@ export const GlobalSearch = () => {
             onClick={() => setOpen(false)}
           >
             <div
-              className='flex w-full max-w-[520px] flex-col overflow-hidden rounded-[12px] border border-border bg-popover'
+              className='flex w-full max-w-130 flex-col overflow-hidden rounded-xl border border-border bg-popover'
               style={{ boxShadow: 'var(--dropdown-shadow)', animation: 'dropIn 120ms ease-out' }}
               onClick={e => e.stopPropagation()}
             >
@@ -176,7 +176,7 @@ export const GlobalSearch = () => {
               </div>
 
               {/* Results */}
-              <div ref={listRef} className='max-h-[360px] overflow-y-auto overscroll-contain p-1.5'>
+              <div ref={listRef} className='max-h-90 overflow-y-auto overscroll-contain p-1.5'>
                 {!enabled && (
                   <div className='px-3 py-10 text-center text-[13px] text-text-tertiary'>
                     Type at least 2 characters to search
@@ -191,7 +191,7 @@ export const GlobalSearch = () => {
 
                 {enabled && orders.length > 0 && (
                   <div>
-                    <div className='px-2.5 pt-2 pb-1 text-[11px] font-semibold tracking-[0.05em] text-text-tertiary uppercase'>
+                    <div className='px-2.5 pt-2 pb-1 text-[11px] font-semibold tracking-wider text-text-tertiary uppercase'>
                       Orders
                     </div>
                     {orders.map((o, i) => {
@@ -203,7 +203,7 @@ export const GlobalSearch = () => {
                           type='button'
                           data-result-index={idx}
                           className={cn(
-                            'flex w-full items-center gap-2.5 rounded-[6px] px-2.5 py-1.5 text-left transition-colors duration-75',
+                            'flex w-full items-center gap-2.5 rounded-md px-2.5 py-1.5 text-left transition-colors duration-75',
                             isActive ? 'bg-bg-active' : 'hover:bg-bg-hover'
                           )}
                           onClick={() =>
@@ -216,7 +216,7 @@ export const GlobalSearch = () => {
                           }
                           onMouseEnter={() => setActiveIdx(idx)}
                         >
-                          <div className='flex size-7 shrink-0 items-center justify-center rounded-[6px] bg-amber-500/10 text-amber-600 dark:text-amber-400'>
+                          <div className='flex size-7 shrink-0 items-center justify-center rounded-md bg-amber-500/10 text-amber-600 dark:text-amber-400'>
                             <Package className='size-3.5' />
                           </div>
                           <div className='min-w-0 flex-1'>
@@ -238,7 +238,7 @@ export const GlobalSearch = () => {
 
                 {enabled && customers.length > 0 && (
                   <div className={orders.length > 0 ? 'mt-1' : ''}>
-                    <div className='px-2.5 pt-2 pb-1 text-[11px] font-semibold tracking-[0.05em] text-text-tertiary uppercase'>
+                    <div className='px-2.5 pt-2 pb-1 text-[11px] font-semibold tracking-wider text-text-tertiary uppercase'>
                       Customers
                     </div>
                     {customers.map((c, i) => {
@@ -250,7 +250,7 @@ export const GlobalSearch = () => {
                           type='button'
                           data-result-index={idx}
                           className={cn(
-                            'flex w-full items-center gap-2.5 rounded-[6px] px-2.5 py-1.5 text-left transition-colors duration-75',
+                            'flex w-full items-center gap-2.5 rounded-md px-2.5 py-1.5 text-left transition-colors duration-75',
                             isActive ? 'bg-bg-active' : 'hover:bg-bg-hover'
                           )}
                           onClick={() =>
@@ -263,7 +263,7 @@ export const GlobalSearch = () => {
                           }
                           onMouseEnter={() => setActiveIdx(idx)}
                         >
-                          <div className='flex size-7 shrink-0 items-center justify-center rounded-[6px] bg-blue-500/10 text-blue-600 dark:text-blue-400'>
+                          <div className='flex size-7 shrink-0 items-center justify-center rounded-md bg-blue-500/10 text-blue-600 dark:text-blue-400'>
                             <Users className='size-3.5' />
                           </div>
                           <div className='min-w-0 flex-1'>

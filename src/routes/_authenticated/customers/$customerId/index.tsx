@@ -121,7 +121,7 @@ function CustomerDetailPage() {
           <Skeleton className='h-4 w-16' />
           <Skeleton className='size-5 rounded-[5px]' />
           <Skeleton className='h-4 w-28' />
-          <Skeleton className='h-5 w-[60px] rounded-full' />
+          <Skeleton className='h-5 w-15 rounded-full' />
           <div className='flex-1' />
           <Skeleton className='h-7 w-14 rounded-[5px]' />
           <Skeleton className='size-7 rounded-[5px]' />
@@ -137,7 +137,7 @@ function CustomerDetailPage() {
               <Skeleton className='h-64 w-full' />
             </div>
           </div>
-          <div className='hidden shrink-0 border-l border-border bg-bg-secondary/50 lg:block lg:w-[380px]'>
+          <div className='hidden shrink-0 border-l border-border bg-bg-secondary/50 lg:block lg:w-95'>
             <div className='space-y-3 px-4 py-3'>
               <Skeleton className='h-3 w-16' />
               <div className='grid grid-cols-2 gap-x-4 gap-y-2'>
@@ -173,7 +173,7 @@ function CustomerDetailPage() {
         <SidebarTrigger className='-ml-1' />
         <button
           type='button'
-          className='inline-flex h-7 shrink-0 items-center gap-0.5 rounded-[6px] border border-border bg-bg-secondary pr-2.5 pl-1.5 text-[13px] font-medium text-text-secondary transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground'
+          className='inline-flex h-7 shrink-0 items-center gap-0.5 rounded-md border border-border bg-bg-secondary pr-2.5 pl-1.5 text-[13px] font-medium text-text-secondary transition-colors duration-80 hover:bg-bg-active hover:text-foreground'
           onClick={() => router.history.back()}
         >
           <ChevronLeft className='size-3.5' />
@@ -210,7 +210,7 @@ function CustomerDetailPage() {
                 <button
                   type='button'
                   className={cn(
-                    'inline-flex size-7 items-center justify-center rounded-[5px] border text-[12px] font-medium transition-colors duration-[80ms] md:h-7 md:w-auto md:gap-1.5 md:px-2.5',
+                    'inline-flex size-7 items-center justify-center rounded-[5px] border text-[12px] font-medium transition-colors duration-80 md:h-7 md:w-auto md:gap-1.5 md:px-2.5',
                     customer.assigned_users?.length || customer.assigned_user
                       ? 'border-primary/20 bg-primary/[0.06] text-primary hover:bg-primary/[0.1]'
                       : 'border-border bg-bg-secondary text-text-secondary hover:bg-bg-active hover:text-foreground'
@@ -252,7 +252,7 @@ function CustomerDetailPage() {
             <TooltipTrigger asChild>
               <button
                 type='button'
-                className='inline-flex size-7 items-center justify-center rounded-[5px] border border-border bg-bg-secondary text-text-secondary transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground'
+                className='inline-flex size-7 items-center justify-center rounded-[5px] border border-border bg-bg-secondary text-text-secondary transition-colors duration-80 hover:bg-bg-active hover:text-foreground'
                 onClick={() => setNotesOpen(true)}
               >
                 <StickyNote className='size-3.5' />
@@ -265,7 +265,7 @@ function CustomerDetailPage() {
             <TooltipTrigger asChild>
               <button
                 type='button'
-                className='inline-flex size-7 items-center justify-center rounded-[5px] border border-border bg-bg-secondary text-text-secondary transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground'
+                className='inline-flex size-7 items-center justify-center rounded-[5px] border border-border bg-bg-secondary text-text-secondary transition-colors duration-80 hover:bg-bg-active hover:text-foreground'
                 onClick={() => setEditOpen(true)}
               >
                 <Pencil className='size-3.5' />
@@ -278,7 +278,7 @@ function CustomerDetailPage() {
             <TooltipTrigger asChild>
               <button
                 type='button'
-                className='inline-flex size-7 items-center justify-center rounded-[5px] text-text-tertiary transition-colors duration-[80ms] hover:bg-bg-hover hover:text-destructive'
+                className='inline-flex size-7 items-center justify-center rounded-[5px] text-text-tertiary transition-colors duration-80 hover:bg-bg-hover hover:text-destructive'
                 onClick={() => setDeleteOpen(true)}
               >
                 <Trash2 className='size-3.5' />
@@ -300,7 +300,7 @@ function CustomerDetailPage() {
                 key={tab.value}
                 type='button'
                 className={cn(
-                  'relative px-3 py-2.5 text-[13px] font-medium transition-colors duration-[80ms]',
+                  'relative px-3 py-2.5 text-[13px] font-medium transition-colors duration-80',
                   activeTab === tab.value
                     ? 'text-foreground'
                     : 'text-text-tertiary hover:text-text-secondary'
@@ -309,7 +309,7 @@ function CustomerDetailPage() {
               >
                 {tab.label}
                 {activeTab === tab.value && (
-                  <div className='absolute inset-x-3 bottom-0 h-[2px] rounded-full bg-primary' />
+                  <div className='absolute inset-x-3 bottom-0 h-0.5 rounded-full bg-primary' />
                 )}
               </button>
             ))}
@@ -333,7 +333,7 @@ function CustomerDetailPage() {
         </div>
 
         {/* Right panel — properties */}
-        <div className='flex shrink-0 flex-col overflow-hidden border-t border-border bg-bg-secondary/50 lg:w-[380px] lg:border-t-0 lg:border-l'>
+        <div className='flex shrink-0 flex-col overflow-hidden border-t border-border bg-bg-secondary/50 lg:w-95 lg:border-t-0 lg:border-l'>
           {/* Panel tabs */}
           <div className='flex shrink-0 items-center gap-0 border-b border-border px-1'>
             {(['general', 'custom'] as const).map(tab => {
@@ -355,7 +355,7 @@ function CustomerDetailPage() {
                 >
                   {label}
                   {panelTab === tab && (
-                    <span className='absolute right-3 bottom-0 left-3 h-[2px] rounded-full bg-primary' />
+                    <span className='absolute right-3 bottom-0 left-3 h-0.5 rounded-full bg-primary' />
                   )}
                 </button>
               )
@@ -363,7 +363,7 @@ function CustomerDetailPage() {
           </div>
 
           {/* Panel content */}
-          <div className='flex-1 [scrollbar-width:none] overflow-y-auto [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden'>
+          <div className='flex-1 scrollbar-none overflow-y-auto [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden'>
             {panelTab === 'general' ? (
               <CustomerInfoPanel
                 customer={customer}

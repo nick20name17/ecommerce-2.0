@@ -92,7 +92,7 @@ export const CartTable = ({
                         {item.name}
                       </span>
                     </TooltipTrigger>
-                    <TooltipContent className='max-w-[260px]'>{item.name}</TooltipContent>
+                    <TooltipContent className='max-w-65'>{item.name}</TooltipContent>
                   </Tooltip>
                 </div>
                 <div className='mt-1 flex items-center gap-2'>
@@ -118,7 +118,7 @@ export const CartTable = ({
                     {activeConfigs.map(c => (
                       <span
                         key={c.id}
-                        className='inline-flex items-center rounded-[4px] border border-border bg-bg-secondary px-1.5 py-0.5 text-[11px] font-medium text-text-secondary'
+                        className='inline-flex items-center rounded-sm border border-border bg-bg-secondary px-1.5 py-0.5 text-[11px] font-medium text-text-secondary'
                       >
                         {c.name}
                         {c.childs && c.childs.length > 0 && (

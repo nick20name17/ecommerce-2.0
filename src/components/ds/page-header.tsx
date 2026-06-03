@@ -11,10 +11,8 @@ interface PageHeaderIconProps {
  */
 export function PageHeaderIcon({ icon: Icon, color }: PageHeaderIconProps) {
   return (
-    <div
-      className={cn('flex size-[22px] shrink-0 items-center justify-center rounded-[6px]', color)}
-    >
-      <Icon className='size-[13px] text-white' />
+    <div className={cn('flex size-5.5 shrink-0 items-center justify-center rounded-md', color)}>
+      <Icon className='size-3.25 text-white' />
     </div>
   )
 }

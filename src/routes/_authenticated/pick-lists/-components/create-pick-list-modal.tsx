@@ -93,7 +93,7 @@ export function CreatePickListModal({ open, onOpenChange }: Props) {
         onOpenChange(next)
       }}
     >
-      <DialogContent className='flex max-h-[85vh] flex-col gap-0 overflow-hidden p-0 sm:max-w-[520px]'>
+      <DialogContent className='flex max-h-[85vh] flex-col gap-0 overflow-hidden p-0 sm:max-w-130'>
         <DialogHeader className='border-b border-border px-5 py-3'>
           <DialogTitle className='text-[14px]'>New Pick List</DialogTitle>
         </DialogHeader>

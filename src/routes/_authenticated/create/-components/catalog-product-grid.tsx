@@ -86,7 +86,7 @@ export const CatalogProductGrid = ({
     <div className='flex h-full min-h-0 flex-col'>
       {/* Search + pagination bar */}
       <div className='flex shrink-0 items-center gap-2 border-b border-border px-4 py-2'>
-        <div className='flex flex-1 items-center gap-1.5 rounded-[6px] border border-border bg-background px-2.5 py-1.5'>
+        <div className='flex flex-1 items-center gap-1.5 rounded-md border border-border bg-background px-2.5 py-1.5'>
           {isFetching ? (
             <Loader2 className='size-3.5 shrink-0 animate-spin text-text-tertiary' />
           ) : (
@@ -135,13 +135,13 @@ export const CatalogProductGrid = ({
       {/* Table header */}
       <div className='flex shrink-0 items-center gap-3 border-b border-border bg-bg-secondary/60 px-4 py-1.5'>
         <div className='w-10 shrink-0' />
-        <div className='min-w-0 flex-1 text-[11px] font-semibold tracking-[0.05em] text-text-tertiary uppercase'>
+        <div className='min-w-0 flex-1 text-[11px] font-semibold tracking-wider text-text-tertiary uppercase'>
           Product
         </div>
-        <div className='hidden w-[80px] shrink-0 text-right text-[11px] font-semibold tracking-[0.05em] text-text-tertiary uppercase sm:block'>
+        <div className='hidden w-20 shrink-0 text-right text-[11px] font-semibold tracking-wider text-text-tertiary uppercase sm:block'>
           Price
         </div>
-        <div className='w-[60px] shrink-0' />
+        <div className='w-15 shrink-0' />
       </div>
 
       {/* Product rows */}
@@ -153,7 +153,7 @@ export const CatalogProductGrid = ({
                 key={i}
                 className='flex items-center gap-3 border-b border-border-light px-4 py-2'
               >
-                <div className='size-10 shrink-0 animate-pulse rounded-[6px] bg-border' />
+                <div className='size-10 shrink-0 animate-pulse rounded-md bg-border' />
                 <div className='min-w-0 flex-1 space-y-1'>
                   <div className='h-3.5 w-3/4 animate-pulse rounded bg-border' />
                   <div className='h-3 w-1/3 animate-pulse rounded bg-border' />
@@ -191,7 +191,7 @@ export const CatalogProductGrid = ({
                 className='group/row flex items-center gap-3 border-b border-border-light px-4 py-1.5 transition-colors duration-75 hover:bg-bg-hover/50'
               >
                 {/* Thumbnail */}
-                <div className='flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-[6px] bg-bg-secondary'>
+                <div className='flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-md bg-bg-secondary'>
                   {photo ? (
                     <img
                       src={photo}
@@ -222,7 +222,7 @@ export const CatalogProductGrid = ({
                       </span>
                     )}
                     {needsConfig && (
-                      <span className='inline-flex shrink-0 items-center gap-1 rounded-[4px] bg-primary/10 px-1.5 py-0.5 text-[11px] font-medium text-primary'>
+                      <span className='inline-flex shrink-0 items-center gap-1 rounded-sm bg-primary/10 px-1.5 py-0.5 text-[11px] font-medium text-primary'>
                         <Settings2 className='size-2.5' />
                         {hasConfigurations ? 'Configurable' : 'Multi-unit'}
                       </span>
@@ -239,7 +239,7 @@ export const CatalogProductGrid = ({
                 </div>
 
                 {/* Price */}
-                <div className='hidden w-[80px] shrink-0 text-right sm:block'>
+                <div className='hidden w-20 shrink-0 text-right sm:block'>
                   {hasDiscount && (
                     <p className='text-[11px] text-text-tertiary tabular-nums line-through'>
                       {formatCurrency(oldNum)}
@@ -256,10 +256,10 @@ export const CatalogProductGrid = ({
                 </div>
 
                 {/* Add button */}
-                <div className='w-[60px] shrink-0 text-right'>
+                <div className='w-15 shrink-0 text-right'>
                   <button
                     type='button'
-                    className='inline-flex h-7 items-center gap-1 rounded-[5px] border border-border bg-bg-secondary px-2 text-[12px] font-medium text-text-secondary transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground disabled:pointer-events-none disabled:opacity-40'
+                    className='inline-flex h-7 items-center gap-1 rounded-[5px] border border-border bg-bg-secondary px-2 text-[12px] font-medium text-text-secondary transition-colors duration-80 hover:bg-bg-active hover:text-foreground disabled:pointer-events-none disabled:opacity-40'
                     disabled={cartUpdating || isAdding}
                     onClick={() => handleAdd(product)}
                   >

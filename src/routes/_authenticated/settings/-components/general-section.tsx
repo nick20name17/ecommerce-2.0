@@ -1,21 +1,15 @@
 import { useMutation, useQuery } from '@tanstack/react-query'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { toast } from 'sonner'
 
 import { getProjectByIdQuery } from '@/api/project/query'
+import type { Project } from '@/api/project/schema'
 import { projectService } from '@/api/project/service'
+import { isSuperAdmin } from '@/constants/user'
 import { cn } from '@/lib/utils'
 import { useAuth } from '@/providers/auth'
-import { isSuperAdmin } from '@/constants/user'
 
 export const GeneralSection = ({ projectId }: { projectId: number }) => {
-  const [unitSystem, setUnitSystem] = useState<string>('metric')
-  const [categoryWebFilter, setCategoryWebFilter] = useState(true)
-  const [productWebFilter, setProductWebFilter] = useState(true)
-  const [oosField, setOosField] = useState('')
-  const [salesTotalField, setSalesTotalField] = useState('')
-  const [loaded, setLoaded] = useState(false)
-
   // Fetch settings via project detail — only for superadmins
   const { user } = useAuth()
   const isSuperAdminUser = !!user?.role && isSuperAdmin(user.role)
@@ -25,16 +19,40 @@ export const GeneralSection = ({ projectId }: { projectId: number }) => {
     retry: false
   })
 
-  useEffect(() => {
-    if (project && !loaded) {
-      setUnitSystem(project.unit_system ?? 'metric')
-      setCategoryWebFilter(project.category_show_web_filter ?? true)
-      setProductWebFilter(project.product_show_web_filter ?? true)
-      setOosField(project.oos_field ?? '')
-      setSalesTotalField(project.sales_total_field ?? '')
-      setLoaded(true)
-    }
-  }, [project, loaded])
+  console.log(project)
+
+  // Remount the form once project data first arrives so the editable fields are
+  // seeded from it via lazy initial state — no setState-in-effect / prop mirroring.
+  // The key is keyed on projectId (not the project object identity), so background
+  // refetches don't remount and clobber in-progress edits; it only reseeds when a
+  // different project is loaded. Non-superadmins never load `project`, so the form
+  // stays mounted with defaults exactly as before.
+  return (
+    <GeneralSettingsForm
+      key={project ? `loaded-${projectId}` : 'pending'}
+      projectId={projectId}
+      project={project}
+      isSuperAdminUser={isSuperAdminUser}
+    />
+  )
+}
+
+const GeneralSettingsForm = ({
+  projectId,
+  project,
+  isSuperAdminUser
+}: {
+  projectId: number
+  project: Project | undefined
+  isSuperAdminUser: boolean
+}) => {
+  const [unitSystem, setUnitSystem] = useState<string>(project?.unit_system ?? 'metric')
+  const [categoryWebFilter, setCategoryWebFilter] = useState(
+    project?.category_show_web_filter ?? true
+  )
+  const [productWebFilter, setProductWebFilter] = useState(project?.product_show_web_filter ?? true)
+  const [oosField, setOosField] = useState(project?.oos_field ?? '')
+  const [salesTotalField, setSalesTotalField] = useState(project?.sales_total_field ?? '')
 
   const updateMutation = useMutation({
     mutationFn: (payload: Record<string, unknown>) =>
@@ -71,9 +89,9 @@ export const GeneralSection = ({ projectId }: { projectId: number }) => {
                 type='button'
                 disabled={updateMutation.isPending}
                 className={cn(
-                  'inline-flex h-8 items-center rounded-[6px] border px-3 text-[13px] font-medium transition-colors duration-[80ms]',
+                  'inline-flex h-8 items-center rounded-md border px-3 text-[13px] font-medium transition-colors duration-80',
                   unitSystem === unit
-                    ? 'border-primary bg-primary/[0.06] text-primary'
+                    ? 'border-primary bg-primary/6 text-primary'
                     : 'border-border text-text-secondary hover:bg-bg-hover'
                 )}
                 onClick={() => {
@@ -93,7 +111,7 @@ export const GeneralSection = ({ projectId }: { projectId: number }) => {
             Web Filters
           </label>
 
-          <div className='flex items-center justify-between rounded-[8px] border border-border px-3.5 py-2.5'>
+          <div className='flex items-center justify-between rounded-lg border border-border px-3.5 py-2.5'>
             <div>
               <span className='text-[13px] font-medium text-foreground'>Category Web Filter</span>
               <p className='text-[12px] text-text-tertiary'>Show web filter option on categories</p>
@@ -113,13 +131,13 @@ export const GeneralSection = ({ projectId }: { projectId: number }) => {
               <span
                 className={cn(
                   'inline-block size-3.5 rounded-full bg-background shadow-sm transition-transform duration-200',
-                  categoryWebFilter ? 'translate-x-[18px]' : 'translate-x-[3px]'
+                  categoryWebFilter ? 'translate-x-4.5' : 'translate-x-0.75'
                 )}
               />
             </button>
           </div>
 
-          <div className='flex items-center justify-between rounded-[8px] border border-border px-3.5 py-2.5'>
+          <div className='flex items-center justify-between rounded-lg border border-border px-3.5 py-2.5'>
             <div>
               <span className='text-[13px] font-medium text-foreground'>Product Web Filter</span>
               <p className='text-[12px] text-text-tertiary'>Show web filter option on products</p>
@@ -139,7 +157,7 @@ export const GeneralSection = ({ projectId }: { projectId: number }) => {
               <span
                 className={cn(
                   'inline-block size-3.5 rounded-full bg-background shadow-sm transition-transform duration-200',
-                  productWebFilter ? 'translate-x-[18px]' : 'translate-x-[3px]'
+                  productWebFilter ? 'translate-x-4.5' : 'translate-x-0.75'
                 )}
               />
             </button>
@@ -153,7 +171,7 @@ export const GeneralSection = ({ projectId }: { projectId: number }) => {
               Database Fields
             </label>
 
-            <div className='rounded-[8px] border border-border px-3.5 py-2.5'>
+            <div className='rounded-xl border border-border px-3.5 py-2.5'>
               <div className='mb-1'>
                 <span className='text-[13px] font-medium text-foreground'>Out-of-Stock Field</span>
                 <p className='text-[12px] text-text-tertiary'>
@@ -169,11 +187,11 @@ export const GeneralSection = ({ projectId }: { projectId: number }) => {
                 }}
                 placeholder='e.g. QTY_ON_HND'
                 disabled={updateMutation.isPending}
-                className='placeholder:text-text-quaternary h-8 w-full rounded-[6px] border border-border bg-background px-2.5 text-[13px] outline-none focus:border-primary'
+                className='placeholder:text-text-quaternary h-8 w-full rounded-md border border-border bg-background px-2.5 text-[13px] outline-none focus:border-primary'
               />
             </div>
 
-            <div className='rounded-[8px] border border-border px-3.5 py-2.5'>
+            <div className='rounded-xl border border-border px-3.5 py-2.5'>
               <div className='mb-1'>
                 <span className='text-[13px] font-medium text-foreground'>Sales Total Field</span>
                 <p className='text-[12px] text-text-tertiary'>
@@ -189,7 +207,7 @@ export const GeneralSection = ({ projectId }: { projectId: number }) => {
                 }}
                 placeholder='e.g. total'
                 disabled={updateMutation.isPending}
-                className='placeholder:text-text-quaternary h-8 w-full rounded-[6px] border border-border bg-background px-2.5 text-[13px] outline-none focus:border-primary'
+                className='placeholder:text-text-quaternary h-8 w-full rounded-md border border-border bg-background px-2.5 text-[13px] outline-none focus:border-primary'
               />
             </div>
           </div>

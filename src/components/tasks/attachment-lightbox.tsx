@@ -114,7 +114,7 @@ export function AttachmentLightbox({
                 }}
                 className={cn(
                   'fixed top-1/2 left-3 z-10 flex size-10 -translate-y-1/2 items-center justify-center rounded-full',
-                  'bg-white/10 text-white/70 backdrop-blur-sm transition-colors duration-[80ms]',
+                  'bg-white/10 text-white/70 backdrop-blur-sm transition-colors duration-80',
                   'hover:bg-white/20 hover:text-white'
                 )}
               >
@@ -128,7 +128,7 @@ export function AttachmentLightbox({
                 }}
                 className={cn(
                   'fixed top-1/2 right-3 z-10 flex size-10 -translate-y-1/2 items-center justify-center rounded-full',
-                  'bg-white/10 text-white/70 backdrop-blur-sm transition-colors duration-[80ms]',
+                  'bg-white/10 text-white/70 backdrop-blur-sm transition-colors duration-80',
                   'hover:bg-white/20 hover:text-white'
                 )}
               >

@@ -101,8 +101,8 @@ const AccessoryRow = ({
   })
 
   return (
-    <div className='flex items-center gap-3 rounded-[8px] border border-border bg-background p-2 transition-colors hover:border-primary/40'>
-      <div className='flex size-12 shrink-0 items-center justify-center overflow-hidden rounded-[6px] border border-border bg-bg-secondary/50'>
+    <div className='flex items-center gap-3 rounded-lg border border-border bg-background p-2 transition-colors hover:border-primary/40'>
+      <div className='flex size-12 shrink-0 items-center justify-center overflow-hidden rounded-md border border-border bg-bg-secondary/50'>
         {photo ? (
           <img
             src={photo}
@@ -131,7 +131,7 @@ const AccessoryRow = ({
           onChange={setQty}
           min={1}
           max={accessory.ignore_count ? undefined : accessory.max_count || undefined}
-          className='w-[88px]'
+          className='w-22'
         />
         <button
           type='button'
@@ -142,7 +142,7 @@ const AccessoryRow = ({
               ? 'This accessory has its own configurator — add from product page'
               : undefined
           }
-          className='inline-flex h-8 items-center gap-1 rounded-[6px] bg-primary px-2.5 text-[12px] font-semibold text-primary-foreground transition-opacity duration-75 hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40'
+          className='inline-flex h-8 items-center gap-1 rounded-md bg-primary px-2.5 text-[12px] font-semibold text-primary-foreground transition-opacity duration-75 hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40'
         >
           {addMutation.isPending ? (
             <Spinner className='size-3' />

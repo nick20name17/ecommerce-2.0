@@ -230,7 +230,7 @@ export function ShippingDialog({ pickList, open, onOpenChange }: ShippingDialogP
                         </PopoverTrigger>
                         <PopoverContent
                           align='start'
-                          className='w-[var(--radix-popover-trigger-width)] p-1'
+                          className='w-(--radix-popover-trigger-width) p-1'
                         >
                           {addressList.map(addr => (
                             <button
@@ -238,7 +238,7 @@ export function ShippingDialog({ pickList, open, onOpenChange }: ShippingDialogP
                               type='button'
                               onClick={() => setAddressId(addr.id)}
                               className={cn(
-                                'flex w-full items-center gap-2 rounded-[6px] px-2.5 py-2 text-left text-[13px] transition-colors hover:bg-bg-hover',
+                                'flex w-full items-center gap-2 rounded-md px-2.5 py-2 text-left text-[13px] transition-colors hover:bg-bg-hover',
                                 addressId === addr.id && 'bg-bg-hover font-medium'
                               )}
                             >
@@ -488,7 +488,7 @@ function ShipToEditDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className='gap-0 p-0 sm:max-w-[400px]'>
+      <DialogContent className='gap-0 p-0 sm:max-w-100'>
         <DialogHeader className='border-b border-border px-5 py-3'>
           <DialogTitle className='text-[14px] font-semibold'>Ship To Address</DialogTitle>
         </DialogHeader>
@@ -548,7 +548,7 @@ function AddrField({
         value={value}
         onChange={e => onChange(e.target.value)}
         placeholder={label}
-        className='placeholder:text-text-quaternary h-8 w-full rounded-[6px] border border-border bg-background px-2.5 text-[13px] text-foreground transition-colors outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20'
+        className='placeholder:text-text-quaternary h-8 w-full rounded-md border border-border bg-background px-2.5 text-[13px] text-foreground transition-colors outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20'
       />
     </div>
   )

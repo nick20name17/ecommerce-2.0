@@ -57,12 +57,12 @@ const SettingsPage = () => {
   if (!projectId) {
     return (
       <div className='flex h-full flex-col items-center justify-center gap-5'>
-        <div className='flex size-12 items-center justify-center rounded-[12px] bg-primary/[0.08] text-primary dark:bg-primary/15'>
+        <div className='flex size-12 items-center justify-center rounded-xl bg-primary/[0.08] text-primary dark:bg-primary/15'>
           <ISettings className='size-6' />
         </div>
         <div className='flex flex-col items-center gap-1.5 text-center'>
           <h1 className='text-[16px] font-semibold tracking-[-0.02em] text-foreground'>Settings</h1>
-          <p className='max-w-[280px] text-[13px] leading-snug text-text-tertiary'>
+          <p className='max-w-70 text-[13px] leading-snug text-text-tertiary'>
             Select a project in the sidebar to manage settings.
           </p>
         </div>
@@ -82,7 +82,7 @@ const SettingsPage = () => {
       {/* Sidebar + Content */}
       <div className='flex min-h-0 flex-1 flex-col overflow-hidden md:flex-row'>
         {/* Horizontal tabs on narrow, vertical sidebar on md+ */}
-        <nav className='flex shrink-0 gap-px overflow-x-auto border-b border-border bg-bg-secondary/40 px-3 py-1.5 md:w-[180px] md:flex-col md:overflow-x-visible md:border-r md:border-b-0 md:py-3'>
+        <nav className='flex shrink-0 gap-px overflow-x-auto border-b border-border bg-bg-secondary/40 px-3 py-1.5 md:w-45 md:flex-col md:overflow-x-visible md:border-r md:border-b-0 md:py-3'>
           {visibleSections.map(s => {
             const isActive = currentSection === s.value
             return (
@@ -90,7 +90,7 @@ const SettingsPage = () => {
                 key={s.value}
                 type='button'
                 className={cn(
-                  'flex h-[30px] shrink-0 items-center rounded-[6px] px-2.5 text-[13px] font-medium whitespace-nowrap transition-colors duration-[80ms]',
+                  'flex h-7.5 shrink-0 items-center rounded-md px-2.5 text-[13px] font-medium whitespace-nowrap transition-colors duration-80',
                   isActive
                     ? 'bg-bg-active text-foreground'
                     : 'text-text-tertiary hover:bg-bg-hover hover:text-foreground'

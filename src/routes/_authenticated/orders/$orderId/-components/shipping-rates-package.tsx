@@ -33,7 +33,7 @@ export function PackageCard({
   return (
     <div
       className={cn(
-        'group/pkg overflow-hidden rounded-[8px] border transition-all',
+        'group/pkg overflow-hidden rounded-lg border transition-all',
         isDragOver ? 'border-primary bg-primary/[0.04] ring-1 ring-primary/20' : 'border-border'
       )}
       onDragOver={onDragOver}
@@ -42,7 +42,7 @@ export function PackageCard({
     >
       {/* Header — shipping-label style */}
       <div className='flex items-center gap-2.5 bg-foreground/[0.03] px-3 py-2'>
-        <div className='flex size-7 items-center justify-center rounded-[6px] bg-foreground/[0.07]'>
+        <div className='flex size-7 items-center justify-center rounded-md bg-foreground/[0.07]'>
           <Box className='size-4 text-text-secondary' />
         </div>
         <div className='min-w-0 flex-1'>
@@ -154,7 +154,7 @@ export function PackageCard({
                 </span>
                 <button
                   type='button'
-                  className='text-text-quaternary flex size-5 shrink-0 items-center justify-center rounded-[4px] opacity-0 transition-all group-hover/item:opacity-100 hover:bg-destructive/10 hover:text-destructive'
+                  className='text-text-quaternary flex size-5 shrink-0 items-center justify-center rounded-sm opacity-0 transition-all group-hover/item:opacity-100 hover:bg-destructive/10 hover:text-destructive'
                   onClick={() => onUnassignItem(autoid)}
                 >
                   <Trash2 className='size-2.5' />
@@ -169,7 +169,7 @@ export function PackageCard({
       {!hasItems && (
         <div
           className={cn(
-            'mx-2 mb-2 flex flex-col items-center gap-1 rounded-[6px] border border-dashed py-3 transition-colors',
+            'mx-2 mb-2 flex flex-col items-center gap-1 rounded-md border border-dashed py-3 transition-colors',
             isDragOver
               ? 'border-primary bg-primary/[0.04] text-primary'
               : 'border-border-heavy/30 text-text-quaternary'

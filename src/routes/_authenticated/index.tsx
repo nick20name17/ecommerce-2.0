@@ -51,14 +51,14 @@ const DashboardPage = () => {
   if (userIsSuperAdmin && projectId == null) {
     return (
       <div className='flex h-full flex-col items-center justify-center gap-5 px-4'>
-        <div className='flex size-12 items-center justify-center rounded-[12px] bg-primary/[0.08] text-primary dark:bg-primary/15'>
+        <div className='flex size-12 items-center justify-center rounded-xl bg-primary/[0.08] text-primary dark:bg-primary/15'>
           <LayoutDashboard className='size-6' strokeWidth={1.75} />
         </div>
         <div className='flex flex-col items-center gap-1.5 text-center'>
           <h1 className='text-[16px] font-semibold tracking-[-0.02em] text-foreground'>
             Dashboard
           </h1>
-          <p className='max-w-[280px] text-[13px] leading-snug text-text-tertiary'>
+          <p className='max-w-70 text-[13px] leading-snug text-text-tertiary'>
             Select a project in the sidebar to view metrics.
           </p>
         </div>
@@ -77,12 +77,12 @@ const DashboardPage = () => {
         />
         <div className='flex flex-1 items-center justify-center px-4'>
           <div className='flex flex-col items-center gap-5'>
-            <div className='flex size-12 items-center justify-center rounded-[12px] bg-destructive/10 text-destructive'>
+            <div className='flex size-12 items-center justify-center rounded-xl bg-destructive/10 text-destructive'>
               <TriangleAlert className='size-6' strokeWidth={1.75} />
             </div>
             <div className='flex flex-col items-center gap-1.5 text-center'>
               <p className='text-[14px] font-semibold text-foreground'>Unable to load dashboard</p>
-              <p className='max-w-[280px] text-[13px] leading-snug text-text-tertiary'>
+              <p className='max-w-70 text-[13px] leading-snug text-text-tertiary'>
                 {getErrorMessage(error)}
               </p>
             </div>
@@ -108,7 +108,7 @@ const DashboardPage = () => {
               {['sk-1', 'sk-2', 'sk-3', 'sk-4', 'sk-5', 'sk-6'].map(id => (
                 <div
                   key={id}
-                  className='rounded-[8px] border border-border bg-background px-3 py-3 sm:px-4 sm:py-4'
+                  className='rounded-lg border border-border bg-background px-3 py-3 sm:px-4 sm:py-4'
                 >
                   <Skeleton className='h-3 w-16' />
                   <Skeleton className='mt-2.5 h-6 w-14' />
@@ -116,17 +116,17 @@ const DashboardPage = () => {
               ))}
             </div>
             {/* Chart skeleton */}
-            <div className='rounded-[8px] border border-border bg-background'>
+            <div className='rounded-lg border border-border bg-background'>
               <div className='flex items-center gap-2.5 px-4 py-3'>
                 <Skeleton className='h-4 w-48' />
               </div>
               <div className='space-y-3 p-4'>
-                <Skeleton className='h-8 w-full rounded-[6px]' />
-                <Skeleton className='h-8 w-1/4 rounded-[6px]' />
+                <Skeleton className='h-8 w-full rounded-md' />
+                <Skeleton className='h-8 w-1/4 rounded-md' />
               </div>
             </div>
             {/* Table skeleton */}
-            <div className='rounded-[8px] border border-border bg-background'>
+            <div className='rounded-lg border border-border bg-background'>
               <div className='px-4 py-3'>
                 <Skeleton className='h-4 w-28' />
               </div>
@@ -161,7 +161,7 @@ const DashboardPage = () => {
           <DashboardKpis metrics={data} />
 
           {/* Orders chart */}
-          <div className='rounded-[8px] border border-border bg-background'>
+          <div className='rounded-lg border border-border bg-background'>
             <div className='flex flex-wrap items-center gap-2 px-4 py-3 sm:gap-2.5'>
               <h2 className='text-[13px] font-semibold sm:text-[14px]'>
                 Orders — this month vs last month
@@ -199,7 +199,7 @@ function DashboardHeader({
         <PageHeaderIcon icon={IDashboard} color={PAGE_COLORS.dashboard} />
         <h1 className='text-[14px] font-semibold tracking-[-0.01em]'>Dashboard</h1>
       </div>
-      <div className='w-40 min-w-0 sm:w-[280px]'>
+      <div className='w-40 min-w-0 sm:w-70'>
         <CustomerCombobox
           value={customerFilterValue}
           onChange={onCustomerChange}

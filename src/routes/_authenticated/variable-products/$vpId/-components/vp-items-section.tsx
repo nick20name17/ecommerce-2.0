@@ -118,12 +118,12 @@ export const VPItemsSection = ({ vp, projectId, isMobile, isTablet }: VPItemsSec
             )}
           >
             <div className='w-5 shrink-0' />
-            <div className={cn(isTablet ? 'w-[80px]' : 'w-[100px]', 'shrink-0')}>Product ID</div>
+            <div className={cn(isTablet ? 'w-20' : 'w-25', 'shrink-0')}>Product ID</div>
             <div className='min-w-0 flex-1'>Description</div>
-            <div className='w-[70px] shrink-0 text-right'>Price</div>
-            {!isTablet && <div className='w-[70px] shrink-0 text-right'>Stock</div>}
-            {!isTablet && <div className='w-[50px] shrink-0 text-center'>Default</div>}
-            <div className='w-[28px] shrink-0' />
+            <div className='w-17.5 shrink-0 text-right'>Price</div>
+            {!isTablet && <div className='w-17.5 shrink-0 text-right'>Stock</div>}
+            {!isTablet && <div className='w-12.5 shrink-0 text-center'>Default</div>}
+            <div className='w-7 shrink-0' />
           </div>
 
           {vp.items.map(item => (
@@ -137,7 +137,7 @@ export const VPItemsSection = ({ vp, projectId, isMobile, isTablet }: VPItemsSec
               <Package className='size-4 shrink-0 text-amber-500' />
               <div
                 className={cn(
-                  isTablet ? 'w-[80px]' : 'w-[100px]',
+                  isTablet ? 'w-20' : 'w-25',
                   'shrink-0 truncate font-mono text-[12px] text-text-secondary'
                 )}
               >
@@ -149,16 +149,16 @@ export const VPItemsSection = ({ vp, projectId, isMobile, isTablet }: VPItemsSec
                   <Star className='ml-1 inline size-3 fill-amber-400 text-amber-400' />
                 )}
               </div>
-              <div className='w-[70px] shrink-0 text-right text-[13px] tabular-nums'>
+              <div className='w-17.5 shrink-0 text-right text-[13px] tabular-nums'>
                 {item.price ? `$${item.price}` : '—'}
               </div>
               {!isTablet && (
-                <div className='w-[70px] shrink-0 text-right text-[13px] tabular-nums'>
+                <div className='w-17.5 shrink-0 text-right text-[13px] tabular-nums'>
                   {item.available_stock ?? '—'}
                 </div>
               )}
               {!isTablet && (
-                <div className='flex w-[50px] shrink-0 justify-center'>
+                <div className='flex w-12.5 shrink-0 justify-center'>
                   {item.is_default && <Star className='size-3.5 fill-amber-400 text-amber-400' />}
                 </div>
               )}

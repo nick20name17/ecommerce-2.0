@@ -203,7 +203,7 @@ const CatalogPage = () => {
               isMobile
                 ? 'w-full'
                 : isTablet
-                  ? 'w-[240px] border-r border-border'
+                  ? 'w-60 border-r border-border'
                   : 'w-[320px] border-r border-border'
             )}
           >
@@ -217,7 +217,7 @@ const CatalogPage = () => {
                     style={{ paddingLeft: `${indent * 16 + 6}px` }}
                   >
                     {indent > 0 && <Skeleton className='size-3.5 shrink-0 rounded' />}
-                    <Skeleton className='size-[18px] shrink-0 rounded' />
+                    <Skeleton className='size-4.5 shrink-0 rounded' />
                     <Skeleton
                       className={cn(
                         'h-3.5 rounded',

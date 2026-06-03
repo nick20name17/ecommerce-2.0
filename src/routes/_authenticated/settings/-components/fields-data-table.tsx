@@ -56,13 +56,13 @@ export const FieldsDataTable = ({
       <div className='space-y-0'>
         {Array.from({ length: 8 }).map((_, i) => (
           <div key={i} className='flex items-center gap-4 border-b border-border-light px-6 py-1.5'>
-            <div className='w-[200px] shrink-0'>
+            <div className='w-50 shrink-0'>
               <Skeleton className='h-3.5 w-28' />
             </div>
             <div className='min-w-0 flex-1'>
               <Skeleton className='h-6 w-40 rounded-[5px]' />
             </div>
-            <div className='flex w-[60px] shrink-0 justify-end'>
+            <div className='flex w-15 shrink-0 justify-end'>
               <Skeleton className='h-5 w-9 rounded-full' />
             </div>
           </div>
@@ -86,18 +86,18 @@ export const FieldsDataTable = ({
     <div>
       {/* Table header */}
       <div className='sticky top-0 z-10 flex items-center gap-4 border-b border-border bg-bg-secondary px-6 py-1.5'>
-        <div className='w-[200px] shrink-0 text-[11px] font-semibold tracking-[0.05em] text-text-tertiary uppercase'>
+        <div className='w-50 shrink-0 text-[11px] font-semibold tracking-wider text-text-tertiary uppercase'>
           Field
         </div>
-        <div className='min-w-0 flex-1 text-[11px] font-semibold tracking-[0.05em] text-text-tertiary uppercase'>
+        <div className='min-w-0 flex-1 text-[11px] font-semibold tracking-wider text-text-tertiary uppercase'>
           Display Name
         </div>
         {showListToggle && (
-          <div className='w-[60px] shrink-0 text-right text-[11px] font-semibold tracking-[0.05em] text-text-tertiary uppercase'>
+          <div className='w-15 shrink-0 text-right text-[11px] font-semibold tracking-wider text-text-tertiary uppercase'>
             Header
           </div>
         )}
-        <div className='w-[60px] shrink-0 text-right text-[11px] font-semibold tracking-[0.05em] text-text-tertiary uppercase'>
+        <div className='w-15 shrink-0 text-right text-[11px] font-semibold tracking-wider text-text-tertiary uppercase'>
           Table
         </div>
       </div>
@@ -179,7 +179,7 @@ function FieldRow({
       )}
     >
       {/* Field name + editable indicator */}
-      <div className='flex w-[200px] shrink-0 items-center gap-1.5'>
+      <div className='flex w-50 shrink-0 items-center gap-1.5'>
         {/* Editable indicator */}
         {isSuperAdmin ? (
           <Tooltip>
@@ -187,7 +187,7 @@ function FieldRow({
               <button
                 type='button'
                 className={cn(
-                  'inline-flex size-5 shrink-0 items-center justify-center rounded-[4px] border transition-colors duration-75',
+                  'inline-flex size-5 shrink-0 items-center justify-center rounded-sm border transition-colors duration-75',
                   row.editable
                     ? 'border-primary/30 bg-primary/10 text-primary hover:bg-primary/20'
                     : 'text-text-quaternary border-border bg-bg-secondary hover:bg-bg-active hover:text-text-tertiary',
@@ -208,7 +208,7 @@ function FieldRow({
         ) : row.editable ? (
           <Tooltip>
             <TooltipTrigger asChild>
-              <span className='inline-flex size-5 shrink-0 items-center justify-center rounded-[4px] border border-primary/30 bg-primary/10 text-primary'>
+              <span className='inline-flex size-5 shrink-0 items-center justify-center rounded-sm border border-primary/30 bg-primary/10 text-primary'>
                 <Pencil className='size-2.5' />
               </span>
             </TooltipTrigger>
@@ -229,7 +229,7 @@ function FieldRow({
         {isDefault && (
           <Tooltip>
             <TooltipTrigger asChild>
-              <span className='inline-flex items-center gap-0.5 rounded-[4px] border border-border bg-bg-secondary px-1 py-px text-[10px] font-medium text-text-tertiary'>
+              <span className='inline-flex items-center gap-0.5 rounded-sm border border-border bg-bg-secondary px-1 py-px text-[10px] font-medium text-text-tertiary'>
                 <Lock className='size-2.5' />
                 Default
               </span>
@@ -246,7 +246,7 @@ function FieldRow({
           onChange={e => setAliasValue(e.target.value)}
           placeholder='Display name…'
           disabled={isAliasPending}
-          className='placeholder:text-text-quaternary h-6 max-w-[240px] min-w-0 flex-1 rounded-[5px] border border-border bg-background px-2 text-[12px] transition-colors duration-[80ms] outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 disabled:opacity-50'
+          className='placeholder:text-text-quaternary h-6 max-w-60 min-w-0 flex-1 rounded-[5px] border border-border bg-background px-2 text-[12px] transition-colors duration-80 outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 disabled:opacity-50'
           onKeyDown={e => {
             if (e.key === 'Enter') {
               e.preventDefault()
@@ -257,7 +257,7 @@ function FieldRow({
         {isDirty && (
           <button
             type='button'
-            className='inline-flex size-6 shrink-0 items-center justify-center rounded-[5px] border border-border bg-bg-secondary text-text-secondary transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground disabled:opacity-50'
+            className='inline-flex size-6 shrink-0 items-center justify-center rounded-[5px] border border-border bg-bg-secondary text-text-secondary transition-colors duration-80 hover:bg-bg-active hover:text-foreground disabled:opacity-50'
             disabled={isAliasPending}
             onClick={() => onAliasSubmit(entity, row.field, aliasValue.trim())}
             aria-label='Save alias'
@@ -269,7 +269,7 @@ function FieldRow({
 
       {/* Header toggle (in_list) — independent from Table */}
       {showListToggle && (
-        <div className='flex w-[60px] shrink-0 justify-end'>
+        <div className='flex w-15 shrink-0 justify-end'>
           <Tooltip>
             <TooltipTrigger asChild>
               <span className='inline-flex'>
@@ -289,7 +289,7 @@ function FieldRow({
       )}
 
       {/* Table toggle (detail Custom tab inclusion) */}
-      <div className='flex w-[60px] shrink-0 justify-end'>
+      <div className='flex w-15 shrink-0 justify-end'>
         {isDefault ? (
           <Tooltip>
             <TooltipTrigger asChild>

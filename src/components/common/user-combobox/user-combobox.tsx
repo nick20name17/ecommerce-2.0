@@ -113,7 +113,7 @@ export function UserCombobox({
         ) : (
           <button
             type='button'
-            className='flex h-9 w-full min-w-0 items-center justify-between gap-2 rounded-[6px] border border-input bg-background px-3 text-[13px] font-medium shadow-sm transition-colors duration-[80ms] hover:bg-bg-hover'
+            className='flex h-9 w-full min-w-0 items-center justify-between gap-2 rounded-md border border-input bg-background px-3 text-[13px] font-medium shadow-sm transition-colors duration-80 hover:bg-bg-hover'
           >
             {displayLabel ? (
               <span className='flex items-center gap-2 truncate'>
@@ -135,7 +135,7 @@ export function UserCombobox({
           animation: 'dropIn 0.15s ease'
         }}
       >
-        <div className='flex items-center gap-1.5 border-b border-border px-2.5 py-[6px]'>
+        <div className='flex items-center gap-1.5 border-b border-border px-2.5 py-1.5'>
           {loading ? (
             <Spinner className='size-3.5 shrink-0' />
           ) : (
@@ -156,7 +156,7 @@ export function UserCombobox({
           {loading && users.length === 0 ? (
             <div className='space-y-1'>
               {Array.from({ length: 5 }).map((_, i) => (
-                <Skeleton key={i} className='h-8 w-full rounded-[6px]' />
+                <Skeleton key={i} className='h-8 w-full rounded-md' />
               ))}
             </div>
           ) : users.length === 0 ? (
@@ -171,7 +171,7 @@ export function UserCombobox({
               {(value != null || selectedUser) && (
                 <button
                   type='button'
-                  className='flex w-full items-center gap-2 rounded-[6px] px-2.5 py-[7px] text-left text-[13px] font-medium text-text-secondary transition-colors duration-[80ms] hover:bg-destructive/10 hover:text-destructive'
+                  className='flex w-full items-center gap-2 rounded-md px-2.5 py-1.75 text-left text-[13px] font-medium text-text-secondary transition-colors duration-80 hover:bg-destructive/10 hover:text-destructive'
                   onClick={() => {
                     onChange(null)
                     setOpen(false)
@@ -195,7 +195,7 @@ export function UserCombobox({
                   <button
                     key={u.id}
                     type='button'
-                    className='flex w-full items-center gap-2 rounded-[6px] px-2.5 py-[7px] text-left text-[13px] font-medium transition-colors duration-[80ms] hover:bg-bg-hover'
+                    className='flex w-full items-center gap-2 rounded-md px-2.5 py-1.75 text-left text-[13px] font-medium transition-colors duration-80 hover:bg-bg-hover'
                     onClick={() => handleSelect(u)}
                   >
                     <InitialsAvatar initials={initials} size={20} />

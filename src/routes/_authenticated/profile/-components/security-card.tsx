@@ -35,7 +35,7 @@ export const SecurityCard = () => {
           </p>
           <button
             type='button'
-            className='inline-flex h-7 items-center gap-1.5 rounded-[5px] border border-border bg-background px-2.5 text-[13px] font-medium text-text-secondary transition-colors duration-[80ms] hover:bg-bg-hover hover:text-foreground'
+            className='inline-flex h-7 items-center gap-1.5 rounded-[5px] border border-border bg-background px-2.5 text-[13px] font-medium text-text-secondary transition-colors duration-80 hover:bg-bg-hover hover:text-foreground'
             onClick={() => setOpen(true)}
           >
             <Lock className='size-3.5' />

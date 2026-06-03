@@ -77,9 +77,9 @@ function NotificationItem({
   return (
     <div
       className={cn(
-        'flex items-start gap-2.5 px-3 py-2 transition-colors duration-[80ms]',
+        'flex items-start gap-2.5 px-3 py-2 transition-colors duration-80',
         !notification.read && 'bg-primary/[0.03]',
-        link && 'cursor-pointer hover:bg-black/[0.03] dark:hover:bg-white/[0.03]'
+        link && 'cursor-pointer hover:bg-black/3 dark:hover:bg-white/3'
       )}
       onClick={handleClick}
       role={link ? 'button' : undefined}
@@ -121,19 +121,19 @@ export const NotificationBell = () => {
       <PopoverTrigger asChild>
         <button
           type='button'
-          className='relative flex size-[30px] shrink-0 items-center justify-center rounded-md text-text-tertiary transition-[background-color,color,transform] duration-100 hover:bg-black/[0.04] hover:text-text-secondary active:scale-[0.92] dark:hover:bg-white/[0.04]'
+          className='relative flex size-7.5 shrink-0 items-center justify-center rounded-md text-text-tertiary transition-[background-color,color,transform] duration-100 hover:bg-black/4 hover:text-text-secondary active:scale-[0.92] dark:hover:bg-white/4'
           onClick={() => markAllRead()}
         >
-          <Bell className='size-[14px]' />
+          <Bell className='size-3.5' />
           {unreadCount > 0 && (
-            <span className='absolute -top-0.5 -right-0.5 flex size-[14px] items-center justify-center rounded-full bg-primary text-[9px] font-bold text-primary-foreground'>
+            <span className='absolute -top-0.5 -right-0.5 flex size-3.5 items-center justify-center rounded-full bg-primary text-[9px] font-bold text-primary-foreground'>
               {unreadCount > 9 ? '9+' : unreadCount}
             </span>
           )}
         </button>
       </PopoverTrigger>
       <PopoverContent
-        className='w-[340px] overflow-hidden rounded-[10px] border-border p-0'
+        className='w-85 overflow-hidden rounded-[10px] border-border p-0'
         side='right'
         align='end'
         sideOffset={6}
@@ -167,7 +167,7 @@ export const NotificationBell = () => {
         </div>
 
         {/* List */}
-        <div className='max-h-[360px] overflow-y-auto'>
+        <div className='max-h-90 overflow-y-auto'>
           {notifications.length === 0 ? (
             <div className='flex flex-col items-center justify-center py-8'>
               <Bell className='text-text-quaternary mb-2 size-5' />

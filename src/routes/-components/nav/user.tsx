@@ -41,27 +41,27 @@ export const NavUser = () => {
           <button
             type='button'
             className={cn(
-              'flex h-[32px] min-w-0 flex-1 items-center gap-2.5 rounded-md px-2.5 text-left text-[13px]',
+              'flex h-8 min-w-0 flex-1 items-center gap-2.5 rounded-md px-2.5 text-left text-[13px]',
               'transition-[background-color,color,transform] duration-100',
-              'text-foreground/90 hover:bg-black/[0.04] active:scale-[0.98] dark:hover:bg-white/[0.04]',
+              'text-foreground/90 hover:bg-black/4 active:scale-[0.98] dark:hover:bg-white/4',
               'focus-visible:outline-none'
             )}
           >
-            <div className='flex size-[18px] shrink-0 items-center justify-center rounded-full bg-black/[0.08] text-[8px] font-semibold text-text-secondary dark:bg-white/[0.12]'>
+            <div className='flex size-4.5 shrink-0 items-center justify-center rounded-full bg-black/8 text-[8px] font-semibold text-text-secondary dark:bg-white/12'>
               {userInitials}
             </div>
             <span className='flex-1 truncate'>{userName}</span>
           </button>
         </DropdownMenuTrigger>
         <DropdownMenuContent
-          className='w-[220px] rounded-lg p-1'
+          className='w-55 rounded-lg p-1'
           side={isMobile ? 'bottom' : 'right'}
           align='end'
           sideOffset={6}
           style={{ boxShadow: 'var(--dropdown-shadow)' }}
         >
           <div className='flex items-center gap-2.5 p-2'>
-            <div className='flex size-7 items-center justify-center rounded-full bg-black/[0.08] text-[13px] font-semibold text-text-secondary dark:bg-white/[0.12]'>
+            <div className='flex size-7 items-center justify-center rounded-full bg-black/8 text-[13px] font-semibold text-text-secondary dark:bg-white/12'>
               {userInitials}
             </div>
             <div className='flex min-w-0 flex-col'>
@@ -96,9 +96,9 @@ export const NavUser = () => {
       <button
         type='button'
         onClick={() => setTheme(isDark ? 'light' : 'dark')}
-        className='flex size-[30px] shrink-0 items-center justify-center rounded-md text-text-tertiary transition-[background-color,color,transform] duration-100 hover:bg-black/[0.04] hover:text-text-secondary active:scale-[0.92] dark:hover:bg-white/[0.04]'
+        className='flex size-7.5 shrink-0 items-center justify-center rounded-md text-text-tertiary transition-[background-color,color,transform] duration-100 hover:bg-black/4 hover:text-text-secondary active:scale-[0.92] dark:hover:bg-white/4'
       >
-        {isDark ? <Sun className='size-[14px]' /> : <Moon className='size-[14px]' />}
+        {isDark ? <Sun className='size-3.5' /> : <Moon className='size-3.5' />}
       </button>
     </div>
   )

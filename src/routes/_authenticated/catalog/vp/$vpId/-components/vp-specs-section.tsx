@@ -437,7 +437,7 @@ function AddSpecDialog({
             >
               {t.label}
               {tab === t.key && (
-                <span className='absolute right-3 bottom-0 left-3 h-[2px] rounded-full bg-primary' />
+                <span className='absolute right-3 bottom-0 left-3 h-0.5 rounded-full bg-primary' />
               )}
             </button>
           ))}
@@ -590,7 +590,7 @@ function ExistingSpecPicker({
         </div>
       </div>
 
-      <div className='max-h-[350px] min-h-[200px] overflow-y-auto'>
+      <div className='max-h-87.5 min-h-50 overflow-y-auto'>
         {specs.length === 0 ? (
           <div className='flex flex-1 items-center justify-center py-12 text-[13px] text-text-tertiary'>
             {search ? 'No matching specs' : 'All specs are already added'}

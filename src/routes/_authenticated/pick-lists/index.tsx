@@ -89,7 +89,7 @@ const PickListsPage = () => {
         <div className='flex-1' />
 
         {/* Search */}
-        <div className='flex items-center gap-1.5 rounded-[6px] border border-border bg-background px-2.5 py-1.5'>
+        <div className='flex items-center gap-1.5 rounded-md border border-border bg-background px-2.5 py-1.5'>
           <Search className='size-3.5 shrink-0 text-text-tertiary' />
           <input
             value={search}
@@ -98,7 +98,7 @@ const PickListsPage = () => {
               setOffset(null)
             }}
             placeholder='Search pick lists...'
-            className='w-[140px] bg-transparent text-[13px] outline-none placeholder:text-text-tertiary sm:w-[200px]'
+            className='w-35 bg-transparent text-[13px] outline-none placeholder:text-text-tertiary sm:w-50'
           />
         </div>
 
@@ -122,14 +122,14 @@ const PickListsPage = () => {
                 key={value}
                 type='button'
                 className={cn(
-                  'flex w-full items-center gap-2 rounded-[5px] px-2 py-[3px] text-left text-[13px] font-medium',
-                  'transition-colors duration-[80ms] hover:bg-bg-hover'
+                  'flex w-full items-center gap-2 rounded-[5px] px-2 py-0.75 text-left text-[13px] font-medium',
+                  'transition-colors duration-80 hover:bg-bg-hover'
                 )}
                 onClick={() => selectStatus(value)}
               >
                 <div
                   className={cn(
-                    'flex size-3.5 items-center justify-center rounded-full border transition-colors duration-[80ms]',
+                    'flex size-3.5 items-center justify-center rounded-full border transition-colors duration-80',
                     selected_ ? 'border-primary bg-primary' : 'border-border'
                   )}
                 >
@@ -148,7 +148,7 @@ const PickListsPage = () => {
         <div className='flex shrink-0 flex-wrap items-center gap-1.5 border-b border-border px-3.5 py-1.5 sm:px-6'>
           <button
             type='button'
-            className='text-[13px] font-medium text-text-tertiary transition-colors duration-[80ms] hover:text-foreground'
+            className='text-[13px] font-medium text-text-tertiary transition-colors duration-80 hover:text-foreground'
             onClick={clearAllFilters}
           >
             Clear
@@ -168,13 +168,13 @@ const PickListsPage = () => {
         {/* Column headers */}
         {!isMobile && (results.length > 0 || isLoading) && (
           <div className='sticky top-0 z-10 flex min-w-fit shrink-0 items-center gap-4 border-b border-border bg-bg-secondary/60 px-5 py-1.5 text-[13px] font-medium text-text-tertiary xl:px-6'>
-            <div className='w-[60px] shrink-0'>ID</div>
+            <div className='w-15 shrink-0'>ID</div>
             <div className='min-w-0 flex-1'>Name / Ship To</div>
-            <div className='w-[130px] shrink-0'>Status</div>
-            <div className='w-[110px] shrink-0'>Items</div>
-            <div className='w-[220px] shrink-0'>Orders</div>
-            <div className='w-[100px] shrink-0'>Created</div>
-            <div className='w-[20px] shrink-0' />
+            <div className='w-32.5 shrink-0'>Status</div>
+            <div className='w-27.5 shrink-0'>Items</div>
+            <div className='w-55 shrink-0'>Orders</div>
+            <div className='w-25 shrink-0'>Created</div>
+            <div className='w-5 shrink-0' />
           </div>
         )}
 
@@ -277,7 +277,7 @@ function PickListRow({
       className='group/row flex min-w-fit cursor-pointer items-center gap-4 border-b border-border-light px-5 py-2 transition-colors duration-100 hover:bg-bg-hover xl:px-6'
       onClick={onClick}
     >
-      <div className='w-[60px] shrink-0 text-[13px] font-semibold text-foreground tabular-nums'>
+      <div className='w-15 shrink-0 text-[13px] font-semibold text-foreground tabular-nums'>
         #{pickList.id}
       </div>
       <div className='min-w-0 flex-1'>
@@ -288,7 +288,7 @@ function PickListRow({
           </span>
         )}
       </div>
-      <div className='w-[130px] shrink-0'>
+      <div className='w-32.5 shrink-0'>
         <span
           className={cn(
             'inline-flex items-center rounded-full border px-2 py-0.5 text-[11px] leading-none font-semibold',
@@ -298,20 +298,20 @@ function PickListRow({
           {statusLabel}
         </span>
       </div>
-      <div className='flex w-[110px] shrink-0 items-center'>
+      <div className='flex w-27.5 shrink-0 items-center'>
         <span className='inline-flex items-center gap-1 rounded-md bg-bg-secondary px-1.5 py-0.5 text-[11px] font-medium text-text-secondary'>
           <Package className='text-text-quaternary size-3' />
           {pickList.item_count} item{pickList.item_count !== 1 ? 's' : ''}
         </span>
       </div>
-      <div className='flex w-[220px] shrink-0 flex-wrap items-center gap-1'>
+      <div className='flex w-55 shrink-0 flex-wrap items-center gap-1'>
         {(pickList.orders ?? []).slice(0, 3).map(order => (
           <Link
             key={order.autoid}
             to='/orders/$orderId'
             params={{ orderId: order.autoid }}
             onClick={e => e.stopPropagation()}
-            className='inline-flex items-center gap-1 rounded-md bg-bg-secondary px-1.5 py-0.5 text-[11px] font-medium text-text-secondary tabular-nums transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground'
+            className='inline-flex items-center gap-1 rounded-md bg-bg-secondary px-1.5 py-0.5 text-[11px] font-medium text-text-secondary tabular-nums transition-colors duration-80 hover:bg-bg-active hover:text-foreground'
           >
             <Receipt className='text-text-quaternary size-3' />
             {order.invoice || order.autoid.slice(0, 8)}
@@ -326,10 +326,10 @@ function PickListRow({
           <span className='text-[11px] text-text-tertiary'>—</span>
         )}
       </div>
-      <div className='w-[100px] shrink-0 text-[13px] text-text-tertiary tabular-nums'>
+      <div className='w-25 shrink-0 text-[13px] text-text-tertiary tabular-nums'>
         {formatDateMedium(pickList.created_at)}
       </div>
-      <div className='w-[20px] shrink-0 text-text-tertiary opacity-0 transition-opacity group-hover/row:opacity-100'>
+      <div className='w-5 shrink-0 text-text-tertiary opacity-0 transition-opacity group-hover/row:opacity-100'>
         <ChevronRight className='size-3.5' />
       </div>
     </div>

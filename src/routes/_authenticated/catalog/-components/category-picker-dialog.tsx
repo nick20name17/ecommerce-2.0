@@ -42,7 +42,7 @@ export const CategoryPickerDialog = ({
         <DialogHeader>
           <DialogTitle>Select Category</DialogTitle>
         </DialogHeader>
-        <DialogBody className='min-h-[200px] flex-1 overflow-y-auto'>
+        <DialogBody className='min-h-50 flex-1 overflow-y-auto'>
           {tree.map(cat => (
             <PickerNode
               key={cat.id}

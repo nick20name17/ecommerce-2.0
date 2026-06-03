@@ -626,7 +626,7 @@ function OrderSelectCard({
       >
         <div
           className={cn(
-            'flex size-[18px] shrink-0 items-center justify-center rounded border transition-colors duration-100',
+            'flex size-4.5 shrink-0 items-center justify-center rounded border transition-colors duration-100',
             selected ? 'border-primary bg-primary text-white' : 'border-border bg-background'
           )}
         >
@@ -704,11 +704,11 @@ function OrderSelectCard({
                 <div
                   key={item.autoid}
                   className={cn(
-                    'flex items-center gap-3 px-3.5 py-[5px]',
+                    'flex items-center gap-3 px-3.5 py-1.25',
                     i < items.length - 1 && 'border-b border-border-light/50'
                   )}
                 >
-                  <span className='w-[90px] shrink-0 font-mono text-[11px] font-medium text-foreground'>
+                  <span className='w-22.5 shrink-0 font-mono text-[11px] font-medium text-foreground'>
                     {item.inven}
                   </span>
                   <span className='min-w-0 flex-1 truncate text-[11px] text-text-tertiary'>
@@ -762,7 +762,7 @@ function PickItemRow({
           <Package className='size-4 text-foreground' />
         </div>
         <div className='flex min-w-0 items-center gap-2'>
-          <span className='w-[90px] shrink-0 font-mono text-[12px] leading-none font-bold text-foreground'>
+          <span className='w-22.5 shrink-0 font-mono text-[12px] leading-none font-bold text-foreground'>
             {item.inven}
           </span>
           <span className='min-w-0 truncate text-[12px] leading-none font-semibold text-foreground'>
@@ -817,7 +817,7 @@ function PickItemRow({
               picking > 0 ? 'text-emerald-500' : 'text-text-quaternary/30'
             )}
           />
-          <span className='w-[80px] shrink-0 font-mono text-[11px] text-text-secondary'>
+          <span className='w-20 shrink-0 font-mono text-[11px] text-text-secondary'>
             {item.inven}
           </span>
           <span className='text-text-quaternary min-w-0 truncate text-[11px]'>{item.descr}</span>
@@ -869,7 +869,7 @@ function PickItemRow({
         />
       </button>
       <div className='flex min-w-0 items-center gap-2'>
-        <span className='w-[90px] shrink-0 font-mono text-[12px] font-medium text-foreground'>
+        <span className='w-22.5 shrink-0 font-mono text-[12px] font-medium text-foreground'>
           {item.inven}
         </span>
         <span className='min-w-0 truncate text-[11px] text-text-tertiary'>{item.descr}</span>

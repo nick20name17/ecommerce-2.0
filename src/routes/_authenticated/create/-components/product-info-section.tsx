@@ -69,7 +69,7 @@ export const ProductInfoSection = ({
                 <span className='text-[13px] text-text-tertiary tabular-nums line-through'>
                   {formatCurrency(oldPriceDisplay)}
                 </span>
-                <span className='rounded-[4px] bg-green-100 px-1.5 py-0.5 text-[11px] font-semibold text-green-700 dark:bg-green-900/40 dark:text-green-400'>
+                <span className='rounded-sm bg-green-100 px-1.5 py-0.5 text-[11px] font-semibold text-green-700 dark:bg-green-900/40 dark:text-green-400'>
                   -{Math.round((1 - priceDisplay / oldPriceDisplay) * 100)}%
                 </span>
               </>
@@ -111,7 +111,7 @@ export const ProductInfoSection = ({
                   key={u.autoid}
                   type='button'
                   className={cn(
-                    'flex items-center gap-1.5 rounded-[6px] border px-2.5 py-1.5 text-[13px] transition-colors duration-[80ms]',
+                    'flex items-center gap-1.5 rounded-md border px-2.5 py-1.5 text-[13px] transition-colors duration-80',
                     isSelected
                       ? 'border-primary bg-primary/10 font-semibold text-primary'
                       : 'border-border hover:border-primary/40'
@@ -146,7 +146,7 @@ export const ProductInfoSection = ({
           <span className='mb-1.5 block text-[12px] font-medium tracking-[0.04em] text-text-tertiary uppercase'>
             Specifications
           </span>
-          <div className='divide-y divide-border-light rounded-[6px] border border-border'>
+          <div className='divide-y divide-border-light rounded-md border border-border'>
             {specs.map(spec => (
               <div key={spec.descr} className='flex gap-3 px-3 py-2 text-[13px]'>
                 <span className='w-2/5 shrink-0 font-medium text-foreground'>{spec.descr}</span>

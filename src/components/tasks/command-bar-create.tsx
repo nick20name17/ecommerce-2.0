@@ -192,9 +192,9 @@ function CommandBarCreateInner({
         onClick={onClose}
       />
       {/* Command bar */}
-      <div className='fixed inset-x-0 top-[20%] z-50 mx-auto w-full max-w-[580px] px-4'>
+      <div className='fixed inset-x-0 top-[20%] z-50 mx-auto w-full max-w-145 px-4'>
         <div
-          className='animate-in overflow-hidden rounded-[12px] border border-border bg-background duration-150 zoom-in-95 fade-in'
+          className='animate-in overflow-hidden rounded-xl border border-border bg-background duration-150 zoom-in-95 fade-in'
           style={{ boxShadow: 'var(--dropdown-shadow)' }}
           onKeyDown={e => {
             if (e.key === 'Escape') {
@@ -246,7 +246,7 @@ function CommandBarCreateInner({
               <PopoverTrigger asChild>
                 <button
                   type='button'
-                  className='inline-flex items-center gap-1.5 rounded-[6px] bg-bg-secondary px-2.5 py-1.5 text-[13px] font-medium text-foreground transition-colors duration-[80ms] hover:bg-bg-hover'
+                  className='inline-flex items-center gap-1.5 rounded-md bg-bg-secondary px-2.5 py-1.5 text-[13px] font-medium text-foreground transition-colors duration-80 hover:bg-bg-hover'
                 >
                   {selectedStatus && (
                     <StatusIcon
@@ -260,7 +260,7 @@ function CommandBarCreateInner({
                 </button>
               </PopoverTrigger>
               <PopoverContent
-                className='w-[180px] gap-0 overflow-hidden rounded-[8px] border-border p-1'
+                className='w-45 gap-0 overflow-hidden rounded-lg border-border p-1'
                 align='start'
                 style={{ boxShadow: 'var(--dropdown-shadow)' }}
               >
@@ -269,8 +269,8 @@ function CommandBarCreateInner({
                     key={s.id}
                     type='button'
                     className={cn(
-                      'flex w-full items-center gap-2 rounded-[6px] px-2 py-1 text-left text-[13px] font-medium',
-                      'transition-colors duration-[80ms]',
+                      'flex w-full items-center gap-2 rounded-md px-2 py-1 text-left text-[13px] font-medium',
+                      'transition-colors duration-80',
                       selectedStatus?.id === s.id ? 'bg-accent-bg' : 'hover:bg-bg-hover'
                     )}
                     onClick={() => {
@@ -290,7 +290,7 @@ function CommandBarCreateInner({
               <PopoverTrigger asChild>
                 <button
                   type='button'
-                  className='inline-flex items-center gap-1.5 rounded-[6px] bg-bg-secondary px-2.5 py-1.5 text-[13px] font-medium text-foreground transition-colors duration-[80ms] hover:bg-bg-hover'
+                  className='inline-flex items-center gap-1.5 rounded-md bg-bg-secondary px-2.5 py-1.5 text-[13px] font-medium text-foreground transition-colors duration-80 hover:bg-bg-hover'
                 >
                   <PriorityIcon
                     priority={selectedPriority}
@@ -302,7 +302,7 @@ function CommandBarCreateInner({
                 </button>
               </PopoverTrigger>
               <PopoverContent
-                className='w-[180px] gap-0 overflow-hidden rounded-[8px] border-border p-1'
+                className='w-45 gap-0 overflow-hidden rounded-lg border-border p-1'
                 align='start'
                 style={{ boxShadow: 'var(--dropdown-shadow)' }}
               >
@@ -311,8 +311,8 @@ function CommandBarCreateInner({
                     key={key}
                     type='button'
                     className={cn(
-                      'flex w-full items-center gap-2 rounded-[6px] px-2 py-1 text-left text-[13px] font-medium',
-                      'transition-colors duration-[80ms]',
+                      'flex w-full items-center gap-2 rounded-md px-2 py-1 text-left text-[13px] font-medium',
+                      'transition-colors duration-80',
                       selectedPriority === key ? 'bg-accent-bg' : 'hover:bg-bg-hover'
                     )}
                     onClick={() => {
@@ -346,7 +346,7 @@ function CommandBarCreateInner({
                 <button
                   type='button'
                   className={cn(
-                    'inline-flex items-center gap-1.5 rounded-[6px] bg-bg-secondary px-2.5 py-1.5 text-[13px] font-medium transition-colors duration-[80ms] hover:bg-bg-hover',
+                    'inline-flex items-center gap-1.5 rounded-md bg-bg-secondary px-2.5 py-1.5 text-[13px] font-medium transition-colors duration-80 hover:bg-bg-hover',
                     selectedDueDate ? 'text-foreground' : 'text-text-tertiary'
                   )}
                 >
@@ -362,7 +362,7 @@ function CommandBarCreateInner({
                       <button
                         key={preset.label}
                         type='button'
-                        className='flex w-full items-center justify-between rounded-[5px] px-2.5 py-1 text-[13px] font-medium transition-colors duration-[80ms] hover:bg-bg-hover'
+                        className='flex w-full items-center justify-between rounded-[5px] px-2.5 py-1 text-[13px] font-medium transition-colors duration-80 hover:bg-bg-hover'
                         onClick={() => {
                           setSelectedDueDate(format(resolved, 'yyyy-MM-dd'))
                           setDateOpen(false)
@@ -378,7 +378,7 @@ function CommandBarCreateInner({
                   {selectedDueDate && (
                     <button
                       type='button'
-                      className='flex w-full items-center rounded-[5px] px-2.5 py-1 text-[13px] font-medium text-destructive transition-colors duration-[80ms] hover:bg-bg-hover'
+                      className='flex w-full items-center rounded-[5px] px-2.5 py-1 text-[13px] font-medium text-destructive transition-colors duration-80 hover:bg-bg-hover'
                       onClick={() => {
                         setSelectedDueDate(null)
                         setDateOpen(false)
@@ -408,7 +408,7 @@ function CommandBarCreateInner({
             </div>
             <div className='flex flex-col gap-1'>
               <div className='flex items-center gap-2'>
-                <span className='w-[60px] shrink-0 text-[13px] font-medium text-text-tertiary'>
+                <span className='w-15 shrink-0 text-[13px] font-medium text-text-tertiary'>
                   Order
                 </span>
                 <OrderCombobox
@@ -423,7 +423,7 @@ function CommandBarCreateInner({
                 />
               </div>
               <div className='flex items-center gap-2'>
-                <span className='w-[60px] shrink-0 text-[13px] font-medium text-text-tertiary'>
+                <span className='w-15 shrink-0 text-[13px] font-medium text-text-tertiary'>
                   Proposal
                 </span>
                 <ProposalCombobox
@@ -438,7 +438,7 @@ function CommandBarCreateInner({
                 />
               </div>
               <div className='flex items-center gap-2'>
-                <span className='w-[60px] shrink-0 text-[13px] font-medium text-text-tertiary'>
+                <span className='w-15 shrink-0 text-[13px] font-medium text-text-tertiary'>
                   Customer
                 </span>
                 {lockLinkedCustomer && selectedCustomer ? (
@@ -491,7 +491,7 @@ function CommandBarCreateInner({
             <button
               type='button'
               className={cn(
-                'rounded-[6px] bg-primary px-3 py-1 text-[13px] font-medium text-primary-foreground transition-colors duration-[80ms]',
+                'rounded-md bg-primary px-3 py-1 text-[13px] font-medium text-primary-foreground transition-colors duration-80',
                 canSubmit ? 'hover:opacity-90' : 'opacity-50'
               )}
               onClick={handleSubmit}

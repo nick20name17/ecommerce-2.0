@@ -110,7 +110,7 @@ export const PayloadLogDetailDialog = ({
             <span className='text-[13px] font-medium tracking-wide text-text-tertiary uppercase'>
               URL
             </span>
-            <div className='rounded-md bg-bg-secondary p-3 font-mono text-[13px] break-words'>
+            <div className='rounded-md bg-bg-secondary p-3 font-mono text-[13px] wrap-break-word'>
               {log.url}
             </div>
           </div>
@@ -121,7 +121,7 @@ export const PayloadLogDetailDialog = ({
                 Error Message
               </span>
               <div className='rounded-md border border-red-200 bg-red-50 dark:border-red-900 dark:bg-red-950'>
-                <pre className='max-h-[200px] overflow-y-auto p-3 font-mono text-[13px] break-words whitespace-pre-wrap text-red-700 dark:text-red-300'>
+                <pre className='max-h-50 overflow-y-auto p-3 font-mono text-[13px] wrap-break-word whitespace-pre-wrap text-red-700 dark:text-red-300'>
                   {formatJson(log.error_message)}
                 </pre>
               </div>
@@ -133,7 +133,7 @@ export const PayloadLogDetailDialog = ({
               Payload
             </span>
             <div className='rounded-md bg-bg-secondary'>
-              <pre className='max-h-[200px] overflow-y-auto p-3 font-mono text-[13px] break-words whitespace-pre-wrap'>
+              <pre className='max-h-50 overflow-y-auto p-3 font-mono text-[13px] wrap-break-word whitespace-pre-wrap'>
                 {formatJson(log.payload)}
               </pre>
             </div>
@@ -144,7 +144,7 @@ export const PayloadLogDetailDialog = ({
               Response
             </span>
             <div className='rounded-md bg-bg-secondary'>
-              <pre className='max-h-[200px] overflow-y-auto p-3 font-mono text-[13px] break-words whitespace-pre-wrap'>
+              <pre className='max-h-50 overflow-y-auto p-3 font-mono text-[13px] wrap-break-word whitespace-pre-wrap'>
                 {formatJson(log.response)}
               </pre>
             </div>

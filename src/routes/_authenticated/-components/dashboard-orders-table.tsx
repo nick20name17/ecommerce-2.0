@@ -35,7 +35,7 @@ export function DashboardOrdersTable({ projectId, customerId }: DashboardOrdersT
 
   if (isLoading) {
     return (
-      <div className='rounded-[8px] border border-border bg-background'>
+      <div className='rounded-lg border border-border bg-background'>
         <div className='px-4 py-3'>
           <Skeleton className='h-4 w-32' />
         </div>
@@ -72,7 +72,7 @@ export function DashboardOrdersTable({ projectId, customerId }: DashboardOrdersT
   if (rows.length === 0) return null
 
   return (
-    <div className='rounded-[8px] border border-border bg-background'>
+    <div className='rounded-lg border border-border bg-background'>
       <div className='px-4 py-3'>
         <h2 className='text-[14px] font-semibold'>Orders to process</h2>
       </div>

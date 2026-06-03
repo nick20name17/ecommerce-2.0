@@ -117,9 +117,9 @@ export const NavProjects = () => {
 
   if (!isSuperAdminUser) {
     return (
-      <div className='mx-3 mt-3 flex h-[36px] items-center gap-2.5 rounded-[8px] bg-background/70 px-2.5 ring-1 ring-border'>
+      <div className='mx-3 mt-3 flex h-9 items-center gap-2.5 rounded-lg bg-background/70 px-2.5 ring-1 ring-border'>
         <div
-          className={`flex size-[20px] shrink-0 items-center justify-center rounded-[5px] text-[10px] font-bold ${selectedColor.bg} ${selectedColor.text}`}
+          className={`flex size-5 shrink-0 items-center justify-center rounded-[5px] text-[10px] font-bold ${selectedColor.bg} ${selectedColor.text}`}
         >
           {projectInitial}
         </div>
@@ -132,15 +132,15 @@ export const NavProjects = () => {
   }
 
   return (
-    <div className='mx-3 mt-3 flex h-[36px] items-center gap-1.5'>
+    <div className='mx-3 mt-3 flex h-9 items-center gap-1.5'>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <button
             type='button'
-            className='flex h-[36px] min-w-0 flex-1 items-center gap-2.5 rounded-[8px] bg-background/70 px-2.5 text-left ring-1 ring-border transition-all duration-100 hover:bg-background hover:shadow-sm focus-visible:outline-none active:scale-[0.98] dark:hover:bg-background/90'
+            className='flex h-9 min-w-0 flex-1 items-center gap-2.5 rounded-lg bg-background/70 px-2.5 text-left ring-1 ring-border transition-all duration-100 hover:bg-background hover:shadow-sm focus-visible:outline-none active:scale-[0.98] dark:hover:bg-background/90'
           >
             <div
-              className={`flex size-[20px] shrink-0 items-center justify-center rounded-[5px] text-[10px] font-bold ${selectedColor.bg} ${selectedColor.text}`}
+              className={`flex size-5 shrink-0 items-center justify-center rounded-[5px] text-[10px] font-bold ${selectedColor.bg} ${selectedColor.text}`}
             >
               {isLoading ? <Spinner className='size-3' /> : projectInitial}
             </div>
@@ -151,7 +151,7 @@ export const NavProjects = () => {
           </button>
         </DropdownMenuTrigger>
         <DropdownMenuContent
-          className='w-[200px] rounded-[10px] p-1'
+          className='w-50 rounded-[10px] p-1'
           align='start'
           side={isMobile ? 'bottom' : 'right'}
           sideOffset={6}
@@ -176,10 +176,10 @@ export const NavProjects = () => {
                 <DropdownMenuItem
                   key={project.id}
                   onClick={() => switchProject(project.id)}
-                  className='flex cursor-pointer items-center gap-2 rounded-[6px] px-2 py-1.5 text-[13px]'
+                  className='flex cursor-pointer items-center gap-2 rounded-md px-2 py-1.5 text-[13px]'
                 >
                   <div
-                    className={`flex size-[18px] items-center justify-center rounded-[4px] text-[9px] font-bold ${color.bg} ${color.text}`}
+                    className={`flex size-4.5 items-center justify-center rounded-sm text-[9px] font-bold ${color.bg} ${color.text}`}
                   >
                     {project.name[0].toUpperCase()}
                   </div>

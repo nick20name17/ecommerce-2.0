@@ -54,7 +54,7 @@ export const CustomerProposalsTab = ({ customerId }: CustomerProposalsTabProps) 
     <div className='flex h-full flex-col overflow-hidden'>
       {/* Search bar */}
       <div className='flex shrink-0 items-center gap-2 border-b border-border px-5 py-2 sm:px-6'>
-        <div className='flex flex-1 items-center gap-1.5 rounded-[6px] border border-border bg-background px-2.5 py-1.5'>
+        <div className='flex flex-1 items-center gap-1.5 rounded-md border border-border bg-background px-2.5 py-1.5'>
           <Search className='size-3.5 shrink-0 text-text-tertiary' />
           <input
             value={search}
@@ -73,10 +73,10 @@ export const CustomerProposalsTab = ({ customerId }: CustomerProposalsTabProps) 
             <div className='min-w-0 flex-1 text-[12px] font-medium tracking-[0.04em] text-text-tertiary uppercase'>
               Quote
             </div>
-            <div className='w-[80px] shrink-0 text-right text-[12px] font-medium tracking-[0.04em] text-text-tertiary uppercase'>
+            <div className='w-20 shrink-0 text-right text-[12px] font-medium tracking-[0.04em] text-text-tertiary uppercase'>
               Date
             </div>
-            <div className='w-[80px] shrink-0 text-right text-[12px] font-medium tracking-[0.04em] text-text-tertiary uppercase'>
+            <div className='w-20 shrink-0 text-right text-[12px] font-medium tracking-[0.04em] text-text-tertiary uppercase'>
               Total
             </div>
           </div>
@@ -90,7 +90,7 @@ export const CustomerProposalsTab = ({ customerId }: CustomerProposalsTabProps) 
                   <div className='flex items-center justify-between gap-2'>
                     <div className='flex items-center gap-2'>
                       <Skeleton className='h-3.5 w-20 rounded' />
-                      <Skeleton className='h-[18px] w-[52px] rounded-full' />
+                      <Skeleton className='h-4.5 w-13 rounded-full' />
                     </div>
                     <Skeleton className='h-3.5 w-14 rounded' />
                   </div>
@@ -105,7 +105,7 @@ export const CustomerProposalsTab = ({ customerId }: CustomerProposalsTabProps) 
                 >
                   <div className='flex min-w-0 flex-1 items-center gap-2'>
                     <Skeleton className='h-3.5 w-20 rounded' />
-                    <Skeleton className='h-[18px] w-[52px] rounded-full' />
+                    <Skeleton className='h-4.5 w-13 rounded-full' />
                   </div>
                   <Skeleton className='h-3.5 w-16 rounded' />
                   <Skeleton className='ml-auto h-3.5 w-14 rounded' />
@@ -206,12 +206,12 @@ function ProposalRow({
       </div>
 
       {/* Date */}
-      <div className='w-[80px] shrink-0 text-right text-[13px] text-text-tertiary tabular-nums'>
+      <div className='w-20 shrink-0 text-right text-[13px] text-text-tertiary tabular-nums'>
         {proposal.qt_date ? formatDate(proposal.qt_date) : '—'}
       </div>
 
       {/* Total */}
-      <div className='w-[80px] shrink-0 text-right text-[13px] font-medium text-foreground tabular-nums'>
+      <div className='w-20 shrink-0 text-right text-[13px] font-medium text-foreground tabular-nums'>
         {formatCurrency(proposal.total, '—')}
       </div>
     </div>

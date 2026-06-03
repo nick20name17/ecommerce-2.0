@@ -88,7 +88,7 @@ export function DatePicker({
         <button
           type='button'
           className={cn(
-            'inline-flex items-center gap-1.5 rounded-[5px] border border-border bg-background px-2 text-[13px] font-medium transition-colors duration-[80ms] hover:bg-bg-hover',
+            'inline-flex items-center gap-1.5 rounded-[5px] border border-border bg-background px-2 text-[13px] font-medium transition-colors duration-80 hover:bg-bg-hover',
             !value && 'text-text-tertiary',
             showTime ? 'h-8 justify-between' : 'h-7',
             className
@@ -122,7 +122,7 @@ export function DatePicker({
               onSelect={handleDateSelect}
             />
             <div className='flex divide-x border-l border-border'>
-              <ScrollArea className='h-[300px] w-16'>
+              <ScrollArea className='h-75 w-16'>
                 <div className='flex flex-col p-2'>
                   {hours.map(hour => (
                     <Button
@@ -137,7 +137,7 @@ export function DatePicker({
                   ))}
                 </div>
               </ScrollArea>
-              <ScrollArea className='h-[300px] w-16'>
+              <ScrollArea className='h-75 w-16'>
                 <div className='flex flex-col p-2'>
                   {minutes.map(minute => (
                     <Button
@@ -152,7 +152,7 @@ export function DatePicker({
                   ))}
                 </div>
               </ScrollArea>
-              <ScrollArea className='h-[300px] w-16'>
+              <ScrollArea className='h-75 w-16'>
                 <div className='flex flex-col p-2'>
                   {(['AM', 'PM'] as const).map(ampm => (
                     <Button

@@ -23,7 +23,7 @@ export function FilterPopover({
           type='button'
           className={cn(
             'inline-flex h-7 items-center gap-1 rounded-[5px] border px-2 text-[13px] font-medium',
-            'transition-colors duration-[80ms] hover:bg-bg-hover',
+            'transition-colors duration-80 hover:bg-bg-hover',
             active
               ? 'border-primary/30 bg-primary/5 text-foreground'
               : 'border-border bg-background text-text-secondary'
@@ -35,7 +35,7 @@ export function FilterPopover({
         </button>
       </PopoverTrigger>
       <PopoverContent
-        className={cn(width, 'gap-0 overflow-hidden rounded-[8px] border-border p-1')}
+        className={cn(width, 'gap-0 overflow-hidden rounded-lg border-border p-1')}
         align='start'
         style={{ boxShadow: 'var(--dropdown-shadow)' }}
       >
@@ -57,7 +57,7 @@ export function FilterChip({
       {children}
       <button
         type='button'
-        className='ml-0.5 rounded-[3px] p-0.5 text-text-tertiary transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground'
+        className='ml-0.5 rounded-[3px] p-0.5 text-text-tertiary transition-colors duration-80 hover:bg-bg-active hover:text-foreground'
         onClick={onRemove}
       >
         <X className='size-3' />

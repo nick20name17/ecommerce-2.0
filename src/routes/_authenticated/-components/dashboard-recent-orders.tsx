@@ -35,7 +35,7 @@ export function DashboardRecentOrders({ projectId, customerId }: DashboardRecent
 
   if (isLoading) {
     return (
-      <div className='rounded-[8px] border border-border bg-background'>
+      <div className='rounded-lg border border-border bg-background'>
         <div className='px-4 py-3'>
           <Skeleton className='h-4 w-28' />
         </div>
@@ -59,7 +59,7 @@ export function DashboardRecentOrders({ projectId, customerId }: DashboardRecent
   if (orders.length === 0) return null
 
   return (
-    <div className='rounded-[8px] border border-border bg-background'>
+    <div className='rounded-lg border border-border bg-background'>
       <div className='px-4 py-3'>
         <h2 className='text-[14px] font-semibold'>Recent orders</h2>
       </div>
@@ -100,7 +100,7 @@ export function DashboardRecentOrders({ projectId, customerId }: DashboardRecent
                     {order.invoice || order.id}
                   </Link>
                 </td>
-                <td className='hidden max-w-[200px] truncate px-3 py-2.5 text-[13px] text-text-secondary md:table-cell'>
+                <td className='hidden max-w-50 truncate px-3 py-2.5 text-[13px] text-text-secondary md:table-cell'>
                   {order.name || '—'}
                 </td>
                 <td className='px-3 py-2.5 text-right text-[13px] whitespace-nowrap tabular-nums sm:px-4'>

@@ -188,7 +188,7 @@ function OrderDetailPage() {
           <Skeleton className='h-4 w-12' />
           <Skeleton className='size-5 rounded-[5px]' />
           <Skeleton className='h-4 w-20' />
-          <Skeleton className='h-5 w-[72px] rounded-full' />
+          <Skeleton className='h-5 w-18 rounded-full' />
           <div className='flex-1' />
           <Skeleton className='size-7 rounded-[5px]' />
           <Skeleton className='size-7 rounded-[5px]' />
@@ -215,7 +215,7 @@ function OrderDetailPage() {
                   key={i}
                   className='flex items-center gap-3 border-b border-border-light py-2 pr-6 pl-6'
                 >
-                  <Skeleton className='size-[18px] rounded-[4px]' />
+                  <Skeleton className='size-4.5 rounded-sm' />
                   <Skeleton className='h-3 w-20' />
                   <Skeleton className='h-3 w-40' />
                   <div className='flex-1' />
@@ -240,7 +240,7 @@ function OrderDetailPage() {
           </div>
 
           {/* Right panel skeleton */}
-          <div className='hidden shrink-0 border-l border-border bg-bg-secondary/50 lg:block lg:w-[380px]'>
+          <div className='hidden shrink-0 border-l border-border bg-bg-secondary/50 lg:block lg:w-95'>
             <div className='flex items-center gap-0 border-b border-border px-4'>
               <Skeleton className='my-2 h-4 w-14' />
               <Skeleton className='my-2 ml-4 h-4 w-14' />
@@ -314,7 +314,7 @@ function OrderDetailPage() {
         <SidebarTrigger className='-ml-1' />
         <button
           type='button'
-          className='inline-flex h-7 shrink-0 items-center gap-0.5 rounded-[6px] border border-border bg-bg-secondary pr-2.5 pl-1.5 text-[13px] font-medium text-text-secondary transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground'
+          className='inline-flex h-7 shrink-0 items-center gap-0.5 rounded-md border border-border bg-bg-secondary pr-2.5 pl-1.5 text-[13px] font-medium text-text-secondary transition-colors duration-80 hover:bg-bg-active hover:text-foreground'
           onClick={() => router.history.back()}
         >
           <ChevronLeft className='size-3.5' />
@@ -330,7 +330,7 @@ function OrderDetailPage() {
             <TooltipTrigger asChild>
               <button
                 type='button'
-                className='inline-flex size-6 shrink-0 items-center justify-center rounded-[5px] text-text-tertiary transition-colors duration-[80ms] hover:bg-bg-hover hover:text-foreground'
+                className='inline-flex size-6 shrink-0 items-center justify-center rounded-[5px] text-text-tertiary transition-colors duration-80 hover:bg-bg-hover hover:text-foreground'
                 onClick={() => {
                   navigator.clipboard.writeText(order.invoice)
                   toast.success('Invoice # copied')
@@ -358,7 +358,7 @@ function OrderDetailPage() {
           <button
             type='button'
             className={cn(
-              'inline-flex h-7 items-center gap-1.5 rounded-[5px] border px-2.5 text-[12px] font-medium transition-colors duration-[80ms]',
+              'inline-flex h-7 items-center gap-1.5 rounded-[5px] border px-2.5 text-[12px] font-medium transition-colors duration-80',
               assignedUsers.length > 0
                 ? 'border-primary/20 bg-primary/[0.06] text-primary hover:bg-primary/[0.1]'
                 : 'border-border bg-bg-secondary text-text-secondary hover:bg-bg-active hover:text-foreground'
@@ -380,7 +380,7 @@ function OrderDetailPage() {
               <TooltipTrigger asChild>
                 <button
                   type='button'
-                  className='inline-flex size-7 items-center justify-center rounded-[5px] border border-border bg-bg-secondary text-[12px] font-medium text-text-secondary transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground lg:h-7 lg:w-auto lg:gap-1.5 lg:px-2.5'
+                  className='inline-flex size-7 items-center justify-center rounded-[5px] border border-border bg-bg-secondary text-[12px] font-medium text-text-secondary transition-colors duration-80 hover:bg-bg-active hover:text-foreground lg:h-7 lg:w-auto lg:gap-1.5 lg:px-2.5'
                   onClick={() => setShippingOpen(true)}
                 >
                   <Truck className='size-3.5' />
@@ -395,7 +395,7 @@ function OrderDetailPage() {
             <TooltipTrigger asChild>
               <button
                 type='button'
-                className='inline-flex size-7 items-center justify-center rounded-[5px] border border-border bg-bg-secondary text-[12px] font-medium text-text-secondary transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground disabled:pointer-events-none disabled:opacity-50 lg:h-7 lg:w-auto lg:gap-1.5 lg:px-2.5'
+                className='inline-flex size-7 items-center justify-center rounded-[5px] border border-border bg-bg-secondary text-[12px] font-medium text-text-secondary transition-colors duration-80 hover:bg-bg-active hover:text-foreground disabled:pointer-events-none disabled:opacity-50 lg:h-7 lg:w-auto lg:gap-1.5 lg:px-2.5'
                 onClick={() => setPickingOpen(true)}
                 disabled={allPicked}
               >
@@ -423,7 +423,7 @@ function OrderDetailPage() {
                 <TooltipTrigger asChild>
                   <button
                     type='button'
-                    className='inline-flex size-7 items-center justify-center rounded-[5px] border border-border bg-bg-secondary text-[12px] font-medium text-text-secondary transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground disabled:pointer-events-none disabled:opacity-50 lg:h-7 lg:w-auto lg:gap-1.5 lg:px-2.5'
+                    className='inline-flex size-7 items-center justify-center rounded-[5px] border border-border bg-bg-secondary text-[12px] font-medium text-text-secondary transition-colors duration-80 hover:bg-bg-active hover:text-foreground disabled:pointer-events-none disabled:opacity-50 lg:h-7 lg:w-auto lg:gap-1.5 lg:px-2.5'
                     onClick={() => processMutation.mutate(true)}
                     disabled={processMutation.isPending}
                   >
@@ -438,7 +438,7 @@ function OrderDetailPage() {
                 <TooltipTrigger asChild>
                   <button
                     type='button'
-                    className='inline-flex size-7 items-center justify-center rounded-[5px] border border-border bg-bg-secondary text-[12px] font-medium text-text-secondary transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground disabled:pointer-events-none disabled:opacity-50 lg:h-7 lg:w-auto lg:gap-1.5 lg:px-2.5'
+                    className='inline-flex size-7 items-center justify-center rounded-[5px] border border-border bg-bg-secondary text-[12px] font-medium text-text-secondary transition-colors duration-80 hover:bg-bg-active hover:text-foreground disabled:pointer-events-none disabled:opacity-50 lg:h-7 lg:w-auto lg:gap-1.5 lg:px-2.5'
                     onClick={() => processMutation.mutate(false)}
                     disabled={processMutation.isPending}
                   >
@@ -455,7 +455,7 @@ function OrderDetailPage() {
             <TooltipTrigger asChild>
               <button
                 type='button'
-                className='inline-flex size-7 items-center justify-center rounded-[5px] border border-border bg-bg-secondary text-text-secondary transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground'
+                className='inline-flex size-7 items-center justify-center rounded-[5px] border border-border bg-bg-secondary text-text-secondary transition-colors duration-80 hover:bg-bg-active hover:text-foreground'
                 onClick={() => setTaskModalOpen(true)}
               >
                 <ListTodo className='size-3.5' />
@@ -469,7 +469,7 @@ function OrderDetailPage() {
               <button
                 type='button'
                 className={cn(
-                  'relative inline-flex size-7 items-center justify-center rounded-[5px] border transition-colors duration-[80ms]',
+                  'relative inline-flex size-7 items-center justify-center rounded-[5px] border transition-colors duration-80',
                   noteCount > 0
                     ? 'border-primary/30 bg-primary/5 text-primary hover:bg-primary/10'
                     : 'border-border bg-bg-secondary text-text-secondary hover:bg-bg-active hover:text-foreground'
@@ -493,7 +493,7 @@ function OrderDetailPage() {
             <TooltipTrigger asChild>
               <button
                 type='button'
-                className='inline-flex size-7 items-center justify-center rounded-[5px] border border-border bg-bg-secondary text-text-secondary transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground'
+                className='inline-flex size-7 items-center justify-center rounded-[5px] border border-border bg-bg-secondary text-text-secondary transition-colors duration-80 hover:bg-bg-active hover:text-foreground'
                 onClick={() => setAttachmentsOpen(true)}
               >
                 <Paperclip className='size-3.5' />
@@ -506,7 +506,7 @@ function OrderDetailPage() {
             <TooltipTrigger asChild>
               <button
                 type='button'
-                className='inline-flex size-7 items-center justify-center rounded-[5px] text-text-tertiary transition-colors duration-[80ms] hover:bg-bg-hover hover:text-destructive'
+                className='inline-flex size-7 items-center justify-center rounded-[5px] text-text-tertiary transition-colors duration-80 hover:bg-bg-hover hover:text-destructive'
                 onClick={() => setDeleteOpen(true)}
               >
                 <Trash2 className='size-3.5' />
@@ -528,33 +528,31 @@ function OrderDetailPage() {
               <table className='w-full text-[13px]'>
                 <thead className='sticky top-0 z-10 bg-bg-secondary select-none'>
                   <tr className='border-b border-border text-left'>
-                    <th className='w-[60px] py-1.5 pr-3 pl-6 font-medium text-text-tertiary'>
-                      Picked
-                    </th>
-                    <th className='min-w-[130px] px-3 py-1.5 font-medium text-text-tertiary'>
+                    <th className='w-15 py-1.5 pr-3 pl-6 font-medium text-text-tertiary'>Picked</th>
+                    <th className='min-w-32.5 px-3 py-1.5 font-medium text-text-tertiary'>
                       Inventory
                     </th>
-                    <th className='min-w-[200px] px-3 py-1.5 font-medium text-text-tertiary'>
+                    <th className='min-w-50 px-3 py-1.5 font-medium text-text-tertiary'>
                       Description
                     </th>
-                    <th className='w-[70px] px-3 py-1.5 text-right font-medium text-text-tertiary'>
+                    <th className='w-17.5 px-3 py-1.5 text-right font-medium text-text-tertiary'>
                       Qty
                     </th>
-                    <th className='w-[60px] px-3 py-1.5 text-right font-medium text-text-tertiary'>
+                    <th className='w-15 px-3 py-1.5 text-right font-medium text-text-tertiary'>
                       Ship
                     </th>
-                    <th className='w-[90px] px-3 py-1.5 text-right font-medium text-text-tertiary'>
+                    <th className='w-22.5 px-3 py-1.5 text-right font-medium text-text-tertiary'>
                       Price
                     </th>
                     {itemCustomCols.map(col => (
                       <th
                         key={col.field}
-                        className='min-w-[80px] px-3 py-1.5 font-medium text-text-tertiary'
+                        className='min-w-20 px-3 py-1.5 font-medium text-text-tertiary'
                       >
                         {getColumnLabel(col.field, 'order_item', fieldConfig)}
                       </th>
                     ))}
-                    <th className='w-[100px] py-1.5 pr-6 pl-3 text-right font-medium text-text-tertiary'>
+                    <th className='w-25 py-1.5 pr-6 pl-3 text-right font-medium text-text-tertiary'>
                       Amount
                     </th>
                   </tr>
@@ -569,7 +567,7 @@ function OrderDetailPage() {
                         {item.picked_quantity != null && parseFloat(item.picked_quantity) > 0 ? (
                           <Tooltip>
                             <TooltipTrigger asChild>
-                              <span className='inline-flex items-center gap-1 rounded-[4px] bg-emerald-500/10 px-1.5 py-0.5 text-[11px] font-medium text-emerald-600 tabular-nums dark:text-emerald-400'>
+                              <span className='inline-flex items-center gap-1 rounded-sm bg-emerald-500/10 px-1.5 py-0.5 text-[11px] font-medium text-emerald-600 tabular-nums dark:text-emerald-400'>
                                 <Check className='size-3' />{' '}
                                 {parseFloat(item.picked_quantity) % 1 === 0
                                   ? parseInt(item.picked_quantity)
@@ -588,14 +586,12 @@ function OrderDetailPage() {
                       <td className='px-3 py-1.5 font-medium text-foreground'>
                         {item.inven || '—'}
                       </td>
-                      <td className='max-w-[400px] px-3 py-1.5 text-text-secondary'>
+                      <td className='max-w-100 px-3 py-1.5 text-text-secondary'>
                         <Tooltip>
                           <TooltipTrigger asChild>
                             <span className='block truncate'>{item.descr || '—'}</span>
                           </TooltipTrigger>
-                          <TooltipContent className='max-w-[300px]'>
-                            {item.descr || '—'}
-                          </TooltipContent>
+                          <TooltipContent className='max-w-75'>{item.descr || '—'}</TooltipContent>
                         </Tooltip>
                       </td>
                       <td className='px-3 py-1.5 text-right text-text-secondary tabular-nums'>
@@ -616,7 +612,7 @@ function OrderDetailPage() {
                         const val = item[col.field]
                         return (
                           <td key={col.field} className='px-3 py-1.5 text-text-secondary'>
-                            <span className='block max-w-[160px] truncate'>
+                            <span className='block max-w-40 truncate'>
                               {val != null ? String(val) : '—'}
                             </span>
                           </td>
@@ -650,7 +646,7 @@ function OrderDetailPage() {
         <div
           className={cn(
             'flex shrink-0 flex-col overflow-hidden bg-bg-secondary/50',
-            'border-t border-border lg:w-[380px] lg:border-t-0 lg:border-l'
+            'border-t border-border lg:w-95 lg:border-t-0 lg:border-l'
           )}
         >
           {/* Panel tabs */}
@@ -677,7 +673,7 @@ function OrderDetailPage() {
                   >
                     {label}
                     {panelTab === tab && (
-                      <span className='absolute right-3 bottom-0 left-3 h-[2px] rounded-full bg-primary' />
+                      <span className='absolute right-3 bottom-0 left-3 h-0.5 rounded-full bg-primary' />
                     )}
                   </button>
                 )
@@ -692,7 +688,7 @@ function OrderDetailPage() {
                     {pickedCount > 0 && (
                       <span
                         className={cn(
-                          'inline-flex items-center gap-1 rounded-[4px] px-1.5 py-0.5 text-[10px] leading-none font-semibold tabular-nums',
+                          'inline-flex items-center gap-1 rounded-sm px-1.5 py-0.5 text-[10px] leading-none font-semibold tabular-nums',
                           pickedCount === items.length
                             ? 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400'
                             : 'bg-primary/10 text-primary'
@@ -709,7 +705,7 @@ function OrderDetailPage() {
                     {packedCount > 0 && (
                       <span
                         className={cn(
-                          'inline-flex items-center gap-1 rounded-[4px] px-1.5 py-0.5 text-[10px] leading-none font-semibold tabular-nums',
+                          'inline-flex items-center gap-1 rounded-sm px-1.5 py-0.5 text-[10px] leading-none font-semibold tabular-nums',
                           packedCount === items.length
                             ? 'bg-violet-500/10 text-violet-700 dark:text-violet-400'
                             : 'bg-violet-500/10 text-violet-600 dark:text-violet-400'
@@ -936,23 +932,23 @@ function OrderDetailPage() {
                             ${parseFloat(shipment.cost).toFixed(2)}
                           </span>
                         </div>
-                        <div className='mt-1.5 flex items-center gap-2 pl-[22px]'>
+                        <div className='mt-1.5 flex items-center gap-2 pl-5.5'>
                           <span className='min-w-0 flex-1 truncate text-[12px] text-text-tertiary tabular-nums'>
                             {shipment.tracking_number}
                           </span>
                           {shipment.voided ? (
-                            <span className='inline-flex shrink-0 items-center gap-1 rounded-[4px] border border-red-200 bg-red-50 px-1.5 py-0.5 text-[10px] font-semibold text-red-600 dark:border-red-800 dark:bg-red-500/10 dark:text-red-400'>
+                            <span className='inline-flex shrink-0 items-center gap-1 rounded-sm border border-red-200 bg-red-50 px-1.5 py-0.5 text-[10px] font-semibold text-red-600 dark:border-red-800 dark:bg-red-500/10 dark:text-red-400'>
                               <XCircle className='size-2.5' />
                               Voided
                             </span>
                           ) : (
-                            <span className='inline-flex shrink-0 items-center gap-1 rounded-[4px] border border-emerald-200 bg-emerald-50 px-1.5 py-0.5 text-[10px] font-semibold text-emerald-600 dark:border-emerald-800 dark:bg-emerald-500/10 dark:text-emerald-400'>
+                            <span className='inline-flex shrink-0 items-center gap-1 rounded-sm border border-emerald-200 bg-emerald-50 px-1.5 py-0.5 text-[10px] font-semibold text-emerald-600 dark:border-emerald-800 dark:bg-emerald-500/10 dark:text-emerald-400'>
                               <Check className='size-2.5' />
                               Active
                             </span>
                           )}
                         </div>
-                        <div className='mt-1.5 flex items-center gap-2 pl-[22px]'>
+                        <div className='mt-1.5 flex items-center gap-2 pl-5.5'>
                           <span className='text-text-quaternary text-[11px]'>
                             {new Date(shipment.created_at).toLocaleDateString(undefined, {
                               month: 'short',
@@ -1056,7 +1052,7 @@ function OrderDetailPage() {
           <div className='fixed inset-0 z-40 bg-black/40' onClick={() => setDeleteOpen(false)} />
           <div className='fixed inset-0 z-50 flex items-center justify-center px-4'>
             <div
-              className='w-full max-w-[400px] rounded-[12px] border border-border bg-background p-6'
+              className='w-full max-w-100 rounded-xl border border-border bg-background p-6'
               style={{ boxShadow: 'var(--dropdown-shadow)' }}
             >
               <h3 className='mb-2 text-[15px] font-semibold'>Delete order</h3>
@@ -1067,14 +1063,14 @@ function OrderDetailPage() {
               <div className='flex justify-end gap-2'>
                 <button
                   type='button'
-                  className='rounded-[6px] border border-border px-3 py-1.5 text-[13px] font-medium transition-colors duration-[80ms] hover:bg-bg-hover'
+                  className='rounded-md border border-border px-3 py-1.5 text-[13px] font-medium transition-colors duration-80 hover:bg-bg-hover'
                   onClick={() => setDeleteOpen(false)}
                 >
                   Cancel
                 </button>
                 <button
                   type='button'
-                  className='rounded-[6px] bg-destructive px-3 py-1.5 text-[13px] font-medium text-white transition-colors duration-[80ms] hover:opacity-90'
+                  className='rounded-md bg-destructive px-3 py-1.5 text-[13px] font-medium text-white transition-colors duration-80 hover:opacity-90'
                   onClick={() => deleteMutation.mutate()}
                   disabled={deleteMutation.isPending}
                 >
