@@ -4,7 +4,6 @@ import { useEffect } from 'react'
 
 import { AppSidebar } from '../-components/app-sidebar'
 
-import { NotificationsWsManager } from './-components/notifications-ws-manager'
 import { AUTH_REDIRECTS } from '@/api/constants'
 import { getEditableFieldsQuery } from '@/api/data/query'
 import { getFieldConfigQuery } from '@/api/field-config/query'
@@ -13,12 +12,12 @@ import { getSalespersonsQuery } from '@/api/salesperson/query'
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar'
 import { getSession } from '@/helpers/auth'
 import { useProjectId } from '@/hooks/use-project-id'
+import { NotificationsWsManager } from './-components/notifications-ws-manager'
 
 const AuthenticatedLayout = () => {
   const queryClient = useQueryClient()
   const [projectId] = useProjectId()
 
-  // Prefetch reference data once — used across many pages
   useEffect(() => {
     if (!projectId) return
     queryClient.prefetchQuery(getFieldConfigQuery(projectId))
