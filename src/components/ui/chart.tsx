@@ -44,9 +44,10 @@ const ChartContainer = ({
 }) => {
   const uniqueId = React.useId()
   const chartId = `chart-${id || uniqueId.replace(/:/g, '')}`
+  const contextValue = React.useMemo(() => ({ config }), [config])
 
   return (
-    <ChartContext.Provider value={{ config }}>
+    <ChartContext.Provider value={contextValue}>
       <div
         data-slot='chart'
         data-chart={chartId}
@@ -257,33 +258,32 @@ const ChartLegendContent = ({
         className
       )}
     >
-      {payload
-        .filter(item => item.type !== 'none')
-        .map(item => {
-          const key = `${nameKey || item.dataKey || 'value'}`
-          const itemConfig = getPayloadConfigFromPayload(config, item, key)
+      {payload.flatMap(item => {
+        if (item.type === 'none') return []
+        const key = `${nameKey || item.dataKey || 'value'}`
+        const itemConfig = getPayloadConfigFromPayload(config, item, key)
 
-          return (
-            <div
-              key={item.value}
-              className={cn(
-                'flex items-center gap-1.5 [&>svg]:h-3 [&>svg]:w-3 [&>svg]:text-muted-foreground'
-              )}
-            >
-              {itemConfig?.icon && !hideIcon ? (
-                <itemConfig.icon />
-              ) : (
-                <div
-                  className='h-2 w-2 shrink-0 rounded-[2px]'
-                  style={{
-                    backgroundColor: item.color
-                  }}
-                />
-              )}
-              {itemConfig?.label}
-            </div>
-          )
-        })}
+        return [
+          <div
+            key={item.value}
+            className={cn(
+              'flex items-center gap-1.5 [&>svg]:h-3 [&>svg]:w-3 [&>svg]:text-muted-foreground'
+            )}
+          >
+            {itemConfig?.icon && !hideIcon ? (
+              <itemConfig.icon />
+            ) : (
+              <div
+                className='h-2 w-2 shrink-0 rounded-[2px]'
+                style={{
+                  backgroundColor: item.color
+                }}
+              />
+            )}
+            {itemConfig?.label}
+          </div>
+        ]
+      })}
     </div>
   )
 }

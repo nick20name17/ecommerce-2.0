@@ -116,13 +116,19 @@ export function AddItemsModal({
   const addMutation = useMutation({
     mutationFn: async () => {
       const payload: AddItemsPayload = {
-        items: allItems
-          .map(item => ({
-            order_autoid: item.orderAutoid,
-            detail_autoid: item.autoid,
-            picked_quantity: pickQuantities.get(item.autoid) || '0'
-          }))
-          .filter(item => parseFloat(item.picked_quantity) > 0)
+        items: allItems.flatMap(item => {
+          const picked_quantity = pickQuantities.get(item.autoid) || '0'
+          if (parseFloat(picked_quantity) > 0) {
+            return [
+              {
+                order_autoid: item.orderAutoid,
+                detail_autoid: item.autoid,
+                picked_quantity
+              }
+            ]
+          }
+          return []
+        })
       }
       if (payload.items.length === 0) throw new Error('No items with quantity > 0')
       return pickListService.addItems(pickListId, payload, projectId)

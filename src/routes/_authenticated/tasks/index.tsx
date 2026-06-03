@@ -107,12 +107,11 @@ function Todos2Page() {
   }
 
   // Group tasks by status in the order defined by statuses
-  const groupedTasks = statuses
-    .map(status => ({
-      status,
-      tasks: tasks.filter(t => t.status === status.id)
-    }))
-    .filter(g => g.tasks.length > 0)
+  const groupedTasks = statuses.flatMap(status => {
+    const statusTasks = tasks.filter(t => t.status === status.id)
+    if (statusTasks.length > 0) return [{ status, tasks: statusTasks }]
+    return []
+  })
 
   // Status change mutation with optimistic update
   const queryClient = useQueryClient()

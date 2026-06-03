@@ -30,17 +30,18 @@ export const buildCustomColumns = (
   const byField = new Map<string, FieldConfigEntry>()
   for (const e of entries) byField.set(e.field, e)
 
-  return ordered
-    .filter(field => !fixedFields.has(field))
-    .map(field => {
-      const entry = byField.get(field)
-      const alias = entry?.alias?.trim()
-      return {
+  return ordered.flatMap(field => {
+    if (fixedFields.has(field)) return []
+    const entry = byField.get(field)
+    const alias = entry?.alias?.trim()
+    return [
+      {
         field,
         label: alias && alias.length > 0 ? alias : humanize(field),
         type: entry?.type
       }
-    })
+    ]
+  })
 }
 
 const humanize = (key: string) => key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
@@ -68,16 +69,21 @@ const isEmpty = (value: unknown): boolean => {
   return String(value).trim() === ''
 }
 
+const INTEGER_FORMAT = new Intl.NumberFormat('en-US', {
+  minimumFractionDigits: 0,
+  maximumFractionDigits: 0
+})
+const FLOAT_FORMAT = new Intl.NumberFormat('en-US', {
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2
+})
+
 const formatNumeric = (value: unknown): string => {
   if (value == null || value === '') return '—'
   const n = typeof value === 'number' ? value : parseFloat(String(value))
   if (Number.isNaN(n)) return String(value)
   // Two decimals for floats, none for integers.
-  const isInt = Number.isInteger(n)
-  return new Intl.NumberFormat('en-US', {
-    minimumFractionDigits: isInt ? 0 : 2,
-    maximumFractionDigits: isInt ? 0 : 2
-  }).format(n)
+  return (Number.isInteger(n) ? INTEGER_FORMAT : FLOAT_FORMAT).format(n)
 }
 
 export const CustomColumnsHeader = ({

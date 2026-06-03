@@ -164,9 +164,9 @@ function useTaskCounts() {
 
   const statuses = statusesData?.results ?? []
   const doneStatusIds = new Set(
-    statuses.filter(s => /done|completed|finished/i.test(s.name)).map(s => s.id)
+    statuses.flatMap(s => (/done|completed|finished/i.test(s.name) ? [s.id] : []))
   )
-  const activeStatusIds = statuses.filter(s => !doneStatusIds.has(s.id)).map(s => s.id)
+  const activeStatusIds = statuses.flatMap(s => (!doneStatusIds.has(s.id) ? [s.id] : []))
 
   // Fetch only count (limit: 0) for active (non-done) statuses
   const { data: tasksData } = useQuery({

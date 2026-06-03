@@ -85,16 +85,17 @@ export const ProductConfigurations = ({
   // Auto-open next on incomplete → complete transition. Always seeds the ref so async fetch
   // settles are captured; only expands once `userInteractionTick > 0` so edit-mode mount with
   // saved selections doesn't pop everything open at once.
-  const prevDoneRef = useRef<Map<string, boolean>>(new Map())
+  const prevDoneRef = useRef<Map<string, boolean> | null>(null)
   useEffect(() => {
     if (wizardMode || !isConfigComplete) return
+    const prevDone = (prevDoneRef.current ??= new Map())
     const newOpens: string[] = []
     for (let i = 0; i < configs.length; i++) {
       const c = configs[i]
-      const wasDone = prevDoneRef.current.get(c.name) ?? false
-      const wasTracked = prevDoneRef.current.has(c.name)
+      const wasDone = prevDone.get(c.name) ?? false
+      const wasTracked = prevDone.has(c.name)
       const isDone = isConfigComplete(c)
-      prevDoneRef.current.set(c.name, isDone)
+      prevDone.set(c.name, isDone)
       if (userInteractionTick > 0 && wasTracked && isDone && !wasDone && configs[i + 1]) {
         newOpens.push(configs[i + 1].name)
       }

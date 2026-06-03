@@ -271,9 +271,9 @@ export const DataControlSection = ({ projectId }: { projectId: number }) => {
   const handleEditableToggle = (entity: string, fieldName: string, editable: boolean) => {
     if (!data?.[entity]) return
     const entityFields = data[entity]
-    const newEditable = entityFields
-      .filter(e => (e.field === fieldName ? editable : !!e.editable))
-      .map(e => e.field)
+    const newEditable = entityFields.flatMap(e =>
+      (e.field === fieldName ? editable : !!e.editable) ? [e.field] : []
+    )
     editableMutation.mutate({
       payload: { _editable: { [entity]: newEditable } },
       entity,
@@ -298,9 +298,9 @@ export const DataControlSection = ({ projectId }: { projectId: number }) => {
     if (!data?.[entity]) return
     const entityFields = data[entity]
     const nonDefaultFields = entityFields.filter(e => !e.default)
-    const newEnabled = nonDefaultFields
-      .filter(e => (e.field === fieldName ? enabled : e.enabled))
-      .map(e => e.field)
+    const newEnabled = nonDefaultFields.flatMap(e =>
+      (e.field === fieldName ? enabled : e.enabled) ? [e.field] : []
+    )
     patchMutation.mutate({
       payload: { [entity]: newEnabled },
       entity,

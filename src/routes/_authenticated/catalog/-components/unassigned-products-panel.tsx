@@ -312,7 +312,7 @@ export const UnassignedProductsPanel = ({ projectId, isMobile }: UnassignedProdu
                     variant='outline'
                     size='xs'
                     disabled={!hasMore}
-                    onClick={() => setOffset(offset + limit)}
+                    onClick={() => setOffset(prev => prev + limit)}
                   >
                     Next
                   </Button>

@@ -32,13 +32,15 @@ interface CustomerInfoPanelProps {
   savingPriceLevel?: boolean
 }
 
+const EMPTY_EDITABLE_FIELDS: string[] = []
+
 export const CustomerInfoPanel = ({
   customer,
   fieldConfig,
   priceLevels,
   onPriceLevelChange,
   onAssign,
-  editableFields = [],
+  editableFields = EMPTY_EDITABLE_FIELDS,
   onFieldSave,
   salespersons,
   savingField,

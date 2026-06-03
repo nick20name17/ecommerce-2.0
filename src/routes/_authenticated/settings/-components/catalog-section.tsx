@@ -270,10 +270,10 @@ export const CatalogSection = ({ projectId }: CatalogSectionProps) => {
   // manually; those stay accessible under "Advanced" for re-running a stage.
   const importAllMutation = useMutation({
     mutationFn: () => {
-      const names = swatchSpecNames
-        .split(',')
-        .map(s => s.trim())
-        .filter(Boolean)
+      const names = swatchSpecNames.split(',').flatMap(s => {
+        const trimmed = s.trim()
+        return trimmed ? [trimmed] : []
+      })
       return catalogService.importAll(
         {
           root_tree_id: null,
@@ -297,10 +297,10 @@ export const CatalogSection = ({ projectId }: CatalogSectionProps) => {
 
   const importVPMutation = useMutation({
     mutationFn: () => {
-      const names = swatchSpecNames
-        .split(',')
-        .map(s => s.trim())
-        .filter(Boolean)
+      const names = swatchSpecNames.split(',').flatMap(s => {
+        const trimmed = s.trim()
+        return trimmed ? [trimmed] : []
+      })
       return variableProductService.importAll(
         { swatch_spec_names: names.length > 0 ? names : undefined },
         { project_id: projectId }
@@ -313,10 +313,10 @@ export const CatalogSection = ({ projectId }: CatalogSectionProps) => {
 
   const importSingleVPMutation = useMutation({
     mutationFn: () => {
-      const names = singleSwatchNames
-        .split(',')
-        .map(s => s.trim())
-        .filter(Boolean)
+      const names = singleSwatchNames.split(',').flatMap(s => {
+        const trimmed = s.trim()
+        return trimmed ? [trimmed] : []
+      })
       return variableProductService.importFromSuperId(
         {
           super_id: singleSuperId.trim(),

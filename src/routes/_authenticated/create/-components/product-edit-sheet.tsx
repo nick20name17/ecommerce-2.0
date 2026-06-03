@@ -45,6 +45,8 @@ interface ProductEditSheetProps {
   onSaved: () => void
 }
 
+const EMPTY_ACCESSORIES: ProductAccessory[] = []
+
 export const ProductEditSheet = ({
   open,
   onOpenChange,
@@ -52,7 +54,7 @@ export const ProductEditSheet = ({
   mode,
   configData,
   configLoading,
-  accessories = [],
+  accessories = EMPTY_ACCESSORIES,
   accessoriesLoading = false,
   customerId,
   projectId,

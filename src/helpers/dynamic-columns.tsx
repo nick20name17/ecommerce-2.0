@@ -6,6 +6,8 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 
 export const RESERVED_KEYS = ['_pending', 'items', 'assigned_user'] as const
 
+const RESERVED_KEYS_SET = new Set<string>(RESERVED_KEYS)
+
 const isEmptyValue = (value: unknown): boolean => {
   if (value == null) return true
   const str = String(value).trim()
@@ -21,10 +23,11 @@ export const getKeysFromRows = (
   rows: Record<string, unknown>[],
   exclude: readonly string[] = []
 ): string[] => {
+  const excludeSet = new Set(exclude)
   const set = new Set<string>()
   for (const row of rows) {
     for (const key of Object.keys(row)) {
-      if (!exclude.includes(key)) set.add(key)
+      if (!excludeSet.has(key)) set.add(key)
     }
   }
   return [...set].sort()
@@ -42,12 +45,12 @@ export const getOrderedDataKeys = (
   const fromData = new Set<string>()
   for (const row of dataRows) {
     for (const key of Object.keys(row)) {
-      if (!RESERVED_KEYS.includes(key as (typeof RESERVED_KEYS)[number])) {
+      if (!RESERVED_KEYS_SET.has(key)) {
         fromData.add(key)
       }
     }
   }
-  const orderedFromConfig = fieldConfig?.[entity]?.filter(e => e.enabled).map(e => e.field) ?? []
+  const orderedFromConfig = fieldConfig?.[entity]?.flatMap(e => (e.enabled ? [e.field] : [])) ?? []
   const configSet = new Set(orderedFromConfig)
   const ordered =
     dataRows.length > 0 ? orderedFromConfig.filter(k => fromData.has(k)) : orderedFromConfig

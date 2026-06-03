@@ -106,7 +106,7 @@ export function ShippingRatesDialog({
   const prevOpenRef = useRef(false)
   useEffect(() => {
     if (open && !prevOpenRef.current) {
-      const pickedIds = items.filter(i => i.is_picked && !i.packed).map(i => i.autoid)
+      const pickedIds = items.flatMap(i => (i.is_picked && !i.packed ? [i.autoid] : []))
       const rawWeight = pickedIds.reduce((sum, id) => {
         const item = items.find(i => i.autoid === id)
         const w = item?.weight ? parseFloat(item.weight) : 0

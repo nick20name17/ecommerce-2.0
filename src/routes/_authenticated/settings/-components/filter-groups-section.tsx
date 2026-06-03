@@ -537,13 +537,16 @@ function FilterPresetDialog({
   }
 
   const buildConditions = (): FilterConditionGroup => {
-    const leaves: FilterConditionLeaf[] = rows
-      .filter(r => r.field && (NO_VALUE_OPS.includes(r.op) || r.value.trim()))
-      .map(r => ({
-        field: r.field,
-        op: r.op,
-        value: NO_VALUE_OPS.includes(r.op) ? '' : r.value.trim()
-      }))
+    const leaves: FilterConditionLeaf[] = rows.flatMap(r => {
+      if (!(r.field && (NO_VALUE_OPS.includes(r.op) || r.value.trim()))) return []
+      return [
+        {
+          field: r.field,
+          op: r.op,
+          value: NO_VALUE_OPS.includes(r.op) ? '' : r.value.trim()
+        }
+      ]
+    })
 
     // Group by field — same-field conditions get OR'd
     const byField = new Map<string, FilterConditionLeaf[]>()

@@ -54,15 +54,20 @@ export function DashboardOrdersTable({ projectId, customerId }: DashboardOrdersT
     )
   }
 
-  const rows = TRACKED_STATUSES.map((status, i) => {
-    const data = queries[i].data
-    return {
-      status,
-      label: ORDER_STATUS_LABELS[status],
-      color: STATUS_COLORS[status],
-      count: data?.count ?? 0
+  const rows = TRACKED_STATUSES.flatMap((status, i) => {
+    const count = queries[i].data?.count ?? 0
+    if (count > 0) {
+      return [
+        {
+          status,
+          label: ORDER_STATUS_LABELS[status],
+          color: STATUS_COLORS[status],
+          count
+        }
+      ]
     }
-  }).filter(r => r.count > 0)
+    return []
+  })
 
   if (rows.length === 0) return null
 
