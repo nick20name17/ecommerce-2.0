@@ -188,7 +188,7 @@ export const EntityNotesSheet = ({
     }
   }
 
-  const orderedNotes = [...notes].sort(
+  const orderedNotes = notes.toSorted(
     (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
   )
 

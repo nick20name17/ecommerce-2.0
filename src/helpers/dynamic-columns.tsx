@@ -30,7 +30,7 @@ export const getKeysFromRows = (
       if (!excludeSet.has(key)) set.add(key)
     }
   }
-  return [...set].sort()
+  return [...set].toSorted()
 }
 
 export const humanizeKey = (key: string): string => {

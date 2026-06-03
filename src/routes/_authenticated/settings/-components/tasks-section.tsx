@@ -191,7 +191,7 @@ export const TasksSection = ({ projectId }: { projectId: number }) => {
 
   const statusKey = statuses.map(s => `${s.id}:${s.name}:${s.color}`).join(',')
   useEffect(() => {
-    setOrderedStatuses([...statuses].sort((a, b) => a.order - b.order))
+    setOrderedStatuses(statuses.toSorted((a, b) => a.order - b.order))
   }, [statusKey]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const reorderMutation = useMutation({

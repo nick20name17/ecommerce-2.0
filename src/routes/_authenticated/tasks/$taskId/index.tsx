@@ -749,8 +749,8 @@ function TaskDetailPage() {
                   </div>
                 ) : (
                   <div className='flex flex-col'>
-                    {[...notes]
-                      .sort(
+                    {notes
+                      .toSorted(
                         (a, b) =>
                           new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
                       )
