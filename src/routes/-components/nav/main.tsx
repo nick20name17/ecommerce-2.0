@@ -112,14 +112,6 @@ const WORKSPACE_ITEMS: NavItem[] = [
     adminOnly: true,
   },
   {
-    title: 'Push Status',
-    url: '/push-status',
-    icon: IStorefront,
-    iconBg: 'bg-red-500',
-    iconColor: 'text-white',
-    adminOnly: true,
-  },
-  {
     title: 'Catalog',
     url: '/catalog',
     icon: ICatalog,
