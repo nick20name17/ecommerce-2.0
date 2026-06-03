@@ -1,32 +1,34 @@
-import { useMutation, useQuery } from '@tanstack/react-query'
-import { useState } from 'react'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useRef, useState } from 'react'
 import { toast } from 'sonner'
 
-import { getProjectByIdQuery } from '@/api/project/query'
-import type { Project } from '@/api/project/schema'
+import { PROJECT_QUERY_KEYS, getProjectByIdQuery } from '@/api/project/query'
+import type { Project, ProjectSettingsPayload } from '@/api/project/schema'
 import { projectService } from '@/api/project/service'
-import { isSuperAdmin } from '@/constants/user'
+import { isAdmin, isSuperAdmin } from '@/constants/user'
 import { cn } from '@/lib/utils'
 import { useAuth } from '@/providers/auth'
 
 export const GeneralSection = ({ projectId }: { projectId: number }) => {
-  // Fetch settings via project detail — only for superadmins
   const { user } = useAuth()
+  // The /settings route is already gated to admins (beforeLoad → isAdmin). Load the
+  // project for every admin (not just superadmins) so the editable controls below are
+  // seeded from real server values — otherwise a non-superadmin admin would see the
+  // hardcoded `??` fallbacks and silently overwrite real settings on the first click.
+  const isAdminUser = !!user?.role && isAdmin(user.role)
   const isSuperAdminUser = !!user?.role && isSuperAdmin(user.role)
   const { data: project } = useQuery({
     ...getProjectByIdQuery(projectId),
-    enabled: isSuperAdminUser,
+    enabled: isAdminUser,
     retry: false
   })
-
-  console.log(project)
 
   // Remount the form once project data first arrives so the editable fields are
   // seeded from it via lazy initial state — no setState-in-effect / prop mirroring.
   // The key is keyed on projectId (not the project object identity), so background
   // refetches don't remount and clobber in-progress edits; it only reseeds when a
-  // different project is loaded. Non-superadmins never load `project`, so the form
-  // stays mounted with defaults exactly as before.
+  // different project is loaded. (Safe only because getProjectByIdQuery sets no
+  // placeholderData/keepPreviousData — otherwise `project` could lag behind projectId.)
   return (
     <GeneralSettingsForm
       key={project ? `loaded-${projectId}` : 'pending'}
@@ -46,6 +48,8 @@ const GeneralSettingsForm = ({
   project: Project | undefined
   isSuperAdminUser: boolean
 }) => {
+  const queryClient = useQueryClient()
+
   const [unitSystem, setUnitSystem] = useState<string>(project?.unit_system ?? 'metric')
   const [categoryWebFilter, setCategoryWebFilter] = useState(
     project?.category_show_web_filter ?? true
@@ -54,17 +58,48 @@ const GeneralSettingsForm = ({
   const [oosField, setOosField] = useState(project?.oos_field ?? '')
   const [salesTotalField, setSalesTotalField] = useState(project?.sales_total_field ?? '')
 
+  // Last values committed to the server — used to skip no-op saves on blur/Enter.
+  const oosSavedRef = useRef(oosField)
+  const salesSavedRef = useRef(salesTotalField)
+
+  // Controls are interactive only once real data has loaded. Until then (loading, or a
+  // query error) editing is blocked so a hardcoded default can never be written back.
+  const isReady = !!project
+
   const updateMutation = useMutation({
-    mutationFn: (payload: Record<string, unknown>) =>
+    mutationFn: ({ payload }: { payload: ProjectSettingsPayload; rollback: () => void }) =>
       projectService.update({ id: projectId, payload }),
     onSuccess: () => {
       toast.success('Settings updated')
+      queryClient.invalidateQueries({ queryKey: PROJECT_QUERY_KEYS.detail(projectId) })
+    },
+    onError: (_error, variables) => {
+      // Revert the optimistic local change so the UI stays in sync with the server.
+      variables.rollback()
     },
     meta: { errorMessage: 'Failed to update settings' }
   })
 
-  const save = (payload: Record<string, unknown>) => {
-    updateMutation.mutate(payload)
+  const save = (payload: ProjectSettingsPayload, rollback: () => void) => {
+    updateMutation.mutate({ payload, rollback })
+  }
+
+  const commitOosField = () => {
+    if (oosField === oosSavedRef.current) return
+    const prevSaved = oosSavedRef.current
+    oosSavedRef.current = oosField
+    save({ oos_field: oosField }, () => {
+      oosSavedRef.current = prevSaved
+    })
+  }
+
+  const commitSalesTotalField = () => {
+    if (salesTotalField === salesSavedRef.current) return
+    const prevSaved = salesSavedRef.current
+    salesSavedRef.current = salesTotalField
+    save({ sales_total_field: salesTotalField }, () => {
+      salesSavedRef.current = prevSaved
+    })
   }
 
   return (
@@ -79,24 +114,25 @@ const GeneralSettingsForm = ({
 
         {/* Unit System */}
         <div>
-          <label className='mb-1.5 block text-[12px] font-medium text-text-tertiary'>
-            Unit System
-          </label>
+          <div className='mb-1.5 block text-[12px] font-medium text-text-tertiary'>Unit System</div>
           <div className='flex gap-2'>
             {(['metric', 'imperial'] as const).map(unit => (
               <button
                 key={unit}
                 type='button'
-                disabled={updateMutation.isPending}
+                disabled={!isReady}
+                aria-pressed={unitSystem === unit}
                 className={cn(
-                  'inline-flex h-8 items-center rounded-md border px-3 text-[13px] font-medium transition-colors duration-80',
+                  'inline-flex h-8 items-center rounded-md border px-3 text-[13px] font-medium transition-colors duration-80 disabled:cursor-not-allowed disabled:opacity-50',
                   unitSystem === unit
                     ? 'border-primary bg-primary/6 text-primary'
                     : 'border-border text-text-secondary hover:bg-bg-hover'
                 )}
                 onClick={() => {
+                  if (unit === unitSystem) return
+                  const prev = unitSystem
                   setUnitSystem(unit)
-                  save({ unit_system: unit })
+                  save({ unit_system: unit }, () => setUnitSystem(prev))
                 }}
               >
                 {unit.charAt(0).toUpperCase() + unit.slice(1)}
@@ -107,9 +143,7 @@ const GeneralSettingsForm = ({
 
         {/* Toggle switches */}
         <div className='space-y-3'>
-          <label className='mb-1.5 block text-[12px] font-medium text-text-tertiary'>
-            Web Filters
-          </label>
+          <div className='mb-1.5 block text-[12px] font-medium text-text-tertiary'>Web Filters</div>
 
           <div className='flex items-center justify-between rounded-lg border border-border px-3.5 py-2.5'>
             <div>
@@ -118,14 +152,19 @@ const GeneralSettingsForm = ({
             </div>
             <button
               type='button'
-              disabled={updateMutation.isPending}
+              role='switch'
+              aria-checked={categoryWebFilter}
+              aria-label='Category Web Filter'
+              disabled={!isReady}
               className={cn(
-                'relative inline-flex h-5 w-9 shrink-0 cursor-pointer items-center rounded-full transition-colors duration-200',
+                'relative inline-flex h-5 w-9 shrink-0 cursor-pointer items-center rounded-full transition-colors duration-200 disabled:cursor-not-allowed disabled:opacity-50',
                 categoryWebFilter ? 'bg-primary' : 'bg-border'
               )}
               onClick={() => {
-                setCategoryWebFilter(!categoryWebFilter)
-                save({ category_show_web_filter: !categoryWebFilter })
+                const prev = categoryWebFilter
+                const next = !prev
+                setCategoryWebFilter(next)
+                save({ category_show_web_filter: next }, () => setCategoryWebFilter(prev))
               }}
             >
               <span
@@ -144,14 +183,19 @@ const GeneralSettingsForm = ({
             </div>
             <button
               type='button'
-              disabled={updateMutation.isPending}
+              role='switch'
+              aria-checked={productWebFilter}
+              aria-label='Product Web Filter'
+              disabled={!isReady}
               className={cn(
-                'relative inline-flex h-5 w-9 shrink-0 cursor-pointer items-center rounded-full transition-colors duration-200',
+                'relative inline-flex h-5 w-9 shrink-0 cursor-pointer items-center rounded-full transition-colors duration-200 disabled:cursor-not-allowed disabled:opacity-50',
                 productWebFilter ? 'bg-primary' : 'bg-border'
               )}
               onClick={() => {
-                setProductWebFilter(!productWebFilter)
-                save({ product_show_web_filter: !productWebFilter })
+                const prev = productWebFilter
+                const next = !prev
+                setProductWebFilter(next)
+                save({ product_show_web_filter: next }, () => setProductWebFilter(prev))
               }}
             >
               <span
@@ -167,47 +211,56 @@ const GeneralSettingsForm = ({
         {/* Advanced fields (superadmin only) */}
         {isSuperAdminUser && (
           <div className='space-y-3'>
-            <label className='mb-1.5 block text-[12px] font-medium text-text-tertiary'>
+            <div className='mb-1.5 block text-[12px] font-medium text-text-tertiary'>
               Database Fields
-            </label>
+            </div>
 
-            <div className='rounded-xl border border-border px-3.5 py-2.5'>
+            <div className='rounded-lg border border-border px-3.5 py-2.5'>
               <div className='mb-1'>
-                <span className='text-[13px] font-medium text-foreground'>Out-of-Stock Field</span>
+                <label htmlFor='oos-field' className='text-[13px] font-medium text-foreground'>
+                  Out-of-Stock Field
+                </label>
                 <p className='text-[12px] text-text-tertiary'>
                   INVENTRY column used for out-of-stock filtering
                 </p>
               </div>
               <input
+                id='oos-field'
                 value={oosField}
                 onChange={e => setOosField(e.target.value)}
-                onBlur={() => save({ oos_field: oosField })}
+                onBlur={commitOosField}
                 onKeyDown={e => {
-                  if (e.key === 'Enter') save({ oos_field: oosField })
+                  if (e.key === 'Enter') e.currentTarget.blur()
                 }}
                 placeholder='e.g. QTY_ON_HND'
-                disabled={updateMutation.isPending}
-                className='placeholder:text-text-quaternary h-8 w-full rounded-md border border-border bg-background px-2.5 text-[13px] outline-none focus:border-primary'
+                disabled={!isReady}
+                className='placeholder:text-text-quaternary h-8 w-full rounded-md border border-border bg-background px-2.5 text-[13px] outline-none focus:border-primary disabled:cursor-not-allowed disabled:opacity-50'
               />
             </div>
 
-            <div className='rounded-xl border border-border px-3.5 py-2.5'>
+            <div className='rounded-lg border border-border px-3.5 py-2.5'>
               <div className='mb-1'>
-                <span className='text-[13px] font-medium text-foreground'>Sales Total Field</span>
+                <label
+                  htmlFor='sales-total-field'
+                  className='text-[13px] font-medium text-foreground'
+                >
+                  Sales Total Field
+                </label>
                 <p className='text-[12px] text-text-tertiary'>
                   ARINV column for monetary totals (e.g. total, sub_total)
                 </p>
               </div>
               <input
+                id='sales-total-field'
                 value={salesTotalField}
                 onChange={e => setSalesTotalField(e.target.value)}
-                onBlur={() => save({ sales_total_field: salesTotalField })}
+                onBlur={commitSalesTotalField}
                 onKeyDown={e => {
-                  if (e.key === 'Enter') save({ sales_total_field: salesTotalField })
+                  if (e.key === 'Enter') e.currentTarget.blur()
                 }}
                 placeholder='e.g. total'
-                disabled={updateMutation.isPending}
-                className='placeholder:text-text-quaternary h-8 w-full rounded-md border border-border bg-background px-2.5 text-[13px] outline-none focus:border-primary'
+                disabled={!isReady}
+                className='placeholder:text-text-quaternary h-8 w-full rounded-md border border-border bg-background px-2.5 text-[13px] outline-none focus:border-primary disabled:cursor-not-allowed disabled:opacity-50'
               />
             </div>
           </div>
