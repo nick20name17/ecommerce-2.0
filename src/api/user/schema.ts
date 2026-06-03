@@ -1,4 +1,4 @@
-import { z } from 'zod'
+import * as z from 'zod/mini'
 
 import { EmailSchema, NameSchema, NewPasswordSchema } from '@/api/schema'
 import type { ApiResponse, PaginationParams } from '@/api/schema'
@@ -68,7 +68,7 @@ export interface UserParams extends PaginationParams {
 const roleValues = Object.values(USER_ROLES) as [string, ...string[]]
 
 const createUserSchemaBase = (isCurrentUserSuperAdmin: boolean) => {
-  const projectSchema = isCurrentUserSuperAdmin ? z.number() : z.number().optional()
+  const projectSchema = isCurrentUserSuperAdmin ? z.number() : z.optional(z.number())
   return z.object({
     first_name: NameSchema,
     last_name: NameSchema,
@@ -82,31 +82,31 @@ const createUserSchemaBase = (isCurrentUserSuperAdmin: boolean) => {
 }
 
 export const getCreateUserSchema = (isCurrentUserSuperAdmin: boolean) =>
-  createUserSchemaBase(isCurrentUserSuperAdmin)
-    .refine(data => data.password === data.password_confirm, {
-      message: 'passwords do not match',
+  createUserSchemaBase(isCurrentUserSuperAdmin).check(
+    z.refine(data => data.password === data.password_confirm, {
+      error: 'passwords do not match',
       path: ['password_confirm']
-    })
-    .superRefine((data, ctx) => {
-      if (
-        isCurrentUserSuperAdmin &&
-        !isSuperAdmin(data.role as UserRole) &&
-        (!data.project || data.project < 1)
-      ) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: 'Project is required',
-          path: ['project']
-        })
+    }),
+    z.refine(
+      data =>
+        !(
+          isCurrentUserSuperAdmin &&
+          !isSuperAdmin(data.role as UserRole) &&
+          (!data.project || data.project < 1)
+        ),
+      {
+        error: 'Project is required',
+        path: ['project']
       }
-    })
+    )
+  )
 
 export const CreateUserSchema = getCreateUserSchema(true)
 
 export type CreateUserFormValues = z.infer<ReturnType<typeof getCreateUserSchema>>
 
 const updateUserSchemaBase = (isCurrentUserSuperAdmin: boolean) => {
-  const projectSchema = isCurrentUserSuperAdmin ? z.number() : z.number().optional()
+  const projectSchema = isCurrentUserSuperAdmin ? z.number() : z.optional(z.number())
   return z
     .object({
       first_name: NameSchema,
@@ -117,19 +117,20 @@ const updateUserSchemaBase = (isCurrentUserSuperAdmin: boolean) => {
       project: projectSchema,
       is_active: z.boolean()
     })
-    .superRefine((data, ctx) => {
-      if (
-        isCurrentUserSuperAdmin &&
-        !isSuperAdmin(data.role as UserRole) &&
-        (!data.project || data.project < 1)
-      ) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: 'Project is required',
+    .check(
+      z.refine(
+        data =>
+          !(
+            isCurrentUserSuperAdmin &&
+            !isSuperAdmin(data.role as UserRole) &&
+            (!data.project || data.project < 1)
+          ),
+        {
+          error: 'Project is required',
           path: ['project']
-        })
-      }
-    })
+        }
+      )
+    )
 }
 
 export const getUpdateUserSchema = (isCurrentUserSuperAdmin: boolean) =>

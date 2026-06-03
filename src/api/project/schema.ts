@@ -1,4 +1,4 @@
-import { z } from 'zod'
+import * as z from 'zod/mini'
 
 import { OptionalStringSchema, RequiredStringSchema } from '@/api/schema'
 import type { ApiResponse, PaginationParams } from '@/api/schema'
@@ -145,10 +145,11 @@ export interface ProjectParams extends PaginationParams {
 }
 
 const PortSchema = z
-  .number({ message: VALIDATION_MESSAGES.required })
-  .int()
-  .min(1, VALIDATION_MESSAGES.portRange)
-  .max(65535, VALIDATION_MESSAGES.portRange)
+  .int({ error: VALIDATION_MESSAGES.required })
+  .check(
+    z.gte(1, { error: VALIDATION_MESSAGES.portRange }),
+    z.lte(65535, { error: VALIDATION_MESSAGES.portRange })
+  )
 
 const sharedFields = {
   name: RequiredStringSchema,

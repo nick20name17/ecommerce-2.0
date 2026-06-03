@@ -1,4 +1,4 @@
-import { z } from 'zod'
+import * as z from 'zod/mini'
 
 import type { UserSummary } from '../user/schema'
 
@@ -145,29 +145,31 @@ export interface TaskStatusListResponse {
 }
 
 export const CreateTaskSchema = z.object({
-  title: z.string().min(1, VALIDATION_MESSAGES.titleRequired).max(200),
-  description: z.string().max(2000).optional().nullable(),
-  status: z.number({ message: VALIDATION_MESSAGES.statusRequired }),
+  title: z
+    .string()
+    .check(z.minLength(1, { error: VALIDATION_MESSAGES.titleRequired }), z.maxLength(200)),
+  description: z.optional(z.nullable(z.string().check(z.maxLength(2000)))),
+  status: z.number({ error: VALIDATION_MESSAGES.statusRequired }),
   priority: z.enum(TASK_PRIORITY_VALUES),
-  due_date: z.string().optional().nullable(),
-  responsible_user: z.number().optional().nullable(),
-  linked_order_autoid: z.string().optional().nullable(),
-  linked_proposal_autoid: z.string().optional().nullable(),
-  linked_customer_autoid: z.string().optional().nullable()
+  due_date: z.optional(z.nullable(z.string())),
+  responsible_user: z.optional(z.nullable(z.number())),
+  linked_order_autoid: z.optional(z.nullable(z.string())),
+  linked_proposal_autoid: z.optional(z.nullable(z.string())),
+  linked_customer_autoid: z.optional(z.nullable(z.string()))
 })
 
 export type CreateTaskFormValues = z.infer<typeof CreateTaskSchema>
 
-export const UpdateTaskSchema = CreateTaskSchema.partial().extend({
-  title: z.string().min(1).max(200).optional(),
-  description: z.string().max(2000).optional().nullable(),
-  status: z.number().optional(),
-  priority: z.enum(TASK_PRIORITY_VALUES).optional(),
-  due_date: z.string().optional().nullable(),
-  responsible_user: z.number().optional().nullable(),
-  linked_order_autoid: z.string().optional().nullable(),
-  linked_proposal_autoid: z.string().optional().nullable(),
-  linked_customer_autoid: z.string().optional().nullable()
+export const UpdateTaskSchema = z.extend(z.partial(CreateTaskSchema), {
+  title: z.optional(z.string().check(z.minLength(1), z.maxLength(200))),
+  description: z.optional(z.nullable(z.string().check(z.maxLength(2000)))),
+  status: z.optional(z.number()),
+  priority: z.optional(z.enum(TASK_PRIORITY_VALUES)),
+  due_date: z.optional(z.nullable(z.string())),
+  responsible_user: z.optional(z.nullable(z.number())),
+  linked_order_autoid: z.optional(z.nullable(z.string())),
+  linked_proposal_autoid: z.optional(z.nullable(z.string())),
+  linked_customer_autoid: z.optional(z.nullable(z.string()))
 })
 
 export type UpdateTaskFormValues = z.infer<typeof UpdateTaskSchema>

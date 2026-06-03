@@ -1,5 +1,5 @@
 import { Outlet, createFileRoute, redirect } from '@tanstack/react-router'
-import z from 'zod'
+import * as z from 'zod/mini'
 
 import { AUTH_REDIRECTS } from '@/api/constants'
 import { getSession } from '@/helpers/auth'
@@ -11,7 +11,7 @@ const AuthLayout = () => {
 export const Route = createFileRoute('/_auth')({
   component: AuthLayout,
   validateSearch: z.object({
-    redirect: z.string().optional()
+    redirect: z.optional(z.string())
   }),
   beforeLoad: () => {
     const session = getSession()

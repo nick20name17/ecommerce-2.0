@@ -1,4 +1,4 @@
-import { z } from 'zod'
+import * as z from 'zod/mini'
 
 import { NameSchema, NewPasswordSchema, PasswordSchema } from '@/api/schema'
 
@@ -26,13 +26,15 @@ export const ChangePasswordSchema = z
     new_password: NewPasswordSchema,
     new_password_confirm: NewPasswordSchema
   })
-  .refine(data => data.new_password !== data.old_password, {
-    message: 'new password must be different from current password',
-    path: ['new_password']
-  })
-  .refine(data => data.new_password === data.new_password_confirm, {
-    message: 'passwords do not match',
-    path: ['new_password_confirm']
-  })
+  .check(
+    z.refine(data => data.new_password !== data.old_password, {
+      error: 'new password must be different from current password',
+      path: ['new_password']
+    }),
+    z.refine(data => data.new_password === data.new_password_confirm, {
+      error: 'passwords do not match',
+      path: ['new_password_confirm']
+    })
+  )
 
 export type ChangePasswordFormValues = z.infer<typeof ChangePasswordSchema>
