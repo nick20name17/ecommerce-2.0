@@ -48,16 +48,10 @@ export const UserModal = ({ user, open, onOpenChange }: UserModalProps) => {
   const isEdit = !!user
 
   return (
-    <Dialog
-      open={open}
-      onOpenChange={onOpenChange}
-    >
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className='flex max-h-[90vh] flex-col overflow-hidden p-0 sm:max-w-md'>
         {isEdit ? (
-          <EditForm
-            user={user}
-            onOpenChange={onOpenChange}
-          />
+          <EditForm user={user} onOpenChange={onOpenChange} />
         ) : (
           <CreateForm onOpenChange={onOpenChange} />
         )}
@@ -78,22 +72,13 @@ const SalesmanField = () => {
       render={({ field, fieldState }) => (
         <Field data-invalid={fieldState.invalid}>
           <FieldLabel>Salesman</FieldLabel>
-          <Select
-            value={field.value || ''}
-            onValueChange={field.onChange}
-          >
-            <SelectTrigger
-              className='w-full'
-              aria-invalid={fieldState.invalid}
-            >
+          <Select value={field.value || ''} onValueChange={field.onChange}>
+            <SelectTrigger className='w-full' aria-invalid={fieldState.invalid}>
               <SelectValue placeholder='Select salesman' />
             </SelectTrigger>
             <SelectContent>
-              {salespersons.map((sp) => (
-                <SelectItem
-                  key={sp.autoid}
-                  value={sp.id}
-                >
+              {salespersons.map(sp => (
+                <SelectItem key={sp.autoid} value={sp.id}>
                   {sp.id}
                 </SelectItem>
               ))}
@@ -195,23 +180,17 @@ const SharedFields = ({ editingUser }: { editingUser?: User | null }) => {
             <FieldLabel>Role</FieldLabel>
             <Select
               value={field.value}
-              onValueChange={(value) => {
+              onValueChange={value => {
                 field.onChange(value)
                 if (value === USER_ROLES.superadmin) setValue('project', 0)
               }}
             >
-              <SelectTrigger
-                className='w-full'
-                aria-invalid={fieldState.invalid}
-              >
+              <SelectTrigger className='w-full' aria-invalid={fieldState.invalid}>
                 <SelectValue placeholder='Select role' />
               </SelectTrigger>
               <SelectContent>
                 {roleOptions.map(([value, label]) => (
-                  <SelectItem
-                    key={value}
-                    value={value}
-                  >
+                  <SelectItem key={value} value={value}>
                     {label}
                   </SelectItem>
                 ))}
@@ -231,20 +210,14 @@ const SharedFields = ({ editingUser }: { editingUser?: User | null }) => {
               <FieldLabel>Project</FieldLabel>
               <Select
                 value={field.value === 0 || field.value === undefined ? '' : String(field.value)}
-                onValueChange={(v) => field.onChange(v ? Number(v) : 0)}
+                onValueChange={v => field.onChange(v ? Number(v) : 0)}
               >
-                <SelectTrigger
-                  className='w-full'
-                  aria-invalid={fieldState.invalid}
-                >
+                <SelectTrigger className='w-full' aria-invalid={fieldState.invalid}>
                   <SelectValue placeholder='Select project' />
                 </SelectTrigger>
                 <SelectContent>
-                  {projects.map((p) => (
-                    <SelectItem
-                      key={p.id}
-                      value={String(p.id)}
-                    >
+                  {projects.map(p => (
+                    <SelectItem key={p.id} value={String(p.id)}>
                       {p.name}
                     </SelectItem>
                   ))}
@@ -288,7 +261,7 @@ const CreateForm = ({ onOpenChange }: { onOpenChange: (open: boolean) => void })
     }
   })
 
-  const handleSubmit = form.handleSubmit((data) => {
+  const handleSubmit = form.handleSubmit(data => {
     const { project, ...rest } = data
     const payload = isCurrentUserSuperAdmin ? { ...rest, project: project ?? 0 } : rest
     mutation.mutate(payload)
@@ -296,15 +269,12 @@ const CreateForm = ({ onOpenChange }: { onOpenChange: (open: boolean) => void })
 
   return (
     <FormProvider {...form}>
-      <DialogHeader className='bg-background sticky top-0 z-10 border-b px-6 py-4'>
+      <DialogHeader className='sticky top-0 z-10 border-b bg-background px-6 py-4'>
         <DialogTitle>Create User</DialogTitle>
       </DialogHeader>
 
       <DialogBody className='px-6 py-4'>
-        <form
-          id='user-form'
-          onSubmit={handleSubmit}
-        >
+        <form id='user-form' onSubmit={handleSubmit}>
           <FieldGroup>
             <SharedFields editingUser={null} />
 
@@ -315,10 +285,7 @@ const CreateForm = ({ onOpenChange }: { onOpenChange: (open: boolean) => void })
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
                     <FieldLabel htmlFor='password'>Password</FieldLabel>
-                    <PasswordInput
-                      {...field}
-                      id='password'
-                    />
+                    <PasswordInput {...field} id='password' />
                     {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                   </Field>
                 )}
@@ -330,10 +297,7 @@ const CreateForm = ({ onOpenChange }: { onOpenChange: (open: boolean) => void })
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
                     <FieldLabel htmlFor='password-confirm'>Confirm</FieldLabel>
-                    <PasswordInput
-                      {...field}
-                      id='password-confirm'
-                    />
+                    <PasswordInput {...field} id='password-confirm' />
                     {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                   </Field>
                 )}
@@ -343,11 +307,8 @@ const CreateForm = ({ onOpenChange }: { onOpenChange: (open: boolean) => void })
         </form>
       </DialogBody>
 
-      <DialogFooter className='bg-background sticky bottom-0 z-10 border-t px-6 py-4'>
-        <Button
-          variant='outline'
-          onClick={() => onOpenChange(false)}
-        >
+      <DialogFooter className='sticky bottom-0 z-10 border-t bg-background px-6 py-4'>
+        <Button variant='outline' onClick={() => onOpenChange(false)}>
           Cancel
         </Button>
         <Button
@@ -363,7 +324,13 @@ const CreateForm = ({ onOpenChange }: { onOpenChange: (open: boolean) => void })
   )
 }
 
-const EditForm = ({ user, onOpenChange }: { user: User; onOpenChange: (open: boolean) => void }) => {
+const EditForm = ({
+  user,
+  onOpenChange
+}: {
+  user: User
+  onOpenChange: (open: boolean) => void
+}) => {
   const { user: currentUser } = useAuth()
   const isSelf = user.id === currentUser?.id
   const isCurrentUserSuperAdmin = !!currentUser?.role && isSuperAdmin(currentUser.role)
@@ -390,23 +357,22 @@ const EditForm = ({ user, onOpenChange }: { user: User; onOpenChange: (open: boo
     onSuccess: () => onOpenChange(false)
   })
 
-  const handleSubmit = form.handleSubmit((data) => {
+  const handleSubmit = form.handleSubmit(data => {
     const { project, ...rest } = data
-    const payload = isCurrentUserSuperAdmin ? { ...rest, project: project ?? user.project_id } : rest
+    const payload = isCurrentUserSuperAdmin
+      ? { ...rest, project: project ?? user.project_id }
+      : rest
     mutation.mutate({ id: user.id, payload })
   })
 
   return (
     <FormProvider {...form}>
-      <DialogHeader className='bg-background sticky top-0 z-10 border-b px-6 py-4'>
+      <DialogHeader className='sticky top-0 z-10 border-b bg-background px-6 py-4'>
         <DialogTitle>Edit User</DialogTitle>
       </DialogHeader>
 
       <DialogBody className='px-6 py-4'>
-        <form
-          id='user-form'
-          onSubmit={handleSubmit}
-        >
+        <form id='user-form' onSubmit={handleSubmit}>
           <FieldGroup>
             <SharedFields editingUser={user} />
 
@@ -414,10 +380,7 @@ const EditForm = ({ user, onOpenChange }: { user: User; onOpenChange: (open: boo
               name='is_active'
               control={form.control}
               render={({ field }) => (
-                <Field
-                  orientation='horizontal'
-                  data-disabled={isSelf}
-                >
+                <Field orientation='horizontal' data-disabled={isSelf}>
                   <Checkbox
                     id='is-active'
                     checked={field.value}
@@ -432,11 +395,8 @@ const EditForm = ({ user, onOpenChange }: { user: User; onOpenChange: (open: boo
         </form>
       </DialogBody>
 
-      <DialogFooter className='bg-background sticky bottom-0 z-10 border-t px-6 py-4'>
-        <Button
-          variant='outline'
-          onClick={() => onOpenChange(false)}
-        >
+      <DialogFooter className='sticky bottom-0 z-10 border-t bg-background px-6 py-4'>
+        <Button variant='outline' onClick={() => onOpenChange(false)}>
           Cancel
         </Button>
         <Button

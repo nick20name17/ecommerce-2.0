@@ -19,7 +19,14 @@ interface ProposalComboboxProps {
   triggerClassName?: string
 }
 
-export const ProposalCombobox = ({ value, onChange, projectId, placeholder = 'Select proposal...', valueLabel, triggerClassName }: ProposalComboboxProps) => {
+export const ProposalCombobox = ({
+  value,
+  onChange,
+  projectId,
+  placeholder = 'Select proposal...',
+  valueLabel,
+  triggerClassName
+}: ProposalComboboxProps) => {
   const [open, setOpen] = useState(false)
   const [search, setSearch] = useState('')
   const [debouncedSearch, setDebouncedSearch] = useState('')
@@ -48,9 +55,7 @@ export const ProposalCombobox = ({ value, onChange, projectId, placeholder = 'Se
   const proposals = data?.results ?? []
   const loading = isLoading || (search !== debouncedSearch && isFetching)
   const selectedProposal =
-    value != null && proposals.length > 0
-      ? (proposals.find((x) => x.autoid === value) ?? null)
-      : null
+    value != null && proposals.length > 0 ? (proposals.find(x => x.autoid === value) ?? null) : null
 
   const handleSearchChange = (q: string) => {
     setSearch(q)
@@ -62,8 +67,9 @@ export const ProposalCombobox = ({ value, onChange, projectId, placeholder = 'Se
     setOpen(false)
   }
 
-  const displayLabel = valueLabel
-    ?? (selectedProposal
+  const displayLabel =
+    valueLabel ??
+    (selectedProposal
       ? `${selectedProposal.quote}${selectedProposal.b_name ? ` — ${selectedProposal.b_name}` : ''}`
       : value
         ? `Proposal ${value}`
@@ -116,13 +122,13 @@ export const ProposalCombobox = ({ value, onChange, projectId, placeholder = 'Se
             ref={inputRef}
             placeholder='Search by quote or name...'
             value={search}
-            onChange={(e) => handleSearchChange(e.target.value)}
+            onChange={e => handleSearchChange(e.target.value)}
             className='flex-1 bg-transparent text-[13px] font-medium outline-none placeholder:text-text-tertiary'
           />
         </div>
         <div
           className='max-h-64 overflow-y-auto overscroll-contain p-1'
-          onWheel={(e) => e.stopPropagation()}
+          onWheel={e => e.stopPropagation()}
         >
           {loading && proposals.length === 0 ? (
             <div className='space-y-1'>
@@ -143,13 +149,16 @@ export const ProposalCombobox = ({ value, onChange, projectId, placeholder = 'Se
                 <button
                   type='button'
                   className='flex w-full items-center gap-2 rounded-[6px] px-2.5 py-[7px] text-left text-[13px] font-medium text-text-secondary transition-colors duration-[80ms] hover:bg-destructive/10 hover:text-destructive'
-                  onClick={() => { onChange(null); setOpen(false) }}
+                  onClick={() => {
+                    onChange(null)
+                    setOpen(false)
+                  }}
                 >
                   <X className='size-3.5 shrink-0' />
                   Remove proposal
                 </button>
               )}
-              {proposals.map((p) => (
+              {proposals.map(p => (
                 <button
                   key={p.autoid}
                   type='button'

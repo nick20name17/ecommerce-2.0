@@ -8,7 +8,7 @@ import {
   Pencil,
   Plus,
   Star,
-  Trash2,
+  Trash2
 } from 'lucide-react'
 import { useDeferredValue, useState } from 'react'
 
@@ -16,7 +16,7 @@ import type {
   GlobalSpecDefinition,
   SpecOption,
   VariableProduct,
-  VariableProductItem,
+  VariableProductItem
 } from '@/api/variable-product/schema'
 import { variableProductService } from '@/api/variable-product/service'
 import { VP_QUERY_KEYS, getSpecOptionsQuery } from '@/api/variable-product/query'
@@ -30,14 +30,14 @@ import {
   DialogContent,
   DialogFooter,
   DialogHeader,
-  DialogTitle,
+  DialogTitle
 } from '@/components/ui/dialog'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
-  DropdownMenuTrigger,
+  DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -46,7 +46,7 @@ import {
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue,
+  SelectValue
 } from '@/components/ui/select'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { cn } from '@/lib/utils'
@@ -62,7 +62,12 @@ interface VariantsTableProps {
 
 // ── Component ────────────────────────────────────────────────
 
-export const VariantsTable = ({ vp, projectId, addProductsOpen, onAddProductsChange }: VariantsTableProps) => {
+export const VariantsTable = ({
+  vp,
+  projectId,
+  addProductsOpen,
+  onAddProductsChange
+}: VariantsTableProps) => {
   const queryClient = useQueryClient()
   const params = { project_id: projectId ?? undefined }
 
@@ -70,7 +75,10 @@ export const VariantsTable = ({ vp, projectId, addProductsOpen, onAddProductsCha
   const setProductBrowserOpen = onAddProductsChange ?? (() => {})
   const [addManualOpen, setAddManualOpen] = useState(false)
   const [manualAutoid, setManualAutoid] = useState('')
-  const [editingCell, setEditingCell] = useState<{ itemId: string; spec: GlobalSpecDefinition } | null>(null)
+  const [editingCell, setEditingCell] = useState<{
+    itemId: string
+    spec: GlobalSpecDefinition
+  } | null>(null)
   const [selectedOptionId, setSelectedOptionId] = useState('')
   const [editingStatusItem, setEditingStatusItem] = useState<VariableProductItem | null>(null)
   const [statusDraft, setStatusDraft] = useState<StatusValue>('')
@@ -81,7 +89,9 @@ export const VariantsTable = ({ vp, projectId, addProductsOpen, onAddProductsCha
   const getActive = (item: VariableProductItem) => localActive[item.id] ?? item.active ?? true
 
   // Optimistic spec overrides: key = `${itemId}:${specSlug}`, value = { option_id, value } or null (removed)
-  const [localSpecs, setLocalSpecs] = useState<Record<string, { option_id: string; value: string } | null>>({})
+  const [localSpecs, setLocalSpecs] = useState<
+    Record<string, { option_id: string; value: string } | null>
+  >({})
 
   const getSpecValue = (item: VariableProductItem, specSlug: string) => {
     const key = `${item.id}:${specSlug}`
@@ -96,7 +106,7 @@ export const VariantsTable = ({ vp, projectId, addProductsOpen, onAddProductsCha
   const addItemMutation = useMutation({
     mutationFn: (productAutoid: string) =>
       variableProductService.addItem(vp.id, { product_autoid: productAutoid }, params),
-    meta: { successMessage: 'Product added', invalidatesQuery: VP_QUERY_KEYS.detail(vp.id) },
+    meta: { successMessage: 'Product added', invalidatesQuery: VP_QUERY_KEYS.detail(vp.id) }
   })
 
   const addBatchMutation = useMutation({
@@ -105,19 +115,21 @@ export const VariantsTable = ({ vp, projectId, addProductsOpen, onAddProductsCha
         await variableProductService.addItem(vp.id, { product_autoid: p.autoid }, params)
       }
     },
-    meta: { successMessage: 'Products added', invalidatesQuery: VP_QUERY_KEYS.detail(vp.id) },
+    meta: { successMessage: 'Products added', invalidatesQuery: VP_QUERY_KEYS.detail(vp.id) }
   })
 
   const removeItemMutation = useMutation({
-    mutationFn: (itemId: string) =>
-      variableProductService.removeItem(vp.id, itemId, params),
-    meta: { successMessage: 'Product removed', invalidatesQuery: VP_QUERY_KEYS.detail(vp.id) },
+    mutationFn: (itemId: string) => variableProductService.removeItem(vp.id, itemId, params),
+    meta: { successMessage: 'Product removed', invalidatesQuery: VP_QUERY_KEYS.detail(vp.id) }
   })
 
   const setDefaultMutation = useMutation({
     mutationFn: (itemId: string) =>
       variableProductService.updateItem(vp.id, itemId, { is_default: true }, params),
-    meta: { successMessage: 'Default variant updated', invalidatesQuery: VP_QUERY_KEYS.detail(vp.id) },
+    meta: {
+      successMessage: 'Default variant updated',
+      invalidatesQuery: VP_QUERY_KEYS.detail(vp.id)
+    }
   })
 
   const updateItemStatusMutation = useMutation({
@@ -126,47 +138,72 @@ export const VariantsTable = ({ vp, projectId, addProductsOpen, onAddProductsCha
         vp.id,
         vars.itemId,
         { status: vars.status, status_expires_at: vars.expires },
-        params,
+        params
       ),
-    meta: { successMessage: 'Variant status updated', invalidatesQuery: VP_QUERY_KEYS.detail(vp.id) },
-    onSuccess: () => setEditingStatusItem(null),
+    meta: {
+      successMessage: 'Variant status updated',
+      invalidatesQuery: VP_QUERY_KEYS.detail(vp.id)
+    },
+    onSuccess: () => setEditingStatusItem(null)
   })
 
   const toggleVisibility = (item: VariableProductItem) => {
     const newActive = !getActive(item)
-    setLocalActive((prev) => ({ ...prev, [item.id]: newActive }))
-    variableProductService.updateItem(vp.id, item.id, { active: newActive }, params).catch(() =>
-      setLocalActive((prev) => ({ ...prev, [item.id]: !newActive }))
-    )
+    setLocalActive(prev => ({ ...prev, [item.id]: newActive }))
+    variableProductService
+      .updateItem(vp.id, item.id, { active: newActive }, params)
+      .catch(() => setLocalActive(prev => ({ ...prev, [item.id]: !newActive })))
   }
 
   // Fire-and-forget spec mutations with optimistic local state
   const setSpecOptimistic = (itemId: string, specSlug: string, optionId: string, value: string) => {
-    setLocalSpecs((prev) => ({ ...prev, [`${itemId}:${specSlug}`]: { option_id: optionId, value } }))
+    setLocalSpecs(prev => ({ ...prev, [`${itemId}:${specSlug}`]: { option_id: optionId, value } }))
   }
   const removeSpecOptimistic = (itemId: string, specSlug: string) => {
-    setLocalSpecs((prev) => ({ ...prev, [`${itemId}:${specSlug}`]: null }))
+    setLocalSpecs(prev => ({ ...prev, [`${itemId}:${specSlug}`]: null }))
   }
 
   const linkMutation = useMutation({
     mutationFn: ({ itemId, optionId }: { itemId: string; optionId: string }) =>
       variableProductService.linkItemToOption(vp.id, itemId, { spec_option_id: optionId }, params),
     onSuccess: () => setEditingCell(null),
-    onError: () => { setLocalSpecs({}); invalidate() },
+    onError: () => {
+      setLocalSpecs({})
+      invalidate()
+    }
   })
 
   const switchOptionMutation = useMutation({
-    mutationFn: async ({ itemId, oldOptionId, newOptionId }: { itemId: string; oldOptionId: string; newOptionId: string }) => {
+    mutationFn: async ({
+      itemId,
+      oldOptionId,
+      newOptionId
+    }: {
+      itemId: string
+      oldOptionId: string
+      newOptionId: string
+    }) => {
       await variableProductService.unlinkItemFromOption(vp.id, itemId, oldOptionId, params)
-      await variableProductService.linkItemToOption(vp.id, itemId, { spec_option_id: newOptionId }, params)
+      await variableProductService.linkItemToOption(
+        vp.id,
+        itemId,
+        { spec_option_id: newOptionId },
+        params
+      )
     },
-    onError: () => { setLocalSpecs({}); invalidate() },
+    onError: () => {
+      setLocalSpecs({})
+      invalidate()
+    }
   })
 
   const unlinkMutation = useMutation({
     mutationFn: ({ itemId, optionId }: { itemId: string; optionId: string }) =>
       variableProductService.unlinkItemFromOption(vp.id, itemId, optionId, params),
-    onError: () => { setLocalSpecs({}); invalidate() },
+    onError: () => {
+      setLocalSpecs({})
+      invalidate()
+    }
   })
 
   const specs = vp.spec_definitions
@@ -174,7 +211,7 @@ export const VariantsTable = ({ vp, projectId, addProductsOpen, onAddProductsCha
 
   // Fetch ALL options for each spec (not just ones used in this VP)
   const specOptionsQueries = useQueries({
-    queries: specs.map((spec) => getSpecOptionsQuery(spec.id, params)),
+    queries: specs.map(spec => getSpecOptionsQuery(spec.id, params))
   })
 
   // Map spec ID → full options list
@@ -195,7 +232,6 @@ export const VariantsTable = ({ vp, projectId, addProductsOpen, onAddProductsCha
 
   return (
     <div>
-
       {items.length === 0 ? (
         <div className='rounded-lg border border-dashed border-border py-8 text-center text-[13px] text-text-tertiary'>
           No products yet. Add products to create variants.
@@ -205,12 +241,14 @@ export const VariantsTable = ({ vp, projectId, addProductsOpen, onAddProductsCha
           <table className='min-w-full table-fixed text-[13px]'>
             <thead>
               <tr className='border-b border-border bg-bg-secondary text-left text-[12px] font-medium text-text-tertiary'>
-                <th className='sticky left-0 z-10 w-auto bg-bg-secondary py-2 pl-3 pr-2'>Product</th>
+                <th className='sticky left-0 z-10 w-auto bg-bg-secondary py-2 pr-2 pl-3'>
+                  Product
+                </th>
                 <th className='w-[70px] px-3 py-2'>Stock</th>
-                {specs.map((spec) => (
-                  <th key={spec.id} className='w-[150px] whitespace-nowrap px-3 py-2'>
+                {specs.map(spec => (
+                  <th key={spec.id} className='w-[150px] px-3 py-2 whitespace-nowrap'>
                     {spec.name}
-                    <span className='ml-1 text-[10px] capitalize text-text-quaternary'>
+                    <span className='text-text-quaternary ml-1 text-[10px] capitalize'>
                       ({spec.display_type})
                     </span>
                   </th>
@@ -219,7 +257,7 @@ export const VariantsTable = ({ vp, projectId, addProductsOpen, onAddProductsCha
               </tr>
             </thead>
             <tbody>
-              {items.map((item) => {
+              {items.map(item => {
                 const isActive = getActive(item)
                 return (
                   <tr
@@ -230,7 +268,7 @@ export const VariantsTable = ({ vp, projectId, addProductsOpen, onAddProductsCha
                     )}
                   >
                     {/* Product cell */}
-                    <td className='sticky left-0 z-10 bg-background py-2 pl-3 pr-2 group-hover:bg-bg-hover'>
+                    <td className='sticky left-0 z-10 bg-background py-2 pr-2 pl-3 group-hover:bg-bg-hover'>
                       <div className='flex items-center gap-2.5'>
                         <ProductThumbnail
                           entityType='product'
@@ -248,10 +286,7 @@ export const VariantsTable = ({ vp, projectId, addProductsOpen, onAddProductsCha
                                 DEFAULT
                               </span>
                             )}
-                            <StatusBadge
-                              status={item.status}
-                              expiresAt={item.status_expires_at}
-                            />
+                            <StatusBadge status={item.status} expiresAt={item.status_expires_at} />
                           </div>
                           <div className='truncate text-[11px] text-text-tertiary'>
                             {item.product_id}
@@ -261,16 +296,16 @@ export const VariantsTable = ({ vp, projectId, addProductsOpen, onAddProductsCha
                     </td>
 
                     {/* Stock cell */}
-                    <td className='px-3 py-2 tabular-nums text-text-secondary'>
+                    <td className='px-3 py-2 text-text-secondary tabular-nums'>
                       {item.available_stock ?? '—'}
                     </td>
 
                     {/* Spec value cells */}
-                    {specs.map((spec) => {
+                    {specs.map(spec => {
                       const val = getSpecValue(item, spec.slug)
                       const allOpts = getOptions(spec)
                       const matchedOption = val
-                        ? allOpts.find((o) => o.id === val.option_id)
+                        ? allOpts.find(o => o.id === val.option_id)
                         : undefined
 
                       return (
@@ -281,19 +316,30 @@ export const VariantsTable = ({ vp, projectId, addProductsOpen, onAddProductsCha
                             currentOptionId={val?.option_id ?? null}
                             currentValue={val?.value ?? null}
                             matchedOption={matchedOption}
-                            onSelect={(optId) => {
-                              const opt = allOpts.find((o) => o.id === optId)
+                            onSelect={optId => {
+                              const opt = allOpts.find(o => o.id === optId)
                               if (opt) setSpecOptimistic(item.id, spec.slug, optId, opt.value)
                               if (val) {
-                                switchOptionMutation.mutate({ itemId: item.id, oldOptionId: val.option_id, newOptionId: optId })
+                                switchOptionMutation.mutate({
+                                  itemId: item.id,
+                                  oldOptionId: val.option_id,
+                                  newOptionId: optId
+                                })
                               } else {
                                 linkMutation.mutate({ itemId: item.id, optionId: optId })
                               }
                             }}
-                            onRemove={val ? () => {
-                              removeSpecOptimistic(item.id, spec.slug)
-                              unlinkMutation.mutate({ itemId: item.id, optionId: val.option_id })
-                            } : undefined}
+                            onRemove={
+                              val
+                                ? () => {
+                                    removeSpecOptimistic(item.id, spec.slug)
+                                    unlinkMutation.mutate({
+                                      itemId: item.id,
+                                      optionId: val.option_id
+                                    })
+                                  }
+                                : undefined
+                            }
                           />
                         </td>
                       )
@@ -329,7 +375,11 @@ export const VariantsTable = ({ vp, projectId, addProductsOpen, onAddProductsCha
                             Edit status
                           </DropdownMenuItem>
                           <DropdownMenuItem onClick={() => toggleVisibility(item)}>
-                            {isActive ? <EyeOff className='size-3.5' /> : <Eye className='size-3.5' />}
+                            {isActive ? (
+                              <EyeOff className='size-3.5' />
+                            ) : (
+                              <Eye className='size-3.5' />
+                            )}
                             {isActive ? 'Hide from catalog' : 'Show in catalog'}
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
@@ -352,19 +402,16 @@ export const VariantsTable = ({ vp, projectId, addProductsOpen, onAddProductsCha
       )}
 
       {/* ── Edit Item Status Dialog ── */}
-      <Dialog
-        open={!!editingStatusItem}
-        onOpenChange={(v) => !v && setEditingStatusItem(null)}
-      >
+      <Dialog open={!!editingStatusItem} onOpenChange={v => !v && setEditingStatusItem(null)}>
         <DialogContent className='sm:max-w-sm'>
           <form
-            onSubmit={(e) => {
+            onSubmit={e => {
               e.preventDefault()
               if (editingStatusItem) {
                 updateItemStatusMutation.mutate({
                   itemId: editingStatusItem.id,
                   status: statusDraft,
-                  expires: statusExpiresDraft,
+                  expires: statusExpiresDraft
                 })
               }
             }}
@@ -400,10 +447,10 @@ export const VariantsTable = ({ vp, projectId, addProductsOpen, onAddProductsCha
       </Dialog>
 
       {/* ── Set Option Dialog ── */}
-      <Dialog open={!!editingCell} onOpenChange={(v) => !v && setEditingCell(null)}>
+      <Dialog open={!!editingCell} onOpenChange={v => !v && setEditingCell(null)}>
         <DialogContent className='sm:max-w-xs'>
           <form
-            onSubmit={(e) => {
+            onSubmit={e => {
               e.preventDefault()
               if (editingCell && selectedOptionId) {
                 linkMutation.mutate({ itemId: editingCell.itemId, optionId: selectedOptionId })
@@ -421,7 +468,7 @@ export const VariantsTable = ({ vp, projectId, addProductsOpen, onAddProductsCha
                     <SelectValue placeholder='Choose an option...' />
                   </SelectTrigger>
                   <SelectContent>
-                    {(editingCell ? getOptions(editingCell.spec) : []).map((opt) => (
+                    {(editingCell ? getOptions(editingCell.spec) : []).map(opt => (
                       <SelectItem key={opt.id} value={opt.id}>
                         <div className='flex items-center gap-2'>
                           {editingCell?.spec.display_type === 'swatch' && opt.color_hex && (
@@ -454,10 +501,13 @@ export const VariantsTable = ({ vp, projectId, addProductsOpen, onAddProductsCha
       <Dialog open={addManualOpen} onOpenChange={setAddManualOpen}>
         <DialogContent className='sm:max-w-xs'>
           <form
-            onSubmit={(e) => {
+            onSubmit={e => {
               e.preventDefault()
               addItemMutation.mutate(manualAutoid, {
-                onSuccess: () => { setManualAutoid(''); setAddManualOpen(false) },
+                onSuccess: () => {
+                  setManualAutoid('')
+                  setAddManualOpen(false)
+                }
               })
             }}
           >
@@ -470,7 +520,7 @@ export const VariantsTable = ({ vp, projectId, addProductsOpen, onAddProductsCha
                 <Input
                   id='manual-autoid'
                   value={manualAutoid}
-                  onChange={(e) => setManualAutoid(e.target.value)}
+                  onChange={e => setManualAutoid(e.target.value)}
                   placeholder='INVENTRY_AUTOID'
                   required
                   autoFocus
@@ -495,7 +545,7 @@ export const VariantsTable = ({ vp, projectId, addProductsOpen, onAddProductsCha
         onOpenChange={setProductBrowserOpen}
         projectId={projectId}
         title='Add Products to Superinventory'
-        onSelect={(products) => addBatchMutation.mutate(products)}
+        onSelect={products => addBatchMutation.mutate(products)}
       />
     </div>
   )
@@ -510,7 +560,7 @@ function OptionPicker({
   currentValue,
   matchedOption,
   onSelect,
-  onRemove,
+  onRemove
 }: {
   spec: GlobalSpecDefinition
   options: SpecOption[]
@@ -525,11 +575,17 @@ function OptionPicker({
   const deferredSearch = useDeferredValue(search)
 
   const filtered = deferredSearch
-    ? options.filter((o) => o.value.toLowerCase().includes(deferredSearch.toLowerCase()))
+    ? options.filter(o => o.value.toLowerCase().includes(deferredSearch.toLowerCase()))
     : options
 
   return (
-    <Popover open={open} onOpenChange={(v) => { setOpen(v); if (!v) setSearch('') }}>
+    <Popover
+      open={open}
+      onOpenChange={v => {
+        setOpen(v)
+        if (!v) setSearch('')
+      }}
+    >
       <PopoverTrigger asChild>
         <button
           type='button'
@@ -549,7 +605,7 @@ function OptionPicker({
                 />
               )}
               <span className='truncate text-foreground'>{currentValue}</span>
-              <ChevronDown className='size-3 shrink-0 text-text-quaternary' />
+              <ChevronDown className='text-text-quaternary size-3 shrink-0' />
             </>
           ) : (
             <>
@@ -565,9 +621,9 @@ function OptionPicker({
           <div className='border-b border-border px-2.5 py-1.5'>
             <input
               value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              onChange={e => setSearch(e.target.value)}
               placeholder='Search...'
-              className='w-full bg-transparent text-[12px] outline-none placeholder:text-text-quaternary'
+              className='placeholder:text-text-quaternary w-full bg-transparent text-[12px] outline-none'
               autoFocus
             />
           </div>
@@ -577,7 +633,7 @@ function OptionPicker({
           {filtered.length === 0 ? (
             <div className='p-2 text-center text-[11px] text-text-tertiary'>No matches</div>
           ) : (
-            filtered.map((opt) => {
+            filtered.map(opt => {
               const isActive = opt.id === currentOptionId
               return (
                 <button
@@ -585,7 +641,9 @@ function OptionPicker({
                   type='button'
                   className={cn(
                     'flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-[12px] transition-colors',
-                    isActive ? 'bg-primary/10 text-primary font-medium' : 'text-foreground hover:bg-bg-hover'
+                    isActive
+                      ? 'bg-primary/10 font-medium text-primary'
+                      : 'text-foreground hover:bg-bg-hover'
                   )}
                   onClick={() => {
                     if (!isActive) onSelect(opt.id)
@@ -611,7 +669,10 @@ function OptionPicker({
             <button
               type='button'
               className='flex w-full items-center gap-1.5 rounded-md px-2 py-1 text-[11px] text-destructive transition-colors hover:bg-destructive/5'
-              onClick={() => { onRemove(); setOpen(false) }}
+              onClick={() => {
+                onRemove()
+                setOpen(false)
+              }}
             >
               <Trash2 className='size-3' />
               Remove

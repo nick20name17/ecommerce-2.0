@@ -5,7 +5,7 @@ import { useState } from 'react'
 import type {
   GlobalSpecDefinition,
   VariableProduct,
-  VariableProductItem,
+  VariableProductItem
 } from '@/api/variable-product/schema'
 import { variableProductService } from '@/api/variable-product/service'
 import { VP_QUERY_KEYS } from '@/api/variable-product/query'
@@ -16,7 +16,7 @@ import {
   DialogContent,
   DialogFooter,
   DialogHeader,
-  DialogTitle,
+  DialogTitle
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -25,7 +25,7 @@ import {
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue,
+  SelectValue
 } from '@/components/ui/select'
 import { cn } from '@/lib/utils'
 
@@ -51,18 +51,25 @@ export const VPValuesMatrix = ({ vp, projectId, isMobile, isTablet }: VPValuesMa
 
   // For editing option value
   const [editOption, setEditOption] = useState<{
-    specId: string; optionId: string; value: string; colorHex: string; vpCount: number
+    specId: string
+    optionId: string
+    value: string
+    colorHex: string
+    vpCount: number
   } | null>(null)
 
   const linkMutation = useMutation({
     mutationFn: async () => {
       const params = { project_id: projectId ?? undefined }
       // If item already has a value for this spec, unlink it first
-      const item = vp.items.find((i) => i.id === linkDialog!.itemId)
+      const item = vp.items.find(i => i.id === linkDialog!.itemId)
       const existingVal = item?.specs[linkDialog!.spec.slug]
       if (existingVal) {
         await variableProductService.unlinkItemFromOption(
-          vp.id, linkDialog!.itemId, existingVal.option_id, params
+          vp.id,
+          linkDialog!.itemId,
+          existingVal.option_id,
+          params
         )
       }
       return variableProductService.linkItemToOption(
@@ -74,23 +81,23 @@ export const VPValuesMatrix = ({ vp, projectId, isMobile, isTablet }: VPValuesMa
     },
     meta: {
       successMessage: 'Option updated',
-      invalidatesQuery: VP_QUERY_KEYS.detail(vp.id),
+      invalidatesQuery: VP_QUERY_KEYS.detail(vp.id)
     },
     onSuccess: () => {
       resetLinkForm()
       setLinkDialog(null)
-    },
+    }
   })
 
   const unlinkMutation = useMutation({
     mutationFn: ({ itemId, optionId }: { itemId: string; optionId: string }) =>
       variableProductService.unlinkItemFromOption(vp.id, itemId, optionId, {
-        project_id: projectId ?? undefined,
+        project_id: projectId ?? undefined
       }),
     meta: {
       successMessage: 'Option unlinked',
-      invalidatesQuery: VP_QUERY_KEYS.detail(vp.id),
-    },
+      invalidatesQuery: VP_QUERY_KEYS.detail(vp.id)
+    }
   })
 
   const createOptionAndLinkMutation = useMutation({
@@ -99,7 +106,7 @@ export const VPValuesMatrix = ({ vp, projectId, isMobile, isTablet }: VPValuesMa
         linkDialog!.spec.id,
         {
           value: newOptionValue,
-          color_hex: newOptionColorHex || undefined,
+          color_hex: newOptionColorHex || undefined
         },
         { project_id: projectId ?? undefined }
       )
@@ -112,12 +119,12 @@ export const VPValuesMatrix = ({ vp, projectId, isMobile, isTablet }: VPValuesMa
     },
     meta: {
       successMessage: 'Option created and linked',
-      invalidatesQuery: VP_QUERY_KEYS.detail(vp.id),
+      invalidatesQuery: VP_QUERY_KEYS.detail(vp.id)
     },
     onSuccess: () => {
       resetLinkForm()
       setLinkDialog(null)
-    },
+    }
   })
 
   const resetLinkForm = () => {
@@ -130,7 +137,7 @@ export const VPValuesMatrix = ({ vp, projectId, isMobile, isTablet }: VPValuesMa
   if (vp.items.length === 0 || vp.spec_definitions.length === 0) {
     return (
       <div>
-        <h3 className='text-[13px] font-semibold text-text-secondary mb-2'>Values Matrix</h3>
+        <h3 className='mb-2 text-[13px] font-semibold text-text-secondary'>Values Matrix</h3>
         <div className='rounded-lg border border-dashed border-border py-6 text-center text-[13px] text-text-tertiary'>
           {vp.items.length === 0
             ? 'Add items first to assign spec options'
@@ -151,25 +158,38 @@ export const VPValuesMatrix = ({ vp, projectId, isMobile, isTablet }: VPValuesMa
 
   return (
     <div>
-      <div className='flex items-center gap-2 mb-2'>
+      <div className='mb-2 flex items-center gap-2'>
         <h3 className='text-[13px] font-semibold text-text-secondary'>Values Matrix</h3>
       </div>
 
-      <div className='rounded-lg border border-border overflow-x-auto'>
+      <div className='overflow-x-auto rounded-lg border border-border'>
         <table className='min-w-full text-[13px]'>
           <thead>
-            <tr className='bg-bg-secondary text-text-tertiary text-[12px] font-medium'>
-              <th className={cn(
-                'py-1.5 text-left font-medium sticky left-0 bg-bg-secondary z-10',
-                isMobile ? 'px-2 min-w-[100px]' : isTablet ? 'px-2.5 min-w-[140px]' : 'px-3 min-w-[180px]'
-              )}>
+            <tr className='bg-bg-secondary text-[12px] font-medium text-text-tertiary'>
+              <th
+                className={cn(
+                  'sticky left-0 z-10 bg-bg-secondary py-1.5 text-left font-medium',
+                  isMobile
+                    ? 'min-w-[100px] px-2'
+                    : isTablet
+                      ? 'min-w-[140px] px-2.5'
+                      : 'min-w-[180px] px-3'
+                )}
+              >
                 Product
               </th>
-              {vp.spec_definitions.map((spec) => (
-                <th key={spec.id} className={cn(
-                  'py-1.5 text-left font-medium whitespace-nowrap',
-                  isMobile ? 'px-2 min-w-[80px]' : isTablet ? 'px-2.5 min-w-[100px]' : 'px-3 min-w-[120px]'
-                )}>
+              {vp.spec_definitions.map(spec => (
+                <th
+                  key={spec.id}
+                  className={cn(
+                    'py-1.5 text-left font-medium whitespace-nowrap',
+                    isMobile
+                      ? 'min-w-[80px] px-2'
+                      : isTablet
+                        ? 'min-w-[100px] px-2.5'
+                        : 'min-w-[120px] px-3'
+                  )}
+                >
                   {spec.name}
                   {!isMobile && !isTablet && (
                     <span className='ml-1 text-[10px] text-text-tertiary capitalize'>
@@ -181,39 +201,54 @@ export const VPValuesMatrix = ({ vp, projectId, isMobile, isTablet }: VPValuesMa
             </tr>
           </thead>
           <tbody>
-            {vp.items.map((item) => (
+            {vp.items.map(item => (
               <tr
                 key={item.id}
-                className='border-t border-border-light hover:bg-bg-hover transition-colors'
+                className='border-t border-border-light transition-colors hover:bg-bg-hover'
               >
-                <td className={cn(
-                  'py-1.5 font-medium sticky left-0 bg-background z-10',
-                  isMobile ? 'px-2 max-w-[120px]' : isTablet ? 'px-2.5 max-w-[180px]' : 'px-3 max-w-[300px]'
-                )}>
-                  <div className='text-[12px] leading-snug' title={`${item.product_id} — ${item.descr_1}`}>
+                <td
+                  className={cn(
+                    'sticky left-0 z-10 bg-background py-1.5 font-medium',
+                    isMobile
+                      ? 'max-w-[120px] px-2'
+                      : isTablet
+                        ? 'max-w-[180px] px-2.5'
+                        : 'max-w-[300px] px-3'
+                  )}
+                >
+                  <div
+                    className='text-[12px] leading-snug'
+                    title={`${item.product_id} — ${item.descr_1}`}
+                  >
                     <span className='font-mono text-text-tertiary'>{item.product_id}</span>
                     {item.descr_1 && <> {item.descr_1}</>}
                   </div>
                 </td>
-                {vp.spec_definitions.map((spec) => {
+                {vp.spec_definitions.map(spec => {
                   const val = getValueForCell(item, spec)
                   // Find the matching option for swatch color display
                   const matchedOption = val
-                    ? spec.options?.find((o) => o.id === val.option_id)
+                    ? spec.options?.find(o => o.id === val.option_id)
                     : undefined
                   return (
-                    <td key={spec.id} className={cn('py-1.5 whitespace-nowrap', isMobile ? 'px-2' : isTablet ? 'px-2.5' : 'px-3')}>
+                    <td
+                      key={spec.id}
+                      className={cn(
+                        'py-1.5 whitespace-nowrap',
+                        isMobile ? 'px-2' : isTablet ? 'px-2.5' : 'px-3'
+                      )}
+                    >
                       {val ? (
-                        <div className='flex items-center gap-1.5 group'>
+                        <div className='group flex items-center gap-1.5'>
                           {spec.display_type === 'swatch' && matchedOption?.color_hex && (
                             <div
-                              className='size-4 rounded-full border border-border shrink-0'
+                              className='size-4 shrink-0 rounded-full border border-border'
                               style={{ backgroundColor: matchedOption.color_hex }}
                             />
                           )}
                           <button
                             type='button'
-                            className='text-left hover:underline cursor-pointer'
+                            className='cursor-pointer text-left hover:underline'
                             onClick={() => {
                               resetLinkForm()
                               setSelectedOptionId(val.option_id)
@@ -226,14 +261,16 @@ export const VPValuesMatrix = ({ vp, projectId, isMobile, isTablet }: VPValuesMa
                           <Button
                             variant='ghost'
                             size='icon-xs'
-                            className='sm:opacity-0 sm:group-hover:opacity-100 text-text-tertiary hover:text-text-secondary shrink-0'
-                            onClick={() => setEditOption({
-                              specId: spec.id,
-                              optionId: val.option_id,
-                              value: val.value,
-                              colorHex: matchedOption?.color_hex ?? '',
-                              vpCount: spec.vp_count ?? 0,
-                            })}
+                            className='shrink-0 text-text-tertiary hover:text-text-secondary sm:opacity-0 sm:group-hover:opacity-100'
+                            onClick={() =>
+                              setEditOption({
+                                specId: spec.id,
+                                optionId: val.option_id,
+                                value: val.value,
+                                colorHex: matchedOption?.color_hex ?? '',
+                                vpCount: spec.vp_count ?? 0
+                              })
+                            }
                             title='Edit option text'
                           >
                             <Pencil className='size-3' />
@@ -241,11 +278,11 @@ export const VPValuesMatrix = ({ vp, projectId, isMobile, isTablet }: VPValuesMa
                           <Button
                             variant='ghost'
                             size='icon-xs'
-                            className='sm:opacity-0 sm:group-hover:opacity-100 text-text-tertiary hover:text-destructive shrink-0'
+                            className='shrink-0 text-text-tertiary hover:text-destructive sm:opacity-0 sm:group-hover:opacity-100'
                             onClick={() =>
                               unlinkMutation.mutate({
                                 itemId: item.id,
-                                optionId: val.option_id,
+                                optionId: val.option_id
                               })
                             }
                           >
@@ -256,7 +293,7 @@ export const VPValuesMatrix = ({ vp, projectId, isMobile, isTablet }: VPValuesMa
                         <Button
                           variant='ghost'
                           size='xs'
-                          className='text-text-tertiary h-6'
+                          className='h-6 text-text-tertiary'
                           onClick={() => {
                             resetLinkForm()
                             setLinkDialog({ spec, itemId: item.id })
@@ -278,7 +315,7 @@ export const VPValuesMatrix = ({ vp, projectId, isMobile, isTablet }: VPValuesMa
       {/* Link option dialog */}
       <Dialog
         open={!!linkDialog}
-        onOpenChange={(v) => {
+        onOpenChange={v => {
           if (!v) {
             setLinkDialog(null)
             resetLinkForm()
@@ -287,7 +324,7 @@ export const VPValuesMatrix = ({ vp, projectId, isMobile, isTablet }: VPValuesMa
       >
         <DialogContent className='sm:max-w-sm'>
           <form
-            onSubmit={(e) => {
+            onSubmit={e => {
               e.preventDefault()
               if (showNewOption) {
                 createOptionAndLinkMutation.mutate()
@@ -297,9 +334,7 @@ export const VPValuesMatrix = ({ vp, projectId, isMobile, isTablet }: VPValuesMa
             }}
           >
             <DialogHeader>
-              <DialogTitle>
-                Set {linkDialog?.spec.name} Value
-              </DialogTitle>
+              <DialogTitle>Set {linkDialog?.spec.name} Value</DialogTitle>
             </DialogHeader>
             <DialogBody className='flex flex-col gap-3'>
               {!showNewOption ? (
@@ -311,7 +346,7 @@ export const VPValuesMatrix = ({ vp, projectId, isMobile, isTablet }: VPValuesMa
                         <SelectValue placeholder='Choose an option' />
                       </SelectTrigger>
                       <SelectContent>
-                        {(linkDialog?.spec.options ?? []).map((opt) => (
+                        {(linkDialog?.spec.options ?? []).map(opt => (
                           <SelectItem key={opt.id} value={opt.id}>
                             {opt.value}
                           </SelectItem>
@@ -337,7 +372,7 @@ export const VPValuesMatrix = ({ vp, projectId, isMobile, isTablet }: VPValuesMa
                     <Input
                       id='new-opt-value'
                       value={newOptionValue}
-                      onChange={(e) => setNewOptionValue(e.target.value)}
+                      onChange={e => setNewOptionValue(e.target.value)}
                       placeholder='e.g. Red, Large'
                       required
                       autoFocus
@@ -350,12 +385,12 @@ export const VPValuesMatrix = ({ vp, projectId, isMobile, isTablet }: VPValuesMa
                         <Input
                           id='new-opt-color'
                           value={newOptionColorHex}
-                          onChange={(e) => setNewOptionColorHex(e.target.value)}
+                          onChange={e => setNewOptionColorHex(e.target.value)}
                           placeholder='#FF0000'
                         />
                         {newOptionColorHex && (
                           <div
-                            className='size-8 rounded-md border border-border shrink-0'
+                            className='size-8 shrink-0 rounded-md border border-border'
                             style={{ backgroundColor: newOptionColorHex }}
                           />
                         )}
@@ -412,9 +447,15 @@ function EditOptionDialog({
   option,
   onClose,
   projectId,
-  vpId,
+  vpId
 }: {
-  option: { specId: string; optionId: string; value: string; colorHex: string; vpCount: number } | null
+  option: {
+    specId: string
+    optionId: string
+    value: string
+    colorHex: string
+    vpCount: number
+  } | null
   onClose: () => void
   projectId: number | null
   vpId: string
@@ -439,11 +480,11 @@ function EditOptionDialog({
       ),
     meta: {
       successMessage: 'Option updated',
-      invalidatesQuery: VP_QUERY_KEYS.detail(vpId),
+      invalidatesQuery: VP_QUERY_KEYS.detail(vpId)
     },
     onSuccess: () => {
       handleClose()
-    },
+    }
   })
 
   const handleClose = () => {
@@ -453,15 +494,20 @@ function EditOptionDialog({
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={(v) => !v && handleClose()}>
+    <Dialog open={isOpen} onOpenChange={v => !v && handleClose()}>
       <DialogContent className='sm:max-w-sm'>
-        <form onSubmit={(e) => { e.preventDefault(); updateMutation.mutate() }}>
+        <form
+          onSubmit={e => {
+            e.preventDefault()
+            updateMutation.mutate()
+          }}
+        >
           <DialogHeader>
             <DialogTitle>Edit Option</DialogTitle>
           </DialogHeader>
           <DialogBody className='flex flex-col gap-3'>
             {(option?.vpCount ?? 0) > 1 && (
-              <div className='rounded-md bg-amber-500/10 border border-amber-500/20 px-3 py-2 text-[12px] text-amber-600 dark:text-amber-400'>
+              <div className='rounded-md border border-amber-500/20 bg-amber-500/10 px-3 py-2 text-[12px] text-amber-600 dark:text-amber-400'>
                 This option is shared across {option?.vpCount} VPs. Changes will affect all of them.
               </div>
             )}
@@ -470,7 +516,7 @@ function EditOptionDialog({
               <Input
                 id='edit-opt-value'
                 value={value}
-                onChange={(e) => setValue(e.target.value)}
+                onChange={e => setValue(e.target.value)}
                 required
                 autoFocus
               />
@@ -482,12 +528,12 @@ function EditOptionDialog({
                   <Input
                     id='edit-opt-color'
                     value={colorHex}
-                    onChange={(e) => setColorHex(e.target.value)}
+                    onChange={e => setColorHex(e.target.value)}
                     placeholder='#FF0000'
                   />
                   {colorHex && (
                     <div
-                      className='size-8 rounded-md border border-border shrink-0'
+                      className='size-8 shrink-0 rounded-md border border-border'
                       style={{ backgroundColor: colorHex }}
                     />
                   )}
@@ -496,8 +542,12 @@ function EditOptionDialog({
             )}
           </DialogBody>
           <DialogFooter>
-            <Button type='button' variant='outline' onClick={handleClose}>Cancel</Button>
-            <Button type='submit' isPending={updateMutation.isPending}>Save</Button>
+            <Button type='button' variant='outline' onClick={handleClose}>
+              Cancel
+            </Button>
+            <Button type='submit' isPending={updateMutation.isPending}>
+              Save
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>

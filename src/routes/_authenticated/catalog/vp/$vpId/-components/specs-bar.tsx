@@ -9,7 +9,7 @@ import {
   DialogBody,
   DialogContent,
   DialogHeader,
-  DialogTitle,
+  DialogTitle
 } from '@/components/ui/dialog'
 
 interface SpecsBarProps {
@@ -33,12 +33,17 @@ export const SpecsBar = ({ vp, projectId, onAddProducts }: SpecsBarProps) => {
         <div className='flex items-center gap-2'>
           <h3 className='text-[14px] font-semibold text-foreground'>
             Variants
-            <span className='ml-1.5 text-[13px] font-normal tabular-nums text-text-tertiary'>
+            <span className='ml-1.5 text-[13px] font-normal text-text-tertiary tabular-nums'>
               {vp.items.length}
             </span>
           </h3>
           <div className='flex-1' />
-          <Button variant='ghost' size='xs' className='text-text-tertiary' onClick={() => setManageOpen(true)}>
+          <Button
+            variant='ghost'
+            size='xs'
+            className='text-text-tertiary'
+            onClick={() => setManageOpen(true)}
+          >
             <Settings className='size-3' />
             Specs
           </Button>
@@ -51,14 +56,14 @@ export const SpecsBar = ({ vp, projectId, onAddProducts }: SpecsBarProps) => {
         {/* Spec pills */}
         {specs.length > 0 && (
           <div className='flex flex-wrap items-center gap-1.5'>
-            {specs.map((spec) => (
+            {specs.map(spec => (
               <button
                 key={spec.id}
                 type='button'
                 className='inline-flex items-center gap-1 rounded-full border border-border bg-bg-secondary/60 px-2.5 py-0.5 text-[11px] font-medium text-text-secondary transition-colors hover:bg-bg-active'
                 onClick={() => setManageOpen(true)}
               >
-                <Layers className='size-2.5 text-text-quaternary' />
+                <Layers className='text-text-quaternary size-2.5' />
                 {spec.name}
                 <span className='text-text-quaternary'>
                   {spec.option_count ?? spec.options?.length ?? 0}

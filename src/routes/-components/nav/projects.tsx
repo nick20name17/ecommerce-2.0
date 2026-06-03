@@ -9,7 +9,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuTrigger,
+  DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
 import { useSidebar } from '@/components/ui/sidebar'
 import { Spinner } from '@/components/ui/spinner'
@@ -29,7 +29,7 @@ const PROJECT_COLORS = [
   { bg: 'bg-pink-500', text: 'text-white' },
   { bg: 'bg-orange-500', text: 'text-white' },
   { bg: 'bg-teal-500', text: 'text-white' },
-  { bg: 'bg-indigo-500', text: 'text-white' },
+  { bg: 'bg-indigo-500', text: 'text-white' }
 ]
 
 const DROPDOWN_COLORS = [
@@ -42,7 +42,7 @@ const DROPDOWN_COLORS = [
   { bg: 'bg-pink-500/15', text: 'text-pink-600' },
   { bg: 'bg-orange-500/15', text: 'text-orange-600' },
   { bg: 'bg-teal-500/15', text: 'text-teal-600' },
-  { bg: 'bg-indigo-500/15', text: 'text-indigo-600' },
+  { bg: 'bg-indigo-500/15', text: 'text-indigo-600' }
 ]
 
 function getProjectColor(id: number) {
@@ -66,23 +66,23 @@ export const NavProjects = () => {
   // project_id so pages don't briefly show the previous project's data.
   // Queries without project_id (auth/user/projects-list/profile) stay.
   const switchProject = (nextId: number) => {
-      if (nextId !== projectId) {
-        queryClient.removeQueries({
-          predicate: (query) =>
-            query.queryKey.some(
-              (part) =>
-                typeof part === 'object' &&
-                part !== null &&
-                'project_id' in (part as Record<string, unknown>),
-            ),
-        })
-      }
-      setProjectId(nextId)
+    if (nextId !== projectId) {
+      queryClient.removeQueries({
+        predicate: query =>
+          query.queryKey.some(
+            part =>
+              typeof part === 'object' &&
+              part !== null &&
+              'project_id' in (part as Record<string, unknown>)
+          )
+      })
     }
+    setProjectId(nextId)
+  }
 
   const { data, isLoading } = useQuery({
     ...getProjectsQuery({ limit: DEFAULT_LIMIT, offset: 0 }),
-    enabled: isSuperAdminUser,
+    enabled: isSuperAdminUser
   })
 
   const projects = data?.results ?? []
@@ -101,7 +101,7 @@ export const NavProjects = () => {
     }
   }, [isSuperAdminUser, user?.project_id, projectId, setProjectId])
 
-  const selectedProject = projects.find((p) => p.id === effectiveProjectId) ?? null
+  const selectedProject = projects.find(p => p.id === effectiveProjectId) ?? null
   const resolvedName = selectedProject?.name || user?.project_name || ''
 
   // Cache the project name so it persists across reloads
@@ -118,7 +118,9 @@ export const NavProjects = () => {
   if (!isSuperAdminUser) {
     return (
       <div className='mx-3 mt-3 flex h-[36px] items-center gap-2.5 rounded-[8px] bg-background/70 px-2.5 ring-1 ring-border'>
-        <div className={`flex size-[20px] shrink-0 items-center justify-center rounded-[5px] text-[10px] font-bold ${selectedColor.bg} ${selectedColor.text}`}>
+        <div
+          className={`flex size-[20px] shrink-0 items-center justify-center rounded-[5px] text-[10px] font-bold ${selectedColor.bg} ${selectedColor.text}`}
+        >
           {projectInitial}
         </div>
         <span className='min-w-0 flex-1 truncate text-[13px] font-semibold text-foreground'>
@@ -135,9 +137,11 @@ export const NavProjects = () => {
         <DropdownMenuTrigger asChild>
           <button
             type='button'
-            className='flex h-[36px] min-w-0 flex-1 items-center gap-2.5 rounded-[8px] bg-background/70 px-2.5 text-left ring-1 ring-border transition-all duration-100 hover:bg-background hover:shadow-sm active:scale-[0.98] focus-visible:outline-none dark:hover:bg-background/90'
+            className='flex h-[36px] min-w-0 flex-1 items-center gap-2.5 rounded-[8px] bg-background/70 px-2.5 text-left ring-1 ring-border transition-all duration-100 hover:bg-background hover:shadow-sm focus-visible:outline-none active:scale-[0.98] dark:hover:bg-background/90'
           >
-            <div className={`flex size-[20px] shrink-0 items-center justify-center rounded-[5px] text-[10px] font-bold ${selectedColor.bg} ${selectedColor.text}`}>
+            <div
+              className={`flex size-[20px] shrink-0 items-center justify-center rounded-[5px] text-[10px] font-bold ${selectedColor.bg} ${selectedColor.text}`}
+            >
               {isLoading ? <Spinner className='size-3' /> : projectInitial}
             </div>
             <span className='min-w-0 flex-1 truncate text-[13px] font-semibold text-foreground'>
@@ -146,44 +150,46 @@ export const NavProjects = () => {
             <ChevronDown className='size-3 shrink-0 text-text-tertiary' />
           </button>
         </DropdownMenuTrigger>
-      <DropdownMenuContent
-        className='w-[200px] rounded-[10px] p-1'
-        align='start'
-        side={isMobile ? 'bottom' : 'right'}
-        sideOffset={6}
-        style={{ boxShadow: 'var(--dropdown-shadow)' }}
-      >
-        <div className='px-2 pb-1 pt-1.5 text-[13px] font-medium text-text-tertiary'>
-          Switch project
-        </div>
-        {isLoading ? (
-          <div className='flex items-center justify-center py-4'>
-            <Spinner className='size-4' />
+        <DropdownMenuContent
+          className='w-[200px] rounded-[10px] p-1'
+          align='start'
+          side={isMobile ? 'bottom' : 'right'}
+          sideOffset={6}
+          style={{ boxShadow: 'var(--dropdown-shadow)' }}
+        >
+          <div className='px-2 pt-1.5 pb-1 text-[13px] font-medium text-text-tertiary'>
+            Switch project
           </div>
-        ) : projects.length === 0 ? (
-          <div className='px-2 py-4 text-center text-[13px] text-text-tertiary'>
-            No projects found
-          </div>
-        ) : (
-          projects.map((project) => {
-            const isActive = project.id === effectiveProjectId
-            const color = getDropdownColor(project.id)
-            return (
-              <DropdownMenuItem
-                key={project.id}
-                onClick={() => switchProject(project.id)}
-                className='flex cursor-pointer items-center gap-2 rounded-[6px] px-2 py-1.5 text-[13px]'
-              >
-                <div className={`flex size-[18px] items-center justify-center rounded-[4px] text-[9px] font-bold ${color.bg} ${color.text}`}>
-                  {project.name[0].toUpperCase()}
-                </div>
-                <span className='flex-1 truncate'>{project.name}</span>
-                {isActive && <Check className='size-3.5 shrink-0 text-primary' />}
-              </DropdownMenuItem>
-            )
-          })
-        )}
-      </DropdownMenuContent>
+          {isLoading ? (
+            <div className='flex items-center justify-center py-4'>
+              <Spinner className='size-4' />
+            </div>
+          ) : projects.length === 0 ? (
+            <div className='px-2 py-4 text-center text-[13px] text-text-tertiary'>
+              No projects found
+            </div>
+          ) : (
+            projects.map(project => {
+              const isActive = project.id === effectiveProjectId
+              const color = getDropdownColor(project.id)
+              return (
+                <DropdownMenuItem
+                  key={project.id}
+                  onClick={() => switchProject(project.id)}
+                  className='flex cursor-pointer items-center gap-2 rounded-[6px] px-2 py-1.5 text-[13px]'
+                >
+                  <div
+                    className={`flex size-[18px] items-center justify-center rounded-[4px] text-[9px] font-bold ${color.bg} ${color.text}`}
+                  >
+                    {project.name[0].toUpperCase()}
+                  </div>
+                  <span className='flex-1 truncate'>{project.name}</span>
+                  {isActive && <Check className='size-3.5 shrink-0 text-primary' />}
+                </DropdownMenuItem>
+              )
+            })
+          )}
+        </DropdownMenuContent>
       </DropdownMenu>
       <NotificationBell />
     </div>

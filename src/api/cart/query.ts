@@ -13,5 +13,5 @@ export const getCartQuery = (customerId: string, projectId?: number | null) =>
     queryKey: CART_QUERY_KEYS.detail(customerId, projectId),
     queryFn: () => cartService.get(customerId, projectId),
     enabled: !!customerId,
-    staleTime: 1000 * 30,
+    staleTime: 1000 * 30
   })

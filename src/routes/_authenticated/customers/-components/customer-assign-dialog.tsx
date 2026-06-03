@@ -14,7 +14,7 @@ export const CustomerAssignDialog = ({
   customer,
   open,
   onOpenChange,
-  projectId,
+  projectId
 }: CustomerAssignDialogProps) => {
   if (!customer) return null
 
@@ -23,8 +23,10 @@ export const CustomerAssignDialog = ({
       open={open}
       onOpenChange={onOpenChange}
       entityLabel={customer.l_name}
-      assignedUsers={customer.assigned_users ?? (customer.assigned_user ? [customer.assigned_user] : [])}
-      assignFn={(payload) => customerService.assign(customer.autoid, payload, projectId)}
+      assignedUsers={
+        customer.assigned_users ?? (customer.assigned_user ? [customer.assigned_user] : [])
+      }
+      assignFn={payload => customerService.assign(customer.autoid, payload, projectId)}
       invalidateQueryKey={CUSTOMER_QUERY_KEYS.all()}
       projectId={projectId}
     />

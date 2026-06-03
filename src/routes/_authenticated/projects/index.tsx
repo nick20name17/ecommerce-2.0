@@ -96,7 +96,7 @@ const ProjectsPage = () => {
   const healthQueries = useQueries({
     queries:
       projects.length > 0
-        ? projects.map((p) => ({
+        ? projects.map(p => ({
             ...getProjectHealthQuery(p.id),
             meta: { suppressErrorToast: true }
           }))
@@ -105,7 +105,7 @@ const ProjectsPage = () => {
 
   const projectsWithHealth = mergeHealthIntoProjects(
     projects,
-    healthQueries?.map((q) => ({ data: q.data, isLoading: q.isLoading }))
+    healthQueries?.map(q => ({ data: q.data, isLoading: q.isLoading }))
   )
 
   const editingProjectId = typeof modalProject === 'number' ? modalProject : null
@@ -125,7 +125,7 @@ const ProjectsPage = () => {
           <Search className='size-3 shrink-0 text-text-tertiary' />
           <input
             defaultValue={search}
-            onChange={(e) => handleSearch(e.target.value)}
+            onChange={e => handleSearch(e.target.value)}
             placeholder='Search projects...'
             className='flex-1 bg-transparent text-[13px] outline-none placeholder:text-text-tertiary'
           />
@@ -147,7 +147,7 @@ const ProjectsPage = () => {
           isLoading={isLoading || isPlaceholderData}
           sorting={sorting}
           setSorting={setSorting}
-          onEdit={(project) => setModalProject(project.id)}
+          onEdit={project => setModalProject(project.id)}
           onDelete={setDeleteProject}
         />
       </div>
@@ -159,13 +159,13 @@ const ProjectsPage = () => {
       <ProjectModal
         key={editingProjectId ?? 'create'}
         open={modalProject !== null}
-        onOpenChange={(open) => !open && setModalProject(null)}
+        onOpenChange={open => !open && setModalProject(null)}
         projectId={editingProjectId}
       />
       <ProjectDeleteDialog
         project={deleteProject}
         open={!!deleteProject}
-        onOpenChange={(open) => !open && setDeleteProject(null)}
+        onOpenChange={open => !open && setDeleteProject(null)}
       />
     </div>
   )

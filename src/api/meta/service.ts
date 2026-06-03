@@ -3,11 +3,7 @@ import { api } from '..'
 import type { MetaTagsData } from './schema'
 
 export const metaService = {
-  get: async (params: {
-    entity_type: string
-    entity_id: string
-    project_id?: number
-  }) => {
+  get: async (params: { entity_type: string; entity_id: string; project_id?: number }) => {
     const { data } = await api.get<MetaTagsData>('/meta/', { params })
     return data
   },
@@ -23,5 +19,5 @@ export const metaService = {
   ) => {
     const { data } = await api.post<MetaTagsData>('/meta/', payload, { params })
     return data
-  },
+  }
 }

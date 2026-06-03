@@ -12,7 +12,7 @@ import {
   DialogContent,
   DialogFooter,
   DialogHeader,
-  DialogTitle,
+  DialogTitle
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -35,9 +35,9 @@ export const VPCreateDialog = ({ open, onOpenChange, projectId }: VPCreateDialog
       variableProductService.create(payload, { project_id: projectId ?? undefined }),
     meta: {
       successMessage: 'Variable product created',
-      invalidatesQuery: VP_QUERY_KEYS.lists(),
+      invalidatesQuery: VP_QUERY_KEYS.lists()
     },
-    onSuccess: (data) => {
+    onSuccess: data => {
       onOpenChange(false)
       setName('')
       setDescription('')
@@ -45,22 +45,22 @@ export const VPCreateDialog = ({ open, onOpenChange, projectId }: VPCreateDialog
       setImageUrl('')
       navigate({
         to: '/variable-products/$vpId',
-        params: { vpId: data.id },
+        params: { vpId: data.id }
       })
-    },
+    }
   })
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className='sm:max-w-md'>
         <form
-          onSubmit={(e) => {
+          onSubmit={e => {
             e.preventDefault()
             createMutation.mutate({
               name,
               description: description || undefined,
               slug: slug || undefined,
-              image_url: imageUrl || undefined,
+              image_url: imageUrl || undefined
             })
           }}
         >
@@ -73,7 +73,7 @@ export const VPCreateDialog = ({ open, onOpenChange, projectId }: VPCreateDialog
               <Input
                 id='vp-name'
                 value={name}
-                onChange={(e) => setName(e.target.value)}
+                onChange={e => setName(e.target.value)}
                 placeholder='Product name'
                 required
                 autoFocus
@@ -84,7 +84,7 @@ export const VPCreateDialog = ({ open, onOpenChange, projectId }: VPCreateDialog
               <Input
                 id='vp-desc'
                 value={description}
-                onChange={(e) => setDescription(e.target.value)}
+                onChange={e => setDescription(e.target.value)}
                 placeholder='Available in multiple colors'
               />
             </div>
@@ -93,7 +93,7 @@ export const VPCreateDialog = ({ open, onOpenChange, projectId }: VPCreateDialog
               <Input
                 id='vp-slug'
                 value={slug}
-                onChange={(e) => setSlug(e.target.value)}
+                onChange={e => setSlug(e.target.value)}
                 placeholder='product-slug (auto-generated if empty)'
               />
             </div>
@@ -102,7 +102,7 @@ export const VPCreateDialog = ({ open, onOpenChange, projectId }: VPCreateDialog
               <Input
                 id='vp-image'
                 value={imageUrl}
-                onChange={(e) => setImageUrl(e.target.value)}
+                onChange={e => setImageUrl(e.target.value)}
                 placeholder='https://...'
               />
             </div>

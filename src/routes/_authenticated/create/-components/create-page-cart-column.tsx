@@ -35,7 +35,7 @@ export const CreatePageCartColumn = ({
       title='Cart'
       trailing={
         cartItems.length > 0 && !cartLoading ? (
-          <span className='bg-accent/10 text-primary rounded-full px-2.5 py-0.5 text-[13px] font-medium'>
+          <span className='rounded-full bg-accent/10 px-2.5 py-0.5 text-[13px] font-medium text-primary'>
             {cartItems.length} item{cartItems.length !== 1 ? 's' : ''}
           </span>
         ) : null
@@ -52,11 +52,7 @@ export const CreatePageCartColumn = ({
       />
       {(cart || loading) && (
         <div className='border-t p-4'>
-          <CartSummary
-            cart={cart ?? null}
-            loading={loading}
-            updating={cartUpdating}
-          />
+          <CartSummary cart={cart ?? null} loading={loading} updating={cartUpdating} />
         </div>
       )}
     </CreatePageSection>

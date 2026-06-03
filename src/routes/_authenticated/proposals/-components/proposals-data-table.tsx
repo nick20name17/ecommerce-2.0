@@ -51,7 +51,17 @@ export const ProposalsDataTable = ({
         onAssign,
         canAssign
       }),
-    [fieldConfig, data, isSuperAdmin, projectId, onDelete, onAttachments, onNotes, onAssign, canAssign]
+    [
+      fieldConfig,
+      data,
+      isSuperAdmin,
+      projectId,
+      onDelete,
+      onAttachments,
+      onNotes,
+      onAssign,
+      canAssign
+    ]
   )
 
   const table = useReactTable({
@@ -59,7 +69,7 @@ export const ProposalsDataTable = ({
     data,
     getCoreRowModel: getCoreRowModel(),
     getExpandedRowModel: getExpandedRowModel(),
-    getRowCanExpand: (row) => !row.original._pending && !!row.original.items?.length,
+    getRowCanExpand: row => !row.original._pending && !!row.original.items?.length,
     onSortingChange: setSorting,
     state: { sorting },
     manualSorting: true
@@ -70,7 +80,7 @@ export const ProposalsDataTable = ({
       table={table}
       isLoading={isLoading}
       className='min-h-0 flex-1'
-      renderSubComponent={(row) => <ProposalExpandedRow row={row} />}
+      renderSubComponent={row => <ProposalExpandedRow row={row} />}
     />
   )
 }

@@ -17,11 +17,7 @@ import { Label } from '@/components/ui/label'
 import { Skeleton } from '@/components/ui/skeleton'
 import { cn } from '@/lib/utils'
 
-const SORTABLE_PLUGINS = [
-  ...defaultPreset.plugins,
-  OptimisticSortingPlugin,
-  SortableKeyboardPlugin,
-]
+const SORTABLE_PLUGINS = [...defaultPreset.plugins, OptimisticSortingPlugin, SortableKeyboardPlugin]
 
 const arrayMove = <T,>(array: T[], from: number, to: number): T[] => {
   const next = array.slice()
@@ -36,12 +32,7 @@ interface Props {
   vpId: string
 }
 
-export const SpecOptionsInlineEditor = ({
-  specId,
-  displayType,
-  projectId,
-  vpId,
-}: Props) => {
+export const SpecOptionsInlineEditor = ({ specId, displayType, projectId, vpId }: Props) => {
   const queryClient = useQueryClient()
   const params = { project_id: projectId ?? undefined }
 
@@ -73,19 +64,19 @@ export const SpecOptionsInlineEditor = ({
     onSuccess: () => {
       invalidate()
       setNewValue('')
-    },
+    }
   })
 
   const deleteMutation = useMutation({
     mutationFn: (optionId: string) =>
       variableProductService.deleteSpecOption(specId, optionId, params),
     meta: { successMessage: 'Option deleted' },
-    onSuccess: invalidate,
+    onSuccess: invalidate
   })
 
   const reorderMutation = useMutation({
     mutationFn: ({ id, sort_order }: { id: string; sort_order: number }) =>
-      variableProductService.updateSpecOption(specId, id, { sort_order }, params),
+      variableProductService.updateSpecOption(specId, id, { sort_order }, params)
   })
 
   const handleDragEnd = (event: unknown) => {
@@ -103,16 +94,15 @@ export const SpecOptionsInlineEditor = ({
     const { source, target } = op
     const sortableSource = source as { initialIndex?: number; index?: number }
     const useSortableIndices =
-      typeof sortableSource.initialIndex === 'number' &&
-      typeof sortableSource.index === 'number'
+      typeof sortableSource.initialIndex === 'number' && typeof sortableSource.index === 'number'
 
     const fromIndex = useSortableIndices
       ? sortableSource.initialIndex
-      : orderedOptions.findIndex((o) => o.id === String(source?.id))
+      : orderedOptions.findIndex(o => o.id === String(source?.id))
     const toIndex = useSortableIndices
       ? sortableSource.index
       : target != null
-        ? orderedOptions.findIndex((o) => o.id === String(target.id))
+        ? orderedOptions.findIndex(o => o.id === String(target.id))
         : -1
 
     if (
@@ -148,16 +138,14 @@ export const SpecOptionsInlineEditor = ({
           </span>
         )}
         {displayType !== 'swatch' && (
-          <span className='ml-1 text-[11px] font-normal text-text-tertiary'>
-            · drag to reorder
-          </span>
+          <span className='ml-1 text-[11px] font-normal text-text-tertiary'>· drag to reorder</span>
         )}
       </Label>
 
       <div className='flex flex-col overflow-hidden rounded-lg border border-border'>
         <div
           className='max-h-[40vh] overflow-y-auto overscroll-contain'
-          onWheel={(e) => e.stopPropagation()}
+          onWheel={e => e.stopPropagation()}
         >
           {isLoading ? (
             <div className='flex flex-col gap-1 p-2'>
@@ -182,9 +170,7 @@ export const SpecOptionsInlineEditor = ({
                     projectId={projectId}
                     vpId={vpId}
                     onDelete={() => deleteMutation.mutate(opt.id)}
-                    isDeleting={
-                      deleteMutation.isPending && deleteMutation.variables === opt.id
-                    }
+                    isDeleting={deleteMutation.isPending && deleteMutation.variables === opt.id}
                   />
                 ))}
               </div>
@@ -195,7 +181,7 @@ export const SpecOptionsInlineEditor = ({
         {/* Add row — sticky at bottom of the list card */}
         <form
           className='flex items-center gap-2 border-t border-border-light bg-bg-secondary/40 px-2 py-1.5'
-          onSubmit={(e) => {
+          onSubmit={e => {
             e.preventDefault()
             if (newValue.trim()) createMutation.mutate()
           }}
@@ -203,7 +189,7 @@ export const SpecOptionsInlineEditor = ({
           <Plus className='size-3.5 shrink-0 text-text-tertiary' />
           <Input
             value={newValue}
-            onChange={(e) => setNewValue(e.target.value)}
+            onChange={e => setNewValue(e.target.value)}
             placeholder='Add option (e.g. Red, Large)'
             className='h-7 border-0 bg-transparent px-1 text-[13px] shadow-none focus-visible:ring-0'
           />
@@ -241,14 +227,14 @@ const SortableOptionRow = ({
   projectId,
   vpId,
   onDelete,
-  isDeleting,
+  isDeleting
 }: OptionRowProps) => {
   const queryClient = useQueryClient()
   const params = { project_id: projectId ?? undefined }
 
   const { handleRef, ref, isDragging } = useSortable({
     id: option.id,
-    index,
+    index
   })
 
   const [value, setValue] = useState(option.value)
@@ -280,7 +266,7 @@ const SortableOptionRow = ({
       <button
         ref={handleRef}
         type='button'
-        className='shrink-0 cursor-grab touch-none text-text-quaternary hover:text-text-secondary'
+        className='text-text-quaternary shrink-0 cursor-grab touch-none hover:text-text-secondary'
         aria-label='Drag to reorder'
       >
         <GripVertical className='size-3.5' />
@@ -289,7 +275,7 @@ const SortableOptionRow = ({
       {displayType === 'swatch' ? (
         <ColorPicker
           value={color}
-          onChange={(next) => {
+          onChange={next => {
             setColor(next)
             debouncedPatchColor(next)
           }}
@@ -304,11 +290,11 @@ const SortableOptionRow = ({
 
       <Input
         value={value}
-        onChange={(e) => setValue(e.target.value)}
+        onChange={e => setValue(e.target.value)}
         onBlur={() => {
           if (value.trim() && value !== option.value) patch({ value: value.trim() })
         }}
-        onKeyDown={(e) => {
+        onKeyDown={e => {
           if (e.key === 'Enter') (e.target as HTMLInputElement).blur()
         }}
         className='h-7 flex-1 border-0 bg-transparent px-1 text-[13px] shadow-none focus-visible:ring-0'
@@ -316,9 +302,7 @@ const SortableOptionRow = ({
       />
 
       {displayType === 'swatch' && color && (
-        <span className='font-mono text-[10px] uppercase text-text-quaternary'>
-          {color}
-        </span>
+        <span className='text-text-quaternary font-mono text-[10px] uppercase'>{color}</span>
       )}
 
       <Button

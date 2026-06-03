@@ -22,13 +22,13 @@ import type { DynamicCellFormatter } from '@/helpers/dynamic-columns'
 import { formatDate, formatPhone } from '@/helpers/formatters'
 
 const CUSTOMER_FORMATTERS: Partial<Record<string, DynamicCellFormatter<Customer>>> = {
-  contact_1: (v) =>
+  contact_1: v =>
     v ? (
       <span className='block max-w-full truncate'>{formatPhone(String(v))}</span>
     ) : (
       <span className='text-text-tertiary'>—</span>
     ),
-  last_order_date: (v) => <span>{formatDate(v as string | null | undefined)}</span>
+  last_order_date: v => <span>{formatDate(v as string | null | undefined)}</span>
 }
 
 interface CustomerColumnsOptions {
@@ -67,8 +67,8 @@ export const getCustomerColumns = ({
           className='max-w-[140px] min-w-0'
           role='button'
           tabIndex={0}
-          onClick={(e) => e.stopPropagation()}
-          onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && e.stopPropagation()}
+          onClick={e => e.stopPropagation()}
+          onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && e.stopPropagation()}
         >
           <EntityNotesTrigger
             entityType='customer'
@@ -90,15 +90,12 @@ export const getCustomerColumns = ({
         <div
           role='group'
           className='flex justify-center'
-          onClick={(e) => e.stopPropagation()}
-          onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && e.stopPropagation()}
+          onClick={e => e.stopPropagation()}
+          onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && e.stopPropagation()}
         >
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button
-                variant='ghost'
-                size='icon-sm'
-              >
+              <Button variant='ghost' size='icon-sm'>
                 <MoreHorizontal />
                 <span className='sr-only'>Open menu</span>
               </Button>
@@ -114,10 +111,7 @@ export const getCustomerColumns = ({
                 <Pencil className='size-4' />
                 Edit
               </DropdownMenuItem>
-              <DropdownMenuItem
-                variant='destructive'
-                onClick={() => onDelete(customer)}
-              >
+              <DropdownMenuItem variant='destructive' onClick={() => onDelete(customer)}>
                 <Trash2 className='size-4' />
                 Delete
               </DropdownMenuItem>

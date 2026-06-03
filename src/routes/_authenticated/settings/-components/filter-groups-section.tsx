@@ -10,14 +10,11 @@ import {
   Plus,
   Trash2,
   Users,
-  X,
+  X
 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
-import {
-  FILTER_PRESET_QUERY_KEYS,
-  getFilterPresetsQuery,
-} from '@/api/filter-preset/query'
+import { FILTER_PRESET_QUERY_KEYS, getFilterPresetsQuery } from '@/api/filter-preset/query'
 import type {
   CreateFilterPresetPayload,
   FilterConditionGroup,
@@ -25,7 +22,7 @@ import type {
   FilterPreset,
   FilterPresetEntityType,
   FilterOp,
-  UpdateFilterPresetPayload,
+  UpdateFilterPresetPayload
 } from '@/api/filter-preset/schema'
 import { isConditionGroup } from '@/api/filter-preset/schema'
 import { filterPresetService } from '@/api/filter-preset/service'
@@ -33,26 +30,17 @@ import { getFieldTypesQuery } from '@/api/data/query'
 import type { FieldTypesResponse } from '@/api/data/schema'
 import { getFieldConfigQuery } from '@/api/field-config/query'
 import type { FieldConfigEntry, FieldConfigResponse } from '@/api/field-config/schema'
-import {
-  ORDER_STATUS_LABELS,
-  ORDER_STATUS_CLASS,
-  type OrderStatus,
-} from '@/constants/order'
+import { ORDER_STATUS_LABELS, ORDER_STATUS_CLASS, type OrderStatus } from '@/constants/order'
 import {
   PROPOSAL_STATUS_LABELS,
   PROPOSAL_STATUS_CLASS,
-  type ProposalStatus,
+  type ProposalStatus
 } from '@/constants/proposal'
 import { CUSTOMER_TYPE_LABELS } from '@/constants/customer'
 import { USER_ROLE_LABELS } from '@/constants/user'
 import type { UserRole } from '@/constants/user'
 import { getUsersQuery } from '@/api/user/query'
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { DatePicker } from '@/components/ui/date-picker'
 import { Input } from '@/components/ui/input'
 import {
@@ -60,7 +48,7 @@ import {
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue,
+  SelectValue
 } from '@/components/ui/select'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Spinner } from '@/components/ui/spinner'
@@ -79,46 +67,57 @@ const ENTITY_META: Record<
     label: 'Order',
     pluralLabel: 'Orders',
     icon: Package,
-    color: 'text-amber-600 bg-amber-500/10 dark:text-amber-400',
+    color: 'text-amber-600 bg-amber-500/10 dark:text-amber-400'
   },
   proposal: {
     label: 'Proposal',
     pluralLabel: 'Proposals',
     icon: FileText,
-    color: 'text-violet-600 bg-violet-500/10 dark:text-violet-400',
+    color: 'text-violet-600 bg-violet-500/10 dark:text-violet-400'
   },
   customer: {
     label: 'Customer',
     pluralLabel: 'Customers',
     icon: Users,
-    color: 'text-blue-600 bg-blue-500/10 dark:text-blue-400',
-  },
+    color: 'text-blue-600 bg-blue-500/10 dark:text-blue-400'
+  }
 }
 
 /** Known dropdown options for specific fields */
-const KNOWN_OPTIONS: Record<string, Record<string, { value: string; label: string; className?: string; dotClass?: string }[]>> = {
+const KNOWN_OPTIONS: Record<
+  string,
+  Record<string, { value: string; label: string; className?: string; dotClass?: string }[]>
+> = {
   order: {
     status: Object.entries(ORDER_STATUS_LABELS).map(([value, label]) => ({
       value,
       label,
       className: ORDER_STATUS_CLASS[value as OrderStatus],
-      dotClass: { U: 'bg-amber-500', O: 'bg-blue-500', X: 'bg-emerald-500' }[value],
-    })),
+      dotClass: { U: 'bg-amber-500', O: 'bg-blue-500', X: 'bg-emerald-500' }[value]
+    }))
   },
   proposal: {
     status: Object.entries(PROPOSAL_STATUS_LABELS).map(([value, label]) => ({
       value,
       label,
       className: PROPOSAL_STATUS_CLASS[value as ProposalStatus],
-      dotClass: { O: 'bg-blue-500', A: 'bg-green-500', L: 'bg-red-500', C: 'bg-slate-400', E: 'bg-amber-500', N: 'bg-violet-500', H: 'bg-slate-400' }[value],
-    })),
+      dotClass: {
+        O: 'bg-blue-500',
+        A: 'bg-green-500',
+        L: 'bg-red-500',
+        C: 'bg-slate-400',
+        E: 'bg-amber-500',
+        N: 'bg-violet-500',
+        H: 'bg-slate-400'
+      }[value]
+    }))
   },
   customer: {
     in_level: Object.entries(CUSTOMER_TYPE_LABELS).map(([value, label]) => ({
       value,
-      label,
-    })),
-  },
+      label
+    }))
+  }
 }
 
 const FILTER_OPS: { value: FilterOp; label: string }[] = [
@@ -133,39 +132,47 @@ const FILTER_OPS: { value: FilterOp; label: string }[] = [
   { value: 'lt', label: '<' },
   { value: 'lte', label: '<=' },
   { value: 'is_empty', label: 'is empty' },
-  { value: 'is_not_empty', label: 'is not empty' },
+  { value: 'is_not_empty', label: 'is not empty' }
 ]
 
 const NO_VALUE_OPS: FilterOp[] = ['is_empty', 'is_not_empty']
 
 // ── Helpers ─────────────────────────────────────────────────
 
-function getFieldLabel(field: string, entityType: FilterPresetEntityType, fieldConfig?: FieldConfigResponse | null): string {
-  const entry = fieldConfig?.[entityType]?.find((e) => e.field === field)
+function getFieldLabel(
+  field: string,
+  entityType: FilterPresetEntityType,
+  fieldConfig?: FieldConfigResponse | null
+): string {
+  const entry = fieldConfig?.[entityType]?.find(e => e.field === field)
   if (entry?.alias?.trim()) return entry.alias.trim()
-  return field.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
+  return field.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
 }
 
 const DYNAMIC_DATE_LABELS: Record<string, string> = {
-  '$today': 'Today',
-  '$tomorrow': 'Tomorrow',
+  $today: 'Today',
+  $tomorrow: 'Tomorrow'
 }
 
 function getValueLabel(field: string, value: string, entityType: FilterPresetEntityType): string {
   if (value in DYNAMIC_DATE_LABELS) return DYNAMIC_DATE_LABELS[value]
   const opts = KNOWN_OPTIONS[entityType]?.[field]
   if (opts) {
-    const opt = opts.find((o) => o.value === value)
+    const opt = opts.find(o => o.value === value)
     if (opt) return opt.label
   }
   return value
 }
 
 function getOpLabel(op: FilterOp): string {
-  return FILTER_OPS.find((o) => o.value === op)?.label ?? op
+  return FILTER_OPS.find(o => o.value === op)?.label ?? op
 }
 
-function getFieldType(field: string, entityType: string, fieldTypes?: FieldTypesResponse | null): string {
+function getFieldType(
+  field: string,
+  entityType: string,
+  fieldTypes?: FieldTypesResponse | null
+): string {
   return fieldTypes?.[entityType]?.[field] ?? 'string'
 }
 
@@ -175,11 +182,15 @@ const DATE_OPS: FilterOp[] = ['eq', 'neq', 'gt', 'gte', 'lt', 'lte', 'is_empty',
 
 function getOpsForType(type: string): { value: FilterOp; label: string }[] {
   switch (type) {
-    case 'boolean': return FILTER_OPS.filter((o) => BOOLEAN_OPS.includes(o.value))
+    case 'boolean':
+      return FILTER_OPS.filter(o => BOOLEAN_OPS.includes(o.value))
     case 'integer':
-    case 'number': return FILTER_OPS.filter((o) => NUMERIC_OPS.includes(o.value))
-    case 'date': return FILTER_OPS.filter((o) => DATE_OPS.includes(o.value))
-    default: return FILTER_OPS
+    case 'number':
+      return FILTER_OPS.filter(o => NUMERIC_OPS.includes(o.value))
+    case 'date':
+      return FILTER_OPS.filter(o => DATE_OPS.includes(o.value))
+    default:
+      return FILTER_OPS
   }
 }
 
@@ -206,25 +217,28 @@ interface ConditionRow {
 export const FilterGroupsSection = () => {
   const queryClient = useQueryClient()
   const [projectId] = useProjectId()
-  const { data: presets, isLoading } = useQuery(getFilterPresetsQuery({ project_id: projectId ?? undefined }))
+  const { data: presets, isLoading } = useQuery(
+    getFilterPresetsQuery({ project_id: projectId ?? undefined })
+  )
   const { data: fieldConfig } = useQuery(getFieldConfigQuery(projectId))
   const { data: fieldTypes } = useQuery(getFieldTypesQuery(projectId))
   const [expandedId, setExpandedId] = useState<number | null>(null)
   const [editingPreset, setEditingPreset] = useState<FilterPreset | 'create' | null>(null)
 
   const deleteMutation = useMutation({
-    mutationFn: (id: number) => filterPresetService.delete(id, { project_id: projectId ?? undefined }),
+    mutationFn: (id: number) =>
+      filterPresetService.delete(id, { project_id: projectId ?? undefined }),
     meta: {
       successMessage: 'Filter preset deleted',
       errorMessage: 'Failed to delete filter preset',
-      invalidatesQuery: FILTER_PRESET_QUERY_KEYS.all(),
-    },
+      invalidatesQuery: FILTER_PRESET_QUERY_KEYS.all()
+    }
   })
 
-  const entityGroups = ENTITY_TYPES.map((entityType) => ({
+  const entityGroups = ENTITY_TYPES.map(entityType => ({
     entityType,
     config: ENTITY_META[entityType],
-    presets: (presets ?? []).filter((p) => p.entity_type === entityType),
+    presets: (presets ?? []).filter(p => p.entity_type === entityType)
   }))
 
   return (
@@ -235,8 +249,8 @@ export const FilterGroupsSection = () => {
           <div className='mb-6'>
             <h2 className='text-[14px] font-semibold text-foreground'>Filter Presets</h2>
             <p className='mt-1 text-[13px] leading-relaxed text-text-tertiary'>
-              Create saved filter combinations for orders, proposals, and customers.
-              Shared presets are visible to all project users.
+              Create saved filter combinations for orders, proposals, and customers. Shared presets
+              are visible to all project users.
             </p>
           </div>
 
@@ -255,7 +269,7 @@ export const FilterGroupsSection = () => {
           {/* Loading */}
           {isLoading && (
             <div className='space-y-4'>
-              {[1, 2, 3].map((i) => (
+              {[1, 2, 3].map(i => (
                 <div key={i} className='rounded-[8px] border border-border p-3'>
                   <div className='flex items-center gap-3'>
                     <Skeleton className='size-5 rounded-[4px]' />
@@ -275,19 +289,24 @@ export const FilterGroupsSection = () => {
               return (
                 <div key={entityType} className='mb-5'>
                   <div className='mb-2 flex items-center gap-2'>
-                    <div className={cn('flex size-5 items-center justify-center rounded-[4px]', config.color)}>
+                    <div
+                      className={cn(
+                        'flex size-5 items-center justify-center rounded-[4px]',
+                        config.color
+                      )}
+                    >
                       <Icon className='size-3' />
                     </div>
-                    <span className='text-[12px] font-semibold uppercase tracking-[0.05em] text-text-tertiary'>
+                    <span className='text-[12px] font-semibold tracking-[0.05em] text-text-tertiary uppercase'>
                       {config.pluralLabel}
                     </span>
-                    <span className='text-[11px] tabular-nums text-text-quaternary'>
+                    <span className='text-text-quaternary text-[11px] tabular-nums'>
                       {entityPresets.length}
                     </span>
                   </div>
 
                   {entityPresets.length === 0 ? (
-                    <div className='rounded-[8px] border border-dashed border-border px-4 py-5 text-center text-[13px] text-text-quaternary'>
+                    <div className='text-text-quaternary rounded-[8px] border border-dashed border-border px-4 py-5 text-center text-[13px]'>
                       No filter presets for {config.pluralLabel.toLowerCase()}
                     </div>
                   ) : (
@@ -298,7 +317,9 @@ export const FilterGroupsSection = () => {
                         return (
                           <div
                             key={preset.id}
-                            className={cn(i < entityPresets.length - 1 && 'border-b border-border-light')}
+                            className={cn(
+                              i < entityPresets.length - 1 && 'border-b border-border-light'
+                            )}
                           >
                             {/* Row header */}
                             <div
@@ -319,41 +340,58 @@ export const FilterGroupsSection = () => {
                                   'inline-flex items-center gap-1 rounded-[4px] px-1.5 py-0.5 text-[11px] font-medium',
                                   preset.shared
                                     ? 'bg-blue-500/10 text-blue-600 dark:text-blue-400'
-                                    : (preset.visible_to_roles?.length > 0 || preset.visible_to_users?.length > 0)
+                                    : preset.visible_to_roles?.length > 0 ||
+                                        preset.visible_to_users?.length > 0
                                       ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400'
                                       : 'bg-foreground/[0.06] text-text-tertiary'
                                 )}
                               >
                                 {preset.shared ? (
-                                  <><Globe className='size-2.5' /> Shared</>
-                                ) : (preset.visible_to_roles?.length > 0 || preset.visible_to_users?.length > 0) ? (
-                                  <><Users className='size-2.5' /> Limited</>
+                                  <>
+                                    <Globe className='size-2.5' /> Shared
+                                  </>
+                                ) : preset.visible_to_roles?.length > 0 ||
+                                  preset.visible_to_users?.length > 0 ? (
+                                  <>
+                                    <Users className='size-2.5' /> Limited
+                                  </>
                                 ) : (
-                                  <><Lock className='size-2.5' /> Private</>
+                                  <>
+                                    <Lock className='size-2.5' /> Private
+                                  </>
                                 )}
                               </span>
 
-                              <span className='shrink-0 rounded-full bg-foreground/[0.06] px-2 py-0.5 text-[11px] font-medium tabular-nums text-text-tertiary'>
+                              <span className='shrink-0 rounded-full bg-foreground/[0.06] px-2 py-0.5 text-[11px] font-medium text-text-tertiary tabular-nums'>
                                 {leaves.length} rule{leaves.length !== 1 ? 's' : ''}
                               </span>
 
                               <div className='flex items-center gap-0.5'>
                                 <button
                                   type='button'
-                                  className='inline-flex size-6 items-center justify-center rounded-[5px] text-text-quaternary transition-colors duration-75 hover:bg-bg-active hover:text-foreground'
-                                  onClick={(e) => { e.stopPropagation(); setEditingPreset(preset) }}
+                                  className='text-text-quaternary inline-flex size-6 items-center justify-center rounded-[5px] transition-colors duration-75 hover:bg-bg-active hover:text-foreground'
+                                  onClick={e => {
+                                    e.stopPropagation()
+                                    setEditingPreset(preset)
+                                  }}
                                 >
                                   <Pencil className='size-3' />
                                 </button>
                                 <button
                                   type='button'
-                                  className='inline-flex size-6 items-center justify-center rounded-[5px] text-text-quaternary transition-colors duration-75 hover:bg-destructive/10 hover:text-destructive disabled:opacity-40'
+                                  className='text-text-quaternary inline-flex size-6 items-center justify-center rounded-[5px] transition-colors duration-75 hover:bg-destructive/10 hover:text-destructive disabled:opacity-40'
                                   disabled={deleteMutation.isPending}
-                                  onClick={(e) => { e.stopPropagation(); deleteMutation.mutate(preset.id) }}
+                                  onClick={e => {
+                                    e.stopPropagation()
+                                    deleteMutation.mutate(preset.id)
+                                  }}
                                 >
-                                  {deleteMutation.isPending && deleteMutation.variables === preset.id
-                                    ? <Spinner className='size-3' />
-                                    : <Trash2 className='size-3' />}
+                                  {deleteMutation.isPending &&
+                                  deleteMutation.variables === preset.id ? (
+                                    <Spinner className='size-3' />
+                                  ) : (
+                                    <Trash2 className='size-3' />
+                                  )}
                                 </button>
                               </div>
                             </div>
@@ -361,7 +399,7 @@ export const FilterGroupsSection = () => {
                             {/* Expanded detail */}
                             {isExpanded && (
                               <div className='border-t border-border-light bg-foreground/[0.015] px-4 py-3'>
-                                <span className='text-[11px] font-semibold uppercase tracking-[0.05em] text-text-tertiary'>
+                                <span className='text-[11px] font-semibold tracking-[0.05em] text-text-tertiary uppercase'>
                                   Conditions
                                 </span>
                                 <div className='mt-1.5 flex flex-wrap gap-1.5'>
@@ -373,10 +411,16 @@ export const FilterGroupsSection = () => {
                                       <span className='font-medium text-text-secondary'>
                                         {getFieldLabel(cond.field, entityType, fieldConfig)}
                                       </span>
-                                      <span className='text-text-quaternary'>{getOpLabel(cond.op)}</span>
+                                      <span className='text-text-quaternary'>
+                                        {getOpLabel(cond.op)}
+                                      </span>
                                       {!NO_VALUE_OPS.includes(cond.op) && (
                                         <span className='font-medium text-foreground'>
-                                          {getValueLabel(cond.field, String(cond.value), entityType)}
+                                          {getValueLabel(
+                                            cond.field,
+                                            String(cond.value),
+                                            entityType
+                                          )}
                                         </span>
                                       )}
                                     </span>
@@ -403,7 +447,7 @@ export const FilterGroupsSection = () => {
           fieldTypes={fieldTypes}
           projectId={projectId}
           open
-          onOpenChange={(open) => !open && setEditingPreset(null)}
+          onOpenChange={open => !open && setEditingPreset(null)}
           onSaved={() => {
             setEditingPreset(null)
             queryClient.invalidateQueries({ queryKey: FILTER_PRESET_QUERY_KEYS.all() })
@@ -423,7 +467,7 @@ function FilterPresetDialog({
   open,
   onOpenChange,
   onSaved,
-  projectId,
+  projectId
 }: {
   preset: FilterPreset | null
   fieldConfig: FieldConfigResponse | null | undefined
@@ -436,12 +480,16 @@ function FilterPresetDialog({
   const isNew = !preset
 
   const [name, setName] = useState(preset?.name ?? '')
-  const [entityType, setEntityType] = useState<FilterPresetEntityType>(preset?.entity_type ?? 'order')
+  const [entityType, setEntityType] = useState<FilterPresetEntityType>(
+    preset?.entity_type ?? 'order'
+  )
   const [shared, setShared] = useState(preset?.shared ?? false)
   const [visibleToRoles, setVisibleToRoles] = useState<string[]>(preset?.visible_to_roles ?? [])
   const [visibleToUsers, setVisibleToUsers] = useState<number[]>(preset?.visible_to_users ?? [])
 
-  const { data: usersData } = useQuery(getUsersQuery({ limit: 500, project: projectId ?? undefined }))
+  const { data: usersData } = useQuery(
+    getUsersQuery({ limit: 500, project: projectId ?? undefined })
+  )
   const users = usersData?.results ?? []
 
   // Build initial condition rows from preset
@@ -450,7 +498,7 @@ function FilterPresetDialog({
         id: `r-${i}`,
         field: c.field,
         op: c.op,
-        value: NO_VALUE_OPS.includes(c.op) ? '' : String(c.value),
+        value: NO_VALUE_OPS.includes(c.op) ? '' : String(c.value)
       }))
     : []
 
@@ -458,12 +506,12 @@ function FilterPresetDialog({
 
   // Get available fields for current entity — include fields from existing rows
   // so that preset conditions with fields not in field-config still display
-  const configFields: FieldConfigEntry[] = fieldConfig?.[entityType]?.filter((e) => e.enabled) ?? []
-  const configFieldSet = new Set(configFields.map((f) => f.field))
+  const configFields: FieldConfigEntry[] = fieldConfig?.[entityType]?.filter(e => e.enabled) ?? []
+  const configFieldSet = new Set(configFields.map(f => f.field))
   const extraFields: FieldConfigEntry[] = rows
-    .filter((r) => r.field && !configFieldSet.has(r.field))
+    .filter(r => r.field && !configFieldSet.has(r.field))
     .reduce<FieldConfigEntry[]>((acc, r) => {
-      if (!acc.some((f) => f.field === r.field)) {
+      if (!acc.some(f => f.field === r.field)) {
         acc.push({ field: r.field, alias: null, default: false, enabled: true })
       }
       return acc
@@ -477,27 +525,24 @@ function FilterPresetDialog({
 
   const addRow = () => {
     const firstField = entityFields[0]?.field ?? 'status'
-    setRows((prev) => [
-      ...prev,
-      { id: `r-${Date.now()}`, field: firstField, op: 'eq', value: '' },
-    ])
+    setRows(prev => [...prev, { id: `r-${Date.now()}`, field: firstField, op: 'eq', value: '' }])
   }
 
   const updateRow = (id: string, updates: Partial<ConditionRow>) => {
-    setRows((prev) => prev.map((r) => (r.id === id ? { ...r, ...updates } : r)))
+    setRows(prev => prev.map(r => (r.id === id ? { ...r, ...updates } : r)))
   }
 
   const removeRow = (id: string) => {
-    setRows((prev) => prev.filter((r) => r.id !== id))
+    setRows(prev => prev.filter(r => r.id !== id))
   }
 
   const buildConditions = (): FilterConditionGroup => {
     const leaves: FilterConditionLeaf[] = rows
-      .filter((r) => r.field && (NO_VALUE_OPS.includes(r.op) || r.value.trim()))
-      .map((r) => ({
+      .filter(r => r.field && (NO_VALUE_OPS.includes(r.op) || r.value.trim()))
+      .map(r => ({
         field: r.field,
         op: r.op,
-        value: NO_VALUE_OPS.includes(r.op) ? '' : r.value.trim(),
+        value: NO_VALUE_OPS.includes(r.op) ? '' : r.value.trim()
       }))
 
     // Group by field — same-field conditions get OR'd
@@ -521,20 +566,27 @@ function FilterPresetDialog({
   }
 
   const createMutation = useMutation({
-    mutationFn: (payload: CreateFilterPresetPayload) => filterPresetService.create(payload, { project_id: projectId ?? undefined }),
-    meta: { successMessage: 'Filter preset created', errorMessage: 'Failed to create filter preset' },
-    onSuccess: () => onSaved(),
+    mutationFn: (payload: CreateFilterPresetPayload) =>
+      filterPresetService.create(payload, { project_id: projectId ?? undefined }),
+    meta: {
+      successMessage: 'Filter preset created',
+      errorMessage: 'Failed to create filter preset'
+    },
+    onSuccess: () => onSaved()
   })
 
   const updateMutation = useMutation({
     mutationFn: ({ id, payload }: { id: number; payload: UpdateFilterPresetPayload }) =>
       filterPresetService.update(id, payload, { project_id: projectId ?? undefined }),
-    meta: { successMessage: 'Filter preset updated', errorMessage: 'Failed to update filter preset' },
-    onSuccess: () => onSaved(),
+    meta: {
+      successMessage: 'Filter preset updated',
+      errorMessage: 'Failed to update filter preset'
+    },
+    onSuccess: () => onSaved()
   })
 
   const isPending = createMutation.isPending || updateMutation.isPending
-  const validRows = rows.filter((r) => r.field && (NO_VALUE_OPS.includes(r.op) || r.value.trim()))
+  const validRows = rows.filter(r => r.field && (NO_VALUE_OPS.includes(r.op) || r.value.trim()))
 
   const handleSubmit = () => {
     if (!name.trim() || validRows.length === 0) return
@@ -542,12 +594,20 @@ function FilterPresetDialog({
     const visibility = {
       shared,
       visible_to_roles: shared ? [] : visibleToRoles,
-      visible_to_users: shared ? [] : visibleToUsers,
+      visible_to_users: shared ? [] : visibleToUsers
     }
     if (isNew) {
-      createMutation.mutate({ entity_type: entityType, name: name.trim(), conditions, ...visibility })
+      createMutation.mutate({
+        entity_type: entityType,
+        name: name.trim(),
+        conditions,
+        ...visibility
+      })
     } else {
-      updateMutation.mutate({ id: preset.id, payload: { entity_type: entityType, name: name.trim(), conditions, ...visibility } })
+      updateMutation.mutate({
+        id: preset.id,
+        payload: { entity_type: entityType, name: name.trim(), conditions, ...visibility }
+      })
     }
   }
 
@@ -564,10 +624,12 @@ function FilterPresetDialog({
           <div className='space-y-5 px-5 py-4'>
             {/* Name */}
             <div>
-              <label className='mb-1.5 block text-[12px] font-medium text-text-secondary'>Name</label>
+              <label className='mb-1.5 block text-[12px] font-medium text-text-secondary'>
+                Name
+              </label>
               <Input
                 value={name}
-                onChange={(e) => setName(e.target.value)}
+                onChange={e => setName(e.target.value)}
                 placeholder='e.g. Open Orders (AARON)'
               />
             </div>
@@ -575,9 +637,11 @@ function FilterPresetDialog({
             {/* Entity selector */}
             {isNew && (
               <div>
-                <label className='mb-1.5 block text-[12px] font-medium text-text-secondary'>Entity</label>
+                <label className='mb-1.5 block text-[12px] font-medium text-text-secondary'>
+                  Entity
+                </label>
                 <div className='flex gap-1.5'>
-                  {ENTITY_TYPES.map((e) => {
+                  {ENTITY_TYPES.map(e => {
                     const cfg = ENTITY_META[e]
                     const Icon = cfg.icon
                     return (
@@ -603,7 +667,9 @@ function FilterPresetDialog({
 
             {/* Conditions */}
             <div>
-              <label className='mb-1.5 block text-[12px] font-medium text-text-secondary'>Conditions</label>
+              <label className='mb-1.5 block text-[12px] font-medium text-text-secondary'>
+                Conditions
+              </label>
               <div className='space-y-2'>
                 {rows.map((row, i) => {
                   const knownOpts = KNOWN_OPTIONS[entityType]?.[row.field]
@@ -613,7 +679,7 @@ function FilterPresetDialog({
                   return (
                     <div key={row.id} className='flex items-center gap-1.5'>
                       {i > 0 && (
-                        <span className='w-[32px] shrink-0 text-center text-[11px] font-medium text-text-quaternary'>
+                        <span className='text-text-quaternary w-[32px] shrink-0 text-center text-[11px] font-medium'>
                           AND
                         </span>
                       )}
@@ -622,12 +688,12 @@ function FilterPresetDialog({
                       {/* Field */}
                       <Select
                         value={row.field}
-                        onValueChange={(v) => {
+                        onValueChange={v => {
                           const newType = getFieldType(v, entityType, fieldTypes)
                           updateRow(row.id, {
                             field: v,
                             value: newType === 'boolean' ? 'true' : '',
-                            op: newType === 'boolean' ? 'eq' : row.op,
+                            op: newType === 'boolean' ? 'eq' : row.op
                           })
                         }}
                       >
@@ -635,9 +701,10 @@ function FilterPresetDialog({
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          {entityFields.map((f) => (
+                          {entityFields.map(f => (
                             <SelectItem key={f.field} value={f.field}>
-                              {f.alias?.trim() || f.field.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())}
+                              {f.alias?.trim() ||
+                                f.field.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}
                             </SelectItem>
                           ))}
                         </SelectContent>
@@ -646,33 +713,39 @@ function FilterPresetDialog({
                       {/* Operator */}
                       <Select
                         value={row.op}
-                        onValueChange={(v) => updateRow(row.id, { op: v as FilterOp })}
+                        onValueChange={v => updateRow(row.id, { op: v as FilterOp })}
                       >
                         <SelectTrigger size='sm' className='w-[110px] shrink-0'>
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          {availableOps.map((op) => (
-                            <SelectItem key={op.value} value={op.value}>{op.label}</SelectItem>
+                          {availableOps.map(op => (
+                            <SelectItem key={op.value} value={op.value}>
+                              {op.label}
+                            </SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
 
                       {/* Value — type-aware */}
-                      {hasValue && (
-                        knownOpts ? (
+                      {hasValue &&
+                        (knownOpts ? (
                           <Select
                             value={row.value || undefined}
-                            onValueChange={(v) => updateRow(row.id, { value: v })}
+                            onValueChange={v => updateRow(row.id, { value: v })}
                           >
                             <SelectTrigger size='sm' className='min-w-0 flex-1'>
                               <SelectValue placeholder='Select...' />
                             </SelectTrigger>
                             <SelectContent>
-                              {knownOpts.map((opt) => (
+                              {knownOpts.map(opt => (
                                 <SelectItem key={opt.value} value={opt.value}>
                                   <span className='flex items-center gap-2'>
-                                    {opt.dotClass && <span className={cn('size-2 shrink-0 rounded-full', opt.dotClass)} />}
+                                    {opt.dotClass && (
+                                      <span
+                                        className={cn('size-2 shrink-0 rounded-full', opt.dotClass)}
+                                      />
+                                    )}
                                     {opt.label}
                                   </span>
                                 </SelectItem>
@@ -686,14 +759,16 @@ function FilterPresetDialog({
                               'relative inline-flex h-7 w-[52px] shrink-0 items-center rounded-full border transition-colors duration-200',
                               row.value === 'true'
                                 ? 'border-emerald-300 bg-emerald-500 dark:border-emerald-600'
-                                : 'border-border bg-bg-active',
+                                : 'border-border bg-bg-active'
                             )}
-                            onClick={() => updateRow(row.id, { value: row.value === 'true' ? 'false' : 'true' })}
+                            onClick={() =>
+                              updateRow(row.id, { value: row.value === 'true' ? 'false' : 'true' })
+                            }
                           >
                             <span
                               className={cn(
                                 'inline-block size-5 rounded-full bg-background shadow-sm transition-transform duration-200',
-                                row.value === 'true' ? 'translate-x-[27px]' : 'translate-x-[3px]',
+                                row.value === 'true' ? 'translate-x-[27px]' : 'translate-x-[3px]'
                               )}
                             />
                           </button>
@@ -701,7 +776,7 @@ function FilterPresetDialog({
                           <Input
                             type='number'
                             value={row.value}
-                            onChange={(e) => updateRow(row.id, { value: e.target.value })}
+                            onChange={e => updateRow(row.id, { value: e.target.value })}
                             placeholder='0'
                             step={fType === 'integer' ? '1' : 'any'}
                             className='h-7 w-[100px] shrink-0 text-[13px] tabular-nums'
@@ -720,7 +795,11 @@ function FilterPresetDialog({
                             ) : (
                               <DatePicker
                                 value={row.value ? new Date(row.value) : undefined}
-                                onChange={(d) => updateRow(row.id, { value: d ? d.toISOString().split('T')[0] : '' })}
+                                onChange={d =>
+                                  updateRow(row.id, {
+                                    value: d ? d.toISOString().split('T')[0] : ''
+                                  })
+                                }
                                 placeholder='Pick date...'
                                 className='h-7 min-w-0 flex-1 text-[13px]'
                               />
@@ -731,9 +810,11 @@ function FilterPresetDialog({
                                 'h-7 shrink-0 rounded-[5px] border px-2 text-[11px] font-medium transition-colors',
                                 row.value === '$today'
                                   ? 'border-primary bg-primary text-primary-foreground'
-                                  : 'border-border text-text-tertiary hover:border-primary/50 hover:text-primary',
+                                  : 'border-border text-text-tertiary hover:border-primary/50 hover:text-primary'
                               )}
-                              onClick={() => updateRow(row.id, { value: row.value === '$today' ? '' : '$today' })}
+                              onClick={() =>
+                                updateRow(row.id, { value: row.value === '$today' ? '' : '$today' })
+                              }
                             >
                               Today
                             </button>
@@ -743,9 +824,13 @@ function FilterPresetDialog({
                                 'h-7 shrink-0 rounded-[5px] border px-2 text-[11px] font-medium transition-colors',
                                 row.value === '$tomorrow'
                                   ? 'border-primary bg-primary text-primary-foreground'
-                                  : 'border-border text-text-tertiary hover:border-primary/50 hover:text-primary',
+                                  : 'border-border text-text-tertiary hover:border-primary/50 hover:text-primary'
                               )}
-                              onClick={() => updateRow(row.id, { value: row.value === '$tomorrow' ? '' : '$tomorrow' })}
+                              onClick={() =>
+                                updateRow(row.id, {
+                                  value: row.value === '$tomorrow' ? '' : '$tomorrow'
+                                })
+                              }
                             >
                               Tmrw
                             </button>
@@ -753,17 +838,16 @@ function FilterPresetDialog({
                         ) : (
                           <Input
                             value={row.value}
-                            onChange={(e) => updateRow(row.id, { value: e.target.value })}
+                            onChange={e => updateRow(row.id, { value: e.target.value })}
                             placeholder='Value...'
                             className='h-7 min-w-0 flex-1 text-[13px]'
                           />
-                        )
-                      )}
+                        ))}
 
                       {/* Remove */}
                       <button
                         type='button'
-                        className='inline-flex size-6 shrink-0 items-center justify-center rounded-[5px] text-text-quaternary transition-colors duration-75 hover:bg-destructive/10 hover:text-destructive'
+                        className='text-text-quaternary inline-flex size-6 shrink-0 items-center justify-center rounded-[5px] transition-colors duration-75 hover:bg-destructive/10 hover:text-destructive'
                         onClick={() => removeRow(row.id)}
                       >
                         <X className='size-3' />
@@ -785,8 +869,10 @@ function FilterPresetDialog({
 
             {/* Visibility */}
             <div>
-              <label className='mb-1.5 block text-[12px] font-medium text-text-secondary'>Visibility</label>
-              <p className='mb-3 text-[11px] text-text-quaternary'>
+              <label className='mb-1.5 block text-[12px] font-medium text-text-secondary'>
+                Visibility
+              </label>
+              <p className='text-text-quaternary mb-3 text-[11px]'>
                 Options can be combined. Leave all empty for creator-only.
               </p>
 
@@ -800,7 +886,7 @@ function FilterPresetDialog({
                       'relative inline-flex h-[18px] w-[30px] shrink-0 items-center rounded-full transition-colors duration-150',
                       shared ? 'bg-primary' : 'bg-foreground/15'
                     )}
-                    onClick={() => setShared((v) => !v)}
+                    onClick={() => setShared(v => !v)}
                   >
                     <span
                       className={cn(
@@ -814,30 +900,34 @@ function FilterPresetDialog({
                 {/* Visible to roles */}
                 {!shared && (
                   <div>
-                    <span className='mb-1 block text-[12px] text-text-tertiary'>Visible to roles</span>
+                    <span className='mb-1 block text-[12px] text-text-tertiary'>
+                      Visible to roles
+                    </span>
                     <div className='flex flex-wrap gap-1'>
-                      {(Object.entries(USER_ROLE_LABELS) as [UserRole, string][]).map(([role, label]) => {
-                        const selected = visibleToRoles.includes(role)
-                        return (
-                          <button
-                            key={role}
-                            type='button'
-                            className={cn(
-                              'inline-flex h-6 items-center rounded-[5px] border px-2 text-[12px] font-medium transition-colors duration-75',
-                              selected
-                                ? 'border-primary/30 bg-primary/[0.08] text-primary'
-                                : 'border-border bg-background text-text-tertiary hover:text-text-secondary'
-                            )}
-                            onClick={() => {
-                              setVisibleToRoles((prev) =>
-                                selected ? prev.filter((r) => r !== role) : [...prev, role]
-                              )
-                            }}
-                          >
-                            {label}
-                          </button>
-                        )
-                      })}
+                      {(Object.entries(USER_ROLE_LABELS) as [UserRole, string][]).map(
+                        ([role, label]) => {
+                          const selected = visibleToRoles.includes(role)
+                          return (
+                            <button
+                              key={role}
+                              type='button'
+                              className={cn(
+                                'inline-flex h-6 items-center rounded-[5px] border px-2 text-[12px] font-medium transition-colors duration-75',
+                                selected
+                                  ? 'border-primary/30 bg-primary/[0.08] text-primary'
+                                  : 'border-border bg-background text-text-tertiary hover:text-text-secondary'
+                              )}
+                              onClick={() => {
+                                setVisibleToRoles(prev =>
+                                  selected ? prev.filter(r => r !== role) : [...prev, role]
+                                )
+                              }}
+                            >
+                              {label}
+                            </button>
+                          )
+                        }
+                      )}
                     </div>
                   </div>
                 )}
@@ -845,11 +935,14 @@ function FilterPresetDialog({
                 {/* Visible to users */}
                 {!shared && (
                   <div>
-                    <span className='mb-1 block text-[12px] text-text-tertiary'>Visible to users</span>
+                    <span className='mb-1 block text-[12px] text-text-tertiary'>
+                      Visible to users
+                    </span>
                     <div className='flex flex-wrap gap-1'>
-                      {users.map((u) => {
+                      {users.map(u => {
                         const selected = visibleToUsers.includes(u.id)
-                        const displayName = [u.first_name, u.last_name].filter(Boolean).join(' ') || u.email
+                        const displayName =
+                          [u.first_name, u.last_name].filter(Boolean).join(' ') || u.email
                         return (
                           <button
                             key={u.id}
@@ -861,8 +954,8 @@ function FilterPresetDialog({
                                 : 'border-border bg-background text-text-tertiary hover:text-text-secondary'
                             )}
                             onClick={() => {
-                              setVisibleToUsers((prev) =>
-                                selected ? prev.filter((id) => id !== u.id) : [...prev, u.id]
+                              setVisibleToUsers(prev =>
+                                selected ? prev.filter(id => id !== u.id) : [...prev, u.id]
                               )
                             }}
                           >
@@ -879,7 +972,9 @@ function FilterPresetDialog({
             {/* Preview */}
             {validRows.length > 0 && (
               <div>
-                <label className='mb-1.5 block text-[12px] font-medium text-text-secondary'>Preview</label>
+                <label className='mb-1.5 block text-[12px] font-medium text-text-secondary'>
+                  Preview
+                </label>
                 <div className='rounded-[8px] border border-border bg-foreground/[0.02] px-3 py-2.5'>
                   <div className='flex flex-wrap items-center gap-1.5 text-[12px]'>
                     <span className='text-text-tertiary'>

@@ -18,7 +18,7 @@ const DEPTH_COLORS = [
   'text-amber-500 fill-amber-500/20',
   'text-emerald-500 fill-emerald-500/20',
   'text-rose-500 fill-rose-500/20',
-  'text-cyan-500 fill-cyan-500/20',
+  'text-cyan-500 fill-cyan-500/20'
 ]
 
 interface ProductRow {
@@ -43,7 +43,7 @@ export const ProductBrowserDialog = ({
   projectId,
   onSelect,
   title = 'Browse Products',
-  defaultCategoryId,
+  defaultCategoryId
 }: ProductBrowserDialogProps) => {
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null)
   const [search, setSearch] = useState('')
@@ -69,12 +69,12 @@ export const ProductBrowserDialog = ({
   }, [open, defaultCategoryId])
 
   const handleSearchChange = (val: string) => {
-      setSearch(val)
-      debouncedSetSearch(val)
-    }
+    setSearch(val)
+    debouncedSetSearch(val)
+  }
 
   const toggleProduct = (product: ProductRow) => {
-    setSelected((prev) => {
+    setSelected(prev => {
       const next = new Map(prev)
       if (next.has(product.autoid)) {
         next.delete(product.autoid)
@@ -92,9 +92,9 @@ export const ProductBrowserDialog = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className='sm:max-w-4xl h-[80vh] flex flex-col gap-0 p-0'>
+      <DialogContent className='flex h-[80vh] flex-col gap-0 p-0 sm:max-w-4xl'>
         {/* Header with search */}
-        <div className='flex shrink-0 flex-col gap-3 border-b border-border px-5 pb-3 pt-5'>
+        <div className='flex shrink-0 flex-col gap-3 border-b border-border px-5 pt-5 pb-3'>
           <div className='flex items-center gap-2'>
             <DialogTitle className='flex-1 text-[15px]'>{title}</DialogTitle>
             {selected.size > 0 && (
@@ -104,10 +104,10 @@ export const ProductBrowserDialog = ({
             )}
           </div>
           <div className='relative'>
-            <Search className='absolute left-3 top-1/2 -translate-y-1/2 size-3.5 text-text-tertiary' />
+            <Search className='absolute top-1/2 left-3 size-3.5 -translate-y-1/2 text-text-tertiary' />
             <Input
               value={search}
-              onChange={(e) => handleSearchChange(e.target.value)}
+              onChange={e => handleSearchChange(e.target.value)}
               placeholder='Search by ID or description...'
               className='h-9 pl-9 text-[13px]'
             />
@@ -122,10 +122,10 @@ export const ProductBrowserDialog = ({
               <button
                 type='button'
                 className={cn(
-                  'w-full text-left rounded-md px-2.5 py-1.5 text-[13px] font-medium transition-colors',
+                  'w-full rounded-md px-2.5 py-1.5 text-left text-[13px] font-medium transition-colors',
                   selectedCategoryId === null && !debouncedSearch
                     ? 'bg-primary/10 text-primary'
-                    : 'hover:bg-bg-hover text-text-secondary'
+                    : 'text-text-secondary hover:bg-bg-hover'
                 )}
                 onClick={() => {
                   setSelectedCategoryId(null)
@@ -140,8 +140,8 @@ export const ProductBrowserDialog = ({
                 selectedId={selectedCategoryId}
                 onSelect={setSelectedCategoryId}
                 expanded={expandedCategories}
-                onToggleExpand={(id) =>
-                  setExpandedCategories((prev) => {
+                onToggleExpand={id =>
+                  setExpandedCategories(prev => {
                     const next = new Set(prev)
                     if (next.has(id)) next.delete(id)
                     else next.add(id)
@@ -188,7 +188,7 @@ function CategoryTreeBrowser({
   expanded,
   onToggleExpand,
   parentId,
-  depth = 0,
+  depth = 0
 }: {
   projectId: number | null
   selectedId: string | null
@@ -203,10 +203,10 @@ function CategoryTreeBrowser({
     queryFn: () =>
       categoryService.get({
         parent_id: parentId,
-        project_id: projectId ?? undefined,
+        project_id: projectId ?? undefined
       }),
     enabled: parentId !== undefined || depth === 0,
-    staleTime: 5 * 60 * 1000,
+    staleTime: 5 * 60 * 1000
   })
 
   const categories = data?.results ?? []
@@ -214,17 +214,17 @@ function CategoryTreeBrowser({
 
   return (
     <>
-      {categories.map((cat) => {
+      {categories.map(cat => {
         const isExpanded = expanded.has(cat.tree_id)
         const hasChildren = cat.subcategory_count > 0
         return (
           <div key={cat.tree_id}>
             <div
               className={cn(
-                'flex items-center gap-1 rounded-md px-1.5 py-1 text-[12px] cursor-pointer transition-colors',
+                'flex cursor-pointer items-center gap-1 rounded-md px-1.5 py-1 text-[12px] transition-colors',
                 selectedId === cat.tree_id
-                  ? 'bg-primary/10 text-primary font-medium'
-                  : 'hover:bg-bg-hover text-text-secondary'
+                  ? 'bg-primary/10 font-medium text-primary'
+                  : 'text-text-secondary hover:bg-bg-hover'
               )}
               style={{ paddingLeft: `${depth * 14 + 6}px` }}
               onClick={() => onSelect(cat.tree_id)}
@@ -233,7 +233,7 @@ function CategoryTreeBrowser({
                 <button
                   type='button'
                   className='shrink-0 p-0.5'
-                  onClick={(e) => {
+                  onClick={e => {
                     e.stopPropagation()
                     onToggleExpand(cat.tree_id)
                   }}
@@ -250,13 +250,23 @@ function CategoryTreeBrowser({
                   <img src={cat.photo} alt='' className='size-full object-cover' loading='lazy' />
                 </div>
               ) : isExpanded && hasChildren ? (
-                <FolderOpen className={cn('size-3.5 shrink-0', DEPTH_COLORS[Math.min(depth, DEPTH_COLORS.length - 1)])} />
+                <FolderOpen
+                  className={cn(
+                    'size-3.5 shrink-0',
+                    DEPTH_COLORS[Math.min(depth, DEPTH_COLORS.length - 1)]
+                  )}
+                />
               ) : (
-                <Folder className={cn('size-3.5 shrink-0', DEPTH_COLORS[Math.min(depth, DEPTH_COLORS.length - 1)])} />
+                <Folder
+                  className={cn(
+                    'size-3.5 shrink-0',
+                    DEPTH_COLORS[Math.min(depth, DEPTH_COLORS.length - 1)]
+                  )}
+                />
               )}
               <span className='flex-1 truncate'>{cat.tree_descr}</span>
               {cat.product_count > 0 && (
-                <span className='text-[10px] text-text-quaternary tabular-nums'>
+                <span className='text-text-quaternary text-[10px] tabular-nums'>
                   {cat.product_count}
                 </span>
               )}
@@ -286,7 +296,7 @@ function ProductList({
   categoryId,
   search,
   selected,
-  onToggle,
+  onToggle
 }: {
   projectId: number | null
   categoryId: string | null
@@ -308,7 +318,7 @@ function ProductList({
       const params: Record<string, string | number> = {
         limit,
         offset,
-        fields: 'id,autoid,descr_1',
+        fields: 'id,autoid,descr_1'
       }
       if (projectId) params.project_id = projectId
       if (search) params.search = search
@@ -319,7 +329,7 @@ function ProductList({
       }>('/data/products/', { params })
       return data
     },
-    staleTime: 30_000,
+    staleTime: 30_000
   })
 
   const products = data?.results ?? []
@@ -328,7 +338,7 @@ function ProductList({
 
   if (isLoading) {
     return (
-      <div className='p-3 flex flex-col gap-1'>
+      <div className='flex flex-col gap-1 p-3'>
         {Array.from({ length: 8 }).map((_, i) => (
           <Skeleton key={i} className='h-8 w-full rounded' />
         ))}
@@ -338,7 +348,7 @@ function ProductList({
 
   if (products.length === 0) {
     return (
-      <div className='flex h-full items-center justify-center text-[13px] text-text-tertiary p-6'>
+      <div className='flex h-full items-center justify-center p-6 text-[13px] text-text-tertiary'>
         {search || categoryId ? 'No products found' : 'Select a category or search'}
       </div>
     )
@@ -347,35 +357,35 @@ function ProductList({
   return (
     <div className='flex flex-col'>
       {/* Header */}
-      <div className='flex items-center gap-3 px-3 py-1.5 text-[11px] font-medium text-text-tertiary bg-bg-secondary border-b border-border sticky top-0'>
+      <div className='sticky top-0 flex items-center gap-3 border-b border-border bg-bg-secondary px-3 py-1.5 text-[11px] font-medium text-text-tertiary'>
         <div className='w-5 shrink-0' />
         <div className='w-[120px] shrink-0'>Product ID</div>
         <div className='flex-1'>Description</div>
       </div>
 
-      {products.map((product) => {
+      {products.map(product => {
         const isSelected = selected.has(product.autoid)
         return (
           <div
             key={product.autoid}
             className={cn(
-              'flex items-center gap-3 px-3 py-1.5 border-b border-border-light cursor-pointer transition-colors',
+              'flex cursor-pointer items-center gap-3 border-b border-border-light px-3 py-1.5 transition-colors',
               isSelected ? 'bg-primary/5' : 'hover:bg-bg-hover'
             )}
             onClick={() => onToggle(product)}
           >
             <Checkbox checked={isSelected} className='shrink-0' />
-            <div className='w-[120px] shrink-0 text-[12px] font-mono text-text-secondary truncate'>
+            <div className='w-[120px] shrink-0 truncate font-mono text-[12px] text-text-secondary'>
               {product.id}
             </div>
-            <div className='flex-1 min-w-0 text-[13px] truncate'>{product.descr_1}</div>
+            <div className='min-w-0 flex-1 truncate text-[13px]'>{product.descr_1}</div>
           </div>
         )
       })}
 
       {/* Pagination */}
       {(hasMore || offset > 0) && (
-        <div className='flex items-center justify-between px-3 py-2 border-t border-border bg-bg-secondary'>
+        <div className='flex items-center justify-between border-t border-border bg-bg-secondary px-3 py-2'>
           <span className='text-[11px] text-text-tertiary'>
             {offset + 1}–{Math.min(offset + limit, count)} of {count}
           </span>

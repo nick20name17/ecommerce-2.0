@@ -14,7 +14,7 @@ export const OrderAssignDialog = ({
   order,
   open,
   onOpenChange,
-  projectId,
+  projectId
 }: OrderAssignDialogProps) => {
   if (!order) return null
 
@@ -24,7 +24,7 @@ export const OrderAssignDialog = ({
       onOpenChange={onOpenChange}
       entityLabel={`order ${order.invoice ?? order.autoid}`}
       assignedUsers={order.assigned_users ?? (order.assigned_user ? [order.assigned_user] : [])}
-      assignFn={(payload) => orderService.assign(order.autoid, payload, projectId)}
+      assignFn={payload => orderService.assign(order.autoid, payload, projectId)}
       invalidateQueryKey={ORDER_QUERY_KEYS.all()}
       projectId={projectId}
     />

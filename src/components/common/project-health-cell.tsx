@@ -18,16 +18,14 @@ export const HealthCell = ({
   if (isLoading) {
     return (
       <span className='flex size-6 items-center justify-center'>
-        <Loader2 className='text-text-tertiary size-4 animate-spin' />
+        <Loader2 className='size-4 animate-spin text-text-tertiary' />
       </span>
     )
   }
 
   if (status === null) {
     return (
-      <span className='text-text-tertiary flex size-6 items-center justify-center text-sm'>
-        —
-      </span>
+      <span className='flex size-6 items-center justify-center text-sm text-text-tertiary'>—</span>
     )
   }
 
@@ -67,7 +65,7 @@ export const HealthCell = ({
       </TooltipTrigger>
       <TooltipContent>
         <div className='flex flex-col gap-0.5'>
-          {tooltipLines.map((line) => (
+          {tooltipLines.map(line => (
             <span key={line}>{line}</span>
           ))}
         </div>

@@ -8,13 +8,13 @@ import {
   DOCUMENT_TEMPLATE_PRESETS,
   type DocumentTemplatePresetKey,
   getPresetByKey,
-  presetToCreatePayload,
+  presetToCreatePayload
 } from '@/api/document-template/presets'
 import { DOCUMENT_TEMPLATE_QUERY_KEYS } from '@/api/document-template/query'
 import type {
   AccessibleRouteKey,
   CreateDocumentTemplatePayload,
-  EntityType,
+  EntityType
 } from '@/api/document-template/schema'
 import { documentTemplateService } from '@/api/document-template/service'
 import { IDocuments, PAGE_COLORS, PageHeaderIcon } from '@/components/ds'
@@ -41,8 +41,8 @@ const ENTITY_CHOICES: {
     icon: Package,
     accessRoutes: [
       { value: 'order_detail', label: 'Order detail page' },
-      { value: 'order_list', label: 'Orders list page' },
-    ],
+      { value: 'order_list', label: 'Orders list page' }
+    ]
   },
   {
     value: 'proposal',
@@ -51,8 +51,8 @@ const ENTITY_CHOICES: {
     icon: FileText,
     accessRoutes: [
       { value: 'proposal_detail', label: 'Proposal detail page' },
-      { value: 'proposal_list', label: 'Proposals list page' },
-    ],
+      { value: 'proposal_list', label: 'Proposals list page' }
+    ]
   },
   {
     value: 'customer',
@@ -61,9 +61,9 @@ const ENTITY_CHOICES: {
     icon: UserSquare,
     accessRoutes: [
       { value: 'customer_detail', label: 'Customer detail page' },
-      { value: 'customer_list', label: 'Customers list page' },
-    ],
-  },
+      { value: 'customer_list', label: 'Customers list page' }
+    ]
+  }
 ]
 
 // ── Page ────────────────────────────────────────────────────
@@ -75,17 +75,15 @@ function NewDocumentPage() {
 
   const [name, setName] = useState('')
   const [entityType, setEntityType] = useState<EntityType>('order')
-  const [accessible, setAccessible] = useState<AccessibleRouteKey[]>([
-    'order_detail',
-  ])
+  const [accessible, setAccessible] = useState<AccessibleRouteKey[]>(['order_detail'])
   const [description, setDescription] = useState('')
   const [presetKey, setPresetKey] = useState<DocumentTemplatePresetKey>('blank')
 
-  const currentEntity = ENTITY_CHOICES.find((c) => c.value === entityType)!
+  const currentEntity = ENTITY_CHOICES.find(c => c.value === entityType)!
 
   const handleEntityChange = (next: EntityType) => {
     setEntityType(next)
-    const entity = ENTITY_CHOICES.find((c) => c.value === next)!
+    const entity = ENTITY_CHOICES.find(c => c.value === next)!
     // Default to "<entity>_detail" only
     setAccessible([entity.accessRoutes[0].value])
   }
@@ -102,33 +100,31 @@ function NewDocumentPage() {
   }
 
   const toggleAccess = (key: AccessibleRouteKey) => {
-    setAccessible((prev) =>
-      prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]
-    )
+    setAccessible(prev => (prev.includes(key) ? prev.filter(k => k !== key) : [...prev, key]))
   }
 
   const createMutation = useMutation({
     mutationFn: (payload: CreateDocumentTemplatePayload) =>
       documentTemplateService.create(payload, projectId),
-    onSuccess: (created) => {
+    onSuccess: created => {
       queryClient.invalidateQueries({
-        queryKey: DOCUMENT_TEMPLATE_QUERY_KEYS.lists(),
+        queryKey: DOCUMENT_TEMPLATE_QUERY_KEYS.lists()
       })
       toast.success('Template created')
       navigate({
         to: '/documents/$templateId',
-        params: { templateId: String(created.id) },
+        params: { templateId: String(created.id) }
       })
     },
     onError: (err: unknown) => {
       const msg =
         err && typeof err === 'object' && 'response' in err
           ? // axios shape
-            ((err as { response?: { data?: { error?: string } } }).response
-              ?.data?.error ?? 'Failed to create template')
+            ((err as { response?: { data?: { error?: string } } }).response?.data?.error ??
+            'Failed to create template')
           : 'Failed to create template'
       toast.error(msg)
-    },
+    }
   })
 
   const canSubmit = name.trim().length > 0 && !createMutation.isPending
@@ -142,7 +138,7 @@ function NewDocumentPage() {
         presetToCreatePayload(preset, {
           name: name.trim(),
           description: description.trim(),
-          accessible_from: accessible,
+          accessible_from: accessible
         })
       )
     } else {
@@ -150,7 +146,7 @@ function NewDocumentPage() {
         name: name.trim(),
         description: description.trim(),
         entity_type: entityType,
-        accessible_from: accessible,
+        accessible_from: accessible
       })
     }
   }
@@ -170,23 +166,18 @@ function NewDocumentPage() {
         <SidebarTrigger className='-ml-1' />
         <button
           type='button'
-          className='inline-flex h-7 shrink-0 items-center gap-0.5 rounded-[6px] border border-border bg-bg-secondary pl-1.5 pr-2.5 text-[13px] font-medium text-text-secondary transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground'
+          className='inline-flex h-7 shrink-0 items-center gap-0.5 rounded-[6px] border border-border bg-bg-secondary pr-2.5 pl-1.5 text-[13px] font-medium text-text-secondary transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground'
           onClick={() => navigate({ to: '/documents' })}
         >
           <ArrowLeft className='size-3.5' />
           <span className='hidden sm:inline'>Documents</span>
         </button>
         <PageHeaderIcon icon={IDocuments} color={PAGE_COLORS.documents} />
-        <h1 className='truncate text-[14px] font-semibold tracking-[-0.01em]'>
-          New template
-        </h1>
+        <h1 className='truncate text-[14px] font-semibold tracking-[-0.01em]'>New template</h1>
       </header>
 
       {/* Form */}
-      <form
-        onSubmit={handleSubmit}
-        className='flex-1 overflow-auto px-3.5 py-5 sm:px-6 sm:py-7'
-      >
+      <form onSubmit={handleSubmit} className='flex-1 overflow-auto px-3.5 py-5 sm:px-6 sm:py-7'>
         <div className='mx-auto flex w-full max-w-xl flex-col gap-6'>
           {/* Preset picker */}
           <div className='flex flex-col gap-2'>
@@ -195,11 +186,10 @@ function NewDocumentPage() {
               Start from a preset
             </label>
             <p className='text-[11.5px] leading-snug text-text-tertiary'>
-              Pick a starter to skip the blank canvas. You can edit anything
-              after creating.
+              Pick a starter to skip the blank canvas. You can edit anything after creating.
             </p>
             <div className='grid gap-2 sm:grid-cols-2'>
-              {DOCUMENT_TEMPLATE_PRESETS.map((p) => {
+              {DOCUMENT_TEMPLATE_PRESETS.map(p => {
                 const isActive = presetKey === p.key
                 return (
                   <button
@@ -225,19 +215,16 @@ function NewDocumentPage() {
 
           {/* Name */}
           <div className='flex flex-col gap-1.5'>
-            <label
-              htmlFor='tpl-name'
-              className='text-[12px] font-semibold text-foreground'
-            >
+            <label htmlFor='tpl-name' className='text-[12px] font-semibold text-foreground'>
               Name
             </label>
             <input
               id='tpl-name'
               type='text'
               value={name}
-              onChange={(e) => setName(e.target.value)}
+              onChange={e => setName(e.target.value)}
               placeholder='e.g. Plain Paper Invoice'
-              className='h-9 rounded-[6px] border border-border bg-background px-2.5 text-[13px] text-foreground outline-none transition-colors duration-[80ms] focus:border-primary focus:ring-2 focus:ring-primary/20'
+              className='h-9 rounded-[6px] border border-border bg-background px-2.5 text-[13px] text-foreground transition-colors duration-[80ms] outline-none focus:border-primary focus:ring-2 focus:ring-primary/20'
               autoFocus
               required
               maxLength={120}
@@ -246,36 +233,28 @@ function NewDocumentPage() {
 
           {/* Description */}
           <div className='flex flex-col gap-1.5'>
-            <label
-              htmlFor='tpl-desc'
-              className='text-[12px] font-semibold text-foreground'
-            >
-              Description{' '}
-              <span className='font-normal text-text-tertiary'>
-                (optional)
-              </span>
+            <label htmlFor='tpl-desc' className='text-[12px] font-semibold text-foreground'>
+              Description <span className='font-normal text-text-tertiary'>(optional)</span>
             </label>
             <textarea
               id='tpl-desc'
               value={description}
-              onChange={(e) => setDescription(e.target.value)}
+              onChange={e => setDescription(e.target.value)}
               placeholder='What is this template used for?'
-              className='min-h-16 resize-y rounded-[6px] border border-border bg-background px-2.5 py-1.5 text-[13px] text-foreground outline-none transition-colors duration-[80ms] focus:border-primary focus:ring-2 focus:ring-primary/20'
+              className='min-h-16 resize-y rounded-[6px] border border-border bg-background px-2.5 py-1.5 text-[13px] text-foreground transition-colors duration-[80ms] outline-none focus:border-primary focus:ring-2 focus:ring-primary/20'
               maxLength={500}
             />
           </div>
 
           {/* Entity type */}
           <div className='flex flex-col gap-2'>
-            <label className='text-[12px] font-semibold text-foreground'>
-              Entity type
-            </label>
+            <label className='text-[12px] font-semibold text-foreground'>Entity type</label>
             <p className='text-[11.5px] leading-snug text-text-tertiary'>
-              Which kind of record does this template render? The designer will
-              expose fields from this entity.
+              Which kind of record does this template render? The designer will expose fields from
+              this entity.
             </p>
             <div className='grid gap-2 sm:grid-cols-3'>
-              {ENTITY_CHOICES.map((c) => {
+              {ENTITY_CHOICES.map(c => {
                 const Icon = c.icon
                 const isActive = entityType === c.value
                 return (
@@ -303,15 +282,12 @@ function NewDocumentPage() {
 
           {/* Accessible from */}
           <div className='flex flex-col gap-2'>
-            <label className='text-[12px] font-semibold text-foreground'>
-              Print from
-            </label>
+            <label className='text-[12px] font-semibold text-foreground'>Print from</label>
             <p className='text-[11.5px] leading-snug text-text-tertiary'>
-              Where this template appears in the Print menu. Can be changed
-              later.
+              Where this template appears in the Print menu. Can be changed later.
             </p>
             <div className='flex flex-col gap-1.5'>
-              {currentEntity.accessRoutes.map((r) => {
+              {currentEntity.accessRoutes.map(r => {
                 const checked = accessible.includes(r.value)
                 return (
                   <label
@@ -371,6 +347,6 @@ export const Route = createFileRoute('/_authenticated/documents/new')({
   },
   component: NewDocumentPage,
   head: () => ({
-    meta: [{ title: 'New document template' }],
-  }),
+    meta: [{ title: 'New document template' }]
+  })
 })

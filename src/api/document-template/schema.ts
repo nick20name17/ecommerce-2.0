@@ -23,12 +23,7 @@ export interface PageMargins {
 export type ElementType = 'text' | 'field' | 'image' | 'table' | 'line' | 'rect'
 
 /** Per-cell value formatter applied before HTML escape. */
-export type TableColumnFormat =
-  | 'string'
-  | 'number'
-  | 'integer'
-  | 'currency'
-  | 'percent'
+export type TableColumnFormat = 'string' | 'number' | 'integer' | 'currency' | 'percent'
 
 /** One column in a Table element. */
 export interface TableColumn {

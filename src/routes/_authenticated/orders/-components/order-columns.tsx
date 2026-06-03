@@ -47,19 +47,13 @@ const ORDER_FORMATTERS: Partial<Record<string, DynamicCellFormatter<OrderRow>>> 
   status: (v, row) => {
     if (row._pending)
       return (
-        <Badge
-          variant='outline'
-          className='text-text-tertiary font-medium'
-        >
+        <Badge variant='outline' className='font-medium text-text-tertiary'>
           Creating…
         </Badge>
       )
     const status = (v ?? row.status) as OrderStatus
     return (
-      <Badge
-        variant='outline'
-        className={cn('font-medium', ORDER_STATUS_CLASS[status] ?? '')}
-      >
+      <Badge variant='outline' className={cn('font-medium', ORDER_STATUS_CLASS[status] ?? '')}>
         {getOrderStatusLabel(status)}
       </Badge>
     )
@@ -93,7 +87,7 @@ const ORDER_FORMATTERS: Partial<Record<string, DynamicCellFormatter<OrderRow>>> 
   invoice: (v, row) => {
     if (row._pending)
       return (
-        <span className='text-text-tertiary flex items-center gap-2'>
+        <span className='flex items-center gap-2 text-text-tertiary'>
           <Loader2 className='size-4 animate-spin' />
           Pending…
         </span>
@@ -138,8 +132,8 @@ export const getOrderColumns = ({
         <button
           type='button'
           className='max-w-[140px] min-w-0 appearance-none border-0 bg-transparent p-0 text-left'
-          onClick={(e) => e.stopPropagation()}
-          onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && e.stopPropagation()}
+          onClick={e => e.stopPropagation()}
+          onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && e.stopPropagation()}
         >
           <EntityNotesTrigger
             entityType='order'
@@ -165,15 +159,12 @@ export const getOrderColumns = ({
         <div
           role='group'
           className='flex justify-center'
-          onClick={(e) => e.stopPropagation()}
-          onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && e.stopPropagation()}
+          onClick={e => e.stopPropagation()}
+          onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && e.stopPropagation()}
         >
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button
-                variant='ghost'
-                size='icon-sm'
-              >
+              <Button variant='ghost' size='icon-sm'>
                 <MoreHorizontal />
                 <span className='sr-only'>Open menu</span>
               </Button>
@@ -200,10 +191,7 @@ export const getOrderColumns = ({
                   Delete Linked Proposal
                 </DropdownMenuItem>
               )}
-              <DropdownMenuItem
-                variant='destructive'
-                onClick={() => onDelete(row.original)}
-              >
+              <DropdownMenuItem variant='destructive' onClick={() => onDelete(row.original)}>
                 <Trash2 className='size-4' />
                 Delete
               </DropdownMenuItem>

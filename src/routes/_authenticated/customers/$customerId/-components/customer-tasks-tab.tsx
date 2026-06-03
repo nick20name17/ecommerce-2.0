@@ -14,7 +14,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuTrigger,
+  DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
@@ -43,7 +43,15 @@ function isOverdue(dateStr: string) {
 
 const PRIORITY_BARS: Record<string, number> = { low: 1, medium: 2, high: 3, urgent: 4 }
 
-function PriorityIcon({ priority, color, size = 14 }: { priority: string; color: string; size?: number }) {
+function PriorityIcon({
+  priority,
+  color,
+  size = 14
+}: {
+  priority: string
+  color: string
+  size?: number
+}) {
   const filled = PRIORITY_BARS[priority] ?? 1
   const barWidth = 2.5
   const gap = 1.5
@@ -54,7 +62,15 @@ function PriorityIcon({ priority, color, size = 14 }: { priority: string; color:
         const barHeight = 4 + i * 2.5
         const y = 14 - barHeight
         return (
-          <rect key={i} x={x} y={y} width={barWidth} height={barHeight} rx={0.75} fill={i < filled ? color : 'var(--border)'} />
+          <rect
+            key={i}
+            x={x}
+            y={y}
+            width={barWidth}
+            height={barHeight}
+            rx={0.75}
+            fill={i < filled ? color : 'var(--border)'}
+          />
         )
       })}
     </svg>
@@ -80,12 +96,12 @@ export const CustomerTasksTab = ({ customerId, customerName }: CustomerTasksTabP
     linked_customer_autoid: customerId,
     search: search || undefined,
     project_id: projectId ?? undefined,
-    limit: 200,
+    limit: 200
   }
 
   const { data, isLoading } = useQuery({
     ...getTasksQuery(params),
-    placeholderData: keepPreviousData,
+    placeholderData: keepPreviousData
   })
 
   const tasks = data?.results ?? []
@@ -95,8 +111,8 @@ export const CustomerTasksTab = ({ customerId, customerName }: CustomerTasksTabP
       taskService.update(taskId, { status: statusId }),
     meta: {
       successMessage: 'Status updated',
-      invalidatesQuery: TASK_QUERY_KEYS.lists(),
-    },
+      invalidatesQuery: TASK_QUERY_KEYS.lists()
+    }
   })
 
   const handleStatusChange = (task: TaskListItem, statusId: number) =>
@@ -109,14 +125,12 @@ export const CustomerTasksTab = ({ customerId, customerName }: CustomerTasksTabP
   return (
     <div className='flex h-full flex-col overflow-hidden'>
       {/* Search + create */}
-      <div
-        className='flex shrink-0 items-center gap-2 border-b border-border py-2 px-5 sm:px-6'
-      >
+      <div className='flex shrink-0 items-center gap-2 border-b border-border px-5 py-2 sm:px-6'>
         <div className='flex flex-1 items-center gap-1.5 rounded-[6px] border border-border bg-background px-2.5 py-1.5'>
           <Search className='size-3.5 shrink-0 text-text-tertiary' />
           <input
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={e => setSearch(e.target.value)}
             placeholder="Search to-do's..."
             className='flex-1 bg-transparent text-[13px] outline-none placeholder:text-text-tertiary'
           />
@@ -138,7 +152,7 @@ export const CustomerTasksTab = ({ customerId, customerName }: CustomerTasksTabP
             {Array.from({ length: 5 }).map((_, i) => (
               <div
                 key={i}
-                className='flex items-center gap-2 border-b border-border-light py-2 px-5 sm:px-6'
+                className='flex items-center gap-2 border-b border-border-light px-5 py-2 sm:px-6'
               >
                 <div className='size-3.5 animate-pulse rounded-full bg-border' />
                 <div className='h-3 w-12 animate-pulse rounded bg-border' />
@@ -147,9 +161,14 @@ export const CustomerTasksTab = ({ customerId, customerName }: CustomerTasksTabP
             ))}
           </div>
         ) : tasks.length === 0 ? (
-          <PageEmpty icon={CheckSquare} title="No to-do's found" description='This customer has no tasks yet.' compact />
+          <PageEmpty
+            icon={CheckSquare}
+            title="No to-do's found"
+            description='This customer has no tasks yet.'
+            compact
+          />
         ) : (
-          tasks.map((task) => (
+          tasks.map(task => (
             <TaskRow
               key={task.id}
               task={task}
@@ -166,10 +185,8 @@ export const CustomerTasksTab = ({ customerId, customerName }: CustomerTasksTabP
 
       {/* Footer */}
       {tasks.length > 0 && (
-        <div
-          className='shrink-0 border-t border-border py-1.5 px-5 sm:px-6'
-        >
-          <p className='text-[13px] tabular-nums text-text-tertiary'>
+        <div className='shrink-0 border-t border-border px-5 py-1.5 sm:px-6'>
+          <p className='text-[13px] text-text-tertiary tabular-nums'>
             {tasks.length} task{tasks.length !== 1 ? 's' : ''}
           </p>
         </div>
@@ -187,7 +204,7 @@ export const CustomerTasksTab = ({ customerId, customerName }: CustomerTasksTabP
       <TaskDeleteDialog
         task={taskToDelete}
         open={taskToDelete !== null}
-        onOpenChange={(open) => !open && setTaskToDelete(null)}
+        onOpenChange={open => !open && setTaskToDelete(null)}
         onDeleted={() => setTaskToDelete(null)}
       />
     </div>
@@ -203,7 +220,7 @@ function TaskRow({
   isTablet,
   onStatusChange,
   onDelete,
-  onClick,
+  onClick
 }: {
   task: TaskListItem
   statuses: TaskStatus[]
@@ -232,7 +249,10 @@ function TaskRow({
           <button
             type='button'
             className='shrink-0 rounded-[4px] transition-opacity duration-[80ms] hover:opacity-70'
-            onClick={(e) => { e.stopPropagation(); setStatusOpen(true) }}
+            onClick={e => {
+              e.stopPropagation()
+              setStatusOpen(true)
+            }}
           >
             <StatusIcon status={task.status_name} color={task.status_color} size={14} />
           </button>
@@ -241,12 +261,17 @@ function TaskRow({
           </span>
         </div>
         <div className='mt-0.5 flex items-center gap-2 pl-[22px]'>
-          <span className='text-[13px] tabular-nums text-text-tertiary'>
+          <span className='text-[13px] text-text-tertiary tabular-nums'>
             TSK-{task.id.toString().padStart(3, '0')}
           </span>
           <PriorityIcon priority={task.priority} color={priorityColor} size={12} />
           {dueDateLabel && (
-            <span className={cn('text-[13px]', overdue ? 'font-medium text-destructive' : 'text-text-tertiary')}>
+            <span
+              className={cn(
+                'text-[13px]',
+                overdue ? 'font-medium text-destructive' : 'text-text-tertiary'
+              )}
+            >
               {dueDateLabel}
             </span>
           )}
@@ -270,18 +295,18 @@ function TaskRow({
             <button
               type='button'
               className='shrink-0 rounded-[4px] transition-opacity duration-[80ms] hover:opacity-70'
-              onClick={(e) => e.stopPropagation()}
+              onClick={e => e.stopPropagation()}
             >
               <StatusIcon status={task.status_name} color={task.status_color} size={14} />
             </button>
           </PopoverTrigger>
           <PopoverContent
-            className='w-[180px] overflow-hidden rounded-[8px] border-border gap-0 p-1'
+            className='w-[180px] gap-0 overflow-hidden rounded-[8px] border-border p-1'
             align='start'
             style={{ boxShadow: 'var(--dropdown-shadow)' }}
-            onOpenAutoFocus={(e) => e.preventDefault()}
+            onOpenAutoFocus={e => e.preventDefault()}
           >
-            {statuses.map((s) => (
+            {statuses.map(s => (
               <button
                 key={s.id}
                 type='button'
@@ -290,7 +315,7 @@ function TaskRow({
                   'transition-colors duration-[80ms]',
                   s.id === task.status ? 'bg-accent-bg' : 'hover:bg-bg-hover'
                 )}
-                onClick={(e) => {
+                onClick={e => {
                   e.stopPropagation()
                   setStatusOpen(false)
                   onStatusChange(task, s.id)
@@ -302,7 +327,7 @@ function TaskRow({
             ))}
           </PopoverContent>
         </Popover>
-        <span className='shrink-0 text-[13px] tabular-nums text-text-tertiary'>
+        <span className='shrink-0 text-[13px] text-text-tertiary tabular-nums'>
           TSK-{task.id.toString().padStart(3, '0')}
         </span>
         <Tooltip>
@@ -335,9 +360,7 @@ function TaskRow({
 
         <div className='w-[60px] text-[13px] text-text-tertiary'>
           {dueDateLabel ? (
-            <span className={cn(overdue && 'font-medium text-destructive')}>
-              {dueDateLabel}
-            </span>
+            <span className={cn(overdue && 'font-medium text-destructive')}>{dueDateLabel}</span>
           ) : (
             <span>&mdash;</span>
           )}
@@ -347,8 +370,8 @@ function TaskRow({
       {/* Actions */}
       <div
         className='flex justify-center opacity-0 transition-opacity group-hover/row:opacity-100'
-        onClick={(e) => e.stopPropagation()}
-        onKeyDown={(e) => e.stopPropagation()}
+        onClick={e => e.stopPropagation()}
+        onKeyDown={e => e.stopPropagation()}
         role='group'
       >
         <DropdownMenu>

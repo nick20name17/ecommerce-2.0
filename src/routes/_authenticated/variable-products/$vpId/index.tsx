@@ -13,5 +13,5 @@ const VPRedirect = () => {
 }
 
 export const Route = createFileRoute('/_authenticated/variable-products/$vpId/')({
-  component: VPRedirect,
+  component: VPRedirect
 })

@@ -17,7 +17,7 @@ import {
   DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogTitle,
+  DialogTitle
 } from '@/components/ui/dialog'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useBreakpoint } from '@/hooks/use-breakpoint'
@@ -41,19 +41,23 @@ const CatalogVPDetailPage = () => {
   )
 
   const deleteMutation = useMutation({
-    mutationFn: () =>
-      variableProductService.delete(vpId, { project_id: projectId ?? undefined }),
+    mutationFn: () => variableProductService.delete(vpId, { project_id: projectId ?? undefined }),
     meta: {
       successMessage: 'Variable product deleted',
-      invalidatesQuery: VP_QUERY_KEYS.lists(),
+      invalidatesQuery: VP_QUERY_KEYS.lists()
     },
-    onSuccess: () => navigate({ to: '/catalog' }),
+    onSuccess: () => navigate({ to: '/catalog' })
   })
 
   if (isLoading) {
     return (
       <div className='flex h-full flex-col overflow-hidden'>
-        <div className={cn('flex items-center gap-3 border-b border-border py-3', isMobile ? 'px-3.5' : 'px-6')}>
+        <div
+          className={cn(
+            'flex items-center gap-3 border-b border-border py-3',
+            isMobile ? 'px-3.5' : 'px-6'
+          )}
+        >
           <Skeleton className='size-7 rounded-md' />
           <Skeleton className='h-5 w-48 rounded' />
         </div>
@@ -88,7 +92,12 @@ const CatalogVPDetailPage = () => {
 
       <div className='flex-1 overflow-y-auto'>
         {/* ── Top bar: images + meta in a compact strip ── */}
-        <div className={cn('flex flex-col gap-3 border-b border-border py-3', isMobile ? 'px-3.5' : 'px-5')}>
+        <div
+          className={cn(
+            'flex flex-col gap-3 border-b border-border py-3',
+            isMobile ? 'px-3.5' : 'px-5'
+          )}
+        >
           <div className='flex items-center gap-4'>
             <ImageStrip
               entityType='vp'
@@ -98,7 +107,7 @@ const CatalogVPDetailPage = () => {
               className='flex-1'
             />
             {vp.slug && (
-              <span className='shrink-0 rounded-md bg-bg-secondary px-2 py-0.5 font-mono text-[11px] text-text-quaternary'>
+              <span className='text-text-quaternary shrink-0 rounded-md bg-bg-secondary px-2 py-0.5 font-mono text-[11px]'>
                 {vp.slug}
               </span>
             )}
@@ -118,15 +127,29 @@ const CatalogVPDetailPage = () => {
           <SpecsBar vp={vp} projectId={projectId} onAddProducts={() => setAddProductsOpen(true)} />
 
           {/* Variants table */}
-          <VariantsTable vp={vp} projectId={projectId} addProductsOpen={addProductsOpen} onAddProductsChange={setAddProductsOpen} />
+          <VariantsTable
+            vp={vp}
+            projectId={projectId}
+            addProductsOpen={addProductsOpen}
+            onAddProductsChange={setAddProductsOpen}
+          />
 
           {/* Danger zone — compact */}
           <div className='flex items-center gap-3 rounded-lg border border-destructive/20 px-4 py-3'>
             <div className='min-w-0 flex-1'>
-              <span className='text-[13px] font-medium text-destructive'>Delete this superinventory</span>
-              <span className='ml-2 text-[11px] text-text-tertiary'>Permanently removes all items, specs, and values</span>
+              <span className='text-[13px] font-medium text-destructive'>
+                Delete this superinventory
+              </span>
+              <span className='ml-2 text-[11px] text-text-tertiary'>
+                Permanently removes all items, specs, and values
+              </span>
             </div>
-            <Button variant='destructive' size='sm' className='shrink-0' onClick={() => setDeleteOpen(true)}>
+            <Button
+              variant='destructive'
+              size='sm'
+              className='shrink-0'
+              onClick={() => setDeleteOpen(true)}
+            >
               <Trash2 className='size-3.5' />
               Delete
             </Button>
@@ -165,6 +188,6 @@ const CatalogVPDetailPage = () => {
 export const Route = createFileRoute('/_authenticated/catalog/vp/$vpId/')({
   component: CatalogVPDetailPage,
   head: () => ({
-    meta: [{ title: 'Superinventory' }],
-  }),
+    meta: [{ title: 'Superinventory' }]
+  })
 })

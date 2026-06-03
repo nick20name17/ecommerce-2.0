@@ -17,10 +17,7 @@ export const DataTable = <TData,>({
 }: DataTableProps<TData>) => {
   const tableEl = (
     <Table className={cn(fitWidth && 'w-full table-fixed')}>
-      <DataTableHeader
-        table={table}
-        fitWidth={fitWidth}
-      />
+      <DataTableHeader table={table} fitWidth={fitWidth} />
       <DataTableBody
         table={table}
         isLoading={isLoading}

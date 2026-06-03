@@ -4,10 +4,7 @@ import { cn } from '@/lib/utils'
 
 const Table = ({ className, ...props }: React.ComponentProps<'table'>) => {
   return (
-    <div
-      data-slot='table-container'
-      className={cn('w-full', className)}
-    >
+    <div data-slot='table-container' className={cn('w-full', className)}>
       <table
         data-slot='table'
         className='w-full caption-bottom border-separate border-spacing-0 text-sm'
@@ -18,13 +15,7 @@ const Table = ({ className, ...props }: React.ComponentProps<'table'>) => {
 }
 
 const TableHeader = ({ className, ...props }: React.ComponentProps<'thead'>) => {
-  return (
-    <thead
-      data-slot='table-header'
-      className={cn('[&_tr]:border-b', className)}
-      {...props}
-    />
-  )
+  return <thead data-slot='table-header' className={cn('[&_tr]:border-b', className)} {...props} />
 }
 
 const TableBody = ({ className, ...props }: React.ComponentProps<'tbody'>) => {
@@ -41,7 +32,7 @@ const TableFooter = ({ className, ...props }: React.ComponentProps<'tfoot'>) => 
   return (
     <tfoot
       data-slot='table-footer'
-      className={cn('bg-muted border-t [&>tr]:last:border-b-0', className)}
+      className={cn('border-t bg-muted [&>tr]:last:border-b-0', className)}
       {...props}
     />
   )
@@ -51,7 +42,7 @@ const TableRow = ({ className, ...props }: React.ComponentProps<'tr'>) => {
   return (
     <tr
       data-slot='table-row'
-      className={cn('data-[state=selected]:bg-muted border-b transition-colors', className)}
+      className={cn('border-b transition-colors data-[state=selected]:bg-muted', className)}
       {...props}
     />
   )
@@ -62,7 +53,7 @@ const TableHead = ({ className, ...props }: React.ComponentProps<'th'>) => {
     <th
       data-slot='table-head'
       className={cn(
-        'text-muted-foreground h-8 px-2 text-left align-middle font-normal whitespace-nowrap',
+        'h-8 px-2 text-left align-middle font-normal whitespace-nowrap text-muted-foreground',
         className
       )}
       {...props}

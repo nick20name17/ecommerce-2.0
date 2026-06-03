@@ -5,7 +5,11 @@ import { toast } from 'sonner'
 import { useNavigate } from '@tanstack/react-router'
 
 import { getOrdersForPickingQuery, PICKING_QUERY_KEYS } from '@/api/orders-for-picking/query'
-import type { PickingCustomerGroup, PickingOrder, PickingOrderItem } from '@/api/orders-for-picking/schema'
+import type {
+  PickingCustomerGroup,
+  PickingOrder,
+  PickingOrderItem
+} from '@/api/orders-for-picking/schema'
 import { PICK_LIST_QUERY_KEYS } from '@/api/pick-list/query'
 import { pickListService } from '@/api/pick-list/service'
 import type { AddItemsPayload } from '@/api/pick-list/schema'
@@ -17,7 +21,7 @@ import {
   DialogContent,
   DialogFooter,
   DialogHeader,
-  DialogTitle,
+  DialogTitle
 } from '@/components/ui/dialog'
 import {
   AlertDialog,
@@ -27,7 +31,7 @@ import {
   AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
-  AlertDialogTitle,
+  AlertDialogTitle
 } from '@/components/ui/alert-dialog'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useProjectId } from '@/hooks/use-project-id'
@@ -51,14 +55,14 @@ export function StartPickingDialog({
   onOpenChange,
   customerId,
   customerName,
-  orderAutoid,
+  orderAutoid
 }: StartPickingDialogProps) {
   const queryClient = useQueryClient()
   const navigate = useNavigate()
   const [projectId] = useProjectId()
   const [step, setStep] = useState<Step>('select-orders')
-  const [selectedOrderIds, setSelectedOrderIds] = useState<Set<string>>(
-    () => orderAutoid ? new Set([orderAutoid]) : new Set()
+  const [selectedOrderIds, setSelectedOrderIds] = useState<Set<string>>(() =>
+    orderAutoid ? new Set([orderAutoid]) : new Set()
   )
   const [pickQuantities, setPickQuantities] = useState<Map<string, string>>(new Map())
   const [confirmOpen, setConfirmOpen] = useState(false)
@@ -70,19 +74,19 @@ export function StartPickingDialog({
     ...getOrdersForPickingQuery({
       ...(hasCustomerId ? { customer_id: customerId } : {}),
       include_items: true,
-      project_id: projectId ?? undefined,
+      project_id: projectId ?? undefined
     }),
-    enabled: open,
+    enabled: open
   })
 
   // Fetch default shipping (ship-from) address
   const { data: shippingAddresses } = useQuery({
     ...getShippingAddressesQuery(projectId),
-    enabled: open,
+    enabled: open
   })
   const defaultShippingAddressId = (() => {
     const list = Array.isArray(shippingAddresses) ? shippingAddresses : []
-    const def = list.find((a) => a.is_default) ?? list[0]
+    const def = list.find(a => a.is_default) ?? list[0]
     return def?.id ?? null
   })()
 
@@ -90,7 +94,7 @@ export function StartPickingDialog({
   const groups = data?.results ?? []
   const group: PickingCustomerGroup | undefined = hasCustomerId
     ? groups[0]
-    : groups.find((g) => g.customer_name === customerName) ?? groups[0]
+    : (groups.find(g => g.customer_name === customerName) ?? groups[0])
   const orders = group?.orders ?? []
 
   // Auto-select order when opened from a specific order
@@ -106,7 +110,7 @@ export function StartPickingDialog({
     }
   }, [open, orderAutoid, orders])
 
-  const selectedOrders = orders.filter((o) => selectedOrderIds.has(o.autoid))
+  const selectedOrders = orders.filter(o => selectedOrderIds.has(o.autoid))
 
   const allItems = (() => {
     const items: (PickingOrderItem & { orderAutoid: string; orderInvoice: string })[] = []
@@ -122,7 +126,7 @@ export function StartPickingDialog({
   })()
 
   const toggleOrder = (autoid: string) => {
-    setSelectedOrderIds((prev) => {
+    setSelectedOrderIds(prev => {
       const next = new Set(prev)
       if (next.has(autoid)) next.delete(autoid)
       else next.add(autoid)
@@ -131,7 +135,7 @@ export function StartPickingDialog({
   }
 
   const selectAll = () => {
-    setSelectedOrderIds(new Set(orders.map((o) => o.autoid)))
+    setSelectedOrderIds(new Set(orders.map(o => o.autoid)))
   }
 
   const formatQty = (raw: string) => {
@@ -153,7 +157,7 @@ export function StartPickingDialog({
     const max = parseFloat(maxQuan)
     const num = parseFloat(value)
     const clamped = isNaN(num) ? '' : num > max ? formatQty(maxQuan) : value
-    setPickQuantities((prev) => {
+    setPickQuantities(prev => {
       const next = new Map(prev)
       next.set(itemAutoid, clamped)
       return next
@@ -171,7 +175,7 @@ export function StartPickingDialog({
       city: (o.c_city as string) || '',
       state: (o.c_state as string) || '',
       postal: (o.c_zip as string) || '',
-      country: (o.c_country as string) || (o.country as string) || '',
+      country: (o.c_country as string) || (o.country as string) || ''
     }
   })()
 
@@ -184,20 +188,20 @@ export function StartPickingDialog({
           ship_to: shipTo,
           ...(defaultShippingAddressId ? { shipping_address_id: defaultShippingAddressId } : {}),
           ...(customerId ? { customer_id: customerId } : {}),
-          name: `${customerName} picking`,
+          name: `${customerName} picking`
         },
-        projectId,
+        projectId
       )
 
       // 2. Add items (exclude items with 0 quantity)
       const payload: AddItemsPayload = {
         items: allItems
-          .map((item) => ({
+          .map(item => ({
             order_autoid: item.orderAutoid,
             detail_autoid: item.autoid,
-            picked_quantity: pickQuantities.get(item.autoid) || (item.qty_in_uom || item.quan),
+            picked_quantity: pickQuantities.get(item.autoid) || item.qty_in_uom || item.quan
           }))
-          .filter((item) => parseFloat(item.picked_quantity) > 0),
+          .filter(item => parseFloat(item.picked_quantity) > 0)
       }
       if (payload.items.length === 0) throw new Error('No items with quantity > 0')
       await pickListService.addItems(pickList.id, payload, projectId)
@@ -212,21 +216,23 @@ export function StartPickingDialog({
     onSuccess: (pickList, pushToEbms) => {
       queryClient.invalidateQueries({ queryKey: PICK_LIST_QUERY_KEYS.all() })
       queryClient.invalidateQueries({ queryKey: PICKING_QUERY_KEYS.all() })
-      toast.success(pushToEbms ? 'Pick list created and pushed to EBMS' : 'Pick list saved as draft')
+      toast.success(
+        pushToEbms ? 'Pick list created and pushed to EBMS' : 'Pick list saved as draft'
+      )
       onOpenChange(false)
       resetState()
       navigate({
         to: '/pick-lists/$pickListId',
-        params: { pickListId: String(pickList.id) },
+        params: { pickListId: String(pickList.id) }
       })
     },
-    onError: (err) => {
+    onError: err => {
       toast.error(err instanceof Error ? err.message : 'Failed to create pick list')
       setStep('set-quantities')
-    },
+    }
   })
 
-  const hasAnyPicked = Array.from(pickQuantities.values()).some((v) => parseFloat(v) > 0)
+  const hasAnyPicked = Array.from(pickQuantities.values()).some(v => parseFloat(v) > 0)
 
   const handleCreate = (pushToEbms: boolean) => {
     setConfirmOpen(false)
@@ -260,8 +266,11 @@ export function StartPickingDialog({
   return (
     <Dialog
       open={open}
-      onOpenChange={(next) => {
-        if (!next) { handleClose(); return }
+      onOpenChange={next => {
+        if (!next) {
+          handleClose()
+          return
+        }
         onOpenChange(next)
       }}
     >
@@ -277,7 +286,7 @@ export function StartPickingDialog({
         <DialogBody className='flex min-h-0 flex-1 flex-col gap-3 overflow-hidden'>
           <p className='text-[13px] text-text-tertiary'>
             Customer: <span className='font-medium text-foreground'>{customerName}</span>
-            {customerId && <span className='ml-1 text-text-quaternary'>({customerId})</span>}
+            {customerId && <span className='text-text-quaternary ml-1'>({customerId})</span>}
           </p>
 
           {/* Step 1: Select orders */}
@@ -297,7 +306,7 @@ export function StartPickingDialog({
               ) : (
                 <>
                   <div className='flex items-center justify-between'>
-                    <span className='text-[11px] font-medium uppercase tracking-wider text-text-quaternary'>
+                    <span className='text-text-quaternary text-[11px] font-medium tracking-wider uppercase'>
                       {orders.length} order{orders.length !== 1 && 's'} available
                     </span>
                     <button
@@ -309,7 +318,7 @@ export function StartPickingDialog({
                     </button>
                   </div>
                   <div className='min-h-0 flex-1 space-y-2 overflow-y-auto'>
-                    {orders.map((order) => (
+                    {orders.map(order => (
                       <OrderSelectCard
                         key={order.autoid}
                         order={order}
@@ -334,7 +343,7 @@ export function StartPickingDialog({
                   onClick={() => {
                     const qty = new Map(pickQuantities)
                     for (const item of allItems) {
-                      qty.set(item.autoid, formatQty((item.qty_in_uom || item.quan)))
+                      qty.set(item.autoid, formatQty(item.qty_in_uom || item.quan))
                     }
                     setPickQuantities(qty)
                   }}
@@ -359,24 +368,34 @@ export function StartPickingDialog({
                 <div className='ml-auto flex items-center gap-2 text-[12px] tabular-nums'>
                   {(() => {
                     const total = allItems.length
-                    const picked = allItems.filter((it) => parseFloat(pickQuantities.get(it.autoid) || '0') > 0).length
+                    const picked = allItems.filter(
+                      it => parseFloat(pickQuantities.get(it.autoid) || '0') > 0
+                    ).length
                     const left = total - picked
                     return left === 0 ? (
-                      <span className='font-medium text-emerald-600 dark:text-emerald-400'>All {total} picked</span>
+                      <span className='font-medium text-emerald-600 dark:text-emerald-400'>
+                        All {total} picked
+                      </span>
                     ) : (
                       <span className='text-text-tertiary'>
-                        <span className='font-medium text-foreground'>{picked}/{total}</span> picked · <span className='font-medium text-amber-600 dark:text-amber-400'>{left} left</span>
+                        <span className='font-medium text-foreground'>
+                          {picked}/{total}
+                        </span>{' '}
+                        picked ·{' '}
+                        <span className='font-medium text-amber-600 dark:text-amber-400'>
+                          {left} left
+                        </span>
                       </span>
                     )
                   })()}
                 </div>
               </div>
 
-              {selectedOrders.map((order) => {
+              {selectedOrders.map(order => {
                 const items = order.items ?? []
 
                 // Group items into parent → components hierarchy
-                const parentItems = items.filter((it) => !it.par_time)
+                const parentItems = items.filter(it => !it.par_time)
                 const componentsByParent = new Map<string, typeof items>()
                 for (const it of items) {
                   if (it.par_time) {
@@ -389,7 +408,10 @@ export function StartPickingDialog({
                 const hasHierarchy = parentItems.length > 0 && parentItems.length < items.length
 
                 return (
-                  <div key={order.autoid} className='overflow-hidden rounded-lg border border-border'>
+                  <div
+                    key={order.autoid}
+                    className='overflow-hidden rounded-lg border border-border'
+                  >
                     {/* Order header */}
                     <div className='flex items-center gap-2 bg-bg-secondary/50 px-3.5 py-2'>
                       <span className='text-[13px] font-semibold text-foreground'>
@@ -407,20 +429,20 @@ export function StartPickingDialog({
                         onClick={() => {
                           const qty = new Map(pickQuantities)
                           for (const item of items) {
-                            qty.set(item.autoid, formatQty((item.qty_in_uom || item.quan)))
+                            qty.set(item.autoid, formatQty(item.qty_in_uom || item.quan))
                           }
                           setPickQuantities(qty)
                         }}
                       >
                         Pick all
                       </button>
-                      <span className='text-[11px] text-text-quaternary'>
+                      <span className='text-text-quaternary text-[11px]'>
                         {items.length} item{items.length !== 1 && 's'}
                       </span>
                     </div>
 
                     {/* Column header */}
-                    <div className='grid grid-cols-[20px_1fr_72px_52px_40px_52px] items-center gap-2 border-b border-border-light bg-bg-secondary/40 px-3.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-text-quaternary'>
+                    <div className='text-text-quaternary grid grid-cols-[20px_1fr_72px_52px_40px_52px] items-center gap-2 border-b border-border-light bg-bg-secondary/40 px-3.5 py-1 text-[10px] font-semibold tracking-wider uppercase'>
                       <span />
                       <span>Item</span>
                       <span className='text-center'>Location</span>
@@ -430,8 +452,10 @@ export function StartPickingDialog({
                     </div>
 
                     {/* Items with parent/component hierarchy */}
-                    {(hasHierarchy ? parentItems : items).map((pItem) => {
-                      const comps = hasHierarchy ? (componentsByParent.get(pItem.timestamp!) ?? []) : []
+                    {(hasHierarchy ? parentItems : items).map(pItem => {
+                      const comps = hasHierarchy
+                        ? (componentsByParent.get(pItem.timestamp!) ?? [])
+                        : []
                       const isParent = hasHierarchy && comps.length > 0
 
                       return (
@@ -443,17 +467,18 @@ export function StartPickingDialog({
                             formatQty={formatQty}
                             isParent={isParent}
                           />
-                          {comps.length > 0 && comps.map((comp, ci) => (
-                            <PickItemRow
-                              key={comp.autoid}
-                              item={comp}
-                              pickQuantities={pickQuantities}
-                              updatePickQty={updatePickQty}
-                              formatQty={formatQty}
-                              isComponent
-                              isLastComponent={ci === comps.length - 1}
-                            />
-                          ))}
+                          {comps.length > 0 &&
+                            comps.map((comp, ci) => (
+                              <PickItemRow
+                                key={comp.autoid}
+                                item={comp}
+                                pickQuantities={pickQuantities}
+                                updatePickQty={updatePickQty}
+                                formatQty={formatQty}
+                                isComponent
+                                isLastComponent={ci === comps.length - 1}
+                              />
+                            ))}
                         </div>
                       )
                     })}
@@ -476,7 +501,7 @@ export function StartPickingDialog({
                 </p>
               </div>
               <div className='flex gap-1'>
-                {[0, 1, 2].map((i) => (
+                {[0, 1, 2].map(i => (
                   <div
                     key={i}
                     className='size-1.5 animate-pulse rounded-full bg-primary/40'
@@ -507,7 +532,11 @@ export function StartPickingDialog({
                 <ArrowLeft className='size-3.5' />
                 Back
               </Button>
-              <Button variant='outline' onClick={() => handleCreate(false)} disabled={!hasAnyPicked}>
+              <Button
+                variant='outline'
+                onClick={() => handleCreate(false)}
+                disabled={!hasAnyPicked}
+              >
                 Save as Draft
               </Button>
               <Button onClick={() => setConfirmOpen(true)} disabled={!hasAnyPicked}>
@@ -516,7 +545,6 @@ export function StartPickingDialog({
               </Button>
             </>
           )}
-
         </DialogFooter>
       </DialogContent>
 
@@ -530,9 +558,7 @@ export function StartPickingDialog({
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={() => handleCreate(true)}>
-              Save & Push
-            </AlertDialogAction>
+            <AlertDialogAction onClick={() => handleCreate(true)}>Save & Push</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
@@ -562,7 +588,7 @@ export function StartPickingDialog({
 function OrderSelectCard({
   order,
   selected,
-  onToggle,
+  onToggle
 }: {
   order: PickingOrder
   selected: boolean
@@ -571,7 +597,9 @@ function OrderSelectCard({
   const [expanded, setExpanded] = useState(false)
   const items = order.items ?? []
   const billTo = [order.address1, order.address2].filter(Boolean).join(', ')
-  const shipTo = [order.c_address1, order.c_city, order.c_state, order.c_zip].filter(Boolean).join(', ')
+  const shipTo = [order.c_address1, order.c_city, order.c_state, order.c_zip]
+    .filter(Boolean)
+    .join(', ')
 
   return (
     <div
@@ -579,28 +607,32 @@ function OrderSelectCard({
         'overflow-hidden rounded-lg border transition-all duration-100',
         selected
           ? 'border-primary ring-1 ring-primary/20'
-          : 'border-border hover:border-border-light hover:shadow-sm',
+          : 'border-border hover:border-border-light hover:shadow-sm'
       )}
     >
       {/* Header — always visible */}
       <div
         className={cn(
           'flex cursor-pointer items-center gap-3 px-3.5 py-2.5',
-          selected ? 'bg-primary/[0.03]' : 'bg-bg-secondary/40',
+          selected ? 'bg-primary/[0.03]' : 'bg-bg-secondary/40'
         )}
         onClick={onToggle}
       >
         <div
           className={cn(
             'flex size-[18px] shrink-0 items-center justify-center rounded border transition-colors duration-100',
-            selected
-              ? 'border-primary bg-primary text-white'
-              : 'border-border bg-background',
+            selected ? 'border-primary bg-primary text-white' : 'border-border bg-background'
           )}
         >
           {selected && (
             <svg className='size-2.5' viewBox='0 0 12 12' fill='none'>
-              <path d='M2.5 6L5 8.5L9.5 3.5' stroke='currentColor' strokeWidth='2' strokeLinecap='round' strokeLinejoin='round' />
+              <path
+                d='M2.5 6L5 8.5L9.5 3.5'
+                stroke='currentColor'
+                strokeWidth='2'
+                strokeLinecap='round'
+                strokeLinejoin='round'
+              />
             </svg>
           )}
         </div>
@@ -613,18 +645,20 @@ function OrderSelectCard({
           </span>
         ) : null}
         <div className='flex-1' />
-        <span className='text-[12px] tabular-nums text-text-tertiary'>
+        <span className='text-[12px] text-text-tertiary tabular-nums'>
           {items.length} item{items.length !== 1 && 's'}
         </span>
         <button
           type='button'
-          className='inline-flex size-5 items-center justify-center rounded text-text-quaternary transition-colors hover:bg-bg-active hover:text-text-secondary'
-          onClick={(e) => {
+          className='text-text-quaternary inline-flex size-5 items-center justify-center rounded transition-colors hover:bg-bg-active hover:text-text-secondary'
+          onClick={e => {
             e.stopPropagation()
-            setExpanded((v) => !v)
+            setExpanded(v => !v)
           }}
         >
-          <ChevronDown className={cn('size-3.5 transition-transform duration-150', expanded && 'rotate-180')} />
+          <ChevronDown
+            className={cn('size-3.5 transition-transform duration-150', expanded && 'rotate-180')}
+          />
         </button>
       </div>
 
@@ -636,16 +670,24 @@ function OrderSelectCard({
             <div className='grid grid-cols-2 gap-3 border-t border-border-light px-3.5 py-2'>
               {billTo ? (
                 <div className='min-w-0'>
-                  <span className='text-[10px] font-semibold uppercase tracking-wider text-text-quaternary'>Bill To</span>
+                  <span className='text-text-quaternary text-[10px] font-semibold tracking-wider uppercase'>
+                    Bill To
+                  </span>
                   <p className='mt-0.5 truncate text-[12px] text-text-secondary'>{billTo}</p>
                 </div>
-              ) : <div />}
+              ) : (
+                <div />
+              )}
               {shipTo ? (
                 <div className='min-w-0'>
-                  <span className='text-[10px] font-semibold uppercase tracking-wider text-text-quaternary'>Ship To</span>
+                  <span className='text-text-quaternary text-[10px] font-semibold tracking-wider uppercase'>
+                    Ship To
+                  </span>
                   <p className='mt-0.5 truncate text-[12px] text-text-secondary'>{shipTo}</p>
                 </div>
-              ) : <div />}
+              ) : (
+                <div />
+              )}
             </div>
           )}
 
@@ -657,7 +699,7 @@ function OrderSelectCard({
                   key={item.autoid}
                   className={cn(
                     'flex items-center gap-3 px-3.5 py-[5px]',
-                    i < items.length - 1 && 'border-b border-border-light/50',
+                    i < items.length - 1 && 'border-b border-border-light/50'
                   )}
                 >
                   <span className='w-[90px] shrink-0 font-mono text-[11px] font-medium text-foreground'>
@@ -666,8 +708,9 @@ function OrderSelectCard({
                   <span className='min-w-0 flex-1 truncate text-[11px] text-text-tertiary'>
                     {item.descr}
                   </span>
-                  <span className='shrink-0 rounded bg-bg-secondary px-1.5 py-0.5 text-[11px] font-medium tabular-nums text-text-secondary'>
-                    {parseFloat((item.qty_in_uom || item.quan)).toFixed(0)}{item.unit_meas && item.unit_meas !== 'EA' ? ` ${item.unit_meas}` : ''}
+                  <span className='shrink-0 rounded bg-bg-secondary px-1.5 py-0.5 text-[11px] font-medium text-text-secondary tabular-nums'>
+                    {parseFloat(item.qty_in_uom || item.quan).toFixed(0)}
+                    {item.unit_meas && item.unit_meas !== 'EA' ? ` ${item.unit_meas}` : ''}
                   </span>
                 </div>
               ))}
@@ -688,7 +731,7 @@ function PickItemRow({
   formatQty,
   isParent,
   isComponent,
-  isLastComponent,
+  isLastComponent
 }: {
   item: PickingOrderItem
   pickQuantities: Map<string, string>
@@ -713,14 +756,20 @@ function PickItemRow({
           <Package className='size-4 text-foreground' />
         </div>
         <div className='flex min-w-0 items-center gap-2'>
-          <span className='w-[90px] shrink-0 font-mono text-[12px] font-bold leading-none text-foreground'>{item.inven}</span>
-          <span className='min-w-0 truncate text-[12px] font-semibold leading-none text-foreground'>{item.descr}</span>
+          <span className='w-[90px] shrink-0 font-mono text-[12px] leading-none font-bold text-foreground'>
+            {item.inven}
+          </span>
+          <span className='min-w-0 truncate text-[12px] leading-none font-semibold text-foreground'>
+            {item.descr}
+          </span>
         </div>
-        <span className='truncate text-center text-[11px] font-mono text-text-tertiary'>{item.location || '—'}</span>
+        <span className='truncate text-center font-mono text-[11px] text-text-tertiary'>
+          {item.location || '—'}
+        </span>
         <button
           type='button'
           onClick={() => updatePickQty(item.autoid, formatQty(qty), qty)}
-          className='flex h-7 cursor-pointer items-center justify-center rounded-[5px] bg-bg-secondary/60 text-[13px] tabular-nums text-text-tertiary transition-colors hover:bg-primary/10 hover:text-primary'
+          className='flex h-7 cursor-pointer items-center justify-center rounded-[5px] bg-bg-secondary/60 text-[13px] text-text-tertiary tabular-nums transition-colors hover:bg-primary/10 hover:text-primary'
           title='Pick full quantity'
         >
           {orderedStr}
@@ -729,12 +778,12 @@ function PickItemRow({
         <input
           type='number'
           value={pickVal}
-          onChange={(e) => updatePickQty(item.autoid, e.target.value, qty)}
+          onChange={e => updatePickQty(item.autoid, e.target.value, qty)}
           min='0'
           step='any'
           className={cn(
-            'h-7 w-full rounded-[5px] border bg-background text-center text-[13px] tabular-nums text-foreground outline-none focus:border-primary focus:ring-1 focus:ring-primary/20',
-            isPartial ? 'border-amber-400' : 'border-border',
+            'h-7 w-full rounded-[5px] border bg-background text-center text-[13px] text-foreground tabular-nums outline-none focus:border-primary focus:ring-1 focus:ring-primary/20',
+            isPartial ? 'border-amber-400' : 'border-border'
           )}
         />
       </div>
@@ -746,27 +795,38 @@ function PickItemRow({
       <div className='grid grid-cols-[20px_1fr_72px_52px_40px_52px] items-center gap-2 px-3.5 py-0.5'>
         {/* Tree connector in col 1 — vertical + horizontal lines */}
         <div className='relative flex items-center justify-center self-stretch'>
-          <div className={cn(
-            'absolute left-1/2 w-px -translate-x-1/2 bg-border',
-            isLastComponent ? 'top-0 h-1/2' : 'top-0 h-full',
-          )} />
-          <div className='absolute left-1/2 top-1/2 h-px w-[calc(50%+4px)] bg-border' />
+          <div
+            className={cn(
+              'absolute left-1/2 w-px -translate-x-1/2 bg-border',
+              isLastComponent ? 'top-0 h-1/2' : 'top-0 h-full'
+            )}
+          />
+          <div className='absolute top-1/2 left-1/2 h-px w-[calc(50%+4px)] bg-border' />
         </div>
 
         <div className='flex min-w-0 items-center gap-1.5'>
-          <Package className={cn('size-3.5 shrink-0', picking > 0 ? 'text-emerald-500' : 'text-text-quaternary/30')} />
-          <span className='w-[80px] shrink-0 font-mono text-[11px] text-text-secondary'>{item.inven}</span>
-          <span className='min-w-0 truncate text-[11px] text-text-quaternary'>{item.descr}</span>
+          <Package
+            className={cn(
+              'size-3.5 shrink-0',
+              picking > 0 ? 'text-emerald-500' : 'text-text-quaternary/30'
+            )}
+          />
+          <span className='w-[80px] shrink-0 font-mono text-[11px] text-text-secondary'>
+            {item.inven}
+          </span>
+          <span className='text-text-quaternary min-w-0 truncate text-[11px]'>{item.descr}</span>
         </div>
 
-        <span className='truncate text-center text-[11px] font-mono text-text-quaternary'>{item.location || '—'}</span>
+        <span className='text-text-quaternary truncate text-center font-mono text-[11px]'>
+          {item.location || '—'}
+        </span>
         <button
           type='button'
           onClick={() => {
             const newVal = picking > 0 ? '0' : formatQty(qty)
             updatePickQty(item.autoid, newVal, qty)
           }}
-          className='flex h-7 cursor-pointer items-center justify-center rounded-[5px] bg-bg-secondary/60 text-[13px] tabular-nums text-text-tertiary transition-colors hover:bg-primary/10 hover:text-primary'
+          className='flex h-7 cursor-pointer items-center justify-center rounded-[5px] bg-bg-secondary/60 text-[13px] text-text-tertiary tabular-nums transition-colors hover:bg-primary/10 hover:text-primary'
           title='Pick full quantity'
         >
           {orderedStr}
@@ -775,12 +835,12 @@ function PickItemRow({
         <input
           type='number'
           value={pickVal}
-          onChange={(e) => updatePickQty(item.autoid, e.target.value, qty)}
+          onChange={e => updatePickQty(item.autoid, e.target.value, qty)}
           min='0'
           step='any'
           className={cn(
-            'h-7 w-full rounded-[5px] border bg-background text-center text-[13px] tabular-nums text-foreground outline-none focus:border-primary focus:ring-1 focus:ring-primary/20',
-            isPartial ? 'border-amber-400' : 'border-border',
+            'h-7 w-full rounded-[5px] border bg-background text-center text-[13px] text-foreground tabular-nums outline-none focus:border-primary focus:ring-1 focus:ring-primary/20',
+            isPartial ? 'border-amber-400' : 'border-border'
           )}
         />
       </div>
@@ -798,17 +858,23 @@ function PickItemRow({
           updatePickQty(item.autoid, newVal, qty)
         }}
       >
-        <Package className={cn('size-4', picking > 0 ? 'text-emerald-500' : 'text-text-quaternary/40')} />
+        <Package
+          className={cn('size-4', picking > 0 ? 'text-emerald-500' : 'text-text-quaternary/40')}
+        />
       </button>
       <div className='flex min-w-0 items-center gap-2'>
-        <span className='w-[90px] shrink-0 font-mono text-[12px] font-medium text-foreground'>{item.inven}</span>
+        <span className='w-[90px] shrink-0 font-mono text-[12px] font-medium text-foreground'>
+          {item.inven}
+        </span>
         <span className='min-w-0 truncate text-[11px] text-text-tertiary'>{item.descr}</span>
       </div>
-      <span className='truncate text-center text-[11px] font-mono text-text-tertiary'>{item.location || '—'}</span>
+      <span className='truncate text-center font-mono text-[11px] text-text-tertiary'>
+        {item.location || '—'}
+      </span>
       <button
         type='button'
         onClick={() => updatePickQty(item.autoid, formatQty(qty), qty)}
-        className='flex h-7 cursor-pointer items-center justify-center rounded-[5px] bg-bg-secondary/60 text-[13px] tabular-nums text-text-tertiary transition-colors hover:bg-primary/10 hover:text-primary'
+        className='flex h-7 cursor-pointer items-center justify-center rounded-[5px] bg-bg-secondary/60 text-[13px] text-text-tertiary tabular-nums transition-colors hover:bg-primary/10 hover:text-primary'
         title='Pick full quantity'
       >
         {orderedStr}
@@ -817,12 +883,12 @@ function PickItemRow({
       <input
         type='number'
         value={pickVal}
-        onChange={(e) => updatePickQty(item.autoid, e.target.value, qty)}
+        onChange={e => updatePickQty(item.autoid, e.target.value, qty)}
         min='0'
         step='any'
         className={cn(
-          'h-7 w-full rounded-[5px] border bg-background text-center text-[13px] tabular-nums text-foreground outline-none focus:border-primary focus:ring-1 focus:ring-primary/20',
-          isPartial ? 'border-amber-400' : 'border-border',
+          'h-7 w-full rounded-[5px] border bg-background text-center text-[13px] text-foreground tabular-nums outline-none focus:border-primary focus:ring-1 focus:ring-primary/20',
+          isPartial ? 'border-amber-400' : 'border-border'
         )}
       />
     </div>

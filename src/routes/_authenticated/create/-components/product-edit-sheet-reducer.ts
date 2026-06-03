@@ -55,11 +55,11 @@ const toggleItemInConfigs = (
   configName: string,
   itemId: string
 ): Configuration[] =>
-  configs.map((c) => {
+  configs.map(c => {
     if (c.name !== configName) return c
     return {
       ...c,
-      items: c.items.map((i) => {
+      items: c.items.map(i => {
         const willBeActive = i.id === itemId ? !i.active : false
         if (i.active && !willBeActive) {
           return {
@@ -82,11 +82,11 @@ export const updateConfigsAtPath = (
 ): Configuration[] => {
   if (path.length === 0) return mutate(configs)
   const [head, ...rest] = path
-  return configs.map((c) => {
+  return configs.map(c => {
     if (c.name !== head.configName) return c
     return {
       ...c,
-      items: c.items.map((i) => {
+      items: c.items.map(i => {
         if (i.id !== head.itemId || !i.subConfigurations) return i
         return {
           ...i,
@@ -138,15 +138,15 @@ export const sheetReducer = (state: SheetState, action: SheetAction): SheetState
       return {
         ...state,
         userInteractionTick: state.userInteractionTick + 1,
-        configs: updateConfigsAtPath(state.configs, action.path, (configs) =>
+        configs: updateConfigsAtPath(state.configs, action.path, configs =>
           toggleItemInConfigs(configs, action.configName, action.itemId)
         )
       }
     case 'DESELECT_ALL_CONFIGS': {
       const clearAll = (configs: Configuration[]): Configuration[] =>
-        configs.map((c) => ({
+        configs.map(c => ({
           ...c,
-          items: c.items.map<ConfigurationItem>((i) => ({
+          items: c.items.map<ConfigurationItem>(i => ({
             ...i,
             active: false,
             subConfigurations: undefined,

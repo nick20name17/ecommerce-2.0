@@ -11,10 +11,7 @@ import {
 } from 'lucide-react'
 
 import type { Order } from '@/api/order/schema'
-import {
-  CustomColumnsCells,
-  type CustomColumn
-} from '@/components/common/custom-list-columns'
+import { CustomColumnsCells, type CustomColumn } from '@/components/common/custom-list-columns'
 import { PrintMenu } from '@/components/common/print-menu'
 import { InitialsAvatar } from '@/components/ds'
 import { useProjectId } from '@/hooks/use-project-id'
@@ -56,12 +53,12 @@ export function PendingOrderRow({ autoid, isMobile }: { autoid: string; isMobile
   return (
     <div
       className={cn(
-        'border-border-light flex items-center gap-3 border-b py-2 opacity-60',
+        'flex items-center gap-3 border-b border-border-light py-2 opacity-60',
         isMobile ? 'px-3.5' : 'px-6'
       )}
     >
-      <Loader2 className='text-text-tertiary size-3.5 animate-spin' />
-      <span className='text-text-tertiary text-[13px]'>Creating order {autoid}…</span>
+      <Loader2 className='size-3.5 animate-spin text-text-tertiary' />
+      <span className='text-[13px] text-text-tertiary'>Creating order {autoid}…</span>
     </div>
   )
 }
@@ -90,31 +87,36 @@ export function OrderRow({
   const dotColor = STATUS_DOT_COLORS[order.status] ?? 'bg-slate-400'
   const [projectIdForRow] = useProjectId()
 
-  const noteCount = typeof order.notes_count === 'number' ? order.notes_count : Array.isArray(order.notes) ? order.notes.length : 0
+  const noteCount =
+    typeof order.notes_count === 'number'
+      ? order.notes_count
+      : Array.isArray(order.notes)
+        ? order.notes.length
+        : 0
 
   if (isMobile) {
     return (
       <div
-        className='border-border-light hover:bg-bg-hover cursor-pointer border-b px-3.5 py-2 transition-colors duration-100'
+        className='cursor-pointer border-b border-border-light px-3.5 py-2 transition-colors duration-100 hover:bg-bg-hover'
         onClick={onClick}
         onMouseEnter={onMouseEnter}
       >
         <div className='mb-1 flex items-center gap-2'>
           <div className={cn('size-1.5 shrink-0 rounded-full', dotColor)} />
-          <span className='text-foreground min-w-0 flex-1 truncate text-[13px] font-medium'>
+          <span className='min-w-0 flex-1 truncate text-[13px] font-medium text-foreground'>
             {invoice}
           </span>
           <PickBadge pickStatus={order.pick_status} />
           <PackedBadge packedStatus={order.packed_status} />
-          <span className='text-foreground shrink-0 text-[13px] font-medium tabular-nums'>
+          <span className='shrink-0 text-[13px] font-medium text-foreground tabular-nums'>
             {formatCurrency(order.total, '—')}
           </span>
         </div>
         <div className='flex flex-wrap items-center gap-2 pl-5'>
-          <span className='text-text-tertiary text-[13px]'>{order.name || '—'}</span>
-          <span className='text-text-tertiary text-[13px]'>{statusLabel}</span>
+          <span className='text-[13px] text-text-tertiary'>{order.name || '—'}</span>
+          <span className='text-[13px] text-text-tertiary'>{statusLabel}</span>
           {order.inv_date && (
-            <span className='text-text-tertiary text-[13px] tabular-nums'>
+            <span className='text-[13px] text-text-tertiary tabular-nums'>
               {formatDate(order.inv_date)}
             </span>
           )}
@@ -126,7 +128,7 @@ export function OrderRow({
   return (
     <div
       className={cn(
-        'group/row border-border-light text-foreground hover:bg-bg-hover flex cursor-pointer items-center border-b transition-colors duration-100',
+        'group/row flex cursor-pointer items-center border-b border-border-light text-foreground transition-colors duration-100 hover:bg-bg-hover',
         isTablet ? 'gap-4 px-5 py-1.5' : 'gap-6 px-6 py-1.5'
       )}
       onClick={onClick}
@@ -134,10 +136,10 @@ export function OrderRow({
     >
       {/* Invoice + customer */}
       <div className='flex min-w-0 flex-1 items-center gap-2'>
-        <span className='shrink-0 text-[13px] font-medium tabular-nums'>
-          {invoice}
+        <span className='shrink-0 text-[13px] font-medium tabular-nums'>{invoice}</span>
+        <span className='min-w-0 flex-1 truncate text-[13px] text-text-tertiary'>
+          {order.name || '—'}
         </span>
-        <span className='text-text-tertiary min-w-0 flex-1 truncate text-[13px]'>{order.name || '—'}</span>
       </div>
 
       {/* Status */}
@@ -154,7 +156,7 @@ export function OrderRow({
 
       {/* Date */}
       {!isTablet && (
-        <div className='text-text-secondary w-[100px] shrink-0 text-right text-[13px] tabular-nums'>
+        <div className='w-[100px] shrink-0 text-right text-[13px] text-text-secondary tabular-nums'>
           {order.inv_date ? (
             formatDate(order.inv_date)
           ) : (
@@ -164,7 +166,12 @@ export function OrderRow({
       )}
 
       {/* Total */}
-      <div className={cn('text-foreground shrink-0 text-right text-[13px] font-medium tabular-nums', isTablet ? 'w-[80px]' : 'w-[100px]')}>
+      <div
+        className={cn(
+          'shrink-0 text-right text-[13px] font-medium text-foreground tabular-nums',
+          isTablet ? 'w-[80px]' : 'w-[100px]'
+        )}
+      >
         {formatCurrency(order.total, '—')}
       </div>
 
@@ -198,7 +205,11 @@ export function OrderRow({
       {/* Responsible */}
       <div className={cn('shrink-0', isTablet ? 'w-[46px]' : 'w-[120px]')}>
         {(() => {
-          const assigned = order.assigned_users?.length ? order.assigned_users : order.assigned_user ? [order.assigned_user] : []
+          const assigned = order.assigned_users?.length
+            ? order.assigned_users
+            : order.assigned_user
+              ? [order.assigned_user]
+              : []
           const first = assigned[0]
           if (canAssign) {
             return (
@@ -207,10 +218,10 @@ export function OrderRow({
                   <button
                     type='button'
                     className={cn(
-                      'hover:bg-bg-active inline-flex items-center gap-1.5 rounded-[5px] px-1 py-0.5 text-[13px] transition-colors duration-75',
+                      'inline-flex items-center gap-1.5 rounded-[5px] px-1 py-0.5 text-[13px] transition-colors duration-75 hover:bg-bg-active',
                       first ? 'text-text-secondary' : 'text-text-tertiary'
                     )}
-                    onClick={(e) => {
+                    onClick={e => {
                       e.stopPropagation()
                       onAssign(order)
                     }}
@@ -223,7 +234,9 @@ export function OrderRow({
                         />
                         <span className='truncate'>{getUserDisplayName(first)}</span>
                         {assigned.length > 1 && (
-                          <span className='text-[11px] text-text-tertiary'>+{assigned.length - 1}</span>
+                          <span className='text-[11px] text-text-tertiary'>
+                            +{assigned.length - 1}
+                          </span>
                         )}
                       </>
                     ) : (
@@ -236,7 +249,7 @@ export function OrderRow({
                 </TooltipTrigger>
                 <TooltipContent>
                   {first
-                    ? `Assigned to ${assigned.map((u) => getUserDisplayName(u)).join(', ')} — click to change`
+                    ? `Assigned to ${assigned.map(u => getUserDisplayName(u)).join(', ')} — click to change`
                     : 'Assign a sales user'}
                 </TooltipContent>
               </Tooltip>
@@ -270,10 +283,10 @@ export function OrderRow({
             'inline-flex h-[26px] w-[46px] items-center justify-center gap-1 rounded-[6px] border text-[12px] font-medium tabular-nums transition-colors duration-[80ms]',
             noteCount > 0
               ? 'border-border bg-bg-secondary text-text-secondary hover:bg-bg-active'
-              : 'text-text-quaternary hover:bg-bg-hover hover:text-text-tertiary border-transparent'
+              : 'text-text-quaternary border-transparent hover:bg-bg-hover hover:text-text-tertiary'
           )}
           aria-label='Open notes'
-          onClick={(e) => {
+          onClick={e => {
             e.stopPropagation()
             onNotes(order)
           }}
@@ -286,7 +299,7 @@ export function OrderRow({
       {/* Print menu (visible only if order_list templates exist) */}
       <div
         className='flex w-[28px] shrink-0 items-center justify-center'
-        onClick={(e) => e.stopPropagation()}
+        onClick={e => e.stopPropagation()}
       >
         <PrintMenu
           entityType='order'
@@ -301,15 +314,15 @@ export function OrderRow({
       {/* Actions */}
       <div
         className='flex w-[28px] shrink-0 items-center justify-center'
-        onClick={(e) => e.stopPropagation()}
-        onKeyDown={(e) => e.stopPropagation()}
+        onClick={e => e.stopPropagation()}
+        onKeyDown={e => e.stopPropagation()}
         role='group'
       >
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button
               type='button'
-              className='text-text-tertiary hover:bg-bg-active hover:text-foreground inline-flex size-6 items-center justify-center rounded-[6px] transition-colors duration-[80ms]'
+              className='inline-flex size-6 items-center justify-center rounded-[6px] text-text-tertiary transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground'
               aria-label='Order actions'
             >
               <MoreHorizontal className='size-4' />

@@ -5,7 +5,7 @@ import { toast } from 'sonner'
 
 import {
   DOCUMENT_TEMPLATE_QUERY_KEYS,
-  getDocumentTemplatesQuery,
+  getDocumentTemplatesQuery
 } from '@/api/document-template/query'
 import type { DocumentTemplate, EntityType } from '@/api/document-template/schema'
 import { documentTemplateService } from '@/api/document-template/service'
@@ -29,8 +29,8 @@ const ENTITY_META: Record<
   customer: {
     label: 'Customer',
     icon: UserSquare,
-    tint: 'bg-blue-500/15 text-blue-600',
-  },
+    tint: 'bg-blue-500/15 text-blue-600'
+  }
 }
 
 // ── Page ────────────────────────────────────────────────────
@@ -42,7 +42,7 @@ function DocumentsPage() {
 
   const { data: templates, isLoading } = useQuery({
     ...getDocumentTemplatesQuery({}, projectId),
-    enabled: !!projectId,
+    enabled: !!projectId
   })
 
   const deleteMutation = useMutation({
@@ -51,7 +51,7 @@ function DocumentsPage() {
       queryClient.invalidateQueries({ queryKey: DOCUMENT_TEMPLATE_QUERY_KEYS.lists() })
       toast.success('Template deleted')
     },
-    onError: () => toast.error('Failed to delete template'),
+    onError: () => toast.error('Failed to delete template')
   })
 
   const duplicateMutation = useMutation({
@@ -67,21 +67,21 @@ function DocumentsPage() {
           page_margins: source.page_margins,
           logo_url: source.logo_url,
           layout: source.layout,
-          is_active: source.is_active,
+          is_active: source.is_active
         },
         projectId
       ),
-    onSuccess: (created) => {
+    onSuccess: created => {
       queryClient.invalidateQueries({
-        queryKey: DOCUMENT_TEMPLATE_QUERY_KEYS.lists(),
+        queryKey: DOCUMENT_TEMPLATE_QUERY_KEYS.lists()
       })
       toast.success('Template duplicated')
       navigate({
         to: '/documents/$templateId',
-        params: { templateId: String(created.id) },
+        params: { templateId: String(created.id) }
       })
     },
-    onError: () => toast.error('Failed to duplicate template'),
+    onError: () => toast.error('Failed to duplicate template')
   })
 
   if (!projectId) {
@@ -114,17 +114,13 @@ function DocumentsPage() {
           <EmptyState />
         ) : (
           <ul className='divide-y divide-border'>
-            {templates.map((t) => (
+            {templates.map(t => (
               <TemplateRow
                 key={t.id}
                 template={t}
                 onDuplicate={() => duplicateMutation.mutate(t)}
                 onDelete={() => {
-                  if (
-                    confirm(
-                      `Delete template "${t.name}"? This cannot be undone.`
-                    )
-                  ) {
+                  if (confirm(`Delete template "${t.name}"? This cannot be undone.`)) {
                     deleteMutation.mutate(t.id)
                   }
                 }}
@@ -142,7 +138,7 @@ function DocumentsPage() {
 function TemplateRow({
   template,
   onDuplicate,
-  onDelete,
+  onDelete
 }: {
   template: DocumentTemplate
   onDuplicate: () => void
@@ -153,10 +149,7 @@ function TemplateRow({
   return (
     <li className='group flex items-center gap-3 px-3.5 py-2.5 transition-colors hover:bg-bg-hover sm:px-6'>
       <div
-        className={cn(
-          'flex size-8 shrink-0 items-center justify-center rounded-[6px]',
-          meta.tint
-        )}
+        className={cn('flex size-8 shrink-0 items-center justify-center rounded-[6px]', meta.tint)}
       >
         <Icon className='size-4' />
       </div>
@@ -181,9 +174,7 @@ function TemplateRow({
           {template.accessible_from.length > 0 && (
             <>
               <span>·</span>
-              <span className='truncate'>
-                Print from: {template.accessible_from.join(', ')}
-              </span>
+              <span className='truncate'>Print from: {template.accessible_from.join(', ')}</span>
             </>
           )}
         </div>
@@ -192,7 +183,7 @@ function TemplateRow({
       <button
         type='button'
         onClick={onDuplicate}
-        className='inline-flex size-7 shrink-0 items-center justify-center rounded-[5px] text-text-tertiary opacity-0 transition-all duration-[80ms] hover:bg-bg-hover hover:text-foreground group-hover:opacity-100'
+        className='inline-flex size-7 shrink-0 items-center justify-center rounded-[5px] text-text-tertiary opacity-0 transition-all duration-[80ms] group-hover:opacity-100 hover:bg-bg-hover hover:text-foreground'
         aria-label='Duplicate template'
         title='Duplicate'
       >
@@ -201,7 +192,7 @@ function TemplateRow({
       <button
         type='button'
         onClick={onDelete}
-        className='inline-flex size-7 shrink-0 items-center justify-center rounded-[5px] text-text-tertiary opacity-0 transition-all duration-[80ms] hover:bg-bg-hover hover:text-destructive group-hover:opacity-100'
+        className='inline-flex size-7 shrink-0 items-center justify-center rounded-[5px] text-text-tertiary opacity-0 transition-all duration-[80ms] group-hover:opacity-100 hover:bg-bg-hover hover:text-destructive'
         aria-label='Delete template'
       >
         <Trash2 className='size-3.5' />
@@ -223,8 +214,8 @@ function EmptyState() {
           No document templates yet
         </h2>
         <p className='text-[13px] leading-snug text-text-tertiary'>
-          Create reusable invoices, packing lists, shipping labels, and other
-          printable documents from your order and proposal data.
+          Create reusable invoices, packing lists, shipping labels, and other printable documents
+          from your order and proposal data.
         </p>
       </div>
       <Link
@@ -245,9 +236,7 @@ function ProjectEmptyState() {
         <IDocuments className='size-6' />
       </div>
       <div className='flex flex-col items-center gap-1.5 text-center'>
-        <h1 className='text-[16px] font-semibold tracking-[-0.02em] text-foreground'>
-          Documents
-        </h1>
+        <h1 className='text-[16px] font-semibold tracking-[-0.02em] text-foreground'>Documents</h1>
         <p className='max-w-[280px] text-[13px] leading-snug text-text-tertiary'>
           Select a project in the sidebar to manage document templates.
         </p>
@@ -284,6 +273,6 @@ export const Route = createFileRoute('/_authenticated/documents/')({
   },
   component: DocumentsPage,
   head: () => ({
-    meta: [{ title: 'Documents' }],
-  }),
+    meta: [{ title: 'Documents' }]
+  })
 })

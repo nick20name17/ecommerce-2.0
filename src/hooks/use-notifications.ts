@@ -18,28 +18,41 @@ const listeners = new Set<() => void>()
 
 const MAX_NOTIFICATIONS = 50
 
-const notify = () => listeners.forEach((l) => l())
+const notify = () => listeners.forEach(l => l())
 
 const getEntityLabel = (entity: string): string => {
   switch (entity) {
-    case 'order': return 'Order'
-    case 'proposal': return 'Proposal'
-    case 'note': return 'Note'
-    case 'customer': return 'Customer'
-    case 'task': return 'Task'
-    case 'pick_list': return 'Pick List'
-    case 'shipment': return 'Shipment'
-    default: return entity.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
+    case 'order':
+      return 'Order'
+    case 'proposal':
+      return 'Proposal'
+    case 'note':
+      return 'Note'
+    case 'customer':
+      return 'Customer'
+    case 'task':
+      return 'Task'
+    case 'pick_list':
+      return 'Pick List'
+    case 'shipment':
+      return 'Shipment'
+    default:
+      return entity.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
   }
 }
 
 const getEventLabel = (eventType: string): string => {
   switch (eventType) {
-    case 'created': return 'created'
-    case 'deleted': return 'deleted'
-    case 'accepted': return 'accepted'
-    case 'updated': return 'updated'
-    default: return eventType
+    case 'created':
+      return 'created'
+    case 'deleted':
+      return 'deleted'
+    case 'accepted':
+      return 'accepted'
+    case 'updated':
+      return 'updated'
+    default:
+      return eventType
   }
 }
 
@@ -47,7 +60,7 @@ export const addNotification = (
   entity: string,
   eventType: string,
   autoid: string,
-  user?: string,
+  user?: string
 ) => {
   const notification: AppNotification = {
     id: nextId++,
@@ -57,7 +70,7 @@ export const addNotification = (
     autoid,
     user,
     timestamp: Date.now(),
-    read: false,
+    read: false
   }
   notifications = [notification, ...notifications].slice(0, MAX_NOTIFICATIONS)
   unreadCount++
@@ -66,7 +79,7 @@ export const addNotification = (
 
 export const markAllRead = () => {
   if (unreadCount === 0) return
-  notifications = notifications.map((n) => (n.read ? n : { ...n, read: true }))
+  notifications = notifications.map(n => (n.read ? n : { ...n, read: true }))
   unreadCount = 0
   notify()
 }
@@ -82,8 +95,6 @@ const subscribe = (cb: () => void) => {
   return () => listeners.delete(cb)
 }
 
-export const useNotifications = () =>
-  useSyncExternalStore(subscribe, () => notifications)
+export const useNotifications = () => useSyncExternalStore(subscribe, () => notifications)
 
-export const useUnreadCount = () =>
-  useSyncExternalStore(subscribe, () => unreadCount)
+export const useUnreadCount = () => useSyncExternalStore(subscribe, () => unreadCount)

@@ -9,5 +9,5 @@ export const shipmentService = {
   },
   void: async (orderAutoid: string, shipmentId: number) => {
     await api.post(`/data/orders/${orderAutoid}/shipments/${shipmentId}/void/`)
-  },
+  }
 }

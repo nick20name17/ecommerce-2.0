@@ -48,7 +48,16 @@ export const OrdersDataTable = ({
         onAssign,
         canAssign
       }),
-    [fieldConfig, data, onDelete, onDeleteLinkedProposal, onAttachments, onNotes, onAssign, canAssign]
+    [
+      fieldConfig,
+      data,
+      onDelete,
+      onDeleteLinkedProposal,
+      onAttachments,
+      onNotes,
+      onAssign,
+      canAssign
+    ]
   )
 
   const table = useReactTable({
@@ -56,7 +65,7 @@ export const OrdersDataTable = ({
     data,
     getCoreRowModel: getCoreRowModel(),
     getExpandedRowModel: getExpandedRowModel(),
-    getRowCanExpand: (row) => !row.original._pending && !!row.original.items?.length,
+    getRowCanExpand: row => !row.original._pending && !!row.original.items?.length,
     onSortingChange: setSorting,
     state: { sorting },
     manualSorting: true
@@ -67,7 +76,7 @@ export const OrdersDataTable = ({
       table={table}
       isLoading={isLoading}
       className='flex-1'
-      renderSubComponent={(row) => <OrderExpandedRow row={row} />}
+      renderSubComponent={row => <OrderExpandedRow row={row} />}
     />
   )
 }

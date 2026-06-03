@@ -32,7 +32,7 @@ export function UserCombobox({
   valueLabel,
   triggerClassName,
   triggerIcon,
-  excludeRoles,
+  excludeRoles
 }: UserComboboxProps) {
   const [open, setOpen] = useState(false)
   const [search, setSearch] = useState('')
@@ -61,10 +61,10 @@ export function UserCombobox({
     enabled: open
   })
   const allUsers = data?.results ?? []
-  const users = excludeRoles ? allUsers.filter((u) => !excludeRoles.includes(u.role)) : allUsers
+  const users = excludeRoles ? allUsers.filter(u => !excludeRoles.includes(u.role)) : allUsers
   const loading = isLoading || (search !== debouncedSearch && isFetching)
   const selectedUser =
-    value != null && users.length > 0 ? (users.find((x) => x.id === value) ?? null) : null
+    value != null && users.length > 0 ? (users.find(x => x.id === value) ?? null) : null
 
   const handleSearchChange = (q: string) => {
     setSearch(q)
@@ -83,14 +83,15 @@ export function UserCombobox({
       : null
 
   const displayInitials = displayLabel
-    ? displayLabel.split(' ').slice(0, 2).map((n) => n[0]?.toUpperCase() ?? '').join('')
+    ? displayLabel
+        .split(' ')
+        .slice(0, 2)
+        .map(n => n[0]?.toUpperCase() ?? '')
+        .join('')
     : null
 
   return (
-    <Popover
-      open={open}
-      onOpenChange={handleOpenChange}
-    >
+    <Popover open={open} onOpenChange={handleOpenChange}>
       <PopoverTrigger asChild>
         {triggerClassName ? (
           <button type='button' className={triggerClassName}>
@@ -105,12 +106,14 @@ export function UserCombobox({
                 <span>{placeholder}</span>
               </>
             )}
-            {!triggerIcon && <ChevronsUpDown className='ml-auto size-3 shrink-0 text-text-tertiary' />}
+            {!triggerIcon && (
+              <ChevronsUpDown className='ml-auto size-3 shrink-0 text-text-tertiary' />
+            )}
           </button>
         ) : (
           <button
             type='button'
-            className='flex h-9 min-w-0 w-full items-center justify-between gap-2 rounded-[6px] border border-input bg-background px-3 text-[13px] font-medium shadow-sm transition-colors duration-[80ms] hover:bg-bg-hover'
+            className='flex h-9 w-full min-w-0 items-center justify-between gap-2 rounded-[6px] border border-input bg-background px-3 text-[13px] font-medium shadow-sm transition-colors duration-[80ms] hover:bg-bg-hover'
           >
             {displayLabel ? (
               <span className='flex items-center gap-2 truncate'>
@@ -129,7 +132,7 @@ export function UserCombobox({
         align='start'
         style={{
           boxShadow: 'var(--dropdown-shadow)',
-          animation: 'dropIn 0.15s ease',
+          animation: 'dropIn 0.15s ease'
         }}
       >
         <div className='flex items-center gap-1.5 border-b border-border px-2.5 py-[6px]'>
@@ -142,13 +145,13 @@ export function UserCombobox({
             ref={inputRef}
             placeholder='Search by name or email...'
             value={search}
-            onChange={(e) => handleSearchChange(e.target.value)}
+            onChange={e => handleSearchChange(e.target.value)}
             className='flex-1 bg-transparent text-[13px] font-medium outline-none placeholder:text-text-tertiary'
           />
         </div>
         <div
           className='max-h-64 overflow-y-auto overscroll-contain p-1'
-          onWheel={(e) => e.stopPropagation()}
+          onWheel={e => e.stopPropagation()}
         >
           {loading && users.length === 0 ? (
             <div className='space-y-1'>
@@ -178,11 +181,15 @@ export function UserCombobox({
                   Remove assignee
                 </button>
               )}
-              {users.map((u) => {
+              {users.map(u => {
                 const selected = u.id === value
                 const fullName = getUserDisplayName(u)
                 const initials = fullName
-                  ? fullName.split(' ').slice(0, 2).map((n) => n[0]?.toUpperCase() ?? '').join('')
+                  ? fullName
+                      .split(' ')
+                      .slice(0, 2)
+                      .map(n => n[0]?.toUpperCase() ?? '')
+                      .join('')
                   : '\u2014'
                 return (
                   <button
@@ -192,13 +199,13 @@ export function UserCombobox({
                     onClick={() => handleSelect(u)}
                   >
                     <InitialsAvatar initials={initials} size={20} />
-                    <span className='flex-1 truncate'>
-                      {fullName || '\u2014'}
-                    </span>
+                    <span className='flex-1 truncate'>{fullName || '\u2014'}</span>
                     <span className='shrink-0 text-[13px] text-text-tertiary'>
                       {USER_ROLE_LABELS[u.role as UserRole] ?? u.role}
                     </span>
-                    {selected && <Check className='size-3.5 shrink-0 text-primary' strokeWidth={2} />}
+                    {selected && (
+                      <Check className='size-3.5 shrink-0 text-primary' strokeWidth={2} />
+                    )}
                   </button>
                 )
               })}

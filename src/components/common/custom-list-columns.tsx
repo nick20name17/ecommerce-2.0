@@ -31,8 +31,8 @@ export const buildCustomColumns = (
   for (const e of entries) byField.set(e.field, e)
 
   return ordered
-    .filter((field) => !fixedFields.has(field))
-    .map((field) => {
+    .filter(field => !fixedFields.has(field))
+    .map(field => {
       const entry = byField.get(field)
       const alias = entry?.alias?.trim()
       return {
@@ -43,13 +43,12 @@ export const buildCustomColumns = (
     })
 }
 
-const humanize = (key: string) =>
-  key.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
+const humanize = (key: string) => key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
 
 /** Returns a comma-separated list of fields, or undefined when empty. */
 export const customFieldsParam = (columns: CustomColumn[]): string | undefined => {
   if (columns.length === 0) return undefined
-  return columns.map((c) => c.field).join(',')
+  return columns.map(c => c.field).join(',')
 }
 
 const CELL_TRUNCATE = 40
@@ -97,7 +96,7 @@ export const CustomColumnsHeader = ({
   if (columns.length === 0) return null
   return (
     <>
-      {columns.map((col) => {
+      {columns.map(col => {
         const active = sortField === col.field
         return (
           <button
@@ -138,13 +137,10 @@ export const CustomColumnsCells = ({
   if (columns.length === 0) return null
   return (
     <>
-      {columns.map((col) => {
+      {columns.map(col => {
         const raw = row[col.field]
         return (
-          <div
-            key={col.field}
-            className='w-[140px] shrink-0 truncate text-[13px]'
-          >
+          <div key={col.field} className='w-[140px] shrink-0 truncate text-[13px]'>
             <CellValue value={raw} type={col.type} />
           </div>
         )
@@ -181,9 +177,7 @@ function CellValue({ value, type }: { value: unknown; type?: string }) {
 
   if (type === 'date') {
     const formatted = formatDate(value as string)
-    return (
-      <span className='block truncate text-text-secondary tabular-nums'>{formatted}</span>
-    )
+    return <span className='block truncate text-text-secondary tabular-nums'>{formatted}</span>
   }
 
   if (type === 'integer' || type === 'number') {

@@ -14,14 +14,14 @@ import {
   DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogTitle,
+  DialogTitle
 } from '@/components/ui/dialog'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
-  DropdownMenuTrigger,
+  DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -70,7 +70,7 @@ const SpecsManagerPage = () => {
   }, [specs, selectedSpec])
 
   const filteredSpecs = deferredSearch
-    ? specs.filter((s) => s.name.toLowerCase().includes(deferredSearch.toLowerCase()))
+    ? specs.filter(s => s.name.toLowerCase().includes(deferredSearch.toLowerCase()))
     : specs
 
   const invalidateAll = () => {
@@ -81,16 +81,31 @@ const SpecsManagerPage = () => {
 
   const createMutation = useMutation({
     mutationFn: () =>
-      variableProductService.createSpec({ name: formName, display_type: formDisplayType, sort_order: formSortOrder }, params),
+      variableProductService.createSpec(
+        { name: formName, display_type: formDisplayType, sort_order: formSortOrder },
+        params
+      ),
     meta: { successMessage: 'Spec created' },
-    onSuccess: () => { invalidateAll(); setCreateOpen(false); resetForm() },
+    onSuccess: () => {
+      invalidateAll()
+      setCreateOpen(false)
+      resetForm()
+    }
   })
 
   const updateMutation = useMutation({
     mutationFn: () =>
-      variableProductService.updateSpec(editSpec!.id, { name: formName, display_type: formDisplayType, sort_order: formSortOrder }, params),
+      variableProductService.updateSpec(
+        editSpec!.id,
+        { name: formName, display_type: formDisplayType, sort_order: formSortOrder },
+        params
+      ),
     meta: { successMessage: 'Spec updated' },
-    onSuccess: () => { invalidateAll(); setEditSpec(null); resetForm() },
+    onSuccess: () => {
+      invalidateAll()
+      setEditSpec(null)
+      resetForm()
+    }
   })
 
   const deleteMutation = useMutation({
@@ -100,14 +115,18 @@ const SpecsManagerPage = () => {
       invalidateAll()
       setDeleteSpec(null)
       if (selectedSpec?.id === deleteSpec?.id) setSelectedSpec(null)
-    },
+    }
   })
 
   const mergeMutation = useMutation({
     mutationFn: () =>
       variableProductService.mergeSpecs(mergeSpec!.id, { source_id: mergeTargetId }, params),
     meta: { successMessage: 'Specs merged' },
-    onSuccess: () => { invalidateAll(); setMergeSpec(null); setMergeTargetId('') },
+    onSuccess: () => {
+      invalidateAll()
+      setMergeSpec(null)
+      setMergeTargetId('')
+    }
   })
 
   const resetForm = () => {
@@ -132,7 +151,7 @@ const SpecsManagerPage = () => {
         <SidebarTrigger className='-ml-1' />
         <button
           type='button'
-          className='inline-flex h-7 shrink-0 items-center gap-0.5 rounded-[6px] border border-border bg-bg-secondary pl-1.5 pr-2.5 text-[13px] font-medium text-text-secondary transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground'
+          className='inline-flex h-7 shrink-0 items-center gap-0.5 rounded-[6px] border border-border bg-bg-secondary pr-2.5 pl-1.5 text-[13px] font-medium text-text-secondary transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground'
           onClick={() => router.history.back()}
         >
           <ArrowLeft className='size-3.5' />
@@ -140,11 +159,17 @@ const SpecsManagerPage = () => {
         </button>
         <PageHeaderIcon icon={ICatalog} color={PAGE_COLORS.catalog} />
         <h1 className='text-[14px] font-semibold tracking-[-0.01em]'>Specs Manager</h1>
-        <span className='text-[13px] tabular-nums text-text-tertiary'>
+        <span className='text-[13px] text-text-tertiary tabular-nums'>
           {isLoading ? '…' : specs.length}
         </span>
         <div className='flex-1' />
-        <Button size='sm' onClick={() => { resetForm(); setCreateOpen(true) }}>
+        <Button
+          size='sm'
+          onClick={() => {
+            resetForm()
+            setCreateOpen(true)
+          }}
+        >
           <Plus className='size-3.5' />
           New Spec
         </Button>
@@ -160,7 +185,7 @@ const SpecsManagerPage = () => {
               <Search className='size-3.5 shrink-0 text-text-tertiary' />
               <input
                 value={search}
-                onChange={(e) => setSearch(e.target.value)}
+                onChange={e => setSearch(e.target.value)}
                 placeholder='Search specs...'
                 className='flex-1 bg-transparent text-[13px] outline-none placeholder:text-text-tertiary'
               />
@@ -177,32 +202,40 @@ const SpecsManagerPage = () => {
               </div>
             ) : filteredSpecs.length === 0 ? (
               <div className='flex flex-col items-center gap-2 py-12 text-center'>
-                <Layers className='size-8 text-text-quaternary' />
+                <Layers className='text-text-quaternary size-8' />
                 <p className='text-[13px] text-text-tertiary'>
                   {search ? 'No specs match your search' : 'No specs defined yet'}
                 </p>
               </div>
             ) : (
               <div className='flex flex-col gap-0.5 p-2'>
-                {filteredSpecs.map((spec) => (
+                {filteredSpecs.map(spec => (
                   <button
                     key={spec.id}
                     type='button'
                     className={cn(
-                      'group flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left outline-none transition-colors',
+                      'group flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left transition-colors outline-none',
                       selectedSpec?.id === spec.id
                         ? 'bg-primary/10 text-foreground'
-                        : 'hover:bg-bg-hover text-text-secondary'
+                        : 'text-text-secondary hover:bg-bg-hover'
                     )}
                     onClick={() => setSelectedSpec(spec)}
                   >
-                    <div className={cn(
-                      'flex size-8 shrink-0 items-center justify-center rounded-md text-[11px] font-bold uppercase',
-                      spec.display_type === 'swatch' ? 'bg-pink-500/10 text-pink-500'
-                        : spec.display_type === 'button' ? 'bg-blue-500/10 text-blue-500'
-                        : 'bg-amber-500/10 text-amber-500'
-                    )}>
-                      {spec.display_type === 'swatch' ? '🎨' : spec.display_type === 'button' ? 'Btn' : '▾'}
+                    <div
+                      className={cn(
+                        'flex size-8 shrink-0 items-center justify-center rounded-md text-[11px] font-bold uppercase',
+                        spec.display_type === 'swatch'
+                          ? 'bg-pink-500/10 text-pink-500'
+                          : spec.display_type === 'button'
+                            ? 'bg-blue-500/10 text-blue-500'
+                            : 'bg-amber-500/10 text-amber-500'
+                      )}
+                    >
+                      {spec.display_type === 'swatch'
+                        ? '🎨'
+                        : spec.display_type === 'button'
+                          ? 'Btn'
+                          : '▾'}
                     </div>
                     <div className='min-w-0 flex-1'>
                       <span className='block truncate text-[13px] font-medium'>{spec.name}</span>
@@ -218,7 +251,7 @@ const SpecsManagerPage = () => {
                           variant='ghost'
                           size='icon-xs'
                           className='shrink-0 opacity-0 transition-opacity group-hover:opacity-100'
-                          onClick={(e) => e.stopPropagation()}
+                          onClick={e => e.stopPropagation()}
                         >
                           <svg width='15' height='15' viewBox='0 0 15 15' fill='none'>
                             <circle cx='3' cy='7.5' r='1.2' fill='currentColor' />
@@ -228,18 +261,32 @@ const SpecsManagerPage = () => {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align='end' className='w-44'>
-                        <DropdownMenuItem onClick={(e) => { e.stopPropagation(); openEdit(spec) }}>
+                        <DropdownMenuItem
+                          onClick={e => {
+                            e.stopPropagation()
+                            openEdit(spec)
+                          }}
+                        >
                           <Pencil className='size-3.5' />
                           Edit spec
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={(e) => { e.stopPropagation(); setMergeSpec(spec); setMergeTargetId('') }}>
+                        <DropdownMenuItem
+                          onClick={e => {
+                            e.stopPropagation()
+                            setMergeSpec(spec)
+                            setMergeTargetId('')
+                          }}
+                        >
                           <Merge className='size-3.5' />
                           Merge into this
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem
                           variant='destructive'
-                          onClick={(e) => { e.stopPropagation(); setDeleteSpec(spec) }}
+                          onClick={e => {
+                            e.stopPropagation()
+                            setDeleteSpec(spec)
+                          }}
                         >
                           <Trash2 className='size-3.5' />
                           Delete spec
@@ -268,11 +315,16 @@ const SpecsManagerPage = () => {
       {/* ── Create/Edit Spec Dialog ── */}
       <Dialog
         open={createOpen || !!editSpec}
-        onOpenChange={(v) => { if (!v) { setCreateOpen(false); setEditSpec(null) } }}
+        onOpenChange={v => {
+          if (!v) {
+            setCreateOpen(false)
+            setEditSpec(null)
+          }
+        }}
       >
         <DialogContent className='sm:max-w-sm'>
           <form
-            onSubmit={(e) => {
+            onSubmit={e => {
               e.preventDefault()
               if (editSpec) updateMutation.mutate()
               else createMutation.mutate()
@@ -289,16 +341,37 @@ const SpecsManagerPage = () => {
             <DialogBody className='flex flex-col gap-4'>
               <div className='flex flex-col gap-1.5'>
                 <Label className='text-[12px]'>Name</Label>
-                <Input value={formName} onChange={(e) => setFormName(e.target.value)} placeholder='e.g. Color, Size, Material' required autoFocus />
+                <Input
+                  value={formName}
+                  onChange={e => setFormName(e.target.value)}
+                  placeholder='e.g. Color, Size, Material'
+                  required
+                  autoFocus
+                />
               </div>
               <div className='flex flex-col gap-2'>
                 <Label className='text-[12px]'>How should customers choose?</Label>
                 <div className='grid grid-cols-3 gap-2'>
-                  {([
-                    { value: 'dropdown' as const, icon: '▾', label: 'Dropdown', desc: 'Select list' },
-                    { value: 'swatch' as const, icon: '🎨', label: 'Swatch', desc: 'Color circles' },
-                    { value: 'button' as const, icon: '▢', label: 'Button', desc: 'Clickable pills' },
-                  ]).map((opt) => (
+                  {[
+                    {
+                      value: 'dropdown' as const,
+                      icon: '▾',
+                      label: 'Dropdown',
+                      desc: 'Select list'
+                    },
+                    {
+                      value: 'swatch' as const,
+                      icon: '🎨',
+                      label: 'Swatch',
+                      desc: 'Color circles'
+                    },
+                    {
+                      value: 'button' as const,
+                      icon: '▢',
+                      label: 'Button',
+                      desc: 'Clickable pills'
+                    }
+                  ].map(opt => (
                     <button
                       key={opt.value}
                       type='button'
@@ -306,7 +379,7 @@ const SpecsManagerPage = () => {
                         'flex flex-col items-center gap-1 rounded-lg border-2 px-2 py-3 text-center transition-colors',
                         formDisplayType === opt.value
                           ? 'border-primary bg-primary/5'
-                          : 'border-border hover:border-border-dark hover:bg-bg-hover'
+                          : 'hover:border-border-dark border-border hover:bg-bg-hover'
                       )}
                       onClick={() => setFormDisplayType(opt.value)}
                     >
@@ -319,8 +392,21 @@ const SpecsManagerPage = () => {
               </div>
             </DialogBody>
             <DialogFooter>
-              <Button type='button' variant='outline' onClick={() => { setCreateOpen(false); setEditSpec(null) }}>Cancel</Button>
-              <Button type='submit' disabled={!formName.trim()} isPending={editSpec ? updateMutation.isPending : createMutation.isPending}>
+              <Button
+                type='button'
+                variant='outline'
+                onClick={() => {
+                  setCreateOpen(false)
+                  setEditSpec(null)
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                type='submit'
+                disabled={!formName.trim()}
+                isPending={editSpec ? updateMutation.isPending : createMutation.isPending}
+              >
                 {editSpec ? 'Save' : 'Create'}
               </Button>
             </DialogFooter>
@@ -329,12 +415,13 @@ const SpecsManagerPage = () => {
       </Dialog>
 
       {/* ── Delete Confirmation ── */}
-      <Dialog open={!!deleteSpec} onOpenChange={(v) => !v && setDeleteSpec(null)}>
+      <Dialog open={!!deleteSpec} onOpenChange={v => !v && setDeleteSpec(null)}>
         <DialogContent className='sm:max-w-sm'>
           <DialogHeader>
             <DialogTitle>Delete "{deleteSpec?.name}"?</DialogTitle>
             <DialogDescription>
-              This will remove the spec and all its options from every superinventory that uses it. This cannot be undone.
+              This will remove the spec and all its options from every superinventory that uses it.
+              This cannot be undone.
               {(deleteSpec?.vp_count ?? 0) > 0 && (
                 <span className='mt-1 block font-semibold text-destructive'>
                   ⚠ Used by {deleteSpec?.vp_count} superinventory items
@@ -343,8 +430,14 @@ const SpecsManagerPage = () => {
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button variant='outline' onClick={() => setDeleteSpec(null)}>Cancel</Button>
-            <Button variant='destructive' onClick={() => deleteMutation.mutate()} isPending={deleteMutation.isPending}>
+            <Button variant='outline' onClick={() => setDeleteSpec(null)}>
+              Cancel
+            </Button>
+            <Button
+              variant='destructive'
+              onClick={() => deleteMutation.mutate()}
+              isPending={deleteMutation.isPending}
+            >
               Delete
             </Button>
           </DialogFooter>
@@ -352,7 +445,7 @@ const SpecsManagerPage = () => {
       </Dialog>
 
       {/* ── Merge Dialog ── */}
-      <Dialog open={!!mergeSpec} onOpenChange={(v) => !v && setMergeSpec(null)}>
+      <Dialog open={!!mergeSpec} onOpenChange={v => !v && setMergeSpec(null)}>
         <DialogContent className='sm:max-w-md'>
           <DialogHeader>
             <DialogTitle>Merge into "{mergeSpec?.name}"</DialogTitle>
@@ -365,38 +458,50 @@ const SpecsManagerPage = () => {
               <Input
                 placeholder='Search specs...'
                 value={mergeSearch}
-                onChange={(e) => setMergeSearch(e.target.value)}
+                onChange={e => setMergeSearch(e.target.value)}
                 autoFocus
               />
             </div>
             <div className='flex flex-col gap-0.5'>
               {specs
-                .filter((s) => s.id !== mergeSpec?.id && s.name.toLowerCase().includes(mergeSearch.toLowerCase()))
-                .map((s) => (
+                .filter(
+                  s =>
+                    s.id !== mergeSpec?.id &&
+                    s.name.toLowerCase().includes(mergeSearch.toLowerCase())
+                )
+                .map(s => (
                   <button
                     key={s.id}
                     type='button'
                     className={cn(
-                      'flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left outline-none transition-colors',
-                      mergeTargetId === s.id ? 'bg-primary/10 ring-1 ring-primary/30' : 'hover:bg-bg-hover'
+                      'flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left transition-colors outline-none',
+                      mergeTargetId === s.id
+                        ? 'bg-primary/10 ring-1 ring-primary/30'
+                        : 'hover:bg-bg-hover'
                     )}
                     onClick={() => setMergeTargetId(s.id)}
                   >
                     <div className='min-w-0 flex-1'>
-                      <span className='block text-[13px] font-medium text-foreground'>{s.name}</span>
+                      <span className='block text-[13px] font-medium text-foreground'>
+                        {s.name}
+                      </span>
                       <span className='text-[11px] text-text-tertiary'>
                         {s.option_count ?? 0} options · {s.vp_count ?? 0} supers · {s.display_type}
                       </span>
                     </div>
                     {mergeTargetId === s.id && (
-                      <span className='shrink-0 text-[11px] font-medium text-primary'>Selected</span>
+                      <span className='shrink-0 text-[11px] font-medium text-primary'>
+                        Selected
+                      </span>
                     )}
                   </button>
                 ))}
             </div>
           </DialogBody>
           <DialogFooter>
-            <Button variant='outline' onClick={() => setMergeSpec(null)}>Cancel</Button>
+            <Button variant='outline' onClick={() => setMergeSpec(null)}>
+              Cancel
+            </Button>
             <Button
               disabled={!mergeTargetId}
               isPending={mergeMutation.isPending}
@@ -414,5 +519,5 @@ const SpecsManagerPage = () => {
 
 export const Route = createFileRoute('/_authenticated/catalog/specs/')({
   component: SpecsManagerPage,
-  head: () => ({ meta: [{ title: 'Specs Manager' }] }),
+  head: () => ({ meta: [{ title: 'Specs Manager' }] })
 })

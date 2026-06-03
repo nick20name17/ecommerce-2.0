@@ -1,20 +1,12 @@
 import { api } from '..'
 
-import type {
-  CatalogImageItem,
-  CatalogImageListResponse,
-  PresignedUploadResponse,
-} from './schema'
+import type { CatalogImageItem, CatalogImageListResponse, PresignedUploadResponse } from './schema'
 import type { ImportStatusResponse, ImportTaskResponse } from '@/api/catalog/schema'
 
 export const catalogImageService = {
-  list: async (params: {
-    entity_type: string
-    entity_id: string
-    project_id?: number
-  }) => {
+  list: async (params: { entity_type: string; entity_id: string; project_id?: number }) => {
     const { data } = await api.get<CatalogImageListResponse>('/catalog-images/', {
-      params,
+      params
     })
     return data
   },
@@ -28,11 +20,9 @@ export const catalogImageService = {
     },
     params?: { project_id?: number }
   ) => {
-    const { data } = await api.post<PresignedUploadResponse>(
-      '/catalog-images/',
-      payload,
-      { params }
-    )
+    const { data } = await api.post<PresignedUploadResponse>('/catalog-images/', payload, {
+      params
+    })
     return data
   },
 
@@ -48,11 +38,9 @@ export const catalogImageService = {
     },
     params?: { project_id?: number }
   ) => {
-    const { data } = await api.post<CatalogImageItem>(
-      '/catalog-images/confirm/',
-      payload,
-      { params }
-    )
+    const { data } = await api.post<CatalogImageItem>('/catalog-images/confirm/', payload, {
+      params
+    })
     return data
   },
 
@@ -61,11 +49,9 @@ export const catalogImageService = {
     payload: { alt?: string; sort_order?: number; is_primary?: boolean },
     params?: { project_id?: number }
   ) => {
-    const { data } = await api.patch<CatalogImageItem>(
-      `/catalog-images/${imageId}/`,
-      payload,
-      { params }
-    )
+    const { data } = await api.patch<CatalogImageItem>(`/catalog-images/${imageId}/`, payload, {
+      params
+    })
     return data
   },
 
@@ -74,11 +60,7 @@ export const catalogImageService = {
   },
 
   startImport: async (params: { project_id?: number }) => {
-    const { data } = await api.post<ImportTaskResponse>(
-      '/catalog-images/import/',
-      {},
-      { params }
-    )
+    const { data } = await api.post<ImportTaskResponse>('/catalog-images/import/', {}, { params })
     return data
   },
 
@@ -92,5 +74,5 @@ export const catalogImageService = {
 
   cancelImport: async (taskId: string, params?: { project_id?: number }) => {
     await api.post(`/catalog-images/cancel/${taskId}/`, {}, { params })
-  },
+  }
 }

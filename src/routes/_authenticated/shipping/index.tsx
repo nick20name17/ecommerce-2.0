@@ -9,7 +9,7 @@ import {
   Search,
   TriangleAlert,
   Truck,
-  XCircle,
+  XCircle
 } from 'lucide-react'
 import { useDeferredValue, useState } from 'react'
 import { toast } from 'sonner'
@@ -34,14 +34,9 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogMedia,
-  AlertDialogTitle,
+  AlertDialogTitle
 } from '@/components/ui/alert-dialog'
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { SidebarTrigger } from '@/components/ui/sidebar'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Pagination } from '@/components/common/filters/pagination'
@@ -58,17 +53,22 @@ type VoidedFilter = 'all' | 'active' | 'voided'
 const FILTER_OPTIONS: { value: VoidedFilter; label: string }[] = [
   { value: 'all', label: 'All' },
   { value: 'active', label: 'Active' },
-  { value: 'voided', label: 'Voided' },
+  { value: 'voided', label: 'Voided' }
 ]
 
 const STATUS_DOT_COLORS: Record<VoidedFilter, string> = {
   all: 'bg-slate-400',
   active: 'bg-emerald-500',
-  voided: 'bg-red-500',
+  voided: 'bg-red-500'
 }
 
 function getCustomerDisplay(shipment: ShipmentRecord): string {
-  return shipment.order_name || shipment.ship_to_name || shipment.order_invoice || `#${shipment.order_autoid?.slice(0, 8) ?? '—'}`
+  return (
+    shipment.order_name ||
+    shipment.ship_to_name ||
+    shipment.order_invoice ||
+    `#${shipment.order_autoid?.slice(0, 8) ?? '—'}`
+  )
 }
 
 function getOrderDisplay(shipment: ShipmentRecord): string {
@@ -100,13 +100,13 @@ const ShippingPage = () => {
     ordering: '-created_at',
     search: deferredSearch || undefined,
     limit,
-    offset,
+    offset
   }
 
   const { data, isLoading } = useQuery({
     ...getShipmentsQuery(queryParams),
     placeholderData: keepPreviousData,
-    enabled: shippingEnabled,
+    enabled: shippingEnabled
   })
   const shipments = data?.results ?? []
   const totalCount = data?.count ?? 0
@@ -138,12 +138,17 @@ const ShippingPage = () => {
   return (
     <div className='flex h-full flex-col overflow-hidden'>
       {/* Header */}
-      <header className={cn('flex h-12 shrink-0 items-center gap-2.5 border-b border-border', isMobile ? 'px-3.5' : 'px-6')}>
+      <header
+        className={cn(
+          'flex h-12 shrink-0 items-center gap-2.5 border-b border-border',
+          isMobile ? 'px-3.5' : 'px-6'
+        )}
+      >
         <SidebarTrigger className='-ml-1' />
         <PageHeaderIcon icon={IShipping} color={PAGE_COLORS.shipping} />
         <h1 className='text-[14px] font-semibold tracking-[-0.01em]'>Shipping</h1>
         {!isLoading && (
-          <span className='text-[13px] tabular-nums text-text-tertiary'>
+          <span className='text-[13px] text-text-tertiary tabular-nums'>
             {totalCount} shipment{totalCount !== 1 ? 's' : ''}
           </span>
         )}
@@ -154,7 +159,10 @@ const ShippingPage = () => {
           <Search className='size-3.5 shrink-0 text-text-tertiary' />
           <input
             value={search}
-            onChange={(e) => { setSearch(e.target.value); setOffset(null) }}
+            onChange={e => {
+              setSearch(e.target.value)
+              setOffset(null)
+            }}
             placeholder='Search shipments...'
             className='w-[140px] bg-transparent text-[13px] outline-none placeholder:text-text-tertiary sm:w-[200px]'
           />
@@ -163,9 +171,16 @@ const ShippingPage = () => {
         <FilterPopover
           label='Status'
           active={hasFilters}
-          icon={<div className={cn('size-2.5 rounded-full', hasFilters ? STATUS_DOT_COLORS[voidedFilter] : 'bg-current')} />}
+          icon={
+            <div
+              className={cn(
+                'size-2.5 rounded-full',
+                hasFilters ? STATUS_DOT_COLORS[voidedFilter] : 'bg-current'
+              )}
+            />
+          }
         >
-          {FILTER_OPTIONS.map((opt) => {
+          {FILTER_OPTIONS.map(opt => {
             const selected_ = voidedFilter === opt.value
             return (
               <button
@@ -177,13 +192,17 @@ const ShippingPage = () => {
                 )}
                 onClick={() => selectStatus(opt.value)}
               >
-                <div className={cn(
-                  'flex size-3.5 items-center justify-center rounded-full border transition-colors duration-[80ms]',
-                  selected_ ? 'border-primary bg-primary' : 'border-border'
-                )}>
+                <div
+                  className={cn(
+                    'flex size-3.5 items-center justify-center rounded-full border transition-colors duration-[80ms]',
+                    selected_ ? 'border-primary bg-primary' : 'border-border'
+                  )}
+                >
                   {selected_ && <div className='size-1.5 rounded-full bg-primary-foreground' />}
                 </div>
-                <div className={cn('size-2.5 shrink-0 rounded-full', STATUS_DOT_COLORS[opt.value])} />
+                <div
+                  className={cn('size-2.5 shrink-0 rounded-full', STATUS_DOT_COLORS[opt.value])}
+                />
                 <span className='flex-1'>{opt.label}</span>
               </button>
             )
@@ -193,7 +212,12 @@ const ShippingPage = () => {
 
       {/* Active filter chips */}
       {hasFilters && (
-        <div className={cn('flex shrink-0 flex-wrap items-center gap-1.5 border-b border-border py-1.5', isMobile ? 'px-3.5' : 'px-6')}>
+        <div
+          className={cn(
+            'flex shrink-0 flex-wrap items-center gap-1.5 border-b border-border py-1.5',
+            isMobile ? 'px-3.5' : 'px-6'
+          )}
+        >
           <button
             type='button'
             className='text-[13px] font-medium text-text-tertiary transition-colors duration-[80ms] hover:text-foreground'
@@ -211,13 +235,14 @@ const ShippingPage = () => {
 
       {/* Table header */}
       {!isMobile && (
-        <div className={cn('flex shrink-0 items-center gap-4 border-b border-border bg-bg-secondary/60 py-1.5', isTablet ? 'px-5' : 'px-6')}>
-          <div className='w-[80px] shrink-0 text-[13px] font-medium text-text-tertiary'>
-            Order
-          </div>
-          <div className='min-w-0 flex-1 text-[13px] font-medium text-text-tertiary'>
-            Customer
-          </div>
+        <div
+          className={cn(
+            'flex shrink-0 items-center gap-4 border-b border-border bg-bg-secondary/60 py-1.5',
+            isTablet ? 'px-5' : 'px-6'
+          )}
+        >
+          <div className='w-[80px] shrink-0 text-[13px] font-medium text-text-tertiary'>Order</div>
+          <div className='min-w-0 flex-1 text-[13px] font-medium text-text-tertiary'>Customer</div>
           <div className='hidden w-[120px] shrink-0 text-[13px] font-medium text-text-tertiary lg:block'>
             Service
           </div>
@@ -238,7 +263,13 @@ const ShippingPage = () => {
       <div className='flex-1 overflow-y-auto'>
         {isLoading ? (
           Array.from({ length: 8 }).map((_, i) => (
-            <div key={i} className={cn('flex items-center gap-4 border-b border-border-light py-2.5', isMobile ? 'px-3.5' : 'px-6')}>
+            <div
+              key={i}
+              className={cn(
+                'flex items-center gap-4 border-b border-border-light py-2.5',
+                isMobile ? 'px-3.5' : 'px-6'
+              )}
+            >
               <Skeleton className='h-4 w-16' />
               <Skeleton className='h-4 w-32 flex-1' />
               {!isMobile && <Skeleton className='hidden h-4 w-20 lg:block' />}
@@ -248,9 +279,13 @@ const ShippingPage = () => {
             </div>
           ))
         ) : shipments.length === 0 ? (
-          <PageEmpty icon={Truck} title='No shipments found' description='Try adjusting your search or filters.' />
+          <PageEmpty
+            icon={Truck}
+            title='No shipments found'
+            description='Try adjusting your search or filters.'
+          />
         ) : (
-          shipments.map((shipment) => (
+          shipments.map(shipment => (
             <ShipmentRow
               key={shipment.id}
               shipment={shipment}
@@ -272,7 +307,7 @@ const ShippingPage = () => {
         <ShipmentDetailDialog
           shipment={selected}
           open={!!selected}
-          onOpenChange={(open) => !open && setSelected(null)}
+          onOpenChange={open => !open && setSelected(null)}
         />
       )}
     </div>
@@ -285,7 +320,7 @@ function ShipmentRow({
   shipment,
   isMobile,
   isTablet,
-  onClick,
+  onClick
 }: {
   shipment: ShipmentRecord
   isMobile: boolean
@@ -301,20 +336,20 @@ function ShipmentRow({
         onClick={onClick}
       >
         <div className='mb-1 flex items-center gap-2'>
-          <span className='text-[13px] font-semibold tabular-nums text-foreground'>
+          <span className='text-[13px] font-semibold text-foreground tabular-nums'>
             {getOrderDisplay(shipment)}
           </span>
           <span className='min-w-0 flex-1 truncate text-[13px] font-medium text-foreground'>
             {customerName}
           </span>
-          <span className='shrink-0 text-[13px] font-medium tabular-nums text-foreground'>
+          <span className='shrink-0 text-[13px] font-medium text-foreground tabular-nums'>
             ${parseFloat(shipment.cost).toFixed(2)}
           </span>
         </div>
         <div className='flex items-center gap-2'>
           <StatusBadge voided={shipment.voided} />
           <span className='text-[13px] text-text-tertiary'>{shipment.service_name}</span>
-          <span className='text-[13px] tabular-nums text-text-tertiary'>
+          <span className='text-[13px] text-text-tertiary tabular-nums'>
             {formatDateMedium(shipment.created_at)}
           </span>
         </div>
@@ -326,12 +361,12 @@ function ShipmentRow({
     <div
       className={cn(
         'group/row flex cursor-pointer items-center gap-4 border-b border-border-light py-2 transition-colors duration-100 hover:bg-bg-hover',
-        isTablet ? 'px-5' : 'px-6',
+        isTablet ? 'px-5' : 'px-6'
       )}
       onClick={onClick}
     >
       <div className='w-[80px] shrink-0'>
-        <span className='text-[13px] font-semibold tabular-nums text-foreground'>
+        <span className='text-[13px] font-semibold text-foreground tabular-nums'>
           {getOrderDisplay(shipment)}
         </span>
       </div>
@@ -344,10 +379,10 @@ function ShipmentRow({
       <div className='w-[110px] shrink-0'>
         <StatusBadge voided={shipment.voided} />
       </div>
-      <div className='hidden w-[80px] shrink-0 text-right text-[13px] font-medium tabular-nums text-foreground sm:block'>
+      <div className='hidden w-[80px] shrink-0 text-right text-[13px] font-medium text-foreground tabular-nums sm:block'>
         ${parseFloat(shipment.cost).toFixed(2)}
       </div>
-      <div className='hidden w-[100px] shrink-0 text-[13px] tabular-nums text-text-tertiary lg:block'>
+      <div className='hidden w-[100px] shrink-0 text-[13px] text-text-tertiary tabular-nums lg:block'>
         {formatDateMedium(shipment.created_at)}
       </div>
       <div className='w-[20px] shrink-0 text-text-tertiary opacity-0 transition-opacity group-hover/row:opacity-100'>
@@ -362,14 +397,14 @@ function ShipmentRow({
 function StatusBadge({ voided }: { voided: boolean }) {
   if (voided) {
     return (
-      <span className='inline-flex items-center gap-1.5 rounded-full border border-red-300 bg-red-500/10 px-2 py-0.5 text-[11px] font-semibold leading-none text-red-800 dark:border-red-600 dark:bg-red-500/20 dark:text-red-300'>
+      <span className='inline-flex items-center gap-1.5 rounded-full border border-red-300 bg-red-500/10 px-2 py-0.5 text-[11px] leading-none font-semibold text-red-800 dark:border-red-600 dark:bg-red-500/20 dark:text-red-300'>
         <XCircle className='size-2.5' />
         Voided
       </span>
     )
   }
   return (
-    <span className='inline-flex items-center gap-1.5 rounded-full border border-emerald-300 bg-emerald-500/10 px-2 py-0.5 text-[11px] font-semibold leading-none text-emerald-800 dark:border-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-300'>
+    <span className='inline-flex items-center gap-1.5 rounded-full border border-emerald-300 bg-emerald-500/10 px-2 py-0.5 text-[11px] leading-none font-semibold text-emerald-800 dark:border-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-300'>
       <Check className='size-2.5' />
       Active
     </span>
@@ -381,7 +416,7 @@ function StatusBadge({ voided }: { voided: boolean }) {
 function ShipmentDetailDialog({
   shipment,
   open,
-  onOpenChange,
+  onOpenChange
 }: {
   shipment: ShipmentRecord
   open: boolean
@@ -394,7 +429,7 @@ function ShipmentDetailDialog({
   // Fetch pick list items when shipment is from a pick list
   const { data: pickListData, isLoading: isPickListLoading } = useQuery({
     ...getPickListDetailQuery(shipment.pick_list_id!, projectId),
-    enabled: open && shipment.pick_list_id != null,
+    enabled: open && shipment.pick_list_id != null
   })
   const pickListItems = pickListData?.items ?? []
   const showPackageLoading = shipment.pick_list_id != null && isPickListLoading
@@ -415,7 +450,7 @@ function ShipmentDetailDialog({
         queryClient.invalidateQueries({ queryKey: PICK_LIST_QUERY_KEYS.lists() })
       }
       toast.success('Shipment voided')
-    },
+    }
   })
 
   return (
@@ -478,7 +513,7 @@ function ShipmentDetailDialog({
             <PropertyCell label='Created' value={formatDateTimeMedium(shipment.created_at)} />
             <PropertyCell label='Tracking'>
               <div className='flex items-center gap-1.5'>
-                <span className='truncate text-[13px] font-mono tabular-nums'>
+                <span className='truncate font-mono text-[13px] tabular-nums'>
                   {shipment.tracking_number}
                 </span>
                 {shipment.tracking_number && (
@@ -503,7 +538,9 @@ function ShipmentDetailDialog({
           {/* Package contents — from shipment items or pick list items */}
           {showPackageLoading && (
             <div className='border-t border-border px-5 py-3'>
-              <div className='mb-2 text-[12px] font-medium text-text-tertiary'>Package Contents</div>
+              <div className='mb-2 text-[12px] font-medium text-text-tertiary'>
+                Package Contents
+              </div>
               <div className='divide-y divide-border-light rounded-[6px] border border-border'>
                 {Array.from({ length: 3 }).map((_, i) => (
                   <div key={i} className='flex items-center gap-3 px-3 py-2'>
@@ -514,40 +551,42 @@ function ShipmentDetailDialog({
               </div>
             </div>
           )}
-          {!showPackageLoading && ((shipment.items?.length ?? 0) > 0 || pickListItems.length > 0) && (
-            <div className='border-t border-border px-5 py-3'>
-              <div className='mb-2 text-[12px] font-medium text-text-tertiary'>
-                Package Contents ({shipment.items?.length || pickListItems.length})
-              </div>
-              <div className='divide-y divide-border-light rounded-[6px] border border-border'>
-                {(shipment.items?.length ?? 0) > 0
-                  ? shipment.items!.map((item) => (
-                      <div key={item.detail_autoid} className='flex items-center gap-3 px-3 py-2'>
-                        <span className='min-w-0 flex-1 truncate text-[12px] font-medium text-foreground'>
-                          {item.description || item.product_id || item.detail_autoid}
-                        </span>
-                        {item.quantity && (
-                          <span className='shrink-0 rounded bg-bg-secondary px-1.5 py-0.5 text-[12px] font-medium tabular-nums text-text-secondary'>
-                            {item.quantity}
+          {!showPackageLoading &&
+            ((shipment.items?.length ?? 0) > 0 || pickListItems.length > 0) && (
+              <div className='border-t border-border px-5 py-3'>
+                <div className='mb-2 text-[12px] font-medium text-text-tertiary'>
+                  Package Contents ({shipment.items?.length || pickListItems.length})
+                </div>
+                <div className='divide-y divide-border-light rounded-[6px] border border-border'>
+                  {(shipment.items?.length ?? 0) > 0
+                    ? shipment.items!.map(item => (
+                        <div key={item.detail_autoid} className='flex items-center gap-3 px-3 py-2'>
+                          <span className='min-w-0 flex-1 truncate text-[12px] font-medium text-foreground'>
+                            {item.description || item.product_id || item.detail_autoid}
                           </span>
-                        )}
-                      </div>
-                    ))
-                  : pickListItems.map((item) => (
-                      <div key={item.id} className='flex items-center gap-3 px-3 py-2'>
-                        <span className='min-w-0 flex-1 truncate text-[12px] font-medium text-foreground'>
-                          {item.descr || item.inven || item.detail_autoid}
-                        </span>
-                        <span className='shrink-0 rounded bg-bg-secondary px-1.5 py-0.5 text-[12px] font-medium tabular-nums text-text-secondary'>
-                          {parseFloat(item.picked_quantity) % 1 === 0 ? parseInt(item.picked_quantity) : item.picked_quantity}
-                        </span>
-                      </div>
-                    ))}
+                          {item.quantity && (
+                            <span className='shrink-0 rounded bg-bg-secondary px-1.5 py-0.5 text-[12px] font-medium text-text-secondary tabular-nums'>
+                              {item.quantity}
+                            </span>
+                          )}
+                        </div>
+                      ))
+                    : pickListItems.map(item => (
+                        <div key={item.id} className='flex items-center gap-3 px-3 py-2'>
+                          <span className='min-w-0 flex-1 truncate text-[12px] font-medium text-foreground'>
+                            {item.descr || item.inven || item.detail_autoid}
+                          </span>
+                          <span className='shrink-0 rounded bg-bg-secondary px-1.5 py-0.5 text-[12px] font-medium text-text-secondary tabular-nums'>
+                            {parseFloat(item.picked_quantity) % 1 === 0
+                              ? parseInt(item.picked_quantity)
+                              : item.picked_quantity}
+                          </span>
+                        </div>
+                      ))}
+                </div>
               </div>
-            </div>
-          )}
+            )}
         </div>
-
       </DialogContent>
 
       <AlertDialog open={voidConfirmOpen} onOpenChange={setVoidConfirmOpen}>
@@ -558,7 +597,8 @@ function ShipmentDetailDialog({
             </AlertDialogMedia>
             <AlertDialogTitle>Void Shipment</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to void shipment #{shipment.id}? This will cancel the shipping label and cannot be undone.
+              Are you sure you want to void shipment #{shipment.id}? This will cancel the shipping
+              label and cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -582,7 +622,7 @@ function ShipmentDetailDialog({
 function PropertyCell({
   label,
   value,
-  children,
+  children
 }: {
   label: string
   value?: string
@@ -599,6 +639,6 @@ function PropertyCell({
 export const Route = createFileRoute('/_authenticated/shipping/')({
   component: ShippingPage,
   head: () => ({
-    meta: [{ title: 'Shipping' }],
-  }),
+    meta: [{ title: 'Shipping' }]
+  })
 })

@@ -19,7 +19,7 @@ export const waitForCreatedAutoid = (
   return new Promise((resolve, reject) => {
     const id = nextId++
     const timeoutId = setTimeout(() => {
-      const idx = pendingWaiters.findIndex((w) => w.id === id)
+      const idx = pendingWaiters.findIndex(w => w.id === id)
       if (idx !== -1) {
         const [waiter] = pendingWaiters.splice(idx, 1)
         waiter.reject(new Error(`Timeout waiting for ${entity} created notification`))
@@ -30,7 +30,7 @@ export const waitForCreatedAutoid = (
 }
 
 export const resolvePendingCreatedAutoid = (entity: string, autoid: string): void => {
-  const idx = pendingWaiters.findIndex((w) => w.entity === entity)
+  const idx = pendingWaiters.findIndex(w => w.entity === entity)
   if (idx === -1) return
   const [waiter] = pendingWaiters.splice(idx, 1)
   clearTimeout(waiter.timeoutId)
@@ -38,7 +38,7 @@ export const resolvePendingCreatedAutoid = (entity: string, autoid: string): voi
 }
 
 export const cancelPendingCreatedAutoid = (entity: Entity): void => {
-  const idx = pendingWaiters.findIndex((w) => w.entity === entity)
+  const idx = pendingWaiters.findIndex(w => w.entity === entity)
   if (idx === -1) return
   const [waiter] = pendingWaiters.splice(idx, 1)
   clearTimeout(waiter.timeoutId)

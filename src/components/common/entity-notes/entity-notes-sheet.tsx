@@ -82,9 +82,12 @@ export const EntityNotesSheet = ({
   const notesQueryKey = NOTE_QUERY_KEYS.entityNotes(entityType, autoid, projectId)
 
   const invalidateEntityList = () => {
-    if (entityType === 'order') queryClient.invalidateQueries({ queryKey: ORDER_QUERY_KEYS.lists() })
-    else if (entityType === 'proposal') queryClient.invalidateQueries({ queryKey: PROPOSAL_QUERY_KEYS.lists() })
-    else if (entityType === 'customer') queryClient.invalidateQueries({ queryKey: CUSTOMER_QUERY_KEYS.lists() })
+    if (entityType === 'order')
+      queryClient.invalidateQueries({ queryKey: ORDER_QUERY_KEYS.lists() })
+    else if (entityType === 'proposal')
+      queryClient.invalidateQueries({ queryKey: PROPOSAL_QUERY_KEYS.lists() })
+    else if (entityType === 'customer')
+      queryClient.invalidateQueries({ queryKey: CUSTOMER_QUERY_KEYS.lists() })
   }
 
   const createMutation = useMutation({
@@ -94,7 +97,7 @@ export const EntityNotesSheet = ({
       successMessage: 'Note added',
       errorMessage: 'Failed to add note'
     },
-    onMutate: async (payload) => {
+    onMutate: async payload => {
       await queryClient.cancelQueries({ queryKey: notesQueryKey, exact: true })
       const previous = queryClient.getQueryData<EntityNoteList[]>(notesQueryKey)
       const optimistic: EntityNoteList = {
@@ -108,13 +111,13 @@ export const EntityNotesSheet = ({
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
       }
-      queryClient.setQueryData<EntityNoteList[]>(notesQueryKey, (old) =>
+      queryClient.setQueryData<EntityNoteList[]>(notesQueryKey, old =>
         old ? [optimistic, ...old] : [optimistic]
       )
       setText('')
       return { previous }
     },
-    onSuccess: (serverNote) => {
+    onSuccess: serverNote => {
       const real: EntityNoteList = {
         id: serverNote.id,
         entity_type: serverNote.entity_type,
@@ -126,8 +129,8 @@ export const EntityNotesSheet = ({
         created_at: serverNote.created_at,
         updated_at: serverNote.updated_at
       }
-      queryClient.setQueryData<EntityNoteList[]>(notesQueryKey, (old) =>
-        old?.map((n) => (n.id < 0 ? real : n))
+      queryClient.setQueryData<EntityNoteList[]>(notesQueryKey, old =>
+        old?.map(n => (n.id < 0 ? real : n))
       )
       invalidateEntityList()
     },
@@ -144,11 +147,11 @@ export const EntityNotesSheet = ({
       successMessage: 'Note deleted',
       errorMessage: 'Failed to delete note'
     },
-    onMutate: async (id) => {
+    onMutate: async id => {
       await queryClient.cancelQueries({ queryKey: notesQueryKey, exact: true })
       const previous = queryClient.getQueryData<EntityNoteList[]>(notesQueryKey)
-      queryClient.setQueryData<EntityNoteList[]>(notesQueryKey, (old) =>
-        old ? old.filter((n) => n.id !== id) : old
+      queryClient.setQueryData<EntityNoteList[]>(notesQueryKey, old =>
+        old ? old.filter(n => n.id !== id) : old
       )
       setNoteToDelete(null)
       return { previous }
@@ -205,7 +208,7 @@ export const EntityNotesSheet = ({
         <ScrollArea className='min-h-0 flex-1'>
           {isLoading ? (
             <div className='flex flex-col'>
-              {(['sk-1', 'sk-2', 'sk-3', 'sk-4'] as const).map((key) => (
+              {(['sk-1', 'sk-2', 'sk-3', 'sk-4'] as const).map(key => (
                 <NoteRowSkeleton key={key} />
               ))}
             </div>
@@ -225,7 +228,7 @@ export const EntityNotesSheet = ({
             </Empty>
           ) : (
             <div className='flex flex-col'>
-              {orderedNotes.map((note) => (
+              {orderedNotes.map(note => (
                 <NoteRow
                   key={note.id}
                   note={note}
@@ -237,10 +240,7 @@ export const EntityNotesSheet = ({
           )}
         </ScrollArea>
 
-        <AlertDialog
-          open={!!noteToDelete}
-          onOpenChange={(open) => !open && setNoteToDelete(null)}
-        >
+        <AlertDialog open={!!noteToDelete} onOpenChange={open => !open && setNoteToDelete(null)}>
           <AlertDialogContent>
             <AlertDialogHeader>
               <AlertDialogTitle>Delete note?</AlertDialogTitle>
@@ -261,26 +261,23 @@ export const EntityNotesSheet = ({
           </AlertDialogContent>
         </AlertDialog>
 
-        <form
-          className='shrink-0 border-t border-border px-4 py-3'
-          onSubmit={handleSubmit}
-        >
+        <form className='shrink-0 border-t border-border px-4 py-3' onSubmit={handleSubmit}>
           <div className='relative'>
             <textarea
               ref={textareaRef}
               value={text}
-              onChange={(e) => setText(e.target.value.slice(0, NOTE_TEXT_MAX))}
+              onChange={e => setText(e.target.value.slice(0, NOTE_TEXT_MAX))}
               onKeyDown={handleKeyDown}
               placeholder='Write a note...'
               rows={2}
-              className='w-full resize-none rounded-[6px] border border-border bg-transparent px-3 py-2 pr-10 text-[13px] leading-relaxed placeholder:text-text-tertiary focus:border-ring focus:outline-none focus:ring-1 focus:ring-ring/50'
+              className='w-full resize-none rounded-[6px] border border-border bg-transparent px-3 py-2 pr-10 text-[13px] leading-relaxed placeholder:text-text-tertiary focus:border-ring focus:ring-1 focus:ring-ring/50 focus:outline-none'
               disabled={createMutation.isPending}
             />
             <button
               type='submit'
               disabled={!text.trim() || createMutation.isPending}
               className={cn(
-                'absolute bottom-2.5 right-2.5 flex size-6 items-center justify-center rounded-[5px] transition-colors duration-[80ms]',
+                'absolute right-2.5 bottom-2.5 flex size-6 items-center justify-center rounded-[5px] transition-colors duration-[80ms]',
                 text.trim()
                   ? 'bg-primary text-primary-foreground hover:opacity-90'
                   : 'text-text-tertiary'
@@ -314,7 +311,7 @@ function NoteRowSkeleton() {
 function NoteRow({
   note,
   canDelete,
-  onDelete,
+  onDelete
 }: {
   note: EntityNoteList
   canDelete: boolean
@@ -329,13 +326,13 @@ function NoteRow({
           <span className='truncate text-[13px] font-medium text-foreground'>
             {note.author_name}
           </span>
-          <span className='shrink-0 text-[12px] tabular-nums text-text-tertiary'>
+          <span className='shrink-0 text-[12px] text-text-tertiary tabular-nums'>
             {relativeTime(note.created_at)}
           </span>
           {canDelete && (
             <button
               type='button'
-              className='ml-auto shrink-0 rounded-[4px] p-0.5 text-text-tertiary opacity-0 transition-all duration-[80ms] hover:text-destructive group-hover:opacity-100'
+              className='ml-auto shrink-0 rounded-[4px] p-0.5 text-text-tertiary opacity-0 transition-all duration-[80ms] group-hover:opacity-100 hover:text-destructive'
               onClick={onDelete}
               aria-label='Delete note'
             >
@@ -343,7 +340,7 @@ function NoteRow({
             </button>
           )}
         </div>
-        <p className='mt-0.5 whitespace-pre-wrap text-[13px] leading-relaxed text-text-secondary break-words'>
+        <p className='mt-0.5 text-[13px] leading-relaxed break-words whitespace-pre-wrap text-text-secondary'>
           {note.text}
         </p>
       </div>

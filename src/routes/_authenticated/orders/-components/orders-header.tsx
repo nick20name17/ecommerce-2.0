@@ -25,7 +25,7 @@ export function OrderSortableHeader({
     <button
       type='button'
       className={cn(
-        'group hover:text-foreground inline-flex items-center gap-1 text-left transition-colors duration-[80ms]',
+        'group inline-flex items-center gap-1 text-left transition-colors duration-[80ms] hover:text-foreground',
         active && 'text-foreground',
         className
       )}

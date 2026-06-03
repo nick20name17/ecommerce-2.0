@@ -1,11 +1,6 @@
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
-import {
-  Package,
-  Plus,
-  Search,
-  UserRound,
-} from 'lucide-react'
+import { Package, Plus, Search, UserRound } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 
 import { OrderAssignDialog } from './-components/order-assign-dialog'
@@ -25,21 +20,12 @@ import { EntityNotesSheet } from '@/components/common/entity-notes/entity-notes-
 import { Pagination } from '@/components/common/filters/pagination'
 import { PresetPicker } from '@/components/common/filters/preset-picker'
 import { PageEmpty } from '@/components/common/page-empty'
-import {
-  FilterChip,
-  FilterPopover,
-  IOrders,
-  PAGE_COLORS,
-  PageHeaderIcon
-} from '@/components/ds'
+import { FilterChip, FilterPopover, IOrders, PAGE_COLORS, PageHeaderIcon } from '@/components/ds'
 import { CommandBarCreate } from '@/components/tasks/command-bar-create'
 import { SidebarTrigger } from '@/components/ui/sidebar'
 import { Skeleton } from '@/components/ui/skeleton'
 import type { OrderStatus } from '@/constants/order'
-import {
-  ORDER_STATUS,
-  ORDER_STATUS_LABELS,
-} from '@/constants/order'
+import { ORDER_STATUS, ORDER_STATUS_LABELS } from '@/constants/order'
 import { isAdmin } from '@/constants/user'
 import { useBreakpoint } from '@/hooks/use-breakpoint'
 import { useProjectId } from '@/hooks/use-project-id'
@@ -92,11 +78,7 @@ const OrdersPage = () => {
   const [sortDir, setSortDir] = useState<SortDir>('asc')
 
   const { data: fieldConfig } = useQuery(getFieldConfigQuery(projectId))
-  const customColumns: CustomColumn[] = buildCustomColumns(
-    fieldConfig,
-    'order',
-    ORDER_FIXED_FIELDS
-  )
+  const customColumns: CustomColumn[] = buildCustomColumns(fieldConfig, 'order', ORDER_FIXED_FIELDS)
 
   const [activeStatus, setActiveStatus] = useState<OrderStatus | null>(ORDER_STATUS.unprocessed)
   const [assignedToMe, setAssignedToMe] = useState(false)
@@ -133,13 +115,13 @@ const OrdersPage = () => {
   })
 
   const selectStatus = (s: OrderStatus) => {
-    setActiveStatus((prev) => (prev === s ? null : s))
+    setActiveStatus(prev => (prev === s ? null : s))
     setActivePresetId(null) // manual filter clears preset
     setOffset(null)
   }
 
   const toggleAssignedToMe = () => {
-    setAssignedToMe((v) => !v)
+    setAssignedToMe(v => !v)
     setActivePresetId(null) // manual filter clears preset
     setOffset(null)
   }
@@ -174,19 +156,20 @@ const OrdersPage = () => {
     notes: true,
     assigned_to: assignedToMe ? 'me' : undefined,
     preset_id: activePresetId ?? undefined,
-    fields: customColumns.length > 0
-      ? `salesman,notes_count,${customColumns.map((c) => c.field).join(',')}`
-      : 'salesman,notes_count',
+    fields:
+      customColumns.length > 0
+        ? `salesman,notes_count,${customColumns.map(c => c.field).join(',')}`
+        : 'salesman,notes_count'
   }
 
   const { data, refetch, isLoading } = useQuery({
     ...getOrdersQuery(params),
-    placeholderData: keepPreviousData,
+    placeholderData: keepPreviousData
   })
 
   const results = data?.results ?? []
   const orderInResults =
-    autoidFromUrl != null && autoidFromUrl !== '' && results.some((o) => o.autoid === autoidFromUrl)
+    autoidFromUrl != null && autoidFromUrl !== '' && results.some(o => o.autoid === autoidFromUrl)
 
   const refetchTimersRef = useRef<ReturnType<typeof setTimeout>[]>([])
   useEffect(() => {
@@ -196,9 +179,7 @@ const OrdersPage = () => {
       refetchTimersRef.current = []
       return
     }
-    refetchTimersRef.current = [
-      setTimeout(() => refetch(), 4000),
-    ]
+    refetchTimersRef.current = [setTimeout(() => refetch(), 4000)]
     return () => {
       refetchTimersRef.current.forEach(clearTimeout)
       refetchTimersRef.current = []
@@ -212,37 +193,30 @@ const OrdersPage = () => {
       {/* Header */}
       <header
         className={cn(
-          'border-border flex h-12 shrink-0 items-center gap-2.5 border-b',
+          'flex h-12 shrink-0 items-center gap-2.5 border-b border-border',
           isMobile ? 'px-3.5' : 'px-6'
         )}
       >
         <SidebarTrigger className='-ml-1' />
         <div className='flex items-center gap-1.5'>
-          <PageHeaderIcon
-            icon={IOrders}
-            color={PAGE_COLORS.orders}
-          />
+          <PageHeaderIcon icon={IOrders} color={PAGE_COLORS.orders} />
           <h1 className='text-[14px] font-semibold tracking-[-0.01em]'>Orders</h1>
         </div>
 
-        <PresetPicker
-          entityType='order'
-          value={activePresetId}
-          onChange={selectPreset}
-        />
+        <PresetPicker entityType='order' value={activePresetId} onChange={selectPreset} />
 
         <div className='flex-1' />
 
-        <div className='border-border bg-background focus-within:border-ring focus-within:ring-ring/50 hidden h-7 w-full max-w-[260px] items-center gap-1.5 rounded-[5px] border px-2 transition-[border-color,box-shadow] focus-within:ring-2 sm:flex'>
-          <Search className='text-text-tertiary size-3 shrink-0' />
+        <div className='hidden h-7 w-full max-w-[260px] items-center gap-1.5 rounded-[5px] border border-border bg-background px-2 transition-[border-color,box-shadow] focus-within:border-ring focus-within:ring-2 focus-within:ring-ring/50 sm:flex'>
+          <Search className='size-3 shrink-0 text-text-tertiary' />
           <input
             value={search}
-            onChange={(e) => {
+            onChange={e => {
               setSearch(e.target.value)
               setOffset(null)
             }}
             placeholder='Search by invoice number...'
-            className='placeholder:text-text-tertiary flex-1 bg-transparent text-[13px] outline-none'
+            className='flex-1 bg-transparent text-[13px] outline-none placeholder:text-text-tertiary'
           />
         </div>
 
@@ -259,15 +233,15 @@ const OrdersPage = () => {
               />
             }
           >
-            {FILTER_STATUSES.map((s) => {
+            {FILTER_STATUSES.map(s => {
               const selected = activeStatus === s.value
               return (
                 <button
                   key={s.value}
                   type='button'
                   className={cn(
-                    'flex w-full items-center gap-2 whitespace-nowrap rounded-[5px] px-2 py-[3px] text-left text-[13px] font-medium',
-                    'hover:bg-bg-hover transition-colors duration-[80ms]'
+                    'flex w-full items-center gap-2 rounded-[5px] px-2 py-[3px] text-left text-[13px] font-medium whitespace-nowrap',
+                    'transition-colors duration-[80ms] hover:bg-bg-hover'
                   )}
                   onClick={() => selectStatus(s.value)}
                 >
@@ -277,7 +251,7 @@ const OrdersPage = () => {
                       selected ? 'border-primary bg-primary' : 'border-border'
                     )}
                   >
-                    {selected && <div className='bg-primary-foreground size-1.5 rounded-full' />}
+                    {selected && <div className='size-1.5 rounded-full bg-primary-foreground' />}
                   </div>
                   <div
                     className={cn(
@@ -308,7 +282,7 @@ const OrdersPage = () => {
 
           <button
             type='button'
-            className='bg-primary text-primary-foreground inline-flex h-7 items-center gap-1 rounded-[5px] px-2 text-[13px] font-semibold transition-colors duration-[80ms] hover:opacity-90 sm:px-2.5'
+            className='inline-flex h-7 items-center gap-1 rounded-[5px] bg-primary px-2 text-[13px] font-semibold text-primary-foreground transition-colors duration-[80ms] hover:opacity-90 sm:px-2.5'
             onClick={() => navigate({ to: '/create' })}
           >
             <Plus className='size-3.5' />
@@ -321,14 +295,14 @@ const OrdersPage = () => {
       {(hasFilters || autoidFromUrl) && (
         <div
           className={cn(
-            'border-border flex shrink-0 flex-wrap items-center gap-1.5 border-b py-1.5',
+            'flex shrink-0 flex-wrap items-center gap-1.5 border-b border-border py-1.5',
             isMobile ? 'px-3.5' : 'px-6'
           )}
         >
           {hasFilters && (
             <button
               type='button'
-              className='text-text-tertiary hover:text-foreground text-[13px] font-medium transition-colors duration-[80ms]'
+              className='text-[13px] font-medium text-text-tertiary transition-colors duration-[80ms] hover:text-foreground'
               onClick={clearAllFilters}
             >
               Clear
@@ -367,7 +341,7 @@ const OrdersPage = () => {
         {!isMobile && (results.length > 0 || isLoading) && (
           <div
             className={cn(
-              'border-border bg-bg-secondary text-text-tertiary sticky top-0 z-10 flex items-center border-b text-[13px] font-medium select-none',
+              'sticky top-0 z-10 flex items-center border-b border-border bg-bg-secondary text-[13px] font-medium text-text-tertiary select-none',
               isTablet ? 'gap-4 px-5 py-1' : 'gap-6 px-6 py-1'
             )}
           >
@@ -425,10 +399,7 @@ const OrdersPage = () => {
         {isLoading ? (
           Array.from({ length: 10 }).map((_, i) =>
             isMobile ? (
-              <div
-                key={i}
-                className='border-border-light border-b px-3.5 py-2'
-              >
+              <div key={i} className='border-b border-border-light px-3.5 py-2'>
                 <div className='mb-1 flex items-center gap-2'>
                   <Skeleton className='size-1.5 shrink-0 rounded-full' />
                   <Skeleton className='h-3.5 w-24 rounded' />
@@ -444,7 +415,7 @@ const OrdersPage = () => {
               <div
                 key={i}
                 className={cn(
-                  'border-border-light flex items-center border-b',
+                  'flex items-center border-b border-border-light',
                   isTablet ? 'gap-4 px-5 py-1.5' : 'gap-6 px-6 py-1.5'
                 )}
               >
@@ -492,13 +463,8 @@ const OrdersPage = () => {
           />
         ) : (
           <>
-            {hasPendingAutoid && (
-              <PendingOrderRow
-                autoid={autoidFromUrl}
-                isMobile={isMobile}
-              />
-            )}
-            {results.map((order) => (
+            {hasPendingAutoid && <PendingOrderRow autoid={autoidFromUrl} isMobile={isMobile} />}
+            {results.map(order => (
               <OrderRow
                 key={order.autoid}
                 order={order}
@@ -507,7 +473,7 @@ const OrdersPage = () => {
                 isTablet={isTablet}
                 canAssign={canAssign}
                 onDelete={setOrderToDelete}
-                onDeleteLinkedProposal={(o) => deleteLinkedProposalMutation.mutate(o.autoid)}
+                onDeleteLinkedProposal={o => deleteLinkedProposalMutation.mutate(o.autoid)}
                 onAttachments={setOrderForAttachments}
                 onNotes={setOrderForNotes}
                 onAssign={setOrderToAssign}
@@ -529,7 +495,7 @@ const OrdersPage = () => {
       </div>
 
       {/* Footer */}
-      <div className={cn('border-border shrink-0 border-t py-2', isMobile ? 'px-3.5' : 'px-6')}>
+      <div className={cn('shrink-0 border-t border-border py-2', isMobile ? 'px-3.5' : 'px-6')}>
         <Pagination totalCount={data?.count ?? 0} />
       </div>
 
@@ -538,7 +504,7 @@ const OrdersPage = () => {
         order={orderToDelete}
         projectId={projectId}
         open={!!orderToDelete}
-        onOpenChange={(open) => !open && setOrderToDelete(null)}
+        onOpenChange={open => !open && setOrderToDelete(null)}
       />
       <EntityAttachmentsDialog
         entityType='order'
@@ -550,17 +516,17 @@ const OrdersPage = () => {
         autoid={orderForAttachments?.autoid ?? ''}
         projectId={projectId}
         open={!!orderForAttachments}
-        onOpenChange={(open) => !open && setOrderForAttachments(null)}
+        onOpenChange={open => !open && setOrderForAttachments(null)}
       />
       <OrderAssignDialog
         order={orderToAssign}
         open={!!orderToAssign}
-        onOpenChange={(open) => !open && setOrderToAssign(null)}
+        onOpenChange={open => !open && setOrderToAssign(null)}
         projectId={projectId}
       />
       <EntityNotesSheet
         open={!!orderForNotes}
-        onOpenChange={(open) => !open && setOrderForNotes(null)}
+        onOpenChange={open => !open && setOrderForNotes(null)}
         entityType='order'
         entityLabel={orderForNotes ? `Order ${orderForNotes.invoice ?? orderForNotes.autoid}` : ''}
         autoid={orderForNotes?.autoid ?? ''}
@@ -574,7 +540,7 @@ const OrdersPage = () => {
       )}
       <StartPickingDialog
         open={!!orderForPicking}
-        onOpenChange={(open) => !open && setOrderForPicking(null)}
+        onOpenChange={open => !open && setOrderForPicking(null)}
         customerId={String(orderForPicking?.c_id ?? orderForPicking?.id ?? '')}
         customerName={orderForPicking?.name ?? ''}
         orderAutoid={orderForPicking?.autoid}

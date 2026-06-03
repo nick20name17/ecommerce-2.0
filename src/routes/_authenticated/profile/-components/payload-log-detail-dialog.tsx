@@ -57,12 +57,9 @@ export const PayloadLogDetailDialog = ({
   if (!log) return null
 
   return (
-    <Dialog
-      open={open}
-      onOpenChange={onOpenChange}
-    >
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className='flex h-[90vh] flex-col overflow-hidden p-0 sm:max-w-4xl!'>
-        <DialogHeader className='bg-background sticky top-0 z-10 border-b px-6 py-4'>
+        <DialogHeader className='sticky top-0 z-10 border-b bg-background px-6 py-4'>
           <DialogTitle>Payload Log #{log.id}</DialogTitle>
         </DialogHeader>
 
@@ -90,10 +87,7 @@ export const PayloadLogDetailDialog = ({
             <DetailItem label='Entity'>{log.entity || '—'}</DetailItem>
             <DetailItem label='Key'>{log.key || '—'}</DetailItem>
             <DetailItem label='Status'>
-              <Badge
-                variant={getStatusVariant(log.status_code)}
-                className='font-mono text-[13px]'
-              >
+              <Badge variant={getStatusVariant(log.status_code)} className='font-mono text-[13px]'>
                 {log.status_code}
               </Badge>
             </DetailItem>
@@ -103,9 +97,7 @@ export const PayloadLogDetailDialog = ({
                 {log.is_error ? 'Yes' : 'No'}
               </Badge>
             </DetailItem>
-            {log.action_name ? (
-              <DetailItem label='Action'>{log.action_name}</DetailItem>
-            ) : null}
+            {log.action_name ? <DetailItem label='Action'>{log.action_name}</DetailItem> : null}
             {log.external_ref ? (
               <DetailItem label='External Ref'>
                 <span className='font-mono'>{log.external_ref}</span>
@@ -115,15 +107,17 @@ export const PayloadLogDetailDialog = ({
           </div>
 
           <div className='flex flex-col gap-1.5 overflow-hidden'>
-            <span className='text-text-tertiary text-[13px] font-medium tracking-wide uppercase'>
+            <span className='text-[13px] font-medium tracking-wide text-text-tertiary uppercase'>
               URL
             </span>
-            <div className='bg-bg-secondary rounded-md p-3 font-mono text-[13px] break-words'>{log.url}</div>
+            <div className='rounded-md bg-bg-secondary p-3 font-mono text-[13px] break-words'>
+              {log.url}
+            </div>
           </div>
 
           {log.error_message ? (
             <div className='flex flex-col gap-1.5 overflow-hidden'>
-              <span className='text-text-tertiary text-[13px] font-medium tracking-wide uppercase'>
+              <span className='text-[13px] font-medium tracking-wide text-text-tertiary uppercase'>
                 Error Message
               </span>
               <div className='rounded-md border border-red-200 bg-red-50 dark:border-red-900 dark:bg-red-950'>
@@ -135,10 +129,10 @@ export const PayloadLogDetailDialog = ({
           ) : null}
 
           <div className='flex flex-col gap-1.5 overflow-hidden'>
-            <span className='text-text-tertiary text-[13px] font-medium tracking-wide uppercase'>
+            <span className='text-[13px] font-medium tracking-wide text-text-tertiary uppercase'>
               Payload
             </span>
-            <div className='bg-bg-secondary rounded-md'>
+            <div className='rounded-md bg-bg-secondary'>
               <pre className='max-h-[200px] overflow-y-auto p-3 font-mono text-[13px] break-words whitespace-pre-wrap'>
                 {formatJson(log.payload)}
               </pre>
@@ -146,10 +140,10 @@ export const PayloadLogDetailDialog = ({
           </div>
 
           <div className='flex flex-col gap-1.5 overflow-hidden'>
-            <span className='text-text-tertiary text-[13px] font-medium tracking-wide uppercase'>
+            <span className='text-[13px] font-medium tracking-wide text-text-tertiary uppercase'>
               Response
             </span>
-            <div className='bg-bg-secondary rounded-md'>
+            <div className='rounded-md bg-bg-secondary'>
               <pre className='max-h-[200px] overflow-y-auto p-3 font-mono text-[13px] break-words whitespace-pre-wrap'>
                 {formatJson(log.response)}
               </pre>
@@ -157,11 +151,8 @@ export const PayloadLogDetailDialog = ({
           </div>
         </DialogBody>
 
-        <DialogFooter className='bg-background sticky bottom-0 z-10 border-t px-6 py-4'>
-          <Button
-            variant='outline'
-            onClick={() => onOpenChange(false)}
-          >
+        <DialogFooter className='sticky bottom-0 z-10 border-t bg-background px-6 py-4'>
+          <Button variant='outline' onClick={() => onOpenChange(false)}>
             Close
           </Button>
         </DialogFooter>
@@ -173,7 +164,7 @@ export const PayloadLogDetailDialog = ({
 const DetailItem = ({ label, children }: { label: string; children: React.ReactNode }) => {
   return (
     <div className='flex flex-col gap-1'>
-      <span className='text-text-tertiary text-[13px] font-medium tracking-wide uppercase'>
+      <span className='text-[13px] font-medium tracking-wide text-text-tertiary uppercase'>
         {label}
       </span>
       <div className='text-[13px]'>{children}</div>

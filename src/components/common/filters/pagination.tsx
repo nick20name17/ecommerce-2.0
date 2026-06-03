@@ -80,7 +80,7 @@ export const Pagination = ({ totalCount, defaultLimit }: PaginationProps) => {
 
   return (
     <div className='flex items-center justify-between'>
-      <p className='text-sm tabular-nums text-text-tertiary'>
+      <p className='text-sm text-text-tertiary tabular-nums'>
         {rangeStart}–{rangeEnd} of {totalCount}
       </p>
 
@@ -88,19 +88,13 @@ export const Pagination = ({ totalCount, defaultLimit }: PaginationProps) => {
         {!isMobile && (
           <div className='flex items-center gap-1.5'>
             <span className='text-sm text-text-tertiary'>Rows</span>
-            <Select
-              value={String(limit)}
-              onValueChange={handleLimitChange}
-            >
+            <Select value={String(limit)} onValueChange={handleLimitChange}>
               <SelectTrigger size='sm'>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent align='end'>
-                {LIMIT_OPTIONS.map((option) => (
-                  <SelectItem
-                    key={option}
-                    value={String(option)}
-                  >
+                {LIMIT_OPTIONS.map(option => (
+                  <SelectItem key={option} value={String(option)}>
                     {option}
                   </SelectItem>
                 ))}
@@ -113,18 +107,12 @@ export const Pagination = ({ totalCount, defaultLimit }: PaginationProps) => {
           <PaginationContent>
             {!isMobile && (
               <PaginationItem>
-                <PaginationFirst
-                  onClick={() => goToPage(1)}
-                  disabled={isFirst}
-                />
+                <PaginationFirst onClick={() => goToPage(1)} disabled={isFirst} />
               </PaginationItem>
             )}
 
             <PaginationItem>
-              <PaginationPrevious
-                onClick={() => goToPage(currentPage - 1)}
-                disabled={isFirst}
-              />
+              <PaginationPrevious onClick={() => goToPage(currentPage - 1)} disabled={isFirst} />
             </PaginationItem>
 
             {!isMobile &&
@@ -146,18 +134,12 @@ export const Pagination = ({ totalCount, defaultLimit }: PaginationProps) => {
               )}
 
             <PaginationItem>
-              <PaginationNext
-                onClick={() => goToPage(currentPage + 1)}
-                disabled={isLast}
-              />
+              <PaginationNext onClick={() => goToPage(currentPage + 1)} disabled={isLast} />
             </PaginationItem>
 
             {!isMobile && (
               <PaginationItem>
-                <PaginationLast
-                  onClick={() => goToPage(totalPages)}
-                  disabled={isLast}
-                />
+                <PaginationLast onClick={() => goToPage(totalPages)} disabled={isLast} />
               </PaginationItem>
             )}
           </PaginationContent>

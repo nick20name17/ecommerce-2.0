@@ -45,10 +45,7 @@ export const UserDeleteDialog = ({ user, open, onOpenChange }: UserDeleteDialogP
   }
 
   return (
-    <AlertDialog
-      open={open}
-      onOpenChange={onOpenChange}
-    >
+    <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogMedia className='bg-destructive/10 text-destructive'>

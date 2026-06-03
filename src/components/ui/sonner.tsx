@@ -34,7 +34,7 @@ const Toaster = ({ ...props }: ToasterProps) => {
           '--info-bg': 'var(--background)',
           '--info-text': 'var(--foreground)',
           '--info-border': 'var(--border)',
-          '--border-radius': '8px',
+          '--border-radius': '8px'
         } as React.CSSProperties
       }
       toastOptions={{
@@ -43,7 +43,7 @@ const Toaster = ({ ...props }: ToasterProps) => {
           success: '[&_[data-icon]>svg]:text-emerald-500',
           error: '[&_[data-icon]>svg]:text-destructive',
           warning: '[&_[data-icon]>svg]:text-amber-500',
-          info: '[&_[data-icon]>svg]:text-blue-500',
+          info: '[&_[data-icon]>svg]:text-blue-500'
         }
       }}
       {...props}

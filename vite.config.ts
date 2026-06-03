@@ -28,7 +28,7 @@ export default defineConfig({
     }
   },
   build: {
-    sourcemap: 'hidden',
+    sourcemap: 'hidden'
   },
   test: {
     globals: true,

@@ -25,7 +25,7 @@ export const getCustomersInfiniteQuery = (params: Omit<CustomerParams, 'offset'>
     getNextPageParam: (lastPage, _allPages, lastPageParam) => {
       if (!lastPage.next) return undefined
       return (lastPageParam as number) + (params.limit ?? 50)
-    },
+    }
   })
 
 export const getCustomerDetailQuery = (id: string, projectId?: number | null) =>

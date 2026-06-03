@@ -20,7 +20,7 @@ export const SignInForm = () => {
 
   const { signInMutation } = useAuth()
 
-  const handleSignIn = form.handleSubmit((data) => {
+  const handleSignIn = form.handleSubmit(data => {
     signInMutation.mutate(data)
   })
 
@@ -33,10 +33,7 @@ export const SignInForm = () => {
           control={form.control}
           render={({ field, fieldState }) => (
             <div className='space-y-1.5'>
-              <label
-                htmlFor='email'
-                className='block text-[13px] font-medium text-text-secondary'
-              >
+              <label htmlFor='email' className='block text-[13px] font-medium text-text-secondary'>
                 Email
               </label>
               <div
@@ -47,14 +44,14 @@ export const SignInForm = () => {
                     : 'border-border'
                 )}
               >
-                <Mail className='size-4 shrink-0 text-text-quaternary' />
+                <Mail className='text-text-quaternary size-4 shrink-0' />
                 <input
                   {...field}
                   id='email'
                   type='email'
                   placeholder='you@example.com'
                   autoComplete='email'
-                  className='flex-1 bg-transparent text-[13px] outline-none placeholder:text-text-quaternary'
+                  className='placeholder:text-text-quaternary flex-1 bg-transparent text-[13px] outline-none'
                 />
               </div>
               {fieldState.error && (
@@ -90,19 +87,15 @@ export const SignInForm = () => {
                   type={showPassword ? 'text' : 'password'}
                   placeholder='••••••••'
                   autoComplete='current-password'
-                  className='flex-1 bg-transparent text-[13px] outline-none placeholder:text-text-quaternary'
+                  className='placeholder:text-text-quaternary flex-1 bg-transparent text-[13px] outline-none'
                 />
                 <button
                   type='button'
-                  className='inline-flex size-5 shrink-0 items-center justify-center rounded-[4px] text-text-quaternary transition-colors hover:text-text-secondary'
+                  className='text-text-quaternary inline-flex size-5 shrink-0 items-center justify-center rounded-[4px] transition-colors hover:text-text-secondary'
                   onClick={() => setShowPassword(!showPassword)}
                   tabIndex={-1}
                 >
-                  {showPassword ? (
-                    <EyeOff className='size-3.5' />
-                  ) : (
-                    <Eye className='size-3.5' />
-                  )}
+                  {showPassword ? <EyeOff className='size-3.5' /> : <Eye className='size-3.5' />}
                 </button>
               </div>
               {fieldState.error && (

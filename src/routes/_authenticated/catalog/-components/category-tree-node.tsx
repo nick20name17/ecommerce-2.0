@@ -8,7 +8,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuTrigger,
+  DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
 import { cn } from '@/lib/utils'
 
@@ -32,7 +32,7 @@ const DEPTH_STYLES = [
   'text-amber-500 fill-amber-500/20',
   'text-emerald-500 fill-emerald-500/20',
   'text-rose-500 fill-rose-500/20',
-  'text-cyan-500 fill-cyan-500/20',
+  'text-cyan-500 fill-cyan-500/20'
 ]
 
 function getDepthStyle(depth: number) {
@@ -49,7 +49,7 @@ export const CategoryTreeNode = ({
   onDelete,
   onAddChild,
   onMove,
-  onProductDrop,
+  onProductDrop
 }: CategoryTreeNodeProps) => {
   const [expanded, setExpanded] = useState(depth === 0)
   const hasChildren = category.children && category.children.length > 0
@@ -68,7 +68,9 @@ export const CategoryTreeNode = ({
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault()
     e.stopPropagation()
-    e.dataTransfer.dropEffect = e.dataTransfer.types.includes('application/product-autoid') ? 'copy' : 'move'
+    e.dataTransfer.dropEffect = e.dataTransfer.types.includes('application/product-autoid')
+      ? 'copy'
+      : 'move'
   }
 
   const handleDragEnter = (e: React.DragEvent) => {
@@ -113,17 +115,17 @@ export const CategoryTreeNode = ({
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
         className={cn(
-          'group flex items-center gap-1 rounded-md px-1.5 text-[13px] transition-colors duration-75 cursor-pointer',
+          'group flex cursor-pointer items-center gap-1 rounded-md px-1.5 text-[13px] transition-colors duration-75',
           'h-8',
           isSelected
-            ? 'bg-primary/10 text-foreground font-medium'
-            : 'hover:bg-bg-hover text-text-secondary',
-          dragOver && 'ring-2 ring-primary bg-primary/10'
+            ? 'bg-primary/10 font-medium text-foreground'
+            : 'text-text-secondary hover:bg-bg-hover',
+          dragOver && 'bg-primary/10 ring-2 ring-primary'
         )}
         style={{ paddingLeft: `${depth * 16 + 6}px` }}
         onClick={() => onSelect(category)}
       >
-        <GripVertical className='size-3 shrink-0 text-text-quaternary opacity-0 group-hover:opacity-100 cursor-grab active:cursor-grabbing' />
+        <GripVertical className='text-text-quaternary size-3 shrink-0 cursor-grab opacity-0 group-hover:opacity-100 active:cursor-grabbing' />
 
         <button
           type='button'
@@ -131,16 +133,13 @@ export const CategoryTreeNode = ({
             'flex size-5 shrink-0 items-center justify-center rounded transition-colors',
             hasChildren ? 'hover:bg-black/5 dark:hover:bg-white/10' : 'invisible'
           )}
-          onClick={(e) => {
+          onClick={e => {
             e.stopPropagation()
             setExpanded(!expanded)
           }}
         >
           <ChevronRight
-            className={cn(
-              'size-3.5 transition-transform duration-150',
-              expanded && 'rotate-90'
-            )}
+            className={cn('size-3.5 transition-transform duration-150', expanded && 'rotate-90')}
           />
         </button>
 
@@ -154,17 +153,17 @@ export const CategoryTreeNode = ({
         <span className='flex-1 truncate'>{category.name}</span>
 
         {itemCount > 0 && (
-          <span className='text-[10px] text-text-quaternary tabular-nums shrink-0 mr-0.5'>
+          <span className='text-text-quaternary mr-0.5 shrink-0 text-[10px] tabular-nums'>
             {itemCount}
           </span>
         )}
 
         {!category.active && (
           <>
-            <span className='hidden sm:inline rounded bg-muted px-1 py-0.5 text-[10px] font-medium text-text-tertiary'>
+            <span className='hidden rounded bg-muted px-1 py-0.5 text-[10px] font-medium text-text-tertiary sm:inline'>
               Inactive
             </span>
-            <span className='sm:hidden size-2 shrink-0 rounded-full bg-muted' title='Inactive' />
+            <span className='size-2 shrink-0 rounded-full bg-muted sm:hidden' title='Inactive' />
           </>
         )}
 
@@ -173,8 +172,8 @@ export const CategoryTreeNode = ({
             <Button
               variant='ghost'
               size='icon-xs'
-              className='sm:opacity-0 sm:group-hover:opacity-100 transition-opacity'
-              onClick={(e) => e.stopPropagation()}
+              className='transition-opacity sm:opacity-0 sm:group-hover:opacity-100'
+              onClick={e => e.stopPropagation()}
             >
               <MoreHorizontal className='size-3.5' />
             </Button>
@@ -201,7 +200,7 @@ export const CategoryTreeNode = ({
 
       {expanded && hasChildren && (
         <div className='animate-fade-in-up' style={{ animationDuration: '0.15s' }}>
-          {category.children.map((child) => (
+          {category.children.map(child => (
             <CategoryTreeNode
               key={child.id}
               category={child}

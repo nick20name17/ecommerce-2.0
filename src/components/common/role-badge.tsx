@@ -23,7 +23,13 @@ interface RoleBadgeProps {
 
 export const RoleBadge = ({ role, className }: RoleBadgeProps) => {
   return (
-    <span className={cn('inline-flex items-center gap-1.5 text-[12px] font-semibold', roleTextColors[role], className)}>
+    <span
+      className={cn(
+        'inline-flex items-center gap-1.5 text-[12px] font-semibold',
+        roleTextColors[role],
+        className
+      )}
+    >
       <span className={cn('size-2 rounded-full', roleDotColors[role])} />
       {getUserRoleLabel(role)}
     </span>

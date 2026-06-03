@@ -14,7 +14,7 @@ export const PX_PER_INCH = 80
 export const PAGE_DIMENSIONS: Record<string, { w: number; h: number }> = {
   letter: { w: 8.5, h: 11 },
   a4: { w: 8.27, h: 11.69 },
-  label_4x6: { w: 4, h: 6 },
+  label_4x6: { w: 4, h: 6 }
 }
 
 export function pageDims(pageSize: string, orientation: 'portrait' | 'landscape') {
@@ -36,8 +36,8 @@ export const ELEMENT_DEFAULTS: Record<
       fontWeight: 'normal',
       fontStyle: 'normal',
       textAlign: 'left',
-      color: '#111111',
-    },
+      color: '#111111'
+    }
   },
   field: {
     w: 3,
@@ -47,13 +47,13 @@ export const ELEMENT_DEFAULTS: Record<
       fontSize: 12,
       fontWeight: 'normal',
       textAlign: 'left',
-      color: '#111111',
-    },
+      color: '#111111'
+    }
   },
   image: {
     w: 2,
     h: 1,
-    props: { src: '' },
+    props: { src: '' }
   },
   table: {
     w: 7,
@@ -62,8 +62,14 @@ export const ELEMENT_DEFAULTS: Record<
       columns: [
         { fieldKey: 'quan', label: 'Qty', widthPct: 12, align: 'right', format: 'number' },
         { fieldKey: 'descr', label: 'Description', widthPct: 55, align: 'left' },
-        { fieldKey: 'unit_price', label: 'Unit Price', widthPct: 16, align: 'right', format: 'currency' },
-        { fieldKey: 'amount', label: 'Amount', widthPct: 17, align: 'right', format: 'currency' },
+        {
+          fieldKey: 'unit_price',
+          label: 'Unit Price',
+          widthPct: 16,
+          align: 'right',
+          format: 'currency'
+        },
+        { fieldKey: 'amount', label: 'Amount', widthPct: 17, align: 'right', format: 'currency' }
       ],
       itemsSource: 'items',
       showHeader: true,
@@ -71,19 +77,19 @@ export const ELEMENT_DEFAULTS: Record<
       fontSize: 10,
       striped: false,
       stripeBackground: '#fafafa',
-      borderColor: '#e4e4e7',
-    },
+      borderColor: '#e4e4e7'
+    }
   },
   line: {
     w: 4,
     h: 0,
-    props: { thickness: 1, color: '#cccccc' },
+    props: { thickness: 1, color: '#cccccc' }
   },
   rect: {
     w: 2,
     h: 1,
-    props: { fill: '#f4f4f5', borderColor: '#e4e4e7', borderWidth: 0 },
-  },
+    props: { fill: '#f4f4f5', borderColor: '#e4e4e7', borderWidth: 0 }
+  }
 }
 
 /** Ensure layout has at least one page; return a normalized copy. */
@@ -117,10 +123,7 @@ export function newId(): string {
  *
  * Returns an empty string for misses.
  */
-export function resolveField(
-  fieldKey: string | undefined | null,
-  entity: unknown
-): string {
+export function resolveField(fieldKey: string | undefined | null, entity: unknown): string {
   const raw = resolveFieldRaw(fieldKey, entity)
   if (raw == null) return ''
   if (typeof raw === 'object') return JSON.stringify(raw)
@@ -128,10 +131,7 @@ export function resolveField(
 }
 
 /** Same lookup as `resolveField` but returns the raw value (list / dict / scalar). */
-export function resolveFieldRaw(
-  fieldKey: string | undefined | null,
-  entity: unknown
-): unknown {
+export function resolveFieldRaw(fieldKey: string | undefined | null, entity: unknown): unknown {
   if (!fieldKey) return null
   let key = fieldKey.trim()
   if (!key) return null
@@ -231,12 +231,14 @@ export function computeAlignment(
 
   // Find the closest match per axis target.
   const findBest = (
-    targets: Array<{ kind: 'left' | 'centerX' | 'right' | 'top' | 'centerY' | 'bottom'; value: number }>,
+    targets: Array<{
+      kind: 'left' | 'centerX' | 'right' | 'top' | 'centerY' | 'bottom'
+      value: number
+    }>,
     candidates: AlignmentCandidate[]
   ) => {
-    let best:
-      | { tgt: typeof targets[number]; cand: AlignmentCandidate; delta: number }
-      | null = null
+    let best: { tgt: (typeof targets)[number]; cand: AlignmentCandidate; delta: number } | null =
+      null
     for (const t of targets) {
       for (const c of candidates) {
         const delta = c.value - t.value
@@ -253,7 +255,7 @@ export function computeAlignment(
     [
       { kind: 'left', value: myLeft },
       { kind: 'centerX', value: myCenterX },
-      { kind: 'right', value: myRight },
+      { kind: 'right', value: myRight }
     ],
     xCandidates
   )
@@ -261,7 +263,7 @@ export function computeAlignment(
     [
       { kind: 'top', value: myTop },
       { kind: 'centerY', value: myCenterY },
-      { kind: 'bottom', value: myBottom },
+      { kind: 'bottom', value: myBottom }
     ],
     yCandidates
   )

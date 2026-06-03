@@ -10,12 +10,7 @@ const RootComponent = () => {
     <AuthProvider>
       <HeadContent />
       <Outlet />
-      <Toaster
-        position='bottom-center'
-        duration={3000}
-        gap={6}
-        offset={24}
-      />
+      <Toaster position='bottom-center' duration={3000} gap={6} offset={24} />
     </AuthProvider>
   )
 }

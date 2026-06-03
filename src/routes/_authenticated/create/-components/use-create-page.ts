@@ -202,7 +202,7 @@ export function useCreatePage() {
   const updateCartOptimistic = useCallback(
     (updater: (prev: Cart) => Cart) => {
       if (customer?.id != null) {
-        queryClient.setQueryData<Cart>(CART_QUERY_KEYS.detail(customer.id, projectId), (prev) =>
+        queryClient.setQueryData<Cart>(CART_QUERY_KEYS.detail(customer.id, projectId), prev =>
           prev ? updater(prev) : prev
         )
       }
@@ -247,7 +247,7 @@ export function useCreatePage() {
       }
 
       // Optimistic: add to cart UI immediately
-      updateCartOptimistic((prev) => ({
+      updateCartOptimistic(prev => ({
         ...prev,
         items: [
           ...prev.items,
@@ -269,8 +269,8 @@ export function useCreatePage() {
       // Fire API in background — replace optimistic with real data
       cartService
         .addItem(payload, customerId, projectId)
-        .then((updatedCart) => setCart(updatedCart))
-        .catch((error) => {
+        .then(updatedCart => setCart(updatedCart))
+        .catch(error => {
           invalidateCart()
           toast.error(getErrorMessage(error))
         })
@@ -284,20 +284,20 @@ export function useCreatePage() {
 
   const handleRemoveItem = (itemId: number) => {
     if (!customer) return
-    const item = cartItems.find((i) => i.id === itemId)
+    const item = cartItems.find(i => i.id === itemId)
 
     // Optimistic: remove from UI immediately
-    updateCartOptimistic((prev) => ({
+    updateCartOptimistic(prev => ({
       ...prev,
-      items: prev.items.filter((i) => i.id !== itemId)
+      items: prev.items.filter(i => i.id !== itemId)
     }))
     if (item) toast.success(`${item.product_id} removed`)
 
     // Fire API in background
     cartService
       .deleteItem(itemId, customer.id, projectId)
-      .then((updatedCart) => setCart(updatedCart))
-      .catch((error) => {
+      .then(updatedCart => setCart(updatedCart))
+      .catch(error => {
         invalidateCart() // revert on failure
         toast.error(getErrorMessage(error))
       })
@@ -315,11 +315,11 @@ export function useCreatePage() {
       const cartKey = CART_QUERY_KEYS.detail(customer.id, projectId)
       const currentCart = queryClient.getQueryData<Cart>(cartKey)
       if (currentCart?.items) {
-        const item = currentCart.items.find((i) => i.id === itemId)
+        const item = currentCart.items.find(i => i.id === itemId)
         if (item) {
           queryClient.setQueryData(cartKey, {
             ...currentCart,
-            items: currentCart.items.map((i) => (i.id === itemId ? { ...i, quantity } : i))
+            items: currentCart.items.map(i => (i.id === itemId ? { ...i, quantity } : i))
           })
         }
       }
@@ -364,11 +364,11 @@ export function useCreatePage() {
     if (!customer || cartItems.length === 0) return
 
     // Optimistic: clear cart UI immediately
-    updateCartOptimistic((prev) => ({ ...prev, items: [] }))
+    updateCartOptimistic(prev => ({ ...prev, items: [] }))
     toast.success('All items cleared')
 
     // Fire API in background
-    cartService.flush(customer.id, projectId).catch((error) => {
+    cartService.flush(customer.id, projectId).catch(error => {
       invalidateCart()
       toast.error(getErrorMessage(error))
     })
@@ -403,7 +403,7 @@ export function useCreatePage() {
         removePendingProposal()
         return waitForCreatedAutoid('proposal', 60_000)
       })
-      .then(async (autoid) => {
+      .then(async autoid => {
         if (pendingAttachments) {
           await pendingAttachments.uploadPendingFiles(autoid, 'proposal')
         }
@@ -468,7 +468,7 @@ export function useCreatePage() {
         removePendingOrder()
         return waitForCreatedAutoid('order', 60_000)
       })
-      .then(async (autoid) => {
+      .then(async autoid => {
         await Promise.all([
           patchAddresses(autoid),
           pendingAttachments

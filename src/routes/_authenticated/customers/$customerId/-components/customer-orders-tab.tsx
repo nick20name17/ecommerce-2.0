@@ -10,7 +10,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuTrigger,
+  DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
 import { PageEmpty } from '@/components/common/page-empty'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
@@ -31,7 +31,7 @@ const STATUS_DOT_COLORS: Record<string, string> = {
   P: 'bg-green-500',
   V: 'bg-red-500',
   H: 'bg-slate-400',
-  A: 'bg-purple-500',
+  A: 'bg-purple-500'
 }
 
 interface CustomerOrdersTabProps {
@@ -52,12 +52,12 @@ export const CustomerOrdersTab = ({ customerId, customerName }: CustomerOrdersTa
     customer_id: customerId,
     search: search || undefined,
     project_id: projectId ?? undefined,
-    limit: 200,
+    limit: 200
   }
 
   const { data, isLoading } = useQuery({
     ...getOrdersQuery(params),
-    placeholderData: keepPreviousData,
+    placeholderData: keepPreviousData
   })
 
   const orders = data?.results ?? []
@@ -70,7 +70,7 @@ export const CustomerOrdersTab = ({ customerId, customerName }: CustomerOrdersTa
           <Search className='size-3.5 shrink-0 text-text-tertiary' />
           <input
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={e => setSearch(e.target.value)}
             placeholder='Search orders...'
             className='flex-1 bg-transparent text-[13px] outline-none placeholder:text-text-tertiary'
           />
@@ -93,16 +93,16 @@ export const CustomerOrdersTab = ({ customerId, customerName }: CustomerOrdersTa
         {/* Column headers */}
         {!isMobile && (orders.length > 0 || isLoading) && (
           <div className='sticky top-0 z-10 flex min-w-fit items-center gap-4 border-b border-border bg-bg-secondary/60 px-5 py-1.5 xl:px-6'>
-            <div className='min-w-0 flex-1 text-[12px] font-medium uppercase tracking-[0.04em] text-text-tertiary'>
+            <div className='min-w-0 flex-1 text-[12px] font-medium tracking-[0.04em] text-text-tertiary uppercase'>
               Invoice
             </div>
-            <div className='w-[80px] shrink-0 text-right text-[12px] font-medium uppercase tracking-[0.04em] text-text-tertiary'>
+            <div className='w-[80px] shrink-0 text-right text-[12px] font-medium tracking-[0.04em] text-text-tertiary uppercase'>
               Date
             </div>
-            <div className='w-[50px] shrink-0 text-right text-[12px] font-medium uppercase tracking-[0.04em] text-text-tertiary'>
+            <div className='w-[50px] shrink-0 text-right text-[12px] font-medium tracking-[0.04em] text-text-tertiary uppercase'>
               Qty
             </div>
-            <div className='w-[80px] shrink-0 text-right text-[12px] font-medium uppercase tracking-[0.04em] text-text-tertiary'>
+            <div className='w-[80px] shrink-0 text-right text-[12px] font-medium tracking-[0.04em] text-text-tertiary uppercase'>
               Total
             </div>
             <div className='w-[26px] shrink-0' />
@@ -144,9 +144,14 @@ export const CustomerOrdersTab = ({ customerId, customerName }: CustomerOrdersTa
             )}
           </div>
         ) : orders.length === 0 ? (
-          <PageEmpty icon={Package} title='No orders found' description='This customer has no orders yet.' compact />
+          <PageEmpty
+            icon={Package}
+            title='No orders found'
+            description='This customer has no orders yet.'
+            compact
+          />
         ) : (
-          orders.map((order) => (
+          orders.map(order => (
             <OrderRow
               key={order.autoid}
               order={order}
@@ -156,7 +161,7 @@ export const CustomerOrdersTab = ({ customerId, customerName }: CustomerOrdersTa
               onClick={() =>
                 navigate({
                   to: '/orders/$orderId',
-                  params: { orderId: order.autoid },
+                  params: { orderId: order.autoid }
                 })
               }
             />
@@ -167,7 +172,7 @@ export const CustomerOrdersTab = ({ customerId, customerName }: CustomerOrdersTa
       {/* Footer */}
       {orders.length > 0 && (
         <div className='shrink-0 border-t border-border px-5 py-1.5 sm:px-6'>
-          <p className='text-[13px] tabular-nums text-text-tertiary'>
+          <p className='text-[13px] text-text-tertiary tabular-nums'>
             {orders.length} order{orders.length !== 1 ? 's' : ''}
           </p>
         </div>
@@ -177,11 +182,11 @@ export const CustomerOrdersTab = ({ customerId, customerName }: CustomerOrdersTa
         order={orderToDelete}
         projectId={projectId}
         open={!!orderToDelete}
-        onOpenChange={(open) => !open && setOrderToDelete(null)}
+        onOpenChange={open => !open && setOrderToDelete(null)}
       />
       <StartPickingDialog
         open={!!orderForPicking}
-        onOpenChange={(open) => !open && setOrderForPicking(null)}
+        onOpenChange={open => !open && setOrderForPicking(null)}
         customerId={customerId}
         customerName={customerName}
         orderAutoid={orderForPicking?.autoid}
@@ -197,7 +202,7 @@ function OrderRow({
   isMobile,
   onDelete,
   onPick,
-  onClick,
+  onClick
 }: {
   order: Order
   isMobile: boolean
@@ -222,17 +227,18 @@ function OrderRow({
             <span className='text-[13px] font-medium text-foreground'>
               {order.invoice || order.id}
             </span>
-            <StatusBadge status={order.status} label={statusLabel} statusClass={statusClass} dotColor={dotColor} />
+            <StatusBadge
+              status={order.status}
+              label={statusLabel}
+              statusClass={statusClass}
+              dotColor={dotColor}
+            />
           </div>
-          <span className='text-[13px] font-medium tabular-nums text-foreground'>
-            {total}
-          </span>
+          <span className='text-[13px] font-medium text-foreground tabular-nums'>{total}</span>
         </div>
         <div className='mt-0.5 flex items-center gap-2 text-[13px] text-text-tertiary'>
           <span>{invoiceDate}</span>
-          <span className='tabular-nums'>
-            Qty: {order.total_quan ?? '—'}
-          </span>
+          <span className='tabular-nums'>Qty: {order.total_quan ?? '—'}</span>
         </div>
       </div>
     )
@@ -251,33 +257,36 @@ function OrderRow({
               {order.invoice || order.id}
             </span>
           </TooltipTrigger>
-          <TooltipContent side='top'>
-            {order.invoice || order.id}
-          </TooltipContent>
+          <TooltipContent side='top'>{order.invoice || order.id}</TooltipContent>
         </Tooltip>
-        <StatusBadge status={order.status} label={statusLabel} statusClass={statusClass} dotColor={dotColor} />
+        <StatusBadge
+          status={order.status}
+          label={statusLabel}
+          statusClass={statusClass}
+          dotColor={dotColor}
+        />
       </div>
 
       {/* Date */}
-      <div className='w-[80px] shrink-0 text-right text-[13px] tabular-nums text-text-tertiary'>
+      <div className='w-[80px] shrink-0 text-right text-[13px] text-text-tertiary tabular-nums'>
         {invoiceDate}
       </div>
 
       {/* Qty */}
-      <div className='w-[50px] shrink-0 text-right text-[13px] tabular-nums text-text-secondary'>
+      <div className='w-[50px] shrink-0 text-right text-[13px] text-text-secondary tabular-nums'>
         {order.total_quan ?? '—'}
       </div>
 
       {/* Total */}
-      <div className='w-[80px] shrink-0 text-right text-[13px] font-medium tabular-nums text-foreground'>
+      <div className='w-[80px] shrink-0 text-right text-[13px] font-medium text-foreground tabular-nums'>
         {total}
       </div>
 
       {/* Actions */}
       <div
         className='flex w-[26px] shrink-0 justify-center opacity-0 transition-opacity group-hover/row:opacity-100'
-        onClick={(e) => e.stopPropagation()}
-        onKeyDown={(e) => e.stopPropagation()}
+        onClick={e => e.stopPropagation()}
+        onKeyDown={e => e.stopPropagation()}
         role='group'
       >
         <DropdownMenu>
@@ -328,7 +337,7 @@ function OrderRow({
 function StatusBadge({
   label,
   statusClass,
-  dotColor,
+  dotColor
 }: {
   status: string
   label: string
@@ -338,8 +347,8 @@ function StatusBadge({
   return (
     <span
       className={cn(
-        'inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-[11px] font-semibold leading-none',
-        statusClass,
+        'inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-[11px] leading-none font-semibold',
+        statusClass
       )}
     >
       <span className={cn('size-1.5 rounded-full', dotColor)} />

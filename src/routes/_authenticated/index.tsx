@@ -55,7 +55,9 @@ const DashboardPage = () => {
           <LayoutDashboard className='size-6' strokeWidth={1.75} />
         </div>
         <div className='flex flex-col items-center gap-1.5 text-center'>
-          <h1 className='text-[16px] font-semibold tracking-[-0.02em] text-foreground'>Dashboard</h1>
+          <h1 className='text-[16px] font-semibold tracking-[-0.02em] text-foreground'>
+            Dashboard
+          </h1>
           <p className='max-w-[280px] text-[13px] leading-snug text-text-tertiary'>
             Select a project in the sidebar to view metrics.
           </p>
@@ -80,7 +82,9 @@ const DashboardPage = () => {
             </div>
             <div className='flex flex-col items-center gap-1.5 text-center'>
               <p className='text-[14px] font-semibold text-foreground'>Unable to load dashboard</p>
-              <p className='max-w-[280px] text-[13px] leading-snug text-text-tertiary'>{getErrorMessage(error)}</p>
+              <p className='max-w-[280px] text-[13px] leading-snug text-text-tertiary'>
+                {getErrorMessage(error)}
+              </p>
             </div>
           </div>
         </div>
@@ -101,8 +105,11 @@ const DashboardPage = () => {
           <div className='flex flex-col gap-5'>
             {/* KPI skeletons */}
             <div className='grid min-w-0 grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-3 lg:grid-cols-6'>
-              {['sk-1', 'sk-2', 'sk-3', 'sk-4', 'sk-5', 'sk-6'].map((id) => (
-                <div key={id} className='rounded-[8px] border border-border bg-background px-3 py-3 sm:px-4 sm:py-4'>
+              {['sk-1', 'sk-2', 'sk-3', 'sk-4', 'sk-5', 'sk-6'].map(id => (
+                <div
+                  key={id}
+                  className='rounded-[8px] border border-border bg-background px-3 py-3 sm:px-4 sm:py-4'
+                >
                   <Skeleton className='h-3 w-16' />
                   <Skeleton className='mt-2.5 h-6 w-14' />
                 </div>
@@ -124,7 +131,7 @@ const DashboardPage = () => {
                 <Skeleton className='h-4 w-28' />
               </div>
               <div className='divide-y divide-border'>
-                {[1, 2, 3, 4, 5].map((j) => (
+                {[1, 2, 3, 4, 5].map(j => (
                   <div key={j} className='flex items-center gap-3 px-4 py-2.5'>
                     <Skeleton className='size-3.5 rounded-full' />
                     <Skeleton className='h-3 w-16' />
@@ -156,7 +163,9 @@ const DashboardPage = () => {
           {/* Orders chart */}
           <div className='rounded-[8px] border border-border bg-background'>
             <div className='flex flex-wrap items-center gap-2 px-4 py-3 sm:gap-2.5'>
-              <h2 className='text-[13px] font-semibold sm:text-[14px]'>Orders — this month vs last month</h2>
+              <h2 className='text-[13px] font-semibold sm:text-[14px]'>
+                Orders — this month vs last month
+              </h2>
               <OrdersChangeBadge metrics={data} />
             </div>
             <div className='p-4'>
@@ -165,10 +174,7 @@ const DashboardPage = () => {
           </div>
 
           {/* Recent orders */}
-          <DashboardRecentOrders
-            projectId={projectId}
-            customerId={customerId || undefined}
-          />
+          <DashboardRecentOrders projectId={projectId} customerId={customerId || undefined} />
         </div>
       </div>
     </div>
@@ -180,7 +186,7 @@ const DashboardPage = () => {
 function DashboardHeader({
   customerFilterValue,
   onCustomerChange,
-  projectId,
+  projectId
 }: {
   customerFilterValue: Customer | null
   onCustomerChange: (customer: Customer | null) => void

@@ -8,7 +8,7 @@ export function FilterPopover({
   active,
   icon,
   width = 'w-[180px]',
-  children,
+  children
 }: {
   label: string
   active: boolean
@@ -35,7 +35,7 @@ export function FilterPopover({
         </button>
       </PopoverTrigger>
       <PopoverContent
-        className={cn(width, 'overflow-hidden rounded-[8px] border-border gap-0 p-1')}
+        className={cn(width, 'gap-0 overflow-hidden rounded-[8px] border-border p-1')}
         align='start'
         style={{ boxShadow: 'var(--dropdown-shadow)' }}
       >
@@ -47,7 +47,7 @@ export function FilterPopover({
 
 export function FilterChip({
   children,
-  onRemove,
+  onRemove
 }: {
   children: React.ReactNode
   onRemove: () => void

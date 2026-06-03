@@ -3,10 +3,7 @@ import { Printer } from 'lucide-react'
 import { toast } from 'sonner'
 
 import { getDocumentTemplatesQuery } from '@/api/document-template/query'
-import type {
-  AccessibleRouteKey,
-  EntityType,
-} from '@/api/document-template/schema'
+import type { AccessibleRouteKey, EntityType } from '@/api/document-template/schema'
 import { documentTemplateService } from '@/api/document-template/service'
 import {
   DropdownMenu,
@@ -14,7 +11,7 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuTrigger,
+  DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
 import { cn } from '@/lib/utils'
 
@@ -49,14 +46,14 @@ export function PrintMenu({
   align = 'end',
   hideWhenEmpty = true,
   className,
-  stopPropagation = false,
+  stopPropagation = false
 }: PrintMenuProps) {
   const { data: templates } = useQuery({
     ...getDocumentTemplatesQuery(
       { entity_type: entityType, accessible_from: accessibleFrom, is_active: true },
       projectId
     ),
-    enabled: !!projectId,
+    enabled: !!projectId
   })
 
   const renderMutation = useMutation({
@@ -86,7 +83,7 @@ export function PrintMenu({
         }
       }
       toast.error(msg)
-    },
+    }
   })
 
   if (hideWhenEmpty && (!templates || templates.length === 0)) {
@@ -111,7 +108,7 @@ export function PrintMenu({
           disabled={renderMutation.isPending}
           className={triggerClass}
           title='Print document'
-          onClick={(e) => {
+          onClick={e => {
             if (stopPropagation) e.stopPropagation()
           }}
         >
@@ -126,30 +123,28 @@ export function PrintMenu({
       <DropdownMenuContent
         align={align}
         className='w-56'
-        onClick={(e) => {
+        onClick={e => {
           if (stopPropagation) e.stopPropagation()
         }}
       >
-        <DropdownMenuLabel className='text-[11px] uppercase tracking-wider text-text-tertiary'>
+        <DropdownMenuLabel className='text-[11px] tracking-wider text-text-tertiary uppercase'>
           Choose a template
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        {(templates ?? []).map((t) => (
+        {(templates ?? []).map(t => (
           <DropdownMenuItem
             key={t.id}
             onSelect={() =>
               renderMutation.mutate({
                 templateId: t.id,
-                templateName: t.name,
+                templateName: t.name
               })
             }
             className='flex flex-col items-start gap-0.5'
           >
             <span className='text-[13px] font-medium'>{t.name}</span>
             {t.description && (
-              <span className='text-[11px] text-text-tertiary'>
-                {t.description}
-              </span>
+              <span className='text-[11px] text-text-tertiary'>{t.description}</span>
             )}
           </DropdownMenuItem>
         ))}

@@ -43,11 +43,5 @@ export const ProjectsDataTable = ({
     manualSorting: true
   })
 
-  return (
-    <DataTable
-      table={table}
-      isLoading={isLoading}
-      className='flex-1'
-    />
-  )
+  return <DataTable table={table} isLoading={isLoading} className='flex-1' />
 }

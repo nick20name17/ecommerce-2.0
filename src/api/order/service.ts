@@ -2,7 +2,17 @@ import { api } from '..'
 
 import type { EntityAssignRequest, EntityAssignmentResponse, EntityAttachment } from '../schema'
 
-import type { Order, OrderParams, OrderPatchPayload, OrderResponse, PickStatusRequest, ShippingRatesRequest, ShippingRatesResponse, ShippingSelectionRequest, ShippingSelectionResponse } from './schema'
+import type {
+  Order,
+  OrderParams,
+  OrderPatchPayload,
+  OrderResponse,
+  PickStatusRequest,
+  ShippingRatesRequest,
+  ShippingRatesResponse,
+  ShippingSelectionRequest,
+  ShippingSelectionResponse
+} from './schema'
 
 const orderParams = (projectId?: number | null) =>
   projectId != null ? { project_id: projectId } : {}
@@ -20,7 +30,7 @@ export const orderService = {
   },
   patch: async (autoid: string, payload: OrderPatchPayload, projectId?: number | null) => {
     const { data } = await api.patch<Order>(`/data/orders/${autoid}/`, payload, {
-      params: orderParams(projectId),
+      params: orderParams(projectId)
     })
     return data
   },
@@ -57,13 +67,22 @@ export const orderService = {
     })
   },
 
-  setItemPickStatus: async (autoid: string, itemAutoid: string, payload: PickStatusRequest, projectId?: number | null) => {
+  setItemPickStatus: async (
+    autoid: string,
+    itemAutoid: string,
+    payload: PickStatusRequest,
+    projectId?: number | null
+  ) => {
     await api.patch(`/data/orders/${autoid}/items/${itemAutoid}/pick/`, payload, {
-      params: orderParams(projectId),
+      params: orderParams(projectId)
     })
   },
 
-  getShippingRates: async (autoid: string, payload: ShippingRatesRequest, projectId?: number | null) => {
+  getShippingRates: async (
+    autoid: string,
+    payload: ShippingRatesRequest,
+    projectId?: number | null
+  ) => {
     const { data } = await api.post<ShippingRatesResponse>(
       `/data/orders/${autoid}/shipping-rates/`,
       payload,
@@ -72,7 +91,11 @@ export const orderService = {
     return data
   },
 
-  selectShippingRate: async (autoid: string, payload: ShippingSelectionRequest, projectId?: number | null) => {
+  selectShippingRate: async (
+    autoid: string,
+    payload: ShippingSelectionRequest,
+    projectId?: number | null
+  ) => {
     const { data } = await api.post<ShippingSelectionResponse>(
       `/data/orders/${autoid}/shipping-selection/`,
       payload,

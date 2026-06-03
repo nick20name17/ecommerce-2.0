@@ -16,7 +16,7 @@ export function Tag({ children, variant = 'default', className }: TagProps) {
   return (
     <span
       className={cn(
-        'inline-flex items-center whitespace-nowrap rounded-[4px] text-[13px] font-medium leading-none',
+        'inline-flex items-center rounded-[4px] text-[13px] leading-none font-medium whitespace-nowrap',
         variant === 'default' && 'bg-bg-secondary px-1.5 py-0.5 text-text-tertiary',
         variant === 'accent' && 'bg-accent-bg px-2 py-[2px] text-primary',
         className

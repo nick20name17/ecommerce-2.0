@@ -25,11 +25,11 @@ export const EntityNotesTrigger = ({
       variant='outline'
       size='sm'
       className={cn('h-8 min-w-0 shrink-0 gap-1.5 px-2', className)}
-      onClick={(e) => {
+      onClick={e => {
         e.stopPropagation()
         onClick()
       }}
-      onKeyDown={(e) => {
+      onKeyDown={e => {
         if (e.key === 'Enter' || e.key === ' ') {
           e.stopPropagation()
           onClick()

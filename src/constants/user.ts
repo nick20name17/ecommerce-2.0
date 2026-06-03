@@ -14,11 +14,9 @@ export const USER_ROLE_LABELS: Record<UserRole, string> = {
   [USER_ROLES.manager]: 'Manager'
 }
 
-export const getUserRoleLabel = (role: UserRole): string =>
-  USER_ROLE_LABELS[role] ?? role
+export const getUserRoleLabel = (role: UserRole): string => USER_ROLE_LABELS[role] ?? role
 
-export const isSuperAdmin = (role: UserRole): boolean =>
-  role === USER_ROLES.superadmin
+export const isSuperAdmin = (role: UserRole): boolean => role === USER_ROLES.superadmin
 
 export const isAdmin = (role: UserRole): boolean =>
   role === USER_ROLES.admin || role === USER_ROLES.superadmin

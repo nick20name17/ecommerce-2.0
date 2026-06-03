@@ -63,7 +63,7 @@ export const CreatePageActions = ({
         {!hasItems && <TooltipContent>No items to clear</TooltipContent>}
       </Tooltip>
 
-      <div className='bg-border h-4 w-px' />
+      <div className='h-4 w-px bg-border' />
 
       <Tooltip>
         <TooltipTrigger asChild>
@@ -86,11 +86,7 @@ export const CreatePageActions = ({
 
       <Tooltip>
         <TooltipTrigger asChild>
-          <Button
-            size='sm'
-            disabled={!canSubmit || isCreating}
-            onClick={onCreateProposal}
-          >
+          <Button size='sm' disabled={!canSubmit || isCreating} onClick={onCreateProposal}>
             {creatingProposal ? (
               <Spinner className='mr-1.5 size-3.5' />
             ) : (

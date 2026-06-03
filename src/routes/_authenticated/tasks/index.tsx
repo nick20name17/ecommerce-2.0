@@ -1,14 +1,6 @@
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
-import {
-  Check,
-  CheckSquare,
-  ChevronDown,
-  Columns3,
-  List,
-  Plus,
-  Search,
-} from 'lucide-react'
+import { Check, CheckSquare, ChevronDown, Columns3, List, Plus, Search } from 'lucide-react'
 import { useState } from 'react'
 
 import { KanbanView } from './-components/kanban-view'
@@ -19,7 +11,16 @@ import { taskService } from '@/api/task/service'
 import { PageEmpty } from '@/components/common/page-empty'
 import { SidebarTrigger } from '@/components/ui/sidebar'
 import { CommandBarCreate, PriorityIcon } from '@/components/tasks/command-bar-create'
-import { FilterChip, FilterPopover, ITodos, PAGE_COLORS, PageHeaderIcon, StatusIcon, ViewToggle, type ViewOption } from '@/components/ds'
+import {
+  FilterChip,
+  FilterPopover,
+  ITodos,
+  PAGE_COLORS,
+  PageHeaderIcon,
+  StatusIcon,
+  ViewToggle,
+  type ViewOption
+} from '@/components/ds'
 import { TASK_PRIORITY, TASK_PRIORITY_COLORS, TASK_PRIORITY_LABELS } from '@/constants/task'
 import type { TaskPriority } from '@/constants/task'
 import { useBreakpoint } from '@/hooks/use-breakpoint'
@@ -37,7 +38,7 @@ export const Route = createFileRoute('/_authenticated/tasks/')({
 
 const TASK_VIEW_OPTIONS: ViewOption<'list' | 'board'>[] = [
   { value: 'list', label: 'List', icon: List },
-  { value: 'board', label: 'Board', icon: Columns3 },
+  { value: 'board', label: 'Board', icon: Columns3 }
 ]
 
 // ── Page Component ───────────────────────────────────────────
@@ -65,16 +66,16 @@ function Todos2Page() {
   const params: TaskParams = {
     search: search || undefined,
     project_id: projectId ?? undefined,
-    limit: 200,
+    limit: 200
   }
   const { data: tasksData, isLoading } = useQuery({
     ...getTasksQuery(params),
-    placeholderData: keepPreviousData,
+    placeholderData: keepPreviousData
   })
   const allTasks = tasksData?.results ?? []
 
   // Client-side multi-select filtering
-  const tasks = allTasks.filter((t) => {
+  const tasks = allTasks.filter(t => {
     if (activeStatuses.size > 0 && !activeStatuses.has(t.status)) return false
     if (activePriorities.size > 0 && !activePriorities.has(t.priority)) return false
     return true
@@ -83,7 +84,7 @@ function Todos2Page() {
   const hasFilters = activeStatuses.size > 0 || activePriorities.size > 0
 
   const toggleStatus = (id: number) => {
-    setActiveStatuses((prev) => {
+    setActiveStatuses(prev => {
       const next = new Set(prev)
       if (next.has(id)) next.delete(id)
       else next.add(id)
@@ -92,7 +93,7 @@ function Todos2Page() {
   }
 
   const togglePriority = (p: TaskPriority) => {
-    setActivePriorities((prev) => {
+    setActivePriorities(prev => {
       const next = new Set(prev)
       if (next.has(p)) next.delete(p)
       else next.add(p)
@@ -106,10 +107,12 @@ function Todos2Page() {
   }
 
   // Group tasks by status in the order defined by statuses
-  const groupedTasks = statuses.map((status) => ({
-    status,
-    tasks: tasks.filter((t) => t.status === status.id),
-  })).filter((g) => g.tasks.length > 0)
+  const groupedTasks = statuses
+    .map(status => ({
+      status,
+      tasks: tasks.filter(t => t.status === status.id)
+    }))
+    .filter(g => g.tasks.length > 0)
 
   // Status change mutation with optimistic update
   const queryClient = useQueryClient()
@@ -120,23 +123,23 @@ function Todos2Page() {
       await queryClient.cancelQueries({ queryKey: TASK_QUERY_KEYS.lists() })
       const queryKey = TASK_QUERY_KEYS.list(params)
       const previous = queryClient.getQueryData(queryKey)
-      const newStatus = statuses.find((s) => s.id === statusId)
+      const newStatus = statuses.find(s => s.id === statusId)
       queryClient.setQueryData(
         queryKey,
         (old: { count: number; results: TaskListItem[] } | undefined) => {
           if (!old) return old
           return {
             ...old,
-            results: old.results.map((t) =>
+            results: old.results.map(t =>
               t.id === taskId
                 ? {
                     ...t,
                     status: statusId,
                     status_name: newStatus?.name ?? t.status_name,
-                    status_color: newStatus?.color ?? t.status_color,
+                    status_color: newStatus?.color ?? t.status_color
                   }
                 : t
-            ),
+            )
           }
         }
       )
@@ -172,9 +175,7 @@ function Todos2Page() {
           if (!old) return old
           return {
             ...old,
-            results: old.results.map((t) =>
-              t.id === taskId ? { ...t, ...payload } : t
-            ),
+            results: old.results.map(t => (t.id === taskId ? { ...t, ...payload } : t))
           }
         }
       )
@@ -187,7 +188,7 @@ function Todos2Page() {
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: TASK_QUERY_KEYS.lists() })
-    },
+    }
   })
 
   // Delete mutation
@@ -207,12 +208,12 @@ function Todos2Page() {
         title,
         status: statusId,
         priority: TASK_PRIORITY.medium,
-        project: resolvedProjectId,
+        project: resolvedProjectId
       }),
     onMutate: async ({ title, statusId }) => {
       await queryClient.cancelQueries({ queryKey: TASK_QUERY_KEYS.lists() })
       const previous = queryClient.getQueryData(queryKey)
-      const newStatus = statuses.find((s) => s.id === statusId)
+      const newStatus = statuses.find(s => s.id === statusId)
       const optimisticTask: TaskListItem = {
         id: -Date.now(),
         project: resolvedProjectId ?? 0,
@@ -228,7 +229,7 @@ function Todos2Page() {
         responsible_user_name: null,
         attachment_count: '0',
         created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
       }
       queryClient.setQueryData(
         queryKey,
@@ -271,7 +272,7 @@ function Todos2Page() {
   }
 
   const toggleGroup = (statusName: string) => {
-    setCollapsedGroups((prev) => {
+    setCollapsedGroups(prev => {
       const next = new Set(prev)
       if (next.has(statusName)) {
         next.delete(statusName)
@@ -285,16 +286,19 @@ function Todos2Page() {
   return (
     <div className='flex h-full flex-col overflow-hidden'>
       {/* ── Header ── */}
-      <header
-        className='flex h-12 shrink-0 items-center gap-2.5 border-b border-border px-3.5 sm:px-6'
-      >
+      <header className='flex h-12 shrink-0 items-center gap-2.5 border-b border-border px-3.5 sm:px-6'>
         <SidebarTrigger className='-ml-1' />
         <div className='flex items-center gap-1.5'>
           <PageHeaderIcon icon={ITodos} color={PAGE_COLORS.todos} />
           <h1 className='text-[14px] font-semibold tracking-[-0.01em]'>To-Do&apos;s</h1>
         </div>
 
-        <ViewToggle options={TASK_VIEW_OPTIONS} value={view} onChange={setView} compact={isMobile} />
+        <ViewToggle
+          options={TASK_VIEW_OPTIONS}
+          value={view}
+          onChange={setView}
+          compact={isMobile}
+        />
 
         <div className='flex-1' />
 
@@ -302,7 +306,7 @@ function Todos2Page() {
           <Search className='size-3 shrink-0 text-text-tertiary' />
           <input
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={e => setSearch(e.target.value)}
             placeholder='Search tasks...'
             className='flex-1 bg-transparent text-[13px] outline-none placeholder:text-text-tertiary'
           />
@@ -315,7 +319,7 @@ function Todos2Page() {
             icon={<StatusIcon status='' color='currentColor' size={12} />}
             width='w-[220px]'
           >
-            {statuses.map((s) => {
+            {statuses.map(s => {
               const selected = activeStatuses.has(s.id)
               return (
                 <button
@@ -327,11 +331,15 @@ function Todos2Page() {
                   )}
                   onClick={() => toggleStatus(s.id)}
                 >
-                  <div className={cn(
-                    'flex size-3.5 items-center justify-center rounded-[3px] border transition-colors duration-[80ms]',
-                    selected ? 'border-primary bg-primary' : 'border-border'
-                  )}>
-                    {selected && <Check className='size-2.5 text-primary-foreground' strokeWidth={3} />}
+                  <div
+                    className={cn(
+                      'flex size-3.5 items-center justify-center rounded-[3px] border transition-colors duration-[80ms]',
+                      selected ? 'border-primary bg-primary' : 'border-border'
+                    )}
+                  >
+                    {selected && (
+                      <Check className='size-2.5 text-primary-foreground' strokeWidth={3} />
+                    )}
                   </div>
                   <StatusIcon status={s.name} color={s.color} size={13} />
                   <span className='flex-1'>{s.name}</span>
@@ -357,13 +365,21 @@ function Todos2Page() {
                   )}
                   onClick={() => togglePriority(key as TaskPriority)}
                 >
-                  <div className={cn(
-                    'flex size-3.5 items-center justify-center rounded-[3px] border transition-colors duration-[80ms]',
-                    selected ? 'border-primary bg-primary' : 'border-border'
-                  )}>
-                    {selected && <Check className='size-2.5 text-primary-foreground' strokeWidth={3} />}
+                  <div
+                    className={cn(
+                      'flex size-3.5 items-center justify-center rounded-[3px] border transition-colors duration-[80ms]',
+                      selected ? 'border-primary bg-primary' : 'border-border'
+                    )}
+                  >
+                    {selected && (
+                      <Check className='size-2.5 text-primary-foreground' strokeWidth={3} />
+                    )}
                   </div>
-                  <PriorityIcon priority={key} color={TASK_PRIORITY_COLORS[key as TaskPriority]} size={13} />
+                  <PriorityIcon
+                    priority={key}
+                    color={TASK_PRIORITY_COLORS[key as TaskPriority]}
+                    size={13}
+                  />
                   <span className='flex-1'>{label}</span>
                 </button>
               )
@@ -383,7 +399,7 @@ function Todos2Page() {
 
       {/* Active filter chips */}
       {hasFilters && (
-        <div className='flex shrink-0 flex-wrap items-center gap-1.5 border-b border-border py-1.5 px-3.5 sm:px-6'>
+        <div className='flex shrink-0 flex-wrap items-center gap-1.5 border-b border-border px-3.5 py-1.5 sm:px-6'>
           <button
             type='button'
             className='text-[13px] font-medium text-text-tertiary transition-colors duration-[80ms] hover:text-foreground'
@@ -391,8 +407,8 @@ function Todos2Page() {
           >
             Clear
           </button>
-          {Array.from(activeStatuses).map((id) => {
-            const s = statuses.find((st) => st.id === id)
+          {Array.from(activeStatuses).map(id => {
+            const s = statuses.find(st => st.id === id)
             if (!s) return null
             return (
               <FilterChip key={`status-${id}`} onRemove={() => toggleStatus(id)}>
@@ -402,7 +418,7 @@ function Todos2Page() {
               </FilterChip>
             )
           })}
-          {Array.from(activePriorities).map((p) => (
+          {Array.from(activePriorities).map(p => (
             <FilterChip key={`priority-${p}`} onRemove={() => togglePriority(p)}>
               <span className='text-text-tertiary'>Priority is</span>
               <PriorityIcon priority={p} color={TASK_PRIORITY_COLORS[p]} size={12} />
@@ -416,7 +432,7 @@ function Todos2Page() {
       {view === 'board' ? (
         <div className='flex-1 overflow-hidden'>
           {isLoading ? (
-            <div className='flex h-full gap-4 py-4 px-3.5 sm:px-6'>
+            <div className='flex h-full gap-4 px-3.5 py-4 sm:px-6'>
               {Array.from({ length: 4 }).map((_, i) => (
                 <div key={i} className='w-[300px] shrink-0'>
                   <div className='mb-3 flex items-center gap-2 px-1'>
@@ -446,12 +462,15 @@ function Todos2Page() {
             <div className='space-y-0'>
               {Array.from({ length: 3 }).map((_, gi) => (
                 <div key={gi}>
-                  <div className='flex items-center gap-2 border-b border-border bg-bg-secondary py-1.5 px-3.5 sm:px-6'>
+                  <div className='flex items-center gap-2 border-b border-border bg-bg-secondary px-3.5 py-1.5 sm:px-6'>
                     <div className='size-3.5 animate-pulse rounded-full bg-border' />
                     <div className='h-3.5 w-20 animate-pulse rounded bg-border' />
                   </div>
                   {Array.from({ length: gi === 0 ? 3 : 2 }).map((_, ti) => (
-                    <div key={ti} className='flex items-center gap-3 border-b border-border-light py-2.5 px-3.5 sm:px-6'>
+                    <div
+                      key={ti}
+                      className='flex items-center gap-3 border-b border-border-light px-3.5 py-2.5 sm:px-6'
+                    >
                       <div className='size-3.5 animate-pulse rounded-full bg-border' />
                       <div className='h-3 w-16 animate-pulse rounded bg-border' />
                       <div className='h-3 flex-1 animate-pulse rounded bg-border' />
@@ -470,14 +489,12 @@ function Todos2Page() {
                   {/* Status Group Header */}
                   <button
                     type='button'
-                    className='flex w-full items-center gap-2 border-b border-border bg-bg-secondary py-1.5 transition-colors duration-[80ms] hover:bg-bg-hover px-3.5 sm:px-6'
+                    className='flex w-full items-center gap-2 border-b border-border bg-bg-secondary px-3.5 py-1.5 transition-colors duration-[80ms] hover:bg-bg-hover sm:px-6'
                     onClick={() => toggleGroup(status.name)}
                   >
                     <StatusIcon status={status.name} color={status.color} size={14} />
-                    <span className='text-[13px] font-semibold text-foreground'>
-                      {status.name}
-                    </span>
-                    <span className='text-[13px] tabular-nums text-text-tertiary'>
+                    <span className='text-[13px] font-semibold text-foreground'>{status.name}</span>
+                    <span className='text-[13px] text-text-tertiary tabular-nums'>
                       {groupTasks.length}
                     </span>
                     <ChevronDown
@@ -494,7 +511,7 @@ function Todos2Page() {
                     style={{ gridTemplateRows: collapsed ? '0fr' : '1fr' }}
                   >
                     <div className='overflow-hidden'>
-                      {groupTasks.map((task) => (
+                      {groupTasks.map(task => (
                         <TaskRow
                           key={task.id}
                           task={task}
@@ -515,21 +532,21 @@ function Todos2Page() {
       )}
 
       {/* Command bar create */}
-      {showCreate && (
-        <CommandBarCreate
-          onClose={() => setShowCreate(false)}
-        />
-      )}
+      {showCreate && <CommandBarCreate onClose={() => setShowCreate(false)} />}
 
       {/* Delete confirmation */}
       {taskToDelete && (
         <>
           <div className='fixed inset-0 z-40 bg-black/40' onClick={() => setTaskToDelete(null)} />
           <div className='fixed inset-0 z-50 flex items-center justify-center px-4'>
-            <div className='w-full max-w-[400px] rounded-[12px] border border-border bg-background p-6' style={{ boxShadow: 'var(--dropdown-shadow)' }}>
+            <div
+              className='w-full max-w-[400px] rounded-[12px] border border-border bg-background p-6'
+              style={{ boxShadow: 'var(--dropdown-shadow)' }}
+            >
               <h3 className='mb-2 text-[15px] font-semibold'>Delete task</h3>
               <p className='mb-5 text-[13px] text-text-secondary'>
-                Are you sure you want to delete &ldquo;{taskToDelete.title}&rdquo;? This action cannot be undone.
+                Are you sure you want to delete &ldquo;{taskToDelete.title}&rdquo;? This action
+                cannot be undone.
               </p>
               <div className='flex justify-end gap-2'>
                 <button
@@ -554,8 +571,8 @@ function Todos2Page() {
 
       {/* Footer */}
       {tasks.length > 0 && (
-        <div className='shrink-0 border-t border-border py-2 px-3.5 sm:px-6'>
-          <p className='text-[13px] tabular-nums text-text-tertiary'>
+        <div className='shrink-0 border-t border-border px-3.5 py-2 sm:px-6'>
+          <p className='text-[13px] text-text-tertiary tabular-nums'>
             {tasks.length} task{tasks.length !== 1 ? 's' : ''}
           </p>
         </div>
@@ -566,6 +583,10 @@ function Todos2Page() {
 
 function EmptyState() {
   return (
-    <PageEmpty icon={CheckSquare} title='No matching tasks' description='Try adjusting your search or filters.' />
+    <PageEmpty
+      icon={CheckSquare}
+      title='No matching tasks'
+      description='Try adjusting your search or filters.'
+    />
   )
 }

@@ -14,7 +14,7 @@ export const ProposalAssignDialog = ({
   proposal,
   open,
   onOpenChange,
-  projectId,
+  projectId
 }: ProposalAssignDialogProps) => {
   if (!proposal) return null
 
@@ -23,8 +23,10 @@ export const ProposalAssignDialog = ({
       open={open}
       onOpenChange={onOpenChange}
       entityLabel={`proposal ${proposal.quote ?? proposal.autoid}`}
-      assignedUsers={proposal.assigned_users ?? (proposal.assigned_user ? [proposal.assigned_user] : [])}
-      assignFn={(payload) => proposalService.assign(proposal.autoid, payload, projectId)}
+      assignedUsers={
+        proposal.assigned_users ?? (proposal.assigned_user ? [proposal.assigned_user] : [])
+      }
+      assignFn={payload => proposalService.assign(proposal.autoid, payload, projectId)}
       invalidateQueryKey={PROPOSAL_QUERY_KEYS.all()}
       projectId={projectId}
     />

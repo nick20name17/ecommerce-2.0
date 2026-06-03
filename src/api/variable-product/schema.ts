@@ -35,19 +35,14 @@ export interface ItemSpecLink {
 
 // ── Variable Product ────────────────────────────────────────
 
-export type ProductStatus =
-  | 'featured'
-  | 'sale'
-  | 'new'
-  | 'clearance'
-  | 'coming_soon'
+export type ProductStatus = 'featured' | 'sale' | 'new' | 'clearance' | 'coming_soon'
 
 export const PRODUCT_STATUS_VALUES: ProductStatus[] = [
   'featured',
   'sale',
   'new',
   'clearance',
-  'coming_soon',
+  'coming_soon'
 ]
 
 export interface VariableProduct {

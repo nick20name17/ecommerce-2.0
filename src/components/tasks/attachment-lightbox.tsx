@@ -42,22 +42,17 @@ export function AttachmentLightbox({
   if (!current) return null
 
   return (
-    <DialogPrimitive.Root
-      open
-      onOpenChange={(open) => !open && onClose()}
-    >
+    <DialogPrimitive.Root open onOpenChange={open => !open && onClose()}>
       <DialogPrimitive.Portal>
-        <DialogPrimitive.Overlay className='fixed inset-0 z-50 bg-black/80 data-open:animate-in data-closed:animate-out data-closed:fade-out-0 data-open:fade-in-0 duration-100' />
+        <DialogPrimitive.Overlay className='fixed inset-0 z-50 bg-black/80 duration-100 data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0' />
         <DialogPrimitive.Content
           className='fixed inset-0 z-50 flex flex-col outline-none'
-          onPointerDownOutside={(e) => e.preventDefault()}
+          onPointerDownOutside={e => e.preventDefault()}
         >
           {/* Header */}
           <div className='flex items-center justify-between px-4 py-3'>
-            <div className='flex items-center gap-3 min-w-0'>
-              <p className='truncate text-sm font-medium text-white/90'>
-                {current.file_name}
-              </p>
+            <div className='flex min-w-0 items-center gap-3'>
+              <p className='truncate text-sm font-medium text-white/90'>{current.file_name}</p>
               {hasMultiple && (
                 <span className='shrink-0 text-[13px] text-white/50'>
                   {currentIndex + 1} / {images.length}
@@ -68,7 +63,7 @@ export function AttachmentLightbox({
               <Button
                 variant='ghost'
                 size='icon-sm'
-                className='text-white/70 hover:text-white hover:bg-white/10'
+                className='text-white/70 hover:bg-white/10 hover:text-white'
                 asChild
               >
                 <a
@@ -84,7 +79,7 @@ export function AttachmentLightbox({
                 <Button
                   variant='ghost'
                   size='icon-sm'
-                  className='text-white/70 hover:text-white hover:bg-white/10'
+                  className='text-white/70 hover:bg-white/10 hover:text-white'
                 >
                   <XIcon className='size-4' />
                 </Button>
@@ -101,7 +96,7 @@ export function AttachmentLightbox({
               src={current.download_url}
               alt={current.file_name}
               className='max-h-full max-w-full rounded-lg object-contain'
-              onClick={(e) => e.stopPropagation()}
+              onClick={e => e.stopPropagation()}
               draggable={false}
             />
           </div>
@@ -111,12 +106,12 @@ export function AttachmentLightbox({
             <>
               <button
                 type='button'
-                onClick={(e) => {
+                onClick={e => {
                   e.stopPropagation()
                   goPrev()
                 }}
                 className={cn(
-                  'fixed left-3 top-1/2 z-10 -translate-y-1/2 flex size-10 items-center justify-center rounded-full',
+                  'fixed top-1/2 left-3 z-10 flex size-10 -translate-y-1/2 items-center justify-center rounded-full',
                   'bg-white/10 text-white/70 backdrop-blur-sm transition-colors duration-[80ms]',
                   'hover:bg-white/20 hover:text-white'
                 )}
@@ -125,12 +120,12 @@ export function AttachmentLightbox({
               </button>
               <button
                 type='button'
-                onClick={(e) => {
+                onClick={e => {
                   e.stopPropagation()
                   goNext()
                 }}
                 className={cn(
-                  'fixed right-3 top-1/2 z-10 -translate-y-1/2 flex size-10 items-center justify-center rounded-full',
+                  'fixed top-1/2 right-3 z-10 flex size-10 -translate-y-1/2 items-center justify-center rounded-full',
                   'bg-white/10 text-white/70 backdrop-blur-sm transition-colors duration-[80ms]',
                   'hover:bg-white/20 hover:text-white'
                 )}
@@ -141,9 +136,7 @@ export function AttachmentLightbox({
           )}
 
           {/* Hidden title for accessibility */}
-          <DialogPrimitive.Title className='sr-only'>
-            {current.file_name}
-          </DialogPrimitive.Title>
+          <DialogPrimitive.Title className='sr-only'>{current.file_name}</DialogPrimitive.Title>
           <DialogPrimitive.Description className='sr-only'>
             Image preview
           </DialogPrimitive.Description>

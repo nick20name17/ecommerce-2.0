@@ -4,7 +4,7 @@ import {
   ClipboardList,
   Minus,
   Receipt,
-  ShoppingCart,
+  ShoppingCart
 } from 'lucide-react'
 
 import type { DashboardMetrics } from '@/api/dashboard/schema'
@@ -24,7 +24,7 @@ const KPI_CONFIG = [
     prev: (m: DashboardMetrics) => m.last_month_order_count,
     icon: ShoppingCart,
     iconBg: 'bg-blue-500/10',
-    iconColor: 'text-blue-500',
+    iconColor: 'text-blue-500'
   },
   {
     key: 'unprocessed',
@@ -35,7 +35,7 @@ const KPI_CONFIG = [
     prev: null,
     icon: ClipboardList,
     iconBg: 'bg-amber-500/10',
-    iconColor: 'text-amber-500',
+    iconColor: 'text-amber-500'
   },
   {
     key: 'pending',
@@ -46,8 +46,8 @@ const KPI_CONFIG = [
     prev: null,
     icon: Receipt,
     iconBg: 'bg-orange-500/10',
-    iconColor: 'text-orange-500',
-  },
+    iconColor: 'text-orange-500'
+  }
 ] as const
 
 function getChange(
@@ -63,7 +63,7 @@ function getChange(
 export const DashboardKpis = ({ metrics }: DashboardKpisProps) => {
   return (
     <div className='grid min-w-0 grid-cols-2 gap-2.5 sm:grid-cols-3 sm:gap-3'>
-      {KPI_CONFIG.map((config) => {
+      {KPI_CONFIG.map(config => {
         const value = config.value(metrics)
         const prev = config.prev ? config.prev(metrics) : null
         const change = prev != null ? getChange(value, prev) : null
@@ -80,9 +80,7 @@ export const DashboardKpis = ({ metrics }: DashboardKpisProps) => {
                 <div className='text-[12px] font-semibold text-foreground sm:text-[13px]'>
                   {config.title}
                 </div>
-                <div className='mt-0.5 text-[11px] text-text-quaternary'>
-                  {config.subtitle}
-                </div>
+                <div className='text-text-quaternary mt-0.5 text-[11px]'>{config.subtitle}</div>
               </div>
               <div
                 className={cn(
@@ -95,7 +93,7 @@ export const DashboardKpis = ({ metrics }: DashboardKpisProps) => {
             </div>
 
             {/* Value */}
-            <div className='mt-3 truncate text-[18px] font-bold tabular-nums leading-none tracking-tight sm:text-[22px]'>
+            <div className='mt-3 truncate text-[18px] leading-none font-bold tracking-tight tabular-nums sm:text-[22px]'>
               {config.format(value)}
             </div>
 
@@ -104,7 +102,7 @@ export const DashboardKpis = ({ metrics }: DashboardKpisProps) => {
               {change ? (
                 <div
                   className={cn(
-                    'flex items-center gap-0.5 text-[11px] font-medium tabular-nums leading-none',
+                    'flex items-center gap-0.5 text-[11px] leading-none font-medium tabular-nums',
                     change.direction === 'up' && 'text-green-600 dark:text-green-400',
                     change.direction === 'down' && 'text-destructive',
                     change.direction === 'same' && 'text-text-tertiary'
@@ -116,7 +114,7 @@ export const DashboardKpis = ({ metrics }: DashboardKpisProps) => {
                   {change.direction === 'same'
                     ? '0%'
                     : `${change.direction === 'up' ? '+' : ''}${change.pct}%`}
-                  <span className='ml-0.5 text-text-quaternary'>vs last month</span>
+                  <span className='text-text-quaternary ml-0.5'>vs last month</span>
                 </div>
               ) : null}
             </div>

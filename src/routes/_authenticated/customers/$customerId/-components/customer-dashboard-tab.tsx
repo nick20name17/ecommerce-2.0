@@ -3,7 +3,10 @@ import { ArrowDownRight, ArrowUpRight, Minus } from 'lucide-react'
 
 import { getDashboardQuery } from '@/api/dashboard/query'
 import type { DashboardMetrics } from '@/api/dashboard/schema'
-import { DashboardOrdersChart, OrdersChangeBadge } from '@/routes/_authenticated/-components/dashboard-orders-chart'
+import {
+  DashboardOrdersChart,
+  OrdersChangeBadge
+} from '@/routes/_authenticated/-components/dashboard-orders-chart'
 import { getErrorMessage } from '@/helpers/error'
 import { formatCurrency } from '@/helpers/formatters'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -22,46 +25,49 @@ const KPI_CONFIG = [
     title: 'Orders',
     value: (m: DashboardMetrics) => m.total_order_count,
     format: (n: number) => String(n),
-    prev: (m: DashboardMetrics) => m.last_month_order_count,
+    prev: (m: DashboardMetrics) => m.last_month_order_count
   },
   {
     key: 'unprocessed',
     title: 'Unprocessed',
     value: (m: DashboardMetrics) => m.unprocessed_orders,
     format: (n: number) => String(n),
-    prev: null,
+    prev: null
   },
   {
     key: 'pending',
     title: 'Pending',
     value: (m: DashboardMetrics) => m.pending_invoices,
     format: (n: number) => String(n),
-    prev: null,
+    prev: null
   },
   {
     key: 'totalSales',
     title: 'Total Sales',
     value: (m: DashboardMetrics) => m.total.total_sales,
     format: (n: number) => formatCurrency(n),
-    prev: (m: DashboardMetrics) => m.total.last_month_total_sales,
+    prev: (m: DashboardMetrics) => m.total.last_month_total_sales
   },
   {
     key: 'avgOrder',
     title: 'Avg Order',
     value: (m: DashboardMetrics) => m.total.average_order_value,
     format: (n: number) => formatCurrency(n),
-    prev: (m: DashboardMetrics) => m.total.last_month_average_order_value,
+    prev: (m: DashboardMetrics) => m.total.last_month_average_order_value
   },
   {
     key: 'outstanding',
     title: 'Outstanding',
     value: (m: DashboardMetrics) => m.total.outstanding_invoices,
     format: (n: number) => formatCurrency(n),
-    prev: null,
-  },
+    prev: null
+  }
 ] as const
 
-function getChange(current: number, previous: number): { pct: number; direction: 'up' | 'down' | 'same' } | null {
+function getChange(
+  current: number,
+  previous: number
+): { pct: number; direction: 'up' | 'down' | 'same' } | null {
   if (previous === 0) return null
   const pct = Math.round(((current - previous) / previous) * 100)
   const direction = pct > 0 ? 'up' : pct < 0 ? 'down' : 'same'
@@ -70,29 +76,22 @@ function getChange(current: number, previous: number): { pct: number; direction:
 
 // ── Component ────────────────────────────────────────────────
 
-export const CustomerDashboardTab = ({
-  customerId,
-  projectId,
-}: CustomerDashboardTabProps) => {
+export const CustomerDashboardTab = ({ customerId, projectId }: CustomerDashboardTabProps) => {
   const params = {
     customer_id: customerId,
-    project_id: projectId ?? undefined,
+    project_id: projectId ?? undefined
   }
   const { data, isLoading, error } = useQuery({
     ...getDashboardQuery(params),
-    enabled: !!customerId,
+    enabled: !!customerId
   })
 
   if (error) {
     return (
       <div className='flex flex-1 items-center justify-center py-16'>
         <div className='text-center'>
-          <p className='text-[13px] font-medium text-destructive'>
-            Unable to load dashboard
-          </p>
-          <p className='mt-1 text-[13px] text-text-tertiary'>
-            {getErrorMessage(error)}
-          </p>
+          <p className='text-[13px] font-medium text-destructive'>Unable to load dashboard</p>
+          <p className='mt-1 text-[13px] text-text-tertiary'>{getErrorMessage(error)}</p>
         </div>
       </div>
     )
@@ -106,7 +105,7 @@ export const CustomerDashboardTab = ({
     <div className='flex min-w-0 flex-col gap-5'>
       {/* KPI cards */}
       <div className='grid min-w-0 grid-cols-2 gap-2 sm:gap-3 lg:grid-cols-3'>
-        {KPI_CONFIG.map((config) => {
+        {KPI_CONFIG.map(config => {
           const value = config.value(data)
           const prev = config.prev ? config.prev(data) : null
           const change = prev != null ? getChange(value, prev) : null
@@ -116,16 +115,16 @@ export const CustomerDashboardTab = ({
               key={config.key}
               className='rounded-[8px] border border-border bg-background px-3 py-3 sm:px-4 sm:py-4'
             >
-              <div className='truncate text-[11px] font-medium uppercase tracking-[0.04em] text-text-tertiary sm:text-[12px]'>
+              <div className='truncate text-[11px] font-medium tracking-[0.04em] text-text-tertiary uppercase sm:text-[12px]'>
                 {config.title}
               </div>
-              <div className='mt-1 truncate text-[16px] font-semibold tabular-nums leading-none tracking-tight sm:mt-1.5 sm:text-[20px]'>
+              <div className='mt-1 truncate text-[16px] leading-none font-semibold tracking-tight tabular-nums sm:mt-1.5 sm:text-[20px]'>
                 {config.format(value)}
               </div>
               {change && (
                 <div
                   className={cn(
-                    'mt-1.5 flex items-center gap-0.5 whitespace-nowrap text-[11px] font-medium tabular-nums leading-none',
+                    'mt-1.5 flex items-center gap-0.5 text-[11px] leading-none font-medium whitespace-nowrap tabular-nums',
                     change.direction === 'up' && 'text-green-600 dark:text-green-400',
                     change.direction === 'down' && 'text-destructive',
                     change.direction === 'same' && 'text-text-tertiary'
@@ -146,7 +145,9 @@ export const CustomerDashboardTab = ({
       {/* Orders chart */}
       <div className='rounded-[8px] border border-border bg-background'>
         <div className='flex flex-wrap items-center gap-2 px-4 py-3 sm:gap-2.5'>
-          <h2 className='text-[13px] font-semibold sm:text-[14px]'>Orders — this month vs last month</h2>
+          <h2 className='text-[13px] font-semibold sm:text-[14px]'>
+            Orders — this month vs last month
+          </h2>
           <OrdersChangeBadge metrics={data} />
         </div>
         <div className='p-4'>
@@ -165,7 +166,10 @@ function DashboardSkeleton() {
       {/* KPI skeletons */}
       <div className='grid min-w-0 grid-cols-2 gap-2 sm:gap-3 lg:grid-cols-3'>
         {Array.from({ length: 6 }).map((_, i) => (
-          <div key={i} className='rounded-[8px] border border-border bg-background px-3 py-3 sm:px-4 sm:py-4'>
+          <div
+            key={i}
+            className='rounded-[8px] border border-border bg-background px-3 py-3 sm:px-4 sm:py-4'
+          >
             <Skeleton className='h-3 w-16' />
             <Skeleton className='mt-2.5 h-6 w-14' />
           </div>

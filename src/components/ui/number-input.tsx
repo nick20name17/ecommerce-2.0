@@ -106,7 +106,7 @@ export const NumberInput = ({
         <button
           type='button'
           className={cn(
-            'hover:bg-muted flex items-center justify-center rounded disabled:opacity-40',
+            'flex items-center justify-center rounded hover:bg-muted disabled:opacity-40',
             s
           )}
           disabled={isDisabled || value <= min}
@@ -131,7 +131,7 @@ export const NumberInput = ({
           max={max}
           step={step}
           disabled={isDisabled}
-          onChange={(e) => {
+          onChange={e => {
             // Allow only digits while typing
             const val = e.target.value.replace(/[^0-9]/g, '')
             setDraft(val)
@@ -143,7 +143,7 @@ export const NumberInput = ({
         <button
           type='button'
           className={cn(
-            'hover:bg-muted flex items-center justify-center rounded disabled:opacity-40',
+            'flex items-center justify-center rounded hover:bg-muted disabled:opacity-40',
             s
           )}
           disabled={isDisabled || (max !== undefined && value >= max)}
@@ -154,7 +154,7 @@ export const NumberInput = ({
         </button>
       </div>
       {showMaxMessage && max !== undefined && (max <= 0 || value > max) ? (
-        <span className='text-destructive flex items-center gap-1.5 text-xs'>
+        <span className='flex items-center gap-1.5 text-xs text-destructive'>
           <AlertCircle className='size-3.5 shrink-0' />
           Only {max} available
         </span>

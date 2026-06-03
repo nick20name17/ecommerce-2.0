@@ -149,13 +149,13 @@ export const ShipToSchema = z.object({
   city: RequiredStringSchema,
   state: RequiredStringSchema,
   postal: RequiredStringSchema,
-  country: RequiredStringSchema,
+  country: RequiredStringSchema
 })
 
 export const CreatePickListSchema = z.object({
   ship_to: ShipToSchema,
   name: OptionalStringSchema,
-  notes: OptionalStringSchema,
+  notes: OptionalStringSchema
 })
 
 export type CreatePickListFormValues = z.infer<typeof CreatePickListSchema>

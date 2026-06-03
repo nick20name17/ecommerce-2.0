@@ -1,5 +1,15 @@
 import { useNavigate } from '@tanstack/react-router'
-import { Bell, Check, CheckCircle, ClipboardList, Package, FileText, Trash2, Truck, Users } from 'lucide-react'
+import {
+  Bell,
+  Check,
+  CheckCircle,
+  ClipboardList,
+  Package,
+  FileText,
+  Trash2,
+  Truck,
+  Users
+} from 'lucide-react'
 import { useState } from 'react'
 
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
@@ -8,7 +18,7 @@ import {
   clearNotifications,
   markAllRead,
   useNotifications,
-  useUnreadCount,
+  useUnreadCount
 } from '@/hooks/use-notifications'
 import { cn } from '@/lib/utils'
 
@@ -28,14 +38,14 @@ const ENTITY_ICONS: Record<string, typeof Package> = {
   customer: Users,
   task: CheckCircle,
   pick_list: ClipboardList,
-  shipment: Truck,
+  shipment: Truck
 }
 
 const EVENT_COLORS: Record<string, string> = {
   created: 'text-emerald-500',
   deleted: 'text-red-500',
   accepted: 'text-blue-500',
-  updated: 'text-amber-500',
+  updated: 'text-amber-500'
 }
 
 const getNotificationLink = (notification: AppNotification): string | null => {
@@ -45,7 +55,13 @@ const getNotificationLink = (notification: AppNotification): string | null => {
   return null
 }
 
-function NotificationItem({ notification, onNavigate }: { notification: AppNotification; onNavigate?: () => void }) {
+function NotificationItem({
+  notification,
+  onNavigate
+}: {
+  notification: AppNotification
+  onNavigate?: () => void
+}) {
   const navigate = useNavigate()
   const Icon = ENTITY_ICONS[notification.entity] ?? Package
   const eventColor = EVENT_COLORS[notification.eventType] ?? 'text-text-tertiary'
@@ -63,18 +79,22 @@ function NotificationItem({ notification, onNavigate }: { notification: AppNotif
       className={cn(
         'flex items-start gap-2.5 px-3 py-2 transition-colors duration-[80ms]',
         !notification.read && 'bg-primary/[0.03]',
-        link && 'cursor-pointer hover:bg-black/[0.03] dark:hover:bg-white/[0.03]',
+        link && 'cursor-pointer hover:bg-black/[0.03] dark:hover:bg-white/[0.03]'
       )}
       onClick={handleClick}
       role={link ? 'button' : undefined}
     >
-      <div className={cn('mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-[5px]', eventColor)}>
+      <div
+        className={cn(
+          'mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-[5px]',
+          eventColor
+        )}
+      >
         <Icon className='size-3.5' />
       </div>
       <div className='min-w-0 flex-1'>
         <p className='text-[13px] leading-tight'>
-          <span className='font-semibold'>{notification.entityLabel}</span>
-          {' '}
+          <span className='font-semibold'>{notification.entityLabel}</span>{' '}
           <span className='text-text-secondary'>{notification.eventType}</span>
         </p>
         <p className='mt-0.5 truncate font-mono text-[11px] text-text-tertiary'>
@@ -82,10 +102,8 @@ function NotificationItem({ notification, onNavigate }: { notification: AppNotif
         </p>
       </div>
       <div className='flex shrink-0 items-center gap-1.5'>
-        {!notification.read && (
-          <div className='size-1.5 rounded-full bg-primary' />
-        )}
-        <span className='text-[11px] tabular-nums text-text-quaternary'>
+        {!notification.read && <div className='size-1.5 rounded-full bg-primary' />}
+        <span className='text-text-quaternary text-[11px] tabular-nums'>
           {formatTimeAgo(notification.timestamp)}
         </span>
       </div>
@@ -152,12 +170,12 @@ export const NotificationBell = () => {
         <div className='max-h-[360px] overflow-y-auto'>
           {notifications.length === 0 ? (
             <div className='flex flex-col items-center justify-center py-8'>
-              <Bell className='mb-2 size-5 text-text-quaternary' />
+              <Bell className='text-text-quaternary mb-2 size-5' />
               <p className='text-[13px] text-text-tertiary'>No notifications yet</p>
             </div>
           ) : (
             <div className='divide-y divide-border-light'>
-              {notifications.map((n) => (
+              {notifications.map(n => (
                 <NotificationItem key={n.id} notification={n} onNavigate={() => setOpen(false)} />
               ))}
             </div>

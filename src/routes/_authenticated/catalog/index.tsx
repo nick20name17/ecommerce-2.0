@@ -41,18 +41,18 @@ const CatalogPage = () => {
   const isMobile = bp === 'mobile'
   const isTablet = bp === 'tablet'
 
-  const { data, isLoading } = useQuery(
-    getCatalogTreeQuery({ project_id: projectId ?? undefined })
-  )
+  const { data, isLoading } = useQuery(getCatalogTreeQuery({ project_id: projectId ?? undefined }))
 
   const tree = data?.results ?? []
 
   // Selection state — synced to URL so it persists on reload and is shareable
   const [selectedCategoryId, setSelectedCategoryId] = useQueryState('category', parseAsString)
 
-  const selectedCategory = selectedCategoryId && tree.length > 0 ? findCategoryById(tree, selectedCategoryId) : null
+  const selectedCategory =
+    selectedCategoryId && tree.length > 0 ? findCategoryById(tree, selectedCategoryId) : null
 
-  const setSelectedCategory = (cat: CatalogCategory | null) => setSelectedCategoryId(cat?.id ?? null)
+  const setSelectedCategory = (cat: CatalogCategory | null) =>
+    setSelectedCategoryId(cat?.id ?? null)
 
   const showDetail = isMobile && selectedCategory !== null
 
@@ -67,9 +67,13 @@ const CatalogPage = () => {
   const queryClient = useQueryClient()
   const moveMutation = useMutation({
     mutationFn: ({ categoryId, newParentId }: { categoryId: string; newParentId: string | null }) =>
-      catalogService.update(categoryId, { parent_id: newParentId }, { project_id: projectId ?? undefined }),
+      catalogService.update(
+        categoryId,
+        { parent_id: newParentId },
+        { project_id: projectId ?? undefined }
+      ),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: CATALOG_QUERY_KEYS.all() }),
-    meta: { successMessage: 'Category moved' },
+    meta: { successMessage: 'Category moved' }
   })
 
   const handleMove = (categoryId: string, newParentId: string | null) => {
@@ -79,17 +83,24 @@ const CatalogPage = () => {
 
   const productDropMutation = useMutation({
     mutationFn: ({ productAutoid, categoryId }: { productAutoid: string; categoryId: string }) =>
-      catalogService.addProduct(categoryId, { product_autoid: productAutoid }, { project_id: projectId ?? undefined }),
+      catalogService.addProduct(
+        categoryId,
+        { product_autoid: productAutoid },
+        { project_id: projectId ?? undefined }
+      ),
     meta: { successMessage: 'Product added to category' },
     onMutate: ({ productAutoid }) => {
       // Optimistically remove from all unassigned query caches immediately
       queryClient.setQueriesData<{ results: { autoid: string }[]; count: number }>(
         { queryKey: ['unassigned-products'] },
-        (old) => old ? {
-          ...old,
-          results: old.results.filter((p) => p.autoid !== productAutoid),
-          count: old.count - 1,
-        } : old
+        old =>
+          old
+            ? {
+                ...old,
+                results: old.results.filter(p => p.autoid !== productAutoid),
+                count: old.count - 1
+              }
+            : old
       )
     },
     onSuccess: (_data, { categoryId: catId }) => {
@@ -100,7 +111,7 @@ const CatalogPage = () => {
     onError: () => {
       // Revert — refetch unassigned list
       queryClient.invalidateQueries({ queryKey: ['unassigned-products'] })
-    },
+    }
   })
 
   const handleProductDrop = (productAutoid: string, categoryId: string) => {
@@ -123,9 +134,7 @@ const CatalogPage = () => {
   return (
     <div className='flex h-full flex-col overflow-hidden'>
       {/* Header */}
-      <header
-        className='border-border flex h-12 shrink-0 items-center gap-2 border-b px-3.5 sm:px-6'
-      >
+      <header className='flex h-12 shrink-0 items-center gap-2 border-b border-border px-3.5 sm:px-6'>
         <SidebarTrigger className='-ml-1' />
 
         {isMobile && showDetail ? (
@@ -148,11 +157,7 @@ const CatalogPage = () => {
 
         {!(isMobile && showDetail) && (
           <div className='flex items-center gap-1.5'>
-            <Button
-              size='sm'
-              variant='ghost'
-              onClick={() => navigate({ to: '/catalog/specs' })}
-            >
+            <Button size='sm' variant='ghost' onClick={() => navigate({ to: '/catalog/specs' })}>
               <Layers className='size-3.5' />
               <span className={cn(isMobile && 'hidden')}>Specs</span>
             </Button>
@@ -203,13 +208,22 @@ const CatalogPage = () => {
             )}
           >
             {isLoading ? (
-              <div className='flex flex-col gap-0.5 py-2 px-1.5'>
+              <div className='flex flex-col gap-0.5 px-1.5 py-2'>
                 {/* Mimic tree structure with indented skeleton rows */}
                 {[0, 1, 2, 2, 2, 1, 2, 1, 1, 0, 1, 1].map((indent, i) => (
-                  <div key={i} className='flex h-8 items-center gap-1.5 rounded-md px-1.5' style={{ paddingLeft: `${indent * 16 + 6}px` }}>
+                  <div
+                    key={i}
+                    className='flex h-8 items-center gap-1.5 rounded-md px-1.5'
+                    style={{ paddingLeft: `${indent * 16 + 6}px` }}
+                  >
                     {indent > 0 && <Skeleton className='size-3.5 shrink-0 rounded' />}
                     <Skeleton className='size-[18px] shrink-0 rounded' />
-                    <Skeleton className={cn('h-3.5 rounded', i % 3 === 0 ? 'w-24' : i % 3 === 1 ? 'w-32' : 'w-20')} />
+                    <Skeleton
+                      className={cn(
+                        'h-3.5 rounded',
+                        i % 3 === 0 ? 'w-24' : i % 3 === 1 ? 'w-32' : 'w-20'
+                      )}
+                    />
                   </div>
                 ))}
               </div>
@@ -228,15 +242,18 @@ const CatalogPage = () => {
               />
             ) : (
               <div
-                className='py-1 px-1.5 min-h-full'
-                onDragOver={(e) => { e.preventDefault(); e.dataTransfer.dropEffect = 'move' }}
-                onDrop={(e) => {
+                className='min-h-full px-1.5 py-1'
+                onDragOver={e => {
+                  e.preventDefault()
+                  e.dataTransfer.dropEffect = 'move'
+                }}
+                onDrop={e => {
                   e.preventDefault()
                   const draggedId = e.dataTransfer.getData('text/plain')
                   if (draggedId) handleMove(draggedId, null)
                 }}
               >
-                {tree.map((cat) => (
+                {tree.map(cat => (
                   <CategoryTreeNode
                     key={cat.id}
                     category={cat}
@@ -246,7 +263,7 @@ const CatalogPage = () => {
                     onSelect={setSelectedCategory}
                     onEdit={openEditDialog}
                     onDelete={setDeleteCategory}
-                    onAddChild={(parentId) => openCreateDialog(parentId)}
+                    onAddChild={parentId => openCreateDialog(parentId)}
                     onMove={handleMove}
                     onProductDrop={handleProductDrop}
                   />
@@ -270,7 +287,7 @@ const CatalogPage = () => {
               />
             ) : (
               !isMobile && (
-                <div className='flex h-full items-center justify-center text-text-tertiary text-[13px]'>
+                <div className='flex h-full items-center justify-center text-[13px] text-text-tertiary'>
                   Select a category to view its items
                 </div>
               )
@@ -282,7 +299,7 @@ const CatalogPage = () => {
       {/* Dialogs */}
       <CategoryFormDialog
         open={formDialogOpen}
-        onOpenChange={(v) => {
+        onOpenChange={v => {
           setFormDialogOpen(v)
           if (!v) {
             setEditingCategory(null)
@@ -296,7 +313,7 @@ const CatalogPage = () => {
       <CategoryDeleteDialog
         category={deleteCategory}
         open={!!deleteCategory}
-        onOpenChange={(open) => !open && setDeleteCategory(null)}
+        onOpenChange={open => !open && setDeleteCategory(null)}
         projectId={projectId}
         onDeleted={() => {
           if (selectedCategory?.id === deleteCategory?.id) {
@@ -319,6 +336,6 @@ const CatalogPage = () => {
 export const Route = createFileRoute('/_authenticated/catalog/')({
   component: CatalogPage,
   head: () => ({
-    meta: [{ title: 'Catalog' }],
-  }),
+    meta: [{ title: 'Catalog' }]
+  })
 })

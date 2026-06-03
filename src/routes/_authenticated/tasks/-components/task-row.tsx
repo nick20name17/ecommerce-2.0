@@ -1,8 +1,5 @@
 import { useNavigate } from '@tanstack/react-router'
-import {
-  Calendar,
-  Trash2,
-} from 'lucide-react'
+import { Calendar, Trash2 } from 'lucide-react'
 import { format } from 'date-fns'
 import { useState } from 'react'
 
@@ -12,7 +9,12 @@ import { UserCombobox } from '@/components/common/user-combobox/user-combobox'
 import { USER_ROLES } from '@/constants/user'
 import { InitialsAvatar, StatusIcon } from '@/components/ds'
 import { Calendar as CalendarComponent } from '@/components/ui/calendar'
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger
+} from '@/components/ui/dropdown-menu'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { TASK_PRIORITY_COLORS, TASK_PRIORITY_LABELS } from '@/constants/task'
@@ -37,7 +39,7 @@ export function StatusChangeButton({
   task,
   statuses,
   size,
-  onStatusChange,
+  onStatusChange
 }: {
   task: TaskListItem
   statuses: TaskStatus[]
@@ -52,19 +54,19 @@ export function StatusChangeButton({
         <button
           type='button'
           className='shrink-0 rounded-[4px] transition-opacity duration-[80ms] hover:opacity-70'
-          onClick={(e) => e.stopPropagation()}
+          onClick={e => e.stopPropagation()}
           aria-label='Change status'
         >
           <StatusIcon status={task.status_name} color={task.status_color} size={size} />
         </button>
       </PopoverTrigger>
       <PopoverContent
-        className='w-[180px] overflow-hidden rounded-[8px] border-border gap-0 p-1'
+        className='w-[180px] gap-0 overflow-hidden rounded-[8px] border-border p-1'
         align='start'
         style={{ boxShadow: 'var(--dropdown-shadow)' }}
-        onOpenAutoFocus={(e) => e.preventDefault()}
+        onOpenAutoFocus={e => e.preventDefault()}
       >
-        {statuses.map((s) => {
+        {statuses.map(s => {
           const selected = s.id === task.status
           return (
             <button
@@ -75,7 +77,7 @@ export function StatusChangeButton({
                 'transition-colors duration-[80ms]',
                 selected ? 'bg-accent-bg' : 'hover:bg-bg-hover'
               )}
-              onClick={(e) => {
+              onClick={e => {
                 e.stopPropagation()
                 setOpen(false)
                 onStatusChange(task, s.id)
@@ -99,7 +101,7 @@ export function TaskRow({
   bp,
   onStatusChange,
   onDelete,
-  onUpdate,
+  onUpdate
 }: {
   task: TaskListItem
   statuses: TaskStatus[]
@@ -125,15 +127,31 @@ export function TaskRow({
 
   if (isMobile) {
     return (
-      <div className='cursor-pointer border-b border-border-light px-3.5 py-3 transition-colors duration-100 hover:bg-bg-hover' role='button' tabIndex={0} onClick={goToDetail} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); goToDetail() } }}>
+      <div
+        className='cursor-pointer border-b border-border-light px-3.5 py-3 transition-colors duration-100 hover:bg-bg-hover'
+        role='button'
+        tabIndex={0}
+        onClick={goToDetail}
+        onKeyDown={e => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault()
+            goToDetail()
+          }
+        }}
+      >
         <div className='mb-2 flex items-start gap-2.5'>
-          <StatusChangeButton task={task} statuses={statuses} size={14} onStatusChange={onStatusChange} />
-          <span className='min-w-0 flex-1 text-sm font-medium leading-snug text-foreground'>
+          <StatusChangeButton
+            task={task}
+            statuses={statuses}
+            size={14}
+            onStatusChange={onStatusChange}
+          />
+          <span className='min-w-0 flex-1 text-sm leading-snug font-medium text-foreground'>
             {task.title}
           </span>
         </div>
         <div className='flex flex-wrap items-center gap-2 pl-[24px]'>
-          <span className='text-[13px] tabular-nums text-text-tertiary'>
+          <span className='text-[13px] text-text-tertiary tabular-nums'>
             TSK-{task.id.toString().padStart(3, '0')}
           </span>
           <span className='inline-flex items-center gap-1'>
@@ -147,7 +165,12 @@ export function TaskRow({
             </span>
           )}
           {dueDateLabel && (
-            <span className={cn('text-[13px]', overdue ? 'font-medium text-destructive' : 'text-text-tertiary')}>
+            <span
+              className={cn(
+                'text-[13px]',
+                overdue ? 'font-medium text-destructive' : 'text-text-tertiary'
+              )}
+            >
               {dueDateLabel}
             </span>
           )}
@@ -165,12 +188,22 @@ export function TaskRow({
       role='button'
       tabIndex={0}
       onClick={goToDetail}
-      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); goToDetail() } }}
+      onKeyDown={e => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault()
+          goToDetail()
+        }
+      }}
     >
       {/* Task: status icon (clickable) + ID + title */}
       <div className='flex min-w-0 flex-1 items-center gap-2'>
-        <StatusChangeButton task={task} statuses={statuses} size={14} onStatusChange={onStatusChange} />
-        <span className='shrink-0 text-[13px] tabular-nums text-text-tertiary'>
+        <StatusChangeButton
+          task={task}
+          statuses={statuses}
+          size={14}
+          onStatusChange={onStatusChange}
+        />
+        <span className='shrink-0 text-[13px] text-text-tertiary tabular-nums'>
           TSK-{task.id.toString().padStart(3, '0')}
         </span>
         <Tooltip>
@@ -188,14 +221,22 @@ export function TaskRow({
           <PopoverTrigger asChild>
             <button
               type='button'
-              className={cn('flex items-center gap-1.5 rounded-[5px] px-1 py-0.5 transition-colors duration-75 hover:bg-bg-active', isTablet ? 'w-auto' : 'w-[90px]')}
-              onClick={(e) => e.stopPropagation()}
+              className={cn(
+                'flex items-center gap-1.5 rounded-[5px] px-1 py-0.5 transition-colors duration-75 hover:bg-bg-active',
+                isTablet ? 'w-auto' : 'w-[90px]'
+              )}
+              onClick={e => e.stopPropagation()}
             >
               <PriorityIcon priority={task.priority} color={priorityColor} size={14} />
               {!isTablet && <span className='text-sm font-medium'>{priorityLabel}</span>}
             </button>
           </PopoverTrigger>
-          <PopoverContent className='w-[160px] overflow-hidden rounded-[8px] border-border gap-0 p-1' align='start' style={{ boxShadow: 'var(--dropdown-shadow)' }} onOpenAutoFocus={(e) => e.preventDefault()}>
+          <PopoverContent
+            className='w-[160px] gap-0 overflow-hidden rounded-[8px] border-border p-1'
+            align='start'
+            style={{ boxShadow: 'var(--dropdown-shadow)' }}
+            onOpenAutoFocus={e => e.preventDefault()}
+          >
             {Object.entries(TASK_PRIORITY_LABELS).map(([key, label]) => (
               <button
                 key={key}
@@ -205,12 +246,16 @@ export function TaskRow({
                   'transition-colors duration-[80ms]',
                   task.priority === key ? 'bg-accent-bg' : 'hover:bg-bg-hover'
                 )}
-                onClick={(e) => {
+                onClick={e => {
                   e.stopPropagation()
                   onUpdate(task, { priority: key })
                 }}
               >
-                <PriorityIcon priority={key} color={TASK_PRIORITY_COLORS[key as TaskPriority]} size={14} />
+                <PriorityIcon
+                  priority={key}
+                  color={TASK_PRIORITY_COLORS[key as TaskPriority]}
+                  size={14}
+                />
                 <span className='flex-1'>{label}</span>
               </button>
             ))}
@@ -218,22 +263,30 @@ export function TaskRow({
         </Popover>
 
         {/* Assignee */}
-        {!isTablet && <div className='w-[160px] min-w-0' onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()}>
-          <UserCombobox
-            value={task.responsible_user ?? null}
-            onChange={(userId) => onUpdate(task, { responsible_user: userId, responsible_user_name: null })}
-            valueLabel={assigneeName ?? undefined}
-            placeholder='Assignee'
-            excludeRoles={[USER_ROLES.superadmin]}
-            triggerClassName={cn(
-              'flex w-full items-center gap-1.5 rounded-[5px] px-1 py-0.5 text-[13px] transition-colors duration-75 hover:bg-bg-active cursor-pointer',
-              assigneeName ? 'text-text-secondary' : 'text-text-tertiary'
-            )}
-          />
-        </div>}
+        {!isTablet && (
+          <div
+            className='w-[160px] min-w-0'
+            onClick={e => e.stopPropagation()}
+            onKeyDown={e => e.stopPropagation()}
+          >
+            <UserCombobox
+              value={task.responsible_user ?? null}
+              onChange={userId =>
+                onUpdate(task, { responsible_user: userId, responsible_user_name: null })
+              }
+              valueLabel={assigneeName ?? undefined}
+              placeholder='Assignee'
+              excludeRoles={[USER_ROLES.superadmin]}
+              triggerClassName={cn(
+                'flex w-full cursor-pointer items-center gap-1.5 rounded-[5px] px-1 py-0.5 text-[13px] transition-colors duration-75 hover:bg-bg-active',
+                assigneeName ? 'text-text-secondary' : 'text-text-tertiary'
+              )}
+            />
+          </div>
+        )}
 
         {/* Due date */}
-        <div onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()}>
+        <div onClick={e => e.stopPropagation()} onKeyDown={e => e.stopPropagation()}>
           <Popover>
             <PopoverTrigger asChild>
               <button
@@ -251,7 +304,9 @@ export function TaskRow({
               <CalendarComponent
                 mode='single'
                 selected={task.due_date ? new Date(task.due_date) : undefined}
-                onSelect={(date) => onUpdate(task, { due_date: date ? format(date, 'yyyy-MM-dd') : null })}
+                onSelect={date =>
+                  onUpdate(task, { due_date: date ? format(date, 'yyyy-MM-dd') : null })
+                }
                 className='p-2'
               />
             </PopoverContent>
@@ -262,8 +317,8 @@ export function TaskRow({
       {/* Actions */}
       <div
         className='flex justify-center opacity-0 transition-opacity group-hover/row:opacity-100'
-        onClick={(e) => e.stopPropagation()}
-        onKeyDown={(e) => e.stopPropagation()}
+        onClick={e => e.stopPropagation()}
+        onKeyDown={e => e.stopPropagation()}
         role='group'
       >
         <DropdownMenu>

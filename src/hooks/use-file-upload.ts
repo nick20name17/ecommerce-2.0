@@ -1,11 +1,5 @@
 import type React from 'react'
-import {
-  type ChangeEvent,
-  type DragEvent,
-  type InputHTMLAttributes,
-  useRef,
-  useState
-} from 'react'
+import { type ChangeEvent, type DragEvent, type InputHTMLAttributes, useRef, useState } from 'react'
 
 import { formatBytes } from '@/helpers/formatters'
 
@@ -73,7 +67,7 @@ export const useFileUpload = (
   } = options
 
   const [state, setState] = useState<FileUploadState>({
-    files: initialFiles.map((file) => ({
+    files: initialFiles.map(file => ({
       file,
       id: file.id,
       preview: file.url
@@ -96,11 +90,11 @@ export const useFileUpload = (
     }
 
     if (accept !== '*') {
-      const acceptedTypes = accept.split(',').map((type) => type.trim())
+      const acceptedTypes = accept.split(',').map(type => type.trim())
       const fileType = file instanceof File ? file.type || '' : file.type
       const fileExtension = `.${file instanceof File ? file.name.split('.').pop() : file.name.split('.').pop()}`
 
-      const isAccepted = acceptedTypes.some((type) => {
+      const isAccepted = acceptedTypes.some(type => {
         if (type.startsWith('.')) {
           return fileExtension.toLowerCase() === type.toLowerCase()
         }
@@ -134,7 +128,7 @@ export const useFileUpload = (
   }
 
   const clearFiles = () => {
-    setState((prev) => {
+    setState(prev => {
       // Clean up object URLs
       for (const file of prev.files) {
         if (file.preview && file.file instanceof File && file.file.type.startsWith('image/')) {
@@ -162,7 +156,7 @@ export const useFileUpload = (
 
     const newFilesArray = Array.from(newFiles)
 
-    setState((prev) => {
+    setState(prev => {
       const errors: string[] = []
 
       // In single file mode, start fresh
@@ -185,7 +179,7 @@ export const useFileUpload = (
         // Only check for duplicates if multiple files are allowed
         if (multiple) {
           const isDuplicate = currentFiles.some(
-            (existingFile) =>
+            existingFile =>
               existingFile.file.name === file.name && existingFile.file.size === file.size
           )
 
@@ -236,8 +230,8 @@ export const useFileUpload = (
   }
 
   const removeFile = (id: string) => {
-    setState((prev) => {
-      const fileToRemove = prev.files.find((file) => file.id === id)
+    setState(prev => {
+      const fileToRemove = prev.files.find(file => file.id === id)
       if (
         fileToRemove &&
         fileToRemove.preview &&
@@ -247,7 +241,7 @@ export const useFileUpload = (
         URL.revokeObjectURL(fileToRemove.preview)
       }
 
-      const newFiles = prev.files.filter((file) => file.id !== id)
+      const newFiles = prev.files.filter(file => file.id !== id)
       onFilesChange?.(newFiles)
 
       return {
@@ -259,7 +253,7 @@ export const useFileUpload = (
   }
 
   const clearErrors = () => {
-    setState((prev) => ({
+    setState(prev => ({
       ...prev,
       errors: []
     }))
@@ -268,7 +262,7 @@ export const useFileUpload = (
   const handleDragEnter = (e: DragEvent<HTMLElement>) => {
     e.preventDefault()
     e.stopPropagation()
-    setState((prev) => ({ ...prev, isDragging: true }))
+    setState(prev => ({ ...prev, isDragging: true }))
   }
 
   const handleDragLeave = (e: DragEvent<HTMLElement>) => {
@@ -279,7 +273,7 @@ export const useFileUpload = (
       return
     }
 
-    setState((prev) => ({ ...prev, isDragging: false }))
+    setState(prev => ({ ...prev, isDragging: false }))
   }
 
   const handleDragOver = (e: DragEvent<HTMLElement>) => {
@@ -290,7 +284,7 @@ export const useFileUpload = (
   const handleDrop = (e: DragEvent<HTMLElement>) => {
     e.preventDefault()
     e.stopPropagation()
-    setState((prev) => ({ ...prev, isDragging: false }))
+    setState(prev => ({ ...prev, isDragging: false }))
 
     // Don't process files if the input is disabled
     if (inputRef.current?.disabled) {

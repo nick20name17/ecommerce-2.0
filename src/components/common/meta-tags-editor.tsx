@@ -11,7 +11,7 @@ import {
   DialogContent,
   DialogFooter,
   DialogHeader,
-  DialogTitle,
+  DialogTitle
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -22,19 +22,13 @@ interface MetaTagsEditorProps {
   projectId: number | null
 }
 
-export const MetaTagsEditor = ({
-  entityType,
-  entityId,
-  projectId,
-}: MetaTagsEditorProps) => {
+export const MetaTagsEditor = ({ entityType, entityId, projectId }: MetaTagsEditorProps) => {
   const queryClient = useQueryClient()
   const [editOpen, setEditOpen] = useState(false)
   const [metaTitle, setMetaTitle] = useState('')
   const [metaDescription, setMetaDescription] = useState('')
 
-  const { data } = useQuery(
-    getMetaQuery(entityType, entityId, projectId ?? undefined)
-  )
+  const { data } = useQuery(getMetaQuery(entityType, entityId, projectId ?? undefined))
 
   useEffect(() => {
     if (data) {
@@ -50,21 +44,17 @@ export const MetaTagsEditor = ({
           entity_type: entityType,
           entity_id: entityId,
           meta_title: metaTitle,
-          meta_description: metaDescription,
+          meta_description: metaDescription
         },
         { project_id: projectId ?? undefined }
       ),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: META_QUERY_KEYS.entity(
-          entityType,
-          entityId,
-          projectId ?? undefined
-        ),
+        queryKey: META_QUERY_KEYS.entity(entityType, entityId, projectId ?? undefined)
       })
       setEditOpen(false)
     },
-    meta: { successMessage: 'Meta tags saved' },
+    meta: { successMessage: 'Meta tags saved' }
   })
 
   const hasMeta = !!(data?.meta_title || data?.meta_description)
@@ -72,10 +62,10 @@ export const MetaTagsEditor = ({
   return (
     <>
       <div className='flex items-start gap-2'>
-        <div className='flex-1 min-w-0'>
+        <div className='min-w-0 flex-1'>
           <button
             type='button'
-            className='flex items-center gap-1.5 text-[12px] text-text-tertiary hover:text-text-secondary transition-colors'
+            className='flex items-center gap-1.5 text-[12px] text-text-tertiary transition-colors hover:text-text-secondary'
             onClick={() => setEditOpen(true)}
           >
             <Globe className='size-3 shrink-0' />
@@ -87,7 +77,7 @@ export const MetaTagsEditor = ({
             <Pencil className='size-2.5 shrink-0 opacity-0 group-hover:opacity-100' />
           </button>
           {hasMeta && data!.meta_description && (
-            <p className='text-[11px] text-text-quaternary truncate pl-[18px]'>
+            <p className='text-text-quaternary truncate pl-[18px] text-[11px]'>
               {data!.meta_description}
             </p>
           )}
@@ -97,7 +87,7 @@ export const MetaTagsEditor = ({
       <Dialog open={editOpen} onOpenChange={setEditOpen}>
         <DialogContent className='sm:max-w-md'>
           <form
-            onSubmit={(e) => {
+            onSubmit={e => {
               e.preventDefault()
               saveMutation.mutate()
             }}
@@ -111,12 +101,12 @@ export const MetaTagsEditor = ({
                 <Input
                   id='meta-title'
                   value={metaTitle}
-                  onChange={(e) => setMetaTitle(e.target.value)}
+                  onChange={e => setMetaTitle(e.target.value)}
                   placeholder='Page title for search engines...'
                   maxLength={200}
                   autoFocus
                 />
-                <span className='text-[11px] text-text-quaternary text-right'>
+                <span className='text-text-quaternary text-right text-[11px]'>
                   {metaTitle.length}/200
                 </span>
               </div>
@@ -125,34 +115,30 @@ export const MetaTagsEditor = ({
                 <textarea
                   id='meta-desc'
                   value={metaDescription}
-                  onChange={(e) => setMetaDescription(e.target.value)}
+                  onChange={e => setMetaDescription(e.target.value)}
                   placeholder='Brief description for search results...'
                   maxLength={1000}
                   rows={3}
-                  className='flex w-full rounded-md border border-input bg-bg-primary px-3 py-2 text-sm placeholder:text-text-quaternary focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:opacity-50 resize-none'
+                  className='bg-bg-primary placeholder:text-text-quaternary flex w-full resize-none rounded-md border border-input px-3 py-2 text-sm focus-visible:ring-1 focus-visible:ring-ring focus-visible:outline-none disabled:opacity-50'
                 />
-                <span className='text-[11px] text-text-quaternary text-right'>
+                <span className='text-text-quaternary text-right text-[11px]'>
                   {metaDescription.length}/1000
                 </span>
               </div>
 
               {/* Preview */}
-              <div className='rounded-md border border-border p-3 bg-bg-secondary'>
-                <p className='text-[11px] text-text-quaternary mb-1'>Search preview</p>
-                <p className='text-[14px] text-blue-600 dark:text-blue-400 truncate'>
+              <div className='rounded-md border border-border bg-bg-secondary p-3'>
+                <p className='text-text-quaternary mb-1 text-[11px]'>Search preview</p>
+                <p className='truncate text-[14px] text-blue-600 dark:text-blue-400'>
                   {metaTitle || 'Page title'}
                 </p>
-                <p className='text-[12px] text-text-tertiary line-clamp-2'>
+                <p className='line-clamp-2 text-[12px] text-text-tertiary'>
                   {metaDescription || 'Page description will appear here...'}
                 </p>
               </div>
             </DialogBody>
             <DialogFooter>
-              <Button
-                type='button'
-                variant='outline'
-                onClick={() => setEditOpen(false)}
-              >
+              <Button type='button' variant='outline' onClick={() => setEditOpen(false)}>
                 Cancel
               </Button>
               <Button type='submit' isPending={saveMutation.isPending}>

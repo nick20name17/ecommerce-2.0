@@ -13,9 +13,11 @@ export const getFieldConfigQuery = (projectId: number | null) =>
   queryOptions({
     queryKey: FIELD_CONFIG_QUERY_KEYS.fieldConfig(projectId!),
     queryFn: () => fieldConfigService.getFieldConfig(projectId!),
-    enabled: !!projectId && (() => {
-      const session = getSession()
-      return !!session?.user?.role && isAdmin(session.user.role)
-    })(),
+    enabled:
+      !!projectId &&
+      (() => {
+        const session = getSession()
+        return !!session?.user?.role && isAdmin(session.user.role)
+      })(),
     staleTime: Infinity
   })

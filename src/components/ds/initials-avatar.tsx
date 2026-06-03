@@ -34,7 +34,7 @@ export function InitialsAvatar({ initials, size = 24, className }: InitialsAvata
         fontWeight: 600,
         letterSpacing: '-0.02em',
         flexShrink: 0,
-        lineHeight: 1,
+        lineHeight: 1
       }}
     >
       {initials.slice(0, 2).toUpperCase()}

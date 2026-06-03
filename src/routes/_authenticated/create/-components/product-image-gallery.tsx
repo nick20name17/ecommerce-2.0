@@ -45,7 +45,7 @@ export const ProductImageGallery = ({
                 >
                   <ChevronRight className='size-3' />
                 </button>
-                <span className='absolute right-1.5 bottom-1.5 rounded-[4px] bg-foreground/70 px-1.5 py-0.5 text-[10px] font-medium tabular-nums text-background'>
+                <span className='absolute right-1.5 bottom-1.5 rounded-[4px] bg-foreground/70 px-1.5 py-0.5 text-[10px] font-medium text-background tabular-nums'>
                   {photoIndex + 1}/{photos.length}
                 </span>
               </>
@@ -68,9 +68,7 @@ export const ProductImageGallery = ({
               type='button'
               className={cn(
                 'relative size-12 shrink-0 overflow-hidden rounded-[5px] border transition-colors',
-                i === photoIndex
-                  ? 'border-primary'
-                  : 'border-border hover:border-text-tertiary/40'
+                i === photoIndex ? 'border-primary' : 'border-border hover:border-text-tertiary/40'
               )}
               onClick={() => onPhotoIndexChange(i)}
             >

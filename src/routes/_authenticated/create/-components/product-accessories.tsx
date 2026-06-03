@@ -25,23 +25,23 @@ export const ProductAccessories = ({
 }: ProductAccessoriesProps) => {
   if (loading) {
     return (
-      <div className='border-border flex items-center justify-center border-t px-4 py-6'>
-        <Spinner className='text-text-tertiary size-4' />
+      <div className='flex items-center justify-center border-t border-border px-4 py-6'>
+        <Spinner className='size-4 text-text-tertiary' />
       </div>
     )
   }
   if (!accessories.length) return null
 
   return (
-    <div className='border-border border-t'>
+    <div className='border-t border-border'>
       <div className='flex items-center gap-2 px-4 py-2.5'>
         <span className='text-[13px] font-semibold'>Accessories</span>
-        <span className='text-text-tertiary text-[11px] font-medium'>(not required)</span>
-        <span className='text-text-tertiary text-[12px] tabular-nums'>{accessories.length}</span>
+        <span className='text-[11px] font-medium text-text-tertiary'>(not required)</span>
+        <span className='text-[12px] text-text-tertiary tabular-nums'>{accessories.length}</span>
       </div>
-      <div className='border-border-light border-t p-2.5'>
+      <div className='border-t border-border-light p-2.5'>
         <div className='grid grid-cols-1 gap-1.5 sm:grid-cols-2'>
-          {accessories.map((acc) => (
+          {accessories.map(acc => (
             <AccessoryRow
               key={acc.id}
               accessory={acc}
@@ -94,15 +94,15 @@ const AccessoryRow = ({
       setJustAdded(true)
       setTimeout(() => setJustAdded(false), 1500)
     },
-    onError: (e) => {
+    onError: e => {
       const msg = e instanceof Error ? e.message : 'Failed to add accessory'
       toast.error(msg)
     }
   })
 
   return (
-    <div className='border-border bg-background hover:border-primary/40 flex items-center gap-3 rounded-[8px] border p-2 transition-colors'>
-      <div className='border-border bg-bg-secondary/50 flex size-12 shrink-0 items-center justify-center overflow-hidden rounded-[6px] border'>
+    <div className='flex items-center gap-3 rounded-[8px] border border-border bg-background p-2 transition-colors hover:border-primary/40'>
+      <div className='flex size-12 shrink-0 items-center justify-center overflow-hidden rounded-[6px] border border-border bg-bg-secondary/50'>
         {photo ? (
           <img
             src={photo}
@@ -111,15 +111,15 @@ const AccessoryRow = ({
             loading='lazy'
           />
         ) : (
-          <ImageIcon className='text-text-tertiary/40 size-4' />
+          <ImageIcon className='size-4 text-text-tertiary/40' />
         )}
       </div>
       <div className='flex min-w-0 flex-1 flex-col gap-0.5'>
         <span className='truncate text-[13px] font-medium'>{accessory.descr_1}</span>
-        <span className='text-text-tertiary text-[11px] tabular-nums'>
+        <span className='text-[11px] text-text-tertiary tabular-nums'>
           {price > 0 ? `+${formatCurrency(price)}` : 'Included'}
           {showOldPrice && (
-            <span className='text-text-tertiary/60 ml-1 line-through'>
+            <span className='ml-1 text-text-tertiary/60 line-through'>
               {formatCurrency(oldPrice)}
             </span>
           )}
@@ -142,7 +142,7 @@ const AccessoryRow = ({
               ? 'This accessory has its own configurator — add from product page'
               : undefined
           }
-          className='bg-primary text-primary-foreground inline-flex h-8 items-center gap-1 rounded-[6px] px-2.5 text-[12px] font-semibold transition-opacity duration-75 hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40'
+          className='inline-flex h-8 items-center gap-1 rounded-[6px] bg-primary px-2.5 text-[12px] font-semibold text-primary-foreground transition-opacity duration-75 hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40'
         >
           {addMutation.isPending ? (
             <Spinner className='size-3' />

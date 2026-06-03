@@ -14,7 +14,7 @@ import {
   DialogContent,
   DialogFooter,
   DialogHeader,
-  DialogTitle,
+  DialogTitle
 } from '@/components/ui/dialog'
 import { Field, FieldError, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
@@ -31,11 +31,11 @@ export function CreatePickListModal({ open, onOpenChange }: Props) {
 
   const { data: shippingAddresses } = useQuery({
     ...getShippingAddressesQuery(projectId),
-    enabled: open,
+    enabled: open
   })
   const defaultShippingAddressId = (() => {
     const list = Array.isArray(shippingAddresses) ? shippingAddresses : []
-    const def = list.find((a) => a.is_default) ?? list[0]
+    const def = list.find(a => a.is_default) ?? list[0]
     return def?.id ?? null
   })()
 
@@ -52,9 +52,9 @@ export function CreatePickListModal({ open, onOpenChange }: Props) {
         city: '',
         state: '',
         postal: '',
-        country: 'US',
-      },
-    },
+        country: 'US'
+      }
+    }
   })
 
   const { control, handleSubmit, reset } = form
@@ -64,16 +64,16 @@ export function CreatePickListModal({ open, onOpenChange }: Props) {
       pickListService.create(payload, projectId),
     meta: {
       successMessage: 'Pick list created',
-      invalidatesQuery: PICK_LIST_QUERY_KEYS.lists(),
+      invalidatesQuery: PICK_LIST_QUERY_KEYS.lists()
     },
-    onSuccess: (pickList) => {
+    onSuccess: pickList => {
       onOpenChange(false)
       reset()
       navigate({ to: '/pick-lists/$pickListId', params: { pickListId: String(pickList.id) } })
-    },
+    }
   })
 
-  const onSubmit = handleSubmit((values) => {
+  const onSubmit = handleSubmit(values => {
     if (!defaultShippingAddressId) {
       return
     }
@@ -81,14 +81,14 @@ export function CreatePickListModal({ open, onOpenChange }: Props) {
       ship_to: values.ship_to,
       shipping_address_id: defaultShippingAddressId,
       name: values.name || undefined,
-      notes: values.notes || undefined,
+      notes: values.notes || undefined
     })
   })
 
   return (
     <Dialog
       open={open}
-      onOpenChange={(next) => {
+      onOpenChange={next => {
         if (!next) reset()
         onOpenChange(next)
       }}
@@ -136,7 +136,12 @@ export function CreatePickListModal({ open, onOpenChange }: Props) {
                     render={({ field, fieldState }) => (
                       <Field data-invalid={fieldState.invalid}>
                         <FieldLabel htmlFor='ship-to-name'>Name *</FieldLabel>
-                        <Input {...field} id='ship-to-name' placeholder='John Smith' aria-invalid={fieldState.invalid} />
+                        <Input
+                          {...field}
+                          id='ship-to-name'
+                          placeholder='John Smith'
+                          aria-invalid={fieldState.invalid}
+                        />
                         {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                       </Field>
                     )}
@@ -159,7 +164,12 @@ export function CreatePickListModal({ open, onOpenChange }: Props) {
                   render={({ field, fieldState }) => (
                     <Field data-invalid={fieldState.invalid}>
                       <FieldLabel htmlFor='ship-to-address1'>Address 1 *</FieldLabel>
-                      <Input {...field} id='ship-to-address1' placeholder='123 Main St' aria-invalid={fieldState.invalid} />
+                      <Input
+                        {...field}
+                        id='ship-to-address1'
+                        placeholder='123 Main St'
+                        aria-invalid={fieldState.invalid}
+                      />
                       {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                     </Field>
                   )}
@@ -183,7 +193,12 @@ export function CreatePickListModal({ open, onOpenChange }: Props) {
                     render={({ field, fieldState }) => (
                       <Field data-invalid={fieldState.invalid}>
                         <FieldLabel htmlFor='ship-to-city'>City *</FieldLabel>
-                        <Input {...field} id='ship-to-city' placeholder='Toronto' aria-invalid={fieldState.invalid} />
+                        <Input
+                          {...field}
+                          id='ship-to-city'
+                          placeholder='Toronto'
+                          aria-invalid={fieldState.invalid}
+                        />
                         {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                       </Field>
                     )}
@@ -194,7 +209,12 @@ export function CreatePickListModal({ open, onOpenChange }: Props) {
                     render={({ field, fieldState }) => (
                       <Field data-invalid={fieldState.invalid}>
                         <FieldLabel htmlFor='ship-to-state'>State *</FieldLabel>
-                        <Input {...field} id='ship-to-state' placeholder='ON' aria-invalid={fieldState.invalid} />
+                        <Input
+                          {...field}
+                          id='ship-to-state'
+                          placeholder='ON'
+                          aria-invalid={fieldState.invalid}
+                        />
                         {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                       </Field>
                     )}
@@ -205,7 +225,12 @@ export function CreatePickListModal({ open, onOpenChange }: Props) {
                     render={({ field, fieldState }) => (
                       <Field data-invalid={fieldState.invalid}>
                         <FieldLabel htmlFor='ship-to-postal'>Postal *</FieldLabel>
-                        <Input {...field} id='ship-to-postal' placeholder='M5V1A1' aria-invalid={fieldState.invalid} />
+                        <Input
+                          {...field}
+                          id='ship-to-postal'
+                          placeholder='M5V1A1'
+                          aria-invalid={fieldState.invalid}
+                        />
                         {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                       </Field>
                     )}
@@ -218,7 +243,12 @@ export function CreatePickListModal({ open, onOpenChange }: Props) {
                   render={({ field, fieldState }) => (
                     <Field data-invalid={fieldState.invalid}>
                       <FieldLabel htmlFor='ship-to-country'>Country *</FieldLabel>
-                      <Input {...field} id='ship-to-country' placeholder='CA' aria-invalid={fieldState.invalid} />
+                      <Input
+                        {...field}
+                        id='ship-to-country'
+                        placeholder='CA'
+                        aria-invalid={fieldState.invalid}
+                      />
                       {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                     </Field>
                   )}

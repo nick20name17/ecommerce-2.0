@@ -126,7 +126,7 @@ export function getInitials(name: string): string {
     .split(/\s+/)
     .filter(Boolean)
     .slice(0, 2)
-    .map((n) => n[0]?.toUpperCase() ?? '')
+    .map(n => n[0]?.toUpperCase() ?? '')
     .join('')
 }
 
@@ -149,7 +149,7 @@ export function getInitialsFromParts(
 export function formatDateShort(dateStr: string): string {
   return new Date(dateStr).toLocaleDateString('en-US', {
     month: 'short',
-    day: 'numeric',
+    day: 'numeric'
   })
 }
 
@@ -158,7 +158,7 @@ export function formatDateMedium(dateStr: string): string {
   return new Date(dateStr).toLocaleDateString('en-US', {
     month: 'short',
     day: 'numeric',
-    year: 'numeric',
+    year: 'numeric'
   })
 }
 
@@ -168,7 +168,7 @@ export function formatDateTimeShort(dateStr: string): string {
     month: 'short',
     day: 'numeric',
     hour: '2-digit',
-    minute: '2-digit',
+    minute: '2-digit'
   })
 }
 
@@ -179,19 +179,22 @@ export function formatDateTimeMedium(dateStr: string): string {
     day: 'numeric',
     year: 'numeric',
     hour: '2-digit',
-    minute: '2-digit',
+    minute: '2-digit'
   })
 }
 
 // ── Display name ────────────────────────────────────────────
 
 export const getUserDisplayName = (
-  user: {
-    first_name?: string | null
-    last_name?: string | null
-    email?: string | null
-    full_name?: string | null
-  } | null | undefined,
+  user:
+    | {
+        first_name?: string | null
+        last_name?: string | null
+        email?: string | null
+        full_name?: string | null
+      }
+    | null
+    | undefined,
   fallback: string = '—'
 ): string => {
   const fullName = user?.full_name?.trim()

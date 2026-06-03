@@ -23,18 +23,13 @@ export function AbandonedCartsSection({ projectId }: { projectId: number }) {
   const isMobile = bp === 'mobile'
 
   const [search, setSearch] = useSearchParam()
-  const handleSearch = useDebouncedCallback(
-    (value: string) => setSearch(value || null),
-    300,
-  )
+  const handleSearch = useDebouncedCallback((value: string) => setSearch(value || null), 300)
   const [offset] = useOffsetParam()
   const [limit] = useLimitParam(ABANDONED_CARTS_DEFAULT_LIMIT)
 
   const [sortField, setSortField] = useState<SortField | null>('updated_at')
   const [sortDir, setSortDir] = useState<SortDir>('desc')
-  const ordering = sortField
-    ? sortDir === 'desc' ? `-${sortField}` : sortField
-    : undefined
+  const ordering = sortField ? (sortDir === 'desc' ? `-${sortField}` : sortField) : undefined
 
   const { data, isLoading, isPlaceholderData, error } = useQuery({
     ...getLegacyCartsQuery({
@@ -42,10 +37,10 @@ export function AbandonedCartsSection({ projectId }: { projectId: number }) {
       project_id: projectId,
       ordering,
       offset,
-      limit,
+      limit
     }),
     placeholderData: keepPreviousData,
-    retry: false,
+    retry: false
   })
 
   const carts = data?.results ?? []
@@ -65,8 +60,7 @@ export function AbandonedCartsSection({ projectId }: { projectId: number }) {
   }
 
   const errMsg =
-    (error as { response?: { data?: { error?: string } } } | null)
-      ?.response?.data?.error ?? ''
+    (error as { response?: { data?: { error?: string } } } | null)?.response?.data?.error ?? ''
   const isNotConfigured = errMsg.toLowerCase().includes('not configured')
 
   return (
@@ -74,21 +68,19 @@ export function AbandonedCartsSection({ projectId }: { projectId: number }) {
       <div
         className={cn(
           'flex h-11 shrink-0 items-center gap-2.5 border-b border-border',
-          isMobile ? 'px-3.5' : 'px-6',
+          isMobile ? 'px-3.5' : 'px-6'
         )}
       >
         <div className='text-[13px] font-medium text-text-tertiary'>
           {totalCount > 0 && `${totalCount} cart${totalCount === 1 ? '' : 's'}`}
-          {isPlaceholderData && (
-            <Spinner className='ml-2 inline size-3 text-text-tertiary' />
-          )}
+          {isPlaceholderData && <Spinner className='ml-2 inline size-3 text-text-tertiary' />}
         </div>
         <div className='flex-1' />
         <div className='hidden h-7 w-full max-w-[260px] items-center gap-1.5 rounded-[5px] border border-border bg-background px-2 transition-[border-color,box-shadow] focus-within:border-ring focus-within:ring-2 focus-within:ring-ring/50 sm:flex'>
           <Search className='size-3 shrink-0 text-text-tertiary' />
           <input
             defaultValue={search}
-            onChange={(e) => handleSearch(e.target.value)}
+            onChange={e => handleSearch(e.target.value)}
             placeholder='Search by email or EBMS ID...'
             className='flex-1 bg-transparent text-[13px] outline-none placeholder:text-text-tertiary'
           />
@@ -99,8 +91,8 @@ export function AbandonedCartsSection({ projectId }: { projectId: number }) {
         {!isMobile && (carts.length > 0 || isLoading || isPlaceholderData) && (
           <div
             className={cn(
-              'sticky top-0 z-10 flex select-none items-center border-b border-border bg-bg-secondary text-[13px] font-medium text-text-tertiary',
-              bp === 'tablet' ? 'gap-4 px-5 py-1' : 'gap-6 px-6 py-1',
+              'sticky top-0 z-10 flex items-center border-b border-border bg-bg-secondary text-[13px] font-medium text-text-tertiary select-none',
+              bp === 'tablet' ? 'gap-4 px-5 py-1' : 'gap-6 px-6 py-1'
             )}
           >
             <div className='w-[70px] shrink-0'>ID</div>
@@ -157,7 +149,7 @@ export function AbandonedCartsSection({ projectId }: { projectId: number }) {
               key={i}
               className={cn(
                 'flex items-center border-b border-border-light',
-                bp === 'tablet' ? 'gap-4 px-5 py-2.5' : 'gap-6 px-6 py-2.5',
+                bp === 'tablet' ? 'gap-4 px-5 py-2.5' : 'gap-6 px-6 py-2.5'
               )}
             >
               <Skeleton className='h-3.5 w-[50px] rounded' />
@@ -183,11 +175,11 @@ export function AbandonedCartsSection({ projectId }: { projectId: number }) {
           <div
             className={cn(
               'transition-opacity duration-150',
-              isPlaceholderData && 'pointer-events-none opacity-50',
+              isPlaceholderData && 'pointer-events-none opacity-50'
             )}
             aria-busy={isPlaceholderData}
           >
-            {carts.map((cart) => (
+            {carts.map(cart => (
               <LegacyCartRow key={cart.user_id} cart={cart} isMobile={isMobile} />
             ))}
           </div>
@@ -195,16 +187,8 @@ export function AbandonedCartsSection({ projectId }: { projectId: number }) {
       </div>
 
       {!error && (
-        <div
-          className={cn(
-            'shrink-0 border-t border-border py-2',
-            isMobile ? 'px-3.5' : 'px-6',
-          )}
-        >
-          <Pagination
-            totalCount={totalCount}
-            defaultLimit={ABANDONED_CARTS_DEFAULT_LIMIT}
-          />
+        <div className={cn('shrink-0 border-t border-border py-2', isMobile ? 'px-3.5' : 'px-6')}>
+          <Pagination totalCount={totalCount} defaultLimit={ABANDONED_CARTS_DEFAULT_LIMIT} />
         </div>
       )}
     </div>
@@ -217,7 +201,7 @@ function SortableHeader({
   sortField,
   sortDir,
   onSort,
-  className,
+  className
 }: {
   field: SortField
   label: string
@@ -233,7 +217,7 @@ function SortableHeader({
       className={cn(
         'group inline-flex items-center gap-1 text-left transition-colors duration-[80ms] hover:text-foreground',
         active && 'text-foreground',
-        className,
+        className
       )}
       onClick={() => onSort(field)}
     >

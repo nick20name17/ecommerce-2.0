@@ -28,7 +28,7 @@ export const ProfileInfoCard = ({ user }: ProfileInfoCardProps) => {
   const mutation = useMutation({
     mutationFn: profileService.updateProfile,
     meta: { successMessage: 'Profile updated successfully' },
-    onSuccess: (updatedUser) => {
+    onSuccess: updatedUser => {
       queryClient.setQueryData(USER_QUERY_KEYS.detail('me'), updatedUser)
       queryClient.invalidateQueries({ queryKey: USER_QUERY_KEYS.lists() })
       updateSessionUser(updatedUser)
@@ -39,12 +39,12 @@ export const ProfileInfoCard = ({ user }: ProfileInfoCardProps) => {
     }
   })
 
-  const handleSubmit = form.handleSubmit((data) => mutation.mutate(data))
+  const handleSubmit = form.handleSubmit(data => mutation.mutate(data))
 
   return (
     <div>
       <div className='bg-bg-secondary/60 px-5 py-2'>
-        <span className='text-[11px] font-semibold uppercase tracking-[0.06em] text-text-tertiary'>
+        <span className='text-[11px] font-semibold tracking-[0.06em] text-text-tertiary uppercase'>
           Profile Information
         </span>
       </div>
@@ -122,7 +122,7 @@ export const ProfileInfoCard = ({ user }: ProfileInfoCardProps) => {
 function ProfileRow({
   label,
   value,
-  children,
+  children
 }: {
   label: string
   value?: string
@@ -144,7 +144,7 @@ function FieldRow({
   label,
   value,
   onChange,
-  error,
+  error
 }: {
   label: string
   value: string
@@ -156,8 +156,8 @@ function FieldRow({
       <label className='mb-1 block text-[12px] font-medium text-text-tertiary'>{label}</label>
       <input
         value={value}
-        onChange={(e) => onChange(e.target.value)}
-        className='w-full rounded-[5px] border border-border bg-background px-2.5 py-1.5 text-[13px] font-medium text-foreground outline-none transition-[border-color,box-shadow] duration-75 placeholder:text-text-quaternary focus:border-primary/50 focus:ring-1 focus:ring-primary/20'
+        onChange={e => onChange(e.target.value)}
+        className='placeholder:text-text-quaternary w-full rounded-[5px] border border-border bg-background px-2.5 py-1.5 text-[13px] font-medium text-foreground transition-[border-color,box-shadow] duration-75 outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20'
         placeholder={`Enter ${label.toLowerCase()}`}
       />
       {error && <p className='mt-1 text-[11px] text-destructive'>{error}</p>}

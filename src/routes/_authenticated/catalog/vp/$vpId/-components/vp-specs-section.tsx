@@ -5,7 +5,7 @@ import { useState } from 'react'
 import type {
   GlobalSpecDefinition,
   SpecDisplayType,
-  VariableProduct,
+  VariableProduct
 } from '@/api/variable-product/schema'
 import { variableProductService } from '@/api/variable-product/service'
 import { VP_QUERY_KEYS, getSpecsQuery } from '@/api/variable-product/query'
@@ -18,7 +18,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogDescription,
+  DialogDescription
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -45,12 +45,12 @@ export const VPSpecsSection = ({ vp, projectId }: VPSpecsSectionProps) => {
       ),
     meta: {
       successMessage: 'Spec created',
-      invalidatesQuery: VP_QUERY_KEYS.detail(vp.id),
+      invalidatesQuery: VP_QUERY_KEYS.detail(vp.id)
     },
     onSuccess: () => {
       resetForm()
       setAddOpen(false)
-    },
+    }
   })
 
   const updateSpecMutation = useMutation({
@@ -62,24 +62,24 @@ export const VPSpecsSection = ({ vp, projectId }: VPSpecsSectionProps) => {
       ),
     meta: {
       successMessage: 'Spec updated',
-      invalidatesQuery: VP_QUERY_KEYS.detail(vp.id),
+      invalidatesQuery: VP_QUERY_KEYS.detail(vp.id)
     },
     onSuccess: () => {
       resetForm()
       setEditSpec(null)
-    },
+    }
   })
 
   const deleteSpecMutation = useMutation({
     mutationFn: () =>
       variableProductService.deleteSpec(deleteSpec!.id, {
-        project_id: projectId ?? undefined,
+        project_id: projectId ?? undefined
       }),
     meta: {
       successMessage: 'Spec deleted',
-      invalidatesQuery: VP_QUERY_KEYS.detail(vp.id),
+      invalidatesQuery: VP_QUERY_KEYS.detail(vp.id)
     },
-    onSuccess: () => setDeleteSpec(null),
+    onSuccess: () => setDeleteSpec(null)
   })
 
   const resetForm = () => {
@@ -102,33 +102,47 @@ export const VPSpecsSection = ({ vp, projectId }: VPSpecsSectionProps) => {
       {vp.spec_definitions.length === 0 ? (
         <div className='flex flex-col items-center gap-3 py-8 text-center'>
           <div className='flex size-10 items-center justify-center rounded-xl bg-bg-secondary'>
-            <Plus className='size-5 text-text-quaternary' />
+            <Plus className='text-text-quaternary size-5' />
           </div>
           <div>
             <p className='text-[13px] font-medium text-text-secondary'>No specs yet</p>
-            <p className='text-[12px] text-text-tertiary'>Add attributes like Color, Size, or Material</p>
+            <p className='text-[12px] text-text-tertiary'>
+              Add attributes like Color, Size, or Material
+            </p>
           </div>
-          <Button variant='outline' size='sm' onClick={() => { resetForm(); setAddOpen(true) }}>
+          <Button
+            variant='outline'
+            size='sm'
+            onClick={() => {
+              resetForm()
+              setAddOpen(true)
+            }}
+          >
             <Plus className='size-3.5' />
             Add first spec
           </Button>
         </div>
       ) : (
         <div className='flex flex-col gap-1'>
-          {vp.spec_definitions.map((spec) => {
+          {vp.spec_definitions.map(spec => {
             const isShared = (spec.vp_count ?? 0) > 1
-            const typeIcon = spec.display_type === 'swatch' ? '🎨' : spec.display_type === 'button' ? '▢' : '▾'
+            const typeIcon =
+              spec.display_type === 'swatch' ? '🎨' : spec.display_type === 'button' ? '▢' : '▾'
             return (
               <div
                 key={spec.id}
                 className='group flex items-center gap-3 rounded-lg px-3 py-2.5 transition-colors hover:bg-bg-hover'
               >
-                <div className={cn(
-                  'flex size-8 shrink-0 items-center justify-center rounded-lg text-sm',
-                  spec.display_type === 'swatch' ? 'bg-pink-50 dark:bg-pink-500/10'
-                    : spec.display_type === 'button' ? 'bg-blue-50 dark:bg-blue-500/10'
-                    : 'bg-amber-50 dark:bg-amber-500/10'
-                )}>
+                <div
+                  className={cn(
+                    'flex size-8 shrink-0 items-center justify-center rounded-lg text-sm',
+                    spec.display_type === 'swatch'
+                      ? 'bg-pink-50 dark:bg-pink-500/10'
+                      : spec.display_type === 'button'
+                        ? 'bg-blue-50 dark:bg-blue-500/10'
+                        : 'bg-amber-50 dark:bg-amber-500/10'
+                  )}
+                >
                   {typeIcon}
                 </div>
                 <div className='min-w-0 flex-1'>
@@ -140,7 +154,9 @@ export const VPSpecsSection = ({ vp, projectId }: VPSpecsSectionProps) => {
                     {isShared && (
                       <>
                         <span>·</span>
-                        <span className='text-text-quaternary'>shared by {spec.vp_count} supers</span>
+                        <span className='text-text-quaternary'>
+                          shared by {spec.vp_count} supers
+                        </span>
                       </>
                     )}
                   </div>
@@ -156,7 +172,7 @@ export const VPSpecsSection = ({ vp, projectId }: VPSpecsSectionProps) => {
                 <Button
                   variant='ghost'
                   size='icon-xs'
-                  className='shrink-0 text-text-tertiary opacity-0 transition-opacity hover:text-destructive group-hover:opacity-100'
+                  className='shrink-0 text-text-tertiary opacity-0 transition-opacity group-hover:opacity-100 hover:text-destructive'
                   onClick={() => setDeleteSpec(spec)}
                 >
                   <Trash2 className='size-3' />
@@ -167,7 +183,10 @@ export const VPSpecsSection = ({ vp, projectId }: VPSpecsSectionProps) => {
           <button
             type='button'
             className='flex items-center gap-2 rounded-lg px-3 py-2 text-[12px] font-medium text-primary transition-colors hover:bg-primary/5'
-            onClick={() => { resetForm(); setAddOpen(true) }}
+            onClick={() => {
+              resetForm()
+              setAddOpen(true)
+            }}
           >
             <Plus className='size-3.5' />
             Add another spec
@@ -178,7 +197,12 @@ export const VPSpecsSection = ({ vp, projectId }: VPSpecsSectionProps) => {
       {/* Add dialog — select existing or create new */}
       <AddSpecDialog
         open={addOpen}
-        onOpenChange={(v) => { if (!v) { setAddOpen(false); resetForm() } }}
+        onOpenChange={v => {
+          if (!v) {
+            setAddOpen(false)
+            resetForm()
+          }
+        }}
         vp={vp}
         projectId={projectId}
         specName={specName}
@@ -194,13 +218,16 @@ export const VPSpecsSection = ({ vp, projectId }: VPSpecsSectionProps) => {
       {/* Edit dialog */}
       <Dialog
         open={!!editSpec}
-        onOpenChange={(v) => {
-          if (!v) { setEditSpec(null); resetForm() }
+        onOpenChange={v => {
+          if (!v) {
+            setEditSpec(null)
+            resetForm()
+          }
         }}
       >
         <DialogContent className='max-h-[85vh] sm:max-w-lg'>
           <form
-            onSubmit={(e) => {
+            onSubmit={e => {
               e.preventDefault()
               updateSpecMutation.mutate()
             }}
@@ -210,7 +237,7 @@ export const VPSpecsSection = ({ vp, projectId }: VPSpecsSectionProps) => {
             </DialogHeader>
             <DialogBody className='flex flex-col gap-3'>
               {(editSpec?.vp_count ?? 0) > 1 && (
-                <div className='rounded-md bg-amber-500/10 border border-amber-500/20 px-3 py-2 text-[12px] text-amber-600 dark:text-amber-400'>
+                <div className='rounded-md border border-amber-500/20 bg-amber-500/10 px-3 py-2 text-[12px] text-amber-600 dark:text-amber-400'>
                   This spec is used by {editSpec?.vp_count} VPs. Changes will affect all of them.
                 </div>
               )}
@@ -219,7 +246,7 @@ export const VPSpecsSection = ({ vp, projectId }: VPSpecsSectionProps) => {
                 <Input
                   id='spec-name-edit'
                   value={specName}
-                  onChange={(e) => setSpecName(e.target.value)}
+                  onChange={e => setSpecName(e.target.value)}
                   required
                   autoFocus
                 />
@@ -227,11 +254,26 @@ export const VPSpecsSection = ({ vp, projectId }: VPSpecsSectionProps) => {
               <div className='flex flex-col gap-2'>
                 <Label className='text-[12px]'>How should customers choose?</Label>
                 <div className='grid grid-cols-3 gap-2'>
-                  {([
-                    { value: 'dropdown' as const, icon: '▾', label: 'Dropdown', desc: 'Select list' },
-                    { value: 'swatch' as const, icon: '🎨', label: 'Swatch', desc: 'Color circles' },
-                    { value: 'button' as const, icon: '▢', label: 'Button', desc: 'Clickable pills' },
-                  ]).map((opt) => (
+                  {[
+                    {
+                      value: 'dropdown' as const,
+                      icon: '▾',
+                      label: 'Dropdown',
+                      desc: 'Select list'
+                    },
+                    {
+                      value: 'swatch' as const,
+                      icon: '🎨',
+                      label: 'Swatch',
+                      desc: 'Color circles'
+                    },
+                    {
+                      value: 'button' as const,
+                      icon: '▢',
+                      label: 'Button',
+                      desc: 'Clickable pills'
+                    }
+                  ].map(opt => (
                     <button
                       key={opt.value}
                       type='button'
@@ -239,7 +281,7 @@ export const VPSpecsSection = ({ vp, projectId }: VPSpecsSectionProps) => {
                         'flex flex-col items-center gap-1 rounded-lg border-2 px-2 py-3 text-center transition-colors',
                         displayType === opt.value
                           ? 'border-primary bg-primary/5'
-                          : 'border-border hover:border-border-dark hover:bg-bg-hover'
+                          : 'hover:border-border-dark border-border hover:bg-bg-hover'
                       )}
                       onClick={() => setDisplayType(opt.value)}
                     >
@@ -256,7 +298,7 @@ export const VPSpecsSection = ({ vp, projectId }: VPSpecsSectionProps) => {
                   id='spec-sort-edit'
                   type='number'
                   value={sortOrder}
-                  onChange={(e) => setSortOrder(Number(e.target.value))}
+                  onChange={e => setSortOrder(Number(e.target.value))}
                 />
               </div>
               {editSpec && (
@@ -269,25 +311,45 @@ export const VPSpecsSection = ({ vp, projectId }: VPSpecsSectionProps) => {
               )}
             </DialogBody>
             <DialogFooter>
-              <Button type='button' variant='outline' onClick={() => { setEditSpec(null); resetForm() }}>Cancel</Button>
-              <Button type='submit' isPending={isPending}>Save Changes</Button>
+              <Button
+                type='button'
+                variant='outline'
+                onClick={() => {
+                  setEditSpec(null)
+                  resetForm()
+                }}
+              >
+                Cancel
+              </Button>
+              <Button type='submit' isPending={isPending}>
+                Save Changes
+              </Button>
             </DialogFooter>
           </form>
         </DialogContent>
       </Dialog>
 
       {/* Delete confirmation */}
-      <Dialog open={!!deleteSpec} onOpenChange={(v) => !v && setDeleteSpec(null)}>
+      <Dialog open={!!deleteSpec} onOpenChange={v => !v && setDeleteSpec(null)}>
         <DialogContent className='sm:max-w-sm'>
           <DialogHeader>
             <DialogTitle>Delete Spec</DialogTitle>
             <DialogDescription>
-              Delete <strong>{deleteSpec?.name}</strong>? This will also delete all its options and item links.
+              Delete <strong>{deleteSpec?.name}</strong>? This will also delete all its options and
+              item links.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button variant='outline' onClick={() => setDeleteSpec(null)}>Cancel</Button>
-            <Button variant='destructive' onClick={() => deleteSpecMutation.mutate()} isPending={deleteSpecMutation.isPending}>Delete</Button>
+            <Button variant='outline' onClick={() => setDeleteSpec(null)}>
+              Cancel
+            </Button>
+            <Button
+              variant='destructive'
+              onClick={() => deleteSpecMutation.mutate()}
+              isPending={deleteSpecMutation.isPending}
+            >
+              Delete
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -309,7 +371,7 @@ function AddSpecDialog({
   sortOrder,
   setSortOrder,
   onCreateNew,
-  isPending,
+  isPending
 }: {
   open: boolean
   onOpenChange: (v: boolean) => void
@@ -330,43 +392,52 @@ function AddSpecDialog({
   // Fetch all global specs
   const { data: allSpecs } = useQuery({
     ...getSpecsQuery({ project_id: projectId ?? undefined }),
-    enabled: open,
+    enabled: open
   })
 
   // Specs already on this VP
-  const existingSpecIds = new Set(vp.spec_definitions.map((s) => s.id))
+  const existingSpecIds = new Set(vp.spec_definitions.map(s => s.id))
 
   // Available specs = all global specs not already on this VP
   const availableSpecs = (allSpecs?.results ?? []).filter(
-    (s) => !existingSpecIds.has(s.id) &&
-      (!search || s.name.toLowerCase().includes(search.toLowerCase()))
+    s =>
+      !existingSpecIds.has(s.id) && (!search || s.name.toLowerCase().includes(search.toLowerCase()))
   )
 
   return (
-    <Dialog open={open} onOpenChange={(v) => { onOpenChange(v); if (!v) { setSearch(''); setTab('existing') } }}>
-      <DialogContent className='sm:max-w-md gap-0 p-0'>
+    <Dialog
+      open={open}
+      onOpenChange={v => {
+        onOpenChange(v)
+        if (!v) {
+          setSearch('')
+          setTab('existing')
+        }
+      }}
+    >
+      <DialogContent className='gap-0 p-0 sm:max-w-md'>
         <div className='px-5 pt-5 pb-3'>
           <DialogTitle>Add Spec</DialogTitle>
         </div>
 
         {/* Tabs */}
         <div className='flex gap-1 border-b border-border px-5'>
-          {([
+          {[
             { key: 'existing' as const, label: 'Use Existing' },
-            { key: 'new' as const, label: 'Create New' },
-          ]).map((t) => (
+            { key: 'new' as const, label: 'Create New' }
+          ].map(t => (
             <button
               key={t.key}
               type='button'
               className={cn(
-                'relative px-3 py-2 text-[13px] font-medium outline-none transition-colors',
+                'relative px-3 py-2 text-[13px] font-medium transition-colors outline-none',
                 tab === t.key ? 'text-foreground' : 'text-text-tertiary hover:text-text-secondary'
               )}
               onClick={() => setTab(t.key)}
             >
               {t.label}
               {tab === t.key && (
-                <span className='absolute bottom-0 left-3 right-3 h-[2px] rounded-full bg-primary' />
+                <span className='absolute right-3 bottom-0 left-3 h-[2px] rounded-full bg-primary' />
               )}
             </button>
           ))}
@@ -383,7 +454,7 @@ function AddSpecDialog({
           />
         ) : (
           <form
-            onSubmit={(e) => {
+            onSubmit={e => {
               e.preventDefault()
               onCreateNew()
             }}
@@ -394,7 +465,7 @@ function AddSpecDialog({
                 <Input
                   id='spec-name-new'
                   value={specName}
-                  onChange={(e) => setSpecName(e.target.value)}
+                  onChange={e => setSpecName(e.target.value)}
                   placeholder='e.g. Color, Size'
                   required
                   autoFocus
@@ -403,11 +474,26 @@ function AddSpecDialog({
               <div className='flex flex-col gap-2'>
                 <Label className='text-[12px]'>How should customers choose?</Label>
                 <div className='grid grid-cols-3 gap-2'>
-                  {([
-                    { value: 'dropdown' as const, icon: '▾', label: 'Dropdown', desc: 'Select list' },
-                    { value: 'swatch' as const, icon: '🎨', label: 'Swatch', desc: 'Color circles' },
-                    { value: 'button' as const, icon: '▢', label: 'Button', desc: 'Clickable pills' },
-                  ]).map((opt) => (
+                  {[
+                    {
+                      value: 'dropdown' as const,
+                      icon: '▾',
+                      label: 'Dropdown',
+                      desc: 'Select list'
+                    },
+                    {
+                      value: 'swatch' as const,
+                      icon: '🎨',
+                      label: 'Swatch',
+                      desc: 'Color circles'
+                    },
+                    {
+                      value: 'button' as const,
+                      icon: '▢',
+                      label: 'Button',
+                      desc: 'Clickable pills'
+                    }
+                  ].map(opt => (
                     <button
                       key={opt.value}
                       type='button'
@@ -415,7 +501,7 @@ function AddSpecDialog({
                         'flex flex-col items-center gap-1 rounded-lg border-2 px-2 py-3 text-center transition-colors',
                         displayType === opt.value
                           ? 'border-primary bg-primary/5'
-                          : 'border-border hover:border-border-dark hover:bg-bg-hover'
+                          : 'hover:border-border-dark border-border hover:bg-bg-hover'
                       )}
                       onClick={() => setDisplayType(opt.value)}
                     >
@@ -432,14 +518,18 @@ function AddSpecDialog({
                   id='spec-sort-new'
                   type='number'
                   value={sortOrder}
-                  onChange={(e) => setSortOrder(Number(e.target.value))}
+                  onChange={e => setSortOrder(Number(e.target.value))}
                 />
               </div>
             </div>
             <div className='flex items-center gap-2 border-t border-border px-5 py-3'>
               <div className='flex-1' />
-              <Button type='button' variant='outline' onClick={() => onOpenChange(false)}>Cancel</Button>
-              <Button type='submit' isPending={isPending}>Create</Button>
+              <Button type='button' variant='outline' onClick={() => onOpenChange(false)}>
+                Cancel
+              </Button>
+              <Button type='submit' isPending={isPending}>
+                Create
+              </Button>
             </div>
           </form>
         )}
@@ -456,7 +546,7 @@ function ExistingSpecPicker({
   onSearchChange,
   vp,
   projectId,
-  onDone,
+  onDone
 }: {
   specs: GlobalSpecDefinition[]
   search: string
@@ -474,7 +564,7 @@ function ExistingSpecPicker({
     setIsPending(true)
     try {
       await variableProductService.associateSpec(vp.id, selectedId, {
-        project_id: projectId ?? undefined,
+        project_id: projectId ?? undefined
       })
       queryClient.invalidateQueries({ queryKey: VP_QUERY_KEYS.detail(vp.id) })
       onDone()
@@ -489,10 +579,10 @@ function ExistingSpecPicker({
     <>
       <div className='border-b border-border px-5 py-2'>
         <div className='relative'>
-          <Search className='absolute left-2.5 top-1/2 -translate-y-1/2 size-3.5 text-text-tertiary' />
+          <Search className='absolute top-1/2 left-2.5 size-3.5 -translate-y-1/2 text-text-tertiary' />
           <Input
             value={search}
-            onChange={(e) => onSearchChange(e.target.value)}
+            onChange={e => onSearchChange(e.target.value)}
             placeholder='Search specs...'
             className='h-8 pl-8 text-[13px]'
             autoFocus
@@ -500,32 +590,37 @@ function ExistingSpecPicker({
         </div>
       </div>
 
-      <div className='min-h-[200px] max-h-[350px] overflow-y-auto'>
+      <div className='max-h-[350px] min-h-[200px] overflow-y-auto'>
         {specs.length === 0 ? (
           <div className='flex flex-1 items-center justify-center py-12 text-[13px] text-text-tertiary'>
             {search ? 'No matching specs' : 'All specs are already added'}
           </div>
         ) : (
           <div className='p-1.5'>
-            {specs.map((spec) => {
+            {specs.map(spec => {
               const isSelected = selectedId === spec.id
-              const typeIcon = spec.display_type === 'swatch' ? '🎨' : spec.display_type === 'button' ? '▢' : '▾'
+              const typeIcon =
+                spec.display_type === 'swatch' ? '🎨' : spec.display_type === 'button' ? '▢' : '▾'
               return (
                 <button
                   key={spec.id}
                   type='button'
                   className={cn(
-                    'flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left outline-none transition-colors',
+                    'flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left transition-colors outline-none',
                     isSelected ? 'bg-primary/10 ring-1 ring-primary/30' : 'hover:bg-bg-hover'
                   )}
                   onClick={() => setSelectedId(isSelected ? null : spec.id)}
                 >
-                  <div className={cn(
-                    'flex size-7 shrink-0 items-center justify-center rounded-md text-sm',
-                    spec.display_type === 'swatch' ? 'bg-pink-50 dark:bg-pink-500/10'
-                      : spec.display_type === 'button' ? 'bg-blue-50 dark:bg-blue-500/10'
-                      : 'bg-amber-50 dark:bg-amber-500/10'
-                  )}>
+                  <div
+                    className={cn(
+                      'flex size-7 shrink-0 items-center justify-center rounded-md text-sm',
+                      spec.display_type === 'swatch'
+                        ? 'bg-pink-50 dark:bg-pink-500/10'
+                        : spec.display_type === 'button'
+                          ? 'bg-blue-50 dark:bg-blue-500/10'
+                          : 'bg-amber-50 dark:bg-amber-500/10'
+                    )}
+                  >
                     {typeIcon}
                   </div>
                   <div className='min-w-0 flex-1'>
@@ -549,7 +644,9 @@ function ExistingSpecPicker({
 
       <div className='flex items-center gap-2 border-t border-border px-5 py-3'>
         <div className='flex-1' />
-        <Button variant='outline' onClick={onDone}>Cancel</Button>
+        <Button variant='outline' onClick={onDone}>
+          Cancel
+        </Button>
         <Button disabled={!selectedId} isPending={isPending} onClick={handleAdd}>
           Add Spec
         </Button>

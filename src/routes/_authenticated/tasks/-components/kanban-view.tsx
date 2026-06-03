@@ -16,10 +16,18 @@ const PRIORITY_BARS: Record<string, number> = {
   low: 1,
   medium: 2,
   high: 3,
-  urgent: 4,
+  urgent: 4
 }
 
-function PriorityIcon({ priority, color, size = 12 }: { priority: string; color: string; size?: number }) {
+function PriorityIcon({
+  priority,
+  color,
+  size = 12
+}: {
+  priority: string
+  color: string
+  size?: number
+}) {
   const filled = PRIORITY_BARS[priority] ?? 1
   const barWidth = 2.5
   const gap = 1.5
@@ -69,7 +77,9 @@ interface KanbanViewProps {
 // ── Kanban View ──────────────────────────────────────────────
 
 export function KanbanView({ tasks, statuses, onStatusChange, onCreate }: KanbanViewProps) {
-  const handleDragEnd = (event: Parameters<NonNullable<React.ComponentProps<typeof DragDropProvider>['onDragEnd']>>[0]) => {
+  const handleDragEnd = (
+    event: Parameters<NonNullable<React.ComponentProps<typeof DragDropProvider>['onDragEnd']>>[0]
+  ) => {
     const { source, target } = event.operation ?? {}
     if (!source || !target) return
 
@@ -78,7 +88,7 @@ export function KanbanView({ tasks, statuses, onStatusChange, onCreate }: Kanban
 
     if (taskId == null || statusId == null) return
 
-    const task = tasks.find((t) => t.id === taskId)
+    const task = tasks.find(t => t.id === taskId)
     if (!task || task.status === statusId) return
 
     onStatusChange(task, statusId)
@@ -87,22 +97,17 @@ export function KanbanView({ tasks, statuses, onStatusChange, onCreate }: Kanban
   return (
     <DragDropProvider onDragEnd={handleDragEnd}>
       <div className='flex h-full gap-4 overflow-x-auto px-3.5 py-4 sm:px-6'>
-        {statuses.map((status) => {
-          const columnTasks = tasks.filter((t) => t.status === status.id)
+        {statuses.map(status => {
+          const columnTasks = tasks.filter(t => t.status === status.id)
           return (
-            <KanbanColumn
-              key={status.id}
-              status={status}
-              tasks={columnTasks}
-              onCreate={onCreate}
-            />
+            <KanbanColumn key={status.id} status={status} tasks={columnTasks} onCreate={onCreate} />
           )
         })}
       </div>
       <DragOverlay>
-        {(source) => {
+        {source => {
           if (!source) return null
-          const task = tasks.find((t) => t.id === source.data?.taskId)
+          const task = tasks.find(t => t.id === source.data?.taskId)
           if (!task) return null
           return <KanbanCardContent task={task} isDragging />
         }}
@@ -116,7 +121,7 @@ export function KanbanView({ tasks, statuses, onStatusChange, onCreate }: Kanban
 function KanbanColumn({
   status,
   tasks,
-  onCreate,
+  onCreate
 }: {
   status: TaskStatus
   tasks: TaskListItem[]
@@ -131,7 +136,7 @@ function KanbanColumn({
 
   const { ref, isDropTarget } = useDroppable({
     id: `column-${status.id}`,
-    data: { statusId: status.id },
+    data: { statusId: status.id }
   })
 
   const handleCreate = () => {
@@ -149,24 +154,12 @@ function KanbanColumn({
   }
 
   return (
-    <div
-      className={cn(
-        'flex shrink-0 flex-col rounded-lg',
-        columnWidth
-      )}
-    >
+    <div className={cn('flex shrink-0 flex-col rounded-lg', columnWidth)}>
       {/* Column header */}
       <div className='mb-3 flex items-center gap-2 px-1'>
-        <div
-          className='size-2.5 rounded-full'
-          style={{ backgroundColor: status.color }}
-        />
-        <span className='text-[13px] font-semibold text-foreground'>
-          {status.name}
-        </span>
-        <span className='text-[13px] tabular-nums text-text-tertiary'>
-          {tasks.length}
-        </span>
+        <div className='size-2.5 rounded-full' style={{ backgroundColor: status.color }} />
+        <span className='text-[13px] font-semibold text-foreground'>{status.name}</span>
+        <span className='text-[13px] text-text-tertiary tabular-nums'>{tasks.length}</span>
         <div className='flex-1' />
         <button
           type='button'
@@ -188,14 +181,16 @@ function KanbanColumn({
           isDropTarget && 'border-primary/30 bg-primary/5'
         )}
       >
-        {tasks.map((task) => (
+        {tasks.map(task => (
           <KanbanCard key={task.id} task={task} />
         ))}
         {tasks.length === 0 && !isCreating && (
-          <div className={cn(
-            'flex items-center justify-center rounded-lg border border-dashed py-8 text-[13px] text-text-tertiary transition-colors duration-150',
-            isDropTarget ? 'border-primary/40 bg-primary/5' : 'border-border-light'
-          )}>
+          <div
+            className={cn(
+              'flex items-center justify-center rounded-lg border border-dashed py-8 text-[13px] text-text-tertiary transition-colors duration-150',
+              isDropTarget ? 'border-primary/40 bg-primary/5' : 'border-border-light'
+            )}
+          >
             Drop tasks here
           </div>
         )}
@@ -207,8 +202,8 @@ function KanbanColumn({
               ref={inputRef}
               type='text'
               value={newTitle}
-              onChange={(e) => setNewTitle(e.target.value)}
-              onKeyDown={(e) => {
+              onChange={e => setNewTitle(e.target.value)}
+              onKeyDown={e => {
                 if (e.key === 'Enter') handleCreate()
                 if (e.key === 'Escape') handleCancel()
               }}
@@ -247,16 +242,11 @@ function KanbanColumn({
 function KanbanCard({ task }: { task: TaskListItem }) {
   const { ref, isDragging } = useDraggable({
     id: `task-${task.id}`,
-    data: { taskId: task.id },
+    data: { taskId: task.id }
   })
 
   return (
-    <div
-      ref={ref}
-      className={cn(
-        isDragging && 'opacity-30'
-      )}
-    >
+    <div ref={ref} className={cn(isDragging && 'opacity-30')}>
       <KanbanCardContent task={task} />
     </div>
   )
@@ -279,9 +269,9 @@ function KanbanCardContent({ task, isDragging }: { task: TaskListItem; isDraggin
         'cursor-pointer rounded-lg border border-border bg-background p-3 transition-all duration-100',
         isDragging
           ? 'rotate-[2deg] shadow-lg ring-1 ring-primary/20'
-          : 'hover:border-foreground/15 hover:shadow-md hover:bg-bg-hover/50'
+          : 'hover:border-foreground/15 hover:bg-bg-hover/50 hover:shadow-md'
       )}
-      onClick={(e) => {
+      onClick={e => {
         if (isDragging) return
         e.stopPropagation()
         navigate({ to: '/tasks/$taskId', params: { taskId: String(task.id) } })
@@ -289,13 +279,13 @@ function KanbanCardContent({ task, isDragging }: { task: TaskListItem; isDraggin
       style={isDragging ? { width: 290 } : undefined}
     >
       {/* Title */}
-      <p className='mb-2 text-[13px] font-medium leading-snug text-foreground line-clamp-2'>
+      <p className='mb-2 line-clamp-2 text-[13px] leading-snug font-medium text-foreground'>
         {task.title}
       </p>
 
       {/* Meta row */}
       <div className='flex items-center gap-2'>
-        <span className='text-[13px] tabular-nums text-text-tertiary'>
+        <span className='text-[13px] text-text-tertiary tabular-nums'>
           TSK-{task.id.toString().padStart(3, '0')}
         </span>
 
@@ -307,17 +297,17 @@ function KanbanCardContent({ task, isDragging }: { task: TaskListItem; isDraggin
         <div className='flex-1' />
 
         {dueDateLabel && (
-          <span className={cn(
-            'text-[13px]',
-            overdue ? 'font-medium text-destructive' : 'text-text-tertiary'
-          )}>
+          <span
+            className={cn(
+              'text-[13px]',
+              overdue ? 'font-medium text-destructive' : 'text-text-tertiary'
+            )}
+          >
             {dueDateLabel}
           </span>
         )}
 
-        {assigneeInitials && (
-          <InitialsAvatar initials={assigneeInitials} size={18} />
-        )}
+        {assigneeInitials && <InitialsAvatar initials={assigneeInitials} size={18} />}
       </div>
     </div>
   )

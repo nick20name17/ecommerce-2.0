@@ -49,7 +49,7 @@ function BarRow({
   label,
   value,
   max,
-  color,
+  color
 }: {
   label: string
   value: number
@@ -60,16 +60,16 @@ function BarRow({
 
   return (
     <div className='flex items-center gap-2 sm:gap-3'>
-      <span className='w-16 shrink-0 text-[12px] text-text-tertiary sm:w-20 sm:text-[13px]'>{label}</span>
+      <span className='w-16 shrink-0 text-[12px] text-text-tertiary sm:w-20 sm:text-[13px]'>
+        {label}
+      </span>
       <div className='relative h-8 flex-1 overflow-hidden rounded-[6px] bg-border/30'>
         <div
           className='absolute inset-y-0 left-0 rounded-[6px]'
           style={{ width: `${pct}%`, backgroundColor: color }}
         />
       </div>
-      <span className='w-8 shrink-0 text-right text-[13px] font-medium tabular-nums'>
-        {value}
-      </span>
+      <span className='w-8 shrink-0 text-right text-[13px] font-medium tabular-nums'>{value}</span>
     </div>
   )
 }

@@ -1,14 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
-import {
-  Eraser,
-  FileCheck,
-  LayoutGrid,
-  Paperclip,
-  ShoppingCart,
-  User,
-  XIcon,
-} from 'lucide-react'
+import { Eraser, FileCheck, LayoutGrid, Paperclip, ShoppingCart, User, XIcon } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
@@ -18,9 +10,7 @@ import { CustomerCombobox } from '../create/-components/customer-combobox'
 import { ProductCatalogDialog } from '../create/-components/product-catalog-dialog'
 import { ProductEditSheet } from '../create/-components/product-edit-sheet'
 import { useCreatePage } from '../create/-components/use-create-page'
-import {
-  EntityAttachments,
-} from '@/components/common/entity-attachments/entity-attachments'
+import { EntityAttachments } from '@/components/common/entity-attachments/entity-attachments'
 import { CUSTOMER_QUERY_KEYS } from '@/api/customer/query'
 import { customerService } from '@/api/customer/service'
 import { getEditableFieldsQuery } from '@/api/data/query'
@@ -72,7 +62,7 @@ const OrderDeskPage = () => {
     handleClearAll,
     handleCreateProposal,
     handleCreateOrder,
-    isCartItemType,
+    isCartItemType
   } = useCreatePage()
 
   const { data: fieldConfig } = useQuery(getFieldConfigQuery(projectId))
@@ -93,28 +83,27 @@ const OrderDeskPage = () => {
 
   const priceLevelMutation = useMutation({
     mutationFn: (value: string) => customerService.update(customerId, { in_level: value }),
-    onSuccess: (updatedCustomer) => {
+    onSuccess: updatedCustomer => {
       queryClient.setQueryData(
         [...CUSTOMER_QUERY_KEYS.detail(customerId), projectId],
-        updatedCustomer,
+        updatedCustomer
       )
       invalidateCustomerDelayed()
       toast.success('Price level updated')
-    },
+    }
   })
 
   const patchMutation = useMutation({
-    mutationFn: (payload: Record<string, unknown>) =>
-      customerService.update(customerId, payload),
-    onSuccess: (updatedCustomer) => {
+    mutationFn: (payload: Record<string, unknown>) => customerService.update(customerId, payload),
+    onSuccess: updatedCustomer => {
       queryClient.setQueryData(
         [...CUSTOMER_QUERY_KEYS.detail(customerId), projectId],
-        updatedCustomer,
+        updatedCustomer
       )
       invalidateCustomerDelayed()
       toast.success('Customer updated')
     },
-    meta: { errorMessage: 'Failed to update customer' },
+    meta: { errorMessage: 'Failed to update customer' }
   })
 
   const handleFieldSave = (field: string, value: string) => {
@@ -125,12 +114,12 @@ const OrderDeskPage = () => {
   }
 
   const savingField = patchMutation.isPending
-    ? Object.keys(patchMutation.variables ?? {})[0] ?? null
+    ? (Object.keys(patchMutation.variables ?? {})[0] ?? null)
     : null
 
   const customerCustomFields = (() => {
     const entries = fieldConfig?.customer ?? []
-    return entries.filter((e) => !e.default && e.enabled && e.field !== 'salesman')
+    return entries.filter(e => !e.default && e.enabled && e.field !== 'salesman')
   })()
 
   const isCreating = busy.creatingProposal || busy.creatingOrder
@@ -151,7 +140,7 @@ const OrderDeskPage = () => {
         <button
           type='button'
           className={cn(
-            'inline-flex h-7 items-center gap-1.5 rounded-[5px] border border-border bg-bg-secondary px-2.5 text-[12px] font-medium text-text-secondary transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground disabled:pointer-events-none disabled:opacity-40',
+            'inline-flex h-7 items-center gap-1.5 rounded-[5px] border border-border bg-bg-secondary px-2.5 text-[12px] font-medium text-text-secondary transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground disabled:pointer-events-none disabled:opacity-40'
           )}
           disabled={!customer || isBusy}
           onClick={() => setCatalogOpen(true)}
@@ -169,7 +158,11 @@ const OrderDeskPage = () => {
               disabled={cartItems.length === 0 || isBusy || isCreating}
               onClick={handleClearAll}
             >
-              {busy.clearingCart ? <Spinner className='size-3.5' /> : <Eraser className='size-3.5' />}
+              {busy.clearingCart ? (
+                <Spinner className='size-3.5' />
+              ) : (
+                <Eraser className='size-3.5' />
+              )}
             </button>
           </TooltipTrigger>
           <TooltipContent>Clear all items</TooltipContent>
@@ -198,11 +191,7 @@ const OrderDeskPage = () => {
           {/* Cart summary footer */}
           {(cart || loading) && (
             <div className='shrink-0 border-t border-border px-6 py-2.5'>
-              <CartSummary
-                cart={cart ?? null}
-                loading={loading}
-                updating={busy.cartUpdating}
-              />
+              <CartSummary cart={cart ?? null} loading={loading} updating={busy.cartUpdating} />
             </div>
           )}
         </div>
@@ -213,7 +202,7 @@ const OrderDeskPage = () => {
           <div className='shrink-0 border-b border-border p-4'>
             <div className='mb-2.5 flex items-center gap-1.5'>
               <User className='size-3.5 text-text-tertiary' />
-              <span className='text-[12px] font-semibold uppercase tracking-[0.04em] text-text-tertiary'>
+              <span className='text-[12px] font-semibold tracking-[0.04em] text-text-tertiary uppercase'>
                 Customer
               </span>
             </div>
@@ -225,7 +214,7 @@ const OrderDeskPage = () => {
           </div>
 
           {/* Scrollable middle area */}
-          <div className='min-h-0 flex-1 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]'>
+          <div className='min-h-0 flex-1 overflow-y-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden'>
             {/* Customer details — same panel as customer detail page */}
             {customer && customerDetail && (
               <>
@@ -233,7 +222,7 @@ const OrderDeskPage = () => {
                   customer={customerDetail}
                   fieldConfig={fieldConfig}
                   priceLevels={priceLevels}
-                  onPriceLevelChange={(value) => priceLevelMutation.mutate(value)}
+                  onPriceLevelChange={value => priceLevelMutation.mutate(value)}
                   editableFields={editableCustomerFields}
                   onFieldSave={handleFieldSave}
                   salespersons={salespersons}
@@ -245,16 +234,17 @@ const OrderDeskPage = () => {
                 {customerCustomFields.length > 0 && (
                   <div className='border-b border-border'>
                     <div className='bg-bg-secondary/60 px-4 py-2'>
-                      <span className='text-[11px] font-semibold uppercase tracking-[0.06em] text-text-tertiary'>
+                      <span className='text-[11px] font-semibold tracking-[0.06em] text-text-tertiary uppercase'>
                         Custom Fields
                       </span>
                     </div>
                     <div className='bg-background text-[13px]'>
-                      {customerCustomFields.map((entry) => {
+                      {customerCustomFields.map(entry => {
                         const label = getColumnLabel(entry.field, 'customer', fieldConfig)
                         const val = customerDetail[entry.field]
                         const strVal = val != null ? String(val) : null
-                        const isEditable = !!entry.editable || editableCustomerFields.includes(entry.field)
+                        const isEditable =
+                          !!entry.editable || editableCustomerFields.includes(entry.field)
                         return (
                           <PropertyField
                             key={entry.field}
@@ -385,14 +375,10 @@ const OrderDeskPage = () => {
       {/* ── Dialogs ── */}
       <ProductEditSheet
         key={
-          editProduct
-            ? isCartItemType(editProduct)
-              ? editProduct.id
-              : editProduct.autoid
-            : 'none'
+          editProduct ? (isCartItemType(editProduct) ? editProduct.id : editProduct.autoid) : 'none'
         }
         open={editSheetOpen}
-        onOpenChange={(open) => {
+        onOpenChange={open => {
           if (!open) editDispatch({ type: 'CLOSE' })
         }}
         product={editProductWithPhotos}
@@ -418,10 +404,7 @@ const OrderDeskPage = () => {
 
       {/* Attachments panel — always mounted to preserve pending files */}
       {attachmentsOpen && (
-        <div
-          className='fixed inset-0 z-50 bg-black/10'
-          onClick={() => setAttachmentsOpen(false)}
-        />
+        <div className='fixed inset-0 z-50 bg-black/10' onClick={() => setAttachmentsOpen(false)} />
       )}
       <div
         className={cn(
@@ -429,7 +412,7 @@ const OrderDeskPage = () => {
           'max-h-[85vh] gap-0 overflow-hidden p-0 transition-all duration-100',
           attachmentsOpen
             ? 'visible scale-100 opacity-100'
-            : 'pointer-events-none invisible scale-95 opacity-0',
+            : 'pointer-events-none invisible scale-95 opacity-0'
         )}
       >
         <div className='flex shrink-0 items-center justify-between border-b border-border px-5 py-3'>
@@ -461,6 +444,6 @@ const OrderDeskPage = () => {
 export const Route = createFileRoute('/_authenticated/order-desk/')({
   component: OrderDeskPage,
   head: () => ({
-    meta: [{ title: 'Order Desk' }],
-  }),
+    meta: [{ title: 'Order Desk' }]
+  })
 })

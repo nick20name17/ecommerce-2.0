@@ -55,15 +55,9 @@ export const ListColumnsReorder = ({
     const src = e.operation.source
     const tgt = e.operation.target
     const from =
-      typeof src.initialIndex === 'number'
-        ? src.initialIndex
-        : local.indexOf(String(src.id))
+      typeof src.initialIndex === 'number' ? src.initialIndex : local.indexOf(String(src.id))
     const to =
-      typeof src.index === 'number'
-        ? src.index
-        : tgt != null
-          ? local.indexOf(String(tgt.id))
-          : -1
+      typeof src.index === 'number' ? src.index : tgt != null ? local.indexOf(String(tgt.id)) : -1
     if (from === -1 || to === -1 || from === to) return
     const next = arrayMove(local, from, to)
     setLocal(next)
@@ -73,7 +67,8 @@ export const ListColumnsReorder = ({
   if (local.length === 0) {
     return (
       <p className='px-6 py-3 text-[12px] text-text-tertiary'>
-        No list columns selected. Toggle <span className='font-semibold'>Header</span> on a field above to add it here.
+        No list columns selected. Toggle <span className='font-semibold'>Header</span> on a field
+        above to add it here.
       </p>
     )
   }
@@ -135,9 +130,7 @@ function SortableColumnRow({
         <GripVertical className='size-4' />
       </button>
       <span className='flex-1 truncate text-[13px]'>{label}</span>
-      {label !== field && (
-        <span className='text-[11px] text-text-quaternary'>{field}</span>
-      )}
+      {label !== field && <span className='text-text-quaternary text-[11px]'>{field}</span>}
       <Tooltip>
         <TooltipTrigger asChild>
           <button

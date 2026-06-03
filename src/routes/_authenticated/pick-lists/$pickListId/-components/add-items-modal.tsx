@@ -14,7 +14,7 @@ import {
   DialogContent,
   DialogFooter,
   DialogHeader,
-  DialogTitle,
+  DialogTitle
 } from '@/components/ui/dialog'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useProjectId } from '@/hooks/use-project-id'
@@ -30,7 +30,13 @@ interface Props {
 
 type Step = 'select-orders' | 'set-quantities'
 
-export function AddItemsModal({ pickListId, customerId, existingDetailAutoids, open, onOpenChange }: Props) {
+export function AddItemsModal({
+  pickListId,
+  customerId,
+  existingDetailAutoids,
+  open,
+  onOpenChange
+}: Props) {
   const queryClient = useQueryClient()
   const [projectId] = useProjectId()
   const [step, setStep] = useState<Step>('select-orders')
@@ -42,15 +48,15 @@ export function AddItemsModal({ pickListId, customerId, existingDetailAutoids, o
       ...(customerId ? { customer_id: customerId } : {}),
       include_items: true,
       project_id: projectId ?? undefined,
-      pick_list_id: pickListId,
+      pick_list_id: pickListId
     }),
-    enabled: open,
+    enabled: open
   })
 
   const groups = data?.results ?? []
   const orders = groups[0]?.orders ?? []
 
-  const selectedOrders = orders.filter((o) => selectedOrderIds.has(o.autoid))
+  const selectedOrders = orders.filter(o => selectedOrderIds.has(o.autoid))
 
   // All items from selected orders, excluding already-in-pick-list items
   const allItems = (() => {
@@ -67,7 +73,7 @@ export function AddItemsModal({ pickListId, customerId, existingDetailAutoids, o
   })()
 
   const toggleOrder = (autoid: string) => {
-    setSelectedOrderIds((prev) => {
+    setSelectedOrderIds(prev => {
       const next = new Set(prev)
       if (next.has(autoid)) next.delete(autoid)
       else next.add(autoid)
@@ -76,7 +82,7 @@ export function AddItemsModal({ pickListId, customerId, existingDetailAutoids, o
   }
 
   const selectAll = () => {
-    setSelectedOrderIds(new Set(orders.map((o) => o.autoid)))
+    setSelectedOrderIds(new Set(orders.map(o => o.autoid)))
   }
 
   const formatQty = (raw: string) => {
@@ -98,25 +104,25 @@ export function AddItemsModal({ pickListId, customerId, existingDetailAutoids, o
     const max = parseFloat(maxQuan)
     const num = parseFloat(value)
     const clamped = isNaN(num) ? '' : num > max ? formatQty(maxQuan) : value
-    setPickQuantities((prev) => {
+    setPickQuantities(prev => {
       const next = new Map(prev)
       next.set(itemAutoid, clamped)
       return next
     })
   }
 
-  const hasAnyPicked = Array.from(pickQuantities.values()).some((v) => parseFloat(v) > 0)
+  const hasAnyPicked = Array.from(pickQuantities.values()).some(v => parseFloat(v) > 0)
 
   const addMutation = useMutation({
     mutationFn: async () => {
       const payload: AddItemsPayload = {
         items: allItems
-          .map((item) => ({
+          .map(item => ({
             order_autoid: item.orderAutoid,
             detail_autoid: item.autoid,
-            picked_quantity: pickQuantities.get(item.autoid) || '0',
+            picked_quantity: pickQuantities.get(item.autoid) || '0'
           }))
-          .filter((item) => parseFloat(item.picked_quantity) > 0),
+          .filter(item => parseFloat(item.picked_quantity) > 0)
       }
       if (payload.items.length === 0) throw new Error('No items with quantity > 0')
       return pickListService.addItems(pickListId, payload, projectId)
@@ -126,7 +132,7 @@ export function AddItemsModal({ pickListId, customerId, existingDetailAutoids, o
       queryClient.invalidateQueries({ queryKey: PICK_LIST_QUERY_KEYS.detail(pickListId) })
       queryClient.invalidateQueries({ queryKey: PICK_LIST_QUERY_KEYS.lists() })
       resetAndClose()
-    },
+    }
   })
 
   const resetAndClose = () => {
@@ -139,13 +145,13 @@ export function AddItemsModal({ pickListId, customerId, existingDetailAutoids, o
   // Count existing items per order for badge
   const existingCountPerOrder = (order: PickingOrder) => {
     const items = order.items ?? []
-    return items.filter((i) => existingDetailAutoids.has(i.autoid)).length
+    return items.filter(i => existingDetailAutoids.has(i.autoid)).length
   }
 
   return (
     <Dialog
       open={open}
-      onOpenChange={(next) => {
+      onOpenChange={next => {
         if (!next) resetAndClose()
         else onOpenChange(next)
       }}
@@ -176,7 +182,7 @@ export function AddItemsModal({ pickListId, customerId, existingDetailAutoids, o
               ) : (
                 <>
                   <div className='flex items-center justify-between'>
-                    <span className='text-[11px] font-medium uppercase tracking-wider text-text-quaternary'>
+                    <span className='text-text-quaternary text-[11px] font-medium tracking-wider uppercase'>
                       {orders.length} order{orders.length !== 1 && 's'} available
                     </span>
                     <button
@@ -188,7 +194,7 @@ export function AddItemsModal({ pickListId, customerId, existingDetailAutoids, o
                     </button>
                   </div>
                   <div className='min-h-0 flex-1 space-y-2 overflow-y-auto'>
-                    {orders.map((order) => {
+                    {orders.map(order => {
                       const existingCount = existingCountPerOrder(order)
                       return (
                         <OrderSelectCard
@@ -213,7 +219,9 @@ export function AddItemsModal({ pickListId, customerId, existingDetailAutoids, o
               {allItems.length === 0 ? (
                 <div className='flex flex-col items-center py-8 text-center text-text-tertiary'>
                   <Package className='mb-2 size-8 opacity-50' />
-                  <p className='text-[13px]'>All items from selected orders are already in this pick list</p>
+                  <p className='text-[13px]'>
+                    All items from selected orders are already in this pick list
+                  </p>
                 </div>
               ) : (
                 <>
@@ -247,26 +255,38 @@ export function AddItemsModal({ pickListId, customerId, existingDetailAutoids, o
                     <div className='ml-auto flex items-center gap-2 text-[12px] tabular-nums'>
                       {(() => {
                         const total = allItems.length
-                        const picked = allItems.filter((it) => parseFloat(pickQuantities.get(it.autoid) || '0') > 0).length
+                        const picked = allItems.filter(
+                          it => parseFloat(pickQuantities.get(it.autoid) || '0') > 0
+                        ).length
                         const left = total - picked
                         return left === 0 ? (
-                          <span className='font-medium text-emerald-600 dark:text-emerald-400'>All {total} picked</span>
+                          <span className='font-medium text-emerald-600 dark:text-emerald-400'>
+                            All {total} picked
+                          </span>
                         ) : (
                           <span className='text-text-tertiary'>
-                            <span className='font-medium text-foreground'>{picked}/{total}</span> picked · <span className='font-medium text-amber-600 dark:text-amber-400'>{left} left</span>
+                            <span className='font-medium text-foreground'>
+                              {picked}/{total}
+                            </span>{' '}
+                            picked ·{' '}
+                            <span className='font-medium text-amber-600 dark:text-amber-400'>
+                              {left} left
+                            </span>
                           </span>
                         )
                       })()}
                     </div>
                   </div>
 
-                  {selectedOrders.map((order) => {
+                  {selectedOrders.map(order => {
                     const items = (order.items ?? []).filter(
-                      (it) => !existingDetailAutoids.has(it.autoid) && (it.inven?.trim() || parseFloat(it.qty_in_uom || it.quan || '0') > 0),
+                      it =>
+                        !existingDetailAutoids.has(it.autoid) &&
+                        (it.inven?.trim() || parseFloat(it.qty_in_uom || it.quan || '0') > 0)
                     )
                     if (items.length === 0) return null
 
-                    const parentItems = items.filter((it) => !it.par_time)
+                    const parentItems = items.filter(it => !it.par_time)
                     const componentsByParent = new Map<string, typeof items>()
                     for (const it of items) {
                       if (it.par_time) {
@@ -278,7 +298,10 @@ export function AddItemsModal({ pickListId, customerId, existingDetailAutoids, o
                     const hasHierarchy = parentItems.length > 0 && parentItems.length < items.length
 
                     return (
-                      <div key={order.autoid} className='overflow-hidden rounded-lg border border-border'>
+                      <div
+                        key={order.autoid}
+                        className='overflow-hidden rounded-lg border border-border'
+                      >
                         <div className='flex items-center gap-2 bg-bg-secondary/50 px-3.5 py-2'>
                           <span className='text-[13px] font-semibold text-foreground'>
                             #{(order.invoice || order.id).trim()}
@@ -289,18 +312,19 @@ export function AddItemsModal({ pickListId, customerId, existingDetailAutoids, o
                             className='text-[11px] font-medium text-primary hover:underline'
                             onClick={() => {
                               const qty = new Map(pickQuantities)
-                              for (const item of items) qty.set(item.autoid, formatQty(item.qty_in_uom || item.quan))
+                              for (const item of items)
+                                qty.set(item.autoid, formatQty(item.qty_in_uom || item.quan))
                               setPickQuantities(qty)
                             }}
                           >
                             Pick all
                           </button>
-                          <span className='text-[11px] text-text-quaternary'>
+                          <span className='text-text-quaternary text-[11px]'>
                             {items.length} item{items.length !== 1 && 's'}
                           </span>
                         </div>
 
-                        <div className='grid grid-cols-[20px_1fr_72px_52px_40px_52px] items-center gap-2 border-b border-border-light bg-bg-secondary/40 px-3.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-text-quaternary'>
+                        <div className='text-text-quaternary grid grid-cols-[20px_1fr_72px_52px_40px_52px] items-center gap-2 border-b border-border-light bg-bg-secondary/40 px-3.5 py-1 text-[10px] font-semibold tracking-wider uppercase'>
                           <span />
                           <span>Item</span>
                           <span className='text-center'>Location</span>
@@ -309,8 +333,10 @@ export function AddItemsModal({ pickListId, customerId, existingDetailAutoids, o
                           <span className='text-center'>Pick</span>
                         </div>
 
-                        {(hasHierarchy ? parentItems : items).map((pItem) => {
-                          const comps = hasHierarchy ? (componentsByParent.get(pItem.timestamp!) ?? []) : []
+                        {(hasHierarchy ? parentItems : items).map(pItem => {
+                          const comps = hasHierarchy
+                            ? (componentsByParent.get(pItem.timestamp!) ?? [])
+                            : []
                           const isParent = hasHierarchy && comps.length > 0
                           return (
                             <div key={pItem.autoid}>
@@ -347,7 +373,9 @@ export function AddItemsModal({ pickListId, customerId, existingDetailAutoids, o
         <DialogFooter>
           {step === 'select-orders' && (
             <>
-              <Button variant='outline' onClick={() => onOpenChange(false)}>Cancel</Button>
+              <Button variant='outline' onClick={() => onOpenChange(false)}>
+                Cancel
+              </Button>
               <Button disabled={selectedOrderIds.size === 0} onClick={goToQuantities}>
                 Next <ArrowRight className='size-3.5' />
               </Button>
@@ -380,7 +408,7 @@ function OrderSelectCard({
   selected,
   onToggle,
   existingCount,
-  existingDetailAutoids,
+  existingDetailAutoids
 }: {
   order: PickingOrder
   selected: boolean
@@ -397,44 +425,57 @@ function OrderSelectCard({
         'overflow-hidden rounded-lg border transition-all duration-100',
         selected
           ? 'border-primary ring-1 ring-primary/20'
-          : 'border-border hover:border-border-light hover:shadow-sm',
+          : 'border-border hover:border-border-light hover:shadow-sm'
       )}
     >
       <div
         className={cn(
           'flex cursor-pointer items-center gap-3 px-3.5 py-2.5',
-          selected ? 'bg-primary/[0.03]' : 'bg-bg-secondary/40',
+          selected ? 'bg-primary/[0.03]' : 'bg-bg-secondary/40'
         )}
         onClick={onToggle}
       >
         <div
           className={cn(
             'flex size-[18px] shrink-0 items-center justify-center rounded border transition-colors duration-100',
-            selected ? 'border-primary bg-primary text-white' : 'border-border bg-background',
+            selected ? 'border-primary bg-primary text-white' : 'border-border bg-background'
           )}
         >
           {selected && (
             <svg className='size-2.5' viewBox='0 0 12 12' fill='none'>
-              <path d='M2.5 6L5 8.5L9.5 3.5' stroke='currentColor' strokeWidth='2' strokeLinecap='round' strokeLinejoin='round' />
+              <path
+                d='M2.5 6L5 8.5L9.5 3.5'
+                stroke='currentColor'
+                strokeWidth='2'
+                strokeLinecap='round'
+                strokeLinejoin='round'
+              />
             </svg>
           )}
         </div>
-        <span className='text-[13px] font-semibold text-foreground'>#{order.invoice || order.id}</span>
+        <span className='text-[13px] font-semibold text-foreground'>
+          #{order.invoice || order.id}
+        </span>
         {existingCount > 0 && (
           <span className='rounded bg-amber-500/10 px-1.5 py-0.5 text-[10px] font-medium text-amber-700 dark:text-amber-400'>
             {existingCount} already picked
           </span>
         )}
         <div className='flex-1' />
-        <span className='text-[12px] tabular-nums text-text-tertiary'>
+        <span className='text-[12px] text-text-tertiary tabular-nums'>
           {items.length} item{items.length !== 1 && 's'}
         </span>
         <button
           type='button'
-          className='inline-flex size-5 items-center justify-center rounded text-text-quaternary transition-colors hover:bg-bg-active hover:text-text-secondary'
-          onClick={(e) => { e.stopPropagation(); setExpanded((v) => !v) }}
+          className='text-text-quaternary inline-flex size-5 items-center justify-center rounded transition-colors hover:bg-bg-active hover:text-text-secondary'
+          onClick={e => {
+            e.stopPropagation()
+            setExpanded(v => !v)
+          }}
         >
-          <ChevronDown className={cn('size-3.5 transition-transform duration-150', expanded && 'rotate-180')} />
+          <ChevronDown
+            className={cn('size-3.5 transition-transform duration-150', expanded && 'rotate-180')}
+          />
         </button>
       </div>
 
@@ -448,18 +489,23 @@ function OrderSelectCard({
                 className={cn(
                   'flex items-center gap-3 px-3.5 py-[5px]',
                   i < items.length - 1 && 'border-b border-border-light/50',
-                  alreadyPicked && 'opacity-40',
+                  alreadyPicked && 'opacity-40'
                 )}
               >
                 <span className='w-[90px] shrink-0 font-mono text-[11px] font-medium text-foreground'>
                   {item.inven}
                 </span>
-                <span className='min-w-0 flex-1 truncate text-[11px] text-text-tertiary'>{item.descr}</span>
-                <span className='shrink-0 rounded bg-bg-secondary px-1.5 py-0.5 text-[11px] font-medium tabular-nums text-text-secondary'>
-                  {parseFloat(item.qty_in_uom || item.quan).toFixed(0)}{item.unit_meas && item.unit_meas !== 'EA' ? ` ${item.unit_meas}` : ''}
+                <span className='min-w-0 flex-1 truncate text-[11px] text-text-tertiary'>
+                  {item.descr}
+                </span>
+                <span className='shrink-0 rounded bg-bg-secondary px-1.5 py-0.5 text-[11px] font-medium text-text-secondary tabular-nums'>
+                  {parseFloat(item.qty_in_uom || item.quan).toFixed(0)}
+                  {item.unit_meas && item.unit_meas !== 'EA' ? ` ${item.unit_meas}` : ''}
                 </span>
                 {alreadyPicked && (
-                  <span className='shrink-0 text-[10px] font-medium text-amber-600 dark:text-amber-400'>In list</span>
+                  <span className='shrink-0 text-[10px] font-medium text-amber-600 dark:text-amber-400'>
+                    In list
+                  </span>
                 )}
               </div>
             )
@@ -479,7 +525,7 @@ function PickItemRow({
   formatQty,
   isParent,
   isComponent,
-  isLastComponent,
+  isLastComponent
 }: {
   item: PickingOrderItem
   pickQuantities: Map<string, string>
@@ -504,14 +550,20 @@ function PickItemRow({
           <Package className='size-4 text-foreground' />
         </div>
         <div className='flex min-w-0 items-center gap-2'>
-          <span className='w-[90px] shrink-0 font-mono text-[12px] font-bold leading-none text-foreground'>{item.inven}</span>
-          <span className='min-w-0 truncate text-[12px] font-semibold leading-none text-foreground'>{item.descr}</span>
+          <span className='w-[90px] shrink-0 font-mono text-[12px] leading-none font-bold text-foreground'>
+            {item.inven}
+          </span>
+          <span className='min-w-0 truncate text-[12px] leading-none font-semibold text-foreground'>
+            {item.descr}
+          </span>
         </div>
-        <span className='truncate text-center text-[11px] font-mono text-text-tertiary'>{item.location || '—'}</span>
+        <span className='truncate text-center font-mono text-[11px] text-text-tertiary'>
+          {item.location || '—'}
+        </span>
         <button
           type='button'
           onClick={() => updatePickQty(item.autoid, formatQty(qty), qty)}
-          className='flex h-7 cursor-pointer items-center justify-center rounded-[5px] bg-bg-secondary/60 text-[13px] tabular-nums text-text-tertiary transition-colors hover:bg-primary/10 hover:text-primary'
+          className='flex h-7 cursor-pointer items-center justify-center rounded-[5px] bg-bg-secondary/60 text-[13px] text-text-tertiary tabular-nums transition-colors hover:bg-primary/10 hover:text-primary'
         >
           {orderedStr}
         </button>
@@ -519,12 +571,12 @@ function PickItemRow({
         <input
           type='number'
           value={pickVal}
-          onChange={(e) => updatePickQty(item.autoid, e.target.value, qty)}
+          onChange={e => updatePickQty(item.autoid, e.target.value, qty)}
           min='0'
           step='any'
           className={cn(
-            'h-7 w-full rounded-[5px] border bg-background text-center text-[13px] tabular-nums text-foreground outline-none focus:border-primary focus:ring-1 focus:ring-primary/20',
-            isPartial ? 'border-amber-400' : 'border-border',
+            'h-7 w-full rounded-[5px] border bg-background text-center text-[13px] text-foreground tabular-nums outline-none focus:border-primary focus:ring-1 focus:ring-primary/20',
+            isPartial ? 'border-amber-400' : 'border-border'
           )}
         />
       </div>
@@ -535,19 +587,35 @@ function PickItemRow({
     return (
       <div className='grid grid-cols-[20px_1fr_72px_52px_40px_52px] items-center gap-2 px-3.5 py-0.5'>
         <div className='relative flex items-center justify-center self-stretch'>
-          <div className={cn('absolute left-1/2 w-px -translate-x-1/2 bg-border', isLastComponent ? 'top-0 h-1/2' : 'top-0 h-full')} />
-          <div className='absolute left-1/2 top-1/2 h-px w-[calc(50%+4px)] bg-border' />
+          <div
+            className={cn(
+              'absolute left-1/2 w-px -translate-x-1/2 bg-border',
+              isLastComponent ? 'top-0 h-1/2' : 'top-0 h-full'
+            )}
+          />
+          <div className='absolute top-1/2 left-1/2 h-px w-[calc(50%+4px)] bg-border' />
         </div>
         <div className='flex min-w-0 items-center gap-1.5'>
-          <Package className={cn('size-3.5 shrink-0', picking > 0 ? 'text-emerald-500' : 'text-text-quaternary/30')} />
-          <span className='w-[80px] shrink-0 font-mono text-[11px] text-text-secondary'>{item.inven}</span>
-          <span className='min-w-0 truncate text-[11px] text-text-quaternary'>{item.descr}</span>
+          <Package
+            className={cn(
+              'size-3.5 shrink-0',
+              picking > 0 ? 'text-emerald-500' : 'text-text-quaternary/30'
+            )}
+          />
+          <span className='w-[80px] shrink-0 font-mono text-[11px] text-text-secondary'>
+            {item.inven}
+          </span>
+          <span className='text-text-quaternary min-w-0 truncate text-[11px]'>{item.descr}</span>
         </div>
-        <span className='truncate text-center text-[11px] font-mono text-text-quaternary'>{item.location || '—'}</span>
+        <span className='text-text-quaternary truncate text-center font-mono text-[11px]'>
+          {item.location || '—'}
+        </span>
         <button
           type='button'
-          onClick={() => { updatePickQty(item.autoid, picking > 0 ? '0' : formatQty(qty), qty) }}
-          className='flex h-7 cursor-pointer items-center justify-center rounded-[5px] bg-bg-secondary/60 text-[13px] tabular-nums text-text-tertiary transition-colors hover:bg-primary/10 hover:text-primary'
+          onClick={() => {
+            updatePickQty(item.autoid, picking > 0 ? '0' : formatQty(qty), qty)
+          }}
+          className='flex h-7 cursor-pointer items-center justify-center rounded-[5px] bg-bg-secondary/60 text-[13px] text-text-tertiary tabular-nums transition-colors hover:bg-primary/10 hover:text-primary'
         >
           {orderedStr}
         </button>
@@ -555,12 +623,12 @@ function PickItemRow({
         <input
           type='number'
           value={pickVal}
-          onChange={(e) => updatePickQty(item.autoid, e.target.value, qty)}
+          onChange={e => updatePickQty(item.autoid, e.target.value, qty)}
           min='0'
           step='any'
           className={cn(
-            'h-7 w-full rounded-[5px] border bg-background text-center text-[13px] tabular-nums text-foreground outline-none focus:border-primary focus:ring-1 focus:ring-primary/20',
-            isPartial ? 'border-amber-400' : 'border-border',
+            'h-7 w-full rounded-[5px] border bg-background text-center text-[13px] text-foreground tabular-nums outline-none focus:border-primary focus:ring-1 focus:ring-primary/20',
+            isPartial ? 'border-amber-400' : 'border-border'
           )}
         />
       </div>
@@ -572,19 +640,27 @@ function PickItemRow({
       <button
         type='button'
         className='flex size-5 items-center justify-center rounded transition-colors hover:bg-bg-active'
-        onClick={() => { updatePickQty(item.autoid, picking > 0 ? '0' : formatQty(qty), qty) }}
+        onClick={() => {
+          updatePickQty(item.autoid, picking > 0 ? '0' : formatQty(qty), qty)
+        }}
       >
-        <Package className={cn('size-4', picking > 0 ? 'text-emerald-500' : 'text-text-quaternary/40')} />
+        <Package
+          className={cn('size-4', picking > 0 ? 'text-emerald-500' : 'text-text-quaternary/40')}
+        />
       </button>
       <div className='flex min-w-0 items-center gap-2'>
-        <span className='w-[90px] shrink-0 font-mono text-[12px] font-medium text-foreground'>{item.inven}</span>
+        <span className='w-[90px] shrink-0 font-mono text-[12px] font-medium text-foreground'>
+          {item.inven}
+        </span>
         <span className='min-w-0 truncate text-[11px] text-text-tertiary'>{item.descr}</span>
       </div>
-      <span className='truncate text-center text-[11px] font-mono text-text-tertiary'>{item.location || '—'}</span>
+      <span className='truncate text-center font-mono text-[11px] text-text-tertiary'>
+        {item.location || '—'}
+      </span>
       <button
         type='button'
         onClick={() => updatePickQty(item.autoid, formatQty(qty), qty)}
-        className='flex h-7 cursor-pointer items-center justify-center rounded-[5px] bg-bg-secondary/60 text-[13px] tabular-nums text-text-tertiary transition-colors hover:bg-primary/10 hover:text-primary'
+        className='flex h-7 cursor-pointer items-center justify-center rounded-[5px] bg-bg-secondary/60 text-[13px] text-text-tertiary tabular-nums transition-colors hover:bg-primary/10 hover:text-primary'
       >
         {orderedStr}
       </button>
@@ -592,12 +668,12 @@ function PickItemRow({
       <input
         type='number'
         value={pickVal}
-        onChange={(e) => updatePickQty(item.autoid, e.target.value, qty)}
+        onChange={e => updatePickQty(item.autoid, e.target.value, qty)}
         min='0'
         step='any'
         className={cn(
-          'h-7 w-full rounded-[5px] border bg-background text-center text-[13px] tabular-nums text-foreground outline-none focus:border-primary focus:ring-1 focus:ring-primary/20',
-          isPartial ? 'border-amber-400' : 'border-border',
+          'h-7 w-full rounded-[5px] border bg-background text-center text-[13px] text-foreground tabular-nums outline-none focus:border-primary focus:ring-1 focus:ring-primary/20',
+          isPartial ? 'border-amber-400' : 'border-border'
         )}
       />
     </div>

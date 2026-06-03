@@ -22,7 +22,7 @@ export const GeneralSection = ({ projectId }: { projectId: number }) => {
   const { data: project } = useQuery({
     ...getProjectByIdQuery(projectId),
     enabled: isSuperAdminUser,
-    retry: false,
+    retry: false
   })
 
   useEffect(() => {
@@ -42,7 +42,7 @@ export const GeneralSection = ({ projectId }: { projectId: number }) => {
     onSuccess: () => {
       toast.success('Settings updated')
     },
-    meta: { errorMessage: 'Failed to update settings' },
+    meta: { errorMessage: 'Failed to update settings' }
   })
 
   const save = (payload: Record<string, unknown>) => {
@@ -54,14 +54,18 @@ export const GeneralSection = ({ projectId }: { projectId: number }) => {
       <div className='max-w-xl space-y-6'>
         <div>
           <h3 className='text-[14px] font-semibold text-foreground'>General Settings</h3>
-          <p className='mt-0.5 text-[13px] text-text-tertiary'>Configure project-wide preferences.</p>
+          <p className='mt-0.5 text-[13px] text-text-tertiary'>
+            Configure project-wide preferences.
+          </p>
         </div>
 
         {/* Unit System */}
         <div>
-          <label className='mb-1.5 block text-[12px] font-medium text-text-tertiary'>Unit System</label>
+          <label className='mb-1.5 block text-[12px] font-medium text-text-tertiary'>
+            Unit System
+          </label>
           <div className='flex gap-2'>
-            {(['metric', 'imperial'] as const).map((unit) => (
+            {(['metric', 'imperial'] as const).map(unit => (
               <button
                 key={unit}
                 type='button'
@@ -70,9 +74,12 @@ export const GeneralSection = ({ projectId }: { projectId: number }) => {
                   'inline-flex h-8 items-center rounded-[6px] border px-3 text-[13px] font-medium transition-colors duration-[80ms]',
                   unitSystem === unit
                     ? 'border-primary bg-primary/[0.06] text-primary'
-                    : 'border-border text-text-secondary hover:bg-bg-hover',
+                    : 'border-border text-text-secondary hover:bg-bg-hover'
                 )}
-                onClick={() => { setUnitSystem(unit); save({ unit_system: unit }) }}
+                onClick={() => {
+                  setUnitSystem(unit)
+                  save({ unit_system: unit })
+                }}
               >
                 {unit.charAt(0).toUpperCase() + unit.slice(1)}
               </button>
@@ -80,10 +87,11 @@ export const GeneralSection = ({ projectId }: { projectId: number }) => {
           </div>
         </div>
 
-
         {/* Toggle switches */}
         <div className='space-y-3'>
-          <label className='mb-1.5 block text-[12px] font-medium text-text-tertiary'>Web Filters</label>
+          <label className='mb-1.5 block text-[12px] font-medium text-text-tertiary'>
+            Web Filters
+          </label>
 
           <div className='flex items-center justify-between rounded-[8px] border border-border px-3.5 py-2.5'>
             <div>
@@ -95,11 +103,19 @@ export const GeneralSection = ({ projectId }: { projectId: number }) => {
               disabled={updateMutation.isPending}
               className={cn(
                 'relative inline-flex h-5 w-9 shrink-0 cursor-pointer items-center rounded-full transition-colors duration-200',
-                categoryWebFilter ? 'bg-primary' : 'bg-border',
+                categoryWebFilter ? 'bg-primary' : 'bg-border'
               )}
-              onClick={() => { setCategoryWebFilter(!categoryWebFilter); save({ category_show_web_filter: !categoryWebFilter }) }}
+              onClick={() => {
+                setCategoryWebFilter(!categoryWebFilter)
+                save({ category_show_web_filter: !categoryWebFilter })
+              }}
             >
-              <span className={cn('inline-block size-3.5 rounded-full bg-background shadow-sm transition-transform duration-200', categoryWebFilter ? 'translate-x-[18px]' : 'translate-x-[3px]')} />
+              <span
+                className={cn(
+                  'inline-block size-3.5 rounded-full bg-background shadow-sm transition-transform duration-200',
+                  categoryWebFilter ? 'translate-x-[18px]' : 'translate-x-[3px]'
+                )}
+              />
             </button>
           </div>
 
@@ -113,11 +129,19 @@ export const GeneralSection = ({ projectId }: { projectId: number }) => {
               disabled={updateMutation.isPending}
               className={cn(
                 'relative inline-flex h-5 w-9 shrink-0 cursor-pointer items-center rounded-full transition-colors duration-200',
-                productWebFilter ? 'bg-primary' : 'bg-border',
+                productWebFilter ? 'bg-primary' : 'bg-border'
               )}
-              onClick={() => { setProductWebFilter(!productWebFilter); save({ product_show_web_filter: !productWebFilter }) }}
+              onClick={() => {
+                setProductWebFilter(!productWebFilter)
+                save({ product_show_web_filter: !productWebFilter })
+              }}
             >
-              <span className={cn('inline-block size-3.5 rounded-full bg-background shadow-sm transition-transform duration-200', productWebFilter ? 'translate-x-[18px]' : 'translate-x-[3px]')} />
+              <span
+                className={cn(
+                  'inline-block size-3.5 rounded-full bg-background shadow-sm transition-transform duration-200',
+                  productWebFilter ? 'translate-x-[18px]' : 'translate-x-[3px]'
+                )}
+              />
             </button>
           </div>
         </div>
@@ -125,37 +149,47 @@ export const GeneralSection = ({ projectId }: { projectId: number }) => {
         {/* Advanced fields (superadmin only) */}
         {isSuperAdminUser && (
           <div className='space-y-3'>
-            <label className='mb-1.5 block text-[12px] font-medium text-text-tertiary'>Database Fields</label>
+            <label className='mb-1.5 block text-[12px] font-medium text-text-tertiary'>
+              Database Fields
+            </label>
 
             <div className='rounded-[8px] border border-border px-3.5 py-2.5'>
               <div className='mb-1'>
                 <span className='text-[13px] font-medium text-foreground'>Out-of-Stock Field</span>
-                <p className='text-[12px] text-text-tertiary'>INVENTRY column used for out-of-stock filtering</p>
+                <p className='text-[12px] text-text-tertiary'>
+                  INVENTRY column used for out-of-stock filtering
+                </p>
               </div>
               <input
                 value={oosField}
-                onChange={(e) => setOosField(e.target.value)}
+                onChange={e => setOosField(e.target.value)}
                 onBlur={() => save({ oos_field: oosField })}
-                onKeyDown={(e) => { if (e.key === 'Enter') save({ oos_field: oosField }) }}
+                onKeyDown={e => {
+                  if (e.key === 'Enter') save({ oos_field: oosField })
+                }}
                 placeholder='e.g. QTY_ON_HND'
                 disabled={updateMutation.isPending}
-                className='h-8 w-full rounded-[6px] border border-border bg-background px-2.5 text-[13px] outline-none placeholder:text-text-quaternary focus:border-primary'
+                className='placeholder:text-text-quaternary h-8 w-full rounded-[6px] border border-border bg-background px-2.5 text-[13px] outline-none focus:border-primary'
               />
             </div>
 
             <div className='rounded-[8px] border border-border px-3.5 py-2.5'>
               <div className='mb-1'>
                 <span className='text-[13px] font-medium text-foreground'>Sales Total Field</span>
-                <p className='text-[12px] text-text-tertiary'>ARINV column for monetary totals (e.g. total, sub_total)</p>
+                <p className='text-[12px] text-text-tertiary'>
+                  ARINV column for monetary totals (e.g. total, sub_total)
+                </p>
               </div>
               <input
                 value={salesTotalField}
-                onChange={(e) => setSalesTotalField(e.target.value)}
+                onChange={e => setSalesTotalField(e.target.value)}
                 onBlur={() => save({ sales_total_field: salesTotalField })}
-                onKeyDown={(e) => { if (e.key === 'Enter') save({ sales_total_field: salesTotalField }) }}
+                onKeyDown={e => {
+                  if (e.key === 'Enter') save({ sales_total_field: salesTotalField })
+                }}
                 placeholder='e.g. total'
                 disabled={updateMutation.isPending}
-                className='h-8 w-full rounded-[6px] border border-border bg-background px-2.5 text-[13px] outline-none placeholder:text-text-quaternary focus:border-primary'
+                className='placeholder:text-text-quaternary h-8 w-full rounded-[6px] border border-border bg-background px-2.5 text-[13px] outline-none focus:border-primary'
               />
             </div>
           </div>

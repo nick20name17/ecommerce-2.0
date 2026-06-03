@@ -52,15 +52,14 @@ export function CartEditableTable({
   // Clear pending entries when their products appear in the real cart
   useEffect(() => {
     if (pendingEntries.length === 0) return
-    setPendingEntries((prev) =>
+    setPendingEntries(prev =>
       prev.filter(
-        (pe) =>
-          !pe.product || !items.some((item) => item.product_autoid === pe.product!.autoid)
+        pe => !pe.product || !items.some(item => item.product_autoid === pe.product!.autoid)
       )
     )
   }, [items]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  const searching = pendingEntries.some((pe) => !pe.product)
+  const searching = pendingEntries.some(pe => !pe.product)
 
   const handleSubmit = async () => {
     const id = inputValue.trim()
@@ -80,14 +79,14 @@ export function CartEditableTable({
       const hasConfigurations = Number(cached.configurations) > 0
       const hasMultipleUnits = (cached.units?.length ?? 0) > 1
       if (!hasConfigurations && !hasMultipleUnits) {
-        setPendingEntries((prev) => [...prev, { id, product: cached, key: entryKey }])
+        setPendingEntries(prev => [...prev, { id, product: cached, key: entryKey }])
       }
       onProductFound(cached)
       return
     }
 
     // Show a "searching" pending row
-    setPendingEntries((prev) => [...prev, { id, key: entryKey }])
+    setPendingEntries(prev => [...prev, { id, key: entryKey }])
 
     try {
       const res = await productService.get({
@@ -100,7 +99,7 @@ export function CartEditableTable({
       const product = res.results[0]
 
       if (!product) {
-        setPendingEntries((prev) => prev.filter((pe) => pe.key !== entryKey))
+        setPendingEntries(prev => prev.filter(pe => pe.key !== entryKey))
         setError(`No product found for "${id}"`)
         return
       }
@@ -112,17 +111,15 @@ export function CartEditableTable({
       const hasConfigurations = Number(product.configurations) > 0
       const hasMultipleUnits = (product.units?.length ?? 0) > 1
       if (!hasConfigurations && !hasMultipleUnits) {
-        setPendingEntries((prev) =>
-          prev.map((pe) => (pe.key === entryKey ? { ...pe, product } : pe))
-        )
+        setPendingEntries(prev => prev.map(pe => (pe.key === entryKey ? { ...pe, product } : pe)))
       } else {
         // Will open config sheet — remove pending entry
-        setPendingEntries((prev) => prev.filter((pe) => pe.key !== entryKey))
+        setPendingEntries(prev => prev.filter(pe => pe.key !== entryKey))
       }
 
       onProductFound(product)
     } catch (err) {
-      setPendingEntries((prev) => prev.filter((pe) => pe.key !== entryKey))
+      setPendingEntries(prev => prev.filter(pe => pe.key !== entryKey))
       setError(getErrorMessage(err))
     }
   }
@@ -133,36 +130,60 @@ export function CartEditableTable({
     <div className='flex h-full flex-col'>
       <div className='min-h-0 flex-1 overflow-auto'>
         <table className='w-full text-[13px]'>
-          <thead className='sticky top-0 z-10 select-none bg-bg-secondary'>
+          <thead className='sticky top-0 z-10 bg-bg-secondary select-none'>
             <tr className='border-b border-border text-left'>
-              <th className='w-[36px] py-1.5 pl-5 pr-0 font-medium text-text-tertiary'></th>
-              <th className='min-w-[110px] px-3 py-1.5 font-medium text-text-tertiary'>Inventory</th>
-              <th className='min-w-[160px] px-3 py-1.5 font-medium text-text-tertiary'>Description</th>
-              <th className='w-[80px] px-3 py-1.5 text-right font-medium text-text-tertiary'>Qty</th>
+              <th className='w-[36px] py-1.5 pr-0 pl-5 font-medium text-text-tertiary'></th>
+              <th className='min-w-[110px] px-3 py-1.5 font-medium text-text-tertiary'>
+                Inventory
+              </th>
+              <th className='min-w-[160px] px-3 py-1.5 font-medium text-text-tertiary'>
+                Description
+              </th>
+              <th className='w-[80px] px-3 py-1.5 text-right font-medium text-text-tertiary'>
+                Qty
+              </th>
               <th className='w-[60px] px-3 py-1.5 font-medium text-text-tertiary'>Unit</th>
-              <th className='w-[90px] px-3 py-1.5 text-right font-medium text-text-tertiary'>Price</th>
-              <th className='w-[100px] px-3 py-1.5 text-right font-medium text-text-tertiary'>Amount</th>
-              <th className='w-[60px] py-1.5 pl-2 pr-5 font-medium text-text-tertiary'></th>
+              <th className='w-[90px] px-3 py-1.5 text-right font-medium text-text-tertiary'>
+                Price
+              </th>
+              <th className='w-[100px] px-3 py-1.5 text-right font-medium text-text-tertiary'>
+                Amount
+              </th>
+              <th className='w-[60px] py-1.5 pr-5 pl-2 font-medium text-text-tertiary'></th>
             </tr>
           </thead>
           <tbody>
             {loading ? (
               Array.from({ length: 4 }).map((_, i) => (
                 <tr key={i} className='border-b border-border-light'>
-                  <td className='py-2 pl-5 pr-0'><Skeleton className='size-7 rounded-[4px]' /></td>
-                  <td className='px-3 py-2'><Skeleton className='h-4 w-16' /></td>
-                  <td className='px-3 py-2'><Skeleton className='h-4 w-32' /></td>
-                  <td className='px-3 py-2'><Skeleton className='ml-auto h-4 w-8' /></td>
-                  <td className='px-3 py-2'><Skeleton className='h-4 w-8' /></td>
-                  <td className='px-3 py-2'><Skeleton className='ml-auto h-4 w-14' /></td>
-                  <td className='px-3 py-2'><Skeleton className='ml-auto h-4 w-16' /></td>
-                  <td className='py-2 pl-2 pr-5' />
+                  <td className='py-2 pr-0 pl-5'>
+                    <Skeleton className='size-7 rounded-[4px]' />
+                  </td>
+                  <td className='px-3 py-2'>
+                    <Skeleton className='h-4 w-16' />
+                  </td>
+                  <td className='px-3 py-2'>
+                    <Skeleton className='h-4 w-32' />
+                  </td>
+                  <td className='px-3 py-2'>
+                    <Skeleton className='ml-auto h-4 w-8' />
+                  </td>
+                  <td className='px-3 py-2'>
+                    <Skeleton className='h-4 w-8' />
+                  </td>
+                  <td className='px-3 py-2'>
+                    <Skeleton className='ml-auto h-4 w-14' />
+                  </td>
+                  <td className='px-3 py-2'>
+                    <Skeleton className='ml-auto h-4 w-16' />
+                  </td>
+                  <td className='py-2 pr-5 pl-2' />
                 </tr>
               ))
             ) : (
               <>
                 {/* Real cart items */}
-                {items.map((item) => {
+                {items.map(item => {
                   const isUpdating = updatingQuantityItemId === item.id
                   return (
                     <tr
@@ -170,19 +191,22 @@ export function CartEditableTable({
                       className='group/row border-b border-border-light transition-colors duration-100 hover:bg-bg-hover'
                     >
                       {/* Thumbnail */}
-                      <td className='w-[36px] py-1.5 pl-5 pr-0'>
+                      <td className='w-[36px] py-1.5 pr-0 pl-5'>
                         <div className='flex size-7 items-center justify-center overflow-hidden rounded-[4px] bg-bg-secondary'>
                           {item.photo ? (
-                            <img src={item.photo} alt={item.name} className='size-7 object-cover' loading='lazy' />
+                            <img
+                              src={item.photo}
+                              alt={item.name}
+                              className='size-7 object-cover'
+                              loading='lazy'
+                            />
                           ) : (
-                            <Image className='size-3 text-text-quaternary' />
+                            <Image className='text-text-quaternary size-3' />
                           )}
                         </div>
                       </td>
                       {/* Inventory */}
-                      <td className='px-3 py-1.5 font-medium text-foreground'>
-                        {item.product_id}
-                      </td>
+                      <td className='px-3 py-1.5 font-medium text-foreground'>{item.product_id}</td>
                       {/* Description */}
                       <td className='max-w-[300px] px-3 py-1.5 text-text-secondary'>
                         <Tooltip>
@@ -202,27 +226,27 @@ export function CartEditableTable({
                             size='sm'
                             showMaxMessage
                             disabled={isUpdating}
-                            onChange={(qty) => onQuantityChange(item.id, qty)}
+                            onChange={qty => onQuantityChange(item.id, qty)}
                           />
                         </div>
                       </td>
                       {/* Unit */}
-                      <td className='px-3 py-1.5 text-text-tertiary'>
-                        {item.unit || '—'}
-                      </td>
+                      <td className='px-3 py-1.5 text-text-tertiary'>{item.unit || '—'}</td>
                       {/* Price */}
-                      <td className='px-3 py-1.5 text-right tabular-nums text-text-secondary'>
+                      <td className='px-3 py-1.5 text-right text-text-secondary tabular-nums'>
                         {formatCurrency(item.price)}
                       </td>
                       {/* Amount */}
-                      <td className={cn(
-                        'px-3 py-1.5 text-right font-medium tabular-nums text-foreground',
-                        isUpdating && 'animate-pulse'
-                      )}>
+                      <td
+                        className={cn(
+                          'px-3 py-1.5 text-right font-medium text-foreground tabular-nums',
+                          isUpdating && 'animate-pulse'
+                        )}
+                      >
                         {formatCurrency((item.price || 0) * (item.quantity || 0))}
                       </td>
                       {/* Actions */}
-                      <td className='py-1.5 pl-2 pr-5'>
+                      <td className='py-1.5 pr-5 pl-2'>
                         <div className='flex items-center gap-1'>
                           <button
                             type='button'
@@ -234,7 +258,7 @@ export function CartEditableTable({
                           </button>
                           <button
                             type='button'
-                            className='inline-flex size-6 items-center justify-center rounded-[5px] text-text-quaternary opacity-0 transition-all duration-75 hover:bg-bg-active hover:text-destructive group-hover/row:opacity-100'
+                            className='text-text-quaternary inline-flex size-6 items-center justify-center rounded-[5px] opacity-0 transition-all duration-75 group-hover/row:opacity-100 hover:bg-bg-active hover:text-destructive'
                             onClick={() => onRemove(item.id)}
                           >
                             <Trash2 className='size-3' />
@@ -246,20 +270,22 @@ export function CartEditableTable({
                 })}
 
                 {/* Pending rows — searching or waiting for cart add */}
-                {pendingEntries.map((pe) => {
+                {pendingEntries.map(pe => {
                   const product = pe.product
                   const price = product ? Number(product.price) || 0 : 0
                   return (
-                    <tr
-                      key={pe.key}
-                      className='border-b border-border-light animate-pulse'
-                    >
-                      <td className='w-[36px] py-1.5 pl-5 pr-0'>
+                    <tr key={pe.key} className='animate-pulse border-b border-border-light'>
+                      <td className='w-[36px] py-1.5 pr-0 pl-5'>
                         <div className='flex size-7 items-center justify-center overflow-hidden rounded-[4px] bg-bg-secondary'>
                           {product?.photo ? (
-                            <img src={product.photo} alt={product.descr_1} className='size-7 object-cover' loading='lazy' />
+                            <img
+                              src={product.photo}
+                              alt={product.descr_1}
+                              className='size-7 object-cover'
+                              loading='lazy'
+                            />
                           ) : (
-                            <Image className='size-3 text-text-quaternary' />
+                            <Image className='text-text-quaternary size-3' />
                           )}
                         </div>
                       </td>
@@ -268,23 +294,23 @@ export function CartEditableTable({
                       </td>
                       <td className='max-w-[300px] px-3 py-1.5 text-text-secondary/60'>
                         <span className='block truncate'>
-                          {product ? (product.descr_1 || '—') : 'Looking up…'}
+                          {product ? product.descr_1 || '—' : 'Looking up…'}
                         </span>
                       </td>
-                      <td className='px-3 py-1.5 text-right tabular-nums text-text-secondary/60'>
+                      <td className='px-3 py-1.5 text-right text-text-secondary/60 tabular-nums'>
                         {product ? '1' : '—'}
                       </td>
                       <td className='px-3 py-1.5 text-text-tertiary/60'>
-                        {product ? (product.unit || product.def_unit || '—') : '—'}
+                        {product ? product.unit || product.def_unit || '—' : '—'}
                       </td>
-                      <td className='px-3 py-1.5 text-right tabular-nums text-text-secondary/60'>
+                      <td className='px-3 py-1.5 text-right text-text-secondary/60 tabular-nums'>
                         {product ? formatCurrency(price) : '—'}
                       </td>
-                      <td className='px-3 py-1.5 text-right font-medium tabular-nums text-foreground/60'>
+                      <td className='px-3 py-1.5 text-right font-medium text-foreground/60 tabular-nums'>
                         {product ? formatCurrency(price) : '—'}
                       </td>
-                      <td className='py-1.5 pl-2 pr-5'>
-                        <Loader2 className='size-3.5 animate-spin text-text-quaternary' />
+                      <td className='py-1.5 pr-5 pl-2'>
+                        <Loader2 className='text-text-quaternary size-3.5 animate-spin' />
                       </td>
                     </tr>
                   )
@@ -295,12 +321,12 @@ export function CartEditableTable({
             {/* Input row — always visible when not loading */}
             {!loading && (
               <tr className='border-b border-border-light'>
-                <td className='py-1.5 pl-5 pr-0'>
+                <td className='py-1.5 pr-0 pl-5'>
                   <div className='flex size-7 items-center justify-center'>
                     {searching ? (
-                      <Loader2 className='size-3.5 animate-spin text-text-quaternary' />
+                      <Loader2 className='text-text-quaternary size-3.5 animate-spin' />
                     ) : (
-                      <div className='size-3 rounded-[3px] border border-dashed border-border-heavy' />
+                      <div className='border-border-heavy size-3 rounded-[3px] border border-dashed' />
                     )}
                   </div>
                 </td>
@@ -309,31 +335,33 @@ export function CartEditableTable({
                     ref={inputRef}
                     type='text'
                     value={inputValue}
-                    onChange={(e) => {
+                    onChange={e => {
                       setInputValue(e.target.value.toUpperCase())
                       if (error) setError(null)
                     }}
-                    onKeyDown={(e) => {
+                    onKeyDown={e => {
                       if (e.key === 'Enter') {
                         e.preventDefault()
                         handleSubmit()
                       }
                     }}
-                    placeholder={canInput ? 'Type product ID and press Enter…' : 'Select a customer first'}
+                    placeholder={
+                      canInput ? 'Type product ID and press Enter…' : 'Select a customer first'
+                    }
                     disabled={!canInput || searching}
                     className={cn(
-                      'w-full bg-transparent text-[13px] font-medium uppercase outline-none placeholder:font-normal placeholder:normal-case placeholder:text-text-quaternary disabled:cursor-not-allowed disabled:opacity-50',
+                      'placeholder:text-text-quaternary w-full bg-transparent text-[13px] font-medium uppercase outline-none placeholder:font-normal placeholder:normal-case disabled:cursor-not-allowed disabled:opacity-50',
                       error && 'text-destructive'
                     )}
                     autoComplete='off'
                     spellCheck={false}
                   />
                 </td>
-                <td className='px-3 py-1.5 text-right text-text-quaternary'>—</td>
-                <td className='px-3 py-1.5 text-text-quaternary'>—</td>
-                <td className='px-3 py-1.5 text-right text-text-quaternary'>—</td>
-                <td className='px-3 py-1.5 text-right text-text-quaternary'>—</td>
-                <td className='py-1.5 pl-2 pr-5'>
+                <td className='text-text-quaternary px-3 py-1.5 text-right'>—</td>
+                <td className='text-text-quaternary px-3 py-1.5'>—</td>
+                <td className='text-text-quaternary px-3 py-1.5 text-right'>—</td>
+                <td className='text-text-quaternary px-3 py-1.5 text-right'>—</td>
+                <td className='py-1.5 pr-5 pl-2'>
                   {inputValue.trim() && !searching && (
                     <button
                       type='button'
@@ -349,7 +377,6 @@ export function CartEditableTable({
             )}
           </tbody>
         </table>
-
       </div>
 
       {/* Error message */}

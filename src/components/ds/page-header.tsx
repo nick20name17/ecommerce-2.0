@@ -11,7 +11,9 @@ interface PageHeaderIconProps {
  */
 export function PageHeaderIcon({ icon: Icon, color }: PageHeaderIconProps) {
   return (
-    <div className={cn('flex size-[22px] shrink-0 items-center justify-center rounded-[6px]', color)}>
+    <div
+      className={cn('flex size-[22px] shrink-0 items-center justify-center rounded-[6px]', color)}
+    >
       <Icon className='size-[13px] text-white' />
     </div>
   )
@@ -39,5 +41,5 @@ export const PAGE_COLORS = {
   variableProducts: 'bg-purple-500',
   legacyCarts: 'bg-yellow-500',
   storefront: 'bg-fuchsia-500',
-  documents: 'bg-indigo-500',
+  documents: 'bg-indigo-500'
 } as const

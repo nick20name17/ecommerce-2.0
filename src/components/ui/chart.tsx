@@ -51,15 +51,12 @@ const ChartContainer = ({
         data-slot='chart'
         data-chart={chartId}
         className={cn(
-          "[&_.recharts-cartesian-axis-tick_text]:fill-muted-foreground [&_.recharts-cartesian-grid_line[stroke='#ccc']]:stroke-border/50 [&_.recharts-curve.recharts-tooltip-cursor]:stroke-border [&_.recharts-polar-grid_[stroke='#ccc']]:stroke-border [&_.recharts-radial-bar-background-sector]:fill-muted [&_.recharts-rectangle.recharts-tooltip-cursor]:fill-muted [&_.recharts-reference-line_[stroke='#ccc']]:stroke-border flex aspect-video justify-center text-xs [&_.recharts-dot[stroke='#fff']]:stroke-transparent [&_.recharts-layer]:outline-hidden [&_.recharts-sector]:outline-hidden [&_.recharts-sector[stroke='#fff']]:stroke-transparent [&_.recharts-surface]:outline-hidden",
+          "flex aspect-video justify-center text-xs [&_.recharts-cartesian-axis-tick_text]:fill-muted-foreground [&_.recharts-cartesian-grid_line[stroke='#ccc']]:stroke-border/50 [&_.recharts-curve.recharts-tooltip-cursor]:stroke-border [&_.recharts-dot[stroke='#fff']]:stroke-transparent [&_.recharts-layer]:outline-hidden [&_.recharts-polar-grid_[stroke='#ccc']]:stroke-border [&_.recharts-radial-bar-background-sector]:fill-muted [&_.recharts-rectangle.recharts-tooltip-cursor]:fill-muted [&_.recharts-reference-line_[stroke='#ccc']]:stroke-border [&_.recharts-sector]:outline-hidden [&_.recharts-sector[stroke='#fff']]:stroke-transparent [&_.recharts-surface]:outline-hidden",
           className
         )}
         {...props}
       >
-        <ChartStyle
-          id={chartId}
-          config={config}
-        />
+        <ChartStyle id={chartId} config={config} />
         <RechartsPrimitive.ResponsiveContainer>{children}</RechartsPrimitive.ResponsiveContainer>
       </div>
     </ChartContext.Provider>
@@ -156,14 +153,14 @@ const ChartTooltipContent = ({
   return (
     <div
       className={cn(
-        'border-border/50 bg-background grid min-w-32 items-start gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs shadow-xl',
+        'grid min-w-32 items-start gap-1.5 rounded-lg border border-border/50 bg-background px-2.5 py-1.5 text-xs shadow-xl',
         className
       )}
     >
       {!nestLabel ? tooltipLabel : null}
       <div className='grid gap-1.5'>
         {payload
-          .filter((item) => item.type !== 'none')
+          .filter(item => item.type !== 'none')
           .map((item, index) => {
             const key = `${nameKey || item.name || item.dataKey || 'value'}`
             const itemConfig = getPayloadConfigFromPayload(config, item, key)
@@ -173,7 +170,7 @@ const ChartTooltipContent = ({
               <div
                 key={item.dataKey}
                 className={cn(
-                  '[&>svg]:text-muted-foreground flex w-full flex-wrap items-stretch gap-2 [&>svg]:h-2.5 [&>svg]:w-2.5',
+                  'flex w-full flex-wrap items-stretch gap-2 [&>svg]:h-2.5 [&>svg]:w-2.5 [&>svg]:text-muted-foreground',
                   indicator === 'dot' && 'items-center'
                 )}
               >
@@ -218,7 +215,7 @@ const ChartTooltipContent = ({
                         </span>
                       </div>
                       {item.value && (
-                        <span className='text-foreground font-mono font-medium tabular-nums'>
+                        <span className='font-mono font-medium text-foreground tabular-nums'>
                           {item.value.toLocaleString()}
                         </span>
                       )}
@@ -261,8 +258,8 @@ const ChartLegendContent = ({
       )}
     >
       {payload
-        .filter((item) => item.type !== 'none')
-        .map((item) => {
+        .filter(item => item.type !== 'none')
+        .map(item => {
           const key = `${nameKey || item.dataKey || 'value'}`
           const itemConfig = getPayloadConfigFromPayload(config, item, key)
 
@@ -270,7 +267,7 @@ const ChartLegendContent = ({
             <div
               key={item.value}
               className={cn(
-                '[&>svg]:text-muted-foreground flex items-center gap-1.5 [&>svg]:h-3 [&>svg]:w-3'
+                'flex items-center gap-1.5 [&>svg]:h-3 [&>svg]:w-3 [&>svg]:text-muted-foreground'
               )}
             >
               {itemConfig?.icon && !hideIcon ? (
@@ -291,11 +288,7 @@ const ChartLegendContent = ({
   )
 }
 
-const getPayloadConfigFromPayload = (
-  config: ChartConfig,
-  payload: unknown,
-  key: string
-) => {
+const getPayloadConfigFromPayload = (config: ChartConfig, payload: unknown, key: string) => {
   if (typeof payload !== 'object' || payload === null) {
     return undefined
   }

@@ -11,7 +11,7 @@ import {
   DialogContent,
   DialogFooter,
   DialogHeader,
-  DialogTitle,
+  DialogTitle
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -29,7 +29,7 @@ export const CategoryFormDialog = ({
   onOpenChange,
   category,
   parentId,
-  projectId,
+  projectId
 }: CategoryFormDialogProps) => {
   const isEditing = !!category
   const [name, setName] = useState(category?.name ?? '')
@@ -49,9 +49,9 @@ export const CategoryFormDialog = ({
       catalogService.create(payload, { project_id: projectId ?? undefined }),
     meta: {
       successMessage: 'Category created',
-      invalidatesQuery: CATALOG_QUERY_KEYS.all(),
+      invalidatesQuery: CATALOG_QUERY_KEYS.all()
     },
-    onSuccess: () => onOpenChange(false),
+    onSuccess: () => onOpenChange(false)
   })
 
   const updateMutation = useMutation({
@@ -59,9 +59,9 @@ export const CategoryFormDialog = ({
       catalogService.update(category!.id, payload, { project_id: projectId ?? undefined }),
     meta: {
       successMessage: 'Category updated',
-      invalidatesQuery: CATALOG_QUERY_KEYS.all(),
+      invalidatesQuery: CATALOG_QUERY_KEYS.all()
     },
-    onSuccess: () => onOpenChange(false),
+    onSuccess: () => onOpenChange(false)
   })
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -70,7 +70,7 @@ export const CategoryFormDialog = ({
       name,
       slug: slug || undefined,
       sort_order: sortOrder,
-      parent_id: isEditing ? category.parent_id : (parentId ?? null),
+      parent_id: isEditing ? category.parent_id : (parentId ?? null)
     }
 
     if (isEditing) {
@@ -85,7 +85,7 @@ export const CategoryFormDialog = ({
   return (
     <Dialog
       open={open}
-      onOpenChange={(v) => {
+      onOpenChange={v => {
         if (!v) resetForm()
         onOpenChange(v)
       }}
@@ -101,7 +101,7 @@ export const CategoryFormDialog = ({
               <Input
                 id='cat-name'
                 value={name}
-                onChange={(e) => setName(e.target.value)}
+                onChange={e => setName(e.target.value)}
                 placeholder='Category name'
                 required
                 autoFocus
@@ -112,7 +112,7 @@ export const CategoryFormDialog = ({
               <Input
                 id='cat-slug'
                 value={slug}
-                onChange={(e) => setSlug(e.target.value)}
+                onChange={e => setSlug(e.target.value)}
                 placeholder='category-slug (auto-generated if empty)'
               />
             </div>
@@ -122,16 +122,12 @@ export const CategoryFormDialog = ({
                 id='cat-sort'
                 type='number'
                 value={sortOrder}
-                onChange={(e) => setSortOrder(Number(e.target.value))}
+                onChange={e => setSortOrder(Number(e.target.value))}
               />
             </div>
           </DialogBody>
           <DialogFooter>
-            <Button
-              type='button'
-              variant='outline'
-              onClick={() => onOpenChange(false)}
-            >
+            <Button type='button' variant='outline' onClick={() => onOpenChange(false)}>
               Cancel
             </Button>
             <Button type='submit' isPending={isPending}>

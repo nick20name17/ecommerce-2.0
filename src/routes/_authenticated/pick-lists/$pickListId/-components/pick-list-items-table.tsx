@@ -1,9 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import {
-  AlertTriangle,
-  Check,
-  Trash2,
-} from 'lucide-react'
+import { AlertTriangle, Check, Trash2 } from 'lucide-react'
 import { useState } from 'react'
 
 import { PICK_LIST_QUERY_KEYS } from '@/api/pick-list/query'
@@ -19,7 +15,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogMedia,
-  AlertDialogTitle,
+  AlertDialogTitle
 } from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -44,23 +40,24 @@ export function PickListItemsTable({ pickListId, items, isEditable, isMobile, de
     mutationFn: ({ itemId, quantity }: { itemId: number; quantity: string }) =>
       pickListService.updateItem(pickListId, itemId, { picked_quantity: quantity }, projectId),
     meta: {
-      successMessage: 'Quantity updated',
+      successMessage: 'Quantity updated'
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: PICK_LIST_QUERY_KEYS.detail(pickListId) })
       setEditingItem(null)
-    },
+    }
   })
 
   const removeMutation = useMutation({
-    mutationFn: (itemId: number) => pickListService.removeItem(pickListId, itemId, false, projectId),
+    mutationFn: (itemId: number) =>
+      pickListService.removeItem(pickListId, itemId, false, projectId),
     meta: {
-      successMessage: 'Item removed',
+      successMessage: 'Item removed'
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: PICK_LIST_QUERY_KEYS.detail(pickListId) })
       setItemToRemove(null)
-    },
+    }
   })
 
   const startEdit = (item: PickListItem) => {
@@ -84,35 +81,35 @@ export function PickListItemsTable({ pickListId, items, isEditable, isMobile, de
     <>
       {/* Header */}
       {!isMobile && (
-        <div className='flex items-center gap-4 border-b border-border bg-bg-secondary/60 px-4 py-1.5 text-[12px] font-medium uppercase tracking-[0.04em] text-text-tertiary'>
+        <div className='flex items-center gap-4 border-b border-border bg-bg-secondary/60 px-4 py-1.5 text-[12px] font-medium tracking-[0.04em] text-text-tertiary uppercase'>
           <div className='w-[120px] shrink-0'>Order</div>
           <div className='min-w-0 flex-1'>Detail ID</div>
           <div className='w-[100px] shrink-0 text-right'>Quantity</div>
-          {items.some((i) => i.push_status) && (
-            <div className='w-[100px] shrink-0'>Push Status</div>
-          )}
+          {items.some(i => i.push_status) && <div className='w-[100px] shrink-0'>Push Status</div>}
           {isEditable && <div className='w-[60px] shrink-0' />}
         </div>
       )}
 
       {/* Rows */}
-      {items.map((item) => {
+      {items.map(item => {
         const isEditing = editingItem === item.id
 
         if (isMobile) {
           return (
             <div key={item.id} className='border-b border-border-light px-4 py-2.5'>
               <div className='mb-1 flex items-center justify-between'>
-                <span className='text-[13px] font-medium text-foreground'>
-                  {item.order_autoid}
-                </span>
-                <span className='text-[13px] tabular-nums text-foreground'>
+                <span className='text-[13px] font-medium text-foreground'>{item.order_autoid}</span>
+                <span className='text-[13px] text-foreground tabular-nums'>
                   {item.picked_quantity}
                 </span>
               </div>
               <div className='flex items-center justify-between'>
-                <span className='text-[13px] text-text-tertiary'>{descrMap?.get(item.detail_autoid) || item.descr || item.detail_autoid}</span>
-                {item.push_status && <PushStatusBadge status={item.push_status} error={item.push_error} />}
+                <span className='text-[13px] text-text-tertiary'>
+                  {descrMap?.get(item.detail_autoid) || item.descr || item.detail_autoid}
+                </span>
+                {item.push_status && (
+                  <PushStatusBadge status={item.push_status} error={item.push_error} />
+                )}
               </div>
               {isEditable && (
                 <div className='mt-1.5 flex gap-1.5'>
@@ -141,7 +138,7 @@ export function PickListItemsTable({ pickListId, items, isEditable, isMobile, de
             key={item.id}
             className='group/row flex items-center gap-4 border-b border-border-light px-4 py-2 transition-colors duration-100 hover:bg-bg-hover'
           >
-            <div className='w-[120px] shrink-0 text-[13px] font-semibold tabular-nums text-foreground'>
+            <div className='w-[120px] shrink-0 text-[13px] font-semibold text-foreground tabular-nums'>
               {item.order_autoid}
             </div>
             <div className='min-w-0 flex-1 truncate text-[13px] text-text-secondary'>
@@ -152,9 +149,9 @@ export function PickListItemsTable({ pickListId, items, isEditable, isMobile, de
                 <div className='flex items-center justify-end gap-1'>
                   <Input
                     value={editQty}
-                    onChange={(e) => setEditQty(e.target.value)}
+                    onChange={e => setEditQty(e.target.value)}
                     className='h-7 w-[70px] text-right text-[13px]'
-                    onKeyDown={(e) => {
+                    onKeyDown={e => {
                       if (e.key === 'Enter') commitEdit(item.id)
                       if (e.key === 'Escape') setEditingItem(null)
                     }}
@@ -172,8 +169,8 @@ export function PickListItemsTable({ pickListId, items, isEditable, isMobile, de
               ) : (
                 <span
                   className={cn(
-                    'text-[13px] tabular-nums text-foreground',
-                    isEditable && 'cursor-pointer hover:text-primary',
+                    'text-[13px] text-foreground tabular-nums',
+                    isEditable && 'cursor-pointer hover:text-primary'
                   )}
                   onClick={() => isEditable && startEdit(item)}
                 >
@@ -181,9 +178,11 @@ export function PickListItemsTable({ pickListId, items, isEditable, isMobile, de
                 </span>
               )}
             </div>
-            {items.some((i) => i.push_status) && (
+            {items.some(i => i.push_status) && (
               <div className='w-[100px] shrink-0'>
-                {item.push_status && <PushStatusBadge status={item.push_status} error={item.push_error} />}
+                {item.push_status && (
+                  <PushStatusBadge status={item.push_status} error={item.push_error} />
+                )}
               </div>
             )}
             {isEditable && (
@@ -203,7 +202,7 @@ export function PickListItemsTable({ pickListId, items, isEditable, isMobile, de
       })}
 
       {/* Remove confirmation */}
-      <AlertDialog open={!!itemToRemove} onOpenChange={(open) => !open && setItemToRemove(null)}>
+      <AlertDialog open={!!itemToRemove} onOpenChange={open => !open && setItemToRemove(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogMedia className='bg-destructive/10 text-destructive'>
@@ -211,7 +210,13 @@ export function PickListItemsTable({ pickListId, items, isEditable, isMobile, de
             </AlertDialogMedia>
             <AlertDialogTitle>Remove Item</AlertDialogTitle>
             <AlertDialogDescription>
-              Remove {itemToRemove ? (descrMap?.get(itemToRemove.detail_autoid) || itemToRemove.descr || itemToRemove.detail_autoid) : ''} from this pick list?
+              Remove{' '}
+              {itemToRemove
+                ? descrMap?.get(itemToRemove.detail_autoid) ||
+                  itemToRemove.descr ||
+                  itemToRemove.detail_autoid
+                : ''}{' '}
+              from this pick list?
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -233,7 +238,7 @@ export function PickListItemsTable({ pickListId, items, isEditable, isMobile, de
 function PushStatusBadge({ status, error }: { status: string; error?: string | null }) {
   if (status === 'success') {
     return (
-      <span className='inline-flex items-center gap-1 rounded-full border border-emerald-300 bg-emerald-500/10 px-2 py-0.5 text-[11px] font-semibold leading-none text-emerald-800 dark:border-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-300'>
+      <span className='inline-flex items-center gap-1 rounded-full border border-emerald-300 bg-emerald-500/10 px-2 py-0.5 text-[11px] leading-none font-semibold text-emerald-800 dark:border-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-300'>
         <Check className='size-2.5' />
         Pushed
       </span>
@@ -241,7 +246,7 @@ function PushStatusBadge({ status, error }: { status: string; error?: string | n
   }
   return (
     <span
-      className='inline-flex items-center gap-1 rounded-full border border-red-300 bg-red-500/10 px-2 py-0.5 text-[11px] font-semibold leading-none text-red-800 dark:border-red-600 dark:bg-red-500/20 dark:text-red-300'
+      className='inline-flex items-center gap-1 rounded-full border border-red-300 bg-red-500/10 px-2 py-0.5 text-[11px] leading-none font-semibold text-red-800 dark:border-red-600 dark:bg-red-500/20 dark:text-red-300'
       title={error ?? undefined}
     >
       <AlertTriangle className='size-2.5' />

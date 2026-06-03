@@ -16,7 +16,9 @@ export const DataTableEmpty = ({ columnsCount }: DataTableEmptyProps) => {
           </div>
           <div>
             <p className='text-[13px] font-semibold text-foreground'>Nothing found</p>
-            <p className='mt-0.5 text-[13px] text-text-tertiary'>Try adjusting your search or filters.</p>
+            <p className='mt-0.5 text-[13px] text-text-tertiary'>
+              Try adjusting your search or filters.
+            </p>
           </div>
         </div>
       </TableCell>

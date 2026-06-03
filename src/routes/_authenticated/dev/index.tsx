@@ -1,11 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
-import {
-  Check,
-  CircleDot,
-  Sparkles,
-  Wrench,
-  Zap,
-} from 'lucide-react'
+import { Check, CircleDot, Sparkles, Wrench, Zap } from 'lucide-react'
 
 import { IDev, PAGE_COLORS, PageHeaderIcon } from '@/components/ds'
 import { SidebarTrigger } from '@/components/ui/sidebar'
@@ -31,31 +25,32 @@ const CHANGELOG: ChangelogEntry[] = [
     title: 'EBMS shipment sync',
     description: 'Push shipment data (tracking, carrier, cost) to EBMS via OData API.',
     status: 'in-progress',
-    category: 'feature',
+    category: 'feature'
   },
   {
     title: 'Editable fields & EBMS interactions',
     description: 'Add editable fields and sync changes with EBMS backend.',
     status: 'in-progress',
-    category: 'feature',
+    category: 'feature'
   },
   {
     title: 'Filter presets',
-    description: 'Saved filter presets with CRUD API, preset picker on list pages, and settings management.',
+    description:
+      'Saved filter presets with CRUD API, preset picker on list pages, and settings management.',
     status: 'in-progress',
-    category: 'feature',
+    category: 'feature'
   },
   {
     title: 'Payment details',
     description: 'Ability to add and manage payment information on orders.',
     status: 'in-progress',
-    category: 'feature',
+    category: 'feature'
   },
   {
     title: 'Responsive design',
     description: 'Tablet and mobile layout optimizations across all pages.',
     status: 'in-progress',
-    category: 'improvement',
+    category: 'improvement'
   },
 
   // ── Done ──
@@ -63,179 +58,198 @@ const CHANGELOG: ChangelogEntry[] = [
     title: 'Assigned to me filter',
     description: 'Filter orders, proposals, and customers by current user assignment.',
     status: 'done',
-    category: 'feature',
+    category: 'feature'
   },
   {
     title: 'Assign API — filter & multi-assign endpoints',
     description: 'Backend ?assigned_to=me filter and assign/unassign/unassign-all endpoints.',
     status: 'done',
-    category: 'feature',
+    category: 'feature'
   },
   {
     title: 'Custom fields not displaying on orders page',
     description: 'Fixed missing custom field values in order detail view.',
     status: 'done',
-    category: 'fix',
+    category: 'fix'
   },
   {
     title: 'Price level field type',
     description: 'Dropdown pre-selection instead of manual string entry.',
     status: 'done',
-    category: 'improvement',
+    category: 'improvement'
   },
   {
     title: 'Order Desk — Ship To / Bill To fields',
     description: 'Display and edit shipping and billing addresses in sidebar.',
     status: 'done',
-    category: 'feature',
+    category: 'feature'
   },
   {
     title: 'Expand customer info on Order Desk',
     description: 'Full customer panel with contact, address, price level, and custom fields.',
     status: 'done',
-    category: 'feature',
+    category: 'feature'
   },
   {
     title: 'Catalogue — show to web products only',
     description: 'Limit product catalogue to only display show-to-web items.',
     status: 'done',
-    category: 'fix',
+    category: 'fix'
   },
   {
     title: 'Fix single ID search',
     description: 'Resolved issue where searching by a single product ID returned no results.',
     status: 'done',
-    category: 'fix',
+    category: 'fix'
   },
   {
     title: 'Fix multi UOM search for items',
     description: 'Fixed search to correctly handle products with multiple units of measure.',
     status: 'done',
-    category: 'fix',
+    category: 'fix'
   },
   {
     title: 'Edit Bill To / Ship To data',
     description: 'Compact address card with edit dialog on order pages.',
     status: 'done',
-    category: 'feature',
+    category: 'feature'
   },
   {
     title: 'Shipping rates saved on backend',
     description: 'Persist selected shipping rates to the backend on label purchase.',
     status: 'done',
-    category: 'feature',
+    category: 'feature'
   },
   {
     title: 'Void shipping functionality',
     description: 'Ability to void a shipping label and mark the shipment as voided.',
     status: 'done',
-    category: 'feature',
+    category: 'feature'
   },
   {
     title: 'Display all shippings across all orders',
     description: 'Dedicated shipping page with search and status filtering.',
     status: 'done',
-    category: 'feature',
+    category: 'feature'
   },
   {
     title: 'Display order-based shipping with filtering',
     description: 'Show shipments scoped to a specific order with filter controls.',
     status: 'done',
-    category: 'feature',
+    category: 'feature'
   },
   {
     title: 'Shipping page data not loading',
     description: 'Fixed response handling — API returns flat array, not paginated.',
     status: 'done',
-    category: 'fix',
+    category: 'fix'
   },
   {
     title: 'Shipping page filters redesign',
     description: 'Replaced segmented tabs with FilterPopover + FilterChip pattern.',
     status: 'done',
-    category: 'improvement',
+    category: 'improvement'
   },
   {
     title: 'Shipping page empty customer column',
     description: 'Graceful fallback to invoice or order ID when customer name is empty.',
     status: 'done',
-    category: 'fix',
+    category: 'fix'
   },
   {
     title: 'Shipments search not working',
-    description: 'Client-side filtering across order name, invoice, tracking, service, and carrier.',
+    description:
+      'Client-side filtering across order name, invoice, tracking, service, and carrier.',
     status: 'done',
-    category: 'fix',
+    category: 'fix'
   },
   {
     title: 'Task activity author name showing "?"',
     description: 'Display author name with "Unknown" fallback, redesigned counter badge.',
     status: 'done',
-    category: 'fix',
+    category: 'fix'
   },
   {
     title: 'Cart empty state removed',
     description: 'Removed redundant empty state — the table itself serves as the empty state.',
     status: 'done',
-    category: 'fix',
+    category: 'fix'
   },
   {
     title: 'Task attachments redesign',
     description: 'Clean single-line rows with hover actions and compact drop zone.',
     status: 'done',
-    category: 'improvement',
+    category: 'improvement'
   },
   {
     title: 'Entity attachments hover layout fix',
     description: 'Fixed misplaced hover actions with opacity transition.',
     status: 'done',
-    category: 'fix',
+    category: 'fix'
   },
   {
     title: 'Users search not working',
     description: 'Client-side filtering by name and email.',
     status: 'done',
-    category: 'fix',
+    category: 'fix'
   },
   {
     title: 'Field config "Editable" column redesign',
     description: 'Inline pencil icon toggle replacing separate column.',
     status: 'done',
-    category: 'improvement',
+    category: 'improvement'
   },
   {
     title: 'Smart boolean custom fields',
     description: 'Boolean values toggle on click with styled pill badges.',
     status: 'done',
-    category: 'feature',
+    category: 'feature'
   },
   {
     title: 'Order Desk customer info panel',
     description: 'Sidebar shows full customer details, contact, address, and custom fields.',
     status: 'done',
-    category: 'feature',
+    category: 'feature'
   },
   {
     title: 'Bill To / Ship To redesign',
     description: 'Compact address card with edit dialog replacing inline accordion.',
     status: 'done',
-    category: 'improvement',
-  },
+    category: 'improvement'
+  }
 ]
 
 // ── Helpers ──────────────────────────────────────────────────
 
-const CATEGORY_CONFIG: Record<EntryCategory, { label: string; icon: typeof Wrench; color: string }> = {
-  fix: { label: 'Fix', icon: Wrench, color: 'border-amber-200 bg-amber-500/10 text-amber-700 dark:border-amber-700 dark:bg-amber-500/20 dark:text-amber-300' },
-  feature: { label: 'Feature', icon: Sparkles, color: 'border-violet-200 bg-violet-500/10 text-violet-700 dark:border-violet-700 dark:bg-violet-500/20 dark:text-violet-300' },
-  improvement: { label: 'Improve', icon: Zap, color: 'border-sky-200 bg-sky-500/10 text-sky-700 dark:border-sky-700 dark:bg-sky-500/20 dark:text-sky-300' },
+const CATEGORY_CONFIG: Record<
+  EntryCategory,
+  { label: string; icon: typeof Wrench; color: string }
+> = {
+  fix: {
+    label: 'Fix',
+    icon: Wrench,
+    color:
+      'border-amber-200 bg-amber-500/10 text-amber-700 dark:border-amber-700 dark:bg-amber-500/20 dark:text-amber-300'
+  },
+  feature: {
+    label: 'Feature',
+    icon: Sparkles,
+    color:
+      'border-violet-200 bg-violet-500/10 text-violet-700 dark:border-violet-700 dark:bg-violet-500/20 dark:text-violet-300'
+  },
+  improvement: {
+    label: 'Improve',
+    icon: Zap,
+    color:
+      'border-sky-200 bg-sky-500/10 text-sky-700 dark:border-sky-700 dark:bg-sky-500/20 dark:text-sky-300'
+  }
 }
 
 // ── Page Component ───────────────────────────────────────────
 
 const DevPage = () => {
-  const doneEntries = CHANGELOG.filter((e) => e.status === 'done')
-  const inProgressEntries = CHANGELOG.filter((e) => e.status === 'in-progress')
+  const doneEntries = CHANGELOG.filter(e => e.status === 'done')
+  const inProgressEntries = CHANGELOG.filter(e => e.status === 'in-progress')
 
   return (
     <div className='flex h-full flex-col overflow-hidden'>
@@ -244,7 +258,7 @@ const DevPage = () => {
         <SidebarTrigger className='-ml-1' />
         <PageHeaderIcon icon={IDev} color={PAGE_COLORS.dev} />
         <h1 className='text-[14px] font-semibold tracking-[-0.01em]'>Development</h1>
-        <span className='text-[13px] tabular-nums text-text-tertiary'>
+        <span className='text-[13px] text-text-tertiary tabular-nums'>
           {CHANGELOG.length} item{CHANGELOG.length !== 1 ? 's' : ''}
         </span>
       </header>
@@ -256,7 +270,7 @@ const DevPage = () => {
           <>
             <div className='flex items-center gap-2 border-b border-border bg-bg-secondary/60 px-6 py-1.5'>
               <CircleDot className='size-3.5 text-amber-500' />
-              <span className='text-[11px] font-semibold uppercase tracking-[0.05em] text-text-tertiary'>
+              <span className='text-[11px] font-semibold tracking-[0.05em] text-text-tertiary uppercase'>
                 In Progress ({inProgressEntries.length})
               </span>
             </div>
@@ -269,7 +283,7 @@ const DevPage = () => {
         {/* Completed */}
         <div className='flex items-center gap-2 border-b border-border bg-bg-secondary/60 px-6 py-1.5'>
           <Check className='size-3.5 text-emerald-500' />
-          <span className='text-[11px] font-semibold uppercase tracking-[0.05em] text-text-tertiary'>
+          <span className='text-[11px] font-semibold tracking-[0.05em] text-text-tertiary uppercase'>
             Completed ({doneEntries.length})
           </span>
         </div>
@@ -280,7 +294,7 @@ const DevPage = () => {
 
       {/* Footer */}
       <div className='shrink-0 border-t border-border px-6 py-1.5'>
-        <p className='text-[13px] tabular-nums text-text-tertiary'>
+        <p className='text-[13px] text-text-tertiary tabular-nums'>
           {doneEntries.length} done · {inProgressEntries.length} in progress
         </p>
       </div>
@@ -313,10 +327,12 @@ function EntryRow({ entry }: { entry: ChangelogEntry }) {
       <div className='min-w-0 flex-1'>
         <div className='flex items-center gap-2'>
           <span className='text-[13px] font-medium text-foreground'>{entry.title}</span>
-          <span className={cn(
-            'inline-flex shrink-0 items-center gap-1 rounded-full border px-1.5 py-0.5 text-[10px] font-semibold leading-none',
-            cat.color,
-          )}>
+          <span
+            className={cn(
+              'inline-flex shrink-0 items-center gap-1 rounded-full border px-1.5 py-0.5 text-[10px] leading-none font-semibold',
+              cat.color
+            )}
+          >
             <CatIcon className='size-2.5' />
             {cat.label}
           </span>
@@ -330,6 +346,6 @@ function EntryRow({ entry }: { entry: ChangelogEntry }) {
 export const Route = createFileRoute('/_authenticated/dev/')({
   component: DevPage,
   head: () => ({
-    meta: [{ title: 'Development' }],
-  }),
+    meta: [{ title: 'Development' }]
+  })
 })

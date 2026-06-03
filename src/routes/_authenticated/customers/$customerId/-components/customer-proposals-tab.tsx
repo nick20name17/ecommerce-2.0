@@ -8,10 +8,7 @@ import type { ProposalParams } from '@/api/proposal/schema'
 import { PageEmpty } from '@/components/common/page-empty'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
-import {
-  PROPOSAL_STATUS_CLASS,
-  getProposalStatusLabel,
-} from '@/constants/proposal'
+import { PROPOSAL_STATUS_CLASS, getProposalStatusLabel } from '@/constants/proposal'
 import { useBreakpoint } from '@/hooks/use-breakpoint'
 import { useProjectId } from '@/hooks/use-project-id'
 import { formatCurrency, formatDate } from '@/helpers/formatters'
@@ -25,7 +22,7 @@ const STATUS_DOT_COLORS: Record<string, string> = {
   C: 'bg-slate-400',
   E: 'bg-amber-500',
   N: 'bg-violet-500',
-  H: 'bg-slate-400',
+  H: 'bg-slate-400'
 }
 
 interface CustomerProposalsTabProps {
@@ -43,12 +40,12 @@ export const CustomerProposalsTab = ({ customerId }: CustomerProposalsTabProps) 
     b_id: customerId,
     search: search || undefined,
     project_id: projectId ?? undefined,
-    limit: 200,
+    limit: 200
   }
 
   const { data, isLoading } = useQuery({
     ...getProposalsQuery(params),
-    placeholderData: keepPreviousData,
+    placeholderData: keepPreviousData
   })
 
   const proposals = data?.results ?? []
@@ -61,7 +58,7 @@ export const CustomerProposalsTab = ({ customerId }: CustomerProposalsTabProps) 
           <Search className='size-3.5 shrink-0 text-text-tertiary' />
           <input
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={e => setSearch(e.target.value)}
             placeholder='Search proposals...'
             className='flex-1 bg-transparent text-[13px] outline-none placeholder:text-text-tertiary'
           />
@@ -73,13 +70,13 @@ export const CustomerProposalsTab = ({ customerId }: CustomerProposalsTabProps) 
         {/* Column headers */}
         {!isMobile && (proposals.length > 0 || isLoading) && (
           <div className='sticky top-0 z-10 flex min-w-fit items-center gap-4 border-b border-border bg-bg-secondary/60 px-5 py-1.5 xl:px-6'>
-            <div className='min-w-0 flex-1 text-[12px] font-medium uppercase tracking-[0.04em] text-text-tertiary'>
+            <div className='min-w-0 flex-1 text-[12px] font-medium tracking-[0.04em] text-text-tertiary uppercase'>
               Quote
             </div>
-            <div className='w-[80px] shrink-0 text-right text-[12px] font-medium uppercase tracking-[0.04em] text-text-tertiary'>
+            <div className='w-[80px] shrink-0 text-right text-[12px] font-medium tracking-[0.04em] text-text-tertiary uppercase'>
               Date
             </div>
-            <div className='w-[80px] shrink-0 text-right text-[12px] font-medium uppercase tracking-[0.04em] text-text-tertiary'>
+            <div className='w-[80px] shrink-0 text-right text-[12px] font-medium tracking-[0.04em] text-text-tertiary uppercase'>
               Total
             </div>
           </div>
@@ -117,9 +114,14 @@ export const CustomerProposalsTab = ({ customerId }: CustomerProposalsTabProps) 
             )}
           </div>
         ) : proposals.length === 0 ? (
-          <PageEmpty icon={FileText} title='No proposals found' description='This customer has no proposals yet.' compact />
+          <PageEmpty
+            icon={FileText}
+            title='No proposals found'
+            description='This customer has no proposals yet.'
+            compact
+          />
         ) : (
-          proposals.map((proposal) => (
+          proposals.map(proposal => (
             <ProposalRow
               key={proposal.autoid}
               proposal={proposal}
@@ -127,7 +129,7 @@ export const CustomerProposalsTab = ({ customerId }: CustomerProposalsTabProps) 
               onClick={() =>
                 navigate({
                   to: '/proposals/$proposalId',
-                  params: { proposalId: proposal.autoid },
+                  params: { proposalId: proposal.autoid }
                 })
               }
             />
@@ -138,7 +140,7 @@ export const CustomerProposalsTab = ({ customerId }: CustomerProposalsTabProps) 
       {/* Footer */}
       {proposals.length > 0 && (
         <div className='shrink-0 border-t border-border px-5 py-1.5 sm:px-6'>
-          <p className='text-[13px] tabular-nums text-text-tertiary'>
+          <p className='text-[13px] text-text-tertiary tabular-nums'>
             {proposals.length} proposal{proposals.length !== 1 ? 's' : ''}
           </p>
         </div>
@@ -152,7 +154,7 @@ export const CustomerProposalsTab = ({ customerId }: CustomerProposalsTabProps) 
 function ProposalRow({
   proposal,
   isMobile,
-  onClick,
+  onClick
 }: {
   proposal: Proposal
   isMobile: boolean
@@ -171,17 +173,15 @@ function ProposalRow({
       >
         <div className='flex items-center justify-between gap-2'>
           <div className='flex items-center gap-2'>
-            <span className='text-[13px] font-medium text-foreground'>
-              {quote}
-            </span>
+            <span className='text-[13px] font-medium text-foreground'>{quote}</span>
             <StatusBadge label={statusLabel} statusClass={statusClass} dotColor={dotColor} />
           </div>
-          <span className='text-[13px] font-medium tabular-nums text-foreground'>
+          <span className='text-[13px] font-medium text-foreground tabular-nums'>
             {formatCurrency(proposal.total, '—')}
           </span>
         </div>
         {proposal.qt_date && (
-          <div className='mt-0.5 text-[13px] tabular-nums text-text-tertiary'>
+          <div className='mt-0.5 text-[13px] text-text-tertiary tabular-nums'>
             {formatDate(proposal.qt_date)}
           </div>
         )}
@@ -198,9 +198,7 @@ function ProposalRow({
       <div className='flex min-w-0 flex-1 items-center gap-2'>
         <Tooltip>
           <TooltipTrigger asChild>
-            <span className='truncate text-[13px] font-medium text-foreground'>
-              {quote}
-            </span>
+            <span className='truncate text-[13px] font-medium text-foreground'>{quote}</span>
           </TooltipTrigger>
           <TooltipContent side='top'>{quote}</TooltipContent>
         </Tooltip>
@@ -208,12 +206,12 @@ function ProposalRow({
       </div>
 
       {/* Date */}
-      <div className='w-[80px] shrink-0 text-right text-[13px] tabular-nums text-text-tertiary'>
+      <div className='w-[80px] shrink-0 text-right text-[13px] text-text-tertiary tabular-nums'>
         {proposal.qt_date ? formatDate(proposal.qt_date) : '—'}
       </div>
 
       {/* Total */}
-      <div className='w-[80px] shrink-0 text-right text-[13px] font-medium tabular-nums text-foreground'>
+      <div className='w-[80px] shrink-0 text-right text-[13px] font-medium text-foreground tabular-nums'>
         {formatCurrency(proposal.total, '—')}
       </div>
     </div>
@@ -225,7 +223,7 @@ function ProposalRow({
 function StatusBadge({
   label,
   statusClass,
-  dotColor,
+  dotColor
 }: {
   label: string
   statusClass: string
@@ -234,8 +232,8 @@ function StatusBadge({
   return (
     <span
       className={cn(
-        'inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-[11px] font-semibold leading-none',
-        statusClass,
+        'inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-[11px] leading-none font-semibold',
+        statusClass
       )}
     >
       <span className={cn('size-1.5 rounded-full', dotColor)} />

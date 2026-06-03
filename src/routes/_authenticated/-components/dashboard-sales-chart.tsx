@@ -41,34 +41,15 @@ export const DashboardSalesChart = ({ metrics }: DashboardSalesChartProps) => {
   ]
 
   return (
-    <ChartContainer
-      config={chartConfig}
-      className='h-[280px] w-full'
-    >
-      <BarChart
-        data={data}
-        margin={{ top: 8, right: 8, bottom: 8, left: 8 }}
-      >
-        <CartesianGrid
-          strokeDasharray='3 3'
-          vertical={false}
-          className='stroke-border/50'
-        />
-        <XAxis
-          dataKey='name'
-          tickLine={false}
-          axisLine={false}
-          tickMargin={8}
-        />
-        <YAxis
-          tickLine={false}
-          axisLine={false}
-          tickMargin={8}
-        />
+    <ChartContainer config={chartConfig} className='h-[280px] w-full'>
+      <BarChart data={data} margin={{ top: 8, right: 8, bottom: 8, left: 8 }}>
+        <CartesianGrid strokeDasharray='3 3' vertical={false} className='stroke-border/50' />
+        <XAxis dataKey='name' tickLine={false} axisLine={false} tickMargin={8} />
+        <YAxis tickLine={false} axisLine={false} tickMargin={8} />
         <ChartTooltip
           content={
             <ChartTooltipContent
-              formatter={(value) => (
+              formatter={value => (
                 <span className='font-mono font-medium tabular-nums'>
                   {formatCurrency(Number(value), '$0', {
                     minimumFractionDigits: 0,
@@ -80,16 +61,8 @@ export const DashboardSalesChart = ({ metrics }: DashboardSalesChartProps) => {
           }
         />
         <Legend content={<ChartLegendContent />} />
-        <Bar
-          dataKey='thisMonth'
-          fill='var(--color-thisMonth)'
-          radius={[4, 4, 0, 0]}
-        />
-        <Bar
-          dataKey='lastMonth'
-          fill='var(--color-lastMonth)'
-          radius={[4, 4, 0, 0]}
-        />
+        <Bar dataKey='thisMonth' fill='var(--color-thisMonth)' radius={[4, 4, 0, 0]} />
+        <Bar dataKey='lastMonth' fill='var(--color-lastMonth)' radius={[4, 4, 0, 0]} />
       </BarChart>
     </ChartContainer>
   )

@@ -76,10 +76,7 @@ export const ProposalDeleteDialog = ({
   }
 
   return (
-    <AlertDialog
-      open={open}
-      onOpenChange={handleOpenChange}
-    >
+    <AlertDialog open={open} onOpenChange={handleOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogMedia className='bg-destructive/10 text-destructive'>
@@ -97,7 +94,7 @@ export const ProposalDeleteDialog = ({
             <button
               type='button'
               onClick={handleCopy}
-              className='hover:bg-bg-hover inline-flex cursor-pointer items-center gap-1 rounded px-1 font-semibold transition-colors'
+              className='inline-flex cursor-pointer items-center gap-1 rounded px-1 font-semibold transition-colors hover:bg-bg-hover'
             >
               {CONFIRMATION_TEXT}
               {copied ? <Check className='size-3' /> : <Copy className='size-3' />}
@@ -107,7 +104,7 @@ export const ProposalDeleteDialog = ({
           <Input
             id='confirm-delete'
             value={confirmText}
-            onChange={(e) => setConfirmText(e.target.value)}
+            onChange={e => setConfirmText(e.target.value)}
             placeholder={CONFIRMATION_TEXT}
           />
         </div>

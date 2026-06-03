@@ -68,7 +68,12 @@ const getInvalidationKeys = (entity: string): readonly (readonly unknown[])[] =>
     case 'shipment':
       return [SHIPMENT_QUERY_KEYS.all(), PICK_LIST_QUERY_KEYS.all()]
     default:
-      return [ORDER_QUERY_KEYS.lists(), PROPOSAL_QUERY_KEYS.lists(), PICK_LIST_QUERY_KEYS.all(), SHIPMENT_QUERY_KEYS.all()]
+      return [
+        ORDER_QUERY_KEYS.lists(),
+        PROPOSAL_QUERY_KEYS.lists(),
+        PICK_LIST_QUERY_KEYS.all(),
+        SHIPMENT_QUERY_KEYS.all()
+      ]
   }
 }
 
@@ -78,7 +83,7 @@ const ENTITY_LABELS: Record<string, string> = {
   customer: 'Customer',
   task: 'Task',
   pick_list: 'Pick List',
-  shipment: 'Shipment',
+  shipment: 'Shipment'
 }
 
 const getToastMessage = (payload: WSNotificationPayload): string => {

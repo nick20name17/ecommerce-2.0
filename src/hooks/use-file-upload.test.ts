@@ -22,9 +22,7 @@ function makeFile(name: string, size: number, type: string = 'text/plain'): File
 
 describe('useFileUpload - size validation', () => {
   it('accepts a file within the size limit', () => {
-    const { result } = renderHook(() =>
-      useFileUpload({ maxSize: 1024, multiple: true })
-    )
+    const { result } = renderHook(() => useFileUpload({ maxSize: 1024, multiple: true }))
 
     act(() => {
       result.current[1].addFiles([makeFile('small.txt', 500)])
@@ -35,9 +33,7 @@ describe('useFileUpload - size validation', () => {
   })
 
   it('rejects a file that exceeds the size limit', () => {
-    const { result } = renderHook(() =>
-      useFileUpload({ maxSize: 1024, multiple: true })
-    )
+    const { result } = renderHook(() => useFileUpload({ maxSize: 1024, multiple: true }))
 
     act(() => {
       result.current[1].addFiles([makeFile('big.txt', 2048)])
@@ -48,9 +44,7 @@ describe('useFileUpload - size validation', () => {
   })
 
   it('rejects oversized file in single-file mode', () => {
-    const { result } = renderHook(() =>
-      useFileUpload({ maxSize: 100 })
-    )
+    const { result } = renderHook(() => useFileUpload({ maxSize: 100 }))
 
     act(() => {
       result.current[1].addFiles([makeFile('huge.txt', 500)])
@@ -65,9 +59,7 @@ describe('useFileUpload - size validation', () => {
 
 describe('useFileUpload - type validation', () => {
   it('accepts a file with a matching MIME type', () => {
-    const { result } = renderHook(() =>
-      useFileUpload({ accept: 'image/*', multiple: true })
-    )
+    const { result } = renderHook(() => useFileUpload({ accept: 'image/*', multiple: true }))
 
     act(() => {
       result.current[1].addFiles([makeFile('photo.png', 100, 'image/png')])
@@ -78,9 +70,7 @@ describe('useFileUpload - type validation', () => {
   })
 
   it('rejects a file with a non-matching MIME type', () => {
-    const { result } = renderHook(() =>
-      useFileUpload({ accept: 'image/*', multiple: true })
-    )
+    const { result } = renderHook(() => useFileUpload({ accept: 'image/*', multiple: true }))
 
     act(() => {
       result.current[1].addFiles([makeFile('doc.pdf', 100, 'application/pdf')])
@@ -91,9 +81,7 @@ describe('useFileUpload - type validation', () => {
   })
 
   it('accepts file matching extension-based accept', () => {
-    const { result } = renderHook(() =>
-      useFileUpload({ accept: '.csv,.xlsx', multiple: true })
-    )
+    const { result } = renderHook(() => useFileUpload({ accept: '.csv,.xlsx', multiple: true }))
 
     act(() => {
       result.current[1].addFiles([makeFile('data.csv', 100, 'text/csv')])
@@ -103,9 +91,7 @@ describe('useFileUpload - type validation', () => {
   })
 
   it('rejects file not matching extension-based accept', () => {
-    const { result } = renderHook(() =>
-      useFileUpload({ accept: '.csv', multiple: true })
-    )
+    const { result } = renderHook(() => useFileUpload({ accept: '.csv', multiple: true }))
 
     act(() => {
       result.current[1].addFiles([makeFile('data.json', 100, 'application/json')])
@@ -116,9 +102,7 @@ describe('useFileUpload - type validation', () => {
   })
 
   it('accepts any file when accept is wildcard', () => {
-    const { result } = renderHook(() =>
-      useFileUpload({ accept: '*', multiple: true })
-    )
+    const { result } = renderHook(() => useFileUpload({ accept: '*', multiple: true }))
 
     act(() => {
       result.current[1].addFiles([makeFile('anything.xyz', 100, 'application/octet-stream')])
@@ -132,9 +116,7 @@ describe('useFileUpload - type validation', () => {
 
 describe('useFileUpload - duplicate detection', () => {
   it('skips duplicate files in multiple mode (same name and size)', () => {
-    const { result } = renderHook(() =>
-      useFileUpload({ multiple: true })
-    )
+    const { result } = renderHook(() => useFileUpload({ multiple: true }))
 
     act(() => {
       result.current[1].addFiles([makeFile('report.pdf', 200, 'application/pdf')])
@@ -148,9 +130,7 @@ describe('useFileUpload - duplicate detection', () => {
   })
 
   it('allows files with same name but different size', () => {
-    const { result } = renderHook(() =>
-      useFileUpload({ multiple: true })
-    )
+    const { result } = renderHook(() => useFileUpload({ multiple: true }))
 
     act(() => {
       result.current[1].addFiles([makeFile('report.pdf', 200, 'application/pdf')])
@@ -164,9 +144,7 @@ describe('useFileUpload - duplicate detection', () => {
   })
 
   it('replaces file in single mode (no duplicate check)', () => {
-    const { result } = renderHook(() =>
-      useFileUpload({ multiple: false })
-    )
+    const { result } = renderHook(() => useFileUpload({ multiple: false }))
 
     act(() => {
       result.current[1].addFiles([makeFile('a.txt', 100)])
@@ -185,9 +163,7 @@ describe('useFileUpload - duplicate detection', () => {
 
 describe('useFileUpload - max file count', () => {
   it('rejects batch that would exceed maxFiles', () => {
-    const { result } = renderHook(() =>
-      useFileUpload({ maxFiles: 2, multiple: true })
-    )
+    const { result } = renderHook(() => useFileUpload({ maxFiles: 2, multiple: true }))
 
     act(() => {
       result.current[1].addFiles([
@@ -202,9 +178,7 @@ describe('useFileUpload - max file count', () => {
   })
 
   it('rejects when adding to already-full list', () => {
-    const { result } = renderHook(() =>
-      useFileUpload({ maxFiles: 1, multiple: true })
-    )
+    const { result } = renderHook(() => useFileUpload({ maxFiles: 1, multiple: true }))
 
     act(() => {
       result.current[1].addFiles([makeFile('a.txt', 10)])
@@ -221,9 +195,7 @@ describe('useFileUpload - max file count', () => {
   })
 
   it('allows exactly maxFiles', () => {
-    const { result } = renderHook(() =>
-      useFileUpload({ maxFiles: 3, multiple: true })
-    )
+    const { result } = renderHook(() => useFileUpload({ maxFiles: 3, multiple: true }))
 
     act(() => {
       result.current[1].addFiles([
@@ -242,9 +214,7 @@ describe('useFileUpload - max file count', () => {
 
 describe('useFileUpload - removeFile and clearFiles', () => {
   it('removes a file by id', () => {
-    const { result } = renderHook(() =>
-      useFileUpload({ multiple: true })
-    )
+    const { result } = renderHook(() => useFileUpload({ multiple: true }))
 
     act(() => {
       result.current[1].addFiles([makeFile('a.txt', 10), makeFile('b.txt', 20)])
@@ -260,9 +230,7 @@ describe('useFileUpload - removeFile and clearFiles', () => {
   })
 
   it('clears all files', () => {
-    const { result } = renderHook(() =>
-      useFileUpload({ multiple: true })
-    )
+    const { result } = renderHook(() => useFileUpload({ multiple: true }))
 
     act(() => {
       result.current[1].addFiles([makeFile('a.txt', 10)])
@@ -276,9 +244,7 @@ describe('useFileUpload - removeFile and clearFiles', () => {
   })
 
   it('does nothing when removing a non-existent id', () => {
-    const { result } = renderHook(() =>
-      useFileUpload({ multiple: true })
-    )
+    const { result } = renderHook(() => useFileUpload({ multiple: true }))
 
     act(() => {
       result.current[1].addFiles([makeFile('a.txt', 10)])
@@ -297,9 +263,7 @@ describe('useFileUpload - removeFile and clearFiles', () => {
 describe('useFileUpload - callbacks', () => {
   it('calls onError when validation fails', () => {
     const onError = vi.fn()
-    const { result } = renderHook(() =>
-      useFileUpload({ maxSize: 10, multiple: true, onError })
-    )
+    const { result } = renderHook(() => useFileUpload({ maxSize: 10, multiple: true, onError }))
 
     act(() => {
       result.current[1].addFiles([makeFile('big.txt', 1000)])
@@ -310,9 +274,7 @@ describe('useFileUpload - callbacks', () => {
 
   it('calls onFilesAdded when valid files are added', () => {
     const onFilesAdded = vi.fn()
-    const { result } = renderHook(() =>
-      useFileUpload({ multiple: true, onFilesAdded })
-    )
+    const { result } = renderHook(() => useFileUpload({ multiple: true, onFilesAdded }))
 
     act(() => {
       result.current[1].addFiles([makeFile('a.txt', 10)])

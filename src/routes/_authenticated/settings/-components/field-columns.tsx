@@ -32,11 +32,11 @@ const AliasCell = ({
     <div className='flex min-w-0 items-center gap-1.5'>
       <Input
         value={value}
-        onChange={(e) => setValue(e.target.value)}
+        onChange={e => setValue(e.target.value)}
         placeholder='Display name'
         className='h-8 min-w-0 flex-1 text-sm'
         disabled={isPending}
-        onKeyDown={(e) => {
+        onKeyDown={e => {
           if (e.key === 'Enter') {
             e.preventDefault()
             if (isDirty) onSubmit(entity, field, trimmed)
@@ -73,12 +73,7 @@ export const getFieldColumns = (
   {
     id: 'field_name',
     accessorKey: 'field',
-    header: ({ column }) => (
-      <ColumnHeader
-        column={column}
-        title='Field'
-      />
-    ),
+    header: ({ column }) => <ColumnHeader column={column} title='Field' />,
     cell: ({ row }) => (
       <Tooltip>
         <TooltipTrigger asChild>
@@ -93,12 +88,7 @@ export const getFieldColumns = (
   {
     id: 'alias',
     accessorKey: 'alias',
-    header: ({ column }) => (
-      <ColumnHeader
-        column={column}
-        title='Alias'
-      />
-    ),
+    header: ({ column }) => <ColumnHeader column={column} title='Alias' />,
     cell: ({ row }) => (
       <AliasCell
         key={`${row.original.field}-${row.original.alias ?? ''}`}
@@ -115,12 +105,7 @@ export const getFieldColumns = (
   {
     id: 'state',
     accessorKey: 'enabled',
-    header: ({ column }) => (
-      <ColumnHeader
-        column={column}
-        title='State'
-      />
-    ),
+    header: ({ column }) => <ColumnHeader column={column} title='State' />,
     cell: ({ row }) => {
       const { field, default: isDefault, enabled } = row.original
 
@@ -129,11 +114,7 @@ export const getFieldColumns = (
           <Tooltip>
             <TooltipTrigger asChild>
               <span className='inline-flex'>
-                <Switch
-                  checked
-                  disabled
-                  aria-label='Default field, always enabled'
-                />
+                <Switch checked disabled aria-label='Default field, always enabled' />
               </span>
             </TooltipTrigger>
             <TooltipContent>Default field, always enabled</TooltipContent>
@@ -146,7 +127,7 @@ export const getFieldColumns = (
           checked={enabled}
           disabled={isPending}
           aria-label={enabled ? 'Disable field' : 'Enable field'}
-          onCheckedChange={(checked) => onFieldToggle(entity, field, checked)}
+          onCheckedChange={checked => onFieldToggle(entity, field, checked)}
         />
       )
     },

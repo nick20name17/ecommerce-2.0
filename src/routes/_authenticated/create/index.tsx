@@ -107,7 +107,7 @@ const CreatePage = () => {
 
   const priceLevelMutation = useMutation({
     mutationFn: (value: string) => customerService.update(customerId, { in_level: value }),
-    onSuccess: (updatedCustomer) => {
+    onSuccess: updatedCustomer => {
       queryClient.setQueryData(
         [...CUSTOMER_QUERY_KEYS.detail(customerId), projectId],
         updatedCustomer
@@ -119,7 +119,7 @@ const CreatePage = () => {
 
   const patchMutation = useMutation({
     mutationFn: (payload: Record<string, unknown>) => customerService.update(customerId, payload),
-    onSuccess: (updatedCustomer) => {
+    onSuccess: updatedCustomer => {
       queryClient.setQueryData(
         [...CUSTOMER_QUERY_KEYS.detail(customerId), projectId],
         updatedCustomer
@@ -131,11 +131,11 @@ const CreatePage = () => {
   })
 
   const handleFieldSave = (field: string, value: string) => {
-      if (!customerDetail) return
-      const current = (customerDetail[field] as string | null) ?? ''
-      if (value === current) return
-      patchMutation.mutate({ [field]: value || null })
-    }
+    if (!customerDetail) return
+    const current = (customerDetail[field] as string | null) ?? ''
+    if (value === current) return
+    patchMutation.mutate({ [field]: value || null })
+  }
 
   const savingField = patchMutation.isPending
     ? (Object.keys(patchMutation.variables ?? {})[0] ?? null)
@@ -143,7 +143,7 @@ const CreatePage = () => {
 
   const customerCustomFields = (() => {
     const entries = fieldConfig?.customer ?? []
-    return entries.filter((e) => !e.default && e.enabled && e.field !== 'salesman')
+    return entries.filter(e => !e.default && e.enabled && e.field !== 'salesman')
   })()
 
   const isCreating = busy.creatingProposal || busy.creatingOrder
@@ -153,11 +153,11 @@ const CreatePage = () => {
   return (
     <div className='flex h-full flex-col overflow-hidden'>
       {/* ── Header ── */}
-      <header className='border-border flex h-12 shrink-0 items-center gap-2.5 border-b px-3.5 sm:px-6'>
+      <header className='flex h-12 shrink-0 items-center gap-2.5 border-b border-border px-3.5 sm:px-6'>
         <SidebarTrigger className='-ml-1' />
         <button
           type='button'
-          className='border-border bg-bg-secondary text-text-secondary hover:bg-bg-active hover:text-foreground inline-flex h-7 items-center gap-0.5 rounded-[6px] border pr-2.5 pl-1.5 text-[13px] font-medium transition-colors duration-[80ms]'
+          className='inline-flex h-7 items-center gap-0.5 rounded-[6px] border border-border bg-bg-secondary pr-2.5 pl-1.5 text-[13px] font-medium text-text-secondary transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground'
           onClick={() => router.history.back()}
         >
           <ChevronLeft className='size-3.5' />
@@ -175,7 +175,7 @@ const CreatePage = () => {
         <button
           type='button'
           className={cn(
-            'border-border bg-bg-secondary text-text-secondary hover:bg-bg-active hover:text-foreground inline-flex h-7 items-center gap-1.5 rounded-[5px] border px-2.5 text-[12px] font-medium transition-colors duration-[80ms] disabled:pointer-events-none disabled:opacity-40'
+            'inline-flex h-7 items-center gap-1.5 rounded-[5px] border border-border bg-bg-secondary px-2.5 text-[12px] font-medium text-text-secondary transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground disabled:pointer-events-none disabled:opacity-40'
           )}
           disabled={!customer || isBusy}
           onClick={() => setCatalogOpen(true)}
@@ -189,7 +189,7 @@ const CreatePage = () => {
           <TooltipTrigger asChild>
             <button
               type='button'
-              className='text-text-tertiary hover:bg-bg-hover hover:text-destructive inline-flex size-7 items-center justify-center rounded-[5px] transition-colors duration-[80ms] disabled:pointer-events-none disabled:opacity-40'
+              className='inline-flex size-7 items-center justify-center rounded-[5px] text-text-tertiary transition-colors duration-[80ms] hover:bg-bg-hover hover:text-destructive disabled:pointer-events-none disabled:opacity-40'
               disabled={cartItems.length === 0 || isBusy || isCreating}
               onClick={handleClearAll}
             >
@@ -225,23 +225,19 @@ const CreatePage = () => {
 
           {/* Cart summary footer */}
           {(cart || loading) && (
-            <div className='border-border shrink-0 border-t px-6 py-2.5'>
-              <CartSummary
-                cart={cart ?? null}
-                loading={loading}
-                updating={busy.cartUpdating}
-              />
+            <div className='shrink-0 border-t border-border px-6 py-2.5'>
+              <CartSummary cart={cart ?? null} loading={loading} updating={busy.cartUpdating} />
             </div>
           )}
         </div>
 
         {/* Right: Sidebar — customer, info, addresses, actions */}
-        <div className='border-border bg-bg-secondary/30 hidden w-[320px] shrink-0 flex-col overflow-hidden border-l lg:flex'>
+        <div className='hidden w-[320px] shrink-0 flex-col overflow-hidden border-l border-border bg-bg-secondary/30 lg:flex'>
           {/* Customer combobox — fixed at top */}
-          <div className='border-border shrink-0 border-b p-4'>
+          <div className='shrink-0 border-b border-border p-4'>
             <div className='mb-2.5 flex items-center gap-1.5'>
-              <User className='text-text-tertiary size-3.5' />
-              <span className='text-text-tertiary text-[12px] font-semibold tracking-[0.04em] uppercase'>
+              <User className='size-3.5 text-text-tertiary' />
+              <span className='text-[12px] font-semibold tracking-[0.04em] text-text-tertiary uppercase'>
                 Customer
               </span>
             </div>
@@ -253,7 +249,7 @@ const CreatePage = () => {
           </div>
 
           {/* Scrollable middle area */}
-          <div className='min-h-0 flex-1 [scrollbar-width:none] overflow-y-auto [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden'>
+          <div className='min-h-0 flex-1 overflow-y-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden'>
             {/* Customer details — same as customer detail page */}
             {customer && customerDetail && (
               <>
@@ -261,7 +257,7 @@ const CreatePage = () => {
                   customer={customerDetail}
                   fieldConfig={fieldConfig}
                   priceLevels={priceLevels}
-                  onPriceLevelChange={(value) => priceLevelMutation.mutate(value)}
+                  onPriceLevelChange={value => priceLevelMutation.mutate(value)}
                   editableFields={editableCustomerFields}
                   onFieldSave={handleFieldSave}
                   salespersons={salespersons}
@@ -271,14 +267,14 @@ const CreatePage = () => {
 
                 {/* Custom fields */}
                 {customerCustomFields.length > 0 && (
-                  <div className='border-border border-b'>
+                  <div className='border-b border-border'>
                     <div className='bg-bg-secondary/60 px-4 py-2'>
-                      <span className='text-text-tertiary text-[11px] font-semibold tracking-[0.06em] uppercase'>
+                      <span className='text-[11px] font-semibold tracking-[0.06em] text-text-tertiary uppercase'>
                         Custom Fields
                       </span>
                     </div>
                     <div className='bg-background text-[13px]'>
-                      {customerCustomFields.map((entry) => {
+                      {customerCustomFields.map(entry => {
                         const label = getColumnLabel(entry.field, 'customer', fieldConfig)
                         const val = customerDetail[entry.field]
                         const strVal = val != null ? String(val) : null
@@ -305,24 +301,16 @@ const CreatePage = () => {
             {/* Bill To / Ship To */}
             {customer && (
               <>
-                <AddressCard
-                  title='Bill To'
-                  address={billTo}
-                  onChange={setBillTo}
-                />
-                <AddressCard
-                  title='Ship To'
-                  address={shipTo}
-                  onChange={setShipTo}
-                />
+                <AddressCard title='Bill To' address={billTo} onChange={setBillTo} />
+                <AddressCard title='Ship To' address={shipTo} onChange={setShipTo} />
               </>
             )}
 
             {/* Attachments */}
-            <div className='border-border border-b p-4'>
+            <div className='border-b border-border p-4'>
               <button
                 type='button'
-                className='border-border bg-background text-text-secondary hover:bg-bg-hover hover:text-foreground inline-flex h-8 w-full items-center justify-center gap-1.5 rounded-[6px] border text-[13px] font-medium transition-colors duration-[80ms] disabled:pointer-events-none disabled:opacity-50'
+                className='inline-flex h-8 w-full items-center justify-center gap-1.5 rounded-[6px] border border-border bg-background text-[13px] font-medium text-text-secondary transition-colors duration-[80ms] hover:bg-bg-hover hover:text-foreground disabled:pointer-events-none disabled:opacity-50'
                 disabled={!customer}
                 onClick={() => setAttachmentsOpen(true)}
               >
@@ -333,13 +321,13 @@ const CreatePage = () => {
           </div>
 
           {/* Actions — fixed at bottom */}
-          <div className='border-border shrink-0 border-t p-4'>
+          <div className='shrink-0 border-t border-border p-4'>
             <div className='flex flex-col gap-2'>
               <Tooltip>
                 <TooltipTrigger asChild>
                   <button
                     type='button'
-                    className='bg-primary text-primary-foreground inline-flex h-9 w-full items-center justify-center gap-2 rounded-[6px] text-[13px] font-semibold transition-opacity duration-[80ms] hover:opacity-90 disabled:pointer-events-none disabled:opacity-40'
+                    className='inline-flex h-9 w-full items-center justify-center gap-2 rounded-[6px] bg-primary text-[13px] font-semibold text-primary-foreground transition-opacity duration-[80ms] hover:opacity-90 disabled:pointer-events-none disabled:opacity-40'
                     disabled={!canSubmit}
                     onClick={handleCreateProposal}
                   >
@@ -366,7 +354,7 @@ const CreatePage = () => {
                 <TooltipTrigger asChild>
                   <button
                     type='button'
-                    className='border-border bg-background text-foreground hover:bg-bg-hover inline-flex h-9 w-full items-center justify-center gap-2 rounded-[6px] border text-[13px] font-medium transition-colors duration-[80ms] disabled:pointer-events-none disabled:opacity-40'
+                    className='inline-flex h-9 w-full items-center justify-center gap-2 rounded-[6px] border border-border bg-background text-[13px] font-medium text-foreground transition-colors duration-[80ms] hover:bg-bg-hover disabled:pointer-events-none disabled:opacity-40'
                     disabled={!canSubmit}
                     onClick={handleCreateOrder}
                   >
@@ -394,7 +382,7 @@ const CreatePage = () => {
       </div>
 
       {/* ── Mobile/tablet bottom bar (visible below lg breakpoint) ── */}
-      <div className='border-border flex shrink-0 items-center justify-between gap-2 border-t px-4 py-2 lg:hidden'>
+      <div className='flex shrink-0 items-center justify-between gap-2 border-t border-border px-4 py-2 lg:hidden'>
         <div className='flex min-w-0 flex-1 items-center gap-2'>
           <div className='min-w-0 flex-1'>
             <CustomerCombobox
@@ -405,7 +393,7 @@ const CreatePage = () => {
           </div>
           <button
             type='button'
-            className='border-border bg-background text-text-secondary inline-flex h-8 shrink-0 items-center gap-1.5 rounded-[6px] border px-2.5 text-[12px] font-medium'
+            className='inline-flex h-8 shrink-0 items-center gap-1.5 rounded-[6px] border border-border bg-background px-2.5 text-[12px] font-medium text-text-secondary'
             disabled={!customer}
             onClick={() => setAttachmentsOpen(true)}
           >
@@ -415,7 +403,7 @@ const CreatePage = () => {
         <div className='flex shrink-0 items-center gap-2'>
           <button
             type='button'
-            className='border-border bg-background text-foreground inline-flex h-8 items-center gap-1.5 rounded-[6px] border px-3 text-[12px] font-medium disabled:opacity-40'
+            className='inline-flex h-8 items-center gap-1.5 rounded-[6px] border border-border bg-background px-3 text-[12px] font-medium text-foreground disabled:opacity-40'
             disabled={!canSubmit}
             onClick={handleCreateOrder}
           >
@@ -424,7 +412,7 @@ const CreatePage = () => {
           </button>
           <button
             type='button'
-            className='bg-primary text-primary-foreground inline-flex h-8 items-center gap-1.5 rounded-[6px] px-3 text-[12px] font-semibold disabled:opacity-40'
+            className='inline-flex h-8 items-center gap-1.5 rounded-[6px] bg-primary px-3 text-[12px] font-semibold text-primary-foreground disabled:opacity-40'
             disabled={!canSubmit}
             onClick={handleCreateProposal}
           >
@@ -440,7 +428,7 @@ const CreatePage = () => {
           editProduct ? (isCartItemType(editProduct) ? editProduct.id : editProduct.autoid) : 'none'
         }
         open={editSheetOpen}
-        onOpenChange={(open) => {
+        onOpenChange={open => {
           if (!open) editDispatch({ type: 'CLOSE' })
         }}
         product={editProductWithPhotos}
@@ -467,14 +455,11 @@ const CreatePage = () => {
       />
 
       {/* Attachments dialog */}
-      <Dialog
-        open={attachmentsOpen}
-        onOpenChange={setAttachmentsOpen}
-      >
+      <Dialog open={attachmentsOpen} onOpenChange={setAttachmentsOpen}>
         <DialogContent className='flex max-h-[85vh] flex-col gap-0 overflow-hidden p-0 sm:max-w-md'>
-          <DialogHeader className='border-border border-b px-5 py-3'>
+          <DialogHeader className='border-b border-border px-5 py-3'>
             <DialogTitle className='flex items-center gap-2 text-[14px]'>
-              <Paperclip className='text-text-tertiary size-4' />
+              <Paperclip className='size-4 text-text-tertiary' />
               Attachments
             </DialogTitle>
           </DialogHeader>
@@ -517,7 +502,7 @@ function AddressCard({
   }
 
   const updateDraft = (field: keyof AddressFields, value: string) => {
-    setDraft((prev) => ({ ...prev, [field]: value }))
+    setDraft(prev => ({ ...prev, [field]: value }))
   }
 
   const hasAddress = address.name || address.address1 || address.city
@@ -526,18 +511,18 @@ function AddressCard({
   return (
     <>
       <div
-        className='border-border hover:bg-bg-hover/50 cursor-pointer border-b px-4 py-2.5 transition-colors duration-75'
+        className='cursor-pointer border-b border-border px-4 py-2.5 transition-colors duration-75 hover:bg-bg-hover/50'
         onClick={handleOpen}
       >
         <div className='mb-1 flex items-center gap-1.5'>
           <MapPin className='text-text-quaternary size-3 shrink-0' />
-          <span className='text-text-tertiary text-[11px] font-semibold tracking-[0.04em] uppercase'>
+          <span className='text-[11px] font-semibold tracking-[0.04em] text-text-tertiary uppercase'>
             {title}
           </span>
         </div>
         {hasAddress ? (
-          <div className='text-text-secondary pl-[18px] text-[12px] leading-relaxed'>
-            {address.name && <div className='text-foreground font-medium'>{address.name}</div>}
+          <div className='pl-[18px] text-[12px] leading-relaxed text-text-secondary'>
+            {address.name && <div className='font-medium text-foreground'>{address.name}</div>}
             {address.address1 && <div>{address.address1}</div>}
             {address.address2 && <div>{address.address2}</div>}
             {cityStateZip && <div>{cityStateZip}</div>}
@@ -547,14 +532,11 @@ function AddressCard({
         )}
       </div>
 
-      <Dialog
-        open={open}
-        onOpenChange={setOpen}
-      >
+      <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className='gap-0 overflow-hidden p-0 sm:max-w-[380px]'>
-          <DialogHeader className='border-border border-b px-5 py-3'>
+          <DialogHeader className='border-b border-border px-5 py-3'>
             <DialogTitle className='flex items-center gap-2 text-[14px]'>
-              <MapPin className='text-text-tertiary size-4' />
+              <MapPin className='size-4 text-text-tertiary' />
               {title}
             </DialogTitle>
           </DialogHeader>
@@ -562,48 +544,48 @@ function AddressCard({
             <AddressDialogField
               label='Name'
               value={draft.name}
-              onChange={(v) => updateDraft('name', v)}
+              onChange={v => updateDraft('name', v)}
               autoFocus
             />
             <AddressDialogField
               label='Street'
               value={draft.address1}
-              onChange={(v) => updateDraft('address1', v)}
+              onChange={v => updateDraft('address1', v)}
             />
             <AddressDialogField
               label='Apt / Suite'
               value={draft.address2}
-              onChange={(v) => updateDraft('address2', v)}
+              onChange={v => updateDraft('address2', v)}
             />
             <div className='grid grid-cols-3 gap-2'>
               <AddressDialogField
                 label='City'
                 value={draft.city}
-                onChange={(v) => updateDraft('city', v)}
+                onChange={v => updateDraft('city', v)}
               />
               <AddressDialogField
                 label='State'
                 value={draft.state}
-                onChange={(v) => updateDraft('state', v)}
+                onChange={v => updateDraft('state', v)}
               />
               <AddressDialogField
                 label='ZIP'
                 value={draft.zip}
-                onChange={(v) => updateDraft('zip', v)}
+                onChange={v => updateDraft('zip', v)}
               />
             </div>
           </div>
-          <div className='border-border flex justify-end gap-2 border-t px-5 py-3'>
+          <div className='flex justify-end gap-2 border-t border-border px-5 py-3'>
             <button
               type='button'
-              className='border-border text-text-secondary hover:bg-bg-hover hover:text-foreground inline-flex h-7 items-center rounded-[6px] border px-3 text-[12px] font-medium transition-colors duration-[80ms]'
+              className='inline-flex h-7 items-center rounded-[6px] border border-border px-3 text-[12px] font-medium text-text-secondary transition-colors duration-[80ms] hover:bg-bg-hover hover:text-foreground'
               onClick={() => setOpen(false)}
             >
               Cancel
             </button>
             <button
               type='button'
-              className='bg-primary text-primary-foreground inline-flex h-7 items-center rounded-[6px] px-3 text-[12px] font-semibold transition-opacity duration-[80ms] hover:opacity-90'
+              className='inline-flex h-7 items-center rounded-[6px] bg-primary px-3 text-[12px] font-semibold text-primary-foreground transition-opacity duration-[80ms] hover:opacity-90'
               onClick={handleSave}
             >
               Save
@@ -628,13 +610,13 @@ function AddressDialogField({
 }) {
   return (
     <div>
-      <label className='text-text-tertiary mb-1 block text-[12px] font-medium'>{label}</label>
+      <label className='mb-1 block text-[12px] font-medium text-text-tertiary'>{label}</label>
       <input
         value={value}
-        onChange={(e) => onChange(e.target.value)}
+        onChange={e => onChange(e.target.value)}
         placeholder={label}
         autoFocus={autoFocus}
-        className='border-border bg-background text-foreground placeholder:text-text-quaternary focus:border-primary focus:ring-primary/20 h-8 w-full rounded-[6px] border px-2.5 text-[13px] transition-colors duration-[80ms] outline-none focus:ring-1'
+        className='placeholder:text-text-quaternary h-8 w-full rounded-[6px] border border-border bg-background px-2.5 text-[13px] text-foreground transition-colors duration-[80ms] outline-none focus:border-primary focus:ring-1 focus:ring-primary/20'
       />
     </div>
   )

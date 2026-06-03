@@ -5,12 +5,7 @@ import { getOrderAttachmentsQuery } from '@/api/order/query'
 import { getProposalAttachmentsQuery } from '@/api/proposal/query'
 import { EntityAttachments } from '@/components/common/entity-attachments/entity-attachments'
 import type { EntityAttachmentType } from '@/components/common/entity-attachments/entity-attachments'
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle
-} from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 
 interface EntityAttachmentsDialogProps {
   entityType: EntityAttachmentType

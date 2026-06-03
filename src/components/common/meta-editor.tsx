@@ -10,7 +10,7 @@ import {
   DialogContent,
   DialogFooter,
   DialogHeader,
-  DialogTitle,
+  DialogTitle
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -30,7 +30,7 @@ export const MetaEditor = ({
   entityId,
   projectId,
   initialTitle,
-  initialDescription,
+  initialDescription
 }: MetaEditorProps) => {
   const queryClient = useQueryClient()
   const [editOpen, setEditOpen] = useState(false)
@@ -45,10 +45,10 @@ export const MetaEditor = ({
       metaService.get({
         entity_type: entityType,
         entity_id: entityId,
-        project_id: projectId ?? undefined,
+        project_id: projectId ?? undefined
       }),
     enabled: initialTitle === undefined,
-    staleTime: 5 * 60 * 1000,
+    staleTime: 5 * 60 * 1000
   })
 
   const metaTitle = initialTitle ?? data?.meta_title ?? ''
@@ -69,7 +69,7 @@ export const MetaEditor = ({
           entity_type: entityType,
           entity_id: entityId,
           meta_title: title,
-          meta_description: description,
+          meta_description: description
         },
         { project_id: projectId ?? undefined }
       ),
@@ -81,7 +81,7 @@ export const MetaEditor = ({
         queryClient.invalidateQueries({ queryKey: ['variable-products', 'detail', entityId] })
       }
       setEditOpen(false)
-    },
+    }
   })
 
   return (
@@ -94,26 +94,32 @@ export const MetaEditor = ({
         )}
         onClick={() => setEditOpen(true)}
       >
-        <Globe className={cn('size-3.5 shrink-0', hasMeta ? 'text-emerald-500' : 'text-text-quaternary')} />
+        <Globe
+          className={cn('size-3.5 shrink-0', hasMeta ? 'text-emerald-500' : 'text-text-quaternary')}
+        />
         {hasMeta ? (
           <div className='min-w-0 flex-1'>
             {metaTitle && (
-              <span className='block truncate text-[12px] font-medium text-text-secondary'>{metaTitle}</span>
+              <span className='block truncate text-[12px] font-medium text-text-secondary'>
+                {metaTitle}
+              </span>
             )}
             {metaDescription && (
-              <span className='block truncate text-[11px] text-text-tertiary'>{metaDescription}</span>
+              <span className='block truncate text-[11px] text-text-tertiary'>
+                {metaDescription}
+              </span>
             )}
           </div>
         ) : (
-          <span className='flex-1 text-[12px] text-text-quaternary'>Add SEO meta tags</span>
+          <span className='text-text-quaternary flex-1 text-[12px]'>Add SEO meta tags</span>
         )}
-        <Pencil className='size-3 shrink-0 text-text-quaternary opacity-0 transition-opacity group-hover:opacity-100' />
+        <Pencil className='text-text-quaternary size-3 shrink-0 opacity-0 transition-opacity group-hover:opacity-100' />
       </button>
 
       <Dialog open={editOpen} onOpenChange={setEditOpen}>
         <DialogContent className='sm:max-w-md'>
           <form
-            onSubmit={(e) => {
+            onSubmit={e => {
               e.preventDefault()
               saveMutation.mutate()
             }}
@@ -134,44 +140,67 @@ export const MetaEditor = ({
                   example.com/{entityType}/{entityId}
                 </div>
                 <div className='mt-0.5 line-clamp-2 text-[12px] text-text-tertiary'>
-                  {description || 'Add a description to help people find this page in search results.'}
+                  {description ||
+                    'Add a description to help people find this page in search results.'}
                 </div>
               </div>
 
               <div className='flex flex-col gap-1.5'>
-                <Label htmlFor='meta-title' className='text-[12px]'>Title</Label>
+                <Label htmlFor='meta-title' className='text-[12px]'>
+                  Title
+                </Label>
                 <Input
                   id='meta-title'
                   value={title}
-                  onChange={(e) => setTitle(e.target.value)}
+                  onChange={e => setTitle(e.target.value)}
                   placeholder='Page title for search engines'
                   maxLength={200}
                   autoFocus
                 />
                 <div className='flex justify-between'>
-                  <span className='text-[10px] text-text-quaternary'>Recommended: 50–60 characters</span>
-                  <span className={cn('text-[10px] tabular-nums', title.length > 60 ? 'text-amber-500' : 'text-text-quaternary')}>{title.length}/200</span>
+                  <span className='text-text-quaternary text-[10px]'>
+                    Recommended: 50–60 characters
+                  </span>
+                  <span
+                    className={cn(
+                      'text-[10px] tabular-nums',
+                      title.length > 60 ? 'text-amber-500' : 'text-text-quaternary'
+                    )}
+                  >
+                    {title.length}/200
+                  </span>
                 </div>
               </div>
               <div className='flex flex-col gap-1.5'>
-                <Label htmlFor='meta-desc' className='text-[12px]'>Description</Label>
+                <Label htmlFor='meta-desc' className='text-[12px]'>
+                  Description
+                </Label>
                 <textarea
                   id='meta-desc'
                   value={description}
-                  onChange={(e) => setDescription(e.target.value)}
+                  onChange={e => setDescription(e.target.value)}
                   placeholder='Description shown in search results'
                   maxLength={1000}
                   rows={3}
                   className={cn(
                     'flex w-full rounded-md border border-input bg-background px-3 py-2 text-[13px]',
                     'ring-offset-background placeholder:text-muted-foreground',
-                    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+                    'focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none',
                     'disabled:cursor-not-allowed disabled:opacity-50'
                   )}
                 />
                 <div className='flex justify-between'>
-                  <span className='text-[10px] text-text-quaternary'>Recommended: 120–160 characters</span>
-                  <span className={cn('text-[10px] tabular-nums', description.length > 160 ? 'text-amber-500' : 'text-text-quaternary')}>{description.length}/1000</span>
+                  <span className='text-text-quaternary text-[10px]'>
+                    Recommended: 120–160 characters
+                  </span>
+                  <span
+                    className={cn(
+                      'text-[10px] tabular-nums',
+                      description.length > 160 ? 'text-amber-500' : 'text-text-quaternary'
+                    )}
+                  >
+                    {description.length}/1000
+                  </span>
                 </div>
               </div>
             </DialogBody>

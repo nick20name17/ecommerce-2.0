@@ -25,7 +25,7 @@ export const SecurityCard = () => {
     <>
       <div>
         <div className='bg-bg-secondary/60 px-5 py-2'>
-          <span className='text-[11px] font-semibold uppercase tracking-[0.06em] text-text-tertiary'>
+          <span className='text-[11px] font-semibold tracking-[0.06em] text-text-tertiary uppercase'>
             Security
           </span>
         </div>
@@ -74,7 +74,7 @@ const ChangePasswordDialog = ({
     }
   })
 
-  const handleSubmit = form.handleSubmit((data) => mutation.mutate(data))
+  const handleSubmit = form.handleSubmit(data => mutation.mutate(data))
 
   const handleClose = (nextOpen: boolean) => {
     if (!nextOpen) form.reset()

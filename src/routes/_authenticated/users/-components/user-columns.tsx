@@ -75,13 +75,8 @@ export const getUserColumns = ({
   return [
     {
       id: 'user',
-      accessorFn: (row) => getUserDisplayName(row, 'User'),
-      header: ({ column }) => (
-        <ColumnHeader
-          column={column}
-          title='User'
-        />
-      ),
+      accessorFn: row => getUserDisplayName(row, 'User'),
+      header: ({ column }) => <ColumnHeader column={column} title='User' />,
       cell: ({ row }) => {
         const user = row.original
         const fullName = getUserDisplayName(user, 'User')
@@ -89,7 +84,7 @@ export const getUserColumns = ({
         return (
           <div className='flex min-w-0 items-center gap-3'>
             <Avatar className='size-8 shrink-0'>
-              <AvatarFallback className='bg-primary/10 text-primary text-[13px] font-medium'>
+              <AvatarFallback className='bg-primary/10 text-[13px] font-medium text-primary'>
                 {getInitialsFromParts(user.first_name, user.last_name, user.email)}
               </AvatarFallback>
             </Avatar>
@@ -100,7 +95,7 @@ export const getUserColumns = ({
                 </TooltipTrigger>
                 <TooltipContent>{fullName}</TooltipContent>
               </Tooltip>
-              <p className='text-text-tertiary text-[13px]'>{user.email}</p>
+              <p className='text-[13px] text-text-tertiary'>{user.email}</p>
             </div>
           </div>
         )
@@ -109,35 +104,20 @@ export const getUserColumns = ({
     },
     {
       accessorKey: 'role',
-      header: ({ column }) => (
-        <ColumnHeader
-          column={column}
-          title='Role'
-        />
-      ),
+      header: ({ column }) => <ColumnHeader column={column} title='Role' />,
       cell: ({ row }) => <RoleBadge role={row.original.role} />,
       size: 120
     },
     {
       accessorKey: 'is_active',
       header: 'Status',
-      cell: ({ row }) => (
-        <StatusToggle
-          user={row.original}
-          currentUserId={currentUserId}
-        />
-      ),
+      cell: ({ row }) => <StatusToggle user={row.original} currentUserId={currentUserId} />,
       size: 80,
       enableSorting: false
     },
     {
       accessorKey: 'date_joined',
-      header: ({ column }) => (
-        <ColumnHeader
-          column={column}
-          title='Joined'
-        />
-      ),
+      header: ({ column }) => <ColumnHeader column={column} title='Joined' />,
       cell: ({ row }) => (
         <span className='text-text-tertiary'>{formatDate(row.original.date_joined)}</span>
       ),
@@ -152,10 +132,7 @@ export const getUserColumns = ({
           <div className='flex justify-center'>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button
-                  variant='ghost'
-                  size='icon-sm'
-                >
+                <Button variant='ghost' size='icon-sm'>
                   <MoreHorizontal />
                   <span className='sr-only'>Open menu</span>
                 </Button>
@@ -166,10 +143,7 @@ export const getUserColumns = ({
                   Edit
                 </DropdownMenuItem>
                 {!isSelf(user) && (
-                  <DropdownMenuItem
-                    variant='destructive'
-                    onClick={() => onDelete(user)}
-                  >
+                  <DropdownMenuItem variant='destructive' onClick={() => onDelete(user)}>
                     <Trash2 className='size-4' />
                     Delete
                   </DropdownMenuItem>

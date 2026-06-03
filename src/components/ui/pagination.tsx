@@ -28,10 +28,7 @@ const PaginationContent = ({ className, ...props }: React.ComponentProps<'ul'>) 
 )
 
 const PaginationItem = ({ ...props }: React.ComponentProps<'li'>) => (
-  <li
-    data-slot='pagination-item'
-    {...props}
-  />
+  <li data-slot='pagination-item' {...props} />
 )
 
 type PaginationButtonProps = {
@@ -45,90 +42,66 @@ const PaginationButton = ({
   size = 'icon',
   ...props
 }: PaginationButtonProps) => (
-    <Button
-      variant={isActive ? 'outline' : 'ghost'}
-      size={size}
-      aria-current={isActive ? 'page' : undefined}
-      data-slot='pagination-button'
-      data-active={isActive}
-      className={cn(isActive && 'pointer-events-none', className)}
-      {...props}
-    />
-  )
+  <Button
+    variant={isActive ? 'outline' : 'ghost'}
+    size={size}
+    aria-current={isActive ? 'page' : undefined}
+    data-slot='pagination-button'
+    data-active={isActive}
+    className={cn(isActive && 'pointer-events-none', className)}
+    {...props}
+  />
+)
 
 const PaginationPrevious = ({
   className,
   ...props
 }: React.ComponentProps<typeof PaginationButton>) => (
-    <PaginationButton
-      aria-label='Go to previous page'
-      size='icon'
-      className={cn(className)}
-      {...props}
-    >
-      <ChevronLeftIcon />
-    </PaginationButton>
-  )
+  <PaginationButton
+    aria-label='Go to previous page'
+    size='icon'
+    className={cn(className)}
+    {...props}
+  >
+    <ChevronLeftIcon />
+  </PaginationButton>
+)
 
-const PaginationNext = ({
-  className,
-  ...props
-}: React.ComponentProps<typeof PaginationButton>) => (
-    <PaginationButton
-      aria-label='Go to next page'
-      size='icon'
-      className={cn(className)}
-      {...props}
-    >
-      <ChevronRightIcon />
-    </PaginationButton>
-  )
+const PaginationNext = ({ className, ...props }: React.ComponentProps<typeof PaginationButton>) => (
+  <PaginationButton aria-label='Go to next page' size='icon' className={cn(className)} {...props}>
+    <ChevronRightIcon />
+  </PaginationButton>
+)
 
 const PaginationFirst = ({
   className,
   ...props
 }: React.ComponentProps<typeof PaginationButton>) => (
-    <PaginationButton
-      aria-label='Go to first page'
-      size='icon'
-      className={cn(className)}
-      {...props}
-    >
-      <ChevronsLeftIcon />
-    </PaginationButton>
-  )
+  <PaginationButton aria-label='Go to first page' size='icon' className={cn(className)} {...props}>
+    <ChevronsLeftIcon />
+  </PaginationButton>
+)
 
-const PaginationLast = ({
-  className,
-  ...props
-}: React.ComponentProps<typeof PaginationButton>) => (
-    <PaginationButton
-      aria-label='Go to last page'
-      size='icon'
-      className={cn(className)}
-      {...props}
-    >
-      <ChevronsRightIcon />
-    </PaginationButton>
-  )
+const PaginationLast = ({ className, ...props }: React.ComponentProps<typeof PaginationButton>) => (
+  <PaginationButton aria-label='Go to last page' size='icon' className={cn(className)} {...props}>
+    <ChevronsRightIcon />
+  </PaginationButton>
+)
 
-const PaginationEllipsis = ({
-  className,
-  ...props
-}: React.ComponentProps<'span'>) => (
-    <span
-      aria-hidden
-      data-slot='pagination-ellipsis'
-      className={cn(
-        "flex size-8 items-center justify-center [&_svg:not([class*='size-'])]:size-4",
-        className
-      )}
-      {...props}
-    >
-      <MoreHorizontalIcon />
-      <span className='sr-only'>More pages</span>
-    </span>
-  )
+const PaginationEllipsis = ({ className, ...props }: React.ComponentProps<'span'>) => (
+  <span
+    aria-hidden
+    data-slot='pagination-ellipsis'
+    className={cn(
+      "flex size-8 items-center justify-center [&_svg:not([class*='size-'])]:size-4",
+      className
+    )}
+    {...props}
+  >
+    <MoreHorizontalIcon />
+    <span className='sr-only'>More pages</span>
+  </span>
+)
 
 export {
   Pagination,

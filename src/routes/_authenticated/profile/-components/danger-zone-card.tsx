@@ -80,7 +80,7 @@ export const DangerZoneCard = ({ user }: DangerZoneCardProps) => {
     <>
       <div>
         <div className='bg-destructive/5 px-5 py-2'>
-          <span className='text-[11px] font-semibold uppercase tracking-[0.06em] text-destructive/70'>
+          <span className='text-[11px] font-semibold tracking-[0.06em] text-destructive/70 uppercase'>
             Danger Zone
           </span>
         </div>
@@ -176,7 +176,7 @@ export const DangerZoneCard = ({ user }: DangerZoneCardProps) => {
                 id='delete-confirm'
                 placeholder={DELETE_CONFIRMATION_TEXT}
                 value={deleteConfirmation}
-                onChange={(e) => setDeleteConfirmation(e.target.value)}
+                onChange={e => setDeleteConfirmation(e.target.value)}
                 disabled={deleteMutation.isPending}
               />
               {deleteConfirmation && !isDeleteValid ? (

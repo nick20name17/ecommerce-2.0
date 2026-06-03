@@ -9,12 +9,7 @@ import {
   type EntityAttachmentsRef
 } from '@/components/common/entity-attachments/entity-attachments'
 import { Button } from '@/components/ui/button'
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 
 interface CreatePageFormProps {
   customer: Customer | null
@@ -46,11 +41,7 @@ export const CreatePageForm = ({
         step={1}
         isComplete={!!customer}
       >
-        <CustomerCombobox
-          value={customer}
-          onChange={onCustomerChange}
-          projectId={projectId}
-        />
+        <CustomerCombobox value={customer} onChange={onCustomerChange} projectId={projectId} />
       </CreatePageSection>
 
       <CreatePageSection
@@ -71,7 +62,7 @@ export const CreatePageForm = ({
               onClick={() => setCatalogOpen(true)}
             >
               <span>Browse catalog</span>
-              <span className='text-primary-foreground/80 text-[13px] font-normal'>
+              <span className='text-[13px] font-normal text-primary-foreground/80'>
                 Categories · Search · Prices
               </span>
             </Button>
@@ -85,9 +76,9 @@ export const CreatePageForm = ({
               Attachments
             </button>
           </div>
-          <p className='text-text-tertiary text-[13px]'>
-            Use the catalog to filter by category and search across products. Configurable
-            products will prompt for options.
+          <p className='text-[13px] text-text-tertiary'>
+            Use the catalog to filter by category and search across products. Configurable products
+            will prompt for options.
           </p>
         </div>
       </CreatePageSection>

@@ -13,7 +13,7 @@ import {
   DialogContent,
   DialogFooter,
   DialogHeader,
-  DialogTitle,
+  DialogTitle
 } from '@/components/ui/dialog'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Spinner } from '@/components/ui/spinner'
@@ -39,7 +39,7 @@ export function MultiAssignDialog({
   entityLabel,
   assignedUsers,
   assignFn,
-  invalidateQueryKey,
+  invalidateQueryKey
 }: MultiAssignDialogProps) {
   const queryClient = useQueryClient()
   const [search, setSearch] = useState('')
@@ -59,15 +59,20 @@ export function MultiAssignDialog({
     updateDebouncedSearch(q)
   }
 
-  const params = { limit: 50, offset: 0, search: debouncedSearch || undefined, role: 'sale' as const }
+  const params = {
+    limit: 50,
+    offset: 0,
+    search: debouncedSearch || undefined,
+    role: 'sale' as const
+  }
   const { data, isLoading, isFetching } = useQuery({
     ...getUsersQuery(params),
-    enabled: open,
+    enabled: open
   })
   const users = data?.results ?? []
   const loading = isLoading || (search !== debouncedSearch && isFetching)
 
-  const assignedIds = new Set(localAssigned.map((u) => u.id))
+  const assignedIds = new Set(localAssigned.map(u => u.id))
 
   const pendingRef = useRef(0)
 
@@ -87,15 +92,18 @@ export function MultiAssignDialog({
   }
 
   const handleAssign = (userId: number) => {
-    const user = users.find((u) => u.id === userId)
+    const user = users.find(u => u.id === userId)
     if (user) {
-      setLocalAssigned((prev) => [...prev, { id: user.id, email: user.email, first_name: user.first_name, last_name: user.last_name }])
+      setLocalAssigned(prev => [
+        ...prev,
+        { id: user.id, email: user.email, first_name: user.first_name, last_name: user.last_name }
+      ])
     }
     fireAssign({ user_id: userId })
   }
 
   const handleUnassign = (userId: number) => {
-    setLocalAssigned((prev) => prev.filter((u) => u.id !== userId))
+    setLocalAssigned(prev => prev.filter(u => u.id !== userId))
     fireAssign({ user_id: userId, remove: true })
   }
 
@@ -107,7 +115,7 @@ export function MultiAssignDialog({
   return (
     <Dialog
       open={open}
-      onOpenChange={(next) => {
+      onOpenChange={next => {
         if (!next) {
           setSearch('')
           setDebouncedSearch('')
@@ -131,21 +139,21 @@ export function MultiAssignDialog({
           {/* Currently assigned */}
           {localAssigned.length > 0 && (
             <div className='flex flex-col gap-1.5'>
-              <span className='text-[11px] font-medium uppercase tracking-wider text-text-quaternary'>
+              <span className='text-text-quaternary text-[11px] font-medium tracking-wider uppercase'>
                 Assigned ({localAssigned.length})
               </span>
               <div className='flex flex-wrap gap-1.5'>
-                {localAssigned.map((user) => {
+                {localAssigned.map(user => {
                   const name = getUserDisplayName(user)
                   const initials = name
                     .split(' ')
                     .slice(0, 2)
-                    .map((n) => n[0]?.toUpperCase() ?? '')
+                    .map(n => n[0]?.toUpperCase() ?? '')
                     .join('')
                   return (
                     <span
                       key={user.id}
-                      className='inline-flex items-center gap-1.5 rounded-full border border-border bg-bg-secondary py-0.5 pl-0.5 pr-1.5 text-[12px] font-medium text-foreground'
+                      className='inline-flex items-center gap-1.5 rounded-full border border-border bg-bg-secondary py-0.5 pr-1.5 pl-0.5 text-[12px] font-medium text-foreground'
                     >
                       <InitialsAvatar initials={initials} size={18} />
                       <span className='max-w-[120px] truncate'>{name}</span>
@@ -175,7 +183,7 @@ export function MultiAssignDialog({
                 ref={inputRef}
                 placeholder='Search users to add...'
                 value={search}
-                onChange={(e) => handleSearchChange(e.target.value)}
+                onChange={e => handleSearchChange(e.target.value)}
                 className='flex-1 bg-transparent text-[13px] font-medium outline-none placeholder:text-text-tertiary'
                 autoFocus
               />
@@ -192,13 +200,13 @@ export function MultiAssignDialog({
                   {search ? 'No users found' : 'Start typing to search'}
                 </div>
               ) : (
-                users.map((u) => {
+                users.map(u => {
                   const isAssigned = assignedIds.has(u.id)
                   const fullName = getUserDisplayName(u)
                   const initials = fullName
                     .split(' ')
                     .slice(0, 2)
-                    .map((n) => n[0]?.toUpperCase() ?? '')
+                    .map(n => n[0]?.toUpperCase() ?? '')
                     .join('')
                   return (
                     <button

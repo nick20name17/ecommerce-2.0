@@ -7,7 +7,7 @@ import {
   DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuSeparator,
-  DropdownMenuTrigger,
+  DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
 import { useSidebar } from '@/components/ui/sidebar'
 import { getUserDisplayName } from '@/helpers/formatters'
@@ -25,12 +25,14 @@ export const NavUser = () => {
   const userInitials = namePart
     ? namePart
         .split(' ')
-        .map((n) => n[0])
+        .map(n => n[0])
         .join('')
         .toUpperCase()
     : (user?.email?.[0] ?? '?').toUpperCase()
 
-  const isDark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)
+  const isDark =
+    theme === 'dark' ||
+    (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)
 
   return (
     <div className='flex items-center gap-1.5 px-3 pb-3'>
@@ -42,7 +44,7 @@ export const NavUser = () => {
               'flex h-[32px] min-w-0 flex-1 items-center gap-2.5 rounded-md px-2.5 text-left text-[13px]',
               'transition-[background-color,color,transform] duration-100',
               'text-foreground/90 hover:bg-black/[0.04] active:scale-[0.98] dark:hover:bg-white/[0.04]',
-              'focus-visible:outline-none',
+              'focus-visible:outline-none'
             )}
           >
             <div className='flex size-[18px] shrink-0 items-center justify-center rounded-full bg-black/[0.08] text-[8px] font-semibold text-text-secondary dark:bg-white/[0.12]'>
@@ -69,7 +71,10 @@ export const NavUser = () => {
           </div>
           <DropdownMenuSeparator />
           <DropdownMenuGroup>
-            <DropdownMenuItem asChild className='cursor-pointer gap-2 rounded-md px-2 py-1.5 text-[13px]'>
+            <DropdownMenuItem
+              asChild
+              className='cursor-pointer gap-2 rounded-md px-2 py-1.5 text-[13px]'
+            >
               <Link to='/profile'>
                 <User className='size-3.5 text-text-tertiary' />
                 My Profile

@@ -1,9 +1,6 @@
 import { useCallback, useEffect, useRef } from 'react'
 
-import type {
-  LayoutElement,
-  TableColumn,
-} from '@/api/document-template/schema'
+import type { LayoutElement, TableColumn } from '@/api/document-template/schema'
 import { cn } from '@/lib/utils'
 
 import {
@@ -12,7 +9,7 @@ import {
   formatCellValue,
   resolveField,
   resolveFieldRaw,
-  snapInches,
+  snapInches
 } from './designer-types'
 import type { AlignmentGuide } from './designer-types'
 
@@ -72,7 +69,7 @@ export function CanvasElement({
   resolvedValue,
   entityData,
   siblings,
-  onGuidesChange,
+  onGuidesChange
 }: CanvasElementProps) {
   const ref = useRef<HTMLDivElement>(null)
   const dragRef = useRef<DragMode | null>(null)
@@ -93,7 +90,7 @@ export function CanvasElement({
         startX: e.clientX,
         startY: e.clientY,
         origX: latestRef.current.x,
-        origY: latestRef.current.y,
+        origY: latestRef.current.y
       }
     },
     [onSelect]
@@ -110,7 +107,7 @@ export function CanvasElement({
         handle,
         startX: e.clientX,
         startY: e.clientY,
-        orig: { x: el.x, y: el.y, w: el.w, h: el.h },
+        orig: { x: el.x, y: el.y, w: el.w, h: el.h }
       }
     },
     [onSelect]
@@ -136,7 +133,7 @@ export function CanvasElement({
         if (!bypassSnap && siblings && siblings.length > 0) {
           const result = computeAlignment(
             { x: nextX, y: nextY, w: el.w, h: el.h },
-            siblings.filter((s) => s.id !== el.id)
+            siblings.filter(s => s.id !== el.id)
           )
           nextX = result.x
           nextY = result.y
@@ -195,14 +192,9 @@ export function CanvasElement({
             x: snapInches(x),
             y: snapInches(y),
             w: snapInches(w),
-            h: snapInches(h),
+            h: snapInches(h)
           }
-      if (
-        next.x !== el.x ||
-        next.y !== el.y ||
-        next.w !== el.w ||
-        next.h !== el.h
-      ) {
+      if (next.x !== el.x || next.y !== el.y || next.w !== el.w || next.h !== el.h) {
         onChange({ ...el, ...next })
       }
     },
@@ -231,9 +223,7 @@ export function CanvasElement({
         const target = e.target as HTMLElement | null
         if (
           target &&
-          (target.tagName === 'INPUT' ||
-            target.tagName === 'TEXTAREA' ||
-            target.isContentEditable)
+          (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)
         ) {
           return
         }
@@ -252,7 +242,7 @@ export function CanvasElement({
     left: element.x * PX_PER_INCH,
     top: element.y * PX_PER_INCH,
     width: element.w * PX_PER_INCH,
-    height: element.h * PX_PER_INCH,
+    height: element.h * PX_PER_INCH
   }
 
   return (
@@ -263,22 +253,18 @@ export function CanvasElement({
       onPointerMove={handleMove}
       onPointerUp={endDrag}
       onPointerCancel={endDrag}
-      onClick={(e) => {
+      onClick={e => {
         e.stopPropagation()
         onSelect()
       }}
       className={cn(
-        'cursor-move select-none transition-shadow duration-[80ms]',
+        'cursor-move transition-shadow duration-[80ms] select-none',
         isSelected
           ? 'outline outline-2 outline-primary'
           : 'outline outline-1 outline-transparent hover:outline-primary/40'
       )}
     >
-      <ElementBody
-        element={element}
-        resolvedValue={resolvedValue}
-        entityData={entityData}
-      />
+      <ElementBody element={element} resolvedValue={resolvedValue} entityData={entityData} />
       {isSelected && <ResizeHandles onBegin={beginResize} />}
     </div>
   )
@@ -289,7 +275,7 @@ export function CanvasElement({
 function ElementBody({
   element,
   resolvedValue,
-  entityData,
+  entityData
 }: {
   element: LayoutElement
   resolvedValue?: string
@@ -330,7 +316,7 @@ function TextBody({ element }: { element: LayoutElement }) {
         whiteSpace: 'pre-wrap',
         wordBreak: 'break-word',
         boxSizing: 'border-box',
-        lineHeight: 1.25,
+        lineHeight: 1.25
       }}
     >
       {(p.text as string) || 'Text'}
@@ -338,13 +324,7 @@ function TextBody({ element }: { element: LayoutElement }) {
   )
 }
 
-function FieldBody({
-  element,
-  resolvedValue,
-}: {
-  element: LayoutElement
-  resolvedValue?: string
-}) {
+function FieldBody({ element, resolvedValue }: { element: LayoutElement; resolvedValue?: string }) {
   const p = element.props ?? {}
   const fieldKey = (p.fieldKey as string) || 'field.key'
   const hasResolved = resolvedValue !== undefined
@@ -366,13 +346,11 @@ function FieldBody({
         background: hasResolved
           ? 'transparent'
           : 'repeating-linear-gradient(45deg, rgba(99,102,241,0.06) 0 6px, transparent 6px 12px)',
-        border: hasResolved
-          ? '1px dashed transparent'
-          : '1px dashed rgba(99,102,241,0.4)',
+        border: hasResolved ? '1px dashed transparent' : '1px dashed rgba(99,102,241,0.4)',
         borderRadius: 3,
         whiteSpace: 'pre-wrap',
         wordBreak: 'break-word',
-        lineHeight: 1.25,
+        lineHeight: 1.25
       }}
     >
       {hasResolved ? (
@@ -392,12 +370,7 @@ function ImageBody({ element }: { element: LayoutElement }) {
   const src = (element.props?.src as string) || ''
   if (src) {
     // eslint-disable-next-line jsx-a11y/alt-text
-    return (
-      <img
-        src={src}
-        style={{ width: '100%', height: '100%', objectFit: 'contain' }}
-      />
-    )
+    return <img src={src} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
   }
   return (
     <div
@@ -411,7 +384,7 @@ function ImageBody({ element }: { element: LayoutElement }) {
         color: 'rgba(0,0,0,0.5)',
         fontSize: 11,
         border: '1px dashed rgba(0,0,0,0.2)',
-        boxSizing: 'border-box',
+        boxSizing: 'border-box'
       }}
     >
       Image
@@ -428,7 +401,7 @@ function LineBody({ element }: { element: LayoutElement }) {
         width: '100%',
         height: '100%',
         display: 'flex',
-        alignItems: 'center',
+        alignItems: 'center'
       }}
     >
       <div style={{ width: '100%', height: thickness, background: color }} />
@@ -447,7 +420,7 @@ function RectBody({ element }: { element: LayoutElement }) {
         border: `${(p.borderWidth as number) ?? 0}px solid ${
           (p.borderColor as string) ?? '#e4e4e7'
         }`,
-        boxSizing: 'border-box',
+        boxSizing: 'border-box'
       }}
     />
   )
@@ -455,18 +428,18 @@ function RectBody({ element }: { element: LayoutElement }) {
 
 function TableBody({
   element,
-  entityData,
+  entityData
 }: {
   element: LayoutElement
   entityData?: Record<string, unknown> | null
 }) {
   const p = element.props ?? {}
-  const columns = ((p.columns as TableColumn[] | undefined) ?? []).map((c) => ({
+  const columns = ((p.columns as TableColumn[] | undefined) ?? []).map(c => ({
     fieldKey: c.fieldKey ?? '',
     label: c.label ?? c.fieldKey ?? '',
     widthPct: c.widthPct ?? 0,
     align: (c.align ?? 'left') as 'left' | 'right' | 'center',
-    format: c.format ?? 'string',
+    format: c.format ?? 'string'
   }))
   const itemsSource = (p.itemsSource as string) || 'items'
   const showHeader = p.showHeader !== false
@@ -489,9 +462,9 @@ function TableBody({
 
   // Distribute widths evenly when missing.
   const totalPct = columns.reduce((s, c) => s + (c.widthPct || 0), 0)
-  const widths = columns.map((c) => {
+  const widths = columns.map(c => {
     if (c.widthPct && c.widthPct > 0) return c.widthPct
-    const zeros = columns.filter((cc) => !cc.widthPct).length
+    const zeros = columns.filter(cc => !cc.widthPct).length
     const remaining = Math.max(0, 100 - totalPct)
     return zeros ? remaining / zeros : 100 / columns.length
   })
@@ -510,7 +483,7 @@ function TableBody({
           color: '#6366f1',
           fontSize: 10,
           padding: 4,
-          boxSizing: 'border-box',
+          boxSizing: 'border-box'
         }}
       >
         Empty table — add columns in the properties panel
@@ -526,14 +499,14 @@ function TableBody({
         overflow: 'hidden',
         fontSize: fontSize + 'pt',
         color: '#111',
-        boxSizing: 'border-box',
+        boxSizing: 'border-box'
       }}
     >
       <table
         style={{
           width: '100%',
           borderCollapse: 'collapse',
-          tableLayout: 'fixed',
+          tableLayout: 'fixed'
         }}
       >
         {showHeader && (
@@ -551,7 +524,7 @@ function TableBody({
                     width: widths[i] + '%',
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap',
+                    whiteSpace: 'nowrap'
                   }}
                 >
                   {c.label}
@@ -584,12 +557,10 @@ function TableBody({
                         fontFamily: isPlaceholder
                           ? 'ui-monospace, SFMono-Regular, monospace'
                           : undefined,
-                        fontSize: isPlaceholder ? '0.9em' : undefined,
+                        fontSize: isPlaceholder ? '0.9em' : undefined
                       }}
                     >
-                      {raw || (
-                        <span style={{ color: '#bbb', fontStyle: 'italic' }}>—</span>
-                      )}
+                      {raw || <span style={{ color: '#bbb', fontStyle: 'italic' }}>—</span>}
                     </td>
                   )
                 })}
@@ -604,7 +575,7 @@ function TableBody({
                   textAlign: 'center',
                   padding: 8,
                   color: '#999',
-                  fontStyle: 'italic',
+                  fontStyle: 'italic'
                 }}
               >
                 No items
@@ -629,7 +600,7 @@ function PlaceholderBody({ label }: { label: string }) {
         background: 'rgba(99,102,241,0.08)',
         color: '#6366f1',
         fontSize: 11,
-        textTransform: 'capitalize',
+        textTransform: 'capitalize'
       }}
     >
       {label}
@@ -643,21 +614,29 @@ const HANDLES: { key: ResizeHandle; style: React.CSSProperties; cursor: string }
   { key: 'nw', style: { top: -4, left: -4 }, cursor: 'nwse-resize' },
   { key: 'n', style: { top: -4, left: '50%', transform: 'translateX(-50%)' }, cursor: 'ns-resize' },
   { key: 'ne', style: { top: -4, right: -4 }, cursor: 'nesw-resize' },
-  { key: 'e', style: { top: '50%', right: -4, transform: 'translateY(-50%)' }, cursor: 'ew-resize' },
+  {
+    key: 'e',
+    style: { top: '50%', right: -4, transform: 'translateY(-50%)' },
+    cursor: 'ew-resize'
+  },
   { key: 'se', style: { bottom: -4, right: -4 }, cursor: 'nwse-resize' },
-  { key: 's', style: { bottom: -4, left: '50%', transform: 'translateX(-50%)' }, cursor: 'ns-resize' },
+  {
+    key: 's',
+    style: { bottom: -4, left: '50%', transform: 'translateX(-50%)' },
+    cursor: 'ns-resize'
+  },
   { key: 'sw', style: { bottom: -4, left: -4 }, cursor: 'nesw-resize' },
-  { key: 'w', style: { top: '50%', left: -4, transform: 'translateY(-50%)' }, cursor: 'ew-resize' },
+  { key: 'w', style: { top: '50%', left: -4, transform: 'translateY(-50%)' }, cursor: 'ew-resize' }
 ]
 
 function ResizeHandles({
-  onBegin,
+  onBegin
 }: {
   onBegin: (h: ResizeHandle) => (e: React.PointerEvent) => void
 }) {
   return (
     <>
-      {HANDLES.map((h) => (
+      {HANDLES.map(h => (
         <div
           key={h.key}
           data-handle={h.key}
@@ -671,7 +650,7 @@ function ResizeHandles({
             borderRadius: 2,
             cursor: h.cursor,
             zIndex: 10,
-            ...h.style,
+            ...h.style
           }}
         />
       ))}

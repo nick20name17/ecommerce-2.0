@@ -5,7 +5,7 @@ import { useState } from 'react'
 import type {
   GlobalSpecDefinition,
   SpecDisplayType,
-  VariableProduct,
+  VariableProduct
 } from '@/api/variable-product/schema'
 import { variableProductService } from '@/api/variable-product/service'
 import { VP_QUERY_KEYS } from '@/api/variable-product/query'
@@ -17,13 +17,13 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogDescription,
+  DialogDescription
 } from '@/components/ui/dialog'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuTrigger,
+  DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -32,12 +32,12 @@ import {
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue,
+  SelectValue
 } from '@/components/ui/select'
 const DISPLAY_TYPES: { value: SpecDisplayType; label: string }[] = [
   { value: 'swatch', label: 'Swatch (Color circles)' },
   { value: 'dropdown', label: 'Dropdown (Select menu)' },
-  { value: 'button', label: 'Button (Toggle group)' },
+  { value: 'button', label: 'Button (Toggle group)' }
 ]
 
 interface VPSpecsSectionProps {
@@ -61,12 +61,12 @@ export const VPSpecsSection = ({ vp, projectId }: VPSpecsSectionProps) => {
       ),
     meta: {
       successMessage: 'Spec created',
-      invalidatesQuery: VP_QUERY_KEYS.detail(vp.id),
+      invalidatesQuery: VP_QUERY_KEYS.detail(vp.id)
     },
     onSuccess: () => {
       resetForm()
       setAddOpen(false)
-    },
+    }
   })
 
   const updateSpecMutation = useMutation({
@@ -78,24 +78,24 @@ export const VPSpecsSection = ({ vp, projectId }: VPSpecsSectionProps) => {
       ),
     meta: {
       successMessage: 'Spec updated',
-      invalidatesQuery: VP_QUERY_KEYS.detail(vp.id),
+      invalidatesQuery: VP_QUERY_KEYS.detail(vp.id)
     },
     onSuccess: () => {
       resetForm()
       setEditSpec(null)
-    },
+    }
   })
 
   const deleteSpecMutation = useMutation({
     mutationFn: () =>
       variableProductService.deleteSpec(deleteSpec!.id, {
-        project_id: projectId ?? undefined,
+        project_id: projectId ?? undefined
       }),
     meta: {
       successMessage: 'Spec deleted',
-      invalidatesQuery: VP_QUERY_KEYS.detail(vp.id),
+      invalidatesQuery: VP_QUERY_KEYS.detail(vp.id)
     },
-    onSuccess: () => setDeleteSpec(null),
+    onSuccess: () => setDeleteSpec(null)
   })
 
   const resetForm = () => {
@@ -116,12 +116,19 @@ export const VPSpecsSection = ({ vp, projectId }: VPSpecsSectionProps) => {
 
   return (
     <div>
-      <div className='flex items-center gap-2 mb-2'>
+      <div className='mb-2 flex items-center gap-2'>
         <h3 className='text-[13px] font-semibold text-text-secondary'>
           Specs ({vp.spec_definitions.length})
         </h3>
         <div className='flex-1' />
-        <Button variant='outline' size='xs' onClick={() => { resetForm(); setAddOpen(true) }}>
+        <Button
+          variant='outline'
+          size='xs'
+          onClick={() => {
+            resetForm()
+            setAddOpen(true)
+          }}
+        >
           <Plus className='size-3' />
           Add Spec
         </Button>
@@ -133,7 +140,7 @@ export const VPSpecsSection = ({ vp, projectId }: VPSpecsSectionProps) => {
         </div>
       ) : (
         <div className='flex flex-wrap gap-2'>
-          {vp.spec_definitions.map((spec) => (
+          {vp.spec_definitions.map(spec => (
             <div
               key={spec.id}
               className='group flex items-center gap-2 rounded-lg border border-border bg-background px-3 py-2'
@@ -149,7 +156,7 @@ export const VPSpecsSection = ({ vp, projectId }: VPSpecsSectionProps) => {
                   <Button
                     variant='ghost'
                     size='icon-xs'
-                    className='sm:opacity-0 sm:group-hover:opacity-100 transition-opacity'
+                    className='transition-opacity sm:opacity-0 sm:group-hover:opacity-100'
                   >
                     <MoreHorizontal className='size-3.5' />
                   </Button>
@@ -176,7 +183,7 @@ export const VPSpecsSection = ({ vp, projectId }: VPSpecsSectionProps) => {
       {/* Add / Edit dialog */}
       <Dialog
         open={isFormOpen}
-        onOpenChange={(v) => {
+        onOpenChange={v => {
           if (!v) {
             setAddOpen(false)
             setEditSpec(null)
@@ -186,7 +193,7 @@ export const VPSpecsSection = ({ vp, projectId }: VPSpecsSectionProps) => {
       >
         <DialogContent className='sm:max-w-sm'>
           <form
-            onSubmit={(e) => {
+            onSubmit={e => {
               e.preventDefault()
               if (editSpec) {
                 updateSpecMutation.mutate()
@@ -204,7 +211,7 @@ export const VPSpecsSection = ({ vp, projectId }: VPSpecsSectionProps) => {
                 <Input
                   id='spec-name'
                   value={specName}
-                  onChange={(e) => setSpecName(e.target.value)}
+                  onChange={e => setSpecName(e.target.value)}
                   placeholder='e.g. Color, Size'
                   required
                   autoFocus
@@ -214,13 +221,13 @@ export const VPSpecsSection = ({ vp, projectId }: VPSpecsSectionProps) => {
                 <Label>Display Type</Label>
                 <Select
                   value={displayType}
-                  onValueChange={(v) => setDisplayType(v as SpecDisplayType)}
+                  onValueChange={v => setDisplayType(v as SpecDisplayType)}
                 >
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    {DISPLAY_TYPES.map((dt) => (
+                    {DISPLAY_TYPES.map(dt => (
                       <SelectItem key={dt.value} value={dt.value}>
                         {dt.label}
                       </SelectItem>
@@ -234,7 +241,7 @@ export const VPSpecsSection = ({ vp, projectId }: VPSpecsSectionProps) => {
                   id='spec-sort'
                   type='number'
                   value={sortOrder}
-                  onChange={(e) => setSortOrder(Number(e.target.value))}
+                  onChange={e => setSortOrder(Number(e.target.value))}
                 />
               </div>
             </DialogBody>
@@ -259,12 +266,13 @@ export const VPSpecsSection = ({ vp, projectId }: VPSpecsSectionProps) => {
       </Dialog>
 
       {/* Delete confirmation */}
-      <Dialog open={!!deleteSpec} onOpenChange={(v) => !v && setDeleteSpec(null)}>
+      <Dialog open={!!deleteSpec} onOpenChange={v => !v && setDeleteSpec(null)}>
         <DialogContent className='sm:max-w-sm'>
           <DialogHeader>
             <DialogTitle>Delete Spec</DialogTitle>
             <DialogDescription>
-              Delete <strong>{deleteSpec?.name}</strong>? This will also delete all its options and item links.
+              Delete <strong>{deleteSpec?.name}</strong>? This will also delete all its options and
+              item links.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>

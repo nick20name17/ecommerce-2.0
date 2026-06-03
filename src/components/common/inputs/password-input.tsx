@@ -7,24 +7,13 @@ import { InputGroup, InputGroupAddon, InputGroupInput } from '../../ui/input-gro
 export const PasswordInput = (props: React.ComponentProps<'input'>) => {
   const [isVisible, setIsVisible] = useState<boolean>(false)
 
-  const toggleVisibility = () => setIsVisible((prevState) => !prevState)
+  const toggleVisibility = () => setIsVisible(prevState => !prevState)
 
   return (
     <InputGroup>
-      <InputGroupInput
-        {...props}
-        type={isVisible ? 'text' : 'password'}
-        placeholder='••••••••'
-      />
-      <InputGroupAddon
-        align='inline-end'
-        onClick={toggleVisibility}
-      >
-        <Button
-          type='button'
-          variant='ghost'
-          size='icon-sm'
-        >
+      <InputGroupInput {...props} type={isVisible ? 'text' : 'password'} placeholder='••••••••' />
+      <InputGroupAddon align='inline-end' onClick={toggleVisibility}>
+        <Button type='button' variant='ghost' size='icon-sm'>
           {isVisible ? <EyeOff aria-hidden='true' /> : <EyeIcon aria-hidden='true' />}
         </Button>
       </InputGroupAddon>

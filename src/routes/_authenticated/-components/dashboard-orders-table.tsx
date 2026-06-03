@@ -8,13 +8,10 @@ import { Skeleton } from '@/components/ui/skeleton'
 
 const STATUS_COLORS: Record<string, string> = {
   [ORDER_STATUS.unprocessed]: '#f59e0b',
-  [ORDER_STATUS.outstandingInvoice]: '#3b82f6',
+  [ORDER_STATUS.outstandingInvoice]: '#3b82f6'
 }
 
-const TRACKED_STATUSES: OrderStatus[] = [
-  ORDER_STATUS.unprocessed,
-  ORDER_STATUS.outstandingInvoice,
-]
+const TRACKED_STATUSES: OrderStatus[] = [ORDER_STATUS.unprocessed, ORDER_STATUS.outstandingInvoice]
 
 interface DashboardOrdersTableProps {
   projectId: number | null
@@ -22,20 +19,20 @@ interface DashboardOrdersTableProps {
 }
 
 export function DashboardOrdersTable({ projectId, customerId }: DashboardOrdersTableProps) {
-  const queries = TRACKED_STATUSES.map((status) => {
+  const queries = TRACKED_STATUSES.map(status => {
     const params = {
       status,
       limit: 1,
       project_id: projectId ?? undefined,
-      customer_id: customerId,
+      customer_id: customerId
     }
     return useQuery({
       ...getOrdersQuery(params),
-      enabled: projectId != null,
+      enabled: projectId != null
     })
   })
 
-  const isLoading = queries.some((q) => q.isLoading)
+  const isLoading = queries.some(q => q.isLoading)
 
   if (isLoading) {
     return (
@@ -44,7 +41,7 @@ export function DashboardOrdersTable({ projectId, customerId }: DashboardOrdersT
           <Skeleton className='h-4 w-32' />
         </div>
         <div className='divide-y divide-border'>
-          {[1, 2, 3].map((i) => (
+          {[1, 2, 3].map(i => (
             <div key={i} className='flex items-center gap-3 px-4 py-2.5'>
               <Skeleton className='size-3.5 rounded-full' />
               <Skeleton className='h-3 w-24' />
@@ -64,9 +61,9 @@ export function DashboardOrdersTable({ projectId, customerId }: DashboardOrdersT
       status,
       label: ORDER_STATUS_LABELS[status],
       color: STATUS_COLORS[status],
-      count: data?.count ?? 0,
+      count: data?.count ?? 0
     }
-  }).filter((r) => r.count > 0)
+  }).filter(r => r.count > 0)
 
   if (rows.length === 0) return null
 
@@ -83,7 +80,7 @@ export function DashboardOrdersTable({ projectId, customerId }: DashboardOrdersT
           </tr>
         </thead>
         <tbody className='divide-y divide-border'>
-          {rows.map((row) => (
+          {rows.map(row => (
             <tr key={row.status}>
               <td className='px-4 py-2.5'>
                 <div className='flex items-center gap-2.5'>
@@ -91,9 +88,7 @@ export function DashboardOrdersTable({ projectId, customerId }: DashboardOrdersT
                   <span className='text-[13px]'>{row.label}</span>
                 </div>
               </td>
-              <td className='px-4 py-2.5 text-right text-[13px] tabular-nums'>
-                {row.count}
-              </td>
+              <td className='px-4 py-2.5 text-right text-[13px] tabular-nums'>{row.count}</td>
             </tr>
           ))}
         </tbody>

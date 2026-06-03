@@ -30,13 +30,10 @@ const ColorPicker = forwardRef<
     if (inline) {
       return (
         <div className='flex shrink-0 flex-col gap-2'>
-          <HexColorPicker
-            color={parsedValue}
-            onChange={onChange}
-          />
+          <HexColorPicker color={parsedValue} onChange={onChange} />
           <Input
             maxLength={7}
-            onChange={(e) => onChange(e.currentTarget.value)}
+            onChange={e => onChange(e.currentTarget.value)}
             onBlur={onBlur}
             ref={ref}
             value={parsedValue}
@@ -49,15 +46,8 @@ const ColorPicker = forwardRef<
     }
 
     return (
-      <Popover
-        onOpenChange={setOpen}
-        open={open}
-      >
-        <PopoverTrigger
-          asChild
-          disabled={disabled}
-          onBlur={onBlur}
-        >
+      <Popover onOpenChange={setOpen} open={open}>
+        <PopoverTrigger asChild disabled={disabled} onBlur={onBlur}>
           <Button
             {...props}
             className={cn('block shrink-0', className)}
@@ -71,13 +61,10 @@ const ColorPicker = forwardRef<
           </Button>
         </PopoverTrigger>
         <PopoverContent className='w-full'>
-          <HexColorPicker
-            color={parsedValue}
-            onChange={onChange}
-          />
+          <HexColorPicker color={parsedValue} onChange={onChange} />
           <Input
             maxLength={7}
-            onChange={(e) => onChange(e.currentTarget.value)}
+            onChange={e => onChange(e.currentTarget.value)}
             ref={ref}
             value={parsedValue}
             className='mt-2 font-mono text-sm'

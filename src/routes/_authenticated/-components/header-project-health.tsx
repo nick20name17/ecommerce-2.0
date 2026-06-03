@@ -23,32 +23,26 @@ export const HeaderProjectHealth = () => {
   if (userIsSuperAdmin && projectId == null) return null
 
   return (
-    <div className='border-border bg-bg-secondary/30 flex items-center gap-4 rounded-md border px-3 py-1.5'>
-      <span className='text-text-tertiary text-[13px] font-medium'>Project health</span>
+    <div className='flex items-center gap-4 rounded-md border border-border bg-bg-secondary/30 px-3 py-1.5'>
+      <span className='text-[13px] font-medium text-text-tertiary'>Project health</span>
       <div className='flex items-center gap-3'>
         {HEALTH_SERVICES.map(({ label, service }) => {
           const details = health ? getServiceHealthDetails(health, service) : null
           return (
-            <div
-              key={service}
-              className='flex items-center gap-1.5'
-            >
+            <div key={service} className='flex items-center gap-1.5'>
               <HealthCell
                 status={details?.status ?? null}
                 responseMs={details?.responseMs}
                 lastChecked={details?.lastChecked}
                 isLoading={!isConnected}
               />
-              <span className='text-text-tertiary text-[13px]'>{label}</span>
+              <span className='text-[13px] text-text-tertiary'>{label}</span>
             </div>
           )
         })}
         <div className='flex items-center gap-1.5'>
-          <HealthCell
-            status={health?.overall_status ?? null}
-            isLoading={!isConnected}
-          />
-          <span className='text-text-tertiary text-[13px]'>Status</span>
+          <HealthCell status={health?.overall_status ?? null} isLoading={!isConnected} />
+          <span className='text-[13px] text-text-tertiary'>Status</span>
         </div>
       </div>
     </div>

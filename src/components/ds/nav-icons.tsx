@@ -23,7 +23,7 @@ import {
   FileText,
   Truck,
   UserCircle2,
-  Users,
+  Users
 } from 'lucide-react'
 
 type IC = React.FC<{ className?: string }>

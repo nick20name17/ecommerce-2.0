@@ -21,32 +21,19 @@ interface ProjectColumnsOptions {
   onDelete: (project: Project) => void
 }
 
-const renderServiceHealthCell = (project: ProjectWithHealthLoading, service: ProjectHealthService) => {
+const renderServiceHealthCell = (
+  project: ProjectWithHealthLoading,
+  service: ProjectHealthService
+) => {
   if (project._healthLoading) {
-    return (
-      <HealthCell
-        status={null}
-        isLoading
-      />
-    )
+    return <HealthCell status={null} isLoading />
   }
   const { status, responseMs, lastChecked } = getServiceHealthDetails(project, service)
-  return (
-    <HealthCell
-      status={status}
-      responseMs={responseMs}
-      lastChecked={lastChecked}
-    />
-  )
+  return <HealthCell status={status} responseMs={responseMs} lastChecked={lastChecked} />
 }
 
 const renderStatusOnlyCell = (status: 'healthy' | 'unhealthy' | null, isLoading?: boolean) => {
-  return (
-    <HealthCell
-      status={status}
-      isLoading={isLoading}
-    />
-  )
+  return <HealthCell status={status} isLoading={isLoading} />
 }
 
 export const getProjectColumns = ({
@@ -55,12 +42,7 @@ export const getProjectColumns = ({
 }: ProjectColumnsOptions): ColumnDef<ProjectWithHealthLoading>[] => [
   {
     accessorKey: 'name',
-    header: ({ column }) => (
-      <ColumnHeader
-        column={column}
-        title='Project Name'
-      />
-    ),
+    header: ({ column }) => <ColumnHeader column={column} title='Project Name' />,
     cell: ({ row }) => {
       const name = row.original.name
       return (
@@ -76,17 +58,9 @@ export const getProjectColumns = ({
   },
   {
     accessorKey: 'db_type',
-    header: ({ column }) => (
-      <ColumnHeader
-        column={column}
-        title='DB Type'
-      />
-    ),
+    header: ({ column }) => <ColumnHeader column={column} title='DB Type' />,
     cell: ({ row }) => (
-      <Badge
-        className='whitespace-nowrap'
-        variant='secondary'
-      >
+      <Badge className='whitespace-nowrap' variant='secondary'>
         {row.original.db_type}
       </Badge>
     ),
@@ -100,7 +74,7 @@ export const getProjectColumns = ({
       return (
         <Tooltip>
           <TooltipTrigger asChild>
-            <span className='text-text-tertiary block max-w-full truncate'>{host}</span>
+            <span className='block max-w-full truncate text-text-tertiary'>{host}</span>
           </TooltipTrigger>
           <TooltipContent>{host}</TooltipContent>
         </Tooltip>
@@ -147,23 +121,13 @@ export const getProjectColumns = ({
   },
   {
     accessorKey: 'user_count',
-    header: ({ column }) => (
-      <ColumnHeader
-        column={column}
-        title='Users'
-      />
-    ),
+    header: ({ column }) => <ColumnHeader column={column} title='Users' />,
     cell: ({ row }) => <span className='whitespace-nowrap'>{row.original.user_count}</span>,
     size: 80
   },
   {
     accessorKey: 'created_at',
-    header: ({ column }) => (
-      <ColumnHeader
-        column={column}
-        title='Created'
-      />
-    ),
+    header: ({ column }) => <ColumnHeader column={column} title='Created' />,
     cell: ({ row }) => formatDate(row.original.created_at),
     size: 130
   },
@@ -177,10 +141,7 @@ export const getProjectColumns = ({
         <div className='flex justify-center'>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button
-                variant='ghost'
-                size='icon-sm'
-              >
+              <Button variant='ghost' size='icon-sm'>
                 <MoreHorizontal />
                 <span className='sr-only'>Open menu</span>
               </Button>
@@ -190,10 +151,7 @@ export const getProjectColumns = ({
                 <Pencil className='size-4' />
                 Edit
               </DropdownMenuItem>
-              <DropdownMenuItem
-                variant='destructive'
-                onClick={() => onDelete(project)}
-              >
+              <DropdownMenuItem variant='destructive' onClick={() => onDelete(project)}>
                 <Trash2 className='size-4' />
                 Delete
               </DropdownMenuItem>

@@ -14,7 +14,7 @@ import {
   DialogContent,
   DialogFooter,
   DialogHeader,
-  DialogTitle,
+  DialogTitle
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -32,7 +32,7 @@ export const VPCreateFromProductDialog = ({
   categoryId,
   open,
   onOpenChange,
-  projectId,
+  projectId
 }: VPCreateFromProductDialogProps) => {
   const navigate = useNavigate()
   const [name, setName] = useState('')
@@ -69,19 +69,19 @@ export const VPCreateFromProductDialog = ({
       }
       return vp
     },
-    onSuccess: (vp) => {
+    onSuccess: vp => {
       queryClient.invalidateQueries({ queryKey: VP_QUERY_KEYS.lists() })
       queryClient.invalidateQueries({ queryKey: CATALOG_QUERY_KEYS.all() })
       onOpenChange(false)
       navigate({ to: `/catalog/vp/${vp.id}` })
-    },
+    }
   })
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className='sm:max-w-md'>
         <form
-          onSubmit={(e) => {
+          onSubmit={e => {
             e.preventDefault()
             createMutation.mutate()
           }}
@@ -92,7 +92,8 @@ export const VPCreateFromProductDialog = ({
           <DialogBody className='flex flex-col gap-3'>
             {product && (
               <div className='rounded-md bg-bg-secondary px-3 py-2 text-[12px] text-text-tertiary'>
-                Product: <span className='font-mono'>{product.product_id || product.product_autoid}</span>
+                Product:{' '}
+                <span className='font-mono'>{product.product_id || product.product_autoid}</span>
                 {product.descr_1 && <> — {product.descr_1}</>}
               </div>
             )}
@@ -101,12 +102,12 @@ export const VPCreateFromProductDialog = ({
               <Input
                 id='vp-from-name'
                 value={name}
-                onChange={(e) => setName(e.target.value)}
+                onChange={e => setName(e.target.value)}
                 placeholder='Variable product name'
                 required
                 autoFocus
               />
-              <p className='text-[11px] text-text-quaternary'>
+              <p className='text-text-quaternary text-[11px]'>
                 Edit to remove color/size from the name if needed
               </p>
             </div>
@@ -115,7 +116,7 @@ export const VPCreateFromProductDialog = ({
               <Input
                 id='vp-from-desc'
                 value={description}
-                onChange={(e) => setDescription(e.target.value)}
+                onChange={e => setDescription(e.target.value)}
                 placeholder='Optional description'
               />
             </div>

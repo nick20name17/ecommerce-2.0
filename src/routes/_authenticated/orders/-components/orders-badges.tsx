@@ -9,7 +9,7 @@ export function PickBadge({ pickStatus }: { pickStatus?: string }) {
   if (!pickStatus) return null
   const match = pickStatus.match(/^(\d+)\/(\d+)$/)
   if (!match)
-    return <span className='text-text-tertiary text-[11px] tabular-nums'>{pickStatus}</span>
+    return <span className='text-[11px] text-text-tertiary tabular-nums'>{pickStatus}</span>
 
   const picked = Number(match[1])
   const total = Number(match[2])
@@ -47,7 +47,7 @@ export function PackedBadge({ packedStatus }: { packedStatus?: string }) {
   if (!packedStatus) return null
   const match = packedStatus.match(/^(\d+)\/(\d+)$/)
   if (!match)
-    return <span className='text-text-tertiary text-[11px] tabular-nums'>{packedStatus}</span>
+    return <span className='text-[11px] text-text-tertiary tabular-nums'>{packedStatus}</span>
 
   const packed = Number(match[1])
   const total = Number(match[2])

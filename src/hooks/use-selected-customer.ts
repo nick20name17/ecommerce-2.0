@@ -10,11 +10,12 @@ import { STORAGE_KEYS } from '@/constants/storage'
  * project B and 404.
  */
 export const useSelectedCustomerId = (
-  projectId: number | null | undefined,
+  projectId: number | null | undefined
 ): [string | null, (id: string | null) => void] => {
-  const key = projectId == null
-    ? STORAGE_KEYS.selectedCustomerId
-    : `${STORAGE_KEYS.selectedCustomerId}:${projectId}`
+  const key =
+    projectId == null
+      ? STORAGE_KEYS.selectedCustomerId
+      : `${STORAGE_KEYS.selectedCustomerId}:${projectId}`
   const [customerId, setCustomerId] = useLocalStorage<string | null>(key, null)
   return [customerId, setCustomerId]
 }

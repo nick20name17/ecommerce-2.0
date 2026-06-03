@@ -11,7 +11,7 @@ import {
   Trash2,
   UserPlus,
   UserRound,
-  Users,
+  Users
 } from 'lucide-react'
 import { useState } from 'react'
 
@@ -32,24 +32,33 @@ import { EntityNotesSheet } from '@/components/common/entity-notes/entity-notes-
 import { SidebarTrigger } from '@/components/ui/sidebar'
 import { Pagination } from '@/components/common/filters/pagination'
 import { PageEmpty } from '@/components/common/page-empty'
-import { FilterChip, ICustomers, InitialsAvatar, PAGE_COLORS, PageHeaderIcon } from '@/components/ds'
+import {
+  FilterChip,
+  ICustomers,
+  InitialsAvatar,
+  PAGE_COLORS,
+  PageHeaderIcon
+} from '@/components/ds'
 import { PresetPicker } from '@/components/common/filters/preset-picker'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuTrigger,
+  DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
-import {
-  getCustomerTypeLabel,
-} from '@/constants/customer'
+import { getCustomerTypeLabel } from '@/constants/customer'
 import { isAdmin } from '@/constants/user'
 import { useBreakpoint } from '@/hooks/use-breakpoint'
 import { useProjectId } from '@/hooks/use-project-id'
 import { formatPhone, getInitials, getUserDisplayName } from '@/helpers/formatters'
-import { useLimitParam, useOffsetParam, usePresetParam, useSearchParam } from '@/hooks/use-query-params'
+import {
+  useLimitParam,
+  useOffsetParam,
+  usePresetParam,
+  useSearchParam
+} from '@/hooks/use-query-params'
 import { cn } from '@/lib/utils'
 import { useAuth } from '@/providers/auth'
 
@@ -102,7 +111,7 @@ function CustomersPage() {
   const [activePresetId, setActivePresetId] = usePresetParam()
 
   const toggleAssignedToMe = () => {
-    setAssignedToMe((v) => !v)
+    setAssignedToMe(v => !v)
     setActivePresetId(null)
   }
 
@@ -128,12 +137,12 @@ function CustomersPage() {
     notes: true as const,
     assigned_to: assignedToMe ? 'me' : undefined,
     preset_id: activePresetId ?? undefined,
-    fields: customFieldsParam(customColumns),
+    fields: customFieldsParam(customColumns)
   }
 
   const { data, isLoading } = useQuery({
     ...getCustomersQuery(params),
-    placeholderData: keepPreviousData,
+    placeholderData: keepPreviousData
   })
 
   const customers = data?.results ?? []
@@ -143,7 +152,10 @@ function CustomersPage() {
   const handleSort = (field: SortField) => {
     if (sortField === field) {
       if (sortDir === 'asc') setSortDir('desc')
-      else { setSortField(null); setSortDir('asc') }
+      else {
+        setSortField(null)
+        setSortDir('asc')
+      }
     } else {
       setSortField(field)
       setSortDir('asc')
@@ -156,7 +168,10 @@ function CustomersPage() {
     <div className='flex h-full flex-col overflow-hidden'>
       {/* ── Header ── */}
       <header
-        className={cn('flex h-12 shrink-0 items-center gap-2.5 border-b border-border', isMobile ? 'px-3.5' : 'px-6')}
+        className={cn(
+          'flex h-12 shrink-0 items-center gap-2.5 border-b border-border',
+          isMobile ? 'px-3.5' : 'px-6'
+        )}
       >
         <SidebarTrigger className='-ml-1' />
         <div className='flex items-center gap-1.5'>
@@ -164,11 +179,7 @@ function CustomersPage() {
           <h1 className='text-[14px] font-semibold tracking-[-0.01em]'>Customers</h1>
         </div>
 
-        <PresetPicker
-          entityType='customer'
-          value={activePresetId}
-          onChange={selectPreset}
-        />
+        <PresetPicker entityType='customer' value={activePresetId} onChange={selectPreset} />
 
         <div className='flex-1' />
 
@@ -177,7 +188,7 @@ function CustomersPage() {
           <Search className='size-3 shrink-0 text-text-tertiary' />
           <input
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={e => setSearch(e.target.value)}
             placeholder='Search by name, email, or phone...'
             className='flex-1 bg-transparent text-[13px] outline-none placeholder:text-text-tertiary'
           />
@@ -212,7 +223,12 @@ function CustomersPage() {
 
       {/* Active filter chips */}
       {(assignedToMe || activePresetId !== null) && (
-        <div className={cn('flex shrink-0 flex-wrap items-center gap-1.5 border-b border-border py-1.5', isMobile ? 'px-3.5' : 'px-6')}>
+        <div
+          className={cn(
+            'flex shrink-0 flex-wrap items-center gap-1.5 border-b border-border py-1.5',
+            isMobile ? 'px-3.5' : 'px-6'
+          )}
+        >
           <button
             type='button'
             className='text-[13px] font-medium text-text-tertiary transition-colors duration-[80ms] hover:text-foreground'
@@ -238,14 +254,37 @@ function CustomersPage() {
         {!isMobile && (customers.length > 0 || isLoading) && (
           <div
             className={cn(
-              'sticky top-0 z-10 flex select-none items-center border-b border-border bg-bg-secondary text-[13px] font-medium text-text-tertiary',
-              bp === 'tablet' ? 'gap-4 px-5 py-1' : 'gap-6 px-6 py-1',
+              'sticky top-0 z-10 flex items-center border-b border-border bg-bg-secondary text-[13px] font-medium text-text-tertiary select-none',
+              bp === 'tablet' ? 'gap-4 px-5 py-1' : 'gap-6 px-6 py-1'
             )}
           >
-            <SortableHeader field='l_name' label='Customer' sortField={sortField} sortDir={sortDir} onSort={handleSort} className='min-w-0 flex-1' />
+            <SortableHeader
+              field='l_name'
+              label='Customer'
+              sortField={sortField}
+              sortDir={sortDir}
+              onSort={handleSort}
+              className='min-w-0 flex-1'
+            />
             <div className='w-[130px] shrink-0'>Phone</div>
-            {bp !== 'tablet' && <SortableHeader field='contact_3' label='Email' sortField={sortField} sortDir={sortDir} onSort={handleSort} className='w-[160px] shrink-0' />}
-            <SortableHeader field='in_level' label='Type' sortField={sortField} sortDir={sortDir} onSort={handleSort} className='w-[100px] shrink-0' />
+            {bp !== 'tablet' && (
+              <SortableHeader
+                field='contact_3'
+                label='Email'
+                sortField={sortField}
+                sortDir={sortDir}
+                onSort={handleSort}
+                className='w-[160px] shrink-0'
+              />
+            )}
+            <SortableHeader
+              field='in_level'
+              label='Type'
+              sortField={sortField}
+              sortDir={sortDir}
+              onSort={handleSort}
+              className='w-[100px] shrink-0'
+            />
             <div className='w-[120px] shrink-0'>Responsible</div>
             <CustomColumnsHeader
               columns={customColumns}
@@ -284,20 +323,34 @@ function CustomersPage() {
                   <Skeleton className='h-3.5 w-28 rounded' />
                   <Skeleton className='h-3.5 w-12 rounded' />
                 </div>
-                <div className='w-[130px] shrink-0'><Skeleton className='h-3.5 w-[90px] rounded' /></div>
-                {bp !== 'tablet' && <div className='w-[160px] shrink-0'><Skeleton className='h-3.5 w-[120px] rounded' /></div>}
-                <div className='w-[100px] shrink-0'><Skeleton className='h-[18px] w-[50px] rounded-[4px]' /></div>
-                <div className='w-[120px] shrink-0'><Skeleton className='h-3.5 w-[70px] rounded' /></div>
+                <div className='w-[130px] shrink-0'>
+                  <Skeleton className='h-3.5 w-[90px] rounded' />
+                </div>
+                {bp !== 'tablet' && (
+                  <div className='w-[160px] shrink-0'>
+                    <Skeleton className='h-3.5 w-[120px] rounded' />
+                  </div>
+                )}
+                <div className='w-[100px] shrink-0'>
+                  <Skeleton className='h-[18px] w-[50px] rounded-[4px]' />
+                </div>
+                <div className='w-[120px] shrink-0'>
+                  <Skeleton className='h-3.5 w-[70px] rounded' />
+                </div>
                 <div className='w-[46px] shrink-0' />
                 <div className='w-[28px] shrink-0' />
               </div>
             )
           )
         ) : customers.length === 0 ? (
-          <PageEmpty icon={Users} title='No matching customers' description='Try adjusting your search or filters.' />
+          <PageEmpty
+            icon={Users}
+            title='No matching customers'
+            description='Try adjusting your search or filters.'
+          />
         ) : (
           <>
-            {customers.map((customer) => (
+            {customers.map(customer => (
               <CustomerRow
                 key={customer.id}
                 customer={customer}
@@ -312,10 +365,12 @@ function CustomersPage() {
                 onClick={() =>
                   navigate({
                     to: '/customers/$customerId',
-                    params: { customerId: customer.id },
+                    params: { customerId: customer.id }
                   })
                 }
-                onMouseEnter={() => queryClient.prefetchQuery(getCustomerDetailQuery(customer.id, projectId))}
+                onMouseEnter={() =>
+                  queryClient.prefetchQuery(getCustomerDetailQuery(customer.id, projectId))
+                }
               />
             ))}
           </>
@@ -331,28 +386,26 @@ function CustomersPage() {
       <CustomerModal
         key={editingCustomer?.id ?? 'create'}
         open={modalCustomer !== null}
-        onOpenChange={(open) => !open && setModalCustomer(null)}
+        onOpenChange={open => !open && setModalCustomer(null)}
         customer={editingCustomer}
       />
       <CustomerDeleteDialog
         customer={deleteCustomer}
         open={!!deleteCustomer}
-        onOpenChange={(open) => !open && setDeleteCustomer(null)}
+        onOpenChange={open => !open && setDeleteCustomer(null)}
       />
       <CustomerAssignDialog
         customer={assignCustomer}
         open={!!assignCustomer}
-        onOpenChange={(open) => !open && setAssignCustomer(null)}
+        onOpenChange={open => !open && setAssignCustomer(null)}
         projectId={projectId}
       />
       <EntityNotesSheet
         open={!!customerForNotes}
-        onOpenChange={(open) => !open && setCustomerForNotes(null)}
+        onOpenChange={open => !open && setCustomerForNotes(null)}
         entityType='customer'
         entityLabel={
-          customerForNotes
-            ? `Customer ${customerForNotes.l_name ?? customerForNotes.autoid}`
-            : ''
+          customerForNotes ? `Customer ${customerForNotes.l_name ?? customerForNotes.autoid}` : ''
         }
         autoid={customerForNotes?.autoid ?? ''}
         projectId={projectId}
@@ -369,7 +422,7 @@ function SortableHeader({
   sortField,
   sortDir,
   onSort,
-  className,
+  className
 }: {
   field: FixedSortField
   label: string
@@ -391,11 +444,13 @@ function SortableHeader({
     >
       {label}
       {active ? (
-        sortDir === 'asc'
-          ? <ArrowUp className='size-3' />
-          : <ArrowDown className='size-3' />
+        sortDir === 'asc' ? (
+          <ArrowUp className='size-3' />
+        ) : (
+          <ArrowDown className='size-3' />
+        )
       ) : (
-        <ArrowUp className='size-3 opacity-30 group-hover:opacity-60 transition-opacity' />
+        <ArrowUp className='size-3 opacity-30 transition-opacity group-hover:opacity-60' />
       )}
     </button>
   )
@@ -414,7 +469,7 @@ function CustomerRow({
   onNotes,
   onAssign,
   onClick,
-  onMouseEnter,
+  onMouseEnter
 }: {
   customer: Customer
   customColumns: CustomColumn[]
@@ -433,7 +488,12 @@ function CustomerRow({
   const email = customer.contact_3 || null
   const typeLabel = getCustomerTypeLabel(customer.in_level)
 
-  const noteCount = typeof customer.notes_count === 'number' ? customer.notes_count : Array.isArray(customer.notes) ? customer.notes.length : 0
+  const noteCount =
+    typeof customer.notes_count === 'number'
+      ? customer.notes_count
+      : Array.isArray(customer.notes)
+        ? customer.notes.length
+        : 0
 
   if (isMobile) {
     return (
@@ -449,12 +509,8 @@ function CustomerRow({
           </span>
         </div>
         <div className='flex flex-wrap items-center gap-2 pl-[28px]'>
-          <span className='text-[13px] tabular-nums text-text-tertiary'>
-            CUS-{customer.id}
-          </span>
-          {phone && (
-            <span className='text-[13px] text-text-tertiary'>{phone}</span>
-          )}
+          <span className='text-[13px] text-text-tertiary tabular-nums'>CUS-{customer.id}</span>
+          {phone && <span className='text-[13px] text-text-tertiary'>{phone}</span>}
           {typeLabel !== '—' && (
             <span className='inline-flex items-center rounded-[4px] bg-bg-secondary px-1.5 py-0.5 text-[13px] font-medium text-text-tertiary'>
               {typeLabel}
@@ -483,7 +539,7 @@ function CustomerRow({
           </TooltipTrigger>
           <TooltipContent side='top'>{customer.l_name}</TooltipContent>
         </Tooltip>
-        <span className='shrink-0 text-[13px] tabular-nums text-text-tertiary'>
+        <span className='shrink-0 text-[13px] text-text-tertiary tabular-nums'>
           CUS-{customer.id}
         </span>
       </div>
@@ -523,7 +579,11 @@ function CustomerRow({
       {/* Assign */}
       <div className='w-[120px] shrink-0'>
         {(() => {
-          const assigned = customer.assigned_users?.length ? customer.assigned_users : customer.assigned_user ? [customer.assigned_user] : []
+          const assigned = customer.assigned_users?.length
+            ? customer.assigned_users
+            : customer.assigned_user
+              ? [customer.assigned_user]
+              : []
           const first = assigned[0]
           if (canAssign) {
             return (
@@ -535,16 +595,23 @@ function CustomerRow({
                       'inline-flex items-center gap-1.5 rounded-[5px] px-1 py-0.5 text-[13px] transition-colors duration-75 hover:bg-bg-active',
                       first ? 'text-text-secondary' : 'text-text-tertiary'
                     )}
-                    onClick={(e) => {
+                    onClick={e => {
                       e.stopPropagation()
                       onAssign(customer)
                     }}
                   >
                     {first ? (
                       <>
-                        <InitialsAvatar initials={getInitials(getUserDisplayName(first))} size={16} />
+                        <InitialsAvatar
+                          initials={getInitials(getUserDisplayName(first))}
+                          size={16}
+                        />
                         <span className='truncate'>{getUserDisplayName(first)}</span>
-                        {assigned.length > 1 && <span className='text-[11px] text-text-tertiary'>+{assigned.length - 1}</span>}
+                        {assigned.length > 1 && (
+                          <span className='text-[11px] text-text-tertiary'>
+                            +{assigned.length - 1}
+                          </span>
+                        )}
                       </>
                     ) : (
                       <>
@@ -555,7 +622,9 @@ function CustomerRow({
                   </button>
                 </TooltipTrigger>
                 <TooltipContent>
-                  {first ? `Assigned to ${assigned.map((u) => getUserDisplayName(u)).join(', ')} — click to change` : 'Assign a sales user'}
+                  {first
+                    ? `Assigned to ${assigned.map(u => getUserDisplayName(u)).join(', ')} — click to change`
+                    : 'Assign a sales user'}
                 </TooltipContent>
               </Tooltip>
             )
@@ -565,7 +634,9 @@ function CustomerRow({
               <span className='inline-flex items-center gap-1.5 px-1 py-0.5 text-[13px] text-text-secondary'>
                 <InitialsAvatar initials={getInitials(getUserDisplayName(first))} size={16} />
                 <span className='truncate'>{getUserDisplayName(first)}</span>
-                {assigned.length > 1 && <span className='text-[11px] text-text-tertiary'>+{assigned.length - 1}</span>}
+                {assigned.length > 1 && (
+                  <span className='text-[11px] text-text-tertiary'>+{assigned.length - 1}</span>
+                )}
               </span>
             )
           }
@@ -584,10 +655,10 @@ function CustomerRow({
             'inline-flex h-[26px] w-[46px] items-center justify-center gap-1 rounded-[6px] border text-[12px] font-medium tabular-nums transition-colors duration-[80ms]',
             noteCount > 0
               ? 'border-border bg-bg-secondary text-text-secondary hover:bg-bg-active'
-              : 'border-transparent text-text-quaternary hover:bg-bg-hover hover:text-text-tertiary',
+              : 'text-text-quaternary border-transparent hover:bg-bg-hover hover:text-text-tertiary'
           )}
           aria-label='Open notes'
-          onClick={(e) => {
+          onClick={e => {
             e.stopPropagation()
             onNotes(customer)
           }}
@@ -600,8 +671,8 @@ function CustomerRow({
       {/* Actions */}
       <div
         className='flex w-[28px] shrink-0 items-center justify-center'
-        onClick={(e) => e.stopPropagation()}
-        onKeyDown={(e) => e.stopPropagation()}
+        onClick={e => e.stopPropagation()}
+        onKeyDown={e => e.stopPropagation()}
         role='group'
       >
         <DropdownMenu>
@@ -653,6 +724,6 @@ function CustomerRow({
 export const Route = createFileRoute('/_authenticated/customers/')({
   component: CustomersPage,
   head: () => ({
-    meta: [{ title: 'Customers' }],
-  }),
+    meta: [{ title: 'Customers' }]
+  })
 })

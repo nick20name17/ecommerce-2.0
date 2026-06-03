@@ -1,12 +1,34 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { createFileRoute, useRouter } from '@tanstack/react-router'
-import { Check, ChevronLeft, ClipboardList, Copy, ExternalLink, ListTodo, Package, PackageCheck, Paperclip, Printer, StickyNote, Trash2, Truck, UserPlus, XCircle } from 'lucide-react'
+import {
+  Check,
+  ChevronLeft,
+  ClipboardList,
+  Copy,
+  ExternalLink,
+  ListTodo,
+  Package,
+  PackageCheck,
+  Paperclip,
+  Printer,
+  StickyNote,
+  Trash2,
+  Truck,
+  UserPlus,
+  XCircle
+} from 'lucide-react'
 
 import { PageEmpty } from '@/components/common/page-empty'
 import { EntityAttachmentsDialog } from '@/components/common/entity-attachments/entity-attachments-dialog'
 import { EntityNotesSheet } from '@/components/common/entity-notes/entity-notes-sheet'
 import { ShippingRatesDialog } from './-components/shipping-rates-dialog'
-import { PanelSection, PanelRow, PanelBlock, PropertyField, SummaryCell } from './-components/order-properties'
+import {
+  PanelSection,
+  PanelRow,
+  PanelBlock,
+  PropertyField,
+  SummaryCell
+} from './-components/order-properties'
 import { useState } from 'react'
 
 import { getEditableFieldsQuery } from '@/api/data/query'
@@ -36,8 +58,8 @@ import { toast } from 'sonner'
 export const Route = createFileRoute('/_authenticated/orders/$orderId/')({
   component: OrderDetailPage,
   head: ({ params }) => ({
-    meta: [{ title: `Order ${params.orderId}` }],
-  }),
+    meta: [{ title: `Order ${params.orderId}` }]
+  })
 })
 
 // ── Helpers ──────────────────────────────────────────────────
@@ -49,7 +71,7 @@ const STATUS_DOT_COLORS: Record<string, string> = {
   P: 'bg-green-500',
   V: 'bg-red-500',
   H: 'bg-slate-400',
-  A: 'bg-purple-500',
+  A: 'bg-purple-500'
 }
 
 function formatAddress(
@@ -57,7 +79,7 @@ function formatAddress(
   line2?: string | null,
   city?: string | null,
   state?: string | null,
-  zip?: string | null,
+  zip?: string | null
 ) {
   const parts = [line1, line2, [city, state, zip].filter(Boolean).join(', ')].filter(Boolean)
   return parts.length > 0 ? parts.join('\n') : null
@@ -87,14 +109,13 @@ function OrderDetailPage() {
   const editableOrderFields = editableFields?.order ?? []
 
   const patchMutation = useMutation({
-    mutationFn: (payload: OrderPatchPayload) =>
-      orderService.patch(orderId, payload, projectId),
-    onSuccess: (updated) => {
+    mutationFn: (payload: OrderPatchPayload) => orderService.patch(orderId, payload, projectId),
+    onSuccess: updated => {
       queryClient.setQueryData(ORDER_QUERY_KEYS.detail(orderId), updated)
     },
     meta: {
-      errorMessage: 'Failed to update order',
-    },
+      errorMessage: 'Failed to update order'
+    }
   })
 
   const handleFieldSave = (field: string, value: string) => {
@@ -107,13 +128,13 @@ function OrderDetailPage() {
   // Custom fields: enabled non-default fields from field config
   const customFields = (() => {
     const entries = fieldConfig?.order ?? []
-    return entries.filter((e) => !e.default && e.enabled)
+    return entries.filter(e => !e.default && e.enabled)
   })()
 
   // Line item custom columns from order_item field config
   const itemCustomCols = (() => {
     const entries = fieldConfig?.order_item ?? []
-    return entries.filter((e) => !e.default && e.enabled)
+    return entries.filter(e => !e.default && e.enabled)
   })()
 
   const [assignOpen, setAssignOpen] = useState(false)
@@ -123,19 +144,24 @@ function OrderDetailPage() {
     mutationFn: () => orderService.delete(orderId, projectId!),
     meta: {
       successMessage: 'Order deleted',
-      invalidatesQuery: ORDER_QUERY_KEYS.lists(),
+      invalidatesQuery: ORDER_QUERY_KEYS.lists()
     },
-    onSuccess: () => router.history.back(),
+    onSuccess: () => router.history.back()
   })
 
   const voidShipmentMutation = useMutation({
-    mutationFn: ({ shipmentId, shipmentOrderAutoid }: { shipmentId: number; shipmentOrderAutoid?: string }) =>
-      orderService.voidShipment(shipmentOrderAutoid || orderId, shipmentId),
+    mutationFn: ({
+      shipmentId,
+      shipmentOrderAutoid
+    }: {
+      shipmentId: number
+      shipmentOrderAutoid?: string
+    }) => orderService.voidShipment(shipmentOrderAutoid || orderId, shipmentId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ORDER_QUERY_KEYS.detail(orderId) })
       toast.success('Shipment voided')
     },
-    onError: () => toast.error('Failed to void shipment'),
+    onError: () => toast.error('Failed to void shipment')
   })
 
   const processMutation = useMutation({
@@ -146,8 +172,8 @@ function OrderDetailPage() {
       toast.success(withPrint ? 'Order processed (print queued)' : 'Order processed')
     },
     meta: {
-      errorMessage: 'Failed to process order',
-    },
+      errorMessage: 'Failed to process order'
+    }
   })
 
   // Print menu is rendered via <PrintMenu/> below.
@@ -172,7 +198,7 @@ function OrderDetailPage() {
           {/* Table skeleton */}
           <div className='flex min-h-0 flex-1 flex-col overflow-hidden'>
             {/* Table header */}
-            <div className='flex items-center gap-3 border-b border-border bg-bg-secondary/60 py-1.5 pl-6 pr-6'>
+            <div className='flex items-center gap-3 border-b border-border bg-bg-secondary/60 py-1.5 pr-6 pl-6'>
               <Skeleton className='h-3 w-10' />
               <Skeleton className='h-3 w-16' />
               <Skeleton className='h-3 w-32' />
@@ -185,7 +211,10 @@ function OrderDetailPage() {
             {/* Table rows */}
             <div className='flex-1'>
               {Array.from({ length: 6 }).map((_, i) => (
-                <div key={i} className='flex items-center gap-3 border-b border-border-light py-2 pl-6 pr-6'>
+                <div
+                  key={i}
+                  className='flex items-center gap-3 border-b border-border-light py-2 pr-6 pl-6'
+                >
                   <Skeleton className='size-[18px] rounded-[4px]' />
                   <Skeleton className='h-3 w-20' />
                   <Skeleton className='h-3 w-40' />
@@ -212,31 +241,31 @@ function OrderDetailPage() {
 
           {/* Right panel skeleton */}
           <div className='hidden shrink-0 border-l border-border bg-bg-secondary/50 lg:block lg:w-[380px]'>
-              <div className='flex items-center gap-0 border-b border-border px-4'>
-                <Skeleton className='my-2 h-4 w-14' />
-                <Skeleton className='my-2 ml-4 h-4 w-14' />
+            <div className='flex items-center gap-0 border-b border-border px-4'>
+              <Skeleton className='my-2 h-4 w-14' />
+              <Skeleton className='my-2 ml-4 h-4 w-14' />
+            </div>
+            <div className='space-y-3 px-4 py-3'>
+              <Skeleton className='h-3 w-16' />
+              <div className='grid grid-cols-2 gap-x-4 gap-y-2'>
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <div key={i}>
+                    <Skeleton className='mb-1 h-2.5 w-12' />
+                    <Skeleton className='h-3.5 w-full' />
+                  </div>
+                ))}
               </div>
-              <div className='space-y-3 px-4 py-3'>
-                <Skeleton className='h-3 w-16' />
-                <div className='grid grid-cols-2 gap-x-4 gap-y-2'>
-                  {Array.from({ length: 6 }).map((_, i) => (
-                    <div key={i}>
-                      <Skeleton className='mb-1 h-2.5 w-12' />
-                      <Skeleton className='h-3.5 w-full' />
-                    </div>
-                  ))}
-                </div>
-                <Skeleton className='h-3 w-20' />
-                <div className='grid grid-cols-2 gap-x-4 gap-y-2'>
-                  {Array.from({ length: 4 }).map((_, i) => (
-                    <div key={i}>
-                      <Skeleton className='mb-1 h-2.5 w-12' />
-                      <Skeleton className='h-3.5 w-full' />
-                    </div>
-                  ))}
-                </div>
+              <Skeleton className='h-3 w-20' />
+              <div className='grid grid-cols-2 gap-x-4 gap-y-2'>
+                {Array.from({ length: 4 }).map((_, i) => (
+                  <div key={i}>
+                    <Skeleton className='mb-1 h-2.5 w-12' />
+                    <Skeleton className='h-3.5 w-full' />
+                  </div>
+                ))}
               </div>
             </div>
+          </div>
         </div>
       </div>
     )
@@ -246,7 +275,11 @@ function OrderDetailPage() {
   if (!order) {
     return (
       <div className='flex h-full items-center justify-center'>
-        <PageEmpty icon={Package} title='Order not found' description='This order may have been deleted or you may not have access.' />
+        <PageEmpty
+          icon={Package}
+          title='Order not found'
+          description='This order may have been deleted or you may not have access.'
+        />
       </div>
     )
   }
@@ -255,10 +288,24 @@ function OrderDetailPage() {
   const dotColor = STATUS_DOT_COLORS[order.status] ?? 'bg-slate-400'
   const statusClass = ORDER_STATUS_CLASS[order.status as OrderStatus] ?? ''
   const items = order.items ?? []
-  const allPicked = items.length > 0 && items.every((it) => it.picked_quantity != null && parseFloat(it.picked_quantity) > 0)
+  const allPicked =
+    items.length > 0 &&
+    items.every(it => it.picked_quantity != null && parseFloat(it.picked_quantity) > 0)
   const assignedUsers = order.assigned_users ?? (order.assigned_user ? [order.assigned_user] : [])
-  const billToAddress = formatAddress(order.address1, order.address2, order.city, order.state, order.zip)
-  const shipToAddress = formatAddress(order.c_address1, order.c_address2, order.c_city, order.c_state, order.c_zip)
+  const billToAddress = formatAddress(
+    order.address1,
+    order.address2,
+    order.city,
+    order.state,
+    order.zip
+  )
+  const shipToAddress = formatAddress(
+    order.c_address1,
+    order.c_address2,
+    order.c_city,
+    order.c_state,
+    order.c_zip
+  )
 
   return (
     <div className='flex h-full flex-col overflow-hidden'>
@@ -267,7 +314,7 @@ function OrderDetailPage() {
         <SidebarTrigger className='-ml-1' />
         <button
           type='button'
-          className='inline-flex h-7 shrink-0 items-center gap-0.5 rounded-[6px] border border-border bg-bg-secondary pl-1.5 pr-2.5 text-[13px] font-medium text-text-secondary transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground'
+          className='inline-flex h-7 shrink-0 items-center gap-0.5 rounded-[6px] border border-border bg-bg-secondary pr-2.5 pl-1.5 text-[13px] font-medium text-text-secondary transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground'
           onClick={() => router.history.back()}
         >
           <ChevronLeft className='size-3.5' />
@@ -298,8 +345,8 @@ function OrderDetailPage() {
 
         <span
           className={cn(
-            'hidden shrink-0 items-center gap-1.5 rounded-full border px-2 py-0.5 text-[12px] font-semibold leading-none sm:inline-flex',
-            statusClass,
+            'hidden shrink-0 items-center gap-1.5 rounded-full border px-2 py-0.5 text-[12px] leading-none font-semibold sm:inline-flex',
+            statusClass
           )}
         >
           <span className={cn('size-1.5 rounded-full', dotColor)} />
@@ -320,7 +367,7 @@ function OrderDetailPage() {
           >
             <UserPlus className='size-3.5' />
             {assignedUsers.length > 0
-              ? assignedUsers.map((u) => getUserDisplayName(u)).join(', ')
+              ? assignedUsers.map(u => getUserDisplayName(u)).join(', ')
               : 'Assign'}
           </button>
         </div>
@@ -353,10 +400,14 @@ function OrderDetailPage() {
                 disabled={allPicked}
               >
                 <ClipboardList className='size-3.5' />
-                <span className='hidden lg:inline'>{allPicked ? 'All Picked' : 'Start Picking'}</span>
+                <span className='hidden lg:inline'>
+                  {allPicked ? 'All Picked' : 'Start Picking'}
+                </span>
               </button>
             </TooltipTrigger>
-            <TooltipContent>{allPicked ? 'All items have been picked' : 'Start picking for this customer'}</TooltipContent>
+            <TooltipContent>
+              {allPicked ? 'All items have been picked' : 'Start picking for this customer'}
+            </TooltipContent>
           </Tooltip>
 
           <PrintMenu
@@ -427,13 +478,15 @@ function OrderDetailPage() {
               >
                 <StickyNote className='size-3.5' />
                 {noteCount > 0 && (
-                  <span className='absolute -right-1.5 -top-1.5 flex size-4 items-center justify-center rounded-full bg-primary text-[9px] font-bold text-primary-foreground'>
+                  <span className='absolute -top-1.5 -right-1.5 flex size-4 items-center justify-center rounded-full bg-primary text-[9px] font-bold text-primary-foreground'>
                     {noteCount > 9 ? '9+' : noteCount}
                   </span>
                 )}
               </button>
             </TooltipTrigger>
-            <TooltipContent>{noteCount > 0 ? `${noteCount} note${noteCount !== 1 ? 's' : ''}` : 'Notes'}</TooltipContent>
+            <TooltipContent>
+              {noteCount > 0 ? `${noteCount} note${noteCount !== 1 ? 's' : ''}` : 'Notes'}
+            </TooltipContent>
           </Tooltip>
 
           <Tooltip>
@@ -473,20 +526,37 @@ function OrderDetailPage() {
               <PageEmpty icon={Package} title='No items in this order' compact />
             ) : (
               <table className='w-full text-[13px]'>
-                <thead className='sticky top-0 z-10 select-none bg-bg-secondary'>
+                <thead className='sticky top-0 z-10 bg-bg-secondary select-none'>
                   <tr className='border-b border-border text-left'>
-                    <th className='w-[60px] py-1.5 pl-6 pr-3 font-medium text-text-tertiary'>Picked</th>
-                    <th className='min-w-[130px] px-3 py-1.5 font-medium text-text-tertiary'>Inventory</th>
-                    <th className='min-w-[200px] px-3 py-1.5 font-medium text-text-tertiary'>Description</th>
-                    <th className='w-[70px] px-3 py-1.5 text-right font-medium text-text-tertiary'>Qty</th>
-                    <th className='w-[60px] px-3 py-1.5 text-right font-medium text-text-tertiary'>Ship</th>
-                    <th className='w-[90px] px-3 py-1.5 text-right font-medium text-text-tertiary'>Price</th>
-                    {itemCustomCols.map((col) => (
-                      <th key={col.field} className='min-w-[80px] px-3 py-1.5 font-medium text-text-tertiary'>
+                    <th className='w-[60px] py-1.5 pr-3 pl-6 font-medium text-text-tertiary'>
+                      Picked
+                    </th>
+                    <th className='min-w-[130px] px-3 py-1.5 font-medium text-text-tertiary'>
+                      Inventory
+                    </th>
+                    <th className='min-w-[200px] px-3 py-1.5 font-medium text-text-tertiary'>
+                      Description
+                    </th>
+                    <th className='w-[70px] px-3 py-1.5 text-right font-medium text-text-tertiary'>
+                      Qty
+                    </th>
+                    <th className='w-[60px] px-3 py-1.5 text-right font-medium text-text-tertiary'>
+                      Ship
+                    </th>
+                    <th className='w-[90px] px-3 py-1.5 text-right font-medium text-text-tertiary'>
+                      Price
+                    </th>
+                    {itemCustomCols.map(col => (
+                      <th
+                        key={col.field}
+                        className='min-w-[80px] px-3 py-1.5 font-medium text-text-tertiary'
+                      >
                         {getColumnLabel(col.field, 'order_item', fieldConfig)}
                       </th>
                     ))}
-                    <th className='w-[100px] py-1.5 pl-3 pr-6 text-right font-medium text-text-tertiary'>Amount</th>
+                    <th className='w-[100px] py-1.5 pr-6 pl-3 text-right font-medium text-text-tertiary'>
+                      Amount
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
@@ -495,12 +565,15 @@ function OrderDetailPage() {
                       key={item.autoid ?? i}
                       className='border-b border-border-light transition-colors duration-100 hover:bg-bg-hover'
                     >
-                      <td className='py-1.5 pl-6 pr-3'>
+                      <td className='py-1.5 pr-3 pl-6'>
                         {item.picked_quantity != null && parseFloat(item.picked_quantity) > 0 ? (
                           <Tooltip>
                             <TooltipTrigger asChild>
-                              <span className='inline-flex items-center gap-1 rounded-[4px] bg-emerald-500/10 px-1.5 py-0.5 text-[11px] font-medium tabular-nums text-emerald-600 dark:text-emerald-400'>
-                                <Check className='size-3' /> {parseFloat(item.picked_quantity) % 1 === 0 ? parseInt(item.picked_quantity) : item.picked_quantity}
+                              <span className='inline-flex items-center gap-1 rounded-[4px] bg-emerald-500/10 px-1.5 py-0.5 text-[11px] font-medium text-emerald-600 tabular-nums dark:text-emerald-400'>
+                                <Check className='size-3' />{' '}
+                                {parseFloat(item.picked_quantity) % 1 === 0
+                                  ? parseInt(item.picked_quantity)
+                                  : item.picked_quantity}
                               </span>
                             </TooltipTrigger>
                             <TooltipContent>
@@ -509,7 +582,7 @@ function OrderDetailPage() {
                             </TooltipContent>
                           </Tooltip>
                         ) : (
-                          <span className='text-[11px] text-text-quaternary'>—</span>
+                          <span className='text-text-quaternary text-[11px]'>—</span>
                         )}
                       </td>
                       <td className='px-3 py-1.5 font-medium text-foreground'>
@@ -520,22 +593,26 @@ function OrderDetailPage() {
                           <TooltipTrigger asChild>
                             <span className='block truncate'>{item.descr || '—'}</span>
                           </TooltipTrigger>
-                          <TooltipContent className='max-w-[300px]'>{item.descr || '—'}</TooltipContent>
+                          <TooltipContent className='max-w-[300px]'>
+                            {item.descr || '—'}
+                          </TooltipContent>
                         </Tooltip>
                       </td>
-                      <td className='px-3 py-1.5 text-right tabular-nums text-text-secondary'>
+                      <td className='px-3 py-1.5 text-right text-text-secondary tabular-nums'>
                         {item.quan ?? '—'}
                         {item.unit_meas && item.unit_meas !== 'EA' && (
-                          <span className='ml-1 text-[11px] text-text-quaternary'>{item.unit_meas}</span>
+                          <span className='text-text-quaternary ml-1 text-[11px]'>
+                            {item.unit_meas}
+                          </span>
                         )}
                       </td>
-                      <td className='px-3 py-1.5 text-right tabular-nums text-text-tertiary'>
+                      <td className='px-3 py-1.5 text-right text-text-tertiary tabular-nums'>
                         {item.ship ?? '0'}
                       </td>
-                      <td className='px-3 py-1.5 text-right tabular-nums text-text-secondary'>
+                      <td className='px-3 py-1.5 text-right text-text-secondary tabular-nums'>
                         {formatCurrency(item.price)}
                       </td>
-                      {itemCustomCols.map((col) => {
+                      {itemCustomCols.map(col => {
                         const val = item[col.field]
                         return (
                           <td key={col.field} className='px-3 py-1.5 text-text-secondary'>
@@ -545,7 +622,7 @@ function OrderDetailPage() {
                           </td>
                         )
                       })}
-                      <td className='py-1.5 pl-3 pr-6 text-right font-medium tabular-nums text-foreground'>
+                      <td className='py-1.5 pr-6 pl-3 text-right font-medium text-foreground tabular-nums'>
                         {formatCurrency(item.so_amount)}
                       </td>
                     </tr>
@@ -556,9 +633,7 @@ function OrderDetailPage() {
           </div>
 
           {/* Summary footer */}
-          <div
-            className='flex shrink-0 items-center justify-end gap-4 border-t border-border bg-bg-secondary/40 px-4 py-2 sm:px-6'
-          >
+          <div className='flex shrink-0 items-center justify-end gap-4 border-t border-border bg-bg-secondary/40 px-4 py-2 sm:px-6'>
             <SummaryCell label='Subtotal' value={formatCurrency(order.subtotal)} />
             <SummaryCell label='Tax' value={formatCurrency(order.tax)} />
             <SummaryCell label='Total' value={formatCurrency(order.total)} bold />
@@ -575,16 +650,19 @@ function OrderDetailPage() {
         <div
           className={cn(
             'flex shrink-0 flex-col overflow-hidden bg-bg-secondary/50',
-            'border-t border-border lg:border-t-0 lg:w-[380px] lg:border-l',
+            'border-t border-border lg:w-[380px] lg:border-t-0 lg:border-l'
           )}
         >
           {/* Panel tabs */}
           <div className='flex shrink-0 items-center justify-between border-b border-border px-1'>
             <div className='flex items-center gap-0'>
-              {(['general', 'custom', 'shipments'] as const).map((tab) => {
-                const label = tab === 'custom' ? `Line Items${customFields.length > 0 ? ` ${customFields.length}` : ''}`
-                  : tab === 'shipments' ? `Shipments${(order.shipments?.length ?? 0) > 0 ? ` ${order.shipments!.length}` : ''}`
-                  : 'General'
+              {(['general', 'custom', 'shipments'] as const).map(tab => {
+                const label =
+                  tab === 'custom'
+                    ? `Line Items${customFields.length > 0 ? ` ${customFields.length}` : ''}`
+                    : tab === 'shipments'
+                      ? `Shipments${(order.shipments?.length ?? 0) > 0 ? ` ${order.shipments!.length}` : ''}`
+                      : 'General'
                 return (
                   <button
                     key={tab}
@@ -593,13 +671,13 @@ function OrderDetailPage() {
                       'relative px-3 py-2 text-[13px] font-medium transition-colors duration-75',
                       panelTab === tab
                         ? 'text-foreground'
-                        : 'text-text-tertiary hover:text-text-secondary',
+                        : 'text-text-tertiary hover:text-text-secondary'
                     )}
                     onClick={() => setPanelTab(tab)}
                   >
                     {label}
                     {panelTab === tab && (
-                      <span className='absolute bottom-0 left-3 right-3 h-[2px] rounded-full bg-primary' />
+                      <span className='absolute right-3 bottom-0 left-3 h-[2px] rounded-full bg-primary' />
                     )}
                   </button>
                 )
@@ -607,30 +685,34 @@ function OrderDetailPage() {
             </div>
             <div className='flex items-center gap-1 pr-2'>
               {(() => {
-                const pickedCount = items.filter((i) => i.is_picked).length
-                const packedCount = items.filter((i) => i.packed).length
+                const pickedCount = items.filter(i => i.is_picked).length
+                const packedCount = items.filter(i => i.packed).length
                 return (
                   <>
                     {pickedCount > 0 && (
                       <span
                         className={cn(
-                          'inline-flex items-center gap-1 rounded-[4px] px-1.5 py-0.5 text-[10px] font-semibold tabular-nums leading-none',
+                          'inline-flex items-center gap-1 rounded-[4px] px-1.5 py-0.5 text-[10px] leading-none font-semibold tabular-nums',
                           pickedCount === items.length
                             ? 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400'
-                            : 'bg-primary/10 text-primary',
+                            : 'bg-primary/10 text-primary'
                         )}
                       >
-                        {pickedCount === items.length ? <Check className='size-2.5' /> : <PackageCheck className='size-2.5' />}
+                        {pickedCount === items.length ? (
+                          <Check className='size-2.5' />
+                        ) : (
+                          <PackageCheck className='size-2.5' />
+                        )}
                         {pickedCount}/{items.length}
                       </span>
                     )}
                     {packedCount > 0 && (
                       <span
                         className={cn(
-                          'inline-flex items-center gap-1 rounded-[4px] px-1.5 py-0.5 text-[10px] font-semibold tabular-nums leading-none',
+                          'inline-flex items-center gap-1 rounded-[4px] px-1.5 py-0.5 text-[10px] leading-none font-semibold tabular-nums',
                           packedCount === items.length
                             ? 'bg-violet-500/10 text-violet-700 dark:text-violet-400'
-                            : 'bg-violet-500/10 text-violet-600 dark:text-violet-400',
+                            : 'bg-violet-500/10 text-violet-600 dark:text-violet-400'
                         )}
                       >
                         <Package className='size-2.5' />
@@ -649,34 +731,66 @@ function OrderDetailPage() {
               <>
                 {/* Bill To */}
                 <PanelSection title='Bill To'>
-                  <PropertyField label='Name' value={order.name} field='name' onSave={handleFieldSave} editable={editableOrderFields.includes('name')} />
+                  <PropertyField
+                    label='Name'
+                    value={order.name}
+                    field='name'
+                    onSave={handleFieldSave}
+                    editable={editableOrderFields.includes('name')}
+                  />
                   <PanelBlock last>
-                    <span className='mb-0.5 block text-[12px] font-medium text-text-tertiary'>Address</span>
+                    <span className='mb-0.5 block text-[12px] font-medium text-text-tertiary'>
+                      Address
+                    </span>
                     {billToAddress ? (
-                      <span className='whitespace-pre-line text-[13px] leading-snug text-foreground'>{billToAddress}</span>
+                      <span className='text-[13px] leading-snug whitespace-pre-line text-foreground'>
+                        {billToAddress}
+                      </span>
                     ) : (
-                      <span className='text-[13px] text-text-quaternary'>—</span>
+                      <span className='text-text-quaternary text-[13px]'>—</span>
                     )}
                   </PanelBlock>
                 </PanelSection>
 
                 {/* Ship To */}
                 <PanelSection title='Ship To'>
-                  <PropertyField label='Name' value={order.c_name} field='c_name' onSave={handleFieldSave} editable={editableOrderFields.includes('c_name')} />
+                  <PropertyField
+                    label='Name'
+                    value={order.c_name}
+                    field='c_name'
+                    onSave={handleFieldSave}
+                    editable={editableOrderFields.includes('c_name')}
+                  />
                   <PanelBlock last>
-                    <span className='mb-0.5 block text-[12px] font-medium text-text-tertiary'>Address</span>
+                    <span className='mb-0.5 block text-[12px] font-medium text-text-tertiary'>
+                      Address
+                    </span>
                     {shipToAddress ? (
-                      <span className='whitespace-pre-line text-[13px] leading-snug text-foreground'>{shipToAddress}</span>
+                      <span className='text-[13px] leading-snug whitespace-pre-line text-foreground'>
+                        {shipToAddress}
+                      </span>
                     ) : (
-                      <span className='text-[13px] text-text-quaternary'>—</span>
+                      <span className='text-text-quaternary text-[13px]'>—</span>
                     )}
                   </PanelBlock>
                 </PanelSection>
 
                 {/* Contact */}
                 <PanelSection title='Contact'>
-                  <PropertyField label='Email' value={order.email} field='email' onSave={handleFieldSave} editable={editableOrderFields.includes('email')} />
-                  <PropertyField label='Phone' value={order.phone} field='phone' onSave={handleFieldSave} editable={editableOrderFields.includes('phone')} />
+                  <PropertyField
+                    label='Email'
+                    value={order.email}
+                    field='email'
+                    onSave={handleFieldSave}
+                    editable={editableOrderFields.includes('email')}
+                  />
+                  <PropertyField
+                    label='Phone'
+                    value={order.phone}
+                    field='phone'
+                    onSave={handleFieldSave}
+                    editable={editableOrderFields.includes('phone')}
+                  />
                 </PanelSection>
 
                 {/* Order Details */}
@@ -691,23 +805,77 @@ function OrderDetailPage() {
                     <span className='tabular-nums'>{order.packed_status || '—'}</span>
                   </PanelRow>
                   <PanelRow label='Date'>
-                    <span className='tabular-nums'>{order.inv_date ? formatDate(order.inv_date) : '—'}</span>
+                    <span className='tabular-nums'>
+                      {order.inv_date ? formatDate(order.inv_date) : '—'}
+                    </span>
                   </PanelRow>
                   <PanelRow label='Due Date'>
-                    <span className='tabular-nums'>{order.due_date ? formatDate(order.due_date) : '—'}</span>
+                    <span className='tabular-nums'>
+                      {order.due_date ? formatDate(order.due_date) : '—'}
+                    </span>
                   </PanelRow>
-                  <PropertyField label='Sales Person' value={order.salesman} field='salesman' onSave={handleFieldSave} editable={editableOrderFields.includes('salesman')} />
-                  <PropertyField label='PO No.' value={order.po_no} field='po_no' onSave={handleFieldSave} editable={editableOrderFields.includes('po_no')} />
-                  <PropertyField label='Ship Date' value={order.ship_date} field='ship_date' onSave={handleFieldSave} editable={editableOrderFields.includes('ship_date')} />
-                  <PropertyField label='Ship Via' value={order.ship_via} field='ship_via' onSave={handleFieldSave} editable={editableOrderFields.includes('ship_via')} />
-                  <PropertyField label='Price Level' value={order.in_level} field='in_level' onSave={handleFieldSave} editable={editableOrderFields.includes('in_level')} />
-                  <PropertyField label='Due' value={order.charge} field='charge' onSave={handleFieldSave} editable={editableOrderFields.includes('charge')} />
+                  <PropertyField
+                    label='Sales Person'
+                    value={order.salesman}
+                    field='salesman'
+                    onSave={handleFieldSave}
+                    editable={editableOrderFields.includes('salesman')}
+                  />
+                  <PropertyField
+                    label='PO No.'
+                    value={order.po_no}
+                    field='po_no'
+                    onSave={handleFieldSave}
+                    editable={editableOrderFields.includes('po_no')}
+                  />
+                  <PropertyField
+                    label='Ship Date'
+                    value={order.ship_date}
+                    field='ship_date'
+                    onSave={handleFieldSave}
+                    editable={editableOrderFields.includes('ship_date')}
+                  />
+                  <PropertyField
+                    label='Ship Via'
+                    value={order.ship_via}
+                    field='ship_via'
+                    onSave={handleFieldSave}
+                    editable={editableOrderFields.includes('ship_via')}
+                  />
+                  <PropertyField
+                    label='Price Level'
+                    value={order.in_level}
+                    field='in_level'
+                    onSave={handleFieldSave}
+                    editable={editableOrderFields.includes('in_level')}
+                  />
+                  <PropertyField
+                    label='Due'
+                    value={order.charge}
+                    field='charge'
+                    onSave={handleFieldSave}
+                    editable={editableOrderFields.includes('charge')}
+                  />
                 </PanelSection>
 
                 {/* Notes */}
                 <PanelSection title='Notes' last>
-                  <PropertyField label='Memo' value={order.memo} field='memo' onSave={handleFieldSave} editable={editableOrderFields.includes('memo')} multiline />
-                  <PropertyField label='Internal Note' value={order.internalnt} field='internalnt' onSave={handleFieldSave} editable={editableOrderFields.includes('internalnt')} multiline />
+                  <PropertyField
+                    label='Memo'
+                    value={order.memo}
+                    field='memo'
+                    onSave={handleFieldSave}
+                    editable={editableOrderFields.includes('memo')}
+                    multiline
+                  />
+                  <PropertyField
+                    label='Internal Note'
+                    value={order.internalnt}
+                    field='internalnt'
+                    onSave={handleFieldSave}
+                    editable={editableOrderFields.includes('internalnt')}
+                    multiline
+                  />
                 </PanelSection>
               </>
             ) : panelTab === 'custom' ? (
@@ -715,13 +883,13 @@ function OrderDetailPage() {
                 {customFields.length === 0 ? (
                   <div className='flex flex-col items-center justify-center py-12 text-center'>
                     <p className='text-[13px] text-text-tertiary'>No custom fields enabled</p>
-                    <p className='mt-1 text-[12px] text-text-quaternary'>
+                    <p className='text-text-quaternary mt-1 text-[12px]'>
                       Enable fields in Settings &rarr; Data Control
                     </p>
                   </div>
                 ) : (
                   <PanelSection title='Custom Fields' last>
-                    {customFields.map((entry) => {
+                    {customFields.map(entry => {
                       const label = getColumnLabel(entry.field, 'order', fieldConfig)
                       const val = order[entry.field]
                       const strVal = val != null ? String(val) : null
@@ -743,20 +911,20 @@ function OrderDetailPage() {
               <>
                 {(order.shipments?.length ?? 0) === 0 ? (
                   <div className='flex flex-col items-center justify-center py-12 text-center'>
-                    <Truck className='mx-auto mb-2 size-6 text-text-quaternary' />
+                    <Truck className='text-text-quaternary mx-auto mb-2 size-6' />
                     <p className='text-[13px] text-text-tertiary'>No shipments yet</p>
-                    <p className='mt-1 text-[12px] text-text-quaternary'>
+                    <p className='text-text-quaternary mt-1 text-[12px]'>
                       Create a shipment from the Shipping button above
                     </p>
                   </div>
                 ) : (
                   <div>
-                    {order.shipments!.map((shipment) => (
+                    {order.shipments!.map(shipment => (
                       <div
                         key={shipment.id}
                         className={cn(
                           'border-b border-border-light px-4 py-3',
-                          shipment.voided && 'opacity-50',
+                          shipment.voided && 'opacity-50'
                         )}
                       >
                         <div className='flex items-center gap-2'>
@@ -764,12 +932,12 @@ function OrderDetailPage() {
                           <span className='min-w-0 flex-1 truncate text-[13px] font-medium text-foreground'>
                             {shipment.service_name}
                           </span>
-                          <span className='shrink-0 text-[13px] font-medium tabular-nums text-foreground'>
+                          <span className='shrink-0 text-[13px] font-medium text-foreground tabular-nums'>
                             ${parseFloat(shipment.cost).toFixed(2)}
                           </span>
                         </div>
                         <div className='mt-1.5 flex items-center gap-2 pl-[22px]'>
-                          <span className='min-w-0 flex-1 truncate text-[12px] tabular-nums text-text-tertiary'>
+                          <span className='min-w-0 flex-1 truncate text-[12px] text-text-tertiary tabular-nums'>
                             {shipment.tracking_number}
                           </span>
                           {shipment.voided ? (
@@ -785,13 +953,13 @@ function OrderDetailPage() {
                           )}
                         </div>
                         <div className='mt-1.5 flex items-center gap-2 pl-[22px]'>
-                          <span className='text-[11px] text-text-quaternary'>
+                          <span className='text-text-quaternary text-[11px]'>
                             {new Date(shipment.created_at).toLocaleDateString(undefined, {
                               month: 'short',
                               day: 'numeric',
                               year: 'numeric',
                               hour: '2-digit',
-                              minute: '2-digit',
+                              minute: '2-digit'
                             })}
                           </span>
                           {!shipment.voided && (
@@ -802,7 +970,7 @@ function OrderDetailPage() {
                                   target='_blank'
                                   rel='noopener noreferrer'
                                   className='inline-flex items-center gap-0.5 text-[11px] font-medium text-primary hover:underline'
-                                  onClick={(e) => e.stopPropagation()}
+                                  onClick={e => e.stopPropagation()}
                                 >
                                   Label
                                   <ExternalLink className='size-2.5' />
@@ -811,7 +979,12 @@ function OrderDetailPage() {
                               <button
                                 type='button'
                                 className='inline-flex items-center gap-0.5 text-[11px] font-medium text-destructive hover:underline disabled:opacity-50'
-                                onClick={() => voidShipmentMutation.mutate({ shipmentId: shipment.id, shipmentOrderAutoid: shipment.order_autoid })}
+                                onClick={() =>
+                                  voidShipmentMutation.mutate({
+                                    shipmentId: shipment.id,
+                                    shipmentOrderAutoid: shipment.order_autoid
+                                  })
+                                }
                                 disabled={voidShipmentMutation.isPending}
                               >
                                 <XCircle className='size-2.5' />
@@ -874,7 +1047,7 @@ function OrderDetailPage() {
         orderAutoid={orderId}
         items={items}
         order={order}
-        onPatch={(payload) => patchMutation.mutate(payload)}
+        onPatch={payload => patchMutation.mutate(payload)}
       />
 
       {/* ── Delete confirmation ── */}
@@ -923,4 +1096,3 @@ function OrderDetailPage() {
     </div>
   )
 }
-

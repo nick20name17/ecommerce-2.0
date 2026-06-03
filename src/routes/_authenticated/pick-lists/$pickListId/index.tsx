@@ -11,7 +11,7 @@ import {
   Plus,
   Trash2,
   Truck,
-  TriangleAlert,
+  TriangleAlert
 } from 'lucide-react'
 import { useState } from 'react'
 
@@ -30,7 +30,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogMedia,
-  AlertDialogTitle,
+  AlertDialogTitle
 } from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
 import { SidebarTrigger } from '@/components/ui/sidebar'
@@ -39,7 +39,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import {
   PICK_LIST_STATUS,
   PICK_LIST_STATUS_CLASS,
-  getPickListStatusLabel,
+  getPickListStatusLabel
 } from '@/constants/pick-list'
 import { useBreakpoint } from '@/hooks/use-breakpoint'
 import { useProjectId } from '@/hooks/use-project-id'
@@ -71,7 +71,11 @@ const PickListDetailPage = () => {
   const [addItemsOpen, setAddItemsOpen] = useState(false)
   const [editingItem, setEditingItem] = useState<number | null>(null)
   const [editQty, setEditQty] = useState('')
-  const [itemToRemove, setItemToRemove] = useState<{ id: number; pushed: boolean; label: string } | null>(null)
+  const [itemToRemove, setItemToRemove] = useState<{
+    id: number
+    pushed: boolean
+    label: string
+  } | null>(null)
 
   const isDraft = pickList?.status === PICK_LIST_STATUS.draft
   const isPushed = pickList?.status === PICK_LIST_STATUS.pushed
@@ -80,8 +84,8 @@ const PickListDetailPage = () => {
   const isEditable = !isLabelPurchased
 
   const items = pickList?.items ?? []
-  const hasPushedItems = items.some((i) => i.push_status === 'success')
-  const existingDetailAutoids = new Set(items.map((i) => i.detail_autoid))
+  const hasPushedItems = items.some(i => i.push_status === 'success')
+  const existingDetailAutoids = new Set(items.map(i => i.detail_autoid))
 
   // Build description lookup from orders data
   const descrMap = (() => {
@@ -122,15 +126,15 @@ const PickListDetailPage = () => {
   const deleteMutation = useMutation({
     mutationFn: (resetShipped: boolean) => pickListService.delete(id, resetShipped, projectId),
     meta: { successMessage: 'Pick list deleted', invalidatesQuery: PICK_LIST_QUERY_KEYS.lists() },
-    onSuccess: () => window.history.back(),
+    onSuccess: () => window.history.back()
   })
 
   const pushMutation = useMutation({
     mutationFn: () => pickListService.push(id, projectId),
     meta: { successMessage: 'Pushed to EBMS' },
-    onSuccess: (updated) => {
+    onSuccess: updated => {
       queryClient.setQueryData(PICK_LIST_QUERY_KEYS.detail(id), updated)
-    },
+    }
   })
 
   const voidMutation = useMutation({
@@ -140,7 +144,7 @@ const PickListDetailPage = () => {
       queryClient.invalidateQueries({ queryKey: PICK_LIST_QUERY_KEYS.detail(id) })
       queryClient.invalidateQueries({ queryKey: PICK_LIST_QUERY_KEYS.lists() })
       setVoidOpen(false)
-    },
+    }
   })
 
   const updateItemMutation = useMutation({
@@ -151,7 +155,7 @@ const PickListDetailPage = () => {
       queryClient.invalidateQueries({ queryKey: PICK_LIST_QUERY_KEYS.detail(id) })
       queryClient.invalidateQueries({ queryKey: PICK_LIST_QUERY_KEYS.lists() })
       setEditingItem(null)
-    },
+    }
   })
 
   const removeItemMutation = useMutation({
@@ -162,7 +166,7 @@ const PickListDetailPage = () => {
       queryClient.invalidateQueries({ queryKey: PICK_LIST_QUERY_KEYS.detail(id) })
       queryClient.invalidateQueries({ queryKey: PICK_LIST_QUERY_KEYS.lists() })
       setItemToRemove(null)
-    },
+    }
   })
 
   // ── Loading / Not found ────────────────────────────────
@@ -200,9 +204,7 @@ const PickListDetailPage = () => {
   return (
     <div className='flex h-full flex-col overflow-hidden'>
       {/* Header */}
-      <header
-        className='flex h-12 shrink-0 items-center gap-2.5 border-b border-border px-3.5 sm:px-6'
-      >
+      <header className='flex h-12 shrink-0 items-center gap-2.5 border-b border-border px-3.5 sm:px-6'>
         <SidebarTrigger className='-ml-1' />
         <Link
           to='/pick-lists'
@@ -214,7 +216,12 @@ const PickListDetailPage = () => {
         <div className='mx-1 text-text-tertiary'>/</div>
         <PageHeaderIcon icon={IPickLists} color={PAGE_COLORS.pickLists} />
         <h1 className='text-[14px] font-semibold tracking-[-0.01em]'>#{pickList.id}</h1>
-        <span className={cn('inline-flex items-center rounded-full border px-2 py-0.5 text-[11px] font-semibold leading-none', statusClass)}>
+        <span
+          className={cn(
+            'inline-flex items-center rounded-full border px-2 py-0.5 text-[11px] leading-none font-semibold',
+            statusClass
+          )}
+        >
           {statusLabel}
         </span>
 
@@ -229,7 +236,11 @@ const PickListDetailPage = () => {
             </Button>
           )}
           {isDraft && (
-            <Button size='sm' onClick={() => pushMutation.mutate()} isPending={pushMutation.isPending}>
+            <Button
+              size='sm'
+              onClick={() => pushMutation.mutate()}
+              isPending={pushMutation.isPending}
+            >
               <Truck className='size-3.5' />
               {!isMobile && 'Push to EBMS'}
             </Button>
@@ -258,7 +269,12 @@ const PickListDetailPage = () => {
             </Button>
           )}
           {!isLabelPurchased && (
-            <Button size='icon-sm' variant='ghost' className='text-destructive' onClick={() => setDeleteOpen(true)}>
+            <Button
+              size='icon-sm'
+              variant='ghost'
+              className='text-destructive'
+              onClick={() => setDeleteOpen(true)}
+            >
               <Trash2 className='size-3.5' />
             </Button>
           )}
@@ -268,7 +284,6 @@ const PickListDetailPage = () => {
       {/* Content */}
       <div className='flex-1 overflow-y-auto'>
         <div className='px-3.5 py-4 sm:px-6 sm:py-5'>
-
           {/* Summary card */}
           <div className='mb-6 overflow-hidden rounded-lg border border-border'>
             <div className='grid md:grid-cols-2'>
@@ -283,34 +298,44 @@ const PickListDetailPage = () => {
                     {items.length} item{items.length !== 1 && 's'}
                   </span>
                   <span>·</span>
-                  <span>{orderGroups.length} order{orderGroups.length !== 1 && 's'}</span>
+                  <span>
+                    {orderGroups.length} order{orderGroups.length !== 1 && 's'}
+                  </span>
                   <span>·</span>
                   <span>{formatDateTimeMedium(pickList.created_at)}</span>
                 </div>
                 <div className='mt-3'>
-                  <StatusLifecycle currentStatus={pickList.status} shippingEnabled={shippingEnabled} />
+                  <StatusLifecycle
+                    currentStatus={pickList.status}
+                    shippingEnabled={shippingEnabled}
+                  />
                 </div>
               </div>
 
               {/* Right: Ship To */}
-              <div className='border-t border-border p-4 md:border-l md:border-t-0'>
+              <div className='border-t border-border p-4 md:border-t-0 md:border-l'>
                 <div className='mb-1.5 flex items-center gap-1.5'>
-                  <MapPin className='size-3 text-text-quaternary' />
-                  <span className='text-[11px] font-semibold uppercase tracking-wider text-text-quaternary'>Ship To</span>
+                  <MapPin className='text-text-quaternary size-3' />
+                  <span className='text-text-quaternary text-[11px] font-semibold tracking-wider uppercase'>
+                    Ship To
+                  </span>
                 </div>
                 {pickList.ship_to ? (
                   <>
-                    <p className='text-[13px] font-medium text-foreground'>{pickList.ship_to.name}</p>
+                    <p className='text-[13px] font-medium text-foreground'>
+                      {pickList.ship_to.name}
+                    </p>
                     <p className='text-[12px] text-text-tertiary'>{pickList.ship_to.address1}</p>
                     {pickList.ship_to.address2 && (
                       <p className='text-[12px] text-text-tertiary'>{pickList.ship_to.address2}</p>
                     )}
                     <p className='text-[12px] text-text-tertiary'>
-                      {[pickList.ship_to.city, pickList.ship_to.state].filter(Boolean).join(', ')} {pickList.ship_to.postal}
+                      {[pickList.ship_to.city, pickList.ship_to.state].filter(Boolean).join(', ')}{' '}
+                      {pickList.ship_to.postal}
                     </p>
                   </>
                 ) : (
-                  <p className='text-[12px] text-text-quaternary'>No address set</p>
+                  <p className='text-text-quaternary text-[12px]'>No address set</p>
                 )}
               </div>
             </div>
@@ -320,9 +345,7 @@ const PickListDetailPage = () => {
           <div className='mb-6'>
             <div className='mb-3 flex items-center gap-2'>
               <Package className='size-4 text-text-tertiary' />
-              <span className='text-[13px] font-semibold text-foreground'>
-                Items by Order
-              </span>
+              <span className='text-[13px] font-semibold text-foreground'>Items by Order</span>
             </div>
 
             <div className='space-y-3'>
@@ -330,10 +353,13 @@ const PickListDetailPage = () => {
                 <div key={orderAutoid} className='overflow-hidden rounded-lg border border-border'>
                   <div className='flex items-center gap-2 bg-bg-secondary/50 px-3.5 py-2'>
                     <span className='text-[12px] font-semibold text-foreground'>
-                      Order {orderInvoiceMap.get(orderAutoid) || orderItems[0]?.order_number || orderAutoid.slice(0, 12)}
+                      Order{' '}
+                      {orderInvoiceMap.get(orderAutoid) ||
+                        orderItems[0]?.order_number ||
+                        orderAutoid.slice(0, 12)}
                     </span>
                     <div className='flex-1' />
-                    <span className='text-[11px] text-text-quaternary'>
+                    <span className='text-text-quaternary text-[11px]'>
                       {orderItems.length} item{orderItems.length !== 1 && 's'}
                     </span>
                   </div>
@@ -345,20 +371,27 @@ const PickListDetailPage = () => {
                           key={item.id}
                           className={cn(
                             'group/item flex items-center gap-3 px-3.5 py-[6px]',
-                            i < orderItems.length - 1 && 'border-b border-border-light/50',
+                            i < orderItems.length - 1 && 'border-b border-border-light/50'
                           )}
                         >
                           <span className='min-w-0 flex-1 truncate text-[12px] font-medium text-foreground'>
-                            {descrMap.get(item.detail_autoid) || item.description || item.descr || item.detail_autoid}
+                            {descrMap.get(item.detail_autoid) ||
+                              item.description ||
+                              item.descr ||
+                              item.detail_autoid}
                           </span>
                           {isEditingThis && isEditable ? (
                             <div className='flex items-center gap-1'>
                               <input
                                 value={editQty}
-                                onChange={(e) => setEditQty(e.target.value)}
+                                onChange={e => setEditQty(e.target.value)}
                                 className='h-6 w-[60px] rounded border border-border bg-background px-1.5 text-right text-[12px] tabular-nums outline-none focus:border-primary'
-                                onKeyDown={(e) => {
-                                  if (e.key === 'Enter') updateItemMutation.mutate({ itemId: item.id, quantity: editQty })
+                                onKeyDown={e => {
+                                  if (e.key === 'Enter')
+                                    updateItemMutation.mutate({
+                                      itemId: item.id,
+                                      quantity: editQty
+                                    })
                                   if (e.key === 'Escape') setEditingItem(null)
                                 }}
                                 autoFocus
@@ -366,7 +399,9 @@ const PickListDetailPage = () => {
                               <button
                                 type='button'
                                 className='rounded p-0.5 text-primary hover:bg-primary/10'
-                                onClick={() => updateItemMutation.mutate({ itemId: item.id, quantity: editQty })}
+                                onClick={() =>
+                                  updateItemMutation.mutate({ itemId: item.id, quantity: editQty })
+                                }
                               >
                                 <Check className='size-3' />
                               </button>
@@ -374,8 +409,9 @@ const PickListDetailPage = () => {
                           ) : (
                             <span
                               className={cn(
-                                'rounded bg-bg-secondary px-1.5 py-0.5 text-[12px] font-medium tabular-nums text-text-secondary',
-                                isEditable && 'cursor-pointer hover:bg-primary/10 hover:text-primary',
+                                'rounded bg-bg-secondary px-1.5 py-0.5 text-[12px] font-medium text-text-secondary tabular-nums',
+                                isEditable &&
+                                  'cursor-pointer hover:bg-primary/10 hover:text-primary'
                               )}
                               onClick={() => {
                                 if (isEditable) {
@@ -388,25 +424,36 @@ const PickListDetailPage = () => {
                             </span>
                           )}
                           {(item.push_status === 'success' || item.push_status === 'failed') && (
-                            <span className={cn(
-                              'inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-semibold leading-none',
-                              item.push_status === 'success'
-                                ? 'border-emerald-200 bg-emerald-500/10 text-emerald-700 dark:border-emerald-700 dark:text-emerald-400'
-                                : 'border-red-200 bg-red-500/10 text-red-700 dark:border-red-700 dark:text-red-400',
-                            )}>
-                              {item.push_status === 'success' ? <Check className='size-2.5' /> : '!'}
+                            <span
+                              className={cn(
+                                'inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] leading-none font-semibold',
+                                item.push_status === 'success'
+                                  ? 'border-emerald-200 bg-emerald-500/10 text-emerald-700 dark:border-emerald-700 dark:text-emerald-400'
+                                  : 'border-red-200 bg-red-500/10 text-red-700 dark:border-red-700 dark:text-red-400'
+                              )}
+                            >
+                              {item.push_status === 'success' ? (
+                                <Check className='size-2.5' />
+                              ) : (
+                                '!'
+                              )}
                               {item.push_status === 'success' ? 'Pushed' : 'Failed'}
                             </span>
                           )}
                           {isEditable && !isEditingThis && (
                             <button
                               type='button'
-                              className='rounded p-0.5 text-destructive opacity-0 transition-opacity hover:bg-destructive/10 group-hover/item:opacity-100'
-                              onClick={() => setItemToRemove({
-                                id: item.id,
-                                pushed: item.push_status === 'success',
-                                label: descrMap.get(item.detail_autoid) || item.descr || item.detail_autoid,
-                              })}
+                              className='rounded p-0.5 text-destructive opacity-0 transition-opacity group-hover/item:opacity-100 hover:bg-destructive/10'
+                              onClick={() =>
+                                setItemToRemove({
+                                  id: item.id,
+                                  pushed: item.push_status === 'success',
+                                  label:
+                                    descrMap.get(item.detail_autoid) ||
+                                    item.descr ||
+                                    item.detail_autoid
+                                })
+                              }
                             >
                               <Trash2 className='size-3' />
                             </button>
@@ -430,17 +477,22 @@ const PickListDetailPage = () => {
                 </span>
               </div>
               <div className='space-y-2'>
-                {allShipments.map((shipment) => (
+                {allShipments.map(shipment => (
                   <div
                     key={shipment.id}
                     className={cn(
                       'flex items-center gap-3 rounded-lg border px-3.5 py-2.5',
                       shipment.voided
                         ? 'border-border bg-bg-secondary/30 opacity-60'
-                        : 'border-border',
+                        : 'border-border'
                     )}
                   >
-                    <Truck className={cn('size-4 shrink-0', shipment.voided ? 'text-text-quaternary' : 'text-emerald-500')} />
+                    <Truck
+                      className={cn(
+                        'size-4 shrink-0',
+                        shipment.voided ? 'text-text-quaternary' : 'text-emerald-500'
+                      )}
+                    />
                     <div className='min-w-0 flex-1'>
                       <div className='flex items-center gap-2'>
                         <span className='text-[13px] font-medium text-foreground'>
@@ -453,16 +505,19 @@ const PickListDetailPage = () => {
                         )}
                       </div>
                       {shipment.tracking_number && (
-                        <span className='text-[12px] font-mono text-text-tertiary'>
+                        <span className='font-mono text-[12px] text-text-tertiary'>
                           {shipment.tracking_number}
                         </span>
                       )}
                     </div>
-                    <span className='text-[13px] font-medium tabular-nums text-foreground'>
+                    <span className='text-[13px] font-medium text-foreground tabular-nums'>
                       ${parseFloat(shipment.cost || '0').toFixed(2)}
                     </span>
-                    <span className='text-[11px] text-text-quaternary'>
-                      {new Date(shipment.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                    <span className='text-text-quaternary text-[11px]'>
+                      {new Date(shipment.created_at).toLocaleDateString('en-US', {
+                        month: 'short',
+                        day: 'numeric'
+                      })}
                     </span>
                   </div>
                 ))}
@@ -488,7 +543,9 @@ const PickListDetailPage = () => {
       <AlertDialog open={deleteOpen} onOpenChange={setDeleteOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogMedia className='bg-destructive/10 text-destructive'><Trash2 /></AlertDialogMedia>
+            <AlertDialogMedia className='bg-destructive/10 text-destructive'>
+              <Trash2 />
+            </AlertDialogMedia>
             <AlertDialogTitle>Delete Pick List</AlertDialogTitle>
             <AlertDialogDescription>
               Are you sure you want to delete pick list #{pickList.id}? This cannot be undone.
@@ -508,10 +565,12 @@ const PickListDetailPage = () => {
         </AlertDialogContent>
       </AlertDialog>
 
-      <AlertDialog open={!!itemToRemove} onOpenChange={(open) => !open && setItemToRemove(null)}>
+      <AlertDialog open={!!itemToRemove} onOpenChange={open => !open && setItemToRemove(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogMedia className='bg-destructive/10 text-destructive'><Trash2 /></AlertDialogMedia>
+            <AlertDialogMedia className='bg-destructive/10 text-destructive'>
+              <Trash2 />
+            </AlertDialogMedia>
             <AlertDialogTitle>Remove Item</AlertDialogTitle>
             <AlertDialogDescription>
               Remove {itemToRemove?.label} from this pick list?
@@ -526,7 +585,7 @@ const PickListDetailPage = () => {
                 itemToRemove &&
                 removeItemMutation.mutate({
                   itemId: itemToRemove.id,
-                  resetShipped: !!itemToRemove.pushed,
+                  resetShipped: !!itemToRemove.pushed
                 })
               }
               isPending={removeItemMutation.isPending}
@@ -541,7 +600,9 @@ const PickListDetailPage = () => {
         <AlertDialog open={voidOpen} onOpenChange={setVoidOpen}>
           <AlertDialogContent>
             <AlertDialogHeader>
-              <AlertDialogMedia className='bg-destructive/10 text-destructive'><TriangleAlert /></AlertDialogMedia>
+              <AlertDialogMedia className='bg-destructive/10 text-destructive'>
+                <TriangleAlert />
+              </AlertDialogMedia>
               <AlertDialogTitle>Void Label</AlertDialogTitle>
               <AlertDialogDescription>
                 This will void the shipping label. The pick list will return to pushed status.
@@ -549,7 +610,11 @@ const PickListDetailPage = () => {
             </AlertDialogHeader>
             <AlertDialogFooter>
               <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction variant='destructive' onClick={() => voidMutation.mutate()} isPending={voidMutation.isPending}>
+              <AlertDialogAction
+                variant='destructive'
+                onClick={() => voidMutation.mutate()}
+                isPending={voidMutation.isPending}
+              >
                 Void Label
               </AlertDialogAction>
             </AlertDialogFooter>
@@ -565,12 +630,18 @@ const PickListDetailPage = () => {
 const LIFECYCLE_STEPS = [
   { status: PICK_LIST_STATUS.pushed, label: 'Pushed to EBMS', shipping: false },
   { status: PICK_LIST_STATUS.ratesFetched, label: 'Rates Fetched', shipping: true },
-  { status: PICK_LIST_STATUS.labelPurchased, label: 'Label Purchased', shipping: true },
+  { status: PICK_LIST_STATUS.labelPurchased, label: 'Label Purchased', shipping: true }
 ] as const
 
-function StatusLifecycle({ currentStatus, shippingEnabled }: { currentStatus: string; shippingEnabled: boolean }) {
-  const steps = shippingEnabled ? LIFECYCLE_STEPS : LIFECYCLE_STEPS.filter((s) => !s.shipping)
-  const currentIndex = steps.findIndex((s) => s.status === currentStatus)
+function StatusLifecycle({
+  currentStatus,
+  shippingEnabled
+}: {
+  currentStatus: string
+  shippingEnabled: boolean
+}) {
+  const steps = shippingEnabled ? LIFECYCLE_STEPS : LIFECYCLE_STEPS.filter(s => !s.shipping)
+  const currentIndex = steps.findIndex(s => s.status === currentStatus)
 
   return (
     <div className='flex items-center gap-1'>
@@ -589,7 +660,7 @@ function StatusLifecycle({ currentStatus, shippingEnabled }: { currentStatus: st
                   ? 'bg-primary/10 font-semibold text-primary'
                   : isPast
                     ? 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400'
-                    : 'bg-bg-secondary text-text-tertiary',
+                    : 'bg-bg-secondary text-text-tertiary'
               )}
             >
               {step.label}
@@ -603,5 +674,5 @@ function StatusLifecycle({ currentStatus, shippingEnabled }: { currentStatus: st
 
 export const Route = createFileRoute('/_authenticated/pick-lists/$pickListId/')({
   component: PickListDetailPage,
-  head: ({ params }) => ({ meta: [{ title: `Pick List ${params.pickListId}` }] }),
+  head: ({ params }) => ({ meta: [{ title: `Pick List ${params.pickListId}` }] })
 })

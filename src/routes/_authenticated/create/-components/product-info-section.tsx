@@ -45,9 +45,7 @@ export const ProductInfoSection = ({
   return (
     <div className='flex flex-col gap-4'>
       {/* Product name */}
-      <h3 className='text-[15px] font-semibold leading-tight tracking-[-0.01em]'>
-        {displayName}
-      </h3>
+      <h3 className='text-[15px] leading-tight font-semibold tracking-[-0.01em]'>{displayName}</h3>
 
       {/* Price */}
       {configLoading ? (
@@ -60,7 +58,7 @@ export const ProductInfoSection = ({
           <div className='flex items-baseline gap-2'>
             <span
               className={cn(
-                'text-[22px] font-bold tabular-nums tracking-tight',
+                'text-[22px] font-bold tracking-tight tabular-nums',
                 hasDiscount && 'text-green-600 dark:text-green-500'
               )}
             >
@@ -68,7 +66,7 @@ export const ProductInfoSection = ({
             </span>
             {hasDiscount && Math.round((1 - priceDisplay / oldPriceDisplay) * 100) > 0 && (
               <>
-                <span className='text-[13px] tabular-nums text-text-tertiary line-through'>
+                <span className='text-[13px] text-text-tertiary tabular-nums line-through'>
                   {formatCurrency(oldPriceDisplay)}
                 </span>
                 <span className='rounded-[4px] bg-green-100 px-1.5 py-0.5 text-[11px] font-semibold text-green-700 dark:bg-green-900/40 dark:text-green-400'>
@@ -83,7 +81,7 @@ export const ProductInfoSection = ({
       {/* Quantity */}
       {!configLoading && (
         <div>
-          <span className='mb-1.5 block text-[12px] font-medium uppercase tracking-[0.04em] text-text-tertiary'>
+          <span className='mb-1.5 block text-[12px] font-medium tracking-[0.04em] text-text-tertiary uppercase'>
             Quantity
           </span>
           <div className='w-fit'>
@@ -102,11 +100,11 @@ export const ProductInfoSection = ({
       {/* Units */}
       {!configLoading && hasMultipleUnits && units && (
         <div>
-          <span className='mb-1.5 block text-[12px] font-medium uppercase tracking-[0.04em] text-text-tertiary'>
+          <span className='mb-1.5 block text-[12px] font-medium tracking-[0.04em] text-text-tertiary uppercase'>
             Unit of Measure
           </span>
           <div className='flex flex-wrap gap-1.5'>
-            {units.map((u) => {
+            {units.map(u => {
               const isSelected = selectedUnit === u.unit
               return (
                 <button
@@ -121,7 +119,12 @@ export const ProductInfoSection = ({
                   onClick={() => onSelectedUnitChange(u.unit)}
                 >
                   <span className='font-medium'>{u.unit}</span>
-                  <span className={cn('text-[12px] tabular-nums', isSelected ? 'text-primary/80' : 'text-text-tertiary')}>
+                  <span
+                    className={cn(
+                      'text-[12px] tabular-nums',
+                      isSelected ? 'text-primary/80' : 'text-text-tertiary'
+                    )}
+                  >
                     {formatCurrency(u.price)}
                   </span>
                   {u.multiplier !== '1.0000' && (
@@ -140,15 +143,12 @@ export const ProductInfoSection = ({
       {/* Specifications */}
       {!configLoading && specs.length > 0 && (
         <div>
-          <span className='mb-1.5 block text-[12px] font-medium uppercase tracking-[0.04em] text-text-tertiary'>
+          <span className='mb-1.5 block text-[12px] font-medium tracking-[0.04em] text-text-tertiary uppercase'>
             Specifications
           </span>
           <div className='divide-y divide-border-light rounded-[6px] border border-border'>
-            {specs.map((spec) => (
-              <div
-                key={spec.descr}
-                className='flex gap-3 px-3 py-2 text-[13px]'
-              >
+            {specs.map(spec => (
+              <div key={spec.descr} className='flex gap-3 px-3 py-2 text-[13px]'>
                 <span className='w-2/5 shrink-0 font-medium text-foreground'>{spec.descr}</span>
                 <span className='text-text-tertiary'>{spec.info}</span>
               </div>

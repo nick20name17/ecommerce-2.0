@@ -14,7 +14,8 @@ export const TASK_QUERY_KEYS = {
   attachments: (taskId: number) => [...TASK_QUERY_KEYS.all(), 'attachments', taskId] as const,
   attachment: (taskId: number, attachmentId: number) =>
     [...TASK_QUERY_KEYS.attachments(taskId), attachmentId] as const,
-  notes: (taskId: number, projectId?: number | null) => [...TASK_QUERY_KEYS.all(), 'notes', taskId, projectId] as const
+  notes: (taskId: number, projectId?: number | null) =>
+    [...TASK_QUERY_KEYS.all(), 'notes', taskId, projectId] as const
 }
 
 export const getTasksQuery = (params: TaskParams = {}) =>

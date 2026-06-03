@@ -26,30 +26,32 @@ export const CreatePageSection = ({
   return (
     <div
       className={cn(
-        'bg-card rounded-xl border transition-all',
+        'rounded-xl border bg-card transition-all',
         !allowOverflow && 'overflow-hidden',
         isDisabled && 'opacity-60'
       )}
     >
-      <div className='bg-bg-secondary/30 flex items-center gap-3 border-b px-4 py-3'>
+      <div className='flex items-center gap-3 border-b bg-bg-secondary/30 px-4 py-3'>
         {step !== undefined && (
           <div
             className={cn(
               'flex size-6 shrink-0 items-center justify-center rounded-full text-[13px] font-semibold transition-colors',
-              isComplete ? 'bg-primary text-primary-foreground' : 'bg-bg-secondary text-text-tertiary'
+              isComplete
+                ? 'bg-primary text-primary-foreground'
+                : 'bg-bg-secondary text-text-tertiary'
             )}
           >
             {step}
           </div>
         )}
         {icon && !step && (
-          <div className='bg-bg-secondary text-text-tertiary flex size-8 shrink-0 items-center justify-center rounded-lg'>
+          <div className='flex size-8 shrink-0 items-center justify-center rounded-lg bg-bg-secondary text-text-tertiary'>
             {icon}
           </div>
         )}
         <div className='min-w-0 flex-1'>
           <h3 className='text-sm font-semibold'>{title}</h3>
-          {description && <p className='text-text-tertiary text-[13px]'>{description}</p>}
+          {description && <p className='text-[13px] text-text-tertiary'>{description}</p>}
         </div>
         {trailing}
       </div>

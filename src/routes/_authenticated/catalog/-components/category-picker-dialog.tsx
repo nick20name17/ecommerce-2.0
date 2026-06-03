@@ -11,7 +11,7 @@ import {
   DialogContent,
   DialogFooter,
   DialogHeader,
-  DialogTitle,
+  DialogTitle
 } from '@/components/ui/dialog'
 import { cn } from '@/lib/utils'
 
@@ -26,24 +26,24 @@ export const CategoryPickerDialog = ({
   open,
   onOpenChange,
   projectId,
-  onSelect,
+  onSelect
 }: CategoryPickerDialogProps) => {
   const [selectedId, setSelectedId] = useState<string | null>(null)
 
   const { data } = useQuery({
     ...getCatalogTreeQuery({ project_id: projectId ?? undefined }),
-    enabled: open,
+    enabled: open
   })
   const tree = data?.results ?? []
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className='sm:max-w-sm max-h-[70vh] flex flex-col'>
+      <DialogContent className='flex max-h-[70vh] flex-col sm:max-w-sm'>
         <DialogHeader>
           <DialogTitle>Select Category</DialogTitle>
         </DialogHeader>
-        <DialogBody className='flex-1 overflow-y-auto min-h-[200px]'>
-          {tree.map((cat) => (
+        <DialogBody className='min-h-[200px] flex-1 overflow-y-auto'>
+          {tree.map(cat => (
             <PickerNode
               key={cat.id}
               category={cat}
@@ -54,7 +54,9 @@ export const CategoryPickerDialog = ({
           ))}
         </DialogBody>
         <DialogFooter>
-          <Button variant='outline' onClick={() => onOpenChange(false)}>Cancel</Button>
+          <Button variant='outline' onClick={() => onOpenChange(false)}>
+            Cancel
+          </Button>
           <Button
             disabled={!selectedId}
             onClick={() => {
@@ -77,7 +79,7 @@ function PickerNode({
   category,
   depth,
   selectedId,
-  onSelect,
+  onSelect
 }: {
   category: CatalogCategory
   depth: number
@@ -92,8 +94,10 @@ function PickerNode({
     <div>
       <div
         className={cn(
-          'flex items-center gap-1 rounded-md px-1.5 py-1 text-[13px] cursor-pointer transition-colors',
-          isSelected ? 'bg-primary/10 text-primary font-medium' : 'hover:bg-bg-hover text-text-secondary'
+          'flex cursor-pointer items-center gap-1 rounded-md px-1.5 py-1 text-[13px] transition-colors',
+          isSelected
+            ? 'bg-primary/10 font-medium text-primary'
+            : 'text-text-secondary hover:bg-bg-hover'
         )}
         style={{ paddingLeft: `${depth * 14 + 4}px` }}
         onClick={() => onSelect(category.id)}
@@ -102,7 +106,10 @@ function PickerNode({
           <button
             type='button'
             className='shrink-0 p-0.5'
-            onClick={(e) => { e.stopPropagation(); setExpanded(!expanded) }}
+            onClick={e => {
+              e.stopPropagation()
+              setExpanded(!expanded)
+            }}
           >
             <ChevronRight className={cn('size-3 transition-transform', expanded && 'rotate-90')} />
           </button>
@@ -116,15 +123,17 @@ function PickerNode({
         )}
         <span className='flex-1 truncate'>{category.name}</span>
       </div>
-      {expanded && hasChildren && category.children.map((child) => (
-        <PickerNode
-          key={child.id}
-          category={child}
-          depth={depth + 1}
-          selectedId={selectedId}
-          onSelect={onSelect}
-        />
-      ))}
+      {expanded &&
+        hasChildren &&
+        category.children.map(child => (
+          <PickerNode
+            key={child.id}
+            category={child}
+            depth={depth + 1}
+            selectedId={selectedId}
+            onSelect={onSelect}
+          />
+        ))}
     </div>
   )
 }

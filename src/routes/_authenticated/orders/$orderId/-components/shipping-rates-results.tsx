@@ -7,7 +7,7 @@ export function RatesResultStep({
   data,
   itemMap,
   selectedRate,
-  onSelectRate,
+  onSelectRate
 }: {
   data: ShippingRatesResponse
   itemMap: Map<string, OrderItem>
@@ -17,7 +17,7 @@ export function RatesResultStep({
   return (
     <div>
       <div className='px-5 py-3'>
-        <div className='mb-2 text-[11px] font-semibold uppercase tracking-[0.06em] text-text-tertiary'>
+        <div className='mb-2 text-[11px] font-semibold tracking-[0.06em] text-text-tertiary uppercase'>
           Select a Rate
         </div>
         <div className='space-y-1.5'>
@@ -29,7 +29,7 @@ export function RatesResultStep({
             data.rates
               .slice()
               .sort((a, b) => a.cost - b.cost)
-              .map((rate) => (
+              .map(rate => (
                 <RateCard
                   key={`${rate.carrier_id}-${rate.service_id}`}
                   rate={rate}
@@ -43,12 +43,15 @@ export function RatesResultStep({
 
       {data.packages.length > 0 && (
         <div className='border-t border-border px-5 py-3'>
-          <div className='mb-2 text-[11px] font-semibold uppercase tracking-[0.06em] text-text-tertiary'>
+          <div className='mb-2 text-[11px] font-semibold tracking-[0.06em] text-text-tertiary uppercase'>
             Packages ({data.packages.length})
           </div>
           <div className='space-y-2'>
             {data.packages.map((pkg, i) => (
-              <div key={i} className='rounded-[6px] border border-border-light bg-bg-secondary/50 px-3 py-2'>
+              <div
+                key={i}
+                className='rounded-[6px] border border-border-light bg-bg-secondary/50 px-3 py-2'
+              >
                 <div className='flex items-center gap-2'>
                   <Package className='size-3.5 text-text-tertiary' />
                   <span className='text-[13px] font-medium text-foreground'>Package {i + 1}</span>
@@ -58,7 +61,7 @@ export function RatesResultStep({
                 </div>
                 {pkg.items.length > 0 && (
                   <div className='mt-1.5 flex flex-wrap gap-1'>
-                    {pkg.items.map((autoid) => {
+                    {pkg.items.map(autoid => {
                       const item = itemMap.get(autoid)
                       return (
                         <span
@@ -80,7 +83,15 @@ export function RatesResultStep({
   )
 }
 
-export function RateCard({ rate, selected, onSelect }: { rate: ShippingRate; selected: boolean; onSelect: () => void }) {
+export function RateCard({
+  rate,
+  selected,
+  onSelect
+}: {
+  rate: ShippingRate
+  selected: boolean
+  onSelect: () => void
+}) {
   const isFree = rate.cost === 0
   return (
     <button
@@ -89,16 +100,14 @@ export function RateCard({ rate, selected, onSelect }: { rate: ShippingRate; sel
         'flex w-full items-center gap-3 rounded-[6px] border px-3 py-2.5 text-left transition-colors duration-75',
         selected
           ? 'border-primary bg-primary/[0.06]'
-          : 'border-border hover:border-primary/40 hover:bg-primary/[0.04]',
+          : 'border-border hover:border-primary/40 hover:bg-primary/[0.04]'
       )}
       onClick={onSelect}
     >
       <div
         className={cn(
           'flex size-4 shrink-0 items-center justify-center rounded-full border-2 transition-colors duration-75',
-          selected
-            ? 'border-primary bg-primary'
-            : 'border-border-heavy',
+          selected ? 'border-primary bg-primary' : 'border-border-heavy'
         )}
       >
         {selected && <div className='size-1.5 rounded-full bg-white' />}
@@ -110,7 +119,7 @@ export function RateCard({ rate, selected, onSelect }: { rate: ShippingRate; sel
       <span
         className={cn(
           'shrink-0 text-[14px] font-semibold tabular-nums',
-          isFree ? 'text-emerald-600' : 'text-foreground',
+          isFree ? 'text-emerald-600' : 'text-foreground'
         )}
       >
         {isFree ? 'Free' : `$${rate.cost.toFixed(2)}`}

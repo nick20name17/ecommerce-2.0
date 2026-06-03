@@ -48,7 +48,9 @@ export const projectService = {
       tables_existing: string[]
       indexes_created: string[]
       errors: string[]
-    }>('/projects/ec-tables/', null, { params: { project_id: projectId, ...(force ? { force: 'true' } : {}) } })
+    }>('/projects/ec-tables/', null, {
+      params: { project_id: projectId, ...(force ? { force: 'true' } : {}) }
+    })
     return data
-  },
+  }
 }

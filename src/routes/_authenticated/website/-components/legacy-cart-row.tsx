@@ -24,41 +24,33 @@ export function LegacyCartRow({ cart, isMobile }: LegacyCartRowProps) {
       {/* Summary row */}
       <button
         type='button'
-        onClick={() => setOpen((v) => !v)}
+        onClick={() => setOpen(v => !v)}
         className={cn(
           'flex w-full cursor-pointer items-center text-left text-foreground transition-colors duration-100 hover:bg-bg-hover',
-          isMobile
-            ? 'gap-2 px-3.5 py-2'
-            : isTablet
-              ? 'gap-4 px-5 py-2'
-              : 'gap-6 px-6 py-2',
+          isMobile ? 'gap-2 px-3.5 py-2' : isTablet ? 'gap-4 px-5 py-2' : 'gap-6 px-6 py-2'
         )}
         aria-expanded={open}
       >
         {isMobile ? (
           <div className='flex min-w-0 flex-1 flex-col gap-0.5'>
             <div className='flex items-center gap-2'>
-              <span className='text-[13px] font-medium tabular-nums text-foreground'>
+              <span className='text-[13px] font-medium text-foreground tabular-nums'>
                 {cart.ebms_id || '—'}
               </span>
-              <span className='text-[12px] tabular-nums text-text-tertiary'>
-                #{cart.user_id}
-              </span>
+              <span className='text-[12px] text-text-tertiary tabular-nums'>#{cart.user_id}</span>
               <span className='inline-flex items-center rounded-[4px] bg-bg-secondary px-1.5 py-0.5 text-[12px] font-medium text-text-secondary'>
                 {cart.in_level || '—'}
               </span>
-              <span className='ml-auto text-[13px] font-semibold tabular-nums text-foreground'>
+              <span className='ml-auto text-[13px] font-semibold text-foreground tabular-nums'>
                 {formatCurrency(cart.cart_total)}
               </span>
             </div>
-            <span className='truncate text-[12.5px] text-text-secondary'>
-              {cart.email || '—'}
-            </span>
+            <span className='truncate text-[12.5px] text-text-secondary'>{cart.email || '—'}</span>
             <span className='text-[12px] text-text-tertiary'>{updatedAt}</span>
           </div>
         ) : (
           <>
-            <div className='w-[70px] shrink-0 text-[13px] tabular-nums text-text-tertiary'>
+            <div className='w-[70px] shrink-0 text-[13px] text-text-tertiary tabular-nums'>
               #{cart.user_id}
             </div>
             <div className='w-[100px] shrink-0 truncate text-[13px] font-medium tabular-nums'>
@@ -66,7 +58,7 @@ export function LegacyCartRow({ cart, isMobile }: LegacyCartRowProps) {
             </div>
             <div className='w-[110px] shrink-0'>
               {cart.in_level ? (
-                <span className='inline-flex items-center whitespace-nowrap rounded-[4px] bg-bg-secondary px-1.5 py-0.5 text-[13px] font-medium text-text-secondary'>
+                <span className='inline-flex items-center rounded-[4px] bg-bg-secondary px-1.5 py-0.5 text-[13px] font-medium whitespace-nowrap text-text-secondary'>
                   {cart.in_level}
                 </span>
               ) : (
@@ -76,10 +68,10 @@ export function LegacyCartRow({ cart, isMobile }: LegacyCartRowProps) {
             <div className='min-w-0 flex-1 truncate text-[13px] text-text-secondary'>
               {cart.email || <span className='text-text-tertiary'>—</span>}
             </div>
-            <div className='w-[180px] shrink-0 text-[13px] tabular-nums text-text-secondary'>
+            <div className='w-[180px] shrink-0 text-[13px] text-text-secondary tabular-nums'>
               {updatedAt}
             </div>
-            <div className='w-[110px] shrink-0 text-right text-[13px] font-semibold tabular-nums text-foreground'>
+            <div className='w-[110px] shrink-0 text-right text-[13px] font-semibold text-foreground tabular-nums'>
               {formatCurrency(cart.cart_total)}
             </div>
           </>
@@ -88,7 +80,7 @@ export function LegacyCartRow({ cart, isMobile }: LegacyCartRowProps) {
           <ChevronDown
             className={cn(
               'size-4 text-text-tertiary transition-transform duration-150',
-              open && 'rotate-180',
+              open && 'rotate-180'
             )}
           />
         </div>
@@ -99,7 +91,7 @@ export function LegacyCartRow({ cart, isMobile }: LegacyCartRowProps) {
         <div
           className={cn(
             'border-t border-border-light bg-bg-secondary/40',
-            isMobile ? 'px-3.5 py-2' : isTablet ? 'px-5 py-2' : 'px-6 py-2',
+            isMobile ? 'px-3.5 py-2' : isTablet ? 'px-5 py-2' : 'px-6 py-2'
           )}
         >
           {itemsCount === 0 ? (
@@ -109,10 +101,7 @@ export function LegacyCartRow({ cart, isMobile }: LegacyCartRowProps) {
           ) : (
             <ul className='flex flex-col divide-y divide-border-light'>
               {cart.items.map((item, idx) => (
-                <li
-                  key={`${item.id}-${idx}`}
-                  className='flex items-center gap-3 py-1.5'
-                >
+                <li key={`${item.id}-${idx}`} className='flex items-center gap-3 py-1.5'>
                   <div className='flex size-9 shrink-0 items-center justify-center overflow-hidden rounded-[5px] bg-background'>
                     {item.photo ? (
                       <img
@@ -134,13 +123,11 @@ export function LegacyCartRow({ cart, isMobile }: LegacyCartRowProps) {
                       {item.unit ? ` · ${item.unit}` : ''}
                     </span>
                   </div>
-                  <div className='shrink-0 text-[13px] tabular-nums text-text-secondary'>
+                  <div className='shrink-0 text-[13px] text-text-secondary tabular-nums'>
                     {item.quantity.current} ×{' '}
-                    <span className='text-text-tertiary'>
-                      {formatCurrency(item.price)}
-                    </span>
+                    <span className='text-text-tertiary'>{formatCurrency(item.price)}</span>
                   </div>
-                  <div className='w-[100px] shrink-0 text-right text-[13px] font-semibold tabular-nums text-foreground'>
+                  <div className='w-[100px] shrink-0 text-right text-[13px] font-semibold text-foreground tabular-nums'>
                     {formatCurrency(item.amount)}
                   </div>
                 </li>

@@ -14,7 +14,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuTrigger,
+  DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
 import { Input } from '@/components/ui/input'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -27,10 +27,7 @@ interface UnassignedProductsPanelProps {
   isMobile?: boolean
 }
 
-export const UnassignedProductsPanel = ({
-  projectId,
-  isMobile,
-}: UnassignedProductsPanelProps) => {
+export const UnassignedProductsPanel = ({ projectId, isMobile }: UnassignedProductsPanelProps) => {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   const [search, setSearch] = useState('')
@@ -40,7 +37,11 @@ export const UnassignedProductsPanel = ({
 
   const [expandedAutoid, setExpandedAutoid] = useState<string | null>(null)
   // Category picker state
-  const [pickerProduct, setPickerProduct] = useState<{ autoid: string; id: string; descr_1: string } | null>(null)
+  const [pickerProduct, setPickerProduct] = useState<{
+    autoid: string
+    id: string
+    descr_1: string
+  } | null>(null)
 
   const debouncedSetSearch = useDebouncedCallback((val: string) => {
     setDebouncedSearch(val)
@@ -59,9 +60,9 @@ export const UnassignedProductsPanel = ({
         project_id: projectId ?? undefined,
         search: debouncedSearch || undefined,
         limit,
-        offset,
+        offset
       }),
-    staleTime: 60_000,
+    staleTime: 60_000
   })
 
   const products = data?.results ?? []
@@ -70,27 +71,35 @@ export const UnassignedProductsPanel = ({
 
   const addToCategoryMutation = useMutation({
     mutationFn: ({ categoryId, autoid }: { categoryId: string; autoid: string }) =>
-      catalogService.addProduct(categoryId, { product_autoid: autoid }, { project_id: projectId ?? undefined }),
+      catalogService.addProduct(
+        categoryId,
+        { product_autoid: autoid },
+        { project_id: projectId ?? undefined }
+      ),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['unassigned-products'] })
       queryClient.invalidateQueries({ queryKey: CATALOG_QUERY_KEYS.all() })
-    },
+    }
   })
 
   const createVPMutation = useMutation({
     mutationFn: async (product: { autoid: string; descr_1: string }) => {
       const params = { project_id: projectId ?? undefined }
       const vp = await variableProductService.create({ name: product.descr_1 }, params)
-      await variableProductService.addItem(vp.id, { product_autoid: product.autoid, is_default: true }, params)
+      await variableProductService.addItem(
+        vp.id,
+        { product_autoid: product.autoid, is_default: true },
+        params
+      )
       return vp
     },
-    onSuccess: (vp) => {
+    onSuccess: vp => {
       queryClient.invalidateQueries({ queryKey: VP_QUERY_KEYS.lists() })
       navigate({ to: `/catalog/vp/${vp.id}` })
-    },
+    }
   })
 
-  const handleDragStart = (e: React.DragEvent, product: typeof products[0]) => {
+  const handleDragStart = (e: React.DragEvent, product: (typeof products)[0]) => {
     e.dataTransfer.setData('application/product-autoid', product.autoid)
     e.dataTransfer.setData('text/plain', product.id)
     e.dataTransfer.effectAllowed = 'copy'
@@ -105,13 +114,11 @@ export const UnassignedProductsPanel = ({
           isMobile ? 'flex-wrap px-3.5' : 'px-6'
         )}
       >
-        <AlertCircle className='size-4 text-amber-500 shrink-0' />
-        <h2 className='text-[14px] font-semibold flex-1'>
+        <AlertCircle className='size-4 shrink-0 text-amber-500' />
+        <h2 className='flex-1 text-[14px] font-semibold'>
           Unassigned Products
           {total > 0 && (
-            <span className='ml-1.5 text-[12px] font-normal text-text-tertiary'>
-              ({total})
-            </span>
+            <span className='ml-1.5 text-[12px] font-normal text-text-tertiary'>({total})</span>
           )}
         </h2>
       </div>
@@ -119,15 +126,15 @@ export const UnassignedProductsPanel = ({
       {/* Search */}
       <div className={cn('border-b border-border py-2', isMobile ? 'px-3.5' : 'px-6')}>
         <div className='relative'>
-          <Search className='absolute left-2.5 top-1/2 -translate-y-1/2 size-3.5 text-text-tertiary' />
+          <Search className='absolute top-1/2 left-2.5 size-3.5 -translate-y-1/2 text-text-tertiary' />
           <Input
             value={search}
-            onChange={(e) => handleSearch(e.target.value)}
+            onChange={e => handleSearch(e.target.value)}
             placeholder='Search by ID or description...'
-            className='pl-8 h-8 text-[13px]'
+            className='h-8 pl-8 text-[13px]'
           />
         </div>
-        <p className='mt-1.5 text-[11px] text-text-quaternary'>
+        <p className='text-text-quaternary mt-1.5 text-[11px]'>
           Drag products onto categories in the tree, or use the menu.
         </p>
       </div>
@@ -141,8 +148,8 @@ export const UnassignedProductsPanel = ({
             ))}
           </div>
         ) : products.length === 0 ? (
-          <div className='flex flex-col items-center justify-center h-full text-text-tertiary py-12'>
-            <Package className='size-8 mb-2 text-text-quaternary' />
+          <div className='flex h-full flex-col items-center justify-center py-12 text-text-tertiary'>
+            <Package className='text-text-quaternary mb-2 size-8' />
             <p className='text-[13px]'>
               {debouncedSearch ? 'No matching products' : 'All products are assigned to categories'}
             </p>
@@ -150,35 +157,35 @@ export const UnassignedProductsPanel = ({
         ) : (
           <>
             <div className='flex flex-col'>
-              {products.map((product) => {
+              {products.map(product => {
                 const isExpanded = expandedAutoid === product.autoid
                 return (
                   <div key={product.autoid} className='border-b border-border-light'>
                     <div
                       draggable
-                      onDragStart={(e) => handleDragStart(e, product)}
+                      onDragStart={e => handleDragStart(e, product)}
                       className={cn(
-                        'group flex items-center gap-3 py-2 cursor-pointer hover:bg-bg-hover transition-colors',
+                        'group flex cursor-pointer items-center gap-3 py-2 transition-colors hover:bg-bg-hover',
                         isMobile ? 'px-3.5' : 'px-6'
                       )}
                       onClick={() => setExpandedAutoid(isExpanded ? null : product.autoid)}
                     >
-                      <Package className='size-4 text-amber-500 shrink-0' />
-                      <div className='flex-1 min-w-0'>
-                        <div className='text-[13px] font-medium truncate font-mono'>
+                      <Package className='size-4 shrink-0 text-amber-500' />
+                      <div className='min-w-0 flex-1'>
+                        <div className='truncate font-mono text-[13px] font-medium'>
                           {product.id}
                         </div>
-                        <div className='text-[11px] text-text-tertiary truncate'>
+                        <div className='truncate text-[11px] text-text-tertiary'>
                           {product.descr_1 || 'No description'}
                           {(product as Record<string, string>).def_unit && (
-                            <span className='ml-2 text-text-quaternary'>
+                            <span className='text-text-quaternary ml-2'>
                               · {(product as Record<string, string>).def_unit}
                             </span>
                           )}
                         </div>
                       </div>
                       {product.wtree_id && (
-                        <span className='text-[10px] text-text-quaternary tabular-nums shrink-0'>
+                        <span className='text-text-quaternary shrink-0 text-[10px] tabular-nums'>
                           cat:{product.wtree_id}
                         </span>
                       )}
@@ -189,8 +196,8 @@ export const UnassignedProductsPanel = ({
                           <Button
                             variant='ghost'
                             size='icon-xs'
-                            className='opacity-0 group-hover:opacity-100 shrink-0'
-                            onClick={(e) => e.stopPropagation()}
+                            className='shrink-0 opacity-0 group-hover:opacity-100'
+                            onClick={e => e.stopPropagation()}
                           >
                             <span className='text-[16px] leading-none'>···</span>
                           </Button>
@@ -207,26 +214,63 @@ export const UnassignedProductsPanel = ({
                         </DropdownMenuContent>
                       </DropdownMenu>
 
-                      <ChevronDown className={cn(
-                        'size-3.5 shrink-0 text-text-quaternary transition-transform',
-                        isExpanded && 'rotate-180'
-                      )} />
+                      <ChevronDown
+                        className={cn(
+                          'text-text-quaternary size-3.5 shrink-0 transition-transform',
+                          isExpanded && 'rotate-180'
+                        )}
+                      />
                     </div>
 
                     {isExpanded && (
-                      <div className={cn('pb-3 flex flex-col gap-2', isMobile ? 'px-3.5' : 'px-6')}>
+                      <div className={cn('flex flex-col gap-2 pb-3', isMobile ? 'px-3.5' : 'px-6')}>
                         <div className='flex flex-wrap gap-x-4 gap-y-1 text-[12px] text-text-tertiary'>
-                          <span><span className='text-text-secondary font-medium'>Autoid:</span> {product.autoid}</span>
+                          <span>
+                            <span className='font-medium text-text-secondary'>Autoid:</span>{' '}
+                            {product.autoid}
+                          </span>
                           {(product as Record<string, string>).def_unit && (
-                            <span><span className='text-text-secondary font-medium'>Unit:</span> {(product as Record<string, string>).def_unit}</span>
+                            <span>
+                              <span className='font-medium text-text-secondary'>Unit:</span>{' '}
+                              {(product as Record<string, string>).def_unit}
+                            </span>
                           )}
                         </div>
-                        {((product as Record<string, string>).descr_2 || (product as Record<string, string>).web_descr1) && (
-                          <div className='text-[12px] text-text-tertiary space-y-1.5'>
-                            {(product as Record<string, string>).descr_2 && <p><span className='text-text-secondary font-medium'>Description 2:</span> {(product as Record<string, string>).descr_2}</p>}
-                            {(product as Record<string, string>).web_descr1 && <p><span className='text-text-secondary font-medium'>Web Description 1:</span> {(product as Record<string, string>).web_descr1}</p>}
-                            {(product as Record<string, string>).web_descr2 && <p><span className='text-text-secondary font-medium'>Web Description 2:</span> {(product as Record<string, string>).web_descr2}</p>}
-                            {(product as Record<string, string>).web_descr3 && <p><span className='text-text-secondary font-medium'>Web Description 3:</span> {(product as Record<string, string>).web_descr3}</p>}
+                        {((product as Record<string, string>).descr_2 ||
+                          (product as Record<string, string>).web_descr1) && (
+                          <div className='space-y-1.5 text-[12px] text-text-tertiary'>
+                            {(product as Record<string, string>).descr_2 && (
+                              <p>
+                                <span className='font-medium text-text-secondary'>
+                                  Description 2:
+                                </span>{' '}
+                                {(product as Record<string, string>).descr_2}
+                              </p>
+                            )}
+                            {(product as Record<string, string>).web_descr1 && (
+                              <p>
+                                <span className='font-medium text-text-secondary'>
+                                  Web Description 1:
+                                </span>{' '}
+                                {(product as Record<string, string>).web_descr1}
+                              </p>
+                            )}
+                            {(product as Record<string, string>).web_descr2 && (
+                              <p>
+                                <span className='font-medium text-text-secondary'>
+                                  Web Description 2:
+                                </span>{' '}
+                                {(product as Record<string, string>).web_descr2}
+                              </p>
+                            )}
+                            {(product as Record<string, string>).web_descr3 && (
+                              <p>
+                                <span className='font-medium text-text-secondary'>
+                                  Web Description 3:
+                                </span>{' '}
+                                {(product as Record<string, string>).web_descr3}
+                              </p>
+                            )}
                           </div>
                         )}
                         <ImageGallery
@@ -243,10 +287,12 @@ export const UnassignedProductsPanel = ({
 
             {/* Pagination */}
             {(hasMore || offset > 0) && (
-              <div className={cn(
-                'flex items-center justify-between border-t border-border py-2',
-                isMobile ? 'px-3.5' : 'px-6'
-              )}>
+              <div
+                className={cn(
+                  'flex items-center justify-between border-t border-border py-2',
+                  isMobile ? 'px-3.5' : 'px-6'
+                )}
+              >
                 <span className='text-[11px] text-text-tertiary'>
                   {offset + 1}–{Math.min(offset + limit, total)} of {total}
                 </span>
@@ -277,9 +323,9 @@ export const UnassignedProductsPanel = ({
       {/* Category picker dialog */}
       <CategoryPickerDialog
         open={!!pickerProduct}
-        onOpenChange={(v) => !v && setPickerProduct(null)}
+        onOpenChange={v => !v && setPickerProduct(null)}
         projectId={projectId}
-        onSelect={(categoryId) => {
+        onSelect={categoryId => {
           if (pickerProduct) {
             addToCategoryMutation.mutate({ categoryId, autoid: pickerProduct.autoid })
             setPickerProduct(null)

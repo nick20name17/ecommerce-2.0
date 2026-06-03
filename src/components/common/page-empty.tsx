@@ -21,7 +21,7 @@ export const PageEmpty = ({
   title,
   description,
   action,
-  compact,
+  compact
 }: PageEmptyProps) => {
   return (
     <div

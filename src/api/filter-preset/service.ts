@@ -4,7 +4,7 @@ import type {
   CreateFilterPresetPayload,
   FilterPreset,
   FilterPresetParams,
-  UpdateFilterPresetPayload,
+  UpdateFilterPresetPayload
 } from './schema'
 
 export const filterPresetService = {
@@ -23,14 +23,18 @@ export const filterPresetService = {
     return data
   },
 
-  update: async (id: number, payload: UpdateFilterPresetPayload, params?: { project_id?: number }) => {
+  update: async (
+    id: number,
+    payload: UpdateFilterPresetPayload,
+    params?: { project_id?: number }
+  ) => {
     const { data } = await api.patch<FilterPreset>(`/data/filter-presets/${id}/`, payload, {
-      params,
+      params
     })
     return data
   },
 
   delete: async (id: number, params?: { project_id?: number }) => {
     await api.delete(`/data/filter-presets/${id}/`, { params })
-  },
+  }
 }

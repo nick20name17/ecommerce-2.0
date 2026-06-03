@@ -6,7 +6,7 @@ import { SHIPPING_ADDRESS_QUERY_KEYS } from '@/api/shipping-address/query'
 import {
   ShippingAddressSchema,
   type ShippingAddress,
-  type ShippingAddressFormValues,
+  type ShippingAddressFormValues
 } from '@/api/shipping-address/schema'
 import { shippingAddressService } from '@/api/shipping-address/service'
 import { Button } from '@/components/ui/button'
@@ -17,7 +17,7 @@ import {
   DialogContent,
   DialogFooter,
   DialogHeader,
-  DialogTitle,
+  DialogTitle
 } from '@/components/ui/dialog'
 import { Field, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
@@ -33,7 +33,7 @@ export const ShippingAddressModal = ({
   address,
   projectId,
   open,
-  onOpenChange,
+  onOpenChange
 }: ShippingAddressModalProps) => {
   const isEdit = !!address
 
@@ -50,8 +50,8 @@ export const ShippingAddressModal = ({
       state: address?.state ?? '',
       postal_code: address?.postal_code ?? '',
       country_code: address?.country_code ?? '',
-      is_default: address?.is_default ?? false,
-    },
+      is_default: address?.is_default ?? false
+    }
   })
 
   const mutation = useMutation({
@@ -61,15 +61,15 @@ export const ShippingAddressModal = ({
         : shippingAddressService.create(data as any, projectId),
     meta: {
       successMessage: isEdit ? 'Address updated' : 'Address created',
-      invalidatesQuery: SHIPPING_ADDRESS_QUERY_KEYS.all(),
+      invalidatesQuery: SHIPPING_ADDRESS_QUERY_KEYS.all()
     },
     onSuccess: () => {
       onOpenChange(false)
       form.reset()
-    },
+    }
   })
 
-  const handleSubmit = form.handleSubmit((data) => mutation.mutate(data))
+  const handleSubmit = form.handleSubmit(data => mutation.mutate(data))
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -197,7 +197,13 @@ export const ShippingAddressModal = ({
                   render={({ field, fieldState }) => (
                     <Field data-invalid={fieldState.invalid}>
                       <FieldLabel htmlFor='sa-country'>Country Code</FieldLabel>
-                      <Input {...field} id='sa-country' placeholder='US' maxLength={2} className='uppercase' />
+                      <Input
+                        {...field}
+                        id='sa-country'
+                        placeholder='US'
+                        maxLength={2}
+                        className='uppercase'
+                      />
                       {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                     </Field>
                   )}

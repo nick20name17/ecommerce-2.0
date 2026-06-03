@@ -45,11 +45,10 @@ const walkActive = <T>(
       const result = visit(item, config.name, ancestorPath)
       if (result !== undefined) return result
       if (item.subConfigurations?.length) {
-        const nested = walkActive(
-          item.subConfigurations,
-          visit,
-          [...ancestorPath, { configName: config.name, itemId: item.id }]
-        )
+        const nested = walkActive(item.subConfigurations, visit, [
+          ...ancestorPath,
+          { configName: config.name, itemId: item.id }
+        ])
         if (nested !== undefined) return nested
       }
     }
@@ -62,13 +61,13 @@ const applySavedSelections = (
   saved: CartConfiguration[] | undefined
 ): Configuration[] => {
   if (!saved?.length) return configs
-  const byName = new Map(saved.map((s) => [s.name, s]))
-  return configs.map((c) => {
+  const byName = new Map(saved.map(s => [s.name, s]))
+  return configs.map(c => {
     const sav = byName.get(c.name)
     if (!sav) return c
     return {
       ...c,
-      items: c.items.map((i) => (i.id === sav.id ? { ...i, active: true } : i))
+      items: c.items.map(i => (i.id === sav.id ? { ...i, active: true } : i))
     }
   })
 }
@@ -80,7 +79,7 @@ const findSavedChildsAtPath = (
   let current: CartConfiguration[] | undefined = saved
   for (const step of path) {
     const match: CartConfiguration | undefined = current?.find(
-      (c) => c.name === step.configName && c.id === step.itemId
+      c => c.name === step.configName && c.id === step.itemId
     )
     if (!match) return undefined
     current = match.childs
@@ -116,7 +115,7 @@ const buildActivePayload = (configs: Configuration[]): CartConfiguration[] => {
 
 const hasAnyUncheckedRequired = (configs: Configuration[]): boolean => {
   for (const c of configs) {
-    const active = c.items.find((i) => i.active)
+    const active = c.items.find(i => i.active)
     if (!c.allownone && !active) return true
     if (active?.subConfigurations?.length && hasAnyUncheckedRequired(active.subConfigurations)) {
       return true
@@ -126,13 +125,13 @@ const hasAnyUncheckedRequired = (configs: Configuration[]): boolean => {
 }
 
 const isAnythingLoadingDeep = (configs: Configuration[]): boolean =>
-  walkActive<true>(configs, (item) => {
+  walkActive<true>(configs, item => {
     if (item.subConfigsLoading) return true
   }) === true
 
 const sumActivePriceField = (configs: Configuration[], field: 'price' | 'old_price'): number => {
   let total = 0
-  walkActive(configs, (item) => {
+  walkActive(configs, item => {
     const qty = Math.trunc(Number(item.quan))
     const multiplier = !Number.isNaN(qty) && qty > 0 ? qty : 1
     total += (Number(item[field]) || 0) * multiplier
@@ -142,7 +141,7 @@ const sumActivePriceField = (configs: Configuration[], field: 'price' | 'old_pri
 
 const collectActiveIds = (configs: Configuration[]): Set<string | number> => {
   const out = new Set<string | number>()
-  walkActive(configs, (item) => void out.add(item.id))
+  walkActive(configs, item => void out.add(item.id))
   return out
 }
 
@@ -193,9 +192,9 @@ export const useProductEditSheet = (
     }
     // Match Vue: no auto-default selection. Only saved cart-item selections (applied upstream
     // in use-edit-sheet-data.ts) carry over. Required configs start empty — user must pick.
-    const cloned = configData.configurations.map((c) => ({
+    const cloned = configData.configurations.map(c => ({
       ...c,
-      items: c.items.map((item) => ({ ...item })),
+      items: c.items.map(item => ({ ...item })),
       photosRequested: false,
       photosLoading: false
     }))
@@ -228,16 +227,16 @@ export const useProductEditSheet = (
             category_name: tabToFetch,
             project_id: projectIdValue
           })
-          const photosMap = new Map(photos.map((p) => [p.id, p.photos]))
+          const photosMap = new Map(photos.map(p => [p.id, p.photos]))
           dispatch({
             type: 'UPDATE_CONFIGS',
-            updater: (prev) =>
-              prev.map((c) => {
+            updater: prev =>
+              prev.map(c => {
                 if (c.name !== tabToFetch) return c
                 return {
                   ...c,
                   photosLoading: false,
-                  items: c.items.map((item) => ({
+                  items: c.items.map(item => ({
                     ...item,
                     photos: photosMap.get(item.id) ?? item.photos
                   }))
@@ -247,8 +246,8 @@ export const useProductEditSheet = (
         } catch {
           dispatch({
             type: 'UPDATE_CONFIGS',
-            updater: (prev) =>
-              prev.map((c) => (c.name === tabToFetch ? { ...c, photosLoading: false } : c))
+            updater: prev =>
+              prev.map(c => (c.name === tabToFetch ? { ...c, photosLoading: false } : c))
           })
         }
       }
@@ -256,8 +255,8 @@ export const useProductEditSheet = (
       queueMicrotask(() => {
         dispatch({
           type: 'UPDATE_CONFIGS',
-          updater: (prev) =>
-            prev.map((c) => (c.name === tabToFetch ? { ...c, photosLoading: true } : c))
+          updater: prev =>
+            prev.map(c => (c.name === tabToFetch ? { ...c, photosLoading: true } : c))
         })
         fetchPhotos()
       })
@@ -291,42 +290,39 @@ export const useProductEditSheet = (
 
     if (tasks.length === 0) return
 
-    const patchItem = (
-      task: Task,
-      patch: (i: ConfigurationItem) => ConfigurationItem
-    ) =>
+    const patchItem = (task: Task, patch: (i: ConfigurationItem) => ConfigurationItem) =>
       dispatch({
         type: 'UPDATE_CONFIGS',
-        updater: (prev) =>
-          updateConfigsAtPath(prev, task.ancestorPath, (configs) =>
-            configs.map((c) =>
+        updater: prev =>
+          updateConfigsAtPath(prev, task.ancestorPath, configs =>
+            configs.map(c =>
               c.name !== task.configName
                 ? c
                 : {
                     ...c,
-                    items: c.items.map((i) => (i.id !== task.itemId ? i : patch(i)))
+                    items: c.items.map(i => (i.id !== task.itemId ? i : patch(i)))
                   }
             )
           )
       })
 
     for (const t of tasks) {
-      patchItem(t, (i) => ({ ...i, subConfigsLoading: true }))
+      patchItem(t, i => ({ ...i, subConfigsLoading: true }))
 
       productService
         .getConfigurations(t.itemAutoid, {
           customer_id: customerId || '',
           project_id: projectId ?? undefined
         })
-        .then((subProduct) => {
+        .then(subProduct => {
           const fullPath = [...t.ancestorPath, { configName: t.configName, itemId: t.itemId }]
           const savedChilds = findSavedChildsAtPath(savedSelectionsRef.current, fullPath)
-          const cloned = subProduct.configurations.map((sc) => ({
+          const cloned = subProduct.configurations.map(sc => ({
             ...sc,
-            items: sc.items.map((si) => ({ ...si }))
+            items: sc.items.map(si => ({ ...si }))
           }))
           const subConfigs = applySavedSelections(cloned, savedChilds)
-          patchItem(t, (i) => ({
+          patchItem(t, i => ({
             ...i,
             subConfigsLoading: false,
             subConfigsLoaded: true,
@@ -347,16 +343,16 @@ export const useProductEditSheet = (
                 category_name: catName,
                 project_id: projectId ?? undefined
               })
-              .then((photos) => {
-                const photosMap = new Map(photos.map((p) => [p.id, p.photos]))
-                patchItem(t, (i) => ({
+              .then(photos => {
+                const photosMap = new Map(photos.map(p => [p.id, p.photos]))
+                patchItem(t, i => ({
                   ...i,
-                  subConfigurations: i.subConfigurations?.map((c) => {
+                  subConfigurations: i.subConfigurations?.map(c => {
                     if (c.name !== catName) return c
                     return {
                       ...c,
                       photosLoading: false,
-                      items: c.items.map((si) => ({
+                      items: c.items.map(si => ({
                         ...si,
                         photos: photosMap.get(si.id) ?? si.photos
                       }))
@@ -368,7 +364,7 @@ export const useProductEditSheet = (
           }
         })
         .catch(() => {
-          patchItem(t, (i) => ({ ...i, subConfigsLoading: false, subConfigsLoaded: true }))
+          patchItem(t, i => ({ ...i, subConfigsLoading: false, subConfigsLoaded: true }))
         })
     }
   }, [configs, product, projectId, customerId])
@@ -381,17 +377,15 @@ export const useProductEditSheet = (
 
   // Wizard mode is decided once per product from the source data — flipping after fetches
   // settled would jump the layout mid-interaction.
-  const wizardMode = configData?.configurations
-    ? containsCTOItem(configData.configurations)
-    : false
+  const wizardMode = configData?.configurations ? containsCTOItem(configData.configurations) : false
 
-  const activeStepIndex = wizardMode ? configs.findIndex((c) => c.name === state.activeTab) : -1
+  const activeStepIndex = wizardMode ? configs.findIndex(c => c.name === state.activeTab) : -1
 
   // `requireSelection` distinguishes the lenient validity check (Next-step button: allownone
   // empty is OK) from the strict completion check (auto-advance: must have an active item).
   const isStepDone = (step: Configuration | undefined, requireSelection: boolean): boolean => {
     if (!step) return false
-    const activeItem = step.items.find((i) => i.active)
+    const activeItem = step.items.find(i => i.active)
     if (!activeItem) return !requireSelection && step.allownone
     if (activeItem.subConfigsLoading) return false
     if (activeItem.subConfigurations?.length) {

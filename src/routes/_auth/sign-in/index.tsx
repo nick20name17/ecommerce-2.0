@@ -9,7 +9,7 @@ const SignInPage = () => {
         {/* Logo / brand mark */}
         <div className='mb-8 flex flex-col items-center gap-3'>
           <div className='flex size-11 items-center justify-center rounded-[10px] bg-foreground'>
-            <span className='text-[18px] font-bold leading-none text-background'>E</span>
+            <span className='text-[18px] leading-none font-bold text-background'>E</span>
           </div>
           <div className='text-center'>
             <h1 className='text-[18px] font-semibold tracking-[-0.02em]'>Welcome back</h1>

@@ -1,20 +1,14 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
-import {
-  Box,
-  Eye,
-  EyeOff,
-  FolderPlus,
-  Layers,
-  Package,
-  Pencil,
-  Plus,
-  Trash2,
-} from 'lucide-react'
+import { Box, Eye, EyeOff, FolderPlus, Layers, Package, Pencil, Plus, Trash2 } from 'lucide-react'
 import { useState } from 'react'
 
 import { CATALOG_QUERY_KEYS, getCatalogDetailQuery } from '@/api/catalog/query'
-import type { CatalogCategory, CatalogCategoryProduct, CatalogCategoryVP } from '@/api/catalog/schema'
+import type {
+  CatalogCategory,
+  CatalogCategoryProduct,
+  CatalogCategoryVP
+} from '@/api/catalog/schema'
 import { catalogService } from '@/api/catalog/service'
 import { MetaTagsEditor } from '@/components/common/meta-tags-editor'
 import { StatusBadge, StatusEditor, type StatusValue } from '@/components/common/status-editor'
@@ -25,7 +19,7 @@ import {
   DialogContent,
   DialogFooter,
   DialogHeader,
-  DialogTitle,
+  DialogTitle
 } from '@/components/ui/dialog'
 import { Skeleton } from '@/components/ui/skeleton'
 import { cn } from '@/lib/utils'
@@ -44,7 +38,7 @@ export const CategoryItemsPanel = ({
   category,
   projectId,
   isMobile,
-  onAddSubcategory,
+  onAddSubcategory
 }: CategoryItemsPanelProps) => {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
@@ -53,7 +47,7 @@ export const CategoryItemsPanel = ({
 
   const { data, isLoading } = useQuery(
     getCatalogDetailQuery(category.id, {
-      project_id: projectId ?? undefined,
+      project_id: projectId ?? undefined
     })
   )
 
@@ -69,37 +63,40 @@ export const CategoryItemsPanel = ({
   const removeProductMutation = useMutation({
     mutationFn: (recordId: string) =>
       catalogService.removeProduct(category.id, recordId, {
-        project_id: projectId ?? undefined,
+        project_id: projectId ?? undefined
       }),
     meta: { successMessage: 'Product removed' },
-    onSuccess: invalidate,
+    onSuccess: invalidate
   })
 
   const toggleProductMutation = useMutation({
     mutationFn: ({ recordId, active }: { recordId: string; active: boolean }) =>
-      catalogService.updateProduct(category.id, recordId, { active }, {
-        project_id: projectId ?? undefined,
-      }),
-    onSuccess: invalidate,
+      catalogService.updateProduct(
+        category.id,
+        recordId,
+        { active },
+        {
+          project_id: projectId ?? undefined
+        }
+      ),
+    onSuccess: invalidate
   })
 
   const removeVPMutation = useMutation({
     mutationFn: (recordId: string) =>
       catalogService.removeVariableProduct(category.id, recordId, {
-        project_id: projectId ?? undefined,
+        project_id: projectId ?? undefined
       }),
     meta: { successMessage: 'Superinventory removed' },
-    onSuccess: invalidate,
+    onSuccess: invalidate
   })
 
   return (
     <div className={cn('flex h-full flex-col overflow-hidden', isMobile ? 'px-3.5' : 'px-6')}>
       {/* Category header */}
-      <div className='shrink-0 py-4 border-b border-border'>
-        <div className='flex items-center gap-2 mb-2'>
-          <h2 className='text-[15px] font-semibold tracking-[-0.01em]'>
-            {category.name}
-          </h2>
+      <div className='shrink-0 border-b border-border py-4'>
+        <div className='mb-2 flex items-center gap-2'>
+          <h2 className='text-[15px] font-semibold tracking-[-0.01em]'>{category.name}</h2>
           {!category.active && (
             <span className='rounded-full bg-muted px-2 py-0.5 text-[10px] font-medium text-text-tertiary'>
               Inactive
@@ -108,11 +105,7 @@ export const CategoryItemsPanel = ({
         </div>
 
         {/* Meta tags */}
-        <MetaTagsEditor
-          entityType='category'
-          entityId={category.id}
-          projectId={projectId}
-        />
+        <MetaTagsEditor entityType='category' entityId={category.id} projectId={projectId} />
 
         {/* Images */}
         <div className='mt-3'>
@@ -126,7 +119,7 @@ export const CategoryItemsPanel = ({
       </div>
 
       {/* Actions */}
-      <div className='shrink-0 flex items-center gap-1.5 py-2 border-b border-border'>
+      <div className='flex shrink-0 items-center gap-1.5 border-b border-border py-2'>
         <Button size='xs' variant='outline' onClick={() => setAddProductOpen(true)}>
           <Plus className='size-3' />
           Product
@@ -150,17 +143,15 @@ export const CategoryItemsPanel = ({
             ))}
           </div>
         ) : products.length === 0 && vps.length === 0 ? (
-          <div className='flex flex-col items-center justify-center py-12 text-text-quaternary'>
-            <Package className='size-8 mb-2' />
+          <div className='text-text-quaternary flex flex-col items-center justify-center py-12'>
+            <Package className='mb-2 size-8' />
             <p className='text-[13px]'>No items in this category</p>
-            <p className='text-[11px] mt-1'>
-              Add products or drag them from the unassigned panel
-            </p>
+            <p className='mt-1 text-[11px]'>Add products or drag them from the unassigned panel</p>
           </div>
         ) : (
           <div className='flex flex-col gap-1'>
             {/* Variable Products */}
-            {vps.map((vp) => (
+            {vps.map(vp => (
               <VPRow
                 key={vp.id}
                 vp={vp}
@@ -169,14 +160,14 @@ export const CategoryItemsPanel = ({
                   navigate({
                     to: '/catalog/vp/$vpId',
                     params: { vpId: vp.vp_id },
-                    search: { project_id: projectId ?? undefined },
+                    search: { project_id: projectId ?? undefined }
                   })
                 }
               />
             ))}
 
             {/* Standalone Products */}
-            {products.map((product) => (
+            {products.map(product => (
               <ProductRow
                 key={product.id}
                 product={product}
@@ -187,7 +178,7 @@ export const CategoryItemsPanel = ({
                 onToggleActive={() =>
                   toggleProductMutation.mutate({
                     recordId: product.id,
-                    active: !product.active,
+                    active: !product.active
                   })
                 }
               />
@@ -219,38 +210,34 @@ export const CategoryItemsPanel = ({
 function VPRow({
   vp,
   onRemove,
-  onNavigate,
+  onNavigate
 }: {
   vp: CatalogCategoryVP
   onRemove: () => void
   onNavigate: () => void
 }) {
   return (
-    <div className='group flex items-center gap-2 rounded-lg px-2.5 py-2 hover:bg-bg-secondary transition-colors'>
+    <div className='group flex items-center gap-2 rounded-lg px-2.5 py-2 transition-colors hover:bg-bg-secondary'>
       <button
         type='button'
-        className='flex flex-1 items-center gap-2 min-w-0 text-left'
+        className='flex min-w-0 flex-1 items-center gap-2 text-left'
         onClick={onNavigate}
       >
         <div className='flex size-8 shrink-0 items-center justify-center rounded bg-purple-500/10'>
           <Layers className='size-3.5 text-purple-500' />
         </div>
         <div className='min-w-0'>
-          <p className='text-[13px] font-medium truncate'>
-            {vp.name || vp.vp_id}
-          </p>
-          {vp.slug && (
-            <p className='text-[11px] text-text-quaternary truncate'>{vp.slug}</p>
-          )}
+          <p className='truncate text-[13px] font-medium'>{vp.name || vp.vp_id}</p>
+          {vp.slug && <p className='text-text-quaternary truncate text-[11px]'>{vp.slug}</p>}
         </div>
-        <span className='shrink-0 rounded bg-purple-500/10 px-1.5 py-0.5 text-[10px] font-bold uppercase text-purple-500'>
+        <span className='shrink-0 rounded bg-purple-500/10 px-1.5 py-0.5 text-[10px] font-bold text-purple-500 uppercase'>
           SUPER
         </span>
       </button>
       <Button
         variant='ghost'
         size='icon-xs'
-        className='opacity-0 group-hover:opacity-100 hover:bg-destructive hover:text-destructive-foreground'
+        className='hover:text-destructive-foreground opacity-0 group-hover:opacity-100 hover:bg-destructive'
         onClick={onRemove}
         title='Remove from category'
       >
@@ -268,7 +255,7 @@ function ProductRow({
   projectId,
   onInvalidate,
   onRemove,
-  onToggleActive,
+  onToggleActive
 }: {
   product: CatalogCategoryProduct
   categoryId: string
@@ -295,21 +282,26 @@ function ProductRow({
     onSuccess: () => {
       onInvalidate()
       setEditOpen(false)
-    },
+    }
   })
 
   return (
     <>
-      <div className='group flex items-center gap-2 rounded-lg px-2.5 py-2 hover:bg-bg-secondary transition-colors'>
+      <div className='group flex items-center gap-2 rounded-lg px-2.5 py-2 transition-colors hover:bg-bg-secondary'>
         <div className='flex size-8 shrink-0 items-center justify-center rounded bg-blue-500/10'>
           <Box className='size-3.5 text-blue-500' />
         </div>
-        <div className='flex-1 min-w-0'>
-          <p className={cn('text-[13px] font-medium truncate', !product.active && 'text-text-tertiary')}>
+        <div className='min-w-0 flex-1'>
+          <p
+            className={cn(
+              'truncate text-[13px] font-medium',
+              !product.active && 'text-text-tertiary'
+            )}
+          >
             {product.descr_1 || product.product_id || product.product_autoid}
           </p>
           {product.product_id && (
-            <p className='text-[11px] text-text-quaternary truncate'>{product.product_id}</p>
+            <p className='text-text-quaternary truncate text-[11px]'>{product.product_id}</p>
           )}
         </div>
         <StatusBadge status={product.status} expiresAt={product.status_expires_at} />
@@ -333,12 +325,16 @@ function ProductRow({
           onClick={onToggleActive}
           title={product.active ? 'Deactivate' : 'Activate'}
         >
-          {product.active ? <Eye className='size-3' /> : <EyeOff className='size-3 text-text-quaternary' />}
+          {product.active ? (
+            <Eye className='size-3' />
+          ) : (
+            <EyeOff className='text-text-quaternary size-3' />
+          )}
         </Button>
         <Button
           variant='ghost'
           size='icon-xs'
-          className='opacity-0 group-hover:opacity-100 hover:bg-destructive hover:text-destructive-foreground'
+          className='hover:text-destructive-foreground opacity-0 group-hover:opacity-100 hover:bg-destructive'
           onClick={onRemove}
           title='Remove from category'
         >
@@ -349,7 +345,7 @@ function ProductRow({
       <Dialog open={editOpen} onOpenChange={setEditOpen}>
         <DialogContent className='sm:max-w-sm'>
           <form
-            onSubmit={(e) => {
+            onSubmit={e => {
               e.preventDefault()
               updateMutation.mutate()
             }}

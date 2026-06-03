@@ -18,7 +18,7 @@ interface CatalogCategorySidebarProps {
 
 const getLabelForTreeId = (results: Category[], treeId: string | null) => {
   if (treeId == null) return 'All categories'
-  const match = results.find((c) => c.tree_id === treeId)
+  const match = results.find(c => c.tree_id === treeId)
   return match?.tree_descr ?? 'Category'
 }
 
@@ -76,7 +76,7 @@ export const CatalogCategorySidebar = ({
       {/* Header */}
       <div className='flex shrink-0 items-center justify-between gap-2 border-b border-border px-4 py-2'>
         <div className='min-w-0'>
-          <span className='text-[11px] font-semibold uppercase tracking-[0.05em] text-text-tertiary'>
+          <span className='text-[11px] font-semibold tracking-[0.05em] text-text-tertiary uppercase'>
             Categories
           </span>
           <p className='truncate text-[13px] font-semibold' title={currentLabel}>
@@ -116,7 +116,7 @@ export const CatalogCategorySidebar = ({
           <div className='flex flex-col items-center gap-1.5 px-4 py-14 text-center'>
             <FolderOpen className='size-6 text-text-tertiary opacity-40' />
             <p className='text-[13px] font-medium'>No categories</p>
-            <p className='text-[12px] text-text-quaternary'>
+            <p className='text-text-quaternary text-[12px]'>
               This folder doesn't have subcategories.
             </p>
             {path.length > 0 && (
@@ -131,7 +131,7 @@ export const CatalogCategorySidebar = ({
             )}
           </div>
         ) : (
-          results.map((category) => {
+          results.map(category => {
             const isActive = value === category.tree_id
             const hasChildren = category.subcategory_count > 0
             return (
@@ -160,7 +160,7 @@ export const CatalogCategorySidebar = ({
                       loading='lazy'
                     />
                   ) : (
-                    <ImageOff className='size-3 text-text-quaternary' />
+                    <ImageOff className='text-text-quaternary size-3' />
                   )}
                 </div>
 
@@ -178,7 +178,7 @@ export const CatalogCategorySidebar = ({
                 </div>
 
                 {/* Right side */}
-                <div className='flex shrink-0 items-center gap-1.5 text-text-quaternary'>
+                <div className='text-text-quaternary flex shrink-0 items-center gap-1.5'>
                   {!category.show_web && (
                     <span className='rounded-[4px] border border-border px-1.5 py-px text-[10px] font-medium text-text-tertiary'>
                       Hidden

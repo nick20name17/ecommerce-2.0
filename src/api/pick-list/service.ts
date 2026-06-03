@@ -10,7 +10,7 @@ import type {
   ShippingRatesResponse,
   ShippingSelectionResponse,
   UpdateItemPayload,
-  UpdatePickListPayload,
+  UpdatePickListPayload
 } from './schema'
 
 const pickListParams = (projectId?: number | null): Record<string, string | number> =>
@@ -30,28 +30,28 @@ export const pickListService = {
 
   getById: async (id: number, projectId?: number | null) => {
     const { data } = await api.get<PickList>(`/pick-lists/${id}/`, {
-      params: pickListParams(projectId),
+      params: pickListParams(projectId)
     })
     return data
   },
 
   create: async (payload: CreatePickListPayload, projectId?: number | null) => {
     const { data } = await api.post<PickList>('/pick-lists/', payload, {
-      params: pickListParams(projectId),
+      params: pickListParams(projectId)
     })
     return data
   },
 
   update: async (id: number, payload: UpdatePickListPayload, projectId?: number | null) => {
     const { data } = await api.patch<PickList>(`/pick-lists/${id}/`, payload, {
-      params: pickListParams(projectId),
+      params: pickListParams(projectId)
     })
     return data
   },
 
   delete: async (id: number, resetShipped = false, projectId?: number | null) => {
     await api.delete(`/pick-lists/${id}/`, {
-      params: withReset(projectId, resetShipped),
+      params: withReset(projectId, resetShipped)
     })
   },
 
@@ -59,7 +59,7 @@ export const pickListService = {
 
   addItems: async (id: number, payload: AddItemsPayload, projectId?: number | null) => {
     const { data } = await api.post<PickList>(`/pick-lists/${id}/items/`, payload, {
-      params: pickListParams(projectId),
+      params: pickListParams(projectId)
     })
     return data
   },
@@ -68,13 +68,11 @@ export const pickListService = {
     id: number,
     itemId: number,
     payload: UpdateItemPayload,
-    projectId?: number | null,
+    projectId?: number | null
   ) => {
-    const { data } = await api.patch<PickList>(
-      `/pick-lists/${id}/items/${itemId}/`,
-      payload,
-      { params: pickListParams(projectId) },
-    )
+    const { data } = await api.patch<PickList>(`/pick-lists/${id}/items/${itemId}/`, payload, {
+      params: pickListParams(projectId)
+    })
     return data
   },
 
@@ -82,10 +80,10 @@ export const pickListService = {
     id: number,
     itemId: number,
     resetShipped = false,
-    projectId?: number | null,
+    projectId?: number | null
   ) => {
     await api.delete(`/pick-lists/${id}/items/${itemId}/`, {
-      params: withReset(projectId, resetShipped),
+      params: withReset(projectId, resetShipped)
     })
   },
 
@@ -93,7 +91,7 @@ export const pickListService = {
 
   push: async (id: number, projectId?: number | null) => {
     const { data } = await api.post<PickList>(`/pick-lists/${id}/push/`, null, {
-      params: pickListParams(projectId),
+      params: pickListParams(projectId)
     })
     return data
   },
@@ -103,12 +101,12 @@ export const pickListService = {
   getShippingRates: async (
     id: number,
     payload: ShippingRatesRequest,
-    projectId?: number | null,
+    projectId?: number | null
   ) => {
     const { data } = await api.post<ShippingRatesResponse>(
       `/pick-lists/${id}/shipping-rates/`,
       payload,
-      { params: pickListParams(projectId) },
+      { params: pickListParams(projectId) }
     )
     return data
   },
@@ -117,15 +115,15 @@ export const pickListService = {
     const { data } = await api.post<ShippingSelectionResponse>(
       `/pick-lists/${id}/shipping-selection/`,
       { rate_id: rateId },
-      { params: pickListParams(projectId) },
+      { params: pickListParams(projectId) }
     )
     return data
   },
 
   voidLabel: async (id: number, projectId?: number | null) => {
     const { data } = await api.post<PickList>(`/pick-lists/${id}/void/`, null, {
-      params: pickListParams(projectId),
+      params: pickListParams(projectId)
     })
     return data
-  },
+  }
 }

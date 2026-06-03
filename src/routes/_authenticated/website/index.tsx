@@ -19,7 +19,7 @@ type WebsiteSection = 'banner' | 'abandoned-carts' | 'push-status'
 const SECTIONS: { value: WebsiteSection; label: string }[] = [
   { value: 'banner', label: 'Banner' },
   { value: 'abandoned-carts', label: 'Abandoned Carts' },
-  { value: 'push-status', label: 'Push Status' },
+  { value: 'push-status', label: 'Push Status' }
 ]
 
 // ── Main component ──────────────────────────────────────────
@@ -37,9 +37,7 @@ const WebsitePage = () => {
           <IStorefront className='size-6' />
         </div>
         <div className='flex flex-col items-center gap-1.5 text-center'>
-          <h1 className='text-[16px] font-semibold tracking-[-0.02em] text-foreground'>
-            Website
-          </h1>
+          <h1 className='text-[16px] font-semibold tracking-[-0.02em] text-foreground'>Website</h1>
           <p className='max-w-[280px] text-[13px] leading-snug text-text-tertiary'>
             Select a project in the sidebar to manage website content.
           </p>
@@ -53,24 +51,21 @@ const WebsitePage = () => {
       {/* ── Header bar ── */}
       <header className='flex h-12 shrink-0 items-center gap-2.5 border-b border-border px-3.5 sm:px-6'>
         <SidebarTrigger className='-ml-1' />
-        <PageHeaderIcon
-          icon={IStorefront}
-          color={PAGE_COLORS.storefront}
-        />
+        <PageHeaderIcon icon={IStorefront} color={PAGE_COLORS.storefront} />
         <h1 className='text-[14px] font-semibold tracking-[-0.01em]'>Website</h1>
       </header>
 
       {/* Sidebar + Content */}
       <div className='flex min-h-0 flex-1 flex-col overflow-hidden md:flex-row'>
-        <nav className='flex shrink-0 gap-px overflow-x-auto border-b border-border bg-bg-secondary/40 px-3 py-1.5 md:w-[180px] md:flex-col md:overflow-x-visible md:border-b-0 md:border-r md:py-3'>
-          {SECTIONS.map((s) => {
+        <nav className='flex shrink-0 gap-px overflow-x-auto border-b border-border bg-bg-secondary/40 px-3 py-1.5 md:w-[180px] md:flex-col md:overflow-x-visible md:border-r md:border-b-0 md:py-3'>
+          {SECTIONS.map(s => {
             const isActive = currentSection === s.value
             return (
               <button
                 key={s.value}
                 type='button'
                 className={cn(
-                  'flex h-[30px] shrink-0 items-center whitespace-nowrap rounded-[6px] px-2.5 text-[13px] font-medium transition-colors duration-[80ms]',
+                  'flex h-[30px] shrink-0 items-center rounded-[6px] px-2.5 text-[13px] font-medium whitespace-nowrap transition-colors duration-[80ms]',
                   isActive
                     ? 'bg-bg-active text-foreground'
                     : 'text-text-tertiary hover:bg-bg-hover hover:text-foreground'

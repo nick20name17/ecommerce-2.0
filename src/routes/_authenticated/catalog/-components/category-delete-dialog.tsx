@@ -10,7 +10,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogDescription,
+  DialogDescription
 } from '@/components/ui/dialog'
 
 interface CategoryDeleteDialogProps {
@@ -26,19 +26,18 @@ export const CategoryDeleteDialog = ({
   open,
   onOpenChange,
   projectId,
-  onDeleted,
+  onDeleted
 }: CategoryDeleteDialogProps) => {
   const deleteMutation = useMutation({
-    mutationFn: () =>
-      catalogService.delete(category!.id, { project_id: projectId ?? undefined }),
+    mutationFn: () => catalogService.delete(category!.id, { project_id: projectId ?? undefined }),
     meta: {
       successMessage: 'Category deleted',
-      invalidatesQuery: CATALOG_QUERY_KEYS.all(),
+      invalidatesQuery: CATALOG_QUERY_KEYS.all()
     },
     onSuccess: () => {
       onOpenChange(false)
       onDeleted?.()
-    },
+    }
   })
 
   const hasChildren = category?.children && category.children.length > 0
@@ -51,7 +50,7 @@ export const CategoryDeleteDialog = ({
           <DialogDescription>
             Are you sure you want to delete <strong>{category?.name}</strong>?
             {hasChildren && (
-              <span className='text-destructive block mt-1'>
+              <span className='mt-1 block text-destructive'>
                 This will also delete all subcategories and their items.
               </span>
             )}

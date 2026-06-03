@@ -28,11 +28,11 @@ const AuthenticatedLayout = () => {
   }, [projectId, queryClient])
 
   return (
-    <SidebarProvider className='bg-page-canvas h-svh overflow-hidden'>
+    <SidebarProvider className='h-svh overflow-hidden bg-page-canvas'>
       <NotificationsWsManager />
       <AppSidebar />
       <SidebarInset className='flex min-h-0 flex-col overflow-hidden bg-transparent p-0 md:p-2'>
-        <div className='bg-background flex min-h-0 flex-1 flex-col overflow-hidden rounded-none shadow-sm ring-1 ring-black/[0.04] md:rounded-xl'>
+        <div className='flex min-h-0 flex-1 flex-col overflow-hidden rounded-none bg-background shadow-sm ring-1 ring-black/[0.04] md:rounded-xl'>
           <main data-slot='page-content' className='flex min-h-0 flex-1 flex-col overflow-hidden'>
             <Outlet />
           </main>
@@ -51,7 +51,7 @@ export const Route = createFileRoute('/_authenticated')({
       throw redirect({
         to: AUTH_REDIRECTS.logout,
         replace: true,
-        search: (prev) => ({ ...prev, redirect: location.href })
+        search: prev => ({ ...prev, redirect: location.href })
       })
     }
   }

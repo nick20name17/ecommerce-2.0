@@ -19,7 +19,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogMedia,
-  AlertDialogTitle,
+  AlertDialogTitle
 } from '@/components/ui/alert-dialog'
 import { ColorPicker } from '@/components/ui/color-picker'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -44,7 +44,7 @@ const SortableStatusRow = ({
   status,
   index,
   projectId,
-  onDelete,
+  onDelete
 }: {
   status: TaskStatus
   index: number
@@ -53,7 +53,7 @@ const SortableStatusRow = ({
 }) => {
   const { ref, isDragging } = useSortable({
     id: status.id,
-    index,
+    index
   })
 
   const [editing, setEditing] = useState(false)
@@ -65,9 +65,9 @@ const SortableStatusRow = ({
       taskService.updateStatus(status.id, { name, color }),
     meta: {
       successMessage: 'Status updated',
-      invalidatesQuery: TASK_QUERY_KEYS.statuses(projectId),
+      invalidatesQuery: TASK_QUERY_KEYS.statuses(projectId)
     },
-    onSuccess: () => setEditing(false),
+    onSuccess: () => setEditing(false)
   })
 
   const handleSave = () => {
@@ -91,12 +91,12 @@ const SortableStatusRow = ({
         />
         <input
           value={editName}
-          onChange={(e) => setEditName(e.target.value)}
-          onKeyDown={(e) => {
+          onChange={e => setEditName(e.target.value)}
+          onKeyDown={e => {
             if (e.key === 'Enter') handleSave()
             if (e.key === 'Escape') setEditing(false)
           }}
-          className='h-7 min-w-0 flex-1 rounded-[6px] border border-border bg-background px-2.5 text-[13px] font-medium outline-none transition-[border-color,box-shadow] focus:border-primary focus:ring-2 focus:ring-primary/20'
+          className='h-7 min-w-0 flex-1 rounded-[6px] border border-border bg-background px-2.5 text-[13px] font-medium transition-[border-color,box-shadow] outline-none focus:border-primary focus:ring-2 focus:ring-primary/20'
           autoFocus
         />
         <div className='flex shrink-0 items-center gap-1.5'>
@@ -125,18 +125,18 @@ const SortableStatusRow = ({
       ref={ref}
       className={cn(
         'group/row flex cursor-grab items-center gap-3 border-b border-border-light px-4 py-2.5 transition-colors duration-75 active:cursor-grabbing',
-        isDragging && 'z-10 rounded-[10px] border border-primary/20 bg-background shadow-lg shadow-primary/5',
-        !isDragging && 'hover:bg-bg-hover/40',
+        isDragging &&
+          'z-10 rounded-[10px] border border-primary/20 bg-background shadow-lg shadow-primary/5',
+        !isDragging && 'hover:bg-bg-hover/40'
       )}
     >
       {/* Color dot */}
-      <div
-        className='size-4 shrink-0 rounded-full'
-        style={{ backgroundColor: statusColor }}
-      />
+      <div className='size-4 shrink-0 rounded-full' style={{ backgroundColor: statusColor }} />
 
       {/* Name */}
-      <span className='min-w-0 flex-1 truncate text-[13px] font-medium text-foreground'>{status.name}</span>
+      <span className='min-w-0 flex-1 truncate text-[13px] font-medium text-foreground'>
+        {status.name}
+      </span>
 
       {/* Actions — appear on hover */}
       <div className='flex shrink-0 items-center gap-1 opacity-0 transition-opacity duration-75 group-hover/row:opacity-100'>
@@ -144,8 +144,8 @@ const SortableStatusRow = ({
           <TooltipTrigger asChild>
             <button
               type='button'
-              className='inline-flex size-7 items-center justify-center rounded-[6px] text-text-quaternary transition-colors duration-75 hover:bg-bg-active hover:text-foreground'
-              onClick={(e) => {
+              className='text-text-quaternary inline-flex size-7 items-center justify-center rounded-[6px] transition-colors duration-75 hover:bg-bg-active hover:text-foreground'
+              onClick={e => {
                 e.stopPropagation()
                 setEditName(status.name)
                 setEditColor(status.color ?? defaultStatusColorHex)
@@ -161,8 +161,8 @@ const SortableStatusRow = ({
           <TooltipTrigger asChild>
             <button
               type='button'
-              className='inline-flex size-7 items-center justify-center rounded-[6px] text-text-quaternary transition-colors duration-75 hover:bg-destructive/10 hover:text-destructive'
-              onClick={(e) => {
+              className='text-text-quaternary inline-flex size-7 items-center justify-center rounded-[6px] transition-colors duration-75 hover:bg-destructive/10 hover:text-destructive'
+              onClick={e => {
                 e.stopPropagation()
                 onDelete()
               }}
@@ -189,7 +189,7 @@ export const TasksSection = ({ projectId }: { projectId: number }) => {
   const [newColor, setNewColor] = useState(defaultStatusColorHex)
   const [deleteTarget, setDeleteTarget] = useState<TaskStatus | null>(null)
 
-  const statusKey = statuses.map((s) => `${s.id}:${s.name}:${s.color}`).join(',')
+  const statusKey = statuses.map(s => `${s.id}:${s.name}:${s.color}`).join(',')
   useEffect(() => {
     setOrderedStatuses([...statuses].sort((a, b) => a.order - b.order))
   }, [statusKey]) // eslint-disable-line react-hooks/exhaustive-deps
@@ -212,7 +212,7 @@ export const TasksSection = ({ projectId }: { projectId: number }) => {
   const deleteMutation = useMutation({
     mutationFn: (id: number) => taskService.deleteStatus(id),
     onSuccess: (_, id) => {
-      setOrderedStatuses((prev) => prev.filter((s) => s.id !== id))
+      setOrderedStatuses(prev => prev.filter(s => s.id !== id))
       setDeleteTarget(null)
     },
     meta: { invalidatesQuery: TASK_QUERY_KEYS.statuses(projectId) }
@@ -241,16 +241,16 @@ export const TasksSection = ({ projectId }: { projectId: number }) => {
       typeof sortableSource.initialIndex === 'number' && typeof sortableSource.index === 'number'
 
     // Only custom (non-default) statuses are in the sortable — indices are relative to that sub-array
-    const nonDefault = orderedStatuses.filter((s) => !s.is_default)
-    const defaults = orderedStatuses.filter((s) => s.is_default)
+    const nonDefault = orderedStatuses.filter(s => !s.is_default)
+    const defaults = orderedStatuses.filter(s => s.is_default)
 
     const fromIndex = useSortableIndices
       ? sortableSource.initialIndex
-      : nonDefault.findIndex((s) => s.id === Number(source?.id))
+      : nonDefault.findIndex(s => s.id === Number(source?.id))
     const toIndex = useSortableIndices
       ? sortableSource.index
       : target != null
-        ? nonDefault.findIndex((s) => s.id === Number(target.id))
+        ? nonDefault.findIndex(s => s.id === Number(target.id))
         : -1
 
     if (
@@ -266,7 +266,9 @@ export const TasksSection = ({ projectId }: { projectId: number }) => {
     setOrderedStatuses([...defaults, ...next])
 
     Promise.all(
-      next.map((status, i) => reorderMutation.mutateAsync({ id: status.id as number, order: i + 1 }))
+      next.map((status, i) =>
+        reorderMutation.mutateAsync({ id: status.id as number, order: i + 1 })
+      )
     )
       .then(() => {
         queryClient.invalidateQueries({
@@ -278,9 +280,11 @@ export const TasksSection = ({ projectId }: { projectId: number }) => {
   }
 
   // Split for rendering: defaults (non-done) at top, custom (sortable) in middle, "Done" pinned at bottom
-  const defaultStatuses = orderedStatuses.filter((s) => s.is_default && s.name.toLowerCase() !== 'done')
-  const doneStatus = orderedStatuses.find((s) => s.is_default && s.name.toLowerCase() === 'done')
-  const customStatuses = orderedStatuses.filter((s) => !s.is_default)
+  const defaultStatuses = orderedStatuses.filter(
+    s => s.is_default && s.name.toLowerCase() !== 'done'
+  )
+  const doneStatus = orderedStatuses.find(s => s.is_default && s.name.toLowerCase() === 'done')
+  const customStatuses = orderedStatuses.filter(s => !s.is_default)
 
   return (
     <div className='flex min-h-0 flex-1 flex-col'>
@@ -289,7 +293,13 @@ export const TasksSection = ({ projectId }: { projectId: number }) => {
           {isLoading ? (
             <div className='overflow-hidden rounded-[10px] border border-border'>
               {Array.from({ length: 6 }).map((_, i) => (
-                <div key={i} className={cn('flex items-center gap-3 px-4 py-3', i < 5 && 'border-b border-border-light')}>
+                <div
+                  key={i}
+                  className={cn(
+                    'flex items-center gap-3 px-4 py-3',
+                    i < 5 && 'border-b border-border-light'
+                  )}
+                >
                   <Skeleton className='size-4 rounded-full' />
                   <Skeleton className='h-4 w-32' />
                 </div>
@@ -306,10 +316,10 @@ export const TasksSection = ({ projectId }: { projectId: number }) => {
                 />
                 <input
                   value={newName}
-                  onChange={(e) => setNewName(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && handleAddStatus()}
+                  onChange={e => setNewName(e.target.value)}
+                  onKeyDown={e => e.key === 'Enter' && handleAddStatus()}
                   placeholder='Add a status...'
-                  className='h-7 min-w-0 flex-1 bg-transparent text-[13px] font-medium outline-none placeholder:text-text-quaternary'
+                  className='placeholder:text-text-quaternary h-7 min-w-0 flex-1 bg-transparent text-[13px] font-medium outline-none'
                 />
                 {newName.trim() && (
                   <button
@@ -324,7 +334,7 @@ export const TasksSection = ({ projectId }: { projectId: number }) => {
               </div>
 
               {/* Default statuses — static, not draggable */}
-              {defaultStatuses.map((status) => (
+              {defaultStatuses.map(status => (
                 <div
                   key={status.id}
                   className='flex items-center gap-3 border-b border-border-light px-4 py-2.5'
@@ -336,7 +346,7 @@ export const TasksSection = ({ projectId }: { projectId: number }) => {
                   <span className='min-w-0 flex-1 truncate text-[13px] font-medium text-foreground'>
                     {status.name}
                   </span>
-                  <span className='shrink-0 rounded-[5px] bg-bg-secondary/80 px-2 py-[3px] text-[11px] font-medium text-text-quaternary'>
+                  <span className='text-text-quaternary shrink-0 rounded-[5px] bg-bg-secondary/80 px-2 py-[3px] text-[11px] font-medium'>
                     Default
                   </span>
                 </div>
@@ -369,7 +379,7 @@ export const TasksSection = ({ projectId }: { projectId: number }) => {
                   <span className='min-w-0 flex-1 truncate text-[13px] font-medium text-foreground'>
                     {doneStatus.name}
                   </span>
-                  <span className='shrink-0 rounded-[5px] bg-bg-secondary/80 px-2 py-[3px] text-[11px] font-medium text-text-quaternary'>
+                  <span className='text-text-quaternary shrink-0 rounded-[5px] bg-bg-secondary/80 px-2 py-[3px] text-[11px] font-medium'>
                     Default
                   </span>
                 </div>
@@ -380,7 +390,7 @@ export const TasksSection = ({ projectId }: { projectId: number }) => {
       </div>
 
       {/* Delete confirmation */}
-      <AlertDialog open={!!deleteTarget} onOpenChange={(open) => !open && setDeleteTarget(null)}>
+      <AlertDialog open={!!deleteTarget} onOpenChange={open => !open && setDeleteTarget(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogMedia className='bg-destructive/10 text-destructive'>
@@ -388,7 +398,8 @@ export const TasksSection = ({ projectId }: { projectId: number }) => {
             </AlertDialogMedia>
             <AlertDialogTitle>Delete Status</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete &ldquo;{deleteTarget?.name}&rdquo;? Tasks using this status will need to be reassigned.
+              Are you sure you want to delete &ldquo;{deleteTarget?.name}&rdquo;? Tasks using this
+              status will need to be reassigned.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

@@ -40,9 +40,7 @@ export function QuickAddInput({
       })
 
       // Try exact match first, then first result
-      const exact = res.results.find(
-        (p) => p.id.toLowerCase() === id.toLowerCase()
-      )
+      const exact = res.results.find(p => p.id.toLowerCase() === id.toLowerCase())
       const product = exact ?? res.results[0]
 
       if (!product) {
@@ -77,11 +75,11 @@ export function QuickAddInput({
           ref={inputRef}
           type='text'
           value={value}
-          onChange={(e) => {
+          onChange={e => {
             setValue(e.target.value.toUpperCase())
             if (error) setError(null)
           }}
-          onKeyDown={(e) => {
+          onKeyDown={e => {
             if (e.key === 'Enter') {
               e.preventDefault()
               handleSubmit()
@@ -89,7 +87,7 @@ export function QuickAddInput({
           }}
           placeholder='Type product ID and press Enter…'
           disabled={disabled || loading}
-          className='flex-1 bg-transparent text-[13px] font-medium uppercase outline-none placeholder:font-normal placeholder:normal-case placeholder:text-text-tertiary disabled:cursor-not-allowed'
+          className='flex-1 bg-transparent text-[13px] font-medium uppercase outline-none placeholder:font-normal placeholder:text-text-tertiary placeholder:normal-case disabled:cursor-not-allowed'
           autoComplete='off'
           spellCheck={false}
         />
@@ -106,7 +104,7 @@ export function QuickAddInput({
             Add
           </button>
         ) : (
-          <kbd className='shrink-0 rounded-[4px] border border-border bg-bg-secondary px-1.5 py-0.5 text-[11px] text-text-quaternary'>
+          <kbd className='text-text-quaternary shrink-0 rounded-[4px] border border-border bg-bg-secondary px-1.5 py-0.5 text-[11px]'>
             Enter
           </kbd>
         )}

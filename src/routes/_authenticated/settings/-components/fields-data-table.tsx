@@ -73,7 +73,12 @@ export const FieldsDataTable = ({
 
   if (fields.length === 0) {
     return (
-      <PageEmpty icon={Settings} title='No fields configured' description='No fields are configured for this entity.' compact />
+      <PageEmpty
+        icon={Settings}
+        title='No fields configured'
+        description='No fields are configured for this entity.'
+        compact
+      />
     )
   }
 
@@ -81,24 +86,24 @@ export const FieldsDataTable = ({
     <div>
       {/* Table header */}
       <div className='sticky top-0 z-10 flex items-center gap-4 border-b border-border bg-bg-secondary px-6 py-1.5'>
-        <div className='w-[200px] shrink-0 text-[11px] font-semibold uppercase tracking-[0.05em] text-text-tertiary'>
+        <div className='w-[200px] shrink-0 text-[11px] font-semibold tracking-[0.05em] text-text-tertiary uppercase'>
           Field
         </div>
-        <div className='min-w-0 flex-1 text-[11px] font-semibold uppercase tracking-[0.05em] text-text-tertiary'>
+        <div className='min-w-0 flex-1 text-[11px] font-semibold tracking-[0.05em] text-text-tertiary uppercase'>
           Display Name
         </div>
         {showListToggle && (
-          <div className='w-[60px] shrink-0 text-right text-[11px] font-semibold uppercase tracking-[0.05em] text-text-tertiary'>
+          <div className='w-[60px] shrink-0 text-right text-[11px] font-semibold tracking-[0.05em] text-text-tertiary uppercase'>
             Header
           </div>
         )}
-        <div className='w-[60px] shrink-0 text-right text-[11px] font-semibold uppercase tracking-[0.05em] text-text-tertiary'>
+        <div className='w-[60px] shrink-0 text-right text-[11px] font-semibold tracking-[0.05em] text-text-tertiary uppercase'>
           Table
         </div>
       </div>
 
       {/* Rows */}
-      {fields.map((row) => (
+      {fields.map(row => (
         <FieldRow
           key={row.field}
           row={row}
@@ -185,7 +190,7 @@ function FieldRow({
                   'inline-flex size-5 shrink-0 items-center justify-center rounded-[4px] border transition-colors duration-75',
                   row.editable
                     ? 'border-primary/30 bg-primary/10 text-primary hover:bg-primary/20'
-                    : 'border-border bg-bg-secondary text-text-quaternary hover:bg-bg-active hover:text-text-tertiary',
+                    : 'text-text-quaternary border-border bg-bg-secondary hover:bg-bg-active hover:text-text-tertiary',
                   isEditablePending && 'pointer-events-none opacity-50'
                 )}
                 onClick={() => onEditableToggle(entity, row.field, !row.editable)}
@@ -195,7 +200,9 @@ function FieldRow({
               </button>
             </TooltipTrigger>
             <TooltipContent>
-              {row.editable ? 'Editable — click to make read-only' : 'Read-only — click to make editable'}
+              {row.editable
+                ? 'Editable — click to make read-only'
+                : 'Read-only — click to make editable'}
             </TooltipContent>
           </Tooltip>
         ) : row.editable ? (
@@ -236,11 +243,11 @@ function FieldRow({
       <div className='flex min-w-0 flex-1 items-center gap-1.5'>
         <input
           value={aliasValue}
-          onChange={(e) => setAliasValue(e.target.value)}
+          onChange={e => setAliasValue(e.target.value)}
           placeholder='Display name…'
           disabled={isAliasPending}
-          className='h-6 min-w-0 max-w-[240px] flex-1 rounded-[5px] border border-border bg-background px-2 text-[12px] outline-none transition-colors duration-[80ms] placeholder:text-text-quaternary focus:border-primary focus:ring-1 focus:ring-primary/20 disabled:opacity-50'
-          onKeyDown={(e) => {
+          className='placeholder:text-text-quaternary h-6 max-w-[240px] min-w-0 flex-1 rounded-[5px] border border-border bg-background px-2 text-[12px] transition-colors duration-[80ms] outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 disabled:opacity-50'
+          onKeyDown={e => {
             if (e.key === 'Enter') {
               e.preventDefault()
               if (isDirty) onAliasSubmit(entity, row.field, aliasValue.trim())
@@ -270,9 +277,7 @@ function FieldRow({
                   checked={!!row.in_list}
                   disabled={isListPending || !onListToggle}
                   aria-label={row.in_list ? 'Remove from list view' : 'Add to list view'}
-                  onCheckedChange={(checked) =>
-                    onListToggle?.(entity, row.field, checked)
-                  }
+                  onCheckedChange={checked => onListToggle?.(entity, row.field, checked)}
                 />
               </span>
             </TooltipTrigger>
@@ -299,7 +304,7 @@ function FieldRow({
             checked={row.enabled}
             disabled={isPending}
             aria-label={row.enabled ? 'Disable field' : 'Enable field'}
-            onCheckedChange={(checked) => onFieldToggle(entity, row.field, checked)}
+            onCheckedChange={checked => onFieldToggle(entity, row.field, checked)}
           />
         )}
       </div>

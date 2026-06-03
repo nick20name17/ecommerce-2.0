@@ -19,12 +19,7 @@ import { ColorPicker } from '@/components/ui/color-picker'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger
-} from '@/components/ui/tooltip'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 
 const DEFAULT_BANNER: StorefrontBanner = defaultStorefrontConfig().components.banner
 
@@ -50,8 +45,7 @@ export const BannerSection = ({ projectId }: BannerSectionProps) => {
   }, [data])
 
   const updateMutation = useMutation({
-    mutationFn: (next: StorefrontConfig) =>
-      storefrontConfigService.update(projectId, next),
+    mutationFn: (next: StorefrontConfig) => storefrontConfigService.update(projectId, next),
     onSuccess: () => {
       toast.success('Banner saved')
       queryClient.invalidateQueries({
@@ -72,10 +66,8 @@ export const BannerSection = ({ projectId }: BannerSectionProps) => {
     updateMutation.mutate(merged)
   }
 
-  const update = <K extends keyof StorefrontBanner>(
-    key: K,
-    value: StorefrontBanner[K]
-  ) => setBanner((prev) => ({ ...prev, [key]: value }))
+  const update = <K extends keyof StorefrontBanner>(key: K, value: StorefrontBanner[K]) =>
+    setBanner(prev => ({ ...prev, [key]: value }))
 
   return (
     <TooltipProvider>
@@ -84,8 +76,8 @@ export const BannerSection = ({ projectId }: BannerSectionProps) => {
           <div>
             <h3 className='text-[14px] font-semibold text-foreground'>Banner</h3>
             <p className='mt-0.5 text-[13px] text-text-tertiary'>
-              * this component may not be displayed on your website because it is
-              not provided by the design
+              * this component may not be displayed on your website because it is not provided by
+              the design
             </p>
           </div>
 
@@ -94,14 +86,11 @@ export const BannerSection = ({ projectId }: BannerSectionProps) => {
             <Checkbox
               id='banner-authorized-only'
               checked={banner.authorizedOnly}
-              onCheckedChange={(v) => update('authorizedOnly', v === true)}
+              onCheckedChange={v => update('authorizedOnly', v === true)}
               disabled={isLoading}
             />
             <div className='space-y-1 leading-none'>
-              <Label
-                htmlFor='banner-authorized-only'
-                className='text-[13px] font-medium'
-              >
+              <Label htmlFor='banner-authorized-only' className='text-[13px] font-medium'>
                 Authorized users only
               </Label>
               <p className='text-[12px] text-text-tertiary'>
@@ -130,7 +119,7 @@ export const BannerSection = ({ projectId }: BannerSectionProps) => {
               id='banner-text'
               placeholder='Banner text'
               value={banner.text}
-              onChange={(e) => update('text', e.currentTarget.value)}
+              onChange={e => update('text', e.currentTarget.value)}
               disabled={isLoading}
             />
           </div>
@@ -148,17 +137,14 @@ export const BannerSection = ({ projectId }: BannerSectionProps) => {
               type='number'
               placeholder='px'
               value={banner.fontSize ?? ''}
-              onChange={(e) => update('fontSize', toNumberOrNull(e.currentTarget.value))}
+              onChange={e => update('fontSize', toNumberOrNull(e.currentTarget.value))}
               disabled={isLoading}
             />
           </div>
 
           {/* Height */}
           <div className='space-y-1.5'>
-            <Label
-              htmlFor='banner-height'
-              className='text-[12px] font-medium text-text-tertiary'
-            >
+            <Label htmlFor='banner-height' className='text-[12px] font-medium text-text-tertiary'>
               Height
             </Label>
             <Input
@@ -166,20 +152,18 @@ export const BannerSection = ({ projectId }: BannerSectionProps) => {
               type='number'
               placeholder='px'
               value={banner.height ?? ''}
-              onChange={(e) => update('height', toNumberOrNull(e.currentTarget.value))}
+              onChange={e => update('height', toNumberOrNull(e.currentTarget.value))}
               disabled={isLoading}
             />
           </div>
 
           {/* Text color */}
           <div className='space-y-1.5'>
-            <Label className='text-[12px] font-medium text-text-tertiary'>
-              Text color
-            </Label>
+            <Label className='text-[12px] font-medium text-text-tertiary'>Text color</Label>
             <div className='flex items-center gap-3'>
               <ColorPicker
                 value={banner.color ?? '#FFFFFF'}
-                onChange={(v) => update('color', v)}
+                onChange={v => update('color', v)}
                 disabled={isLoading}
               />
               <span className='font-mono text-[13px] text-text-secondary'>
@@ -190,13 +174,11 @@ export const BannerSection = ({ projectId }: BannerSectionProps) => {
 
           {/* Background color */}
           <div className='space-y-1.5'>
-            <Label className='text-[12px] font-medium text-text-tertiary'>
-              Background color
-            </Label>
+            <Label className='text-[12px] font-medium text-text-tertiary'>Background color</Label>
             <div className='flex items-center gap-3'>
               <ColorPicker
                 value={banner.background ?? '#000000'}
-                onChange={(v) => update('background', v)}
+                onChange={v => update('background', v)}
                 disabled={isLoading}
               />
               <span className='font-mono text-[13px] text-text-secondary'>
@@ -212,9 +194,7 @@ export const BannerSection = ({ projectId }: BannerSectionProps) => {
               onClick={handleSave}
               disabled={isLoading || updateMutation.isPending}
             >
-              {updateMutation.isPending && (
-                <Loader2 className='mr-2 size-4 animate-spin' />
-              )}
+              {updateMutation.isPending && <Loader2 className='mr-2 size-4 animate-spin' />}
               {updateMutation.isPending ? 'Saving' : 'Save changes'}
             </Button>
           </div>

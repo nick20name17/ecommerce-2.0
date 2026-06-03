@@ -18,7 +18,7 @@ export const CategoryIcon = ({
   projectId,
   expanded,
   hasChildren,
-  depthStyle,
+  depthStyle
 }: CategoryIconProps) => {
   const [imgLoaded, setImgLoaded] = useState(false)
   const [imgError, setImgError] = useState(false)
@@ -27,7 +27,7 @@ export const CategoryIcon = ({
     getCatalogImagesQuery('category', categoryId, projectId ?? undefined)
   )
 
-  const primary = data?.results?.find((img) => img.is_primary) ?? data?.results?.[0]
+  const primary = data?.results?.find(img => img.is_primary) ?? data?.results?.[0]
   const url = primary?.thumbnail_url
   const hasImage = !!url && !imgError
 
@@ -49,7 +49,10 @@ export const CategoryIcon = ({
       <img
         src={url}
         alt=''
-        className={cn('size-full object-cover transition-opacity duration-150', imgLoaded ? 'opacity-100' : 'opacity-0')}
+        className={cn(
+          'size-full object-cover transition-opacity duration-150',
+          imgLoaded ? 'opacity-100' : 'opacity-0'
+        )}
         onLoad={() => setImgLoaded(true)}
         onError={() => setImgError(true)}
       />

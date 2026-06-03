@@ -5,7 +5,7 @@ export const CUSTOMER_TABS = [
   { value: 'dashboard', label: 'Dashboard' }
 ] as const
 
-export const CUSTOMER_TAB_VALUES = CUSTOMER_TABS.map((t) => t.value) as [string, ...string[]]
+export const CUSTOMER_TAB_VALUES = CUSTOMER_TABS.map(t => t.value) as [string, ...string[]]
 
 export const CUSTOMER_TYPES = {
   retail: 'R',

@@ -4,9 +4,7 @@ import type { StorefrontConfig } from './schema'
 
 export const storefrontConfigService = {
   get: async (projectId: number) => {
-    const { data } = await api.get<StorefrontConfig>(
-      `/projects/${projectId}/storefront-config/`
-    )
+    const { data } = await api.get<StorefrontConfig>(`/projects/${projectId}/storefront-config/`)
     return data
   },
 

@@ -20,11 +20,11 @@ export function ViewToggle<T extends string>({
   options,
   value,
   onChange,
-  compact,
+  compact
 }: ViewToggleProps<T>) {
   return (
     <div className='flex items-center rounded-[5px] border border-border bg-background p-[3px]'>
-      {options.map((opt) => (
+      {options.map(opt => (
         <button
           key={opt.value}
           type='button'

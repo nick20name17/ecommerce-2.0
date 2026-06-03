@@ -8,18 +8,18 @@ export const PICK_LIST_QUERY_KEYS = {
   lists: () => [...PICK_LIST_QUERY_KEYS.all(), 'list'] as const,
   list: (params: PickListParams = {}) => [...PICK_LIST_QUERY_KEYS.lists(), params] as const,
   details: () => [...PICK_LIST_QUERY_KEYS.all(), 'detail'] as const,
-  detail: (id: number) => [...PICK_LIST_QUERY_KEYS.details(), id] as const,
+  detail: (id: number) => [...PICK_LIST_QUERY_KEYS.details(), id] as const
 }
 
 export const getPickListsQuery = (params: PickListParams = {}) =>
   queryOptions({
     queryKey: PICK_LIST_QUERY_KEYS.list(params),
-    queryFn: () => pickListService.get(params),
+    queryFn: () => pickListService.get(params)
   })
 
 export const getPickListDetailQuery = (id: number, projectId?: number | null) =>
   queryOptions({
     queryKey: PICK_LIST_QUERY_KEYS.detail(id),
     queryFn: () => pickListService.getById(id, projectId),
-    enabled: !!id,
+    enabled: !!id
   })

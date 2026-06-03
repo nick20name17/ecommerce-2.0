@@ -19,7 +19,14 @@ interface TaskCustomerComboboxProps {
   triggerClassName?: string
 }
 
-export const TaskCustomerCombobox = ({ value, onChange, projectId, placeholder = 'Select customer...', valueLabel, triggerClassName }: TaskCustomerComboboxProps) => {
+export const TaskCustomerCombobox = ({
+  value,
+  onChange,
+  projectId,
+  placeholder = 'Select customer...',
+  valueLabel,
+  triggerClassName
+}: TaskCustomerComboboxProps) => {
   const [open, setOpen] = useState(false)
   const [search, setSearch] = useState('')
   const [debouncedSearch, setDebouncedSearch] = useState('')
@@ -50,16 +57,13 @@ export const TaskCustomerCombobox = ({ value, onChange, projectId, placeholder =
 
   const displayCustomer =
     value != null
-      ? (customers.find((x) => x.autoid === value) ?? {
+      ? (customers.find(x => x.autoid === value) ?? {
           autoid: value,
           l_name: `Customer ${value}`
         })
       : null
 
-  const displayLabel = valueLabel
-    ?? (displayCustomer
-      ? `${displayCustomer.l_name}`
-      : null)
+  const displayLabel = valueLabel ?? (displayCustomer ? `${displayCustomer.l_name}` : null)
 
   const handleSearchChange = (q: string) => {
     setSearch(q)
@@ -118,13 +122,13 @@ export const TaskCustomerCombobox = ({ value, onChange, projectId, placeholder =
             ref={inputRef}
             placeholder='Search by name or ID...'
             value={search}
-            onChange={(e) => handleSearchChange(e.target.value)}
+            onChange={e => handleSearchChange(e.target.value)}
             className='flex-1 bg-transparent text-[13px] font-medium outline-none placeholder:text-text-tertiary'
           />
         </div>
         <div
           className='max-h-80 overflow-y-auto overscroll-contain p-1'
-          onWheel={(e) => e.stopPropagation()}
+          onWheel={e => e.stopPropagation()}
         >
           {loading && customers.length === 0 ? (
             <div className='space-y-1'>
@@ -145,13 +149,16 @@ export const TaskCustomerCombobox = ({ value, onChange, projectId, placeholder =
                 <button
                   type='button'
                   className='flex w-full items-center gap-2 rounded-[6px] px-2.5 py-[7px] text-left text-[13px] font-medium text-text-secondary transition-colors duration-[80ms] hover:bg-destructive/10 hover:text-destructive'
-                  onClick={() => { onChange(null); setOpen(false) }}
+                  onClick={() => {
+                    onChange(null)
+                    setOpen(false)
+                  }}
                 >
                   <X className='size-3.5 shrink-0' />
                   Remove customer
                 </button>
               )}
-              {customers.map((c) => {
+              {customers.map(c => {
                 const location = [c.city, c.state].filter(Boolean).join(', ')
                 const subtitle = [c.contact_1, location].filter(Boolean).join(' · ')
                 return (

@@ -15,7 +15,7 @@ import type {
   ImportFromInventrePayload,
   ImportStatusResponse,
   ImportTaskResponse,
-  UpdateCatalogCategoryPayload,
+  UpdateCatalogCategoryPayload
 } from './schema'
 
 export const catalogService = {
@@ -85,11 +85,7 @@ export const catalogService = {
     await api.patch(`/catalog/${categoryId}/products/${recordId}/`, payload, { params })
   },
 
-  removeProduct: async (
-    categoryId: string,
-    recordId: string,
-    params: { project_id?: number }
-  ) => {
+  removeProduct: async (categoryId: string, recordId: string, params: { project_id?: number }) => {
     await api.delete(`/catalog/${categoryId}/products/${recordId}/`, { params })
   },
 
@@ -140,28 +136,24 @@ export const catalogService = {
     params: { project_id?: number }
   ) => {
     const { data } = await api.post<ImportTaskResponse>('/catalog/import-from-inventre/', payload, {
-      params,
+      params
     })
     return data
   },
 
   // Single trigger that runs Superinventory → Categories → Images in order.
   // Progress is reported under one task_id with `Step X/3: ...` prefixes.
-  importAll: async (
-    payload: ImportAllPayload,
-    params: { project_id?: number }
-  ) => {
+  importAll: async (payload: ImportAllPayload, params: { project_id?: number }) => {
     const { data } = await api.post<ImportTaskResponse>('/catalog/import-all/', payload, {
-      params,
+      params
     })
     return data
   },
 
   getImportStatus: async (taskId: string, params?: { project_id?: number }) => {
-    const { data } = await api.get<ImportStatusResponse>(
-      `/catalog/import-status/${taskId}/`,
-      { params }
-    )
+    const { data } = await api.get<ImportStatusResponse>(`/catalog/import-status/${taskId}/`, {
+      params
+    })
     return data
-  },
+  }
 }

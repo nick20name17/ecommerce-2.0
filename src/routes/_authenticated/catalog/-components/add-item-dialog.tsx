@@ -10,7 +10,7 @@ import {
   DialogContent,
   DialogFooter,
   DialogHeader,
-  DialogTitle,
+  DialogTitle
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -28,7 +28,7 @@ export const AddItemDialog = ({
   onOpenChange,
   categoryId,
   itemType,
-  projectId,
+  projectId
 }: AddItemDialogProps) => {
   const [itemId, setItemId] = useState('')
   const [sortOrder, setSortOrder] = useState(0)
@@ -37,19 +37,27 @@ export const AddItemDialog = ({
     mutationFn: async () => {
       const params = { project_id: projectId ?? undefined }
       if (itemType === 'product') {
-        return catalogService.addProduct(categoryId, { product_autoid: itemId, sort_order: sortOrder }, params)
+        return catalogService.addProduct(
+          categoryId,
+          { product_autoid: itemId, sort_order: sortOrder },
+          params
+        )
       }
-      return catalogService.addVariableProduct(categoryId, { vp_id: itemId, sort_order: sortOrder }, params)
+      return catalogService.addVariableProduct(
+        categoryId,
+        { vp_id: itemId, sort_order: sortOrder },
+        params
+      )
     },
     meta: {
       successMessage: 'Item added to category',
-      invalidatesQuery: CATALOG_QUERY_KEYS.detail(categoryId),
+      invalidatesQuery: CATALOG_QUERY_KEYS.detail(categoryId)
     },
     onSuccess: () => {
       setItemId('')
       setSortOrder(0)
       onOpenChange(false)
-    },
+    }
   })
 
   const label = itemType === 'product' ? 'Product' : 'Superinventory'
@@ -58,7 +66,7 @@ export const AddItemDialog = ({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className='sm:max-w-sm'>
         <form
-          onSubmit={(e) => {
+          onSubmit={e => {
             e.preventDefault()
             addMutation.mutate()
           }}
@@ -72,10 +80,8 @@ export const AddItemDialog = ({
               <Input
                 id='item-id'
                 value={itemId}
-                onChange={(e) => setItemId(e.target.value)}
-                placeholder={
-                  itemType === 'product' ? 'INVENTRY_AUTOID' : 'Superinventory ID'
-                }
+                onChange={e => setItemId(e.target.value)}
+                placeholder={itemType === 'product' ? 'INVENTRY_AUTOID' : 'Superinventory ID'}
                 required
                 autoFocus
               />
@@ -86,7 +92,7 @@ export const AddItemDialog = ({
                 id='item-sort'
                 type='number'
                 value={sortOrder}
-                onChange={(e) => setSortOrder(Number(e.target.value))}
+                onChange={e => setSortOrder(Number(e.target.value))}
               />
             </div>
           </DialogBody>

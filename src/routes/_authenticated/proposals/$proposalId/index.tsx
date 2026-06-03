@@ -1,6 +1,17 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { createFileRoute, useNavigate, useRouter } from '@tanstack/react-router'
-import { ChevronLeft, Copy, FileText, ListTodo, Paperclip, Settings, ShoppingCart, StickyNote, Trash2, UserPlus } from 'lucide-react'
+import {
+  ChevronLeft,
+  Copy,
+  FileText,
+  ListTodo,
+  Paperclip,
+  Settings,
+  ShoppingCart,
+  StickyNote,
+  Trash2,
+  UserPlus
+} from 'lucide-react'
 import { useState } from 'react'
 
 import { PageEmpty } from '@/components/common/page-empty'
@@ -29,8 +40,8 @@ import { toast } from 'sonner'
 export const Route = createFileRoute('/_authenticated/proposals/$proposalId/')({
   component: ProposalDetailPage,
   head: ({ params }) => ({
-    meta: [{ title: `Proposal ${params.proposalId}` }],
-  }),
+    meta: [{ title: `Proposal ${params.proposalId}` }]
+  })
 })
 
 // ── Helpers ──────────────────────────────────────────────────
@@ -42,7 +53,7 @@ const STATUS_DOT_COLORS: Record<string, string> = {
   C: 'bg-slate-400',
   E: 'bg-amber-500',
   N: 'bg-violet-500',
-  H: 'bg-slate-400',
+  H: 'bg-slate-400'
 }
 
 // ── Page Component ───────────────────────────────────────────
@@ -66,30 +77,30 @@ function ProposalDetailPage() {
 
   const toOrderMutation = useMutation({
     mutationFn: () => proposalService.toOrder(proposalId, projectId!),
-    onSuccess: (data) => {
+    onSuccess: data => {
       queryClient.invalidateQueries({ queryKey: ORDER_QUERY_KEYS.lists() })
       toast.success('Order created from proposal')
       navigate({
         to: '/orders/$orderId',
-        params: { orderId: data.AUTOID },
+        params: { orderId: data.AUTOID }
       })
     },
-    meta: { errorMessage: 'Failed to convert to order' },
+    meta: { errorMessage: 'Failed to convert to order' }
   })
 
   const deleteMutation = useMutation({
     mutationFn: () => proposalService.delete(proposalId, projectId!),
     meta: {
       successMessage: 'Proposal deleted',
-      invalidatesQuery: PROPOSAL_QUERY_KEYS.lists(),
+      invalidatesQuery: PROPOSAL_QUERY_KEYS.lists()
     },
-    onSuccess: () => router.history.back(),
+    onSuccess: () => router.history.back()
   })
 
   // Print menu is rendered via <PrintMenu/> below.
 
   // Custom fields
-  const customFields = (fieldConfig?.proposal ?? []).filter((e) => !e.default && e.enabled)
+  const customFields = (fieldConfig?.proposal ?? []).filter(e => !e.default && e.enabled)
 
   // Line item custom columns from proposal_item field config
   const itemCustomCols = (() => {
@@ -114,7 +125,7 @@ function ProposalDetailPage() {
 
         <div className='flex min-h-0 flex-1 flex-col lg:flex-row'>
           <div className='flex min-h-0 flex-1 flex-col overflow-hidden'>
-            <div className='flex items-center gap-3 border-b border-border bg-bg-secondary/60 py-1.5 pl-6 pr-6'>
+            <div className='flex items-center gap-3 border-b border-border bg-bg-secondary/60 py-1.5 pr-6 pl-6'>
               <Skeleton className='h-3 w-16' />
               <Skeleton className='h-3 w-32' />
               <div className='flex-1' />
@@ -124,7 +135,10 @@ function ProposalDetailPage() {
             </div>
             <div className='flex-1'>
               {Array.from({ length: 6 }).map((_, i) => (
-                <div key={i} className='flex items-center gap-3 border-b border-border-light py-2 pl-6 pr-6'>
+                <div
+                  key={i}
+                  className='flex items-center gap-3 border-b border-border-light py-2 pr-6 pl-6'
+                >
                   <Skeleton className='h-3 w-20' />
                   <Skeleton className='h-3 w-40' />
                   <div className='flex-1' />
@@ -170,7 +184,11 @@ function ProposalDetailPage() {
   if (!proposal) {
     return (
       <div className='flex h-full items-center justify-center'>
-        <PageEmpty icon={FileText} title='Proposal not found' description='This proposal may have been deleted or you may not have access.' />
+        <PageEmpty
+          icon={FileText}
+          title='Proposal not found'
+          description='This proposal may have been deleted or you may not have access.'
+        />
       </div>
     )
   }
@@ -179,7 +197,8 @@ function ProposalDetailPage() {
   const dotColor = STATUS_DOT_COLORS[proposal.status] ?? 'bg-slate-400'
   const statusClass = PROPOSAL_STATUS_CLASS[proposal.status as ProposalStatus] ?? ''
   const items = proposal.items ?? []
-  const assignedUsers = proposal.assigned_users ?? (proposal.assigned_user ? [proposal.assigned_user] : [])
+  const assignedUsers =
+    proposal.assigned_users ?? (proposal.assigned_user ? [proposal.assigned_user] : [])
 
   return (
     <div className='flex h-full flex-col overflow-hidden'>
@@ -188,7 +207,7 @@ function ProposalDetailPage() {
         <SidebarTrigger className='-ml-1' />
         <button
           type='button'
-          className='inline-flex h-7 shrink-0 items-center gap-0.5 rounded-[6px] border border-border bg-bg-secondary pl-1.5 pr-2.5 text-[13px] font-medium text-text-secondary transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground'
+          className='inline-flex h-7 shrink-0 items-center gap-0.5 rounded-[6px] border border-border bg-bg-secondary pr-2.5 pl-1.5 text-[13px] font-medium text-text-secondary transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground'
           onClick={() => router.history.back()}
         >
           <ChevronLeft className='size-3.5' />
@@ -219,8 +238,8 @@ function ProposalDetailPage() {
 
         <span
           className={cn(
-            'hidden shrink-0 items-center gap-1.5 rounded-full border px-2 py-0.5 text-[12px] font-semibold leading-none sm:inline-flex',
-            statusClass,
+            'hidden shrink-0 items-center gap-1.5 rounded-full border px-2 py-0.5 text-[12px] leading-none font-semibold sm:inline-flex',
+            statusClass
           )}
         >
           <span className={cn('size-1.5 rounded-full', dotColor)} />
@@ -241,7 +260,7 @@ function ProposalDetailPage() {
           >
             <UserPlus className='size-3.5' />
             {assignedUsers.length > 0
-              ? assignedUsers.map((u) => getUserDisplayName(u)).join(', ')
+              ? assignedUsers.map(u => getUserDisplayName(u)).join(', ')
               : 'Assign'}
           </button>
         </div>
@@ -339,18 +358,31 @@ function ProposalDetailPage() {
               <PageEmpty icon={FileText} title='No items in this proposal' compact />
             ) : (
               <table className='w-full text-[13px]'>
-                <thead className='sticky top-0 z-10 select-none bg-bg-secondary'>
+                <thead className='sticky top-0 z-10 bg-bg-secondary select-none'>
                   <tr className='border-b border-border text-left'>
-                    <th className='min-w-[100px] py-1.5 pl-6 pr-3 font-medium text-text-tertiary'>Inventory</th>
-                    <th className='min-w-[200px] px-3 py-1.5 font-medium text-text-tertiary'>Description</th>
-                    <th className='w-[70px] px-3 py-1.5 text-right font-medium text-text-tertiary'>Qty</th>
-                    <th className='w-[60px] px-3 py-1.5 text-right font-medium text-text-tertiary'>Unit</th>
-                    {itemCustomCols.map((col) => (
-                      <th key={col.field} className='min-w-[80px] px-3 py-1.5 font-medium text-text-tertiary'>
+                    <th className='min-w-[100px] py-1.5 pr-3 pl-6 font-medium text-text-tertiary'>
+                      Inventory
+                    </th>
+                    <th className='min-w-[200px] px-3 py-1.5 font-medium text-text-tertiary'>
+                      Description
+                    </th>
+                    <th className='w-[70px] px-3 py-1.5 text-right font-medium text-text-tertiary'>
+                      Qty
+                    </th>
+                    <th className='w-[60px] px-3 py-1.5 text-right font-medium text-text-tertiary'>
+                      Unit
+                    </th>
+                    {itemCustomCols.map(col => (
+                      <th
+                        key={col.field}
+                        className='min-w-[80px] px-3 py-1.5 font-medium text-text-tertiary'
+                      >
                         {getColumnLabel(col.field, 'proposal_item', fieldConfig)}
                       </th>
                     ))}
-                    <th className='w-[100px] py-1.5 pl-3 pr-6 text-right font-medium text-text-tertiary'>Amount</th>
+                    <th className='w-[100px] py-1.5 pr-6 pl-3 text-right font-medium text-text-tertiary'>
+                      Amount
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
@@ -359,7 +391,7 @@ function ProposalDetailPage() {
                       key={item.autoid ?? i}
                       className='border-b border-border-light transition-colors duration-100 hover:bg-bg-hover'
                     >
-                      <td className='py-1.5 pl-6 pr-3 font-medium text-foreground'>
+                      <td className='py-1.5 pr-3 pl-6 font-medium text-foreground'>
                         {item.inven || '—'}
                       </td>
                       <td className='max-w-[400px] px-3 py-1.5 text-text-secondary'>
@@ -367,16 +399,18 @@ function ProposalDetailPage() {
                           <TooltipTrigger asChild>
                             <span className='block truncate'>{item.descr || '—'}</span>
                           </TooltipTrigger>
-                          <TooltipContent className='max-w-[300px]'>{item.descr || '—'}</TooltipContent>
+                          <TooltipContent className='max-w-[300px]'>
+                            {item.descr || '—'}
+                          </TooltipContent>
                         </Tooltip>
                       </td>
-                      <td className='px-3 py-1.5 text-right tabular-nums text-text-secondary'>
+                      <td className='px-3 py-1.5 text-right text-text-secondary tabular-nums'>
                         {item.quan ?? '—'}
                       </td>
                       <td className='px-3 py-1.5 text-right text-text-tertiary'>
                         {item.unit || '—'}
                       </td>
-                      {itemCustomCols.map((col) => {
+                      {itemCustomCols.map(col => {
                         const val = item[col.field]
                         return (
                           <td key={col.field} className='px-3 py-1.5 text-text-secondary'>
@@ -386,7 +420,7 @@ function ProposalDetailPage() {
                           </td>
                         )
                       })}
-                      <td className='py-1.5 pl-3 pr-6 text-right font-medium tabular-nums text-foreground'>
+                      <td className='py-1.5 pr-6 pl-3 text-right font-medium text-foreground tabular-nums'>
                         {formatCurrency(item.amount)}
                       </td>
                     </tr>
@@ -397,9 +431,7 @@ function ProposalDetailPage() {
           </div>
 
           {/* Summary footer */}
-          <div
-            className='flex shrink-0 items-center justify-between border-t border-border bg-bg-secondary/40 px-4 py-2 sm:px-6'
-          >
+          <div className='flex shrink-0 items-center justify-between border-t border-border bg-bg-secondary/40 px-4 py-2 sm:px-6'>
             <SummaryCell label='Items' value={String(items.length)} />
             <div className='flex items-center gap-4'>
               <SummaryCell label='Subtotal' value={formatCurrency(proposal.subtotal)} />
@@ -413,12 +445,12 @@ function ProposalDetailPage() {
         <div
           className={cn(
             'flex shrink-0 flex-col overflow-hidden bg-bg-secondary/50',
-            'border-t border-border lg:border-t-0 lg:w-[380px] lg:border-l',
+            'border-t border-border lg:w-[380px] lg:border-t-0 lg:border-l'
           )}
         >
           {/* Panel tabs */}
           <div className='flex shrink-0 items-center gap-0 border-b border-border px-1'>
-            {(['general', 'custom'] as const).map((tab) => (
+            {(['general', 'custom'] as const).map(tab => (
               <button
                 key={tab}
                 type='button'
@@ -426,16 +458,18 @@ function ProposalDetailPage() {
                   'relative px-3 py-2 text-[13px] font-medium capitalize transition-colors duration-75',
                   panelTab === tab
                     ? 'text-foreground'
-                    : 'text-text-tertiary hover:text-text-secondary',
+                    : 'text-text-tertiary hover:text-text-secondary'
                 )}
                 onClick={() => setPanelTab(tab)}
               >
                 {tab}
                 {tab === 'custom' && customFields.length > 0 && (
-                  <span className='ml-1 text-[11px] text-text-quaternary'>{customFields.length}</span>
+                  <span className='text-text-quaternary ml-1 text-[11px]'>
+                    {customFields.length}
+                  </span>
                 )}
                 {panelTab === tab && (
-                  <span className='absolute bottom-0 left-3 right-3 h-[2px] rounded-full bg-primary' />
+                  <span className='absolute right-3 bottom-0 left-3 h-[2px] rounded-full bg-primary' />
                 )}
               </button>
             ))}
@@ -459,23 +493,32 @@ function ProposalDetailPage() {
                     <span className='tabular-nums'>{proposal.quote || '—'}</span>
                   </PanelRow>
                   <PanelRow label='Date' last>
-                    <span className='tabular-nums'>{proposal.qt_date ? formatDate(proposal.qt_date) : '—'}</span>
+                    <span className='tabular-nums'>
+                      {proposal.qt_date ? formatDate(proposal.qt_date) : '—'}
+                    </span>
                   </PanelRow>
                 </PanelSection>
 
                 {proposal.descr && (
                   <PanelSection title='Description' last>
-                    <div className='px-4 py-3 text-[13px] text-text-secondary'>{proposal.descr}</div>
+                    <div className='px-4 py-3 text-[13px] text-text-secondary'>
+                      {proposal.descr}
+                    </div>
                   </PanelSection>
                 )}
               </>
             ) : (
               <>
                 {customFields.length === 0 ? (
-                  <PageEmpty icon={Settings} title='No custom fields enabled' description='Enable fields in Settings &rarr; Data Control' compact />
+                  <PageEmpty
+                    icon={Settings}
+                    title='No custom fields enabled'
+                    description='Enable fields in Settings &rarr; Data Control'
+                    compact
+                  />
                 ) : (
                   <PanelSection title='Custom Fields' last>
-                    {customFields.map((entry) => {
+                    {customFields.map(entry => {
                       const label = getColumnLabel(entry.field, 'proposal', fieldConfig)
                       const val = proposal[entry.field]
                       const strVal = val != null ? String(val) : null
@@ -532,8 +575,8 @@ function ProposalDetailPage() {
             >
               <h3 className='mb-2 text-[15px] font-semibold'>Delete proposal</h3>
               <p className='mb-5 text-[13px] text-text-secondary'>
-                Are you sure you want to delete proposal &ldquo;{proposal.quote || proposal.b_id}&rdquo;?
-                This action cannot be undone.
+                Are you sure you want to delete proposal &ldquo;{proposal.quote || proposal.b_id}
+                &rdquo;? This action cannot be undone.
               </p>
               <div className='flex justify-end gap-2'>
                 <button
@@ -573,7 +616,7 @@ function ProposalDetailPage() {
 function PanelSection({
   title,
   children,
-  last,
+  last
 }: {
   title: string
   children: React.ReactNode
@@ -582,7 +625,7 @@ function PanelSection({
   return (
     <div className={cn(!last && 'border-b border-border')}>
       <div className='bg-bg-secondary/60 px-4 py-2'>
-        <span className='text-[11px] font-semibold uppercase tracking-[0.06em] text-text-tertiary'>
+        <span className='text-[11px] font-semibold tracking-[0.06em] text-text-tertiary uppercase'>
           {title}
         </span>
       </div>
@@ -596,38 +639,37 @@ function PanelSection({
 function PanelRow({
   label,
   children,
-  last,
+  last
 }: {
   label: string
   children: React.ReactNode
   last?: boolean
 }) {
   return (
-    <div className={cn('flex items-center justify-between gap-4 px-4 py-2.5', !last && 'border-b border-border-light')}>
+    <div
+      className={cn(
+        'flex items-center justify-between gap-4 px-4 py-2.5',
+        !last && 'border-b border-border-light'
+      )}
+    >
       <span className='shrink-0 text-[12px] font-medium text-text-tertiary'>{label}</span>
-      <div className='min-w-0 truncate text-right text-[13px] font-medium text-foreground'>{children}</div>
+      <div className='min-w-0 truncate text-right text-[13px] font-medium text-foreground'>
+        {children}
+      </div>
     </div>
   )
 }
 
 // ── Summary Cell ─────────────────────────────────────────────
 
-function SummaryCell({
-  label,
-  value,
-  bold,
-}: {
-  label: string
-  value: string
-  bold?: boolean
-}) {
+function SummaryCell({ label, value, bold }: { label: string; value: string; bold?: boolean }) {
   return (
     <div className='flex items-center gap-1'>
       <span className='text-[12px] text-text-tertiary'>{label}:</span>
       <span
         className={cn(
           'text-[12px] tabular-nums',
-          bold ? 'font-semibold text-foreground' : 'font-medium text-text-secondary',
+          bold ? 'font-semibold text-foreground' : 'font-medium text-text-secondary'
         )}
       >
         {value}

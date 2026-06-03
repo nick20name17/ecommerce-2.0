@@ -13,7 +13,7 @@ import {
   StickyNote,
   Trash2,
   UserPlus,
-  UserRound,
+  UserRound
 } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 
@@ -27,7 +27,14 @@ import {
   type CustomColumn
 } from '@/components/common/custom-list-columns'
 import { CommandBarCreate } from '@/components/tasks/command-bar-create'
-import { FilterChip, FilterPopover, IProposals, InitialsAvatar, PAGE_COLORS, PageHeaderIcon } from '@/components/ds'
+import {
+  FilterChip,
+  FilterPopover,
+  IProposals,
+  InitialsAvatar,
+  PAGE_COLORS,
+  PageHeaderIcon
+} from '@/components/ds'
 import { getProposalDetailQuery, getProposalsQuery } from '@/api/proposal/query'
 import type { Proposal, ProposalParams } from '@/api/proposal/schema'
 import { PageEmpty } from '@/components/common/page-empty'
@@ -40,11 +47,16 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuTrigger,
+  DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
-import { PROPOSAL_STATUS, PROPOSAL_STATUS_CLASS, PROPOSAL_STATUS_LABELS, getProposalStatusLabel } from '@/constants/proposal'
+import {
+  PROPOSAL_STATUS,
+  PROPOSAL_STATUS_CLASS,
+  PROPOSAL_STATUS_LABELS,
+  getProposalStatusLabel
+} from '@/constants/proposal'
 import type { ProposalStatus } from '@/constants/proposal'
 import { isAdmin } from '@/constants/user'
 import { useBreakpoint } from '@/hooks/use-breakpoint'
@@ -56,7 +68,7 @@ import {
   useLimitParam,
   useOffsetParam,
   usePresetParam,
-  useSearchParam,
+  useSearchParam
 } from '@/hooks/use-query-params'
 import { useAuth } from '@/providers/auth'
 
@@ -71,7 +83,7 @@ const STATUS_DOT_COLORS: Record<string, string> = {
   C: 'bg-slate-400',
   E: 'bg-amber-500',
   N: 'bg-violet-500',
-  H: 'bg-slate-400',
+  H: 'bg-slate-400'
 }
 
 type ProposalSortField = 'quote' | 'b_name' | 'qt_date' | 'total'
@@ -92,7 +104,7 @@ const FILTER_STATUSES: { value: ProposalStatus; label: string }[] = [
   { value: PROPOSAL_STATUS.lost, label: 'Lost' },
   { value: PROPOSAL_STATUS.expired, label: 'Expired' },
   { value: PROPOSAL_STATUS.cancelled, label: 'Cancelled' },
-  { value: PROPOSAL_STATUS.onHold, label: 'On Hold' },
+  { value: PROPOSAL_STATUS.onHold, label: 'On Hold' }
 ]
 
 // ── Page Component ───────────────────────────────────────────
@@ -136,7 +148,10 @@ const ProposalsPage = () => {
   const handleSort = (field: ProposalSortField | string) => {
     if (sortField === field) {
       if (sortDir === 'asc') setSortDir('desc')
-      else { setSortField(null); setSortDir('asc') }
+      else {
+        setSortField(null)
+        setSortDir('asc')
+      }
     } else {
       setSortField(field)
       setSortDir('asc')
@@ -144,13 +159,13 @@ const ProposalsPage = () => {
   }
 
   const selectStatus = (s: ProposalStatus) => {
-    setActiveStatus((prev) => (prev === s ? null : s))
+    setActiveStatus(prev => (prev === s ? null : s))
     setActivePresetId(null)
     setOffset(null)
   }
 
   const toggleAssignedToMe = () => {
-    setAssignedToMe((v) => !v)
+    setAssignedToMe(v => !v)
     setActivePresetId(null)
     setOffset(null)
   }
@@ -184,20 +199,17 @@ const ProposalsPage = () => {
     notes: true,
     assigned_to: assignedToMe ? 'me' : undefined,
     preset_id: activePresetId ?? undefined,
-    fields:
-      customColumns.length > 0
-        ? customColumns.map((c) => c.field).join(',')
-        : undefined,
+    fields: customColumns.length > 0 ? customColumns.map(c => c.field).join(',') : undefined
   }
 
   const { data, refetch, isLoading } = useQuery({
     ...getProposalsQuery(params),
-    placeholderData: keepPreviousData,
+    placeholderData: keepPreviousData
   })
 
   const results = data?.results ?? []
   const proposalInResults =
-    autoidFromUrl != null && autoidFromUrl !== '' && results.some((p) => p.autoid === autoidFromUrl)
+    autoidFromUrl != null && autoidFromUrl !== '' && results.some(p => p.autoid === autoidFromUrl)
 
   const refetchTimersRef = useRef<ReturnType<typeof setTimeout>[]>([])
   useEffect(() => {
@@ -207,9 +219,7 @@ const ProposalsPage = () => {
       refetchTimersRef.current = []
       return
     }
-    refetchTimersRef.current = [
-      setTimeout(() => refetch(), 4000),
-    ]
+    refetchTimersRef.current = [setTimeout(() => refetch(), 4000)]
     return () => {
       refetchTimersRef.current.forEach(clearTimeout)
       refetchTimersRef.current = []
@@ -221,18 +231,19 @@ const ProposalsPage = () => {
   return (
     <div className='flex h-full flex-col overflow-hidden'>
       {/* Header */}
-      <header className={cn('flex h-12 shrink-0 items-center gap-2.5 border-b border-border', isMobile ? 'px-3.5' : 'px-6')}>
+      <header
+        className={cn(
+          'flex h-12 shrink-0 items-center gap-2.5 border-b border-border',
+          isMobile ? 'px-3.5' : 'px-6'
+        )}
+      >
         <SidebarTrigger className='-ml-1' />
         <div className='flex items-center gap-1.5'>
           <PageHeaderIcon icon={IProposals} color={PAGE_COLORS.proposals} />
           <h1 className='text-[14px] font-semibold tracking-[-0.01em]'>Proposals</h1>
         </div>
 
-        <PresetPicker
-          entityType='proposal'
-          value={activePresetId}
-          onChange={selectPreset}
-        />
+        <PresetPicker entityType='proposal' value={activePresetId} onChange={selectPreset} />
 
         <div className='flex-1' />
 
@@ -240,7 +251,7 @@ const ProposalsPage = () => {
           <Search className='size-3 shrink-0 text-text-tertiary' />
           <input
             value={search}
-            onChange={(e) => {
+            onChange={e => {
               setSearch(e.target.value)
               setOffset(null)
             }}
@@ -253,9 +264,16 @@ const ProposalsPage = () => {
           <FilterPopover
             label='Status'
             active={activeStatus !== null}
-            icon={<div className={cn('size-2.5 rounded-full', activeStatus ? STATUS_DOT_COLORS[activeStatus] : 'bg-current')} />}
+            icon={
+              <div
+                className={cn(
+                  'size-2.5 rounded-full',
+                  activeStatus ? STATUS_DOT_COLORS[activeStatus] : 'bg-current'
+                )}
+              />
+            }
           >
-            {FILTER_STATUSES.map((s) => {
+            {FILTER_STATUSES.map(s => {
               const selected = activeStatus === s.value
               return (
                 <button
@@ -267,13 +285,20 @@ const ProposalsPage = () => {
                   )}
                   onClick={() => selectStatus(s.value)}
                 >
-                  <div className={cn(
-                    'flex size-3.5 items-center justify-center rounded-full border transition-colors duration-[80ms]',
-                    selected ? 'border-primary bg-primary' : 'border-border'
-                  )}>
+                  <div
+                    className={cn(
+                      'flex size-3.5 items-center justify-center rounded-full border transition-colors duration-[80ms]',
+                      selected ? 'border-primary bg-primary' : 'border-border'
+                    )}
+                  >
                     {selected && <div className='size-1.5 rounded-full bg-primary-foreground' />}
                   </div>
-                  <div className={cn('size-2.5 shrink-0 rounded-full', STATUS_DOT_COLORS[s.value] ?? 'bg-slate-400')} />
+                  <div
+                    className={cn(
+                      'size-2.5 shrink-0 rounded-full',
+                      STATUS_DOT_COLORS[s.value] ?? 'bg-slate-400'
+                    )}
+                  />
                   <span className='flex-1'>{s.label}</span>
                 </button>
               )
@@ -308,7 +333,12 @@ const ProposalsPage = () => {
 
       {/* Active filter chips */}
       {(hasFilters || autoidFromUrl) && (
-        <div className={cn('flex shrink-0 flex-wrap items-center gap-1.5 border-b border-border py-1.5', isMobile ? 'px-3.5' : 'px-6')}>
+        <div
+          className={cn(
+            'flex shrink-0 flex-wrap items-center gap-1.5 border-b border-border py-1.5',
+            isMobile ? 'px-3.5' : 'px-6'
+          )}
+        >
           {hasFilters && (
             <button
               type='button'
@@ -321,7 +351,12 @@ const ProposalsPage = () => {
           {activeStatus && (
             <FilterChip onRemove={() => setActiveStatus(null)}>
               <span className='text-text-tertiary'>Status is</span>
-              <div className={cn('size-2 rounded-full', STATUS_DOT_COLORS[activeStatus] ?? 'bg-slate-400')} />
+              <div
+                className={cn(
+                  'size-2 rounded-full',
+                  STATUS_DOT_COLORS[activeStatus] ?? 'bg-slate-400'
+                )}
+              />
               {PROPOSAL_STATUS_LABELS[activeStatus]}
             </FilterChip>
           )}
@@ -346,14 +381,37 @@ const ProposalsPage = () => {
         {!isMobile && (results.length > 0 || isLoading) && (
           <div
             className={cn(
-              'sticky top-0 z-10 flex select-none items-center border-b border-border bg-bg-secondary text-[13px] font-medium text-text-tertiary',
-              isTablet ? 'gap-4 px-5 py-1' : 'gap-6 px-6 py-1',
+              'sticky top-0 z-10 flex items-center border-b border-border bg-bg-secondary text-[13px] font-medium text-text-tertiary select-none',
+              isTablet ? 'gap-4 px-5 py-1' : 'gap-6 px-6 py-1'
             )}
           >
-            <ProposalSortableHeader field='quote' label='Quote / Customer' sortField={sortField} sortDir={sortDir} onSort={handleSort} className='min-w-0 flex-1' />
+            <ProposalSortableHeader
+              field='quote'
+              label='Quote / Customer'
+              sortField={sortField}
+              sortDir={sortDir}
+              onSort={handleSort}
+              className='min-w-0 flex-1'
+            />
             <div className='w-[88px] shrink-0'>Status</div>
-            {!isTablet && <ProposalSortableHeader field='qt_date' label='Date' sortField={sortField} sortDir={sortDir} onSort={handleSort} className='w-[92px] shrink-0' />}
-            <ProposalSortableHeader field='total' label='Total' sortField={sortField} sortDir={sortDir} onSort={handleSort} className='w-[100px] shrink-0 justify-end text-right' />
+            {!isTablet && (
+              <ProposalSortableHeader
+                field='qt_date'
+                label='Date'
+                sortField={sortField}
+                sortDir={sortDir}
+                onSort={handleSort}
+                className='w-[92px] shrink-0'
+              />
+            )}
+            <ProposalSortableHeader
+              field='total'
+              label='Total'
+              sortField={sortField}
+              sortDir={sortDir}
+              onSort={handleSort}
+              className='w-[100px] shrink-0 justify-end text-right'
+            />
             <div className='w-[120px] shrink-0'>Responsible</div>
             <CustomColumnsHeader
               columns={customColumns}
@@ -393,23 +451,35 @@ const ProposalsPage = () => {
                   <Skeleton className='h-3.5 w-16 rounded' />
                   <Skeleton className='h-3.5 w-24 rounded' />
                 </div>
-                <div className='w-[88px] shrink-0'><Skeleton className='h-[18px] w-[60px] rounded-[4px]' /></div>
-                {!isTablet && <div className='w-[92px] shrink-0'><Skeleton className='h-3.5 w-[70px] rounded' /></div>}
-                <div className='w-[100px] shrink-0'><Skeleton className='ml-auto h-3.5 w-[60px] rounded' /></div>
-                <div className='w-[120px] shrink-0'><Skeleton className='h-3.5 w-[70px] rounded' /></div>
+                <div className='w-[88px] shrink-0'>
+                  <Skeleton className='h-[18px] w-[60px] rounded-[4px]' />
+                </div>
+                {!isTablet && (
+                  <div className='w-[92px] shrink-0'>
+                    <Skeleton className='h-3.5 w-[70px] rounded' />
+                  </div>
+                )}
+                <div className='w-[100px] shrink-0'>
+                  <Skeleton className='ml-auto h-3.5 w-[60px] rounded' />
+                </div>
+                <div className='w-[120px] shrink-0'>
+                  <Skeleton className='h-3.5 w-[70px] rounded' />
+                </div>
                 <div className='w-[46px] shrink-0' />
                 <div className='w-[28px] shrink-0' />
               </div>
             )
           )
         ) : results.length === 0 && !hasPendingAutoid ? (
-          <PageEmpty icon={FileText} title='No matching proposals' description='Try adjusting your search or filters.' />
+          <PageEmpty
+            icon={FileText}
+            title='No matching proposals'
+            description='Try adjusting your search or filters.'
+          />
         ) : (
           <>
-            {hasPendingAutoid && (
-              <PendingProposalRow autoid={autoidFromUrl} isMobile={isMobile} />
-            )}
-            {results.map((proposal) => (
+            {hasPendingAutoid && <PendingProposalRow autoid={autoidFromUrl} isMobile={isMobile} />}
+            {results.map(proposal => (
               <ProposalRow
                 key={proposal.autoid}
                 proposal={proposal}
@@ -422,8 +492,15 @@ const ProposalsPage = () => {
                 onNotes={setProposalForNotes}
                 onAssign={setProposalToAssign}
                 onCreateTask={setProposalForTask}
-                onClick={() => navigate({ to: '/proposals/$proposalId', params: { proposalId: proposal.autoid } })}
-                onMouseEnter={() => queryClient.prefetchQuery(getProposalDetailQuery(proposal.autoid, projectId))}
+                onClick={() =>
+                  navigate({
+                    to: '/proposals/$proposalId',
+                    params: { proposalId: proposal.autoid }
+                  })
+                }
+                onMouseEnter={() =>
+                  queryClient.prefetchQuery(getProposalDetailQuery(proposal.autoid, projectId))
+                }
               />
             ))}
           </>
@@ -440,7 +517,7 @@ const ProposalsPage = () => {
         proposal={proposalToDelete}
         projectId={projectId}
         open={!!proposalToDelete}
-        onOpenChange={(open) => !open && setProposalToDelete(null)}
+        onOpenChange={open => !open && setProposalToDelete(null)}
       />
       <EntityAttachmentsDialog
         entityType='proposal'
@@ -452,22 +529,20 @@ const ProposalsPage = () => {
         autoid={proposalForAttachments?.autoid ?? ''}
         projectId={projectId}
         open={!!proposalForAttachments}
-        onOpenChange={(open) => !open && setProposalForAttachments(null)}
+        onOpenChange={open => !open && setProposalForAttachments(null)}
       />
       <ProposalAssignDialog
         proposal={proposalToAssign}
         open={!!proposalToAssign}
-        onOpenChange={(open) => !open && setProposalToAssign(null)}
+        onOpenChange={open => !open && setProposalToAssign(null)}
         projectId={projectId}
       />
       <EntityNotesSheet
         open={!!proposalForNotes}
-        onOpenChange={(open) => !open && setProposalForNotes(null)}
+        onOpenChange={open => !open && setProposalForNotes(null)}
         entityType='proposal'
         entityLabel={
-          proposalForNotes
-            ? `Proposal ${proposalForNotes.quote ?? proposalForNotes.autoid}`
-            : ''
+          proposalForNotes ? `Proposal ${proposalForNotes.quote ?? proposalForNotes.autoid}` : ''
         }
         autoid={proposalForNotes?.autoid ?? ''}
         projectId={projectId}
@@ -489,13 +564,11 @@ function PendingProposalRow({ autoid, isMobile }: { autoid: string; isMobile: bo
     <div
       className={cn(
         'flex items-center gap-3 border-b border-border-light py-2 opacity-60',
-        isMobile ? 'px-3.5' : 'px-6',
+        isMobile ? 'px-3.5' : 'px-6'
       )}
     >
       <Loader2 className='size-3.5 animate-spin text-text-tertiary' />
-      <span className='text-[13px] text-text-tertiary'>
-        Creating proposal {autoid}…
-      </span>
+      <span className='text-[13px] text-text-tertiary'>Creating proposal {autoid}…</span>
     </div>
   )
 }
@@ -514,7 +587,7 @@ function ProposalRow({
   onAssign,
   onCreateTask,
   onClick,
-  onMouseEnter,
+  onMouseEnter
 }: {
   proposal: Proposal
   customColumns: CustomColumn[]
@@ -534,7 +607,12 @@ function ProposalRow({
   const statusClass = PROPOSAL_STATUS_CLASS[proposal.status] ?? ''
   const dotColor = STATUS_DOT_COLORS[proposal.status] ?? 'bg-slate-400'
 
-  const noteCount = typeof proposal.notes_count === 'number' ? proposal.notes_count : Array.isArray(proposal.notes) ? proposal.notes.length : 0
+  const noteCount =
+    typeof proposal.notes_count === 'number'
+      ? proposal.notes_count
+      : Array.isArray(proposal.notes)
+        ? proposal.notes.length
+        : 0
 
   if (isMobile) {
     return (
@@ -548,7 +626,7 @@ function ProposalRow({
           <span className='min-w-0 flex-1 truncate text-[13px] font-medium text-foreground'>
             {quote}
           </span>
-          <span className='shrink-0 text-[13px] font-medium tabular-nums text-foreground'>
+          <span className='shrink-0 text-[13px] font-medium text-foreground tabular-nums'>
             {formatCurrency(proposal.total, '—')}
           </span>
         </div>
@@ -556,7 +634,7 @@ function ProposalRow({
           <span className='text-[13px] text-text-tertiary'>{proposal.b_name || '—'}</span>
           <span className='text-[13px] text-text-tertiary'>{statusLabel}</span>
           {proposal.qt_date && (
-            <span className='text-[13px] tabular-nums text-text-tertiary'>
+            <span className='text-[13px] text-text-tertiary tabular-nums'>
               {formatDate(proposal.qt_date)}
             </span>
           )}
@@ -569,7 +647,7 @@ function ProposalRow({
     <div
       className={cn(
         'group/row flex cursor-pointer items-center border-b border-border-light text-foreground transition-colors duration-100 hover:bg-bg-hover',
-        isTablet ? 'gap-4 px-5 py-1.5' : 'gap-6 px-6 py-1.5',
+        isTablet ? 'gap-4 px-5 py-1.5' : 'gap-6 px-6 py-1.5'
       )}
       onClick={onClick}
       onMouseEnter={onMouseEnter}
@@ -578,7 +656,9 @@ function ProposalRow({
       <div className='flex min-w-0 flex-1 items-center gap-2'>
         <Tooltip>
           <TooltipTrigger asChild>
-            <span className='shrink-0 truncate text-[13px] font-medium' style={{ maxWidth: '40%' }}>{quote}</span>
+            <span className='shrink-0 truncate text-[13px] font-medium' style={{ maxWidth: '40%' }}>
+              {quote}
+            </span>
           </TooltipTrigger>
           <TooltipContent side='top'>{quote}</TooltipContent>
         </Tooltip>
@@ -589,27 +669,40 @@ function ProposalRow({
 
       {/* Status */}
       <div className='w-[88px] shrink-0'>
-        <span className={cn('inline-flex items-center rounded-[4px] border px-1.5 py-0.5 text-[11px] font-semibold leading-none', statusClass)}>
+        <span
+          className={cn(
+            'inline-flex items-center rounded-[4px] border px-1.5 py-0.5 text-[11px] leading-none font-semibold',
+            statusClass
+          )}
+        >
           {statusLabel}
         </span>
       </div>
 
       {/* Date */}
       {!isTablet && (
-        <div className='w-[92px] shrink-0 text-[13px] tabular-nums text-text-secondary'>
-          {proposal.qt_date ? formatDate(proposal.qt_date) : <span className='text-text-tertiary'>&mdash;</span>}
+        <div className='w-[92px] shrink-0 text-[13px] text-text-secondary tabular-nums'>
+          {proposal.qt_date ? (
+            formatDate(proposal.qt_date)
+          ) : (
+            <span className='text-text-tertiary'>&mdash;</span>
+          )}
         </div>
       )}
 
       {/* Total */}
-      <div className='w-[100px] shrink-0 text-right text-[13px] font-medium tabular-nums text-foreground'>
+      <div className='w-[100px] shrink-0 text-right text-[13px] font-medium text-foreground tabular-nums'>
         {formatCurrency(proposal.total, '—')}
       </div>
 
       {/* Responsible */}
       <div className='w-[120px] shrink-0'>
         {(() => {
-          const assigned = proposal.assigned_users?.length ? proposal.assigned_users : proposal.assigned_user ? [proposal.assigned_user] : []
+          const assigned = proposal.assigned_users?.length
+            ? proposal.assigned_users
+            : proposal.assigned_user
+              ? [proposal.assigned_user]
+              : []
           const first = assigned[0]
           if (canAssign) {
             return (
@@ -621,16 +714,23 @@ function ProposalRow({
                       'inline-flex items-center gap-1.5 rounded-[5px] px-1 py-0.5 text-[13px] transition-colors duration-75 hover:bg-bg-active',
                       first ? 'text-text-secondary' : 'text-text-tertiary'
                     )}
-                    onClick={(e) => {
+                    onClick={e => {
                       e.stopPropagation()
                       onAssign(proposal)
                     }}
                   >
                     {first ? (
                       <>
-                        <InitialsAvatar initials={getInitials(getUserDisplayName(first))} size={16} />
+                        <InitialsAvatar
+                          initials={getInitials(getUserDisplayName(first))}
+                          size={16}
+                        />
                         <span className='truncate'>{getUserDisplayName(first)}</span>
-                        {assigned.length > 1 && <span className='text-[11px] text-text-tertiary'>+{assigned.length - 1}</span>}
+                        {assigned.length > 1 && (
+                          <span className='text-[11px] text-text-tertiary'>
+                            +{assigned.length - 1}
+                          </span>
+                        )}
                       </>
                     ) : (
                       <>
@@ -641,7 +741,9 @@ function ProposalRow({
                   </button>
                 </TooltipTrigger>
                 <TooltipContent>
-                  {first ? `Assigned to ${assigned.map((u) => getUserDisplayName(u)).join(', ')} — click to change` : 'Assign a sales user'}
+                  {first
+                    ? `Assigned to ${assigned.map(u => getUserDisplayName(u)).join(', ')} — click to change`
+                    : 'Assign a sales user'}
                 </TooltipContent>
               </Tooltip>
             )
@@ -651,7 +753,9 @@ function ProposalRow({
               <span className='inline-flex items-center gap-1.5 px-1 py-0.5 text-[13px] text-text-secondary'>
                 <InitialsAvatar initials={getInitials(getUserDisplayName(first))} size={16} />
                 <span className='truncate'>{getUserDisplayName(first)}</span>
-                {assigned.length > 1 && <span className='text-[11px] text-text-tertiary'>+{assigned.length - 1}</span>}
+                {assigned.length > 1 && (
+                  <span className='text-[11px] text-text-tertiary'>+{assigned.length - 1}</span>
+                )}
               </span>
             )
           }
@@ -670,10 +774,10 @@ function ProposalRow({
             'inline-flex h-[26px] w-[46px] items-center justify-center gap-1 rounded-[6px] border text-[12px] font-medium tabular-nums transition-colors duration-[80ms]',
             noteCount > 0
               ? 'border-border bg-bg-secondary text-text-secondary hover:bg-bg-active'
-              : 'border-transparent text-text-quaternary hover:bg-bg-hover hover:text-text-tertiary',
+              : 'text-text-quaternary border-transparent hover:bg-bg-hover hover:text-text-tertiary'
           )}
           aria-label='Open notes'
-          onClick={(e) => {
+          onClick={e => {
             e.stopPropagation()
             onNotes(proposal)
           }}
@@ -686,8 +790,8 @@ function ProposalRow({
       {/* Actions */}
       <div
         className='flex w-[28px] shrink-0 items-center justify-center'
-        onClick={(e) => e.stopPropagation()}
-        onKeyDown={(e) => e.stopPropagation()}
+        onClick={e => e.stopPropagation()}
+        onKeyDown={e => e.stopPropagation()}
         role='group'
       >
         <DropdownMenu>
@@ -751,7 +855,7 @@ function ProposalSortableHeader({
   sortField,
   sortDir,
   onSort,
-  className,
+  className
 }: {
   field: ProposalSortField
   label: string
@@ -773,11 +877,13 @@ function ProposalSortableHeader({
     >
       {label}
       {active ? (
-        sortDir === 'asc'
-          ? <ArrowUp className='size-3' />
-          : <ArrowDown className='size-3' />
+        sortDir === 'asc' ? (
+          <ArrowUp className='size-3' />
+        ) : (
+          <ArrowDown className='size-3' />
+        )
       ) : (
-        <ArrowUp className='size-3 opacity-30 group-hover:opacity-60 transition-opacity' />
+        <ArrowUp className='size-3 opacity-30 transition-opacity group-hover:opacity-60' />
       )}
     </button>
   )
@@ -786,6 +892,6 @@ function ProposalSortableHeader({
 export const Route = createFileRoute('/_authenticated/proposals/')({
   component: ProposalsPage,
   head: () => ({
-    meta: [{ title: 'Proposals' }],
-  }),
+    meta: [{ title: 'Proposals' }]
+  })
 })

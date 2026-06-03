@@ -21,7 +21,7 @@ const COLORS = [
   'bg-rose-100 text-rose-600',
   'bg-cyan-100 text-cyan-600',
   'bg-orange-100 text-orange-600',
-  'bg-violet-100 text-violet-600',
+  'bg-violet-100 text-violet-600'
 ]
 
 function getColorForId(id: string) {
@@ -41,14 +41,14 @@ export const ProductThumbnail = ({
   entityId,
   projectId,
   className,
-  lazy,
+  lazy
 }: ProductThumbnailProps) => {
   const { data } = useQuery({
     ...getCatalogImagesQuery(entityType, entityId, projectId ?? undefined),
-    enabled: !lazy,
+    enabled: !lazy
   })
 
-  const primary = data?.results?.find((img) => img.is_primary) ?? data?.results?.[0]
+  const primary = data?.results?.find(img => img.is_primary) ?? data?.results?.[0]
 
   if (primary) {
     return (
@@ -66,7 +66,13 @@ export const ProductThumbnail = ({
   const initial = getInitial(entityType, entityId)
 
   return (
-    <div className={cn('flex items-center justify-center rounded font-medium text-[11px]', color, className)}>
+    <div
+      className={cn(
+        'flex items-center justify-center rounded text-[11px] font-medium',
+        color,
+        className
+      )}
+    >
       {initial}
     </div>
   )

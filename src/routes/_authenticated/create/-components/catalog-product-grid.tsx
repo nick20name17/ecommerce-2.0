@@ -49,13 +49,13 @@ export const CatalogProductGrid = ({
   }, [categoryId, debouncedSearch])
 
   const params = {
-      limit: DEFAULT_LIMIT,
-      offset,
-      search: debouncedSearch || undefined,
-      category: categoryId ?? undefined,
-      customer_id: customerId,
-      project_id: projectId ?? undefined
-    }
+    limit: DEFAULT_LIMIT,
+    offset,
+    search: debouncedSearch || undefined,
+    category: categoryId ?? undefined,
+    customer_id: customerId,
+    project_id: projectId ?? undefined
+  }
 
   const { data, isLoading, isFetching } = useQuery({
     ...getProductsQuery(params),
@@ -94,14 +94,14 @@ export const CatalogProductGrid = ({
           )}
           <input
             value={query}
-            onChange={(e) => handleInput(e.target.value)}
+            onChange={e => handleInput(e.target.value)}
             placeholder='Search by ID, UPC, description…'
             className='flex-1 bg-transparent text-[13px] outline-none placeholder:text-text-tertiary'
           />
           {query && (
             <button
               type='button'
-              className='text-text-tertiary hover:text-foreground rounded-[3px] p-0.5 transition-colors'
+              className='rounded-[3px] p-0.5 text-text-tertiary transition-colors hover:text-foreground'
               onClick={() => handleInput('')}
             >
               <X className='size-3' />
@@ -110,14 +110,14 @@ export const CatalogProductGrid = ({
         </div>
 
         <div className='flex shrink-0 items-center gap-1.5'>
-          <span className='text-[12px] tabular-nums text-text-tertiary'>
+          <span className='text-[12px] text-text-tertiary tabular-nums'>
             {loading ? '…' : `${rangeStart}–${rangeEnd} of ${count}`}
           </span>
           <button
             type='button'
             className='inline-flex size-6 items-center justify-center rounded-[5px] border border-border text-text-tertiary transition-colors hover:bg-bg-hover hover:text-foreground disabled:pointer-events-none disabled:opacity-40'
             disabled={!canPrev}
-            onClick={() => setOffset((v) => Math.max(0, v - DEFAULT_LIMIT))}
+            onClick={() => setOffset(v => Math.max(0, v - DEFAULT_LIMIT))}
           >
             <ChevronLeft className='size-3' />
           </button>
@@ -125,7 +125,7 @@ export const CatalogProductGrid = ({
             type='button'
             className='inline-flex size-6 items-center justify-center rounded-[5px] border border-border text-text-tertiary transition-colors hover:bg-bg-hover hover:text-foreground disabled:pointer-events-none disabled:opacity-40'
             disabled={!canNext}
-            onClick={() => setOffset((v) => v + DEFAULT_LIMIT)}
+            onClick={() => setOffset(v => v + DEFAULT_LIMIT)}
           >
             <ChevronRight className='size-3' />
           </button>
@@ -135,10 +135,10 @@ export const CatalogProductGrid = ({
       {/* Table header */}
       <div className='flex shrink-0 items-center gap-3 border-b border-border bg-bg-secondary/60 px-4 py-1.5'>
         <div className='w-10 shrink-0' />
-        <div className='min-w-0 flex-1 text-[11px] font-semibold uppercase tracking-[0.05em] text-text-tertiary'>
+        <div className='min-w-0 flex-1 text-[11px] font-semibold tracking-[0.05em] text-text-tertiary uppercase'>
           Product
         </div>
-        <div className='hidden w-[80px] shrink-0 text-right text-[11px] font-semibold uppercase tracking-[0.05em] text-text-tertiary sm:block'>
+        <div className='hidden w-[80px] shrink-0 text-right text-[11px] font-semibold tracking-[0.05em] text-text-tertiary uppercase sm:block'>
           Price
         </div>
         <div className='w-[60px] shrink-0' />
@@ -149,7 +149,10 @@ export const CatalogProductGrid = ({
         {loading ? (
           <div className='space-y-0'>
             {Array.from({ length: 12 }).map((_, i) => (
-              <div key={i} className='flex items-center gap-3 border-b border-border-light px-4 py-2'>
+              <div
+                key={i}
+                className='flex items-center gap-3 border-b border-border-light px-4 py-2'
+              >
                 <div className='size-10 shrink-0 animate-pulse rounded-[6px] bg-border' />
                 <div className='min-w-0 flex-1 space-y-1'>
                   <div className='h-3.5 w-3/4 animate-pulse rounded bg-border' />
@@ -164,11 +167,15 @@ export const CatalogProductGrid = ({
           <PageEmpty
             icon={Package}
             title={debouncedSearch ? 'No matches' : 'No products'}
-            description={debouncedSearch ? 'Try another search term.' : 'Use search or choose another category.'}
+            description={
+              debouncedSearch
+                ? 'Try another search term.'
+                : 'Use search or choose another category.'
+            }
             compact
           />
         ) : (
-          products.map((product) => {
+          products.map(product => {
             const currentNum = Math.round((parseFloat(String(product.price)) || 0) * 100) / 100
             const oldNum = Math.round((parseFloat(String(product.old_price)) || 0) * 100) / 100
             const hasDiscount = oldNum > currentNum
@@ -193,17 +200,20 @@ export const CatalogProductGrid = ({
                       loading='lazy'
                     />
                   ) : (
-                    <Image className='size-4 text-text-quaternary' />
+                    <Image className='text-text-quaternary size-4' />
                   )}
                 </div>
 
                 {/* Product info */}
                 <div className='min-w-0 flex-1'>
                   <div className='flex items-center gap-2'>
-                    <span className='shrink-0 text-[13px] font-semibold tabular-nums text-foreground'>
+                    <span className='shrink-0 text-[13px] font-semibold text-foreground tabular-nums'>
                       {product.id}
                     </span>
-                    <span className='truncate text-[13px] text-text-secondary' title={product.descr_1}>
+                    <span
+                      className='truncate text-[13px] text-text-secondary'
+                      title={product.descr_1}
+                    >
                       {product.descr_1}
                     </span>
                     {product.inactive && (
@@ -219,7 +229,10 @@ export const CatalogProductGrid = ({
                     )}
                   </div>
                   {product.descr_2 && (
-                    <p className='truncate text-[12px] text-text-quaternary' title={product.descr_2}>
+                    <p
+                      className='text-text-quaternary truncate text-[12px]'
+                      title={product.descr_2}
+                    >
                       {product.descr_2}
                     </p>
                   )}
@@ -228,7 +241,7 @@ export const CatalogProductGrid = ({
                 {/* Price */}
                 <div className='hidden w-[80px] shrink-0 text-right sm:block'>
                   {hasDiscount && (
-                    <p className='text-[11px] tabular-nums text-text-tertiary line-through'>
+                    <p className='text-[11px] text-text-tertiary tabular-nums line-through'>
                       {formatCurrency(oldNum)}
                     </p>
                   )}

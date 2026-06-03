@@ -52,9 +52,7 @@ function CustomerDetailPage() {
 
   const queryClient = useQueryClient()
 
-  const { data: customer, isLoading } = useQuery(
-    getCustomerDetailQuery(customerId, projectId)
-  )
+  const { data: customer, isLoading } = useQuery(getCustomerDetailQuery(customerId, projectId))
   const { data: fieldConfig } = useQuery(getFieldConfigQuery(projectId))
   const { data: editableFields } = useQuery(getEditableFieldsQuery(projectId))
   const editableCustomerFields = editableFields?.customer ?? []
@@ -62,14 +60,14 @@ function CustomerDetailPage() {
 
   const customFields = (() => {
     const entries = fieldConfig?.customer ?? []
-    return entries.filter((e) => !e.default && e.enabled)
+    return entries.filter(e => !e.default && e.enabled)
   })()
 
   const detailKey = [...CUSTOMER_QUERY_KEYS.detail(customerId), projectId] as const
 
   const priceLevelMutation = useMutation({
     mutationFn: (value: string) => customerService.update(customerId, { in_level: value }),
-    onMutate: async (value) => {
+    onMutate: async value => {
       await queryClient.cancelQueries({ queryKey: detailKey })
       const prev = queryClient.getQueryData(detailKey)
       queryClient.setQueryData(detailKey, (old: typeof prev) =>
@@ -83,13 +81,12 @@ function CustomerDetailPage() {
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: detailKey })
-    },
+    }
   })
 
   const patchMutation = useMutation({
-    mutationFn: (payload: Record<string, unknown>) =>
-      customerService.update(customerId, payload),
-    onMutate: async (payload) => {
+    mutationFn: (payload: Record<string, unknown>) => customerService.update(customerId, payload),
+    onMutate: async payload => {
       await queryClient.cancelQueries({ queryKey: detailKey })
       const prev = queryClient.getQueryData(detailKey)
       queryClient.setQueryData(detailKey, (old: typeof prev) =>
@@ -103,17 +100,17 @@ function CustomerDetailPage() {
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: detailKey })
     },
-    meta: { errorMessage: 'Failed to update customer' },
+    meta: { errorMessage: 'Failed to update customer' }
   })
 
   // Print menu is rendered via <PrintMenu/> below.
 
   const handleFieldSave = (field: string, value: string) => {
-      if (!customer) return
-      const current = (customer[field] as string | null) ?? ''
-      if (value === current) return
-      patchMutation.mutate({ [field]: value || null })
-    }
+    if (!customer) return
+    const current = (customer[field] as string | null) ?? ''
+    if (value === current) return
+    patchMutation.mutate({ [field]: value || null })
+  }
 
   // Loading
   if (isLoading) {
@@ -176,7 +173,7 @@ function CustomerDetailPage() {
         <SidebarTrigger className='-ml-1' />
         <button
           type='button'
-          className='inline-flex h-7 shrink-0 items-center gap-0.5 rounded-[6px] border border-border bg-bg-secondary pl-1.5 pr-2.5 text-[13px] font-medium text-text-secondary transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground'
+          className='inline-flex h-7 shrink-0 items-center gap-0.5 rounded-[6px] border border-border bg-bg-secondary pr-2.5 pl-1.5 text-[13px] font-medium text-text-secondary transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground'
           onClick={() => router.history.back()}
         >
           <ChevronLeft className='size-3.5' />
@@ -184,28 +181,23 @@ function CustomerDetailPage() {
         </button>
 
         <PageHeaderIcon icon={ICustomers} color={PAGE_COLORS.customers} />
-        <h1 className='truncate text-[14px] font-semibold tracking-[-0.01em]'>
-          {customer.l_name}
-        </h1>
+        <h1 className='truncate text-[14px] font-semibold tracking-[-0.01em]'>{customer.l_name}</h1>
 
         <span
           className={cn(
-            'hidden shrink-0 items-center gap-1.5 rounded-full border px-2 py-0.5 text-[12px] font-semibold leading-none sm:inline-flex',
+            'hidden shrink-0 items-center gap-1.5 rounded-full border px-2 py-0.5 text-[12px] leading-none font-semibold sm:inline-flex',
             isActive
               ? 'border-green-300 bg-green-500/10 text-green-800 dark:border-green-600 dark:bg-green-500/20 dark:text-green-300'
-              : 'border-slate-300 bg-slate-500/10 text-slate-700 dark:border-slate-600 dark:bg-slate-500/20 dark:text-slate-300',
+              : 'border-slate-300 bg-slate-500/10 text-slate-700 dark:border-slate-600 dark:bg-slate-500/20 dark:text-slate-300'
           )}
         >
           <span
-            className={cn(
-              'size-1.5 rounded-full',
-              isActive ? 'bg-green-500' : 'bg-slate-400',
-            )}
+            className={cn('size-1.5 rounded-full', isActive ? 'bg-green-500' : 'bg-slate-400')}
           />
           {isActive ? 'Active' : 'Inactive'}
         </span>
 
-        <span className='hidden text-[13px] tabular-nums text-text-tertiary sm:inline'>
+        <span className='hidden text-[13px] text-text-tertiary tabular-nums sm:inline'>
           CUS-{customer.id}
         </span>
 
@@ -219,7 +211,7 @@ function CustomerDetailPage() {
                   type='button'
                   className={cn(
                     'inline-flex size-7 items-center justify-center rounded-[5px] border text-[12px] font-medium transition-colors duration-[80ms] md:h-7 md:w-auto md:gap-1.5 md:px-2.5',
-                    (customer.assigned_users?.length || customer.assigned_user)
+                    customer.assigned_users?.length || customer.assigned_user
                       ? 'border-primary/20 bg-primary/[0.06] text-primary hover:bg-primary/[0.1]'
                       : 'border-border bg-bg-secondary text-text-secondary hover:bg-bg-active hover:text-foreground'
                   )}
@@ -227,15 +219,23 @@ function CustomerDetailPage() {
                 >
                   <UserPlus className='size-3.5' />
                   <span className='hidden md:inline'>
-                    {(customer.assigned_users?.length ? customer.assigned_users[0] : customer.assigned_user)
-                      ? getUserDisplayName(customer.assigned_users?.length ? customer.assigned_users[0] : customer.assigned_user!)
+                    {(
+                      customer.assigned_users?.length
+                        ? customer.assigned_users[0]
+                        : customer.assigned_user
+                    )
+                      ? getUserDisplayName(
+                          customer.assigned_users?.length
+                            ? customer.assigned_users[0]
+                            : customer.assigned_user!
+                        )
                       : 'Assign'}
                   </span>
                 </button>
               </TooltipTrigger>
               <TooltipContent>
-                {(customer.assigned_users?.length || customer.assigned_user)
-                  ? `Assigned to ${(customer.assigned_users?.length ? customer.assigned_users : customer.assigned_user ? [customer.assigned_user] : []).map((u) => getUserDisplayName(u)).join(', ')} — click to change`
+                {customer.assigned_users?.length || customer.assigned_user
+                  ? `Assigned to ${(customer.assigned_users?.length ? customer.assigned_users : customer.assigned_user ? [customer.assigned_user] : []).map(u => getUserDisplayName(u)).join(', ')} — click to change`
                   : 'Assign a sales user'}
               </TooltipContent>
             </Tooltip>
@@ -295,8 +295,7 @@ function CustomerDetailPage() {
         <div className='flex flex-1 flex-col overflow-hidden'>
           {/* Tabs */}
           <div className='flex shrink-0 gap-1 border-b border-border px-3.5 sm:px-6'>
-
-            {CUSTOMER_TABS.map((tab) => (
+            {CUSTOMER_TABS.map(tab => (
               <button
                 key={tab.value}
                 type='button'
@@ -321,33 +320,27 @@ function CustomerDetailPage() {
             {activeTab === 'orders' && (
               <CustomerOrdersTab customerId={customerId} customerName={customer.l_name ?? ''} />
             )}
-            {activeTab === 'proposals' && (
-              <CustomerProposalsTab customerId={customerId} />
-            )}
+            {activeTab === 'proposals' && <CustomerProposalsTab customerId={customerId} />}
             {activeTab === 'todos' && (
               <CustomerTasksTab customerId={customerId} customerName={customer?.l_name} />
             )}
             {activeTab === 'dashboard' && (
               <div className='flex-1 overflow-y-auto px-5 py-4 sm:px-6 sm:py-5'>
-                <CustomerDashboardTab
-                  customerId={customerId}
-                  projectId={projectId ?? null}
-                />
+                <CustomerDashboardTab customerId={customerId} projectId={projectId ?? null} />
               </div>
             )}
           </div>
         </div>
 
         {/* Right panel — properties */}
-        <div
-          className='flex shrink-0 flex-col overflow-hidden border-t border-border bg-bg-secondary/50 lg:border-t-0 lg:w-[380px] lg:border-l'
-        >
+        <div className='flex shrink-0 flex-col overflow-hidden border-t border-border bg-bg-secondary/50 lg:w-[380px] lg:border-t-0 lg:border-l'>
           {/* Panel tabs */}
           <div className='flex shrink-0 items-center gap-0 border-b border-border px-1'>
-            {(['general', 'custom'] as const).map((tab) => {
-              const label = tab === 'custom'
-                ? `Custom${customFields.length > 0 ? ` ${customFields.length}` : ''}`
-                : 'General'
+            {(['general', 'custom'] as const).map(tab => {
+              const label =
+                tab === 'custom'
+                  ? `Custom${customFields.length > 0 ? ` ${customFields.length}` : ''}`
+                  : 'General'
               return (
                 <button
                   key={tab}
@@ -356,13 +349,13 @@ function CustomerDetailPage() {
                     'relative px-3 py-2 text-[13px] font-medium transition-colors duration-75',
                     panelTab === tab
                       ? 'text-foreground'
-                      : 'text-text-tertiary hover:text-text-secondary',
+                      : 'text-text-tertiary hover:text-text-secondary'
                   )}
                   onClick={() => setPanelTab(tab)}
                 >
                   {label}
                   {panelTab === tab && (
-                    <span className='absolute bottom-0 left-3 right-3 h-[2px] rounded-full bg-primary' />
+                    <span className='absolute right-3 bottom-0 left-3 h-[2px] rounded-full bg-primary' />
                   )}
                 </button>
               )
@@ -370,14 +363,14 @@ function CustomerDetailPage() {
           </div>
 
           {/* Panel content */}
-          <div className='flex-1 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]'>
+          <div className='flex-1 overflow-y-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden'>
             {panelTab === 'general' ? (
               <CustomerInfoPanel
                 customer={customer}
                 fieldConfig={fieldConfig}
                 priceLevels={priceLevels}
                 editableFields={editableCustomerFields}
-                onPriceLevelChange={(value) => priceLevelMutation.mutate(value)}
+                onPriceLevelChange={value => priceLevelMutation.mutate(value)}
                 onAssign={() => setAssignOpen(true)}
               />
             ) : (
@@ -385,19 +378,19 @@ function CustomerDetailPage() {
                 {customFields.length === 0 ? (
                   <div className='flex flex-col items-center justify-center py-12 text-center'>
                     <p className='text-[13px] text-text-tertiary'>No custom fields enabled</p>
-                    <p className='mt-1 text-[12px] text-text-quaternary'>
+                    <p className='text-text-quaternary mt-1 text-[12px]'>
                       Enable fields in Settings &rarr; Data Control
                     </p>
                   </div>
                 ) : (
                   <div className='border-b border-border'>
                     <div className='bg-bg-secondary/60 px-4 py-2'>
-                      <span className='text-[11px] font-semibold uppercase tracking-[0.06em] text-text-tertiary'>
+                      <span className='text-[11px] font-semibold tracking-[0.06em] text-text-tertiary uppercase'>
                         Custom Fields
                       </span>
                     </div>
                     <div className='bg-background text-[13px]'>
-                      {customFields.map((entry) => {
+                      {customFields.map(entry => {
                         const label = getColumnLabel(entry.field, 'customer', fieldConfig)
                         const val = customer[entry.field]
                         const strVal = val != null ? String(val) : null
@@ -408,7 +401,9 @@ function CustomerDetailPage() {
                             value={strVal}
                             field={entry.field}
                             onSave={handleFieldSave}
-                            editable={!!entry.editable || editableCustomerFields.includes(entry.field)}
+                            editable={
+                              !!entry.editable || editableCustomerFields.includes(entry.field)
+                            }
                           />
                         )
                       })}
@@ -443,7 +438,7 @@ function CustomerDetailPage() {
       <CustomerDeleteDialog
         customer={deleteOpen ? customer : null}
         open={deleteOpen}
-        onOpenChange={(open) => {
+        onOpenChange={open => {
           setDeleteOpen(open)
           if (!open) router.history.back()
         }}
@@ -463,6 +458,6 @@ function CustomerDetailPage() {
 export const Route = createFileRoute('/_authenticated/customers/$customerId/')({
   component: CustomerDetailPage,
   head: ({ params }) => ({
-    meta: [{ title: `Customer ${params.customerId}` }],
-  }),
+    meta: [{ title: `Customer ${params.customerId}` }]
+  })
 })

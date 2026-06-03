@@ -9,7 +9,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuTrigger,
+  DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { getCustomerTypeLabel } from '@/constants/customer'
@@ -32,7 +32,18 @@ interface CustomerInfoPanelProps {
   savingPriceLevel?: boolean
 }
 
-export const CustomerInfoPanel = ({ customer, fieldConfig, priceLevels, onPriceLevelChange, onAssign, editableFields = [], onFieldSave, salespersons, savingField, savingPriceLevel }: CustomerInfoPanelProps) => {
+export const CustomerInfoPanel = ({
+  customer,
+  fieldConfig,
+  priceLevels,
+  onPriceLevelChange,
+  onAssign,
+  editableFields = [],
+  onFieldSave,
+  salespersons,
+  savingField,
+  savingPriceLevel
+}: CustomerInfoPanelProps) => {
   const { user } = useAuth()
   const canAssign = !!user?.role && isAdmin(user.role)
   const isActive = !customer.inactive
@@ -56,7 +67,11 @@ export const CustomerInfoPanel = ({ customer, fieldConfig, priceLevels, onPriceL
   const canEditPriceLevel = !!(priceLevels?.length && onPriceLevelChange)
   const salesman = (customer.salesman as string) ?? ''
   const salesmanLabel = getColumnLabel('salesman', 'customer', fieldConfig)
-  const canEditSalesman = !!(salespersons?.length && onFieldSave && editableFields.includes('salesman'))
+  const canEditSalesman = !!(
+    salespersons?.length &&
+    onFieldSave &&
+    editableFields.includes('salesman')
+  )
 
   return (
     <div>
@@ -65,14 +80,9 @@ export const CustomerInfoPanel = ({ customer, fieldConfig, priceLevels, onPriceL
         <PanelRow label='Status'>
           <div className='flex items-center gap-1.5'>
             <div
-              className={cn(
-                'size-2 rounded-full',
-                isActive ? 'bg-green-500' : 'bg-slate-400'
-              )}
+              className={cn('size-2 rounded-full', isActive ? 'bg-green-500' : 'bg-slate-400')}
             />
-            <span className='font-medium'>
-              {isActive ? 'Active' : 'Inactive'}
-            </span>
+            <span className='font-medium'>{isActive ? 'Active' : 'Inactive'}</span>
           </div>
         </PanelRow>
         <PanelRow label='ID'>
@@ -87,13 +97,15 @@ export const CustomerInfoPanel = ({ customer, fieldConfig, priceLevels, onPriceL
                   disabled={savingPriceLevel}
                   className='inline-flex items-center gap-1 rounded-[4px] bg-bg-secondary px-1.5 py-0.5 text-[12px] font-medium text-text-secondary transition-colors duration-75 hover:bg-bg-active disabled:opacity-70'
                 >
-                  {savingPriceLevel && <Loader2 className='size-3 animate-spin text-text-tertiary' />}
+                  {savingPriceLevel && (
+                    <Loader2 className='size-3 animate-spin text-text-tertiary' />
+                  )}
                   {typeLabel !== '—' ? typeLabel : 'Select…'}
-                  {!savingPriceLevel && <ChevronDown className='size-3 text-text-quaternary' />}
+                  {!savingPriceLevel && <ChevronDown className='text-text-quaternary size-3' />}
                 </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align='end'>
-                {priceLevels.map((level) => (
+                {priceLevels.map(level => (
                   <DropdownMenuItem
                     key={level}
                     onClick={() => onPriceLevelChange(level)}
@@ -121,9 +133,13 @@ export const CustomerInfoPanel = ({ customer, fieldConfig, priceLevels, onPriceL
                   disabled={savingField === 'salesman'}
                   className='inline-flex items-center gap-1 rounded-[4px] bg-bg-secondary px-1.5 py-0.5 text-[12px] font-medium text-text-secondary transition-colors duration-75 hover:bg-bg-active disabled:opacity-70'
                 >
-                  {savingField === 'salesman' && <Loader2 className='size-3 animate-spin text-text-tertiary' />}
+                  {savingField === 'salesman' && (
+                    <Loader2 className='size-3 animate-spin text-text-tertiary' />
+                  )}
                   {salesman || 'Select…'}
-                  {savingField !== 'salesman' && <ChevronDown className='size-3 text-text-quaternary' />}
+                  {savingField !== 'salesman' && (
+                    <ChevronDown className='text-text-quaternary size-3' />
+                  )}
                 </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align='end' className='max-h-[240px] overflow-y-auto'>
@@ -133,7 +149,7 @@ export const CustomerInfoPanel = ({ customer, fieldConfig, priceLevels, onPriceL
                 >
                   <span className='text-text-tertiary'>None</span>
                 </DropdownMenuItem>
-                {salespersons!.map((sp) => (
+                {salespersons!.map(sp => (
                   <DropdownMenuItem
                     key={sp.id}
                     onClick={() => onFieldSave!('salesman', sp.id)}
@@ -164,7 +180,7 @@ export const CustomerInfoPanel = ({ customer, fieldConfig, priceLevels, onPriceL
             label='Phone'
             value={customer.contact_1 ?? ''}
             displayValue={phone ?? '—'}
-            onSave={(v) => onFieldSave('contact_1', v)}
+            onSave={v => onFieldSave('contact_1', v)}
             validate={validatePhone}
             mask={applyPhoneMask}
             saving={savingField === 'contact_1'}
@@ -179,7 +195,7 @@ export const CustomerInfoPanel = ({ customer, fieldConfig, priceLevels, onPriceL
             label='Email'
             value={customer.contact_3 ?? ''}
             displayValue={email ?? '—'}
-            onSave={(v) => onFieldSave('contact_3', v)}
+            onSave={v => onFieldSave('contact_3', v)}
             validate={validateEmail}
             saving={savingField === 'contact_3'}
             last
@@ -224,11 +240,18 @@ export const CustomerInfoPanel = ({ customer, fieldConfig, priceLevels, onPriceL
             onClick={canAssign && onAssign ? onAssign : undefined}
           >
             <div className='flex min-w-0 flex-1 flex-wrap gap-1.5'>
-              {allAssigned.map((user) => {
+              {allAssigned.map(user => {
                 const name = getUserDisplayName(user)
-                const initials = name.split(' ').slice(0, 2).map(n => n[0]?.toUpperCase() ?? '').join('')
+                const initials = name
+                  .split(' ')
+                  .slice(0, 2)
+                  .map(n => n[0]?.toUpperCase() ?? '')
+                  .join('')
                 return (
-                  <span key={user.id} className='inline-flex items-center gap-1.5 rounded-full border border-border bg-bg-secondary py-0.5 pl-0.5 pr-2 text-[12px] font-medium'>
+                  <span
+                    key={user.id}
+                    className='inline-flex items-center gap-1.5 rounded-full border border-border bg-bg-secondary py-0.5 pr-2 pl-0.5 text-[12px] font-medium'
+                  >
                     <InitialsAvatar initials={initials} size={18} />
                     {name}
                   </span>
@@ -236,7 +259,7 @@ export const CustomerInfoPanel = ({ customer, fieldConfig, priceLevels, onPriceL
               })}
             </div>
             {canAssign && onAssign && (
-              <UserPlus className='size-3.5 shrink-0 text-text-quaternary' />
+              <UserPlus className='text-text-quaternary size-3.5 shrink-0' />
             )}
           </button>
         ) : canAssign && onAssign ? (
@@ -246,7 +269,7 @@ export const CustomerInfoPanel = ({ customer, fieldConfig, priceLevels, onPriceL
             onClick={onAssign}
           >
             <div className='flex size-5 items-center justify-center rounded-full border border-dashed border-border'>
-              <UserPlus className='size-3 text-text-quaternary' />
+              <UserPlus className='text-text-quaternary size-3' />
             </div>
             <span className='text-[13px] text-text-tertiary'>Assign a sales user</span>
           </button>
@@ -265,7 +288,7 @@ export const CustomerInfoPanel = ({ customer, fieldConfig, priceLevels, onPriceL
 function PanelSection({
   title,
   children,
-  last,
+  last
 }: {
   title: string
   children: React.ReactNode
@@ -274,7 +297,7 @@ function PanelSection({
   return (
     <div className={cn(!last && 'border-b border-border')}>
       <div className='bg-bg-secondary/60 px-4 py-2'>
-        <span className='text-[11px] font-semibold uppercase tracking-[0.06em] text-text-tertiary'>
+        <span className='text-[11px] font-semibold tracking-[0.06em] text-text-tertiary uppercase'>
           {title}
         </span>
       </div>
@@ -288,14 +311,19 @@ function PanelSection({
 function PanelRow({
   label,
   children,
-  last,
+  last
 }: {
   label: string
   children: React.ReactNode
   last?: boolean
 }) {
   return (
-    <div className={cn('flex items-center justify-between px-4 py-2.5', !last && 'border-b border-border-light')}>
+    <div
+      className={cn(
+        'flex items-center justify-between px-4 py-2.5',
+        !last && 'border-b border-border-light'
+      )}
+    >
       <span className='text-[12px] font-medium text-text-tertiary'>{label}</span>
       <div className='flex items-center text-[13px] font-medium text-foreground'>{children}</div>
     </div>
@@ -343,7 +371,7 @@ function EditablePanelRow({
   last,
   validate,
   mask,
-  saving = false,
+  saving = false
 }: {
   label: string
   value: string
@@ -393,11 +421,11 @@ function EditablePanelRow({
           <span className='shrink-0 text-[12px] font-medium text-text-tertiary'>{label}</span>
           <input
             value={draft}
-            onChange={(e) => {
+            onChange={e => {
               setDraft(mask ? mask(e.target.value) : e.target.value)
               if (error) setError(null)
             }}
-            onKeyDown={(e) => {
+            onKeyDown={e => {
               if (e.key === 'Enter') commit()
               if (e.key === 'Escape') cancel()
             }}
@@ -406,7 +434,7 @@ function EditablePanelRow({
               'min-w-0 flex-1 rounded border bg-background px-2 py-0.5 text-right text-[13px] text-foreground shadow-sm outline-none',
               error
                 ? 'border-destructive focus:border-destructive focus:ring-1 focus:ring-destructive/20'
-                : 'border-border focus:border-primary/50 focus:ring-1 focus:ring-primary/20',
+                : 'border-border focus:border-primary/50 focus:ring-1 focus:ring-primary/20'
             )}
           />
           <div className='flex shrink-0 items-center gap-0.5'>
@@ -416,9 +444,9 @@ function EditablePanelRow({
                 'inline-flex size-5 items-center justify-center rounded transition-colors duration-75',
                 isDirty
                   ? 'bg-primary text-primary-foreground hover:bg-primary/90'
-                  : 'text-text-tertiary hover:bg-bg-hover',
+                  : 'text-text-tertiary hover:bg-bg-hover'
               )}
-              onMouseDown={(e) => {
+              onMouseDown={e => {
                 e.preventDefault()
                 commit()
               }}
@@ -428,7 +456,7 @@ function EditablePanelRow({
             <button
               type='button'
               className='inline-flex size-5 items-center justify-center rounded text-text-tertiary transition-colors duration-75 hover:bg-bg-hover hover:text-foreground'
-              onMouseDown={(e) => {
+              onMouseDown={e => {
                 e.preventDefault()
                 cancel()
               }}
@@ -437,9 +465,7 @@ function EditablePanelRow({
             </button>
           </div>
         </div>
-        {error && (
-          <p className='mt-1 text-right text-[11px] text-destructive'>{error}</p>
-        )}
+        {error && <p className='mt-1 text-right text-[11px] text-destructive'>{error}</p>}
       </div>
     )
   }
@@ -449,14 +475,19 @@ function EditablePanelRow({
       className={cn(
         'flex items-center justify-between px-4 py-2.5 transition-colors duration-75',
         saving ? 'pointer-events-none opacity-70' : 'cursor-pointer hover:bg-bg-hover/50',
-        !last && 'border-b border-border-light',
+        !last && 'border-b border-border-light'
       )}
       onClick={startEditing}
     >
       <span className='text-[12px] font-medium text-text-tertiary'>{label}</span>
       <div className='flex items-center gap-1.5'>
         {saving && <Loader2 className='size-3 animate-spin text-text-tertiary' />}
-        <span className={cn('text-[13px] font-medium', value ? 'text-foreground' : 'text-text-tertiary')}>
+        <span
+          className={cn(
+            'text-[13px] font-medium',
+            value ? 'text-foreground' : 'text-text-tertiary'
+          )}
+        >
           {displayValue}
         </span>
       </div>

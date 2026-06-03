@@ -12,7 +12,7 @@ import {
   DialogContent,
   DialogFooter,
   DialogHeader,
-  DialogTitle,
+  DialogTitle
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -25,7 +25,13 @@ interface VPCreateDialogProps {
   categoryName?: string | null
 }
 
-export const VPCreateDialog = ({ open, onOpenChange, projectId, categoryId, categoryName }: VPCreateDialogProps) => {
+export const VPCreateDialog = ({
+  open,
+  onOpenChange,
+  projectId,
+  categoryId,
+  categoryName
+}: VPCreateDialogProps) => {
   const navigate = useNavigate()
   const [name, setName] = useState('')
   const [description, setDescription] = useState('')
@@ -37,25 +43,25 @@ export const VPCreateDialog = ({ open, onOpenChange, projectId, categoryId, cate
       variableProductService.create(payload, { project_id: projectId ?? undefined }),
     meta: {
       successMessage: 'Variable product created',
-      invalidatesQuery: VP_QUERY_KEYS.lists(),
+      invalidatesQuery: VP_QUERY_KEYS.lists()
     },
-    onSuccess: (data) => {
+    onSuccess: data => {
       onOpenChange(false)
       setName('')
       setDescription('')
       setSlug('')
       setImageUrl('')
       navigate({
-        to: `/catalog/vp/${data.id}`,
+        to: `/catalog/vp/${data.id}`
       })
-    },
+    }
   })
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className='sm:max-w-md'>
         <form
-          onSubmit={(e) => {
+          onSubmit={e => {
             e.preventDefault()
             if (!categoryId) return
             createMutation.mutate({
@@ -63,7 +69,7 @@ export const VPCreateDialog = ({ open, onOpenChange, projectId, categoryId, cate
               description: description || undefined,
               slug: slug || undefined,
               image_url: imageUrl || undefined,
-              category_id: categoryId,
+              category_id: categoryId
             })
           }}
         >
@@ -81,7 +87,7 @@ export const VPCreateDialog = ({ open, onOpenChange, projectId, categoryId, cate
               <Input
                 id='vp-name'
                 value={name}
-                onChange={(e) => setName(e.target.value)}
+                onChange={e => setName(e.target.value)}
                 placeholder='Product name'
                 required
                 autoFocus
@@ -92,7 +98,7 @@ export const VPCreateDialog = ({ open, onOpenChange, projectId, categoryId, cate
               <Input
                 id='vp-desc'
                 value={description}
-                onChange={(e) => setDescription(e.target.value)}
+                onChange={e => setDescription(e.target.value)}
                 placeholder='Available in multiple colors'
               />
             </div>
@@ -101,7 +107,7 @@ export const VPCreateDialog = ({ open, onOpenChange, projectId, categoryId, cate
               <Input
                 id='vp-slug'
                 value={slug}
-                onChange={(e) => setSlug(e.target.value)}
+                onChange={e => setSlug(e.target.value)}
                 placeholder='product-slug (auto-generated if empty)'
               />
             </div>
@@ -110,7 +116,7 @@ export const VPCreateDialog = ({ open, onOpenChange, projectId, categoryId, cate
               <Input
                 id='vp-image'
                 value={imageUrl}
-                onChange={(e) => setImageUrl(e.target.value)}
+                onChange={e => setImageUrl(e.target.value)}
                 placeholder='https://...'
               />
             </div>

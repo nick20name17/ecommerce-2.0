@@ -83,10 +83,7 @@ export function DatePicker({
   const displayFormat = showTime ? DATE_FORMATS.dateTime : DATE_FORMATS.datePicker
 
   return (
-    <Popover
-      open={open}
-      onOpenChange={setOpen}
-    >
+    <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <button
           type='button'
@@ -124,10 +121,10 @@ export function DatePicker({
               selected={value}
               onSelect={handleDateSelect}
             />
-            <div className='border-border flex divide-x border-l'>
+            <div className='flex divide-x border-l border-border'>
               <ScrollArea className='h-[300px] w-16'>
                 <div className='flex flex-col p-2'>
-                  {hours.map((hour) => (
+                  {hours.map(hour => (
                     <Button
                       key={hour}
                       size='icon'
@@ -142,7 +139,7 @@ export function DatePicker({
               </ScrollArea>
               <ScrollArea className='h-[300px] w-16'>
                 <div className='flex flex-col p-2'>
-                  {minutes.map((minute) => (
+                  {minutes.map(minute => (
                     <Button
                       key={minute}
                       size='icon'
@@ -157,7 +154,7 @@ export function DatePicker({
               </ScrollArea>
               <ScrollArea className='h-[300px] w-16'>
                 <div className='flex flex-col p-2'>
-                  {(['AM', 'PM'] as const).map((ampm) => (
+                  {(['AM', 'PM'] as const).map(ampm => (
                     <Button
                       key={ampm}
                       size='icon'
@@ -173,11 +170,7 @@ export function DatePicker({
             </div>
           </div>
         ) : (
-          <Calendar
-            mode='single'
-            selected={value}
-            onSelect={handleDateSelect}
-          />
+          <Calendar mode='single' selected={value} onSelect={handleDateSelect} />
         )}
       </PopoverContent>
     </Popover>

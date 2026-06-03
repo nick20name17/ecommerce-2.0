@@ -28,9 +28,7 @@ export const ThemeProvider = ({
 }: ThemeProviderProps) => {
   const [theme, setTheme] = useState<Theme>(() => {
     const stored = localStorage.getItem(storageKey)
-    return stored === 'dark' || stored === 'light' || stored === 'system'
-      ? stored
-      : defaultTheme
+    return stored === 'dark' || stored === 'light' || stored === 'system' ? stored : defaultTheme
   })
 
   useEffect(() => {
@@ -66,10 +64,7 @@ export const ThemeProvider = ({
   }
 
   return (
-    <ThemeProviderContext.Provider
-      {...props}
-      value={value}
-    >
+    <ThemeProviderContext.Provider {...props} value={value}>
       {children}
     </ThemeProviderContext.Provider>
   )

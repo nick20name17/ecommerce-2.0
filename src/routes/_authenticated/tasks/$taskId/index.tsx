@@ -1,16 +1,15 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { createFileRoute, useRouter } from '@tanstack/react-router'
 import { addDays, format, nextFriday, nextMonday } from 'date-fns'
-import {
-  CalendarDays,
-  ChevronDown,
-  ChevronLeft,
-  Paperclip,
-  Trash2
-} from 'lucide-react'
+import { CalendarDays, ChevronDown, ChevronLeft, Paperclip, Trash2 } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 
-import { TASK_QUERY_KEYS, getTaskDetailQuery, getTaskNotesQuery, getTaskStatusesQuery } from '@/api/task/query'
+import {
+  TASK_QUERY_KEYS,
+  getTaskDetailQuery,
+  getTaskNotesQuery,
+  getTaskStatusesQuery
+} from '@/api/task/query'
 import type { Task, TaskNote } from '@/api/task/schema'
 import { taskService } from '@/api/task/service'
 import { TaskAttachments } from '@/components/tasks/task-attachments'
@@ -53,7 +52,7 @@ function formatDateTime(dateStr: string) {
     day: 'numeric',
     year: 'numeric',
     hour: 'numeric',
-    minute: '2-digit',
+    minute: '2-digit'
   })
 }
 
@@ -73,10 +72,18 @@ const PRIORITY_BARS: Record<string, number> = {
   low: 1,
   medium: 2,
   high: 3,
-  urgent: 4,
+  urgent: 4
 }
 
-function PriorityIcon({ priority, color, size = 14 }: { priority: string; color: string; size?: number }) {
+function PriorityIcon({
+  priority,
+  color,
+  size = 14
+}: {
+  priority: string
+  color: string
+  size?: number
+}) {
   const filled = PRIORITY_BARS[priority] ?? 1
   const barWidth = 2.5
   const gap = 1.5
@@ -141,16 +148,18 @@ function TaskDetailPage() {
   // Fetch statuses
   const { data: statusesData } = useQuery(getTaskStatusesQuery(projectId ?? task?.project ?? null))
   const statuses = statusesData?.results ?? []
-  const currentStatus = statuses.find((s) => s.id === task?.status)
+  const currentStatus = statuses.find(s => s.id === task?.status)
 
   // Fetch notes / activity
   const taskProjectId = projectId ?? task?.project ?? null
-  const { data: notes = [], isLoading: notesLoading } = useQuery(getTaskNotesQuery(id, taskProjectId))
+  const { data: notes = [], isLoading: notesLoading } = useQuery(
+    getTaskNotesQuery(id, taskProjectId)
+  )
   const notesQueryKey = TASK_QUERY_KEYS.notes(id, taskProjectId)
 
   const createNoteMutation = useMutation({
     mutationFn: (payload: { text: string }) => taskService.createNote(id, payload, taskProjectId),
-    onMutate: async (payload) => {
+    onMutate: async payload => {
       await queryClient.cancelQueries({ queryKey: notesQueryKey, exact: true })
       const previous = queryClient.getQueryData<TaskNote[]>(notesQueryKey)
       const optimistic: TaskNote = {
@@ -160,39 +169,39 @@ function TaskDetailPage() {
         author: user?.id ?? null,
         author_name: getUserDisplayName(user, ''),
         created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
       }
-      queryClient.setQueryData<TaskNote[]>(notesQueryKey, (old) =>
-        old ? [optimistic, ...old] : [optimistic],
+      queryClient.setQueryData<TaskNote[]>(notesQueryKey, old =>
+        old ? [optimistic, ...old] : [optimistic]
       )
       setNoteText('')
       return { previous }
     },
-    onSuccess: (serverNote) => {
-      queryClient.setQueryData<TaskNote[]>(notesQueryKey, (old) =>
-        old?.map((n) => (n.id < 0 ? serverNote : n)),
+    onSuccess: serverNote => {
+      queryClient.setQueryData<TaskNote[]>(notesQueryKey, old =>
+        old?.map(n => (n.id < 0 ? serverNote : n))
       )
     },
     onError: (_err, _vars, context) => {
       if (context?.previous) queryClient.setQueryData(notesQueryKey, context.previous)
     },
-    meta: { errorMessage: 'Failed to add note' },
+    meta: { errorMessage: 'Failed to add note' }
   })
 
   const deleteNoteMutation = useMutation({
     mutationFn: (noteId: number) => taskService.deleteNote(id, noteId, taskProjectId),
-    onMutate: async (noteId) => {
+    onMutate: async noteId => {
       await queryClient.cancelQueries({ queryKey: notesQueryKey, exact: true })
       const previous = queryClient.getQueryData<TaskNote[]>(notesQueryKey)
-      queryClient.setQueryData<TaskNote[]>(notesQueryKey, (old) =>
-        old ? old.filter((n) => n.id !== noteId) : old,
+      queryClient.setQueryData<TaskNote[]>(notesQueryKey, old =>
+        old ? old.filter(n => n.id !== noteId) : old
       )
       return { previous }
     },
     onError: (_err, _vars, context) => {
       if (context?.previous) queryClient.setQueryData(notesQueryKey, context.previous)
     },
-    meta: { successMessage: 'Note deleted', errorMessage: 'Failed to delete note' },
+    meta: { successMessage: 'Note deleted', errorMessage: 'Failed to delete note' }
   })
 
   const canDeleteNote = (note: TaskNote) =>
@@ -221,24 +230,30 @@ function TaskDetailPage() {
         ...payload,
         ...(userIsSuperAdmin && taskProjectId != null ? { project: taskProjectId } : {})
       }),
-    onMutate: async (payload) => {
+    onMutate: async payload => {
       await queryClient.cancelQueries({ queryKey: TASK_QUERY_KEYS.detail(id) })
       const previous = queryClient.getQueryData(TASK_QUERY_KEYS.detail(id))
-      queryClient.setQueryData(
-        TASK_QUERY_KEYS.detail(id),
-        (old: Task | undefined) => {
-          if (!old) return old
-          const next = { ...old, ...payload }
-          // Clear stale linked details when the autoid changes
-          if ('linked_order_autoid' in payload && payload.linked_order_autoid !== old.linked_order_autoid)
-            next.linked_order_details = null
-          if ('linked_proposal_autoid' in payload && payload.linked_proposal_autoid !== old.linked_proposal_autoid)
-            next.linked_proposal_details = null
-          if ('linked_customer_autoid' in payload && payload.linked_customer_autoid !== old.linked_customer_autoid)
-            next.linked_customer_details = null
-          return next
-        }
-      )
+      queryClient.setQueryData(TASK_QUERY_KEYS.detail(id), (old: Task | undefined) => {
+        if (!old) return old
+        const next = { ...old, ...payload }
+        // Clear stale linked details when the autoid changes
+        if (
+          'linked_order_autoid' in payload &&
+          payload.linked_order_autoid !== old.linked_order_autoid
+        )
+          next.linked_order_details = null
+        if (
+          'linked_proposal_autoid' in payload &&
+          payload.linked_proposal_autoid !== old.linked_proposal_autoid
+        )
+          next.linked_proposal_details = null
+        if (
+          'linked_customer_autoid' in payload &&
+          payload.linked_customer_autoid !== old.linked_customer_autoid
+        )
+          next.linked_customer_details = null
+        return next
+      })
       return { previous }
     },
     onError: (_err, _payload, context) => {
@@ -261,7 +276,7 @@ function TaskDetailPage() {
     },
     onSuccess: () => {
       router.history.back()
-    },
+    }
   })
 
   const handleTitleBlur = () => {
@@ -295,7 +310,12 @@ function TaskDetailPage() {
   if (isLoading) {
     return (
       <div className='flex h-full flex-col overflow-hidden'>
-        <header className={cn('flex shrink-0 items-center gap-2.5 border-b border-border py-2', isMobile ? 'px-4' : 'px-4')}>
+        <header
+          className={cn(
+            'flex shrink-0 items-center gap-2.5 border-b border-border py-2',
+            isMobile ? 'px-4' : 'px-4'
+          )}
+        >
           <SidebarTrigger className='-ml-1' />
           <Skeleton className='h-4 w-24' />
           <div className='flex-1' />
@@ -338,19 +358,24 @@ function TaskDetailPage() {
   return (
     <div className='flex h-full flex-col overflow-hidden'>
       {/* Top bar */}
-      <header className={cn('flex shrink-0 items-center justify-between border-b border-border py-2', isMobile ? 'px-4' : 'px-4')}>
+      <header
+        className={cn(
+          'flex shrink-0 items-center justify-between border-b border-border py-2',
+          isMobile ? 'px-4' : 'px-4'
+        )}
+      >
         <div className='flex items-center gap-3'>
           <SidebarTrigger className='-ml-1' />
           <button
             type='button'
-            className='inline-flex h-7 items-center gap-0.5 rounded-[6px] border border-border bg-bg-secondary pl-1.5 pr-2.5 text-[13px] font-medium text-text-secondary transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground'
+            className='inline-flex h-7 items-center gap-0.5 rounded-[6px] border border-border bg-bg-secondary pr-2.5 pl-1.5 text-[13px] font-medium text-text-secondary transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground'
             onClick={() => router.history.back()}
           >
             <ChevronLeft className='size-3.5' />
             Back
           </button>
           <span className='text-text-tertiary'>/</span>
-          <span className='text-[13px] tabular-nums text-text-tertiary'>
+          <span className='text-[13px] text-text-tertiary tabular-nums'>
             TSK-{task.id.toString().padStart(3, '0')}
           </span>
         </div>
@@ -369,7 +394,9 @@ function TaskDetailPage() {
         {/* Main content — scrollable */}
         <div className='flex flex-1 flex-col overflow-hidden'>
           {/* Tabs */}
-          <div className={cn('flex shrink-0 gap-1 border-b border-border', isMobile ? 'px-4' : 'px-4')}>
+          <div
+            className={cn('flex shrink-0 gap-1 border-b border-border', isMobile ? 'px-4' : 'px-4')}
+          >
             <button
               type='button'
               className={cn(
@@ -398,7 +425,7 @@ function TaskDetailPage() {
               <Paperclip className='size-3.5' />
               Attachments
               {(task.attachments?.length ?? 0) > 0 && (
-                <span className='text-[11px] tabular-nums text-text-tertiary'>
+                <span className='text-[11px] text-text-tertiary tabular-nums'>
                   {task.attachments!.length}
                 </span>
               )}
@@ -417,14 +444,20 @@ function TaskDetailPage() {
                   <textarea
                     ref={titleRef}
                     value={title}
-                    onChange={(e) => { setTitle(e.target.value); autoResizeTitle() }}
+                    onChange={e => {
+                      setTitle(e.target.value)
+                      autoResizeTitle()
+                    }}
                     onBlur={handleTitleBlur}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') { e.preventDefault(); e.currentTarget.blur() }
+                    onKeyDown={e => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault()
+                        e.currentTarget.blur()
+                      }
                     }}
                     rows={1}
                     className={cn(
-                      'mb-6 w-full resize-none overflow-hidden bg-transparent font-semibold tracking-[-0.02em] leading-[1.3] outline-none',
+                      'mb-6 w-full resize-none overflow-hidden bg-transparent leading-[1.3] font-semibold tracking-[-0.02em] outline-none',
                       'placeholder:text-text-tertiary',
                       isMobile ? 'text-xl' : 'text-[24px]'
                     )}
@@ -433,12 +466,12 @@ function TaskDetailPage() {
 
                   {/* Description */}
                   <div className='mb-8'>
-                    <div className='mb-3 text-[13px] font-semibold uppercase tracking-[0.06em] text-text-tertiary'>
+                    <div className='mb-3 text-[13px] font-semibold tracking-[0.06em] text-text-tertiary uppercase'>
                       Description
                     </div>
                     <textarea
                       value={description}
-                      onChange={(e) => setDescription(e.target.value)}
+                      onChange={e => setDescription(e.target.value)}
                       onBlur={handleDescriptionBlur}
                       placeholder='Add a description...'
                       rows={5}
@@ -450,25 +483,28 @@ function TaskDetailPage() {
                       </p>
                     )}
                   </div>
-
                 </>
               ) : (
-                <TaskAttachments taskId={task.id} attachments={task.attachments ?? []} showDropZone />
+                <TaskAttachments
+                  taskId={task.id}
+                  attachments={task.attachments ?? []}
+                  showDropZone
+                />
               )}
             </div>
           </div>
         </div>
 
         {/* Right panel — full height, border-left */}
-        <div className={cn(
-          'flex shrink-0 flex-col overflow-hidden',
-          isMobile
-            ? 'border-t border-border'
-            : 'w-[320px] border-l border-border'
-        )}>
+        <div
+          className={cn(
+            'flex shrink-0 flex-col overflow-hidden',
+            isMobile ? 'border-t border-border' : 'w-[320px] border-l border-border'
+          )}
+        >
           {/* Panel tabs */}
           <div className='flex shrink-0 items-center gap-0 border-b border-border px-1'>
-            {(['properties', 'activity'] as const).map((tab) => (
+            {(['properties', 'activity'] as const).map(tab => (
               <button
                 key={tab}
                 type='button'
@@ -476,18 +512,18 @@ function TaskDetailPage() {
                   'relative flex items-center gap-1.5 px-3 py-2 text-[13px] font-medium transition-colors duration-75',
                   panelTab === tab
                     ? 'text-foreground'
-                    : 'text-text-tertiary hover:text-text-secondary',
+                    : 'text-text-tertiary hover:text-text-secondary'
                 )}
                 onClick={() => setPanelTab(tab)}
               >
                 {tab === 'properties' ? 'Properties' : 'Activity'}
                 {tab === 'activity' && notes.length > 0 && (
-                  <span className='inline-flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-bg-active px-1 text-[11px] font-semibold tabular-nums text-text-secondary'>
+                  <span className='inline-flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-bg-active px-1 text-[11px] font-semibold text-text-secondary tabular-nums'>
                     {notes.length}
                   </span>
                 )}
                 {panelTab === tab && (
-                  <span className='absolute bottom-0 left-3 right-3 h-[2px] rounded-full bg-primary' />
+                  <span className='absolute right-3 bottom-0 left-3 h-[2px] rounded-full bg-primary' />
                 )}
               </button>
             ))}
@@ -495,7 +531,7 @@ function TaskDetailPage() {
 
           {/* Panel content */}
           {panelTab === 'properties' ? (
-            <div className='flex-1 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]'>
+            <div className='flex-1 overflow-y-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden'>
               <div className={cn(isMobile ? 'px-4 py-4' : 'p-5')}>
                 {/* Status */}
                 <PropertyRow label='Status'>
@@ -503,20 +539,26 @@ function TaskDetailPage() {
                     <PopoverTrigger asChild>
                       <button
                         type='button'
-                        className='inline-flex items-center gap-1.5 rounded-[5px] px-2 py-1 -mx-2 -my-1 text-[13px] font-medium transition-colors duration-[80ms] hover:bg-bg-hover cursor-pointer'
+                        className='-mx-2 -my-1 inline-flex cursor-pointer items-center gap-1.5 rounded-[5px] px-2 py-1 text-[13px] font-medium transition-colors duration-[80ms] hover:bg-bg-hover'
                       >
-                        <StatusIcon status={task.status_name} color={currentStatus?.color ?? task.status_color} size={14} />
-                        <span style={{ color: currentStatus?.color ?? task.status_color }}>{currentStatus?.name ?? task.status_name}</span>
+                        <StatusIcon
+                          status={task.status_name}
+                          color={currentStatus?.color ?? task.status_color}
+                          size={14}
+                        />
+                        <span style={{ color: currentStatus?.color ?? task.status_color }}>
+                          {currentStatus?.name ?? task.status_name}
+                        </span>
                         <ChevronDown className='ml-0.5 size-3 text-text-tertiary' />
                       </button>
                     </PopoverTrigger>
                     <PopoverContent
-                      className='w-[220px] overflow-hidden rounded-[8px] border-border gap-0 p-[3px]'
+                      className='w-[220px] gap-0 overflow-hidden rounded-[8px] border-border p-[3px]'
                       align='start'
-                      onOpenAutoFocus={(e) => e.preventDefault()}
+                      onOpenAutoFocus={e => e.preventDefault()}
                       style={{ boxShadow: 'var(--dropdown-shadow)' }}
                     >
-                      {statuses.map((s) => (
+                      {statuses.map(s => (
                         <button
                           key={s.id}
                           type='button'
@@ -525,7 +567,7 @@ function TaskDetailPage() {
                             'transition-colors duration-[80ms]',
                             s.id === task.status ? 'bg-accent-bg' : 'hover:bg-bg-hover'
                           )}
-                          onClick={(e) => {
+                          onClick={e => {
                             e.stopPropagation()
                             setStatusOpen(false)
                             updateMutation.mutate({ status: s.id })
@@ -545,9 +587,13 @@ function TaskDetailPage() {
                     <DropdownMenuTrigger asChild>
                       <button
                         type='button'
-                        className='inline-flex items-center gap-1.5 rounded-[5px] px-2 py-1 -mx-2 -my-1 text-[13px] font-medium transition-colors duration-[80ms] hover:bg-bg-hover cursor-pointer'
+                        className='-mx-2 -my-1 inline-flex cursor-pointer items-center gap-1.5 rounded-[5px] px-2 py-1 text-[13px] font-medium transition-colors duration-[80ms] hover:bg-bg-hover'
                       >
-                        <PriorityIcon priority={task.priority} color={TASK_PRIORITY_COLORS[task.priority]} size={14} />
+                        <PriorityIcon
+                          priority={task.priority}
+                          color={TASK_PRIORITY_COLORS[task.priority]}
+                          size={14}
+                        />
                         <span>{TASK_PRIORITY_LABELS[task.priority]}</span>
                         <ChevronDown className='ml-0.5 size-3 text-text-tertiary' />
                       </button>
@@ -566,7 +612,11 @@ function TaskDetailPage() {
                           )}
                           onSelect={() => updateMutation.mutate({ priority: key as TaskPriority })}
                         >
-                          <PriorityIcon priority={key} color={TASK_PRIORITY_COLORS[key as TaskPriority]} size={14} />
+                          <PriorityIcon
+                            priority={key}
+                            color={TASK_PRIORITY_COLORS[key as TaskPriority]}
+                            size={14}
+                          />
                           {label}
                         </DropdownMenuItem>
                       ))}
@@ -579,7 +629,7 @@ function TaskDetailPage() {
                   <div className='flex items-center'>
                     <DueDatePicker
                       value={task.due_date ?? null}
-                      onChange={(date) => updateMutation.mutate({ due_date: date })}
+                      onChange={date => updateMutation.mutate({ due_date: date })}
                     />
                   </div>
                 </PropertyRow>
@@ -588,12 +638,12 @@ function TaskDetailPage() {
                 <PropertyRow label='Assignee'>
                   <UserCombobox
                     value={task.responsible_user ?? null}
-                    onChange={(userId) => updateMutation.mutate({ responsible_user: userId })}
+                    onChange={userId => updateMutation.mutate({ responsible_user: userId })}
                     placeholder='Unassigned'
                     valueLabel={assigneeName ?? undefined}
                     excludeRoles={[USER_ROLES.superadmin]}
                     triggerClassName={cn(
-                      'inline-flex items-center gap-1.5 rounded-[5px] px-2 py-1 -mx-2 -my-1 text-[13px] font-medium transition-colors duration-[80ms] hover:bg-bg-hover cursor-pointer',
+                      '-mx-2 -my-1 inline-flex cursor-pointer items-center gap-1.5 rounded-[5px] px-2 py-1 text-[13px] font-medium transition-colors duration-[80ms] hover:bg-bg-hover',
                       !task.responsible_user && 'text-text-tertiary'
                     )}
                   />
@@ -601,19 +651,23 @@ function TaskDetailPage() {
 
                 {/* Reference section */}
                 <div className='mt-4 border-t border-border-light pt-3'>
-                  <div className='mb-4 text-[13px] font-semibold uppercase tracking-[0.06em] text-text-tertiary'>
+                  <div className='mb-4 text-[13px] font-semibold tracking-[0.06em] text-text-tertiary uppercase'>
                     Reference
                   </div>
 
                   <PropertyRow label='Order'>
                     <OrderCombobox
                       value={task.linked_order_autoid ?? null}
-                      onChange={(autoid) => updateMutation.mutate({ linked_order_autoid: autoid })}
+                      onChange={autoid => updateMutation.mutate({ linked_order_autoid: autoid })}
                       projectId={task.project}
                       placeholder='None'
-                      valueLabel={task.linked_order_details ? `Order ${task.linked_order_details.invoice}` : undefined}
+                      valueLabel={
+                        task.linked_order_details
+                          ? `Order ${task.linked_order_details.invoice}`
+                          : undefined
+                      }
                       triggerClassName={cn(
-                        'inline-flex items-center gap-1.5 rounded-[5px] px-2 py-1 -mx-2 -my-1 text-[13px] font-medium transition-colors duration-[80ms] hover:bg-bg-hover cursor-pointer',
+                        '-mx-2 -my-1 inline-flex cursor-pointer items-center gap-1.5 rounded-[5px] px-2 py-1 text-[13px] font-medium transition-colors duration-[80ms] hover:bg-bg-hover',
                         !task.linked_order_autoid && 'text-text-tertiary'
                       )}
                     />
@@ -622,12 +676,16 @@ function TaskDetailPage() {
                   <PropertyRow label='Proposal'>
                     <ProposalCombobox
                       value={task.linked_proposal_autoid ?? null}
-                      onChange={(autoid) => updateMutation.mutate({ linked_proposal_autoid: autoid })}
+                      onChange={autoid => updateMutation.mutate({ linked_proposal_autoid: autoid })}
                       projectId={task.project}
                       placeholder='None'
-                      valueLabel={task.linked_proposal_details ? `Proposal ${task.linked_proposal_details.quote}` : undefined}
+                      valueLabel={
+                        task.linked_proposal_details
+                          ? `Proposal ${task.linked_proposal_details.quote}`
+                          : undefined
+                      }
                       triggerClassName={cn(
-                        'inline-flex items-center gap-1.5 rounded-[5px] px-2 py-1 -mx-2 -my-1 text-[13px] font-medium transition-colors duration-[80ms] hover:bg-bg-hover cursor-pointer',
+                        '-mx-2 -my-1 inline-flex cursor-pointer items-center gap-1.5 rounded-[5px] px-2 py-1 text-[13px] font-medium transition-colors duration-[80ms] hover:bg-bg-hover',
                         !task.linked_proposal_autoid && 'text-text-tertiary'
                       )}
                     />
@@ -636,12 +694,12 @@ function TaskDetailPage() {
                   <PropertyRow label='Customer'>
                     <TaskCustomerCombobox
                       value={task.linked_customer_autoid ?? null}
-                      onChange={(autoid) => updateMutation.mutate({ linked_customer_autoid: autoid })}
+                      onChange={autoid => updateMutation.mutate({ linked_customer_autoid: autoid })}
                       projectId={task.project}
                       placeholder='None'
                       valueLabel={task.linked_customer_details?.l_name ?? undefined}
                       triggerClassName={cn(
-                        'inline-flex items-center gap-1.5 rounded-[5px] px-2 py-1 -mx-2 -my-1 text-[13px] font-medium transition-colors duration-[80ms] hover:bg-bg-hover cursor-pointer',
+                        '-mx-2 -my-1 inline-flex cursor-pointer items-center gap-1.5 rounded-[5px] px-2 py-1 text-[13px] font-medium transition-colors duration-[80ms] hover:bg-bg-hover',
                         !task.linked_customer_autoid && 'text-text-tertiary'
                       )}
                     />
@@ -665,10 +723,10 @@ function TaskDetailPage() {
           ) : (
             <>
               {/* Activity notes list */}
-              <div className='min-h-0 flex-1 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]'>
+              <div className='min-h-0 flex-1 overflow-y-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden'>
                 {notesLoading ? (
                   <div className='flex flex-col'>
-                    {[1, 2, 3].map((k) => (
+                    {[1, 2, 3].map(k => (
                       <div key={k} className='flex gap-2.5 px-5 py-3'>
                         <Skeleton className='size-5 shrink-0 rounded-full' />
                         <div className='min-w-0 flex-1 space-y-1.5'>
@@ -685,39 +743,47 @@ function TaskDetailPage() {
                 ) : notes.length === 0 ? (
                   <div className='flex flex-col items-center justify-center py-12 text-center'>
                     <p className='text-[13px] text-text-tertiary'>No activity yet</p>
-                    <p className='mt-1 text-[12px] text-text-quaternary'>
+                    <p className='text-text-quaternary mt-1 text-[12px]'>
                       Add a comment below to start the conversation.
                     </p>
                   </div>
                 ) : (
                   <div className='flex flex-col'>
                     {[...notes]
-                      .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
-                      .map((note) => {
-                        const displayName = note.author_name
-                          || (note.author === user?.id
-                            ? [user.first_name, user.last_name].filter(Boolean).join(' ') || user.email
+                      .sort(
+                        (a, b) =>
+                          new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+                      )
+                      .map(note => {
+                        const displayName =
+                          note.author_name ||
+                          (note.author === user?.id
+                            ? [user.first_name, user.last_name].filter(Boolean).join(' ') ||
+                              user.email
                             : 'Unknown')
                         const initials = displayName
                           .split(' ')
                           .slice(0, 2)
-                          .map((n) => n[0]?.toUpperCase() ?? '')
+                          .map(n => n[0]?.toUpperCase() ?? '')
                           .join('')
                         return (
-                          <div key={note.id} className='group flex gap-2.5 border-b border-border-light px-5 py-3 last:border-b-0'>
+                          <div
+                            key={note.id}
+                            className='group flex gap-2.5 border-b border-border-light px-5 py-3 last:border-b-0'
+                          >
                             <InitialsAvatar initials={initials} size={20} />
                             <div className='min-w-0 flex-1'>
                               <div className='flex items-center gap-2'>
                                 <span className='truncate text-[13px] font-medium text-foreground'>
                                   {displayName}
                                 </span>
-                                <span className='shrink-0 text-[12px] tabular-nums text-text-tertiary'>
+                                <span className='shrink-0 text-[12px] text-text-tertiary tabular-nums'>
                                   {relativeTime(note.created_at)}
                                 </span>
                                 {canDeleteNote(note) && (
                                   <button
                                     type='button'
-                                    className='ml-auto shrink-0 rounded-[4px] p-0.5 text-text-tertiary opacity-0 transition-all duration-[80ms] hover:text-destructive group-hover:opacity-100'
+                                    className='ml-auto shrink-0 rounded-[4px] p-0.5 text-text-tertiary opacity-0 transition-all duration-[80ms] group-hover:opacity-100 hover:text-destructive'
                                     onClick={() => deleteNoteMutation.mutate(note.id)}
                                     disabled={deleteNoteMutation.isPending}
                                   >
@@ -725,7 +791,7 @@ function TaskDetailPage() {
                                   </button>
                                 )}
                               </div>
-                              <p className='mt-0.5 whitespace-pre-wrap text-[13px] leading-relaxed text-text-secondary wrap-break-word'>
+                              <p className='mt-0.5 text-[13px] leading-relaxed wrap-break-word whitespace-pre-wrap text-text-secondary'>
                                 {note.text}
                               </p>
                             </div>
@@ -739,7 +805,7 @@ function TaskDetailPage() {
               {/* Comment input — pinned to bottom */}
               <form
                 className='shrink-0 border-t border-border px-4 py-3'
-                onSubmit={(e) => {
+                onSubmit={e => {
                   e.preventDefault()
                   const trimmed = noteText.trim()
                   if (!trimmed || createNoteMutation.isPending) return
@@ -748,8 +814,8 @@ function TaskDetailPage() {
               >
                 <textarea
                   value={noteText}
-                  onChange={(e) => setNoteText(e.target.value.slice(0, 500))}
-                  onKeyDown={(e) => {
+                  onChange={e => setNoteText(e.target.value.slice(0, 500))}
+                  onKeyDown={e => {
                     if (e.key === 'Enter' && !e.shiftKey) {
                       e.preventDefault()
                       const trimmed = noteText.trim()
@@ -760,7 +826,7 @@ function TaskDetailPage() {
                   }}
                   placeholder='Write a comment...'
                   rows={2}
-                  className='w-full resize-none rounded-[6px] border border-border bg-transparent px-3 py-2 text-[13px] leading-relaxed placeholder:text-text-tertiary focus:border-ring focus:outline-none focus:ring-1 focus:ring-ring/50'
+                  className='w-full resize-none rounded-[6px] border border-border bg-transparent px-3 py-2 text-[13px] leading-relaxed placeholder:text-text-tertiary focus:border-ring focus:ring-1 focus:ring-ring/50 focus:outline-none'
                   disabled={createNoteMutation.isPending}
                 />
                 <div className='mt-2 flex justify-end'>
@@ -783,10 +849,14 @@ function TaskDetailPage() {
         <>
           <div className='fixed inset-0 z-40 bg-black/40' onClick={() => setDeleteOpen(false)} />
           <div className='fixed inset-0 z-50 flex items-center justify-center px-4'>
-            <div className='w-full max-w-[400px] rounded-[12px] border border-border bg-background p-6' style={{ boxShadow: 'var(--dropdown-shadow)' }}>
+            <div
+              className='w-full max-w-[400px] rounded-[12px] border border-border bg-background p-6'
+              style={{ boxShadow: 'var(--dropdown-shadow)' }}
+            >
               <h3 className='mb-2 text-[15px] font-semibold'>Delete task</h3>
               <p className='mb-5 text-[13px] text-text-secondary'>
-                Are you sure you want to delete &ldquo;{task.title}&rdquo;? This action cannot be undone.
+                Are you sure you want to delete &ldquo;{task.title}&rdquo;? This action cannot be
+                undone.
               </p>
               <div className='flex justify-end gap-2'>
                 <button
@@ -815,13 +885,7 @@ function TaskDetailPage() {
 
 // ── Property Row ─────────────────────────────────────────────
 
-function PropertyRow({
-  label,
-  children,
-}: {
-  label: string
-  children: React.ReactNode
-}) {
+function PropertyRow({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className='mb-3'>
       <div className='mb-1 text-[13px] font-medium text-text-tertiary'>{label}</div>
@@ -837,12 +901,12 @@ const DATE_PRESETS = [
   { label: 'Tomorrow', getDate: () => addDays(new Date(), 1) },
   { label: 'Next Monday', getDate: () => nextMonday(new Date()) },
   { label: 'Next Friday', getDate: () => nextFriday(new Date()) },
-  { label: 'In 2 weeks', getDate: () => addDays(new Date(), 14) },
+  { label: 'In 2 weeks', getDate: () => addDays(new Date(), 14) }
 ] as const
 
 function DueDatePicker({
   value,
-  onChange,
+  onChange
 }: {
   value: string | null
   onChange: (date: string | null) => void
@@ -865,7 +929,7 @@ function DueDatePicker({
         <button
           type='button'
           className={cn(
-            'inline-flex items-center gap-1.5 rounded-[5px] px-2 py-1 -mx-2 -my-1 text-[13px] font-medium transition-colors duration-[80ms] hover:bg-bg-hover cursor-pointer',
+            '-mx-2 -my-1 inline-flex cursor-pointer items-center gap-1.5 rounded-[5px] px-2 py-1 text-[13px] font-medium transition-colors duration-[80ms] hover:bg-bg-hover',
             !value && 'text-text-tertiary'
           )}
         >
@@ -882,7 +946,7 @@ function DueDatePicker({
       >
         {/* Quick presets */}
         <div className='border-b border-border-light p-1.5'>
-          {DATE_PRESETS.map((preset) => (
+          {DATE_PRESETS.map(preset => (
             <button
               key={preset.label}
               type='button'
@@ -890,7 +954,7 @@ function DueDatePicker({
               onClick={() => handlePreset(preset.getDate)}
             >
               <span className='font-medium'>{preset.label}</span>
-              <span className='text-[13px] tabular-nums text-text-tertiary'>
+              <span className='text-[13px] text-text-tertiary tabular-nums'>
                 {format(preset.getDate(), 'MMM d')}
               </span>
             </button>
@@ -899,7 +963,10 @@ function DueDatePicker({
             <button
               type='button'
               className='flex w-full items-center rounded-[6px] px-2.5 py-[5px] text-[13px] font-medium text-text-tertiary transition-colors duration-[80ms] hover:bg-bg-hover hover:text-foreground'
-              onClick={() => { onChange(null); setOpen(false) }}
+              onClick={() => {
+                onChange(null)
+                setOpen(false)
+              }}
             >
               No date
             </button>

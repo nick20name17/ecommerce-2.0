@@ -8,7 +8,7 @@ import { cn } from '@/lib/utils'
 export function PanelSection({
   title,
   children,
-  last,
+  last
 }: {
   title: string
   children: React.ReactNode
@@ -17,7 +17,7 @@ export function PanelSection({
   return (
     <div className={cn(!last && 'border-b border-border')}>
       <div className='bg-bg-secondary/60 px-4 py-2'>
-        <span className='text-[11px] font-semibold uppercase tracking-[0.06em] text-text-tertiary'>
+        <span className='text-[11px] font-semibold tracking-[0.06em] text-text-tertiary uppercase'>
           {title}
         </span>
       </div>
@@ -31,33 +31,32 @@ export function PanelSection({
 export function PanelRow({
   label,
   children,
-  last,
+  last
 }: {
   label: string
   children: React.ReactNode
   last?: boolean
 }) {
   return (
-    <div className={cn('flex items-center justify-between gap-4 px-4 py-2.5', !last && 'border-b border-border-light')}>
+    <div
+      className={cn(
+        'flex items-center justify-between gap-4 px-4 py-2.5',
+        !last && 'border-b border-border-light'
+      )}
+    >
       <span className='shrink-0 text-[12px] font-medium text-text-tertiary'>{label}</span>
-      <div className='min-w-0 truncate text-right text-[13px] font-medium text-foreground'>{children}</div>
+      <div className='min-w-0 truncate text-right text-[13px] font-medium text-foreground'>
+        {children}
+      </div>
     </div>
   )
 }
 
 // ── Panel Block (full-width content like address/notes) ──────
 
-export function PanelBlock({
-  children,
-  last,
-}: {
-  children: React.ReactNode
-  last?: boolean
-}) {
+export function PanelBlock({ children, last }: { children: React.ReactNode; last?: boolean }) {
   return (
-    <div className={cn('px-4 py-2.5', !last && 'border-b border-border-light')}>
-      {children}
-    </div>
+    <div className={cn('px-4 py-2.5', !last && 'border-b border-border-light')}>{children}</div>
   )
 }
 
@@ -97,7 +96,7 @@ export function PropertyField({
   onSave,
   multiline,
   editable = true,
-  saving = false,
+  saving = false
 }: {
   label: string
   value: string | null | undefined
@@ -144,9 +143,9 @@ export function PropertyField({
           'inline-flex size-5 items-center justify-center rounded transition-colors duration-75',
           isDirty
             ? 'bg-primary text-primary-foreground hover:bg-primary/90'
-            : 'text-text-tertiary hover:bg-bg-hover',
+            : 'text-text-tertiary hover:bg-bg-hover'
         )}
-        onMouseDown={(e) => {
+        onMouseDown={e => {
           e.preventDefault()
           commit()
         }}
@@ -156,7 +155,7 @@ export function PropertyField({
       <button
         type='button'
         className='inline-flex size-5 items-center justify-center rounded text-text-tertiary transition-colors duration-75 hover:bg-bg-hover hover:text-foreground'
-        onMouseDown={(e) => {
+        onMouseDown={e => {
           e.preventDefault()
           cancel()
         }}
@@ -176,8 +175,8 @@ export function PropertyField({
         </div>
         <textarea
           value={draft}
-          onChange={(e) => setDraft(e.target.value)}
-          onKeyDown={(e) => {
+          onChange={e => setDraft(e.target.value)}
+          onKeyDown={e => {
             if (e.key === 'Escape') cancel()
           }}
           autoFocus
@@ -191,12 +190,15 @@ export function PropertyField({
   // Editing — single-line (inline row)
   if (editing) {
     return (
-      <div ref={containerRef} className='flex items-center gap-2 border-b border-border-light px-4 py-2'>
+      <div
+        ref={containerRef}
+        className='flex items-center gap-2 border-b border-border-light px-4 py-2'
+      >
         <span className='shrink-0 text-[12px] font-medium text-text-tertiary'>{label}</span>
         <input
           value={draft}
-          onChange={(e) => setDraft(e.target.value)}
-          onKeyDown={(e) => {
+          onChange={e => setDraft(e.target.value)}
+          onKeyDown={e => {
             if (e.key === 'Enter') commit()
             if (e.key === 'Escape') cancel()
           }}
@@ -215,19 +217,21 @@ export function PropertyField({
       <div
         className={cn(
           'flex items-center justify-between gap-4 border-b border-border-light px-4 py-2.5 transition-colors duration-75',
-          saving ? 'pointer-events-none opacity-70' : 'cursor-pointer hover:bg-bg-hover/50',
+          saving ? 'pointer-events-none opacity-70' : 'cursor-pointer hover:bg-bg-hover/50'
         )}
         onClick={startEditing}
       >
         <span className='shrink-0 text-[12px] font-medium text-text-tertiary'>{label}</span>
         <div className='flex items-center gap-1.5'>
           {saving && <Loader2 className='size-3 animate-spin text-text-tertiary' />}
-          <span className={cn(
-            'inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold leading-none',
-            isTrue
-              ? 'border border-emerald-200 bg-emerald-500/10 text-emerald-700 dark:border-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300'
-              : 'border border-border bg-bg-secondary text-text-tertiary',
-          )}>
+          <span
+            className={cn(
+              'inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] leading-none font-semibold',
+              isTrue
+                ? 'border border-emerald-200 bg-emerald-500/10 text-emerald-700 dark:border-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300'
+                : 'border border-border bg-bg-secondary text-text-tertiary'
+            )}
+          >
             {displayValue}
           </span>
         </div>
@@ -241,7 +245,9 @@ export function PropertyField({
       <div
         className={cn(
           'border-b border-border-light px-4 py-2.5 transition-colors duration-75',
-          saving ? 'pointer-events-none opacity-70' : editable && 'cursor-pointer hover:bg-bg-hover/50',
+          saving
+            ? 'pointer-events-none opacity-70'
+            : editable && 'cursor-pointer hover:bg-bg-hover/50'
         )}
         onClick={startEditing}
       >
@@ -251,8 +257,8 @@ export function PropertyField({
         </div>
         <span
           className={cn(
-            'block whitespace-pre-line text-[13px]',
-            displayValue ? 'font-medium text-foreground' : 'text-text-quaternary',
+            'block text-[13px] whitespace-pre-line',
+            displayValue ? 'font-medium text-foreground' : 'text-text-quaternary'
           )}
         >
           {displayValue || '—'}
@@ -266,7 +272,9 @@ export function PropertyField({
     <div
       className={cn(
         'flex items-center justify-between gap-4 border-b border-border-light px-4 py-2.5 transition-colors duration-75',
-        saving ? 'pointer-events-none opacity-70' : editable && 'cursor-pointer hover:bg-bg-hover/50',
+        saving
+          ? 'pointer-events-none opacity-70'
+          : editable && 'cursor-pointer hover:bg-bg-hover/50'
       )}
       onClick={startEditing}
     >
@@ -276,7 +284,7 @@ export function PropertyField({
         <span
           className={cn(
             'min-w-0 truncate text-[13px]',
-            displayValue ? 'font-medium text-foreground' : 'text-text-quaternary',
+            displayValue ? 'font-medium text-foreground' : 'text-text-quaternary'
           )}
         >
           {displayValue || '—'}
@@ -292,7 +300,7 @@ export function SummaryCell({
   label,
   value,
   bold,
-  accent,
+  accent
 }: {
   label: string
   value: string
@@ -307,7 +315,7 @@ export function SummaryCell({
           'text-[12px] tabular-nums',
           bold ? 'font-semibold text-foreground' : 'font-medium text-text-secondary',
           accent === 'warning' && 'font-semibold text-amber-600 dark:text-amber-400',
-          accent === 'success' && 'font-semibold text-emerald-600 dark:text-emerald-400',
+          accent === 'success' && 'font-semibold text-emerald-600 dark:text-emerald-400'
         )}
       >
         {value}

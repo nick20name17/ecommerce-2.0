@@ -83,7 +83,7 @@ const createUserSchemaBase = (isCurrentUserSuperAdmin: boolean) => {
 
 export const getCreateUserSchema = (isCurrentUserSuperAdmin: boolean) =>
   createUserSchemaBase(isCurrentUserSuperAdmin)
-    .refine((data) => data.password === data.password_confirm, {
+    .refine(data => data.password === data.password_confirm, {
       message: 'passwords do not match',
       path: ['password_confirm']
     })

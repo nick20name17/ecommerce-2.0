@@ -46,25 +46,16 @@ export const ProjectModal = ({ projectId, open, onOpenChange }: ProjectModalProp
   })
 
   return (
-    <Dialog
-      open={open}
-      onOpenChange={onOpenChange}
-    >
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className='flex max-h-[85vh] flex-col overflow-hidden p-0 sm:max-w-2xl'>
         {!isEdit ? (
           <CreateForm onOpenChange={onOpenChange} />
         ) : isLoading ? (
           <EditFormSkeleton />
         ) : isError || !project ? (
-          <EditFormError
-            error={error}
-            onOpenChange={onOpenChange}
-          />
+          <EditFormError error={error} onOpenChange={onOpenChange} />
         ) : (
-          <EditForm
-            project={project}
-            onOpenChange={onOpenChange}
-          />
+          <EditForm project={project} onOpenChange={onOpenChange} />
         )}
       </DialogContent>
     </Dialog>
@@ -74,7 +65,7 @@ export const ProjectModal = ({ projectId, open, onOpenChange }: ProjectModalProp
 const EditFormSkeleton = () => {
   return (
     <>
-      <DialogHeader className='bg-background sticky top-0 z-10 border-b px-6 py-4'>
+      <DialogHeader className='sticky top-0 z-10 border-b bg-background px-6 py-4'>
         <Skeleton className='h-6 w-32' />
         <Skeleton className='mt-2 h-4 w-48' />
       </DialogHeader>
@@ -109,7 +100,7 @@ const EditFormSkeleton = () => {
           </div>
         </div>
       </div>
-      <DialogFooter className='bg-background sticky bottom-0 z-10 border-t px-6 py-4'>
+      <DialogFooter className='sticky bottom-0 z-10 border-t bg-background px-6 py-4'>
         <Skeleton className='h-9 w-20' />
         <Skeleton className='h-9 w-24' />
       </DialogFooter>
@@ -127,15 +118,12 @@ const EditFormError = ({
   const message = error?.message ?? 'Failed to load project'
   return (
     <>
-      <DialogHeader className='bg-background border-b px-6 py-4'>
+      <DialogHeader className='border-b bg-background px-6 py-4'>
         <DialogTitle>Edit Project</DialogTitle>
         <DialogDescription>{message}</DialogDescription>
       </DialogHeader>
-      <DialogFooter className='bg-background border-t px-6 py-4'>
-        <Button
-          variant='outline'
-          onClick={() => onOpenChange(false)}
-        >
+      <DialogFooter className='border-t bg-background px-6 py-4'>
+        <Button variant='outline' onClick={() => onOpenChange(false)}>
           Close
         </Button>
       </DialogFooter>
@@ -192,7 +180,7 @@ const SharedFields = () => {
               <FieldLabel htmlFor='db-port'>DB Port</FieldLabel>
               <Input
                 {...field}
-                onChange={(e) =>
+                onChange={e =>
                   field.onChange(e.target.value === '' ? undefined : Number(e.target.value))
                 }
                 id='db-port'
@@ -230,12 +218,7 @@ const SharedFields = () => {
           render={({ field, fieldState }) => (
             <Field data-invalid={fieldState.invalid}>
               <FieldLabel htmlFor='db-name'>DB Name</FieldLabel>
-              <Input
-                {...field}
-                id='db-name'
-                placeholder='mydb'
-                aria-invalid={fieldState.invalid}
-              />
+              <Input {...field} id='db-name' placeholder='mydb' aria-invalid={fieldState.invalid} />
               {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
             </Field>
           )}
@@ -582,30 +565,24 @@ const CreateForm = ({ onOpenChange }: { onOpenChange: (open: boolean) => void })
     }
   })
 
-  const handleSubmit = form.handleSubmit((data) => mutation.mutate(data))
+  const handleSubmit = form.handleSubmit(data => mutation.mutate(data))
 
   return (
     <FormProvider {...form}>
-      <DialogHeader className='bg-background sticky top-0 z-10 border-b px-6 py-4'>
+      <DialogHeader className='sticky top-0 z-10 border-b bg-background px-6 py-4'>
         <DialogTitle>Create Project</DialogTitle>
       </DialogHeader>
 
       <DialogBody className='px-6 py-4'>
-        <form
-          id='project-form'
-          onSubmit={handleSubmit}
-        >
+        <form id='project-form' onSubmit={handleSubmit}>
           <FieldGroup>
             <SharedFields />
           </FieldGroup>
         </form>
       </DialogBody>
 
-      <DialogFooter className='bg-background sticky bottom-0 z-10 border-t px-6 py-4'>
-        <Button
-          variant='outline'
-          onClick={() => onOpenChange(false)}
-        >
+      <DialogFooter className='sticky bottom-0 z-10 border-t bg-background px-6 py-4'>
+        <Button variant='outline' onClick={() => onOpenChange(false)}>
           Cancel
         </Button>
         <Button
@@ -660,32 +637,26 @@ const EditForm = ({
     onSuccess: () => onOpenChange(false)
   })
 
-  const handleSubmit = form.handleSubmit((data) => {
+  const handleSubmit = form.handleSubmit(data => {
     mutation.mutate({ id: project.id, payload: data })
   })
 
   return (
     <FormProvider {...form}>
-      <DialogHeader className='bg-background sticky top-0 z-10 border-b px-6 py-4'>
+      <DialogHeader className='sticky top-0 z-10 border-b bg-background px-6 py-4'>
         <DialogTitle>Edit Project</DialogTitle>
       </DialogHeader>
 
       <DialogBody className='px-6 py-4'>
-        <form
-          id='project-form'
-          onSubmit={handleSubmit}
-        >
+        <form id='project-form' onSubmit={handleSubmit}>
           <FieldGroup>
             <SharedFields />
           </FieldGroup>
         </form>
       </DialogBody>
 
-      <DialogFooter className='bg-background sticky bottom-0 z-10 border-t px-6 py-4'>
-        <Button
-          variant='outline'
-          onClick={() => onOpenChange(false)}
-        >
+      <DialogFooter className='sticky bottom-0 z-10 border-t bg-background px-6 py-4'>
+        <Button variant='outline' onClick={() => onOpenChange(false)}>
           Cancel
         </Button>
         <Button

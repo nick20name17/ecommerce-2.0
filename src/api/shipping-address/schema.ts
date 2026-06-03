@@ -31,8 +31,10 @@ export const ShippingAddressSchema = z.object({
   city: RequiredStringSchema,
   state: RequiredStringSchema,
   postal_code: RequiredStringSchema,
-  country_code: RequiredStringSchema.check(z.maxLength(2, { error: 'Use 2-letter code (e.g. US, CA)' })),
-  is_default: z.boolean(),
+  country_code: RequiredStringSchema.check(
+    z.maxLength(2, { error: 'Use 2-letter code (e.g. US, CA)' })
+  ),
+  is_default: z.boolean()
 })
 
 export type ShippingAddressFormValues = z.infer<typeof ShippingAddressSchema>

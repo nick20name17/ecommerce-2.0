@@ -6,8 +6,7 @@ import { legacyCartService } from './service'
 export const LEGACY_CART_QUERY_KEYS = {
   all: () => ['legacy-carts'] as const,
   lists: () => [...LEGACY_CART_QUERY_KEYS.all(), 'list'] as const,
-  list: (params: LegacyCartParams = {}) =>
-    [...LEGACY_CART_QUERY_KEYS.lists(), params] as const
+  list: (params: LegacyCartParams = {}) => [...LEGACY_CART_QUERY_KEYS.lists(), params] as const
 }
 
 export const getLegacyCartsQuery = (params: LegacyCartParams = {}) =>

@@ -23,7 +23,7 @@ import type {
   VariableProduct,
   VariableProductItem,
   VariableProductListResponse,
-  VariableProductParams,
+  VariableProductParams
 } from './schema'
 
 export const variableProductService = {
@@ -50,7 +50,7 @@ export const variableProductService = {
     params: { project_id?: number }
   ) => {
     const { data } = await api.patch<VariableProduct>(`/variable-products/${id}/`, payload, {
-      params,
+      params
     })
     return data
   },
@@ -98,14 +98,14 @@ export const variableProductService = {
 
   getSpec: async (specId: string, params: SpecParams = {}) => {
     const { data } = await api.get<GlobalSpecDefinition>(`/variable-products/specs/${specId}/`, {
-      params,
+      params
     })
     return data
   },
 
   createSpec: async (payload: CreateSpecPayload, params: SpecParams = {}) => {
     const { data } = await api.post<GlobalSpecDefinition>('/variable-products/specs/', payload, {
-      params,
+      params
     })
     return data
   },
@@ -127,7 +127,7 @@ export const variableProductService = {
 
   listSpecOptions: async (specId: string, params: SpecParams = {}) => {
     const { data } = await api.get<SpecOption[]>(`/variable-products/specs/${specId}/options/`, {
-      params,
+      params
     })
     return data
   },
@@ -213,7 +213,7 @@ export const variableProductService = {
 
   filterBySpecs: async (filters: Record<string, string>, params: SpecParams = {}) => {
     const { data } = await api.get<VariableProductListResponse>('/variable-products/filter/', {
-      params: { ...params, ...filters },
+      params: { ...params, ...filters }
     })
     return data
   },
@@ -231,7 +231,7 @@ export const variableProductService = {
 
   importAll: async (payload: ImportAllVPPayload, params: { project_id?: number }) => {
     const { data } = await api.post<ImportTaskResponse>('/variable-products/import-all/', payload, {
-      params,
+      params
     })
     return data
   },
@@ -242,5 +242,5 @@ export const variableProductService = {
       { params }
     )
     return data
-  },
+  }
 }

@@ -9,7 +9,7 @@ import {
   DialogBody,
   DialogContent,
   DialogHeader,
-  DialogTitle,
+  DialogTitle
 } from '@/components/ui/dialog'
 import { Skeleton } from '@/components/ui/skeleton'
 import { cn } from '@/lib/utils'
@@ -27,7 +27,7 @@ export const ImageStrip = ({
   entityId,
   projectId,
   label,
-  className,
+  className
 }: ImageStripProps) => {
   const [galleryOpen, setGalleryOpen] = useState(false)
 
@@ -49,8 +49,13 @@ export const ImageStrip = ({
 
   return (
     <>
-      <div className={cn('flex items-center gap-2 overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]', className)}>
-        {images.map((img) => (
+      <div
+        className={cn(
+          'flex items-center gap-2 overflow-x-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden',
+          className
+        )}
+      >
+        {images.map(img => (
           <button
             key={img.id}
             type='button'
@@ -64,7 +69,7 @@ export const ImageStrip = ({
               loading='lazy'
             />
             {img.is_primary && (
-              <div className='absolute left-0.5 top-0.5'>
+              <div className='absolute top-0.5 left-0.5'>
                 <Star className='size-2.5 fill-amber-400 text-amber-400 drop-shadow-sm' />
               </div>
             )}
@@ -72,7 +77,7 @@ export const ImageStrip = ({
         ))}
         <button
           type='button'
-          className='flex size-10 shrink-0 items-center justify-center rounded-md border border-dashed border-border text-text-quaternary transition-colors hover:border-primary/40 hover:text-primary/60'
+          className='text-text-quaternary flex size-10 shrink-0 items-center justify-center rounded-md border border-dashed border-border transition-colors hover:border-primary/40 hover:text-primary/60'
           onClick={() => setGalleryOpen(true)}
         >
           <Plus className='size-3.5' />
@@ -85,11 +90,7 @@ export const ImageStrip = ({
             <DialogTitle>{label || 'Manage Images'}</DialogTitle>
           </DialogHeader>
           <DialogBody className='max-h-[60vh] overflow-y-auto'>
-            <ImageGallery
-              entityType={entityType}
-              entityId={entityId}
-              projectId={projectId}
-            />
+            <ImageGallery entityType={entityType} entityId={entityId} projectId={projectId} />
           </DialogBody>
         </DialogContent>
       </Dialog>

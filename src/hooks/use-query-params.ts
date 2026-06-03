@@ -15,45 +15,49 @@ const ORDER_STATUS_VALUES = ['all', ...Object.values(ORDER_STATUS)] as [string, 
 const orderStatusParser = parseAsStringLiteral(ORDER_STATUS_VALUES)
 
 const parseAsIsoDate = createParser<Date | null>({
-  parse: (v) => {
+  parse: v => {
     if (!v) return null
     const d = new Date(v)
     return isNaN(d.getTime()) ? null : d
   },
-  serialize: (v) => (v instanceof Date ? v.toISOString() : ''),
+  serialize: v => (v instanceof Date ? v.toISOString() : ''),
   eq: (a, b) => (a?.getTime() ?? null) === (b?.getTime() ?? null)
 })
 
 const parseAsLocalDateTime = createParser<Date | null>({
-  parse: (v) => {
+  parse: v => {
     if (!v) return null
     const d = new Date(v)
     return isNaN(d.getTime()) ? null : d
   },
-  serialize: (v) => (v instanceof Date ? dateToLocalDateTimeString(v) : ''),
+  serialize: v => (v instanceof Date ? dateToLocalDateTimeString(v) : ''),
   eq: (a, b) => (a?.getTime() ?? null) === (b?.getTime() ?? null)
 })
 
 const parseAsCommaSeparatedStrings = createParser<string[]>({
-  parse: (v) => (v ? v.split(',').map((s) => s.trim()).filter(Boolean) : []),
-  serialize: (v) => (v?.length ? v.join(',') : ''),
-  eq: (a, b) =>
-    (a?.length ?? 0) === (b?.length ?? 0) &&
-    (a ?? []).every((x, i) => (b ?? [])[i] === x)
-})
-
-const parseAsCommaSeparatedNumbers = createParser<number[]>({
-  parse: (v) =>
+  parse: v =>
     v
       ? v
           .split(',')
-          .map((s) => parseInt(s.trim(), 10))
-          .filter((n) => !Number.isNaN(n))
+          .map(s => s.trim())
+          .filter(Boolean)
       : [],
-  serialize: (v) => (v?.length ? v.join(',') : ''),
+  serialize: v => (v?.length ? v.join(',') : ''),
   eq: (a, b) =>
-    (a?.length ?? 0) === (b?.length ?? 0) &&
-    (a ?? []).every((x, i) => (b ?? [])[i] === x)
+    (a?.length ?? 0) === (b?.length ?? 0) && (a ?? []).every((x, i) => (b ?? [])[i] === x)
+})
+
+const parseAsCommaSeparatedNumbers = createParser<number[]>({
+  parse: v =>
+    v
+      ? v
+          .split(',')
+          .map(s => parseInt(s.trim(), 10))
+          .filter(n => !Number.isNaN(n))
+      : [],
+  serialize: v => (v?.length ? v.join(',') : ''),
+  eq: (a, b) =>
+    (a?.length ?? 0) === (b?.length ?? 0) && (a ?? []).every((x, i) => (b ?? [])[i] === x)
 })
 
 const offsetParser = parseAsInteger.withDefault(0)

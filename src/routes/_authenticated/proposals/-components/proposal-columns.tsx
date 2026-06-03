@@ -62,7 +62,7 @@ const ToOrderAction = ({
   const handleToOrder = async () => {
     await toast.promise(mutation.mutateAsync(), {
       loading: 'Converting proposal to order...',
-      success: (result) => {
+      success: result => {
         queryClient.invalidateQueries({ queryKey: PROPOSAL_QUERY_KEYS.lists() })
         navigate({ to: '/orders', search: { autoid: result.AUTOID, status: 'all' } })
         return 'Proposal converted to order successfully'
@@ -72,10 +72,7 @@ const ToOrderAction = ({
   }
 
   return (
-    <DropdownMenuItem
-      disabled={!projectId || mutation.isPending}
-      onClick={handleToOrder}
-    >
+    <DropdownMenuItem disabled={!projectId || mutation.isPending} onClick={handleToOrder}>
       <ShoppingCart className='size-4' />
       To Order
     </DropdownMenuItem>
@@ -86,7 +83,7 @@ const PROPOSAL_FORMATTERS: Partial<Record<string, DynamicCellFormatter<ProposalR
   quote: (v, row) => {
     if (row._pending)
       return (
-        <span className='text-text-tertiary flex items-center gap-2'>
+        <span className='flex items-center gap-2 text-text-tertiary'>
           <Loader2 className='size-4 animate-spin' />
           Pending…
         </span>
@@ -104,10 +101,7 @@ const PROPOSAL_FORMATTERS: Partial<Record<string, DynamicCellFormatter<ProposalR
   status: (v, row) => {
     if (row._pending)
       return (
-        <Badge
-          variant='outline'
-          className='text-text-tertiary font-medium'
-        >
+        <Badge variant='outline' className='font-medium text-text-tertiary'>
           Creating…
         </Badge>
       )
@@ -115,7 +109,7 @@ const PROPOSAL_FORMATTERS: Partial<Record<string, DynamicCellFormatter<ProposalR
     return (
       <span
         className={cn(
-          'inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-[12px] font-medium leading-none',
+          'inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-[12px] leading-none font-medium',
           PROPOSAL_STATUS_CLASS[status]
         )}
       >
@@ -156,8 +150,8 @@ export const getProposalColumns = ({
           className='max-w-[140px] min-w-0'
           role='button'
           tabIndex={0}
-          onClick={(e) => e.stopPropagation()}
-          onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && e.stopPropagation()}
+          onClick={e => e.stopPropagation()}
+          onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && e.stopPropagation()}
         >
           <EntityNotesTrigger
             entityType='proposal'
@@ -179,10 +173,7 @@ export const getProposalColumns = ({
         <div className='flex justify-center'>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button
-                variant='ghost'
-                size='icon-sm'
-              >
+              <Button variant='ghost' size='icon-sm'>
                 <MoreHorizontal />
                 <span className='sr-only'>Open menu</span>
               </Button>
@@ -198,16 +189,8 @@ export const getProposalColumns = ({
                 <Paperclip className='size-4' />
                 Attachments
               </DropdownMenuItem>
-              {isSuperAdmin && (
-                <ToOrderAction
-                  proposal={row.original}
-                  projectId={projectId}
-                />
-              )}
-              <DropdownMenuItem
-                variant='destructive'
-                onClick={() => onDelete(row.original)}
-              >
+              {isSuperAdmin && <ToOrderAction proposal={row.original} projectId={projectId} />}
+              <DropdownMenuItem variant='destructive' onClick={() => onDelete(row.original)}>
                 <Trash2 className='size-4' />
                 Delete
               </DropdownMenuItem>

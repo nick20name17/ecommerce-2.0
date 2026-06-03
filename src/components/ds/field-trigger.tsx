@@ -23,7 +23,7 @@ export const FieldTrigger = forwardRef<HTMLButtonElement, FieldTriggerProps>(
         ref={ref}
         type='button'
         className={cn(
-          'inline-flex items-center gap-1.5 rounded-[5px] px-2 py-1 -mx-2 -my-1',
+          '-mx-2 -my-1 inline-flex items-center gap-1.5 rounded-[5px] px-2 py-1',
           'transition-colors duration-[80ms] hover:bg-bg-hover',
           'text-[13px] font-medium text-foreground',
           'cursor-pointer disabled:cursor-default disabled:opacity-50',
@@ -32,9 +32,7 @@ export const FieldTrigger = forwardRef<HTMLButtonElement, FieldTriggerProps>(
         {...props}
       >
         {children}
-        {!hideChevron && (
-          <ChevronDown className='ml-0.5 size-3 shrink-0 text-text-tertiary' />
-        )}
+        {!hideChevron && <ChevronDown className='ml-0.5 size-3 shrink-0 text-text-tertiary' />}
       </button>
     )
   }

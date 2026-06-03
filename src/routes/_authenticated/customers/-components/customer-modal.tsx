@@ -36,16 +36,10 @@ export const CustomerModal = ({ customer, open, onOpenChange }: CustomerModalPro
   const isEdit = !!customer
 
   return (
-    <Dialog
-      open={open}
-      onOpenChange={onOpenChange}
-    >
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className='flex max-h-[90vh] flex-col overflow-hidden p-0 sm:max-w-md'>
         {isEdit ? (
-          <EditForm
-            customer={customer}
-            onOpenChange={onOpenChange}
-          />
+          <EditForm customer={customer} onOpenChange={onOpenChange} />
         ) : (
           <CreateForm onOpenChange={onOpenChange} />
         )}
@@ -83,18 +77,13 @@ const SharedFields = () => {
           control={control}
           render={({ field, fieldState }) => {
             const currentValue = field.value ? String(field.value) : ''
-            const hasUnknownValue = currentValue && !CUSTOMER_TYPE_OPTIONS.some(o => o.value === currentValue)
+            const hasUnknownValue =
+              currentValue && !CUSTOMER_TYPE_OPTIONS.some(o => o.value === currentValue)
             return (
               <Field data-invalid={fieldState.invalid}>
                 <FieldLabel>Type</FieldLabel>
-                <Select
-                  value={currentValue || undefined}
-                  onValueChange={field.onChange}
-                >
-                  <SelectTrigger
-                    className='w-full'
-                    aria-invalid={fieldState.invalid}
-                  >
+                <Select value={currentValue || undefined} onValueChange={field.onChange}>
+                  <SelectTrigger className='w-full' aria-invalid={fieldState.invalid}>
                     <SelectValue placeholder='Select type' />
                   </SelectTrigger>
                   <SelectContent>
@@ -121,12 +110,7 @@ const SharedFields = () => {
           render={({ field, fieldState }) => (
             <Field data-invalid={fieldState.invalid}>
               <FieldLabel htmlFor='country'>Country</FieldLabel>
-              <Input
-                {...field}
-                value={field.value ?? ''}
-                id='country'
-                placeholder='US'
-              />
+              <Input {...field} value={field.value ?? ''} id='country' placeholder='US' />
               {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
             </Field>
           )}
@@ -179,12 +163,7 @@ const SharedFields = () => {
         render={({ field, fieldState }) => (
           <Field data-invalid={fieldState.invalid}>
             <FieldLabel htmlFor='address1'>Street</FieldLabel>
-            <Input
-              {...field}
-              value={field.value ?? ''}
-              id='address1'
-              placeholder='123 Main St'
-            />
+            <Input {...field} value={field.value ?? ''} id='address1' placeholder='123 Main St' />
             {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
           </Field>
         )}
@@ -195,12 +174,7 @@ const SharedFields = () => {
         render={({ field, fieldState }) => (
           <Field data-invalid={fieldState.invalid}>
             <FieldLabel htmlFor='address2'>Apt / Suite</FieldLabel>
-            <Input
-              {...field}
-              value={field.value ?? ''}
-              id='address2'
-              placeholder='Suite 100'
-            />
+            <Input {...field} value={field.value ?? ''} id='address2' placeholder='Suite 100' />
             {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
           </Field>
         )}
@@ -212,12 +186,7 @@ const SharedFields = () => {
           render={({ field, fieldState }) => (
             <Field data-invalid={fieldState.invalid}>
               <FieldLabel htmlFor='city'>City</FieldLabel>
-              <Input
-                {...field}
-                value={field.value ?? ''}
-                id='city'
-                placeholder='City'
-              />
+              <Input {...field} value={field.value ?? ''} id='city' placeholder='City' />
               {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
             </Field>
           )}
@@ -228,12 +197,7 @@ const SharedFields = () => {
           render={({ field, fieldState }) => (
             <Field data-invalid={fieldState.invalid}>
               <FieldLabel htmlFor='state'>State</FieldLabel>
-              <Input
-                {...field}
-                value={field.value ?? ''}
-                id='state'
-                placeholder='CA'
-              />
+              <Input {...field} value={field.value ?? ''} id='state' placeholder='CA' />
               {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
             </Field>
           )}
@@ -244,12 +208,7 @@ const SharedFields = () => {
           render={({ field, fieldState }) => (
             <Field data-invalid={fieldState.invalid}>
               <FieldLabel htmlFor='zip'>ZIP</FieldLabel>
-              <Input
-                {...field}
-                value={field.value ?? ''}
-                id='zip'
-                placeholder='90210'
-              />
+              <Input {...field} value={field.value ?? ''} id='zip' placeholder='90210' />
               {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
             </Field>
           )}
@@ -291,7 +250,7 @@ const CreateForm = ({ onOpenChange }: { onOpenChange: (open: boolean) => void })
     }
   })
 
-  const handleSubmit = form.handleSubmit((data) => mutation.mutate(data))
+  const handleSubmit = form.handleSubmit(data => mutation.mutate(data))
 
   return (
     <FormProvider {...form}>
@@ -300,20 +259,13 @@ const CreateForm = ({ onOpenChange }: { onOpenChange: (open: boolean) => void })
       </DialogHeader>
 
       <DialogBody className='overflow-y-auto px-5 py-4'>
-        <form
-          id='customer-form'
-          onSubmit={handleSubmit}
-        >
+        <form id='customer-form' onSubmit={handleSubmit}>
           <SharedFields />
         </form>
       </DialogBody>
 
       <DialogFooter className='sticky bottom-0 z-10 border-t bg-background px-5 py-3'>
-        <Button
-          variant='outline'
-          size='sm'
-          onClick={() => onOpenChange(false)}
-        >
+        <Button variant='outline' size='sm' onClick={() => onOpenChange(false)}>
           Cancel
         </Button>
         <Button
@@ -365,7 +317,7 @@ const EditForm = ({
     onSuccess: () => onOpenChange(false)
   })
 
-  const handleSubmit = form.handleSubmit((data) => mutation.mutate(data))
+  const handleSubmit = form.handleSubmit(data => mutation.mutate(data))
 
   return (
     <FormProvider {...form}>
@@ -374,10 +326,7 @@ const EditForm = ({
       </DialogHeader>
 
       <DialogBody className='overflow-y-auto px-5 py-4'>
-        <form
-          id='customer-form'
-          onSubmit={handleSubmit}
-        >
+        <form id='customer-form' onSubmit={handleSubmit}>
           <div className='space-y-3'>
             <SharedFields />
 
@@ -388,11 +337,7 @@ const EditForm = ({
               control={form.control}
               render={({ field }) => (
                 <Field orientation='horizontal'>
-                  <Checkbox
-                    id='inactive'
-                    checked={field.value}
-                    onCheckedChange={field.onChange}
-                  />
+                  <Checkbox id='inactive' checked={field.value} onCheckedChange={field.onChange} />
                   <FieldLabel htmlFor='inactive'>Mark as inactive</FieldLabel>
                 </Field>
               )}
@@ -402,11 +347,7 @@ const EditForm = ({
       </DialogBody>
 
       <DialogFooter className='sticky bottom-0 z-10 border-t bg-background px-5 py-3'>
-        <Button
-          variant='outline'
-          size='sm'
-          onClick={() => onOpenChange(false)}
-        >
+        <Button variant='outline' size='sm' onClick={() => onOpenChange(false)}>
           Cancel
         </Button>
         <Button

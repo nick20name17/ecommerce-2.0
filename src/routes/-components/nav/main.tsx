@@ -17,7 +17,7 @@ import {
   ISettings,
   IShipping,
   IStorefront,
-  ITodos,
+  ITodos
 } from '@/components/ds'
 import { isAdmin, isSuperAdmin } from '@/constants/user'
 import { usePendingOrders, usePendingProposals } from '@/hooks/use-pending-orders'
@@ -48,21 +48,21 @@ const TOP_ITEMS: NavItem[] = [
     icon: IDashboard,
     iconBg: 'bg-emerald-500',
     iconColor: 'text-white',
-    adminOnly: true,
+    adminOnly: true
   },
   {
     title: 'Order Desk',
     url: '/order-desk',
     icon: IOrderDesk,
     iconBg: 'bg-orange-500',
-    iconColor: 'text-white',
+    iconColor: 'text-white'
   },
   {
     title: 'Pick Lists',
     url: '/pick-lists',
     icon: IPickLists,
     iconBg: 'bg-teal-500',
-    iconColor: 'text-white',
+    iconColor: 'text-white'
   },
   {
     title: 'Shipping',
@@ -70,8 +70,8 @@ const TOP_ITEMS: NavItem[] = [
     icon: IShipping,
     iconBg: 'bg-cyan-500',
     iconColor: 'text-white',
-    shippingOnly: true,
-  },
+    shippingOnly: true
+  }
 ]
 
 const WORKSPACE_ITEMS: NavItem[] = [
@@ -80,28 +80,28 @@ const WORKSPACE_ITEMS: NavItem[] = [
     url: '/customers',
     icon: ICustomers,
     iconBg: 'bg-blue-500',
-    iconColor: 'text-white',
+    iconColor: 'text-white'
   },
   {
     title: 'Orders',
     url: '/orders',
     icon: IOrders,
     iconBg: 'bg-amber-500',
-    iconColor: 'text-white',
+    iconColor: 'text-white'
   },
   {
     title: 'Proposals',
     url: '/proposals',
     icon: IProposals,
     iconBg: 'bg-rose-500',
-    iconColor: 'text-white',
+    iconColor: 'text-white'
   },
   {
     title: "To-Do's",
     url: '/tasks',
     icon: ITodos,
     iconBg: 'bg-violet-500',
-    iconColor: 'text-white',
+    iconColor: 'text-white'
   },
   {
     title: 'Activity',
@@ -109,7 +109,7 @@ const WORKSPACE_ITEMS: NavItem[] = [
     icon: IActivity,
     iconBg: 'bg-slate-500',
     iconColor: 'text-white',
-    adminOnly: true,
+    adminOnly: true
   },
   {
     title: 'Catalog',
@@ -117,7 +117,7 @@ const WORKSPACE_ITEMS: NavItem[] = [
     icon: ICatalog,
     iconBg: 'bg-green-500',
     iconColor: 'text-white',
-    adminOnly: true,
+    adminOnly: true
   },
   {
     title: 'Website',
@@ -125,7 +125,7 @@ const WORKSPACE_ITEMS: NavItem[] = [
     icon: IStorefront,
     iconBg: 'bg-fuchsia-500',
     iconColor: 'text-white',
-    adminOnly: true,
+    adminOnly: true
   },
   {
     title: 'Documents',
@@ -133,14 +133,14 @@ const WORKSPACE_ITEMS: NavItem[] = [
     icon: IDocuments,
     iconBg: 'bg-indigo-500',
     iconColor: 'text-white',
-    adminOnly: true,
+    adminOnly: true
   },
   {
     title: 'Development',
     url: '/dev',
     icon: IDev,
     iconBg: 'bg-sky-500',
-    iconColor: 'text-white',
+    iconColor: 'text-white'
   },
   {
     title: 'Settings',
@@ -148,12 +148,12 @@ const WORKSPACE_ITEMS: NavItem[] = [
     icon: ISettings,
     iconBg: 'bg-zinc-500',
     iconColor: 'text-white',
-    adminOnly: true,
-  },
+    adminOnly: true
+  }
 ]
 
 const BOTTOM_ITEMS: NavItem[] = [
-  { title: 'Projects', url: '/projects', icon: IProjects, superAdminOnly: true },
+  { title: 'Projects', url: '/projects', icon: IProjects, superAdminOnly: true }
 ]
 
 // ── Hook ────────────────────────────────────────────────────
@@ -164,19 +164,19 @@ function useTaskCounts() {
 
   const statuses = statusesData?.results ?? []
   const doneStatusIds = new Set(
-    statuses.filter((s) => /done|completed|finished/i.test(s.name)).map((s) => s.id),
+    statuses.filter(s => /done|completed|finished/i.test(s.name)).map(s => s.id)
   )
-  const activeStatusIds = statuses.filter((s) => !doneStatusIds.has(s.id)).map((s) => s.id)
+  const activeStatusIds = statuses.filter(s => !doneStatusIds.has(s.id)).map(s => s.id)
 
   // Fetch only count (limit: 0) for active (non-done) statuses
   const { data: tasksData } = useQuery({
     ...getTasksQuery({
       project_id: projectId ?? undefined,
       limit: 0,
-      status: activeStatusIds.join(','),
+      status: activeStatusIds.join(',')
     }),
     enabled: activeStatusIds.length > 0,
-    staleTime: 1000 * 60 * 5,
+    staleTime: 1000 * 60 * 5
   })
 
   return { pendingCount: tasksData?.count ?? 0 }
@@ -187,7 +187,7 @@ function useTaskCounts() {
 const ColoredNavLink = ({
   item,
   badge,
-  loading,
+  loading
 }: {
   item: NavItem
   badge?: number
@@ -202,14 +202,14 @@ const ColoredNavLink = ({
       'dark:[&.active]:bg-white/[0.08]',
       '[&:not(.active)]:text-foreground/90 [&:not(.active)]:hover:bg-black/[0.04]',
       'dark:[&:not(.active)]:hover:bg-white/[0.04]',
-      'active:scale-[0.98]',
+      'active:scale-[0.98]'
     )}
   >
     <div
       className={cn(
         'flex size-[20px] shrink-0 items-center justify-center rounded-[5px]',
         item.iconBg,
-        item.iconColor,
+        item.iconColor
       )}
     >
       <item.icon className='size-[13px]' />
@@ -221,7 +221,7 @@ const ColoredNavLink = ({
       </span>
     )}
     {badge != null && badge > 0 && !loading && (
-      <span className='min-w-[20px] rounded-full bg-violet-500/15 px-1.5 text-center text-[13px] font-semibold tabular-nums text-violet-600 dark:bg-violet-500/20 dark:text-violet-400'>
+      <span className='min-w-[20px] rounded-full bg-violet-500/15 px-1.5 text-center text-[13px] font-semibold text-violet-600 tabular-nums dark:bg-violet-500/20 dark:text-violet-400'>
         {badge}
       </span>
     )}
@@ -240,7 +240,7 @@ const PlainNavLink = ({ item }: { item: NavItem }) => (
       'dark:[&.active]:bg-white/[0.08]',
       '[&:not(.active)]:text-foreground/90 [&:not(.active)]:hover:bg-black/[0.04]',
       'dark:[&:not(.active)]:hover:bg-white/[0.04]',
-      'active:scale-[0.98]',
+      'active:scale-[0.98]'
     )}
   >
     <div className='flex size-[20px] shrink-0 items-center justify-center'>
@@ -263,7 +263,7 @@ export const NavMain = () => {
   const shippingEnabled = user?.shipping_enabled === true
 
   const filterItems = (items: NavItem[]) =>
-    items.filter((item) => {
+    items.filter(item => {
       if (item.superAdminOnly && !userIsSuperAdmin) return false
       if (item.adminOnly && !userIsAdmin) return false
       if (item.shippingOnly && !shippingEnabled) return false
@@ -283,7 +283,7 @@ export const NavMain = () => {
 
       {/* Top items — colored icons */}
       <div className='flex flex-col gap-px'>
-        {filteredTop.map((item) => (
+        {filteredTop.map(item => (
           <ColoredNavLink key={item.title} item={item} />
         ))}
       </div>
@@ -291,7 +291,7 @@ export const NavMain = () => {
       {/* Workspace section — colored square icons */}
       <div className='my-2 border-t border-border' />
       <div className='flex flex-col gap-px'>
-        {filteredWorkspace.map((item) => (
+        {filteredWorkspace.map(item => (
           <ColoredNavLink
             key={item.title}
             item={item}
@@ -310,7 +310,7 @@ export const NavMain = () => {
 
       {/* Bottom utility items — plain gray icons */}
       <div className='flex flex-col gap-px pb-3'>
-        {filteredBottom.map((item) => (
+        {filteredBottom.map(item => (
           <PlainNavLink key={item.title} item={item} />
         ))}
       </div>

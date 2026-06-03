@@ -1,23 +1,34 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { createFileRoute, redirect, useNavigate } from '@tanstack/react-router'
-import { ArrowLeft, Eye, FlaskConical, Redo2, Save, Search, Sparkles, Trash2, Undo2, X } from 'lucide-react'
+import {
+  ArrowLeft,
+  Eye,
+  FlaskConical,
+  Redo2,
+  Save,
+  Search,
+  Sparkles,
+  Trash2,
+  Undo2,
+  X
+} from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
 import {
   DOCUMENT_TEMPLATE_PRESETS,
   type DocumentTemplatePreset,
-  materializePresetLayout,
+  materializePresetLayout
 } from '@/api/document-template/presets'
 import {
   DOCUMENT_TEMPLATE_QUERY_KEYS,
-  getDocumentTemplateQuery,
+  getDocumentTemplateQuery
 } from '@/api/document-template/query'
 import type {
   AccessibleRouteKey,
   DocumentLayout,
   EntityType,
-  UpdateDocumentTemplatePayload,
+  UpdateDocumentTemplatePayload
 } from '@/api/document-template/schema'
 import { documentTemplateService } from '@/api/document-template/service'
 import { getCustomerDetailQuery, getCustomersQuery } from '@/api/customer/query'
@@ -31,13 +42,9 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuTrigger,
+  DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { SidebarTrigger } from '@/components/ui/sidebar'
 import { Skeleton } from '@/components/ui/skeleton'
 import { isAdmin } from '@/constants/user'
@@ -60,13 +67,13 @@ function DocumentEditorPage() {
 
   const { data: template, isLoading } = useQuery({
     ...getDocumentTemplateQuery(id, projectId),
-    enabled: !!id && !!projectId,
+    enabled: !!id && !!projectId
   })
 
   // Field schema for the bound entity — drives the Field picker datalist.
   const { data: fieldConfig } = useQuery({
     ...getFieldConfigQuery(projectId),
-    enabled: !!projectId,
+    enabled: !!projectId
   })
   const availableFields = (() => {
     if (!template || !fieldConfig) return []
@@ -78,18 +85,15 @@ function DocumentEditorPage() {
   const [testEntityId, setTestEntityId] = useState<string | null>(null)
   const { data: testOrder } = useQuery({
     ...getOrderDetailQuery(testEntityId ?? '', projectId),
-    enabled:
-      !!testEntityId && !!projectId && template?.entity_type === 'order',
+    enabled: !!testEntityId && !!projectId && template?.entity_type === 'order'
   })
   const { data: testProposal } = useQuery({
     ...getProposalDetailQuery(testEntityId ?? '', projectId),
-    enabled:
-      !!testEntityId && !!projectId && template?.entity_type === 'proposal',
+    enabled: !!testEntityId && !!projectId && template?.entity_type === 'proposal'
   })
   const { data: testCustomer } = useQuery({
     ...getCustomerDetailQuery(testEntityId ?? '', projectId),
-    enabled:
-      !!testEntityId && !!projectId && template?.entity_type === 'customer',
+    enabled: !!testEntityId && !!projectId && template?.entity_type === 'customer'
   })
   const entityData = ((): Record<string, unknown> | null => {
     if (!testEntityId || !template) return null
@@ -128,10 +132,8 @@ function DocumentEditorPage() {
 
   // Wrap setLayout so callers can pass either a value or an updater function.
   const setLayout = (next: DocumentLayout | ((prev: DocumentLayout) => DocumentLayout)) => {
-    setLayoutRaw((prev) =>
-      typeof next === 'function'
-        ? (next as (p: DocumentLayout) => DocumentLayout)(prev)
-        : next
+    setLayoutRaw(prev =>
+      typeof next === 'function' ? (next as (p: DocumentLayout) => DocumentLayout)(prev) : next
     )
   }
 
@@ -164,7 +166,7 @@ function DocumentEditorPage() {
       if (lastJson === currentJson) return
       const prevCommit = lastCommitRef.current
       lastCommitRef.current = layout
-      setPast((p) => [...p.slice(-(HISTORY_CAP - 1)), prevCommit as DocumentLayout])
+      setPast(p => [...p.slice(-(HISTORY_CAP - 1)), prevCommit as DocumentLayout])
       setFuture([])
     }, 300)
     return () => {
@@ -176,10 +178,10 @@ function DocumentEditorPage() {
   const canRedo = future.length > 0
 
   const undo = () => {
-    setPast((p) => {
+    setPast(p => {
       if (p.length === 0) return p
       const previous = p[p.length - 1]
-      setFuture((f) => [layout, ...f].slice(0, HISTORY_CAP))
+      setFuture(f => [layout, ...f].slice(0, HISTORY_CAP))
       setLayoutRaw(previous)
       lastCommitRef.current = previous
       // Reset the pending commit timer — we just jumped, no debounce needed.
@@ -192,10 +194,10 @@ function DocumentEditorPage() {
   }
 
   const redo = () => {
-    setFuture((f) => {
+    setFuture(f => {
       if (f.length === 0) return f
       const next = f[0]
-      setPast((p) => [...p, layout].slice(-HISTORY_CAP))
+      setPast(p => [...p, layout].slice(-HISTORY_CAP))
       setLayoutRaw(next)
       lastCommitRef.current = next
       if (commitTimerRef.current) {
@@ -211,11 +213,7 @@ function DocumentEditorPage() {
    * so the user can revert if they didn't mean it.
    */
   const applyPreset = (preset: DocumentTemplatePreset) => {
-    if (
-      !confirm(
-        `Replace this template's layout with "${preset.label}"? You can undo with ⌘Z.`
-      )
-    ) {
+    if (!confirm(`Replace this template's layout with "${preset.label}"? You can undo with ⌘Z.`)) {
       return
     }
     const fresh = materializePresetLayout(preset)
@@ -223,9 +221,7 @@ function DocumentEditorPage() {
     setPageSize(preset.page_size)
     setOrientation(preset.orientation)
     if (preset.page_margins) setPageMargins(preset.page_margins)
-    setAccessibleFrom(
-      preset.defaultAccessibleFrom as AccessibleRouteKey[]
-    )
+    setAccessibleFrom(preset.defaultAccessibleFrom as AccessibleRouteKey[])
     toast.success(`Applied "${preset.label}"`)
   }
 
@@ -236,9 +232,7 @@ function DocumentEditorPage() {
       // Don't steal undo from text inputs / textareas — they have native undo.
       if (
         target &&
-        (target.tagName === 'INPUT' ||
-          target.tagName === 'TEXTAREA' ||
-          target.isContentEditable)
+        (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)
       ) {
         return
       }
@@ -265,10 +259,8 @@ function DocumentEditorPage() {
       isActive !== template.is_active ||
       pageSize !== template.page_size ||
       orientation !== template.orientation ||
-      JSON.stringify(pageMargins) !==
-        JSON.stringify(template.page_margins ?? {}) ||
-      JSON.stringify(accessibleFrom) !==
-        JSON.stringify(template.accessible_from ?? []) ||
+      JSON.stringify(pageMargins) !== JSON.stringify(template.page_margins ?? {}) ||
+      JSON.stringify(accessibleFrom) !== JSON.stringify(template.accessible_from ?? []) ||
       JSON.stringify(layout) !== JSON.stringify(ensureLayout(template.layout))
     )
   })()
@@ -276,29 +268,26 @@ function DocumentEditorPage() {
   const saveMutation = useMutation({
     mutationFn: (payload: UpdateDocumentTemplatePayload) =>
       documentTemplateService.update(id, payload, projectId),
-    onSuccess: (updated) => {
-      queryClient.setQueryData(
-        DOCUMENT_TEMPLATE_QUERY_KEYS.detail(id, projectId),
-        updated
-      )
+    onSuccess: updated => {
+      queryClient.setQueryData(DOCUMENT_TEMPLATE_QUERY_KEYS.detail(id, projectId), updated)
       queryClient.invalidateQueries({
-        queryKey: DOCUMENT_TEMPLATE_QUERY_KEYS.lists(),
+        queryKey: DOCUMENT_TEMPLATE_QUERY_KEYS.lists()
       })
       toast.success('Saved')
     },
-    onError: () => toast.error('Failed to save'),
+    onError: () => toast.error('Failed to save')
   })
 
   const deleteMutation = useMutation({
     mutationFn: () => documentTemplateService.delete(id, projectId),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: DOCUMENT_TEMPLATE_QUERY_KEYS.lists(),
+        queryKey: DOCUMENT_TEMPLATE_QUERY_KEYS.lists()
       })
       toast.success('Template deleted')
       navigate({ to: '/documents' })
     },
-    onError: () => toast.error('Failed to delete'),
+    onError: () => toast.error('Failed to delete')
   })
 
   if (isLoading) return <EditorSkeleton />
@@ -311,16 +300,14 @@ function DocumentEditorPage() {
         <SidebarTrigger className='-ml-1' />
         <button
           type='button'
-          className='inline-flex h-7 shrink-0 items-center gap-0.5 rounded-[6px] border border-border bg-bg-secondary pl-1.5 pr-2.5 text-[13px] font-medium text-text-secondary transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground'
+          className='inline-flex h-7 shrink-0 items-center gap-0.5 rounded-[6px] border border-border bg-bg-secondary pr-2.5 pl-1.5 text-[13px] font-medium text-text-secondary transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground'
           onClick={() => navigate({ to: '/documents' })}
         >
           <ArrowLeft className='size-3.5' />
           <span className='hidden sm:inline'>Documents</span>
         </button>
         <PageHeaderIcon icon={IDocuments} color={PAGE_COLORS.documents} />
-        <h1 className='truncate text-[14px] font-semibold tracking-[-0.01em]'>
-          {template.name}
-        </h1>
+        <h1 className='truncate text-[14px] font-semibold tracking-[-0.01em]'>{template.name}</h1>
         <span className='hidden items-center rounded-full bg-bg-secondary px-2 py-0.5 text-[11px] font-medium text-text-tertiary sm:inline-flex'>
           {template.entity_type}
         </span>
@@ -368,30 +355,26 @@ function DocumentEditorPage() {
             </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align='end' className='w-72'>
-            <DropdownMenuLabel className='text-[11px] uppercase tracking-wider text-text-tertiary'>
+            <DropdownMenuLabel className='text-[11px] tracking-wider text-text-tertiary uppercase'>
               Replace current layout
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             {DOCUMENT_TEMPLATE_PRESETS.filter(
-              (p) =>
-                p.key !== 'blank' && p.entity_type === template.entity_type
-            ).map((p) => (
+              p => p.key !== 'blank' && p.entity_type === template.entity_type
+            ).map(p => (
               <DropdownMenuItem
                 key={p.key}
                 onSelect={() => applyPreset(p)}
                 className='flex flex-col items-start gap-0.5'
               >
                 <span className='text-[13px] font-medium'>{p.label}</span>
-                <span className='text-[11px] text-text-tertiary'>
-                  {p.description}
-                </span>
+                <span className='text-[11px] text-text-tertiary'>{p.description}</span>
               </DropdownMenuItem>
             ))}
             {DOCUMENT_TEMPLATE_PRESETS.filter(
-              (p) =>
-                p.key !== 'blank' && p.entity_type === template.entity_type
+              p => p.key !== 'blank' && p.entity_type === template.entity_type
             ).length === 0 && (
-              <div className='px-3 py-2 text-[11.5px] italic text-text-tertiary'>
+              <div className='px-3 py-2 text-[11.5px] text-text-tertiary italic'>
                 No presets for {template.entity_type} entities yet.
               </div>
             )}
@@ -417,9 +400,8 @@ function DocumentEditorPage() {
               page_size: pageSize,
               orientation,
               page_margins: pageMargins,
-              accessible_from:
-                accessibleFrom as UpdateDocumentTemplatePayload['accessible_from'],
-              layout,
+              accessible_from: accessibleFrom as UpdateDocumentTemplatePayload['accessible_from'],
+              layout
             })
           }
           disabled={saveMutation.isPending || !isDirty}
@@ -451,7 +433,7 @@ function DocumentEditorPage() {
             <input
               type='text'
               value={name}
-              onChange={(e) => setName(e.target.value)}
+              onChange={e => setName(e.target.value)}
               className='h-8 w-full rounded-[5px] border border-border bg-background px-2 text-[12.5px] outline-none focus:border-primary focus:ring-2 focus:ring-primary/20'
               maxLength={120}
             />
@@ -459,7 +441,7 @@ function DocumentEditorPage() {
           <PropField label='Description'>
             <textarea
               value={description}
-              onChange={(e) => setDescription(e.target.value)}
+              onChange={e => setDescription(e.target.value)}
               className='min-h-16 w-full resize-y rounded-[5px] border border-border bg-background px-2 py-1 text-[12.5px] outline-none focus:border-primary focus:ring-2 focus:ring-primary/20'
               maxLength={500}
             />
@@ -472,9 +454,7 @@ function DocumentEditorPage() {
           <PropField label='Page size'>
             <select
               value={pageSize}
-              onChange={(e) =>
-                setPageSize(e.target.value as typeof pageSize)
-              }
+              onChange={e => setPageSize(e.target.value as typeof pageSize)}
               className='h-8 w-full rounded-[5px] border border-border bg-background px-2 text-[12.5px] outline-none focus:border-primary focus:ring-2 focus:ring-primary/20'
             >
               <option value='letter'>Letter (8.5×11 in)</option>
@@ -485,7 +465,7 @@ function DocumentEditorPage() {
 
           <PropField label='Orientation'>
             <div className='flex overflow-hidden rounded-[5px] border border-border bg-bg-secondary'>
-              {(['portrait', 'landscape'] as const).map((o) => (
+              {(['portrait', 'landscape'] as const).map(o => (
                 <button
                   key={o}
                   type='button'
@@ -505,10 +485,10 @@ function DocumentEditorPage() {
 
           <PropField label='Margins (in)'>
             <div className='grid grid-cols-2 gap-1.5'>
-              {(['top', 'right', 'bottom', 'left'] as const).map((side) => (
+              {(['top', 'right', 'bottom', 'left'] as const).map(side => (
                 <label
                   key={side}
-                  className='flex flex-col gap-0.5 text-[10px] font-medium uppercase tracking-wider text-text-tertiary'
+                  className='flex flex-col gap-0.5 text-[10px] font-medium tracking-wider text-text-tertiary uppercase'
                 >
                   {side}
                   <input
@@ -517,11 +497,11 @@ function DocumentEditorPage() {
                     min={0}
                     max={4}
                     value={pageMargins[side] ?? 0}
-                    onChange={(e) => {
+                    onChange={e => {
                       const v = Number(e.target.value)
                       setPageMargins({
                         ...pageMargins,
-                        [side]: Number.isFinite(v) && v >= 0 ? v : 0,
+                        [side]: Number.isFinite(v) && v >= 0 ? v : 0
                       })
                     }}
                     className='h-7 w-full rounded-[4px] border border-border bg-background px-1.5 text-[11.5px] outline-none focus:border-primary focus:ring-1 focus:ring-primary/20'
@@ -533,7 +513,7 @@ function DocumentEditorPage() {
 
           <PropField label='Print from'>
             <div className='flex flex-col gap-1'>
-              {accessibleFromOptions(template.entity_type).map((opt) => {
+              {accessibleFromOptions(template.entity_type).map(opt => {
                 const checked = accessibleFrom.includes(opt.value)
                 return (
                   <label
@@ -549,9 +529,9 @@ function DocumentEditorPage() {
                       type='checkbox'
                       checked={checked}
                       onChange={() => {
-                        setAccessibleFrom((prev) =>
+                        setAccessibleFrom(prev =>
                           prev.includes(opt.value)
-                            ? prev.filter((v) => v !== opt.value)
+                            ? prev.filter(v => v !== opt.value)
                             : [...prev, opt.value]
                         )
                       }}
@@ -568,7 +548,7 @@ function DocumentEditorPage() {
               <input
                 type='checkbox'
                 checked={isActive}
-                onChange={(e) => setIsActive(e.target.checked)}
+                onChange={e => setIsActive(e.target.checked)}
                 className='size-3.5 accent-primary'
               />
               <span className='text-[12.5px]'>Active</span>
@@ -595,16 +575,10 @@ function DocumentEditorPage() {
 
 // ── Small bits ──────────────────────────────────────────────
 
-function PropField({
-  label,
-  children,
-}: {
-  label: string
-  children: React.ReactNode
-}) {
+function PropField({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className='flex flex-col gap-1'>
-      <label className='text-[11px] font-semibold uppercase tracking-wider text-text-tertiary'>
+      <label className='text-[11px] font-semibold tracking-wider text-text-tertiary uppercase'>
         {label}
       </label>
       {children}
@@ -636,9 +610,7 @@ function EditorSkeleton() {
 function NotFound({ onBack }: { onBack: () => void }) {
   return (
     <div className='flex h-full flex-col items-center justify-center gap-3 px-6 text-center'>
-      <h2 className='text-[15px] font-semibold text-foreground'>
-        Template not found
-      </h2>
+      <h2 className='text-[15px] font-semibold text-foreground'>Template not found</h2>
       <p className='text-[13px] text-text-tertiary'>
         It may have been deleted or you don't have access.
       </p>
@@ -656,24 +628,22 @@ function NotFound({ onBack }: { onBack: () => void }) {
 
 // ── Helpers ────────────────────────────────────────────────
 
-function accessibleFromOptions(
-  entityType: EntityType
-): { value: string; label: string }[] {
+function accessibleFromOptions(entityType: EntityType): { value: string; label: string }[] {
   if (entityType === 'order') {
     return [
       { value: 'order_detail', label: 'Order detail page' },
-      { value: 'order_list', label: 'Orders list page' },
+      { value: 'order_list', label: 'Orders list page' }
     ]
   }
   if (entityType === 'proposal') {
     return [
       { value: 'proposal_detail', label: 'Proposal detail page' },
-      { value: 'proposal_list', label: 'Proposals list page' },
+      { value: 'proposal_list', label: 'Proposals list page' }
     ]
   }
   return [
     { value: 'customer_detail', label: 'Customer detail page' },
-    { value: 'customer_list', label: 'Customers list page' },
+    { value: 'customer_list', label: 'Customers list page' }
   ]
 }
 
@@ -703,9 +673,7 @@ function pickEntityLabel(
   }
   if (entityType === 'customer') {
     return (
-      (entityData.id as string | undefined) ||
-      (entityData.l_name as string | undefined) ||
-      null
+      (entityData.id as string | undefined) || (entityData.l_name as string | undefined) || null
     )
   }
   return null
@@ -723,7 +691,7 @@ function TestEntityPicker({
   value,
   valueLabel,
   onChange,
-  projectId,
+  projectId
 }: {
   entityType: EntityType
   value: string | null
@@ -740,25 +708,25 @@ function TestEntityPicker({
     ...getOrdersQuery({
       project_id: projectId ?? undefined,
       search: search || undefined,
-      limit: 25,
+      limit: 25
     }),
-    enabled: open && entityType === 'order' && !!projectId,
+    enabled: open && entityType === 'order' && !!projectId
   })
   const proposalsQ = useQuery({
     ...getProposalsQuery({
       project_id: projectId ?? undefined,
       search: search || undefined,
-      limit: 25,
+      limit: 25
     }),
-    enabled: open && entityType === 'proposal' && !!projectId,
+    enabled: open && entityType === 'proposal' && !!projectId
   })
   const customersQ = useQuery({
     ...getCustomersQuery({
       project_id: projectId ?? undefined,
       search: search || undefined,
-      limit: 25,
+      limit: 25
     }),
-    enabled: open && entityType === 'customer' && !!projectId,
+    enabled: open && entityType === 'customer' && !!projectId
   })
 
   const { rows, isLoading } = ((): {
@@ -769,34 +737,34 @@ function TestEntityPicker({
       const orders = ordersQ.data?.results ?? []
       return {
         isLoading: ordersQ.isLoading,
-        rows: orders.map((o) => ({
+        rows: orders.map(o => ({
           pickValue: o.autoid,
           primary: o.invoice || o.autoid,
-          secondary: [o.name, o.status].filter(Boolean).join(' · '),
-        })),
+          secondary: [o.name, o.status].filter(Boolean).join(' · ')
+        }))
       }
     }
     if (entityType === 'proposal') {
       const proposals = proposalsQ.data?.results ?? []
       return {
         isLoading: proposalsQ.isLoading,
-        rows: proposals.map((p) => ({
+        rows: proposals.map(p => ({
           pickValue: p.autoid,
           primary: p.quote || p.autoid,
-          secondary: [p.b_name, p.status].filter(Boolean).join(' · '),
-        })),
+          secondary: [p.b_name, p.status].filter(Boolean).join(' · ')
+        }))
       }
     }
     if (entityType === 'customer') {
       const customers = customersQ.data?.results ?? []
       return {
         isLoading: customersQ.isLoading,
-        rows: customers.map((c) => ({
+        rows: customers.map(c => ({
           // Customer endpoints key off `id` (the EBMS customer id), not autoid.
           pickValue: c.id,
           primary: c.id || c.autoid,
-          secondary: [c.l_name, c.city, c.state].filter(Boolean).join(' · '),
-        })),
+          secondary: [c.l_name, c.city, c.state].filter(Boolean).join(' · ')
+        }))
       }
     }
     return { rows: [], isLoading: false }
@@ -828,12 +796,12 @@ function TestEntityPicker({
         >
           <FlaskConical className='size-3.5 shrink-0' />
           <span className='hidden truncate lg:inline'>
-            {value ? valueLabel ?? value : 'Test data'}
+            {value ? (valueLabel ?? value) : 'Test data'}
           </span>
           {value && (
             <button
               type='button'
-              onClick={(e) => {
+              onClick={e => {
                 e.stopPropagation()
                 onChange(null)
               }}
@@ -852,22 +820,18 @@ function TestEntityPicker({
             ref={inputRef}
             type='text'
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={e => setSearch(e.target.value)}
             placeholder={placeholder}
             className='h-7 w-full bg-transparent text-[13px] outline-none placeholder:text-text-tertiary'
           />
         </div>
         <div className='max-h-[300px] overflow-y-auto py-1'>
           {isLoading ? (
-            <div className='px-3 py-4 text-[12px] text-text-tertiary'>
-              Loading…
-            </div>
+            <div className='px-3 py-4 text-[12px] text-text-tertiary'>Loading…</div>
           ) : rows.length === 0 ? (
-            <div className='px-3 py-4 text-[12px] text-text-tertiary'>
-              No matches
-            </div>
+            <div className='px-3 py-4 text-[12px] text-text-tertiary'>No matches</div>
           ) : (
-            rows.map((row) => (
+            rows.map(row => (
               <button
                 key={row.pickValue}
                 type='button'
@@ -880,13 +844,9 @@ function TestEntityPicker({
                   value === row.pickValue && 'bg-primary/[0.06]'
                 )}
               >
-                <span className='text-[12.5px] font-medium text-foreground'>
-                  {row.primary}
-                </span>
+                <span className='text-[12.5px] font-medium text-foreground'>{row.primary}</span>
                 {row.secondary && (
-                  <span className='truncate text-[11px] text-text-tertiary'>
-                    {row.secondary}
-                  </span>
+                  <span className='truncate text-[11px] text-text-tertiary'>{row.secondary}</span>
                 )}
               </button>
             ))
@@ -899,9 +859,7 @@ function TestEntityPicker({
 
 // ── Route ───────────────────────────────────────────────────
 
-export const Route = createFileRoute(
-  '/_authenticated/documents/$templateId/'
-)({
+export const Route = createFileRoute('/_authenticated/documents/$templateId/')({
   beforeLoad: () => {
     const session = getSession()
     const role = session?.user?.role as UserRole | undefined
@@ -911,6 +869,6 @@ export const Route = createFileRoute(
   },
   component: DocumentEditorPage,
   head: ({ params }) => ({
-    meta: [{ title: `Template ${params.templateId}` }],
-  }),
+    meta: [{ title: `Template ${params.templateId}` }]
+  })
 })

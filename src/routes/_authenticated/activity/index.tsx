@@ -1,11 +1,6 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
-import {
-  AlertCircle,
-  ChevronRight,
-  Clock,
-  Search,
-} from 'lucide-react'
+import { AlertCircle, ChevronRight, Clock, Search } from 'lucide-react'
 import { useState, useDeferredValue } from 'react'
 
 import { getPayloadLogsQuery } from '@/api/payload-log/query'
@@ -33,10 +28,11 @@ function formatDuration(ms: number | null | undefined) {
 const METHOD_COLORS: Record<string, string> = {
   GET: 'bg-blue-500/10 text-blue-700 border-blue-200 dark:text-blue-400 dark:border-blue-800',
   POST: 'bg-emerald-500/10 text-emerald-700 border-emerald-200 dark:text-emerald-400 dark:border-emerald-800',
-  PATCH: 'bg-amber-500/10 text-amber-700 border-amber-200 dark:text-amber-400 dark:border-amber-800',
+  PATCH:
+    'bg-amber-500/10 text-amber-700 border-amber-200 dark:text-amber-400 dark:border-amber-800',
   PUT: 'bg-amber-500/10 text-amber-700 border-amber-200 dark:text-amber-400 dark:border-amber-800',
   DELETE: 'bg-red-500/10 text-red-700 border-red-200 dark:text-red-400 dark:border-red-800',
-  CALCULATION: 'bg-bg-secondary text-text-secondary border-border',
+  CALCULATION: 'bg-bg-secondary text-text-secondary border-border'
 }
 
 type ErrorFilter = 'all' | 'errors' | 'success'
@@ -46,19 +42,19 @@ type SourceFilter = PayloadLogSource | null
 const ERROR_OPTIONS: { value: ErrorFilter; label: string }[] = [
   { value: 'all', label: 'All' },
   { value: 'errors', label: 'Errors Only' },
-  { value: 'success', label: 'Success Only' },
+  { value: 'success', label: 'Success Only' }
 ]
 
 const METHOD_OPTIONS = ['GET', 'POST', 'PATCH', 'PUT', 'DELETE', 'CALCULATION'] as const
 
 const SOURCE_OPTIONS: { value: PayloadLogSource; label: string; description: string }[] = [
   { value: 'internal', label: 'Internal', description: 'Outgoing EBMS calls from ebms.app' },
-  { value: 'storefront', label: 'Storefront', description: 'Pushed by storefront' },
+  { value: 'storefront', label: 'Storefront', description: 'Pushed by storefront' }
 ]
 
 const SOURCE_LABEL: Record<PayloadLogSource, string> = {
   internal: 'Internal',
-  storefront: 'Storefront',
+  storefront: 'Storefront'
 }
 
 // Shared column-track template applied to BOTH the header row and every data
@@ -93,16 +89,16 @@ const ActivityPage = () => {
     offset,
     limit,
     ordering: '-created_at',
-    search: isMethodSearch ? undefined : (deferredSearch || undefined),
+    search: isMethodSearch ? undefined : deferredSearch || undefined,
     is_error: errorFilter === 'errors' ? true : errorFilter === 'success' ? false : undefined,
     method: isMethodSearch ? searchUpper : (methodFilter ?? undefined),
     source: sourceFilter ?? undefined,
-    project_id: projectId ?? undefined,
+    project_id: projectId ?? undefined
   }
 
   const { data, isLoading } = useQuery({
     ...getPayloadLogsQuery(params),
-    placeholderData: keepPreviousData,
+    placeholderData: keepPreviousData
   })
 
   const results = data?.results ?? []
@@ -125,9 +121,7 @@ const ActivityPage = () => {
         <PageHeaderIcon icon={IActivity} color={PAGE_COLORS.activity} />
         <h1 className='text-[14px] font-semibold tracking-[-0.01em]'>Activity</h1>
         {!isLoading && (
-          <span className='text-[13px] tabular-nums text-text-tertiary'>
-            {totalCount}
-          </span>
+          <span className='text-[13px] text-text-tertiary tabular-nums'>{totalCount}</span>
         )}
 
         <div className='flex-1' />
@@ -136,7 +130,10 @@ const ActivityPage = () => {
           <Search className='size-3.5 shrink-0 text-text-tertiary' />
           <input
             value={search}
-            onChange={(e) => { setSearch(e.target.value); setOffset(null) }}
+            onChange={e => {
+              setSearch(e.target.value)
+              setOffset(null)
+            }}
             placeholder='Search URL or method...'
             className='w-[140px] bg-transparent text-[13px] outline-none placeholder:text-text-tertiary sm:w-[200px]'
           />
@@ -146,9 +143,20 @@ const ActivityPage = () => {
         <FilterPopover
           label='Status'
           active={errorFilter !== 'all'}
-          icon={<div className={cn('size-2.5 rounded-full', errorFilter === 'errors' ? 'bg-red-500' : errorFilter === 'success' ? 'bg-emerald-500' : 'bg-current')} />}
+          icon={
+            <div
+              className={cn(
+                'size-2.5 rounded-full',
+                errorFilter === 'errors'
+                  ? 'bg-red-500'
+                  : errorFilter === 'success'
+                    ? 'bg-emerald-500'
+                    : 'bg-current'
+              )}
+            />
+          }
         >
-          {ERROR_OPTIONS.map((opt) => {
+          {ERROR_OPTIONS.map(opt => {
             const selected_ = errorFilter === opt.value
             return (
               <button
@@ -158,12 +166,17 @@ const ActivityPage = () => {
                   'flex w-full items-center gap-2 rounded-[5px] px-2 py-[3px] text-left text-[13px] font-medium',
                   'transition-colors duration-[80ms] hover:bg-bg-hover'
                 )}
-                onClick={() => { setErrorFilter(opt.value === errorFilter ? 'all' : opt.value); setOffset(null) }}
+                onClick={() => {
+                  setErrorFilter(opt.value === errorFilter ? 'all' : opt.value)
+                  setOffset(null)
+                }}
               >
-                <div className={cn(
-                  'flex size-3.5 items-center justify-center rounded-full border transition-colors duration-[80ms]',
-                  selected_ ? 'border-primary bg-primary' : 'border-border'
-                )}>
+                <div
+                  className={cn(
+                    'flex size-3.5 items-center justify-center rounded-full border transition-colors duration-[80ms]',
+                    selected_ ? 'border-primary bg-primary' : 'border-border'
+                  )}
+                >
                   {selected_ && <div className='size-1.5 rounded-full bg-primary-foreground' />}
                 </div>
                 <span className='flex-1'>{opt.label}</span>
@@ -173,11 +186,8 @@ const ActivityPage = () => {
         </FilterPopover>
 
         {/* Method filter */}
-        <FilterPopover
-          label='Method'
-          active={methodFilter !== null}
-        >
-          {METHOD_OPTIONS.map((m) => {
+        <FilterPopover label='Method' active={methodFilter !== null}>
+          {METHOD_OPTIONS.map(m => {
             const selected_ = methodFilter === m
             return (
               <button
@@ -187,15 +197,25 @@ const ActivityPage = () => {
                   'flex w-full items-center gap-2 rounded-[5px] px-2 py-[3px] text-left text-[13px] font-medium',
                   'transition-colors duration-[80ms] hover:bg-bg-hover'
                 )}
-                onClick={() => { setMethodFilter(selected_ ? null : m); setOffset(null) }}
+                onClick={() => {
+                  setMethodFilter(selected_ ? null : m)
+                  setOffset(null)
+                }}
               >
-                <div className={cn(
-                  'flex size-3.5 items-center justify-center rounded-full border transition-colors duration-[80ms]',
-                  selected_ ? 'border-primary bg-primary' : 'border-border'
-                )}>
+                <div
+                  className={cn(
+                    'flex size-3.5 items-center justify-center rounded-full border transition-colors duration-[80ms]',
+                    selected_ ? 'border-primary bg-primary' : 'border-border'
+                  )}
+                >
                   {selected_ && <div className='size-1.5 rounded-full bg-primary-foreground' />}
                 </div>
-                <span className={cn('rounded border px-1.5 py-0.5 font-mono text-[11px] font-semibold', METHOD_COLORS[m] ?? '')}>
+                <span
+                  className={cn(
+                    'rounded border px-1.5 py-0.5 font-mono text-[11px] font-semibold',
+                    METHOD_COLORS[m] ?? ''
+                  )}
+                >
                   {m}
                 </span>
               </button>
@@ -204,11 +224,8 @@ const ActivityPage = () => {
         </FilterPopover>
 
         {/* Source filter */}
-        <FilterPopover
-          label='Source'
-          active={sourceFilter !== null}
-        >
-          {SOURCE_OPTIONS.map((opt) => {
+        <FilterPopover label='Source' active={sourceFilter !== null}>
+          {SOURCE_OPTIONS.map(opt => {
             const selected_ = sourceFilter === opt.value
             return (
               <button
@@ -218,17 +235,24 @@ const ActivityPage = () => {
                   'flex w-full items-start gap-2 rounded-[5px] px-2 py-[3px] text-left text-[13px] font-medium',
                   'transition-colors duration-[80ms] hover:bg-bg-hover'
                 )}
-                onClick={() => { setSourceFilter(selected_ ? null : opt.value); setOffset(null) }}
+                onClick={() => {
+                  setSourceFilter(selected_ ? null : opt.value)
+                  setOffset(null)
+                }}
               >
-                <div className={cn(
-                  'mt-[3px] flex size-3.5 items-center justify-center rounded-full border transition-colors duration-[80ms]',
-                  selected_ ? 'border-primary bg-primary' : 'border-border'
-                )}>
+                <div
+                  className={cn(
+                    'mt-[3px] flex size-3.5 items-center justify-center rounded-full border transition-colors duration-[80ms]',
+                    selected_ ? 'border-primary bg-primary' : 'border-border'
+                  )}
+                >
                   {selected_ && <div className='size-1.5 rounded-full bg-primary-foreground' />}
                 </div>
                 <div className='flex flex-col'>
                   <span>{opt.label}</span>
-                  <span className='text-[11px] font-normal text-text-tertiary'>{opt.description}</span>
+                  <span className='text-[11px] font-normal text-text-tertiary'>
+                    {opt.description}
+                  </span>
                 </div>
               </button>
             )
@@ -238,7 +262,7 @@ const ActivityPage = () => {
 
       {/* Active filter chips */}
       {hasFilters && (
-        <div className='flex shrink-0 flex-wrap items-center gap-1.5 border-b border-border py-1.5 px-3.5 sm:px-6'>
+        <div className='flex shrink-0 flex-wrap items-center gap-1.5 border-b border-border px-3.5 py-1.5 sm:px-6'>
           <button
             type='button'
             className='text-[13px] font-medium text-text-tertiary transition-colors duration-[80ms] hover:text-foreground'
@@ -247,19 +271,34 @@ const ActivityPage = () => {
             Clear
           </button>
           {errorFilter !== 'all' && (
-            <FilterChip onRemove={() => { setErrorFilter('all'); setOffset(null) }}>
+            <FilterChip
+              onRemove={() => {
+                setErrorFilter('all')
+                setOffset(null)
+              }}
+            >
               <span className='text-text-tertiary'>Status is</span>
               {errorFilter === 'errors' ? 'Errors' : 'Success'}
             </FilterChip>
           )}
           {methodFilter && (
-            <FilterChip onRemove={() => { setMethodFilter(null); setOffset(null) }}>
+            <FilterChip
+              onRemove={() => {
+                setMethodFilter(null)
+                setOffset(null)
+              }}
+            >
               <span className='text-text-tertiary'>Method is</span>
               {methodFilter}
             </FilterChip>
           )}
           {sourceFilter && (
-            <FilterChip onRemove={() => { setSourceFilter(null); setOffset(null) }}>
+            <FilterChip
+              onRemove={() => {
+                setSourceFilter(null)
+                setOffset(null)
+              }}
+            >
               <span className='text-text-tertiary'>Source is</span>
               {SOURCE_LABEL[sourceFilter]}
             </FilterChip>
@@ -273,7 +312,12 @@ const ActivityPage = () => {
             aligned with the rows under both the vertical scrollbar gutter and
             horizontal scroll (when outside the scroll area they drift). */}
         {!isMobile && (results.length > 0 || isLoading) && (
-          <div className={cn(ROW_GRID, 'sticky top-0 z-10 border-b border-border bg-bg-secondary px-5 py-1.5 xl:px-6')}>
+          <div
+            className={cn(
+              ROW_GRID,
+              'sticky top-0 z-10 border-b border-border bg-bg-secondary px-5 py-1.5 xl:px-6'
+            )}
+          >
             <div className='text-[12px] font-medium text-text-tertiary'>Method</div>
             <div className='min-w-0 text-[12px] font-medium text-text-tertiary'>URL / Action</div>
             <div className='text-[12px] font-medium text-text-tertiary'>Entity</div>
@@ -288,7 +332,13 @@ const ActivityPage = () => {
         )}
         {isLoading ? (
           Array.from({ length: 10 }).map((_, i) => (
-            <div key={i} className={cn('flex min-w-fit items-center gap-4 border-b border-border-light px-5 py-2.5 xl:px-6', isMobile && 'px-3.5')}>
+            <div
+              key={i}
+              className={cn(
+                'flex min-w-fit items-center gap-4 border-b border-border-light px-5 py-2.5 xl:px-6',
+                isMobile && 'px-3.5'
+              )}
+            >
               <Skeleton className='h-5 w-12' />
               <Skeleton className='h-4 w-48 flex-1' />
               <Skeleton className='h-4 w-16' />
@@ -298,9 +348,13 @@ const ActivityPage = () => {
             </div>
           ))
         ) : results.length === 0 ? (
-          <PageEmpty icon={Clock} title='No logs found' description='Try adjusting your search or filters.' />
+          <PageEmpty
+            icon={Clock}
+            title='No logs found'
+            description='Try adjusting your search or filters.'
+          />
         ) : (
-          results.map((log) => (
+          results.map(log => (
             <LogRow
               key={log.id}
               log={log}
@@ -312,7 +366,7 @@ const ActivityPage = () => {
       </div>
 
       {/* Pagination footer */}
-      <div className='shrink-0 border-t border-border py-1.5 px-3.5 sm:px-6'>
+      <div className='shrink-0 border-t border-border px-3.5 py-1.5 sm:px-6'>
         <Pagination totalCount={totalCount} />
       </div>
 
@@ -320,7 +374,7 @@ const ActivityPage = () => {
       <PayloadLogDetailDialog
         log={selectedLog}
         open={!!selectedLog}
-        onOpenChange={(open) => !open && setSelectedLog(null)}
+        onOpenChange={open => !open && setSelectedLog(null)}
       />
     </div>
   )
@@ -330,19 +384,21 @@ const ActivityPage = () => {
 
 const SOURCE_COLORS: Record<PayloadLogSource, string> = {
   internal: 'bg-bg-secondary text-text-secondary border-border',
-  storefront: 'bg-violet-500/10 text-violet-700 border-violet-200 dark:text-violet-400 dark:border-violet-800',
+  storefront:
+    'bg-violet-500/10 text-violet-700 border-violet-200 dark:text-violet-400 dark:border-violet-800'
 }
 
 function LogRow({
   log,
   isMobile,
-  onClick,
+  onClick
 }: {
   log: PayloadLog
   isMobile: boolean
   onClick: () => void
 }) {
-  const methodColor = METHOD_COLORS[log.method] ?? 'bg-bg-secondary text-text-secondary border-border'
+  const methodColor =
+    METHOD_COLORS[log.method] ?? 'bg-bg-secondary text-text-secondary border-border'
   const sourceColor = SOURCE_COLORS[log.source] ?? SOURCE_COLORS.internal
   const statusColor = log.is_error
     ? 'text-red-700 dark:text-red-400'
@@ -363,15 +419,27 @@ function LogRow({
         onClick={onClick}
       >
         <div className='mb-1.5 flex items-center gap-2'>
-          <span className={cn('shrink-0 rounded border px-1.5 py-0.5 font-mono text-[11px] font-semibold', methodColor)}>
+          <span
+            className={cn(
+              'shrink-0 rounded border px-1.5 py-0.5 font-mono text-[11px] font-semibold',
+              methodColor
+            )}
+          >
             {log.method}
           </span>
-          <span className={cn('shrink-0 font-mono text-[12px] font-semibold tabular-nums', statusColor)}>
+          <span
+            className={cn('shrink-0 font-mono text-[12px] font-semibold tabular-nums', statusColor)}
+          >
             {log.status_code}
           </span>
           {log.is_error && <AlertCircle className='size-3 shrink-0 text-red-500' />}
           {log.source === 'storefront' && (
-            <span className={cn('shrink-0 rounded border px-1.5 py-0.5 text-[11px] font-medium', sourceColor)}>
+            <span
+              className={cn(
+                'shrink-0 rounded border px-1.5 py-0.5 text-[11px] font-medium',
+                sourceColor
+              )}
+            >
               {SOURCE_LABEL.storefront}
             </span>
           )}
@@ -384,7 +452,7 @@ function LogRow({
             <span className='font-mono'>{log.url}</span>
           )}
         </div>
-        <div className='flex items-center gap-2 text-[11px] tabular-nums text-text-tertiary'>
+        <div className='flex items-center gap-2 text-[11px] text-text-tertiary tabular-nums'>
           <span>{formatDuration(log.duration_ms)}</span>
           <span className='text-text-quaternary'>·</span>
           <span>{formatDateTimeShort(log.created_at)}</span>
@@ -398,40 +466,55 @@ function LogRow({
       className={cn(
         ROW_GRID,
         'group/row cursor-pointer border-b border-border-light px-5 py-2 transition-colors duration-100 hover:bg-bg-hover xl:px-6',
-        log.is_error && 'bg-red-500/[0.02]',
+        log.is_error && 'bg-red-500/[0.02]'
       )}
       onClick={onClick}
     >
       <div>
-        <span className={cn('rounded border px-1.5 py-0.5 font-mono text-[11px] font-semibold', methodColor)}>
+        <span
+          className={cn(
+            'rounded border px-1.5 py-0.5 font-mono text-[11px] font-semibold',
+            methodColor
+          )}
+        >
           {log.method}
         </span>
       </div>
       <div className='flex min-w-0 items-center gap-1.5'>
         {log.is_error && <AlertCircle className='size-3 shrink-0 text-red-500' />}
         <div className='flex min-w-0 flex-col'>
-          <span className={cn(
-            'truncate text-[12px]',
-            log.action_name ? 'font-medium text-foreground' : 'font-mono text-foreground',
-          )}>
+          <span
+            className={cn(
+              'truncate text-[12px]',
+              log.action_name ? 'font-medium text-foreground' : 'font-mono text-foreground'
+            )}
+          >
             {primaryLine}
           </span>
           {secondaryLine && (
-            <span className='truncate font-mono text-[11px] text-text-tertiary'>{secondaryLine}</span>
+            <span className='truncate font-mono text-[11px] text-text-tertiary'>
+              {secondaryLine}
+            </span>
           )}
         </div>
       </div>
-      <div className='min-w-0 truncate text-[13px] text-text-tertiary'>
-        {log.entity || '—'}
-      </div>
+      <div className='min-w-0 truncate text-[13px] text-text-tertiary'>{log.entity || '—'}</div>
       <div className='min-w-0 truncate text-[13px] text-text-tertiary tabular-nums'>
         {log.external_ref || '—'}
       </div>
-      <div className='min-w-0 truncate font-mono text-[12px] text-text-tertiary' title={log.key ?? ''}>
+      <div
+        className='min-w-0 truncate font-mono text-[12px] text-text-tertiary'
+        title={log.key ?? ''}
+      >
         {log.key || '—'}
       </div>
       <div className='min-w-0'>
-        <span className={cn('inline-block max-w-full truncate rounded border px-1.5 py-0.5 align-middle text-[11px] font-medium', sourceColor)}>
+        <span
+          className={cn(
+            'inline-block max-w-full truncate rounded border px-1.5 py-0.5 align-middle text-[11px] font-medium',
+            sourceColor
+          )}
+        >
           {SOURCE_LABEL[log.source] ?? log.source}
         </span>
       </div>
@@ -440,10 +523,10 @@ function LogRow({
           {log.status_code}
         </span>
       </div>
-      <div className='text-right text-[12px] tabular-nums text-text-tertiary'>
+      <div className='text-right text-[12px] text-text-tertiary tabular-nums'>
         {formatDuration(log.duration_ms)}
       </div>
-      <div className='min-w-0 truncate text-[12px] tabular-nums text-text-tertiary'>
+      <div className='min-w-0 truncate text-[12px] text-text-tertiary tabular-nums'>
         {formatDateTimeShort(log.created_at)}
       </div>
       <div className='text-text-tertiary opacity-0 transition-opacity group-hover/row:opacity-100'>
@@ -456,6 +539,6 @@ function LogRow({
 export const Route = createFileRoute('/_authenticated/activity/')({
   component: ActivityPage,
   head: () => ({
-    meta: [{ title: 'Activity' }],
-  }),
+    meta: [{ title: 'Activity' }]
+  })
 })

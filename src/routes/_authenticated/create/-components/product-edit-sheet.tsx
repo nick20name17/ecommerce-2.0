@@ -171,7 +171,7 @@ export const ProductEditSheet = ({
     saveMutation.mutate()
   }
 
-  const selectedUnitData = units?.find((u) => u.unit === selectedUnit)
+  const selectedUnitData = units?.find(u => u.unit === selectedUnit)
   const priceDisplay = hasConfigs
     ? selectedConfigCount > 0
       ? totalPrice
@@ -192,26 +192,23 @@ export const ProductEditSheet = ({
 
   return (
     <>
-      <Dialog
-        open={open}
-        onOpenChange={(v) => (!v ? handleClose() : onOpenChange(v))}
-      >
+      <Dialog open={open} onOpenChange={v => (!v ? handleClose() : onOpenChange(v))}>
         <DialogContent
           showCloseButton={false}
           className={`flex ${showConfigs ? 'h-[92vh] w-[94vw] max-w-[1200px]!' : 'h-auto max-h-[92vh] w-[94vw] max-w-[500px]!'} flex-col gap-0 overflow-hidden rounded-[12px] border p-0 shadow-2xl`}
         >
           {/* Header */}
-          <div className='border-border flex h-12 shrink-0 items-center gap-2.5 border-b px-5'>
+          <div className='flex h-12 shrink-0 items-center gap-2.5 border-b border-border px-5'>
             <h2 className='shrink-0 text-[14px] font-semibold tracking-[-0.01em]'>
               {mode === 'add' ? 'Add Product' : 'Edit Product'}
             </h2>
             {showConfigs && (
-              <span className='text-text-tertiary truncate text-[13px]'>{displayName}</span>
+              <span className='truncate text-[13px] text-text-tertiary'>{displayName}</span>
             )}
             <div className='flex-1' />
             <button
               type='button'
-              className='text-text-tertiary hover:bg-bg-hover hover:text-foreground inline-flex size-7 shrink-0 items-center justify-center rounded-[5px] transition-colors duration-[80ms]'
+              className='inline-flex size-7 shrink-0 items-center justify-center rounded-[5px] text-text-tertiary transition-colors duration-[80ms] hover:bg-bg-hover hover:text-foreground'
               onClick={handleClose}
             >
               <X className='size-4' />
@@ -222,16 +219,16 @@ export const ProductEditSheet = ({
             /* Full two-panel layout for products with configurations */
             <div className='flex min-h-0 flex-1'>
               {/* Left panel: image + info */}
-              <div className='border-border bg-bg-secondary/30 flex w-[380px] shrink-0 [scrollbar-width:none] flex-col overflow-y-auto border-r [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden'>
+              <div className='flex w-[380px] shrink-0 flex-col overflow-y-auto border-r border-border bg-bg-secondary/30 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden'>
                 <div className='p-4'>
                   <ProductImageGallery
                     photos={photos}
                     photoIndex={photoIndex}
-                    onPhotoIndexChange={(i) => dispatch({ type: 'SET_PHOTO_INDEX', value: i })}
+                    onPhotoIndexChange={i => dispatch({ type: 'SET_PHOTO_INDEX', value: i })}
                     displayName={displayName}
                   />
                 </div>
-                <div className='border-border border-t p-4'>
+                <div className='border-t border-border p-4'>
                   <ProductInfoSection
                     displayName={displayName}
                     configLoading={configLoading}
@@ -241,11 +238,11 @@ export const ProductEditSheet = ({
                     oldPriceDisplay={oldPriceDisplay}
                     hasDiscount={hasDiscount}
                     quantity={quantity}
-                    onQuantityChange={(v) => dispatch({ type: 'SET_QUANTITY', value: v })}
+                    onQuantityChange={v => dispatch({ type: 'SET_QUANTITY', value: v })}
                     ignoreCount={ignoreCount}
                     maxCount={maxCount}
                     selectedUnit={selectedUnit}
-                    onSelectedUnitChange={(u) => dispatch({ type: 'SET_SELECTED_UNIT', value: u })}
+                    onSelectedUnitChange={u => dispatch({ type: 'SET_SELECTED_UNIT', value: u })}
                     units={units}
                     specs={specs}
                   />
@@ -259,7 +256,7 @@ export const ProductEditSheet = ({
                     <ProductConfigurations
                       configs={configs}
                       activeTab={activeTab}
-                      onActiveTabChange={(tab) => dispatch({ type: 'SET_ACTIVE_TAB', value: tab })}
+                      onActiveTabChange={tab => dispatch({ type: 'SET_ACTIVE_TAB', value: tab })}
                       onSelectItem={handleSelectItem}
                       onResetConfigurations={() => dispatch({ type: 'DESELECT_ALL_CONFIGS' })}
                       hasUncheckedRequired={hasUncheckedRequired}
@@ -267,7 +264,7 @@ export const ProductEditSheet = ({
                       totalConfigCount={totalConfigCount}
                       wizardMode={wizardMode}
                       activeStep={activeTab}
-                      onStepChange={(step) => dispatch({ type: 'SET_ACTIVE_TAB', value: step })}
+                      onStepChange={step => dispatch({ type: 'SET_ACTIVE_TAB', value: step })}
                       canGoNext={canGoNext}
                       canGoPrev={canGoPrev}
                       onNext={goNext}
@@ -284,7 +281,7 @@ export const ProductEditSheet = ({
                   </div>
                 ) : (
                   <div className='flex flex-1 items-center justify-center'>
-                    <Spinner className='text-text-tertiary size-5' />
+                    <Spinner className='size-5 text-text-tertiary' />
                   </div>
                 )}
               </div>
@@ -295,7 +292,7 @@ export const ProductEditSheet = ({
               <div className='flex gap-4 p-4'>
                 {/* Small thumbnail */}
                 {photos && photos.length > 0 && (
-                  <div className='border-border bg-background size-[80px] shrink-0 overflow-hidden rounded-[8px] border'>
+                  <div className='size-[80px] shrink-0 overflow-hidden rounded-[8px] border border-border bg-background'>
                     <img
                       src={photos[0]}
                       alt={displayName}
@@ -312,16 +309,16 @@ export const ProductEditSheet = ({
                 </div>
               </div>
 
-              <div className='border-border flex flex-col gap-4 border-t px-4 py-3'>
+              <div className='flex flex-col gap-4 border-t border-border px-4 py-3'>
                 {/* Quantity */}
                 <div>
-                  <span className='text-text-tertiary mb-1.5 block text-[12px] font-medium tracking-[0.04em] uppercase'>
+                  <span className='mb-1.5 block text-[12px] font-medium tracking-[0.04em] text-text-tertiary uppercase'>
                     Quantity
                   </span>
                   <div className='w-fit'>
                     <NumberInput
                       value={quantity}
-                      onChange={(v) => dispatch({ type: 'SET_QUANTITY', value: v })}
+                      onChange={v => dispatch({ type: 'SET_QUANTITY', value: v })}
                       min={0}
                       max={ignoreCount ? undefined : maxCount}
                       disabled={!ignoreCount && maxCount < 0}
@@ -333,11 +330,11 @@ export const ProductEditSheet = ({
                 {/* Units */}
                 {hasMultipleUnits && units && (
                   <div>
-                    <span className='text-text-tertiary mb-1.5 block text-[12px] font-medium tracking-[0.04em] uppercase'>
+                    <span className='mb-1.5 block text-[12px] font-medium tracking-[0.04em] text-text-tertiary uppercase'>
                       Unit of Measure
                     </span>
                     <div className='flex flex-wrap gap-1.5'>
-                      {units.map((u) => {
+                      {units.map(u => {
                         const isSelected = selectedUnit === u.unit
                         return (
                           <button
@@ -346,7 +343,7 @@ export const ProductEditSheet = ({
                             className={cn(
                               'flex items-center gap-1.5 rounded-[6px] border px-2.5 py-1.5 text-[13px] transition-colors duration-[80ms]',
                               isSelected
-                                ? 'border-primary bg-primary/10 text-primary font-semibold'
+                                ? 'border-primary bg-primary/10 font-semibold text-primary'
                                 : 'border-border hover:border-primary/40'
                             )}
                             onClick={() => dispatch({ type: 'SET_SELECTED_UNIT', value: u.unit })}
@@ -371,9 +368,9 @@ export const ProductEditSheet = ({
           )}
 
           {/* Footer */}
-          <div className='border-border flex shrink-0 items-center justify-between gap-4 border-t px-5 py-3'>
+          <div className='flex shrink-0 items-center justify-between gap-4 border-t border-border px-5 py-3'>
             <div>
-              <span className='text-text-tertiary text-[12px] font-medium tracking-[0.04em] uppercase'>
+              <span className='text-[12px] font-medium tracking-[0.04em] text-text-tertiary uppercase'>
                 Total
               </span>
               <div className='flex items-baseline gap-2'>
@@ -381,7 +378,7 @@ export const ProductEditSheet = ({
                   {formatCurrency(priceDisplay * quantity)}
                 </p>
                 {quantity > 1 && (
-                  <span className='text-text-tertiary text-[12px] tabular-nums'>
+                  <span className='text-[12px] text-text-tertiary tabular-nums'>
                     {formatCurrency(priceDisplay)} × {quantity}
                   </span>
                 )}
@@ -391,14 +388,14 @@ export const ProductEditSheet = ({
             <div className='flex items-center gap-2'>
               <button
                 type='button'
-                className='text-text-secondary hover:bg-bg-hover hover:text-foreground inline-flex h-8 items-center rounded-[6px] px-3 text-[13px] font-medium transition-colors duration-[80ms]'
+                className='inline-flex h-8 items-center rounded-[6px] px-3 text-[13px] font-medium text-text-secondary transition-colors duration-[80ms] hover:bg-bg-hover hover:text-foreground'
                 onClick={handleClose}
               >
                 Cancel
               </button>
               <button
                 type='button'
-                className='bg-primary text-primary-foreground inline-flex h-8 items-center gap-1.5 rounded-[6px] px-4 text-[13px] font-medium transition-opacity duration-[80ms] hover:opacity-90 disabled:pointer-events-none disabled:opacity-50'
+                className='inline-flex h-8 items-center gap-1.5 rounded-[6px] bg-primary px-4 text-[13px] font-medium text-primary-foreground transition-opacity duration-[80ms] hover:opacity-90 disabled:pointer-events-none disabled:opacity-50'
                 disabled={
                   hasUncheckedRequired ||
                   configLoading ||
@@ -425,7 +422,7 @@ export const ProductEditSheet = ({
 
       <AlertDialog
         open={confirmClose}
-        onOpenChange={(v) => dispatch({ type: 'SET_CONFIRM_CLOSE', value: v })}
+        onOpenChange={v => dispatch({ type: 'SET_CONFIRM_CLOSE', value: v })}
       >
         <AlertDialogContent className='rounded-[12px]'>
           <AlertDialogHeader>

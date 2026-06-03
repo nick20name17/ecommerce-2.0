@@ -10,7 +10,7 @@ import {
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue,
+  SelectValue
 } from '@/components/ui/select'
 
 export const STATUS_LABEL: Record<ProductStatus, string> = {
@@ -18,7 +18,7 @@ export const STATUS_LABEL: Record<ProductStatus, string> = {
   sale: 'Sale',
   new: 'New',
   clearance: 'Clearance',
-  coming_soon: 'Coming Soon',
+  coming_soon: 'Coming Soon'
 }
 
 export const STATUS_BADGE_CLASS: Record<ProductStatus, string> = {
@@ -26,7 +26,7 @@ export const STATUS_BADGE_CLASS: Record<ProductStatus, string> = {
   sale: 'bg-rose-500/15 text-rose-700 dark:text-rose-400',
   new: 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-400',
   clearance: 'bg-orange-500/15 text-orange-700 dark:text-orange-400',
-  coming_soon: 'bg-sky-500/15 text-sky-700 dark:text-sky-400',
+  coming_soon: 'bg-sky-500/15 text-sky-700 dark:text-sky-400'
 }
 
 export type StatusValue = ProductStatus | ''
@@ -43,12 +43,7 @@ interface Props {
  * 5 curated values (mirrors INVENTRY.E_FEATURE) or empty. Expiration is
  * optional — null means "doesn't expire". Used inside Edit dialogs.
  */
-export const StatusEditor = ({
-  status,
-  expiresAt,
-  onStatusChange,
-  onExpiresAtChange,
-}: Props) => {
+export const StatusEditor = ({ status, expiresAt, onStatusChange, onExpiresAtChange }: Props) => {
   const expiresDate = expiresAt ? new Date(expiresAt) : undefined
 
   return (
@@ -58,7 +53,7 @@ export const StatusEditor = ({
         <div className='flex items-center gap-2'>
           <Select
             value={status || '__none'}
-            onValueChange={(v) => {
+            onValueChange={v => {
               if (v === '__none') {
                 onStatusChange('')
                 onExpiresAtChange(null)
@@ -74,7 +69,7 @@ export const StatusEditor = ({
               <SelectItem value='__none'>
                 <span className='text-text-tertiary'>None</span>
               </SelectItem>
-              {PRODUCT_STATUS_VALUES.map((v) => (
+              {PRODUCT_STATUS_VALUES.map(v => (
                 <SelectItem key={v} value={v}>
                   {STATUS_LABEL[v]}
                 </SelectItem>
@@ -90,7 +85,7 @@ export const StatusEditor = ({
           <div className='flex items-center gap-2'>
             <DatePicker
               value={expiresDate}
-              onChange={(d) => onExpiresAtChange(d ? d.toISOString() : null)}
+              onChange={d => onExpiresAtChange(d ? d.toISOString() : null)}
               placeholder='No expiration'
               showTime
             />
@@ -107,8 +102,7 @@ export const StatusEditor = ({
             )}
           </div>
           <p className='text-[11px] text-text-tertiary'>
-            Empty = never expires. Storefront hides the status after this
-            date.
+            Empty = never expires. Storefront hides the status after this date.
           </p>
         </div>
       )}
@@ -130,12 +124,12 @@ export const StatusBadge = ({ status, expiresAt, className }: BadgeProps) => {
     <span
       className={[
         'inline-flex shrink-0 items-center rounded-full px-2 py-0.5 text-[11px] font-medium',
-        expired
-          ? 'bg-muted text-text-tertiary line-through'
-          : STATUS_BADGE_CLASS[status],
-        className ?? '',
+        expired ? 'bg-muted text-text-tertiary line-through' : STATUS_BADGE_CLASS[status],
+        className ?? ''
       ].join(' ')}
-      title={expired && expiresAt ? `Expired ${new Date(expiresAt).toLocaleDateString()}` : undefined}
+      title={
+        expired && expiresAt ? `Expired ${new Date(expiresAt).toLocaleDateString()}` : undefined
+      }
     >
       {STATUS_LABEL[status]}
     </span>

@@ -14,7 +14,7 @@ import {
   DialogContent,
   DialogFooter,
   DialogHeader,
-  DialogTitle,
+  DialogTitle
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -36,8 +36,7 @@ export const VPItemsSection = ({ vp, projectId, isMobile, isTablet }: VPItemsSec
 
   // Local active state for instant toggle (fire-and-forget API call)
   const [localActive, setLocalActive] = useState<Record<string, boolean>>({})
-  const getItemActive = (item: VariableProductItem) =>
-    localActive[item.id] ?? item.active ?? true
+  const getItemActive = (item: VariableProductItem) => localActive[item.id] ?? item.active ?? true
 
   const addItemMutation = useMutation({
     mutationFn: () =>
@@ -48,23 +47,28 @@ export const VPItemsSection = ({ vp, projectId, isMobile, isTablet }: VPItemsSec
       ),
     meta: {
       successMessage: 'Product added',
-      invalidatesQuery: VP_QUERY_KEYS.detail(vp.id),
+      invalidatesQuery: VP_QUERY_KEYS.detail(vp.id)
     },
     onSuccess: () => {
       setProductAutoid('')
       setIsDefault(false)
       setSortOrder(0)
       setAddOpen(false)
-    },
+    }
   })
 
   const toggleItemActive = (itemId: string) => {
-    const current = localActive[itemId] ?? vp.items.find((i) => i.id === itemId)?.active ?? true
+    const current = localActive[itemId] ?? vp.items.find(i => i.id === itemId)?.active ?? true
     const next = !current
-    setLocalActive((prev) => ({ ...prev, [itemId]: next }))
-    variableProductService.updateItem(vp.id, itemId, { active: next }, {
-      project_id: projectId ?? undefined,
-    })
+    setLocalActive(prev => ({ ...prev, [itemId]: next }))
+    variableProductService.updateItem(
+      vp.id,
+      itemId,
+      { active: next },
+      {
+        project_id: projectId ?? undefined
+      }
+    )
   }
 
   const addProductsMutation = useMutation({
@@ -76,29 +80,32 @@ export const VPItemsSection = ({ vp, projectId, isMobile, isTablet }: VPItemsSec
     },
     meta: {
       successMessage: 'Products added',
-      invalidatesQuery: VP_QUERY_KEYS.detail(vp.id),
-    },
+      invalidatesQuery: VP_QUERY_KEYS.detail(vp.id)
+    }
   })
 
   const removeItemMutation = useMutation({
     mutationFn: (itemId: string) =>
       variableProductService.removeItem(vp.id, itemId, {
-        project_id: projectId ?? undefined,
+        project_id: projectId ?? undefined
       }),
     meta: {
       successMessage: 'Product removed',
-      invalidatesQuery: VP_QUERY_KEYS.detail(vp.id),
-    },
+      invalidatesQuery: VP_QUERY_KEYS.detail(vp.id)
+    }
   })
 
   return (
     <div>
-      <div className='flex items-center gap-2 mb-2'>
-        <h3 className='text-[13px] font-semibold text-text-secondary'>
-          Items ({vp.items.length})
-        </h3>
+      <div className='mb-2 flex items-center gap-2'>
+        <h3 className='text-[13px] font-semibold text-text-secondary'>Items ({vp.items.length})</h3>
         <div className='flex-1' />
-        <Button variant='outline' size='xs' onClick={() => setProductBrowserOpen(true)} isPending={addProductsMutation.isPending}>
+        <Button
+          variant='outline'
+          size='xs'
+          onClick={() => setProductBrowserOpen(true)}
+          isPending={addProductsMutation.isPending}
+        >
           <Plus className='size-3' />
           Browse
         </Button>
@@ -115,38 +122,55 @@ export const VPItemsSection = ({ vp, projectId, isMobile, isTablet }: VPItemsSec
       ) : isMobile ? (
         /* Mobile: card layout */
         <div className='flex flex-col gap-2'>
-          {vp.items.map((item) => (
+          {vp.items.map(item => (
             <div
               key={item.id}
-              className={cn('rounded-lg border border-border p-3', !getItemActive(item) && 'opacity-40')}
+              className={cn(
+                'rounded-lg border border-border p-3',
+                !getItemActive(item) && 'opacity-40'
+              )}
             >
               <div className='flex items-start gap-2'>
-                <ProductThumbnail entityType='product' entityId={item.product_autoid} projectId={projectId} className='size-8 shrink-0' />
-                <div className='flex-1 min-w-0'>
-                  <div className='text-[13px] font-medium truncate'>{item.descr_1 || item.product_id}</div>
-                  <div className='text-[11px] font-mono text-text-tertiary'>{item.product_id}</div>
+                <ProductThumbnail
+                  entityType='product'
+                  entityId={item.product_autoid}
+                  projectId={projectId}
+                  className='size-8 shrink-0'
+                />
+                <div className='min-w-0 flex-1'>
+                  <div className='truncate text-[13px] font-medium'>
+                    {item.descr_1 || item.product_id}
+                  </div>
+                  <div className='font-mono text-[11px] text-text-tertiary'>{item.product_id}</div>
                 </div>
                 {item.is_default && (
-                  <Star className='size-3.5 fill-amber-400 text-amber-400 shrink-0' />
+                  <Star className='size-3.5 shrink-0 fill-amber-400 text-amber-400' />
                 )}
                 <Button
                   variant='ghost'
                   size='icon-xs'
-                  className={cn('shrink-0', getItemActive(item) ? 'text-text-tertiary' : 'text-text-quaternary')}
+                  className={cn(
+                    'shrink-0',
+                    getItemActive(item) ? 'text-text-tertiary' : 'text-text-quaternary'
+                  )}
                   onClick={() => toggleItemActive(item.id)}
                 >
-                  {getItemActive(item) ? <Eye className='size-3.5' /> : <EyeOff className='size-3.5' />}
+                  {getItemActive(item) ? (
+                    <Eye className='size-3.5' />
+                  ) : (
+                    <EyeOff className='size-3.5' />
+                  )}
                 </Button>
                 <Button
                   variant='ghost'
                   size='icon-xs'
-                  className='text-text-tertiary hover:text-destructive shrink-0'
+                  className='shrink-0 text-text-tertiary hover:text-destructive'
                   onClick={() => removeItemMutation.mutate(item.id)}
                 >
                   <Trash2 className='size-3.5' />
                 </Button>
               </div>
-              <div className='flex items-center gap-4 mt-1.5 pl-6 text-[12px] text-text-secondary'>
+              <div className='mt-1.5 flex items-center gap-4 pl-6 text-[12px] text-text-secondary'>
                 <span>Price: {item.price ? `$${item.price}` : '—'}</span>
                 <span>Stock: {item.available_stock ?? '—'}</span>
               </div>
@@ -155,14 +179,16 @@ export const VPItemsSection = ({ vp, projectId, isMobile, isTablet }: VPItemsSec
         </div>
       ) : (
         /* Desktop/tablet: table layout */
-        <div className='rounded-lg border border-border overflow-hidden'>
-          <div className={cn(
-            'bg-bg-secondary text-text-tertiary flex items-center py-1.5 text-[12px] font-medium',
-            isTablet ? 'gap-3 px-3' : 'gap-4 px-4'
-          )}>
+        <div className='overflow-hidden rounded-lg border border-border'>
+          <div
+            className={cn(
+              'flex items-center bg-bg-secondary py-1.5 text-[12px] font-medium text-text-tertiary',
+              isTablet ? 'gap-3 px-3' : 'gap-4 px-4'
+            )}
+          >
             <div className='w-8 shrink-0' />
             <div className={cn(isTablet ? 'w-[80px]' : 'w-[100px]', 'shrink-0')}>Product ID</div>
-            <div className='flex-1 min-w-0'>Description</div>
+            <div className='min-w-0 flex-1'>Description</div>
             <div className='w-[70px] shrink-0 text-right'>Price</div>
             {!isTablet && <div className='w-[70px] shrink-0 text-right'>Stock</div>}
             {!isTablet && <div className='w-[50px] shrink-0 text-center'>Default</div>}
@@ -170,20 +196,30 @@ export const VPItemsSection = ({ vp, projectId, isMobile, isTablet }: VPItemsSec
             <div className='w-[28px] shrink-0' />
           </div>
 
-          {vp.items.map((item) => (
+          {vp.items.map(item => (
             <div
               key={item.id}
               className={cn(
-                'flex items-center border-t border-border-light py-1.5 hover:bg-bg-hover transition-colors',
+                'flex items-center border-t border-border-light py-1.5 transition-colors hover:bg-bg-hover',
                 isTablet ? 'gap-3 px-3' : 'gap-4 px-4',
                 !getItemActive(item) && 'opacity-40'
               )}
             >
-              <ProductThumbnail entityType='product' entityId={item.product_autoid} projectId={projectId} className='size-8 shrink-0' />
-              <div className={cn(isTablet ? 'w-[80px]' : 'w-[100px]', 'shrink-0 text-[12px] font-mono text-text-secondary truncate')}>
+              <ProductThumbnail
+                entityType='product'
+                entityId={item.product_autoid}
+                projectId={projectId}
+                className='size-8 shrink-0'
+              />
+              <div
+                className={cn(
+                  isTablet ? 'w-[80px]' : 'w-[100px]',
+                  'shrink-0 truncate font-mono text-[12px] text-text-secondary'
+                )}
+              >
                 {item.product_id}
               </div>
-              <div className='flex-1 min-w-0 text-[13px] truncate'>
+              <div className='min-w-0 flex-1 truncate text-[13px]'>
                 {item.descr_1}
                 {isTablet && item.is_default && (
                   <Star className='ml-1 inline size-3 fill-amber-400 text-amber-400' />
@@ -198,10 +234,8 @@ export const VPItemsSection = ({ vp, projectId, isMobile, isTablet }: VPItemsSec
                 </div>
               )}
               {!isTablet && (
-                <div className='w-[50px] shrink-0 flex justify-center'>
-                  {item.is_default && (
-                    <Star className='size-3.5 fill-amber-400 text-amber-400' />
-                  )}
+                <div className='flex w-[50px] shrink-0 justify-center'>
+                  {item.is_default && <Star className='size-3.5 fill-amber-400 text-amber-400' />}
                 </div>
               )}
               <Button
@@ -216,7 +250,11 @@ export const VPItemsSection = ({ vp, projectId, isMobile, isTablet }: VPItemsSec
                 onClick={() => toggleItemActive(item.id)}
                 title={getItemActive(item) ? 'Hide from site' : 'Show on site'}
               >
-                {getItemActive(item) ? <Eye className='size-3.5' /> : <EyeOff className='size-3.5' />}
+                {getItemActive(item) ? (
+                  <Eye className='size-3.5' />
+                ) : (
+                  <EyeOff className='size-3.5' />
+                )}
               </Button>
               <Button
                 variant='ghost'
@@ -235,7 +273,7 @@ export const VPItemsSection = ({ vp, projectId, isMobile, isTablet }: VPItemsSec
       <Dialog open={addOpen} onOpenChange={setAddOpen}>
         <DialogContent className='sm:max-w-sm'>
           <form
-            onSubmit={(e) => {
+            onSubmit={e => {
               e.preventDefault()
               addItemMutation.mutate()
             }}
@@ -249,7 +287,7 @@ export const VPItemsSection = ({ vp, projectId, isMobile, isTablet }: VPItemsSec
                 <Input
                   id='vpi-autoid'
                   value={productAutoid}
-                  onChange={(e) => setProductAutoid(e.target.value)}
+                  onChange={e => setProductAutoid(e.target.value)}
                   placeholder='INVENTRY_AUTOID'
                   required
                   autoFocus
@@ -260,7 +298,7 @@ export const VPItemsSection = ({ vp, projectId, isMobile, isTablet }: VPItemsSec
                   type='checkbox'
                   id='vpi-default'
                   checked={isDefault}
-                  onChange={(e) => setIsDefault(e.target.checked)}
+                  onChange={e => setIsDefault(e.target.checked)}
                   className='size-4 rounded border-border'
                 />
                 <Label htmlFor='vpi-default'>Default variant</Label>
@@ -271,7 +309,7 @@ export const VPItemsSection = ({ vp, projectId, isMobile, isTablet }: VPItemsSec
                   id='vpi-sort'
                   type='number'
                   value={sortOrder}
-                  onChange={(e) => setSortOrder(Number(e.target.value))}
+                  onChange={e => setSortOrder(Number(e.target.value))}
                 />
               </div>
             </DialogBody>
@@ -292,7 +330,7 @@ export const VPItemsSection = ({ vp, projectId, isMobile, isTablet }: VPItemsSec
         onOpenChange={setProductBrowserOpen}
         projectId={projectId}
         title='Add Products to Superinventory'
-        onSelect={(products) => addProductsMutation.mutate(products)}
+        onSelect={products => addProductsMutation.mutate(products)}
       />
     </div>
   )

@@ -2,10 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { GripVertical, ImagePlus, Pencil, Star, Trash2, Upload } from 'lucide-react'
 import { useRef, useState } from 'react'
 
-import {
-  CATALOG_IMAGE_QUERY_KEYS,
-  getCatalogImagesQuery,
-} from '@/api/catalog-image/query'
+import { CATALOG_IMAGE_QUERY_KEYS, getCatalogImagesQuery } from '@/api/catalog-image/query'
 import type { CatalogImageItem } from '@/api/catalog-image/schema'
 import { catalogImageService } from '@/api/catalog-image/service'
 import { Button } from '@/components/ui/button'
@@ -15,7 +12,7 @@ import {
   DialogContent,
   DialogFooter,
   DialogHeader,
-  DialogTitle,
+  DialogTitle
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -28,11 +25,7 @@ interface ImageGalleryProps {
   projectId: number | null
 }
 
-export const ImageGallery = ({
-  entityType,
-  entityId,
-  projectId,
-}: ImageGalleryProps) => {
+export const ImageGallery = ({ entityType, entityId, projectId }: ImageGalleryProps) => {
   const queryClient = useQueryClient()
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [uploading, setUploading] = useState(false)
@@ -42,11 +35,7 @@ export const ImageGallery = ({
   const [dragImageId, setDragImageId] = useState<number | null>(null)
   const [dropTargetId, setDropTargetId] = useState<number | null>(null)
 
-  const queryKey = CATALOG_IMAGE_QUERY_KEYS.list(
-    entityType,
-    entityId,
-    projectId ?? undefined
-  )
+  const queryKey = CATALOG_IMAGE_QUERY_KEYS.list(entityType, entityId, projectId ?? undefined)
 
   const { data, isLoading } = useQuery(
     getCatalogImagesQuery(entityType, entityId, projectId ?? undefined)
@@ -54,54 +43,53 @@ export const ImageGallery = ({
 
   const images = data?.results ?? []
 
-  const invalidate = () =>
-    queryClient.invalidateQueries({ queryKey })
+  const invalidate = () => queryClient.invalidateQueries({ queryKey })
 
   const uploadFiles = async (files: FileList | File[]) => {
-      setUploading(true)
-      try {
-        for (const file of Array.from(files)) {
-          const presigned = await catalogImageService.getPresignedUrl(
-            {
-              entity_type: entityType,
-              entity_id: entityId,
-              filename: file.name,
-              content_type: file.type,
-            },
-            { project_id: projectId ?? undefined }
-          )
+    setUploading(true)
+    try {
+      for (const file of Array.from(files)) {
+        const presigned = await catalogImageService.getPresignedUrl(
+          {
+            entity_type: entityType,
+            entity_id: entityId,
+            filename: file.name,
+            content_type: file.type
+          },
+          { project_id: projectId ?? undefined }
+        )
 
-          await fetch(presigned.upload_url, {
-            method: 'PUT',
-            body: file,
-            headers: { 'Content-Type': file.type },
-          })
+        await fetch(presigned.upload_url, {
+          method: 'PUT',
+          body: file,
+          headers: { 'Content-Type': file.type }
+        })
 
-          await catalogImageService.confirmUpload(
-            {
-              entity_type: entityType,
-              entity_id: entityId,
-              s3_key: presigned.s3_key,
-              original_filename: file.name,
-              content_type: file.type,
-            },
-            { project_id: projectId ?? undefined }
-          )
-        }
-        invalidate()
-      } catch (err) {
-        console.error('Upload failed:', err)
-      } finally {
-        setUploading(false)
+        await catalogImageService.confirmUpload(
+          {
+            entity_type: entityType,
+            entity_id: entityId,
+            s3_key: presigned.s3_key,
+            original_filename: file.name,
+            content_type: file.type
+          },
+          { project_id: projectId ?? undefined }
+        )
       }
+      invalidate()
+    } catch (err) {
+      console.error('Upload failed:', err)
+    } finally {
+      setUploading(false)
     }
+  }
 
   const deleteMutation = useMutation({
     mutationFn: (imageId: number) =>
       catalogImageService.delete(imageId, {
-        project_id: projectId ?? undefined,
+        project_id: projectId ?? undefined
       }),
-    onSuccess: invalidate,
+    onSuccess: invalidate
   })
 
   const setPrimaryMutation = useMutation({
@@ -111,7 +99,7 @@ export const ImageGallery = ({
         { is_primary: true },
         { project_id: projectId ?? undefined }
       ),
-    onSuccess: invalidate,
+    onSuccess: invalidate
   })
 
   const updateAltMutation = useMutation({
@@ -124,7 +112,7 @@ export const ImageGallery = ({
     onSuccess: () => {
       setEditImage(null)
       invalidate()
-    },
+    }
   })
 
   const reorderMutation = useMutation({
@@ -134,15 +122,15 @@ export const ImageGallery = ({
         { sort_order: newSortOrder },
         { project_id: projectId ?? undefined }
       ),
-    onSuccess: invalidate,
+    onSuccess: invalidate
   })
 
   const handleFileDrop = (e: React.DragEvent) => {
-      e.preventDefault()
-      setDragOver(false)
-      const files = e.dataTransfer.files
-      if (files.length > 0) uploadFiles(files)
-    }
+    e.preventDefault()
+    setDragOver(false)
+    const files = e.dataTransfer.files
+    if (files.length > 0) uploadFiles(files)
+  }
 
   const handleImageDragStart = (e: React.DragEvent, imageId: number) => {
     e.dataTransfer.effectAllowed = 'move'
@@ -165,11 +153,11 @@ export const ImageGallery = ({
     setDropTargetId(null)
     if (!sourceId || sourceId === targetId) return
 
-    const targetImage = images.find((img) => img.id === targetId)
+    const targetImage = images.find(img => img.id === targetId)
     if (targetImage) {
       reorderMutation.mutate({
         imageId: sourceId,
-        newSortOrder: targetImage.sort_order,
+        newSortOrder: targetImage.sort_order
       })
     }
   }
@@ -193,10 +181,8 @@ export const ImageGallery = ({
 
   return (
     <div>
-      <div className='flex items-center gap-2 mb-2'>
-        <h3 className='text-[13px] font-semibold text-text-secondary'>
-          Images ({images.length})
-        </h3>
+      <div className='mb-2 flex items-center gap-2'>
+        <h3 className='text-[13px] font-semibold text-text-secondary'>Images ({images.length})</h3>
         <div className='flex-1' />
         <Button
           variant='outline'
@@ -218,7 +204,7 @@ export const ImageGallery = ({
       </div>
 
       {isLoading ? (
-        <div className='grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2'>
+        <div className='grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4'>
           {Array.from({ length: 4 }).map((_, i) => (
             <Skeleton key={i} className='aspect-square rounded-lg' />
           ))}
@@ -227,18 +213,16 @@ export const ImageGallery = ({
         <div
           className={cn(
             'rounded-lg border-2 border-dashed py-8 text-center transition-colors',
-            dragOver
-              ? 'border-primary bg-primary/5'
-              : 'border-border hover:border-border-hover'
+            dragOver ? 'border-primary bg-primary/5' : 'hover:border-border-hover border-border'
           )}
-          onDragOver={(e) => {
+          onDragOver={e => {
             e.preventDefault()
             setDragOver(true)
           }}
           onDragLeave={() => setDragOver(false)}
           onDrop={handleFileDrop}
         >
-          <ImagePlus className='mx-auto size-8 text-text-quaternary mb-2' />
+          <ImagePlus className='text-text-quaternary mx-auto mb-2 size-8' />
           <p className='text-[13px] text-text-tertiary'>
             Drag & drop images here or{' '}
             <button
@@ -249,35 +233,39 @@ export const ImageGallery = ({
               browse
             </button>
           </p>
-          <p className='text-[11px] text-text-quaternary mt-1'>
-            JPG, PNG, WebP · Max 10MB
-          </p>
+          <p className='text-text-quaternary mt-1 text-[11px]'>JPG, PNG, WebP · Max 10MB</p>
         </div>
       ) : (
         <div
           className={cn(
-            'grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 rounded-lg p-1 transition-colors',
+            'grid grid-cols-2 gap-2 rounded-lg p-1 transition-colors sm:grid-cols-3 md:grid-cols-4',
             dragOver && 'bg-primary/5 ring-2 ring-primary/20'
           )}
-          onDragOver={(e) => {
+          onDragOver={e => {
             e.preventDefault()
             if (!e.dataTransfer.types.includes('image-reorder')) setDragOver(true)
           }}
-          onDragLeave={() => { setDragOver(false); setDropTargetId(null) }}
+          onDragLeave={() => {
+            setDragOver(false)
+            setDropTargetId(null)
+          }}
           onDrop={handleDrop}
         >
-          {images.map((img) => (
+          {images.map(img => (
             <div
               key={img.id}
               draggable
-              onDragStart={(e) => handleImageDragStart(e, img.id)}
-              onDragEnd={() => { setDragImageId(null); setDropTargetId(null) }}
-              onDragOver={(e) => handleImageDragOver(e, img.id)}
-              onDrop={(e) => handleImageDrop(e, img.id)}
+              onDragStart={e => handleImageDragStart(e, img.id)}
+              onDragEnd={() => {
+                setDragImageId(null)
+                setDropTargetId(null)
+              }}
+              onDragOver={e => handleImageDragOver(e, img.id)}
+              onDrop={e => handleImageDrop(e, img.id)}
               className={cn(
-                'group relative aspect-square rounded-lg overflow-hidden border bg-bg-secondary cursor-grab active:cursor-grabbing transition-all',
+                'group relative aspect-square cursor-grab overflow-hidden rounded-lg border bg-bg-secondary transition-all active:cursor-grabbing',
                 dragImageId === img.id
-                  ? 'opacity-40 border-border'
+                  ? 'border-border opacity-40'
                   : dropTargetId === img.id
                     ? 'border-primary ring-2 ring-primary/30'
                     : 'border-border'
@@ -286,12 +274,12 @@ export const ImageGallery = ({
               <img
                 src={img.thumbnail_url}
                 alt={img.alt || img.original_filename}
-                className='size-full object-cover pointer-events-none'
+                className='pointer-events-none size-full object-cover'
                 loading='lazy'
               />
 
               {/* Drag handle */}
-              <div className='absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity'>
+              <div className='absolute top-1 right-1 opacity-0 transition-opacity group-hover:opacity-100'>
                 <div className='rounded bg-black/50 p-0.5'>
                   <GripVertical className='size-3 text-white' />
                 </div>
@@ -306,13 +294,13 @@ export const ImageGallery = ({
 
               {/* Alt text indicator */}
               {img.alt && (
-                <div className='absolute bottom-0 left-0 right-0 bg-black/60 px-1.5 py-0.5 text-[10px] text-white truncate'>
+                <div className='absolute right-0 bottom-0 left-0 truncate bg-black/60 px-1.5 py-0.5 text-[10px] text-white'>
                   {img.alt}
                 </div>
               )}
 
               {/* Actions overlay */}
-              <div className='absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center gap-1 opacity-0 group-hover:opacity-100'>
+              <div className='absolute inset-0 flex items-center justify-center gap-1 bg-black/0 opacity-0 transition-colors group-hover:bg-black/30 group-hover:opacity-100'>
                 {!img.is_primary && (
                   <Button
                     variant='secondary'
@@ -339,7 +327,7 @@ export const ImageGallery = ({
                 <Button
                   variant='secondary'
                   size='icon-xs'
-                  className='size-7 hover:bg-destructive hover:text-destructive-foreground'
+                  className='hover:text-destructive-foreground size-7 hover:bg-destructive'
                   onClick={() => deleteMutation.mutate(img.id)}
                   title='Delete'
                 >
@@ -352,23 +340,20 @@ export const ImageGallery = ({
           {/* Upload placeholder tile */}
           <button
             type='button'
-            className='aspect-square rounded-lg border-2 border-dashed border-border hover:border-primary/50 flex flex-col items-center justify-center text-text-quaternary hover:text-primary/50 transition-colors'
+            className='text-text-quaternary flex aspect-square flex-col items-center justify-center rounded-lg border-2 border-dashed border-border transition-colors hover:border-primary/50 hover:text-primary/50'
             onClick={() => fileInputRef.current?.click()}
           >
-            <ImagePlus className='size-6 mb-1' />
+            <ImagePlus className='mb-1 size-6' />
             <span className='text-[11px]'>Add</span>
           </button>
         </div>
       )}
 
       {/* Edit alt dialog */}
-      <Dialog
-        open={!!editImage}
-        onOpenChange={(v) => !v && setEditImage(null)}
-      >
+      <Dialog open={!!editImage} onOpenChange={v => !v && setEditImage(null)}>
         <DialogContent className='sm:max-w-sm'>
           <form
-            onSubmit={(e) => {
+            onSubmit={e => {
               e.preventDefault()
               updateAltMutation.mutate()
             }}
@@ -381,7 +366,7 @@ export const ImageGallery = ({
                 <img
                   src={editImage.thumbnail_url}
                   alt={editImage.alt}
-                  className='w-full max-h-48 object-contain rounded-md bg-bg-secondary'
+                  className='max-h-48 w-full rounded-md bg-bg-secondary object-contain'
                 />
               )}
               <div className='flex flex-col gap-1.5'>
@@ -389,18 +374,14 @@ export const ImageGallery = ({
                 <Input
                   id='img-alt'
                   value={editAlt}
-                  onChange={(e) => setEditAlt(e.target.value)}
+                  onChange={e => setEditAlt(e.target.value)}
                   placeholder='Describe the image...'
                   autoFocus
                 />
               </div>
             </DialogBody>
             <DialogFooter>
-              <Button
-                type='button'
-                variant='outline'
-                onClick={() => setEditImage(null)}
-              >
+              <Button type='button' variant='outline' onClick={() => setEditImage(null)}>
                 Cancel
               </Button>
               <Button type='submit' isPending={updateAltMutation.isPending}>

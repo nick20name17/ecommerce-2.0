@@ -65,7 +65,7 @@ const UsersPage = () => {
           <Search className='size-3 shrink-0 text-text-tertiary' />
           <input
             defaultValue={search}
-            onChange={(e) => handleSearch(e.target.value)}
+            onChange={e => handleSearch(e.target.value)}
             placeholder='Search by name or email...'
             className='flex-1 bg-transparent text-[13px] outline-none placeholder:text-text-tertiary'
           />
@@ -99,13 +99,13 @@ const UsersPage = () => {
       <UserModal
         key={editingUser?.id ?? 'create'}
         open={modalUser !== null}
-        onOpenChange={(open) => !open && setModalUser(null)}
+        onOpenChange={open => !open && setModalUser(null)}
         user={editingUser}
       />
       <UserDeleteDialog
         user={deleteUser}
         open={!!deleteUser}
-        onOpenChange={(open) => !open && setDeleteUser(null)}
+        onOpenChange={open => !open && setDeleteUser(null)}
       />
     </div>
   )

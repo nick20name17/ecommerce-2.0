@@ -64,7 +64,7 @@ export const CustomersDataTable = ({
       table={table}
       isLoading={isLoading}
       className='flex-1'
-      onRowClick={(row) => onRowClick(row.original)}
+      onRowClick={row => onRowClick(row.original)}
     />
   )
 }

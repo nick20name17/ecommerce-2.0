@@ -1,9 +1,5 @@
 import { useMutation, useQuery } from '@tanstack/react-query'
-import {
-  Calendar,
-  ChevronDown,
-  Plus,
-} from 'lucide-react'
+import { Calendar, ChevronDown, Plus } from 'lucide-react'
 import { addDays, format, nextFriday, nextMonday } from 'date-fns'
 import { useRef, useState } from 'react'
 
@@ -30,10 +26,18 @@ const PRIORITY_BARS: Record<string, number> = {
   low: 1,
   medium: 2,
   high: 3,
-  urgent: 4,
+  urgent: 4
 }
 
-export function PriorityIcon({ priority, color, size = 14 }: { priority: string; color: string; size?: number }) {
+export function PriorityIcon({
+  priority,
+  color,
+  size = 14
+}: {
+  priority: string
+  color: string
+  size?: number
+}) {
   const filled = PRIORITY_BARS[priority] ?? 1
   const barWidth = 2.5
   const gap = 1.5
@@ -66,7 +70,7 @@ const CMD_DATE_PRESETS = [
   { label: 'Tomorrow', getDate: () => addDays(new Date(), 1) },
   { label: 'Next Monday', getDate: () => nextMonday(new Date()) },
   { label: 'Next Friday', getDate: () => nextFriday(new Date()) },
-  { label: 'In 2 weeks', getDate: () => addDays(new Date(), 14) },
+  { label: 'In 2 weeks', getDate: () => addDays(new Date(), 14) }
 ] as const
 
 // ── Component ────────────────────────────────────────────────
@@ -86,7 +90,7 @@ export function CommandBarCreate({
   defaultLinkedProposalAutoid,
   defaultLinkedCustomerAutoid,
   lockLinkedCustomer,
-  linkedCustomerLabel,
+  linkedCustomerLabel
 }: CommandBarCreateProps) {
   const [projectId] = useProjectId()
   const { data: statusesData } = useQuery(getTaskStatusesQuery(projectId ?? null))
@@ -114,7 +118,7 @@ function CommandBarCreateInner({
   defaultLinkedProposalAutoid,
   defaultLinkedCustomerAutoid,
   lockLinkedCustomer,
-  linkedCustomerLabel,
+  linkedCustomerLabel
 }: {
   statuses: TaskStatus[]
   onClose: () => void
@@ -130,14 +134,20 @@ function CommandBarCreateInner({
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [selectedStatus, setSelectedStatus] = useState<TaskStatus | null>(
-    () => statuses.find((s) => s.is_default) ?? statuses[0] ?? null
+    () => statuses.find(s => s.is_default) ?? statuses[0] ?? null
   )
   const [selectedPriority, setSelectedPriority] = useState<TaskPriority>(TASK_PRIORITY.medium)
   const [selectedAssignee, setSelectedAssignee] = useState<number | null>(null)
   const [selectedDueDate, setSelectedDueDate] = useState<string | null>(null)
-  const [selectedOrder, setSelectedOrder] = useState<string | null>(defaultLinkedOrderAutoid ?? null)
-  const [selectedProposal, setSelectedProposal] = useState<string | null>(defaultLinkedProposalAutoid ?? null)
-  const [selectedCustomer, setSelectedCustomer] = useState<string | null>(defaultLinkedCustomerAutoid ?? null)
+  const [selectedOrder, setSelectedOrder] = useState<string | null>(
+    defaultLinkedOrderAutoid ?? null
+  )
+  const [selectedProposal, setSelectedProposal] = useState<string | null>(
+    defaultLinkedProposalAutoid ?? null
+  )
+  const [selectedCustomer, setSelectedCustomer] = useState<string | null>(
+    defaultLinkedCustomerAutoid ?? null
+  )
   const [statusOpen, setStatusOpen] = useState(false)
   const [priorityOpen, setPriorityOpen] = useState(false)
   const [dateOpen, setDateOpen] = useState(false)
@@ -155,7 +165,7 @@ function CommandBarCreateInner({
         due_date: selectedDueDate,
         linked_order_autoid: selectedOrder,
         linked_proposal_autoid: selectedProposal,
-        linked_customer_autoid: selectedCustomer,
+        linked_customer_autoid: selectedCustomer
       }),
     meta: {
       successMessage: 'Task created',
@@ -163,7 +173,7 @@ function CommandBarCreateInner({
     },
     onSuccess: () => {
       onClose()
-    },
+    }
   })
 
   const canSubmit = title.trim().length > 0 && selectedStatus != null
@@ -184,10 +194,13 @@ function CommandBarCreateInner({
       {/* Command bar */}
       <div className='fixed inset-x-0 top-[20%] z-50 mx-auto w-full max-w-[580px] px-4'>
         <div
-          className='overflow-hidden rounded-[12px] border border-border bg-background animate-in zoom-in-95 fade-in duration-150'
+          className='animate-in overflow-hidden rounded-[12px] border border-border bg-background duration-150 zoom-in-95 fade-in'
           style={{ boxShadow: 'var(--dropdown-shadow)' }}
-          onKeyDown={(e) => {
-            if (e.key === 'Escape') { e.stopPropagation(); onClose() }
+          onKeyDown={e => {
+            if (e.key === 'Escape') {
+              e.stopPropagation()
+              onClose()
+            }
             if (e.key === 'Enter' && !e.shiftKey && e.target instanceof HTMLInputElement) {
               e.preventDefault()
               handleSubmit()
@@ -202,10 +215,10 @@ function CommandBarCreateInner({
                 ref={titleRef}
                 autoFocus
                 value={title}
-                onChange={(e) => setTitle(e.target.value)}
+                onChange={e => setTitle(e.target.value)}
                 placeholder='What needs to be done?'
                 className='flex-1 text-[15px] font-medium text-foreground outline-none placeholder:text-text-tertiary'
-                onKeyDown={(e) => {
+                onKeyDown={e => {
                   if (e.key === 'Escape') onClose()
                   if (e.key === 'Enter' && !e.shiftKey) {
                     e.preventDefault()
@@ -216,7 +229,7 @@ function CommandBarCreateInner({
             </div>
             <textarea
               value={description}
-              onChange={(e) => setDescription(e.target.value)}
+              onChange={e => setDescription(e.target.value)}
               placeholder='Add description...'
               rows={2}
               className='mt-2 ml-8 w-[calc(100%-2rem)] resize-none bg-transparent text-[13px] text-text-secondary outline-none placeholder:text-text-tertiary'
@@ -235,13 +248,23 @@ function CommandBarCreateInner({
                   type='button'
                   className='inline-flex items-center gap-1.5 rounded-[6px] bg-bg-secondary px-2.5 py-1.5 text-[13px] font-medium text-foreground transition-colors duration-[80ms] hover:bg-bg-hover'
                 >
-                  {selectedStatus && <StatusIcon status={selectedStatus.name} color={selectedStatus.color} size={12} />}
+                  {selectedStatus && (
+                    <StatusIcon
+                      status={selectedStatus.name}
+                      color={selectedStatus.color}
+                      size={12}
+                    />
+                  )}
                   {selectedStatus?.name ?? 'Status'}
                   <ChevronDown className='size-3 text-text-tertiary' />
                 </button>
               </PopoverTrigger>
-              <PopoverContent className='w-[180px] overflow-hidden rounded-[8px] border-border gap-0 p-1' align='start' style={{ boxShadow: 'var(--dropdown-shadow)' }}>
-                {statuses.map((s) => (
+              <PopoverContent
+                className='w-[180px] gap-0 overflow-hidden rounded-[8px] border-border p-1'
+                align='start'
+                style={{ boxShadow: 'var(--dropdown-shadow)' }}
+              >
+                {statuses.map(s => (
                   <button
                     key={s.id}
                     type='button'
@@ -250,7 +273,10 @@ function CommandBarCreateInner({
                       'transition-colors duration-[80ms]',
                       selectedStatus?.id === s.id ? 'bg-accent-bg' : 'hover:bg-bg-hover'
                     )}
-                    onClick={() => { setSelectedStatus(s); setStatusOpen(false) }}
+                    onClick={() => {
+                      setSelectedStatus(s)
+                      setStatusOpen(false)
+                    }}
                   >
                     <StatusIcon status={s.name} color={s.color} size={14} />
                     <span className='flex-1'>{s.name}</span>
@@ -266,12 +292,20 @@ function CommandBarCreateInner({
                   type='button'
                   className='inline-flex items-center gap-1.5 rounded-[6px] bg-bg-secondary px-2.5 py-1.5 text-[13px] font-medium text-foreground transition-colors duration-[80ms] hover:bg-bg-hover'
                 >
-                  <PriorityIcon priority={selectedPriority} color={TASK_PRIORITY_COLORS[selectedPriority]} size={12} />
+                  <PriorityIcon
+                    priority={selectedPriority}
+                    color={TASK_PRIORITY_COLORS[selectedPriority]}
+                    size={12}
+                  />
                   {TASK_PRIORITY_LABELS[selectedPriority]}
                   <ChevronDown className='size-3 text-text-tertiary' />
                 </button>
               </PopoverTrigger>
-              <PopoverContent className='w-[180px] overflow-hidden rounded-[8px] border-border gap-0 p-1' align='start' style={{ boxShadow: 'var(--dropdown-shadow)' }}>
+              <PopoverContent
+                className='w-[180px] gap-0 overflow-hidden rounded-[8px] border-border p-1'
+                align='start'
+                style={{ boxShadow: 'var(--dropdown-shadow)' }}
+              >
                 {Object.entries(TASK_PRIORITY_LABELS).map(([key, label]) => (
                   <button
                     key={key}
@@ -281,9 +315,16 @@ function CommandBarCreateInner({
                       'transition-colors duration-[80ms]',
                       selectedPriority === key ? 'bg-accent-bg' : 'hover:bg-bg-hover'
                     )}
-                    onClick={() => { setSelectedPriority(key as TaskPriority); setPriorityOpen(false) }}
+                    onClick={() => {
+                      setSelectedPriority(key as TaskPriority)
+                      setPriorityOpen(false)
+                    }}
                   >
-                    <PriorityIcon priority={key} color={TASK_PRIORITY_COLORS[key as TaskPriority]} size={14} />
+                    <PriorityIcon
+                      priority={key}
+                      color={TASK_PRIORITY_COLORS[key as TaskPriority]}
+                      size={14}
+                    />
                     <span className='flex-1'>{label}</span>
                   </button>
                 ))}
@@ -315,17 +356,22 @@ function CommandBarCreateInner({
               </PopoverTrigger>
               <PopoverContent className='w-auto gap-0 p-0' align='start'>
                 <div className='flex flex-col gap-0.5 border-b border-border p-1'>
-                  {CMD_DATE_PRESETS.map((preset) => {
+                  {CMD_DATE_PRESETS.map(preset => {
                     const resolved = preset.getDate()
                     return (
                       <button
                         key={preset.label}
                         type='button'
                         className='flex w-full items-center justify-between rounded-[5px] px-2.5 py-1 text-[13px] font-medium transition-colors duration-[80ms] hover:bg-bg-hover'
-                        onClick={() => { setSelectedDueDate(format(resolved, 'yyyy-MM-dd')); setDateOpen(false) }}
+                        onClick={() => {
+                          setSelectedDueDate(format(resolved, 'yyyy-MM-dd'))
+                          setDateOpen(false)
+                        }}
                       >
                         <span>{preset.label}</span>
-                        <span className='text-[13px] text-text-tertiary'>{format(resolved, 'MMM d')}</span>
+                        <span className='text-[13px] text-text-tertiary'>
+                          {format(resolved, 'MMM d')}
+                        </span>
                       </button>
                     )
                   })}
@@ -333,7 +379,10 @@ function CommandBarCreateInner({
                     <button
                       type='button'
                       className='flex w-full items-center rounded-[5px] px-2.5 py-1 text-[13px] font-medium text-destructive transition-colors duration-[80ms] hover:bg-bg-hover'
-                      onClick={() => { setSelectedDueDate(null); setDateOpen(false) }}
+                      onClick={() => {
+                        setSelectedDueDate(null)
+                        setDateOpen(false)
+                      }}
                     >
                       No date
                     </button>
@@ -342,7 +391,10 @@ function CommandBarCreateInner({
                 <CalendarComponent
                   mode='single'
                   selected={selectedDueDate ? new Date(selectedDueDate) : undefined}
-                  onSelect={(date) => { setSelectedDueDate(date ? format(date, 'yyyy-MM-dd') : null); setDateOpen(false) }}
+                  onSelect={date => {
+                    setSelectedDueDate(date ? format(date, 'yyyy-MM-dd') : null)
+                    setDateOpen(false)
+                  }}
                   className='p-2'
                 />
               </PopoverContent>
@@ -351,36 +403,44 @@ function CommandBarCreateInner({
 
           {/* Reference */}
           <div className='border-t border-border-light px-5 py-2.5'>
-            <div className='mb-2 text-[13px] font-semibold uppercase tracking-[0.06em] text-text-tertiary'>Reference</div>
+            <div className='mb-2 text-[13px] font-semibold tracking-[0.06em] text-text-tertiary uppercase'>
+              Reference
+            </div>
             <div className='flex flex-col gap-1'>
               <div className='flex items-center gap-2'>
-                <span className='w-[60px] shrink-0 text-[13px] font-medium text-text-tertiary'>Order</span>
+                <span className='w-[60px] shrink-0 text-[13px] font-medium text-text-tertiary'>
+                  Order
+                </span>
                 <OrderCombobox
                   value={selectedOrder}
                   onChange={setSelectedOrder}
                   projectId={projectId}
                   placeholder='None'
                   triggerClassName={cn(
-                    'inline-flex items-center gap-1.5 rounded-[5px] px-2 py-1 text-[13px] font-medium transition-colors duration-[80ms] hover:bg-bg-hover cursor-pointer',
+                    'inline-flex cursor-pointer items-center gap-1.5 rounded-[5px] px-2 py-1 text-[13px] font-medium transition-colors duration-[80ms] hover:bg-bg-hover',
                     selectedOrder ? 'text-foreground' : 'text-text-tertiary'
                   )}
                 />
               </div>
               <div className='flex items-center gap-2'>
-                <span className='w-[60px] shrink-0 text-[13px] font-medium text-text-tertiary'>Proposal</span>
+                <span className='w-[60px] shrink-0 text-[13px] font-medium text-text-tertiary'>
+                  Proposal
+                </span>
                 <ProposalCombobox
                   value={selectedProposal}
                   onChange={setSelectedProposal}
                   projectId={projectId}
                   placeholder='None'
                   triggerClassName={cn(
-                    'inline-flex items-center gap-1.5 rounded-[5px] px-2 py-1 text-[13px] font-medium transition-colors duration-[80ms] hover:bg-bg-hover cursor-pointer',
+                    'inline-flex cursor-pointer items-center gap-1.5 rounded-[5px] px-2 py-1 text-[13px] font-medium transition-colors duration-[80ms] hover:bg-bg-hover',
                     selectedProposal ? 'text-foreground' : 'text-text-tertiary'
                   )}
                 />
               </div>
               <div className='flex items-center gap-2'>
-                <span className='w-[60px] shrink-0 text-[13px] font-medium text-text-tertiary'>Customer</span>
+                <span className='w-[60px] shrink-0 text-[13px] font-medium text-text-tertiary'>
+                  Customer
+                </span>
                 {lockLinkedCustomer && selectedCustomer ? (
                   <span className='inline-flex items-center gap-1.5 rounded-[5px] px-2 py-1 text-[13px] font-medium text-foreground'>
                     {linkedCustomerLabel ?? selectedCustomer}
@@ -392,7 +452,7 @@ function CommandBarCreateInner({
                     projectId={projectId}
                     placeholder='None'
                     triggerClassName={cn(
-                      'inline-flex items-center gap-1.5 rounded-[5px] px-2 py-1 text-[13px] font-medium transition-colors duration-[80ms] hover:bg-bg-hover cursor-pointer',
+                      'inline-flex cursor-pointer items-center gap-1.5 rounded-[5px] px-2 py-1 text-[13px] font-medium transition-colors duration-[80ms] hover:bg-bg-hover',
                       selectedCustomer ? 'text-foreground' : 'text-text-tertiary'
                     )}
                   />
@@ -407,11 +467,25 @@ function CommandBarCreateInner({
           {/* Footer hints */}
           <div className='flex items-center justify-between px-5 py-2.5'>
             <div className='flex items-center gap-3'>
-              <button type='button' className='text-[13px] text-text-tertiary transition-colors hover:text-text-secondary' onClick={handleSubmit}>
-                <kbd className='rounded border border-border bg-bg-secondary px-1 py-0.5 text-[13px] font-medium'>Enter</kbd> to create
+              <button
+                type='button'
+                className='text-[13px] text-text-tertiary transition-colors hover:text-text-secondary'
+                onClick={handleSubmit}
+              >
+                <kbd className='rounded border border-border bg-bg-secondary px-1 py-0.5 text-[13px] font-medium'>
+                  Enter
+                </kbd>{' '}
+                to create
               </button>
-              <button type='button' className='text-[13px] text-text-tertiary transition-colors hover:text-text-secondary' onClick={onClose}>
-                <kbd className='rounded border border-border bg-bg-secondary px-1 py-0.5 text-[13px] font-medium'>Esc</kbd> to cancel
+              <button
+                type='button'
+                className='text-[13px] text-text-tertiary transition-colors hover:text-text-secondary'
+                onClick={onClose}
+              >
+                <kbd className='rounded border border-border bg-bg-secondary px-1 py-0.5 text-[13px] font-medium'>
+                  Esc
+                </kbd>{' '}
+                to cancel
               </button>
             </div>
             <button

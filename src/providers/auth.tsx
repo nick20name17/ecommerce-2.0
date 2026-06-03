@@ -58,7 +58,7 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
 
   const signInMutation = useMutation({
     mutationFn: authService.signIn,
-    onSuccess: async (response) => {
+    onSuccess: async response => {
       setSession(response)
 
       if (response.user.project_id) {

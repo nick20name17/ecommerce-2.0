@@ -74,7 +74,10 @@ export function CustomerCombobox({
       <PopoverTrigger asChild>
         <Button variant='outline' className='w-full justify-between font-normal'>
           {value ? (
-            <span className='min-w-0 truncate text-[13px] font-medium' title={`${value.id} — ${value.l_name}`}>
+            <span
+              className='min-w-0 truncate text-[13px] font-medium'
+              title={`${value.id} — ${value.l_name}`}
+            >
               {value.l_name}
             </span>
           ) : (
@@ -85,11 +88,11 @@ export function CustomerCombobox({
               role='button'
               tabIndex={0}
               className='ml-auto shrink-0 rounded-[3px] p-0.5 text-text-tertiary transition-colors hover:bg-bg-active hover:text-foreground'
-              onClick={(e) => {
+              onClick={e => {
                 e.stopPropagation()
                 onChange(null)
               }}
-              onKeyDown={(e) => {
+              onKeyDown={e => {
                 if (e.key === 'Enter' || e.key === ' ') {
                   e.stopPropagation()
                   onChange(null)
@@ -103,7 +106,7 @@ export function CustomerCombobox({
           )}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className='min-w-[400px] w-(--radix-popover-trigger-width) p-0' align='start'>
+      <PopoverContent className='w-(--radix-popover-trigger-width) min-w-[400px] p-0' align='start'>
         <div className='flex items-center gap-2 border-b px-3 py-2'>
           {loading ? (
             <Spinner className='size-3.5 shrink-0' />
@@ -114,11 +117,14 @@ export function CustomerCombobox({
             ref={inputRef}
             placeholder='Search by name or ID...'
             value={search}
-            onChange={(e) => handleSearchChange(e.target.value)}
+            onChange={e => handleSearchChange(e.target.value)}
             className='h-5 flex-1 bg-transparent text-sm outline-none placeholder:text-text-tertiary'
           />
         </div>
-        <div className='max-h-80 overflow-y-auto overscroll-contain' onWheel={(e) => e.stopPropagation()}>
+        <div
+          className='max-h-80 overflow-y-auto overscroll-contain'
+          onWheel={e => e.stopPropagation()}
+        >
           {loading && customers.length === 0 ? (
             <div className='p-1'>
               {showAllOption && (
@@ -149,7 +155,9 @@ export function CustomerCombobox({
               )}
               <div className='flex flex-col items-center gap-2 py-6 text-text-tertiary'>
                 <Users className='size-5 opacity-50' />
-                <span className='text-[13px]'>{search ? 'No customers found' : 'Start typing to search'}</span>
+                <span className='text-[13px]'>
+                  {search ? 'No customers found' : 'Start typing to search'}
+                </span>
               </div>
             </div>
           ) : (
@@ -163,9 +171,12 @@ export function CustomerCombobox({
                   All customers
                 </button>
               )}
-              {customers.map((c) => {
+              {customers.map(c => {
                 const selected = value?.id === c.id
-                const meta = [c.contact_1, c.city && c.state ? `${c.city}, ${c.state}` : null].filter(Boolean)
+                const meta = [
+                  c.contact_1,
+                  c.city && c.state ? `${c.city}, ${c.state}` : null
+                ].filter(Boolean)
                 return (
                   <button
                     key={c.id}
@@ -175,18 +186,26 @@ export function CustomerCombobox({
                   >
                     <div className='min-w-0 flex-1'>
                       <div className='flex items-center gap-1.5'>
-                        <span className='shrink-0 text-[13px] font-semibold tabular-nums text-foreground'>{c.id}</span>
-                        <span className='text-[13px] text-text-quaternary'>—</span>
+                        <span className='shrink-0 text-[13px] font-semibold text-foreground tabular-nums'>
+                          {c.id}
+                        </span>
+                        <span className='text-text-quaternary text-[13px]'>—</span>
                         <span className='truncate text-[13px] text-text-secondary'>{c.l_name}</span>
                         {c.inactive && (
-                          <span className='shrink-0 rounded border border-border px-1.5 py-px text-[11px] font-medium text-text-tertiary'>Inactive</span>
+                          <span className='shrink-0 rounded border border-border px-1.5 py-px text-[11px] font-medium text-text-tertiary'>
+                            Inactive
+                          </span>
                         )}
                       </div>
                       {meta.length > 0 && (
-                        <div className='truncate text-[12px] text-text-tertiary'>{meta.join(' · ')}</div>
+                        <div className='truncate text-[12px] text-text-tertiary'>
+                          {meta.join(' · ')}
+                        </div>
                       )}
                     </div>
-                    {selected && <Check className='size-3.5 shrink-0 text-foreground' strokeWidth={2} />}
+                    {selected && (
+                      <Check className='size-3.5 shrink-0 text-foreground' strokeWidth={2} />
+                    )}
                   </button>
                 )
               })}

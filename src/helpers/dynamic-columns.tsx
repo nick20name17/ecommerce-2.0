@@ -31,7 +31,7 @@ export const getKeysFromRows = (
 }
 
 export const humanizeKey = (key: string): string => {
-  return key.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
+  return key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
 }
 
 export const getOrderedDataKeys = (
@@ -47,12 +47,11 @@ export const getOrderedDataKeys = (
       }
     }
   }
-  const orderedFromConfig =
-    fieldConfig?.[entity]?.filter((e) => e.enabled).map((e) => e.field) ?? []
+  const orderedFromConfig = fieldConfig?.[entity]?.filter(e => e.enabled).map(e => e.field) ?? []
   const configSet = new Set(orderedFromConfig)
   const ordered =
-    dataRows.length > 0 ? orderedFromConfig.filter((k) => fromData.has(k)) : orderedFromConfig
-  const rest = dataRows.length > 0 ? [...fromData].filter((k) => !configSet.has(k)).sort() : []
+    dataRows.length > 0 ? orderedFromConfig.filter(k => fromData.has(k)) : orderedFromConfig
+  const rest = dataRows.length > 0 ? [...fromData].filter(k => !configSet.has(k)).sort() : []
   return [...ordered, ...rest]
 }
 
@@ -61,9 +60,9 @@ export const getColumnLabel = (
   entity: string,
   fieldConfig: FieldConfigResponse | null | undefined
 ): string => {
-  const entry = fieldConfig?.[entity]?.find((e) => e.field === key)
+  const entry = fieldConfig?.[entity]?.find(e => e.field === key)
   if (entry?.alias?.trim()) return entry.alias.trim()
-  return key.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
+  return key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
 }
 
 export type DynamicCellFormatter<T> = (value: unknown, row: T) => React.ReactNode
@@ -79,16 +78,11 @@ export const buildDynamicDataColumns = <T extends Record<string, unknown>>(
 ): ColumnDef<T>[] => {
   const formatters = options?.formatters ?? {}
 
-  return orderedKeys.map((key) => {
+  return orderedKeys.map(key => {
     const formatter = formatters[key]
     return {
       accessorKey: key,
-      header: ({ column }) => (
-        <ColumnHeader
-          column={column}
-          title={getLabel(key)}
-        />
-      ),
+      header: ({ column }) => <ColumnHeader column={column} title={getLabel(key)} />,
       cell: ({ row }) => {
         const value = row.original[key]
         if (formatter) return formatter(value, row.original)

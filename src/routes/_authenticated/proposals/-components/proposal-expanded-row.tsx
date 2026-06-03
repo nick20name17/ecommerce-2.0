@@ -30,24 +30,24 @@ export const ProposalExpandedRow = ({ row }: { row: Row<Proposal> }) => {
     <div className='space-y-3'>
       <div className='flex items-center justify-between'>
         <h3 className='text-base font-semibold'>Proposal Items</h3>
-        <div className='text-text-tertiary flex items-center gap-4 text-[13px]'>
+        <div className='flex items-center gap-4 text-[13px] text-text-tertiary'>
           <span>
             Customer:{' '}
-            <span className='text-foreground font-semibold'>{proposal.b_name ?? '—'}</span>
+            <span className='font-semibold text-foreground'>{proposal.b_name ?? '—'}</span>
           </span>
           <span>
             Subtotal:{' '}
-            <span className='text-foreground font-medium'>
+            <span className='font-medium text-foreground'>
               {formatCurrency(proposal.subtotal, '—')}
             </span>
           </span>
           <span>
             Tax:{' '}
-            <span className='text-foreground font-medium'>{formatCurrency(proposal.tax, '—')}</span>
+            <span className='font-medium text-foreground'>{formatCurrency(proposal.tax, '—')}</span>
           </span>
           <span>
             Total:{' '}
-            <span className='text-foreground font-medium'>
+            <span className='font-medium text-foreground'>
               {formatCurrency(proposal.total, '—')}
             </span>
           </span>
@@ -55,13 +55,13 @@ export const ProposalExpandedRow = ({ row }: { row: Row<Proposal> }) => {
       </div>
 
       {!items.length ? (
-        <p className='text-text-tertiary text-[13px]'>No proposal items.</p>
+        <p className='text-[13px] text-text-tertiary'>No proposal items.</p>
       ) : (
         <div className='overflow-hidden rounded-md border'>
           <Table>
             <TableHeader className='bg-bg-secondary'>
               <TableRow className='border-none'>
-                {keys.map((key) => (
+                {keys.map(key => (
                   <TableHead
                     key={key}
                     className='min-w-[80px] shadow-[inset_0_-1px_0_var(--border)]'
@@ -74,14 +74,11 @@ export const ProposalExpandedRow = ({ row }: { row: Row<Proposal> }) => {
             <TableBody>
               {items.map((item, index) => (
                 <TableRow key={(item.autoid as string) ?? index}>
-                  {keys.map((key) => {
+                  {keys.map(key => {
                     const val = formatItemCellValue(key, item[key])
                     const isTruncate = key === 'descr' || key === 'inven'
                     return (
-                      <TableCell
-                        key={key}
-                        className='min-w-[80px] border-b'
-                      >
+                      <TableCell key={key} className='min-w-[80px] border-b'>
                         {isTruncate ? (
                           <Tooltip>
                             <TooltipTrigger asChild>

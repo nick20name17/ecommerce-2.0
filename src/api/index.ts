@@ -9,11 +9,11 @@ export const api = axios.create({
   headers: {
     'Content-Type': 'application/json'
   },
-  paramsSerializer: (params) => {
+  paramsSerializer: params => {
     const sp = new URLSearchParams()
     for (const [key, value] of Object.entries(params)) {
       if (Array.isArray(value)) {
-        value.forEach((v) => sp.append(key, String(v)))
+        value.forEach(v => sp.append(key, String(v)))
       } else if (value != null) {
         sp.append(key, String(value))
       }
@@ -23,7 +23,7 @@ export const api = axios.create({
 })
 
 api.interceptors.request.use(
-  (config) => {
+  config => {
     const session = getSession()
 
     if (session?.access) {
@@ -32,15 +32,15 @@ api.interceptors.request.use(
 
     return config
   },
-  (error) => Promise.reject(error)
+  error => Promise.reject(error)
 )
 
 const isRefreshRequest = (config: InternalAxiosRequestConfig) =>
   String(config?.url ?? '').includes('/auth/refresh')
 
 api.interceptors.response.use(
-  (response) => response,
-  async (error) => {
+  response => response,
+  async error => {
     const config = error?.config as InternalAxiosRequestConfig & {
       _retry?: boolean
     }

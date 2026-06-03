@@ -1,12 +1,6 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
-import {
-  ChevronRight,
-  ClipboardList,
-  Package,
-  Receipt,
-  Search,
-} from 'lucide-react'
+import { ChevronRight, ClipboardList, Package, Receipt, Search } from 'lucide-react'
 import { useState } from 'react'
 
 import { getPickListsQuery } from '@/api/pick-list/query'
@@ -22,7 +16,7 @@ import {
   PICK_LIST_STATUS_CLASS,
   PICK_LIST_STATUS_LABELS,
   type PickListStatus,
-  getPickListStatusLabel,
+  getPickListStatusLabel
 } from '@/constants/pick-list'
 import { useBreakpoint } from '@/hooks/use-breakpoint'
 import { useProjectId } from '@/hooks/use-project-id'
@@ -30,14 +24,13 @@ import { useLimitParam, useOffsetParam, useSearchParam } from '@/hooks/use-query
 import { formatDateMedium } from '@/helpers/formatters'
 import { cn } from '@/lib/utils'
 
-
 // ── Helpers ──────────────────────────────────────────────────
 
 const STATUS_DOT_COLORS: Record<PickListStatus, string> = {
   [PICK_LIST_STATUS.draft]: 'bg-slate-400',
   [PICK_LIST_STATUS.pushed]: 'bg-blue-500',
   [PICK_LIST_STATUS.ratesFetched]: 'bg-amber-500',
-  [PICK_LIST_STATUS.labelPurchased]: 'bg-emerald-500',
+  [PICK_LIST_STATUS.labelPurchased]: 'bg-emerald-500'
 }
 
 const STATUS_OPTIONS = Object.entries(PICK_LIST_STATUS_LABELS) as [PickListStatus, string][]
@@ -56,25 +49,24 @@ const PickListsPage = () => {
 
   const [activeStatus, setActiveStatus] = useState<PickListStatus | null>(null)
 
-
   const params: PickListParams = {
     search: search || undefined,
     offset,
     limit,
     status: activeStatus ?? undefined,
-    project_id: projectId ?? undefined,
+    project_id: projectId ?? undefined
   }
 
   const { data, isLoading } = useQuery({
     ...getPickListsQuery(params),
-    placeholderData: keepPreviousData,
+    placeholderData: keepPreviousData
   })
   const results = data?.results ?? []
 
   const hasFilters = activeStatus !== null
 
   const selectStatus = (s: PickListStatus) => {
-    setActiveStatus((prev) => (prev === s ? null : s))
+    setActiveStatus(prev => (prev === s ? null : s))
     setOffset(null)
   }
 
@@ -91,9 +83,7 @@ const PickListsPage = () => {
         <PageHeaderIcon icon={IPickLists} color={PAGE_COLORS.pickLists} />
         <h1 className='text-[14px] font-semibold tracking-[-0.01em]'>Pick Lists</h1>
         {!isLoading && (
-          <span className='text-[13px] tabular-nums text-text-tertiary'>
-            {data?.count ?? 0}
-          </span>
+          <span className='text-[13px] text-text-tertiary tabular-nums'>{data?.count ?? 0}</span>
         )}
 
         <div className='flex-1' />
@@ -103,7 +93,7 @@ const PickListsPage = () => {
           <Search className='size-3.5 shrink-0 text-text-tertiary' />
           <input
             value={search}
-            onChange={(e) => {
+            onChange={e => {
               setSearch(e.target.value)
               setOffset(null)
             }}
@@ -120,7 +110,7 @@ const PickListsPage = () => {
             <div
               className={cn(
                 'size-2.5 rounded-full',
-                hasFilters && activeStatus ? STATUS_DOT_COLORS[activeStatus] : 'bg-current',
+                hasFilters && activeStatus ? STATUS_DOT_COLORS[activeStatus] : 'bg-current'
               )}
             />
           }
@@ -133,14 +123,14 @@ const PickListsPage = () => {
                 type='button'
                 className={cn(
                   'flex w-full items-center gap-2 rounded-[5px] px-2 py-[3px] text-left text-[13px] font-medium',
-                  'transition-colors duration-[80ms] hover:bg-bg-hover',
+                  'transition-colors duration-[80ms] hover:bg-bg-hover'
                 )}
                 onClick={() => selectStatus(value)}
               >
                 <div
                   className={cn(
                     'flex size-3.5 items-center justify-center rounded-full border transition-colors duration-[80ms]',
-                    selected_ ? 'border-primary bg-primary' : 'border-border',
+                    selected_ ? 'border-primary bg-primary' : 'border-border'
                   )}
                 >
                   {selected_ && <div className='size-1.5 rounded-full bg-primary-foreground' />}
@@ -151,8 +141,6 @@ const PickListsPage = () => {
             )
           })}
         </FilterPopover>
-
-
       </header>
 
       {/* Active filters */}
@@ -211,7 +199,7 @@ const PickListsPage = () => {
             description={hasFilters ? 'Try adjusting your filters.' : 'No pick lists yet.'}
           />
         ) : (
-          results.map((pickList) => (
+          results.map(pickList => (
             <PickListRow
               key={pickList.id}
               pickList={pickList}
@@ -219,7 +207,7 @@ const PickListsPage = () => {
               onClick={() =>
                 navigate({
                   to: '/pick-lists/$pickListId',
-                  params: { pickListId: String(pickList.id) },
+                  params: { pickListId: String(pickList.id) }
                 })
               }
             />
@@ -231,7 +219,6 @@ const PickListsPage = () => {
       <div className='shrink-0 border-t border-border px-3.5 py-2 sm:px-6'>
         <Pagination totalCount={data?.count ?? 0} />
       </div>
-
     </div>
   )
 }
@@ -241,7 +228,7 @@ const PickListsPage = () => {
 function PickListRow({
   pickList,
   isMobile,
-  onClick,
+  onClick
 }: {
   pickList: PickList
   isMobile: boolean
@@ -264,20 +251,20 @@ function PickListRow({
             {displayName}
           </span>
           <span className='inline-flex shrink-0 items-center gap-1 rounded-md bg-bg-secondary px-1.5 py-0.5 text-[11px] font-medium text-text-secondary'>
-            <Package className='size-3 text-text-quaternary' />
+            <Package className='text-text-quaternary size-3' />
             {pickList.item_count} item{pickList.item_count !== 1 ? 's' : ''}
           </span>
         </div>
         <div className='flex items-center gap-2 pl-3.5'>
           <span
             className={cn(
-              'inline-flex items-center rounded-full border px-2 py-0.5 text-[11px] font-semibold leading-none',
-              statusClass,
+              'inline-flex items-center rounded-full border px-2 py-0.5 text-[11px] leading-none font-semibold',
+              statusClass
             )}
           >
             {statusLabel}
           </span>
-          <span className='text-[13px] tabular-nums text-text-tertiary'>
+          <span className='text-[13px] text-text-tertiary tabular-nums'>
             {formatDateMedium(pickList.created_at)}
           </span>
         </div>
@@ -290,7 +277,7 @@ function PickListRow({
       className='group/row flex min-w-fit cursor-pointer items-center gap-4 border-b border-border-light px-5 py-2 transition-colors duration-100 hover:bg-bg-hover xl:px-6'
       onClick={onClick}
     >
-      <div className='w-[60px] shrink-0 text-[13px] font-semibold tabular-nums text-foreground'>
+      <div className='w-[60px] shrink-0 text-[13px] font-semibold text-foreground tabular-nums'>
         #{pickList.id}
       </div>
       <div className='min-w-0 flex-1'>
@@ -304,8 +291,8 @@ function PickListRow({
       <div className='w-[130px] shrink-0'>
         <span
           className={cn(
-            'inline-flex items-center rounded-full border px-2 py-0.5 text-[11px] font-semibold leading-none',
-            statusClass,
+            'inline-flex items-center rounded-full border px-2 py-0.5 text-[11px] leading-none font-semibold',
+            statusClass
           )}
         >
           {statusLabel}
@@ -313,25 +300,25 @@ function PickListRow({
       </div>
       <div className='flex w-[110px] shrink-0 items-center'>
         <span className='inline-flex items-center gap-1 rounded-md bg-bg-secondary px-1.5 py-0.5 text-[11px] font-medium text-text-secondary'>
-          <Package className='size-3 text-text-quaternary' />
+          <Package className='text-text-quaternary size-3' />
           {pickList.item_count} item{pickList.item_count !== 1 ? 's' : ''}
         </span>
       </div>
       <div className='flex w-[220px] shrink-0 flex-wrap items-center gap-1'>
-        {(pickList.orders ?? []).slice(0, 3).map((order) => (
+        {(pickList.orders ?? []).slice(0, 3).map(order => (
           <Link
             key={order.autoid}
             to='/orders/$orderId'
             params={{ orderId: order.autoid }}
-            onClick={(e) => e.stopPropagation()}
+            onClick={e => e.stopPropagation()}
             className='inline-flex items-center gap-1 rounded-md bg-bg-secondary px-1.5 py-0.5 text-[11px] font-medium text-text-secondary tabular-nums transition-colors duration-[80ms] hover:bg-bg-active hover:text-foreground'
           >
-            <Receipt className='size-3 text-text-quaternary' />
+            <Receipt className='text-text-quaternary size-3' />
             {order.invoice || order.autoid.slice(0, 8)}
           </Link>
         ))}
         {(pickList.orders?.length ?? 0) > 3 && (
-          <span className='text-[11px] tabular-nums text-text-tertiary'>
+          <span className='text-[11px] text-text-tertiary tabular-nums'>
             +{(pickList.orders?.length ?? 0) - 3}
           </span>
         )}
@@ -339,7 +326,7 @@ function PickListRow({
           <span className='text-[11px] text-text-tertiary'>—</span>
         )}
       </div>
-      <div className='w-[100px] shrink-0 text-[13px] tabular-nums text-text-tertiary'>
+      <div className='w-[100px] shrink-0 text-[13px] text-text-tertiary tabular-nums'>
         {formatDateMedium(pickList.created_at)}
       </div>
       <div className='w-[20px] shrink-0 text-text-tertiary opacity-0 transition-opacity group-hover/row:opacity-100'>
@@ -352,6 +339,6 @@ function PickListRow({
 export const Route = createFileRoute('/_authenticated/pick-lists/')({
   component: PickListsPage,
   head: () => ({
-    meta: [{ title: 'Pick Lists' }],
-  }),
+    meta: [{ title: 'Pick Lists' }]
+  })
 })

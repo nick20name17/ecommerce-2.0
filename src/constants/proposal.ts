@@ -34,10 +34,8 @@ export const PROPOSAL_STATUS_CLASS: Record<ProposalStatus, string> = {
   [PROPOSAL_STATUS.new]:
     'border-violet-300 bg-violet-500/10 text-violet-800 dark:border-violet-600 dark:bg-violet-500/20 dark:text-violet-300',
   [PROPOSAL_STATUS.onHold]:
-    'border-slate-300 bg-slate-500/10 text-slate-700 dark:border-slate-600 dark:bg-slate-500/20 dark:text-slate-300',
+    'border-slate-300 bg-slate-500/10 text-slate-700 dark:border-slate-600 dark:bg-slate-500/20 dark:text-slate-300'
 }
 
 export const getProposalStatusLabel = (status: ProposalStatus): string =>
   PROPOSAL_STATUS_LABELS[status] ?? status
-
-

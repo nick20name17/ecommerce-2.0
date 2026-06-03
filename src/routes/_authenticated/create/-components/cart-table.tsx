@@ -44,15 +44,20 @@ export const CartTable = ({
 
   if (items.length === 0) {
     return (
-      <PageEmpty icon={Package} title='No products added yet' description='Use the catalog to add products.' compact />
+      <PageEmpty
+        icon={Package}
+        title='No products added yet'
+        description='Use the catalog to add products.'
+        compact
+      />
     )
   }
 
   return (
     <div>
-      {items.map((item) => {
+      {items.map(item => {
         const isUpdating = updatingQuantityItemId === item.id
-        const activeConfigs = item.configurations?.filter((c) => c.active) ?? []
+        const activeConfigs = item.configurations?.filter(c => c.active) ?? []
         const hasConfigs = activeConfigs.length > 0
 
         return (
@@ -64,19 +69,28 @@ export const CartTable = ({
               {/* Thumbnail */}
               <div className='flex size-9 shrink-0 items-center justify-center overflow-hidden rounded-[5px] bg-bg-secondary'>
                 {item.photo ? (
-                  <img src={item.photo} alt={item.name} className='size-full object-cover' loading='lazy' />
+                  <img
+                    src={item.photo}
+                    alt={item.name}
+                    className='size-full object-cover'
+                    loading='lazy'
+                  />
                 ) : (
-                  <Image className='size-3.5 text-text-quaternary' />
+                  <Image className='text-text-quaternary size-3.5' />
                 )}
               </div>
 
               {/* Info */}
               <div className='min-w-0 flex-1'>
                 <div className='flex items-center gap-2'>
-                  <span className='text-[13px] font-semibold text-foreground'>{item.product_id}</span>
+                  <span className='text-[13px] font-semibold text-foreground'>
+                    {item.product_id}
+                  </span>
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <span className='min-w-0 truncate text-[13px] text-text-tertiary'>{item.name}</span>
+                      <span className='min-w-0 truncate text-[13px] text-text-tertiary'>
+                        {item.name}
+                      </span>
                     </TooltipTrigger>
                     <TooltipContent className='max-w-[260px]'>{item.name}</TooltipContent>
                   </Tooltip>
@@ -89,17 +103,19 @@ export const CartTable = ({
                     size='sm'
                     showMaxMessage
                     disabled={isUpdating}
-                    onChange={(qty) => onQuantityChange(item.id, qty)}
+                    onChange={qty => onQuantityChange(item.id, qty)}
                   />
-                  <span className='text-[12px] text-text-quaternary'>×</span>
-                  <span className='text-[12px] tabular-nums text-text-tertiary'>{formatCurrency(item.price)}</span>
+                  <span className='text-text-quaternary text-[12px]'>×</span>
+                  <span className='text-[12px] text-text-tertiary tabular-nums'>
+                    {formatCurrency(item.price)}
+                  </span>
                 </div>
 
                 {/* Selected configurations */}
                 {hasConfigs && (
                   <div className='mt-1.5 flex flex-wrap items-center gap-1'>
                     <Settings2 className='size-3 shrink-0 text-text-tertiary' />
-                    {activeConfigs.map((c) => (
+                    {activeConfigs.map(c => (
                       <span
                         key={c.id}
                         className='inline-flex items-center rounded-[4px] border border-border bg-bg-secondary px-1.5 py-0.5 text-[11px] font-medium text-text-secondary'
@@ -107,7 +123,7 @@ export const CartTable = ({
                         {c.name}
                         {c.childs && c.childs.length > 0 && (
                           <span className='ml-1 text-text-tertiary'>
-                            ({c.childs.map((ch) => ch.name).join(', ')})
+                            ({c.childs.map(ch => ch.name).join(', ')})
                           </span>
                         )}
                       </span>
@@ -118,7 +134,12 @@ export const CartTable = ({
 
               {/* Amount + actions */}
               <div className='flex flex-col items-end gap-1'>
-                <span className={cn('text-[13px] font-semibold tabular-nums text-foreground', isUpdating && 'animate-pulse')}>
+                <span
+                  className={cn(
+                    'text-[13px] font-semibold text-foreground tabular-nums',
+                    isUpdating && 'animate-pulse'
+                  )}
+                >
                   {formatCurrency((item.price || 0) * (item.quantity || 0))}
                 </span>
                 <div className='flex items-center gap-0.5 opacity-0 transition-opacity duration-75 group-hover/item:opacity-100'>

@@ -10,7 +10,7 @@ export const CATALOG_QUERY_KEYS = {
   lists: () => [...CATALOG_QUERY_KEYS.all(), 'list'] as const,
   list: (params: CatalogParams = {}) => [...CATALOG_QUERY_KEYS.lists(), params] as const,
   details: () => [...CATALOG_QUERY_KEYS.all(), 'detail'] as const,
-  detail: (id: string) => [...CATALOG_QUERY_KEYS.details(), id] as const,
+  detail: (id: string) => [...CATALOG_QUERY_KEYS.details(), id] as const
 }
 
 const STALE_60S = 60_000
@@ -21,7 +21,7 @@ export const getCatalogTreeQuery = (params: CatalogTreeParams = {}) =>
     queryKey: CATALOG_QUERY_KEYS.tree(params),
     queryFn: () => catalogService.getTree(params),
     staleTime: STALE_60S,
-    gcTime: GC_30M,
+    gcTime: GC_30M
   })
 
 export const getCatalogListQuery = (params: CatalogParams = {}) =>
@@ -29,7 +29,7 @@ export const getCatalogListQuery = (params: CatalogParams = {}) =>
     queryKey: CATALOG_QUERY_KEYS.list(params),
     queryFn: () => catalogService.list(params),
     staleTime: STALE_60S,
-    gcTime: GC_30M,
+    gcTime: GC_30M
   })
 
 export const getCatalogDetailQuery = (id: string, params?: { project_id?: number }) =>
@@ -38,5 +38,5 @@ export const getCatalogDetailQuery = (id: string, params?: { project_id?: number
     queryFn: () => catalogService.getById(id, params),
     enabled: !!id,
     staleTime: STALE_60S,
-    gcTime: GC_30M,
+    gcTime: GC_30M
   })

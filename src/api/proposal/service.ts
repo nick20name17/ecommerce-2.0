@@ -2,7 +2,13 @@ import { api } from '..'
 
 import type { EntityAssignRequest, EntityAssignmentResponse, EntityAttachment } from '../schema'
 
-import type { Proposal, ProposalPatchPayload, ProposalParams, ProposalResponse, ToOrderResponse } from './schema'
+import type {
+  Proposal,
+  ProposalPatchPayload,
+  ProposalParams,
+  ProposalResponse,
+  ToOrderResponse
+} from './schema'
 
 const proposalParams = (projectId?: number | null) =>
   projectId != null ? { project_id: projectId } : {}
