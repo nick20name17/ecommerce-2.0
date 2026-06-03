@@ -310,7 +310,7 @@ function OrderLogTrailSheet({
 
   return (
     <Sheet open={open} onOpenChange={(o) => !o && onClose()}>
-      <SheetContent className='flex w-full flex-col gap-0 p-0 sm:max-w-xl'>
+      <SheetContent side='bottom' className='flex max-h-[85vh] w-full flex-col gap-0 p-0'>
         <SheetHeader className='border-b border-border px-5 py-4'>
           <SheetTitle>Order #{proposalId}</SheetTitle>
           <SheetDescription>
