@@ -1,6 +1,6 @@
 import { useMutation } from '@tanstack/react-query'
 import { Plus, Trash2 } from 'lucide-react'
-import { useState } from 'react'
+import { useReducer, useState } from 'react'
 
 import type {
   GlobalSpecDefinition,
@@ -45,18 +45,31 @@ const getValueForCell = (
   return item.specs[spec.slug]
 }
 
+interface LinkForm {
+  selectedOptionId: string
+  newOptionValue: string
+  newOptionColorHex: string
+  showNewOption: boolean
+}
+
+const LINK_FORM_INITIAL: LinkForm = {
+  selectedOptionId: '',
+  newOptionValue: '',
+  newOptionColorHex: '',
+  showNewOption: false
+}
+
 export const VPValuesMatrix = ({ vp, projectId, isMobile, isTablet }: VPValuesMatrixProps) => {
   const [linkDialog, setLinkDialog] = useState<{
     spec: GlobalSpecDefinition
     itemId: string
   } | null>(null)
 
-  const [selectedOptionId, setSelectedOptionId] = useState('')
-
-  // For creating a new option inline
-  const [newOptionValue, setNewOptionValue] = useState('')
-  const [newOptionColorHex, setNewOptionColorHex] = useState('')
-  const [showNewOption, setShowNewOption] = useState(false)
+  const [linkForm, patchLinkForm] = useReducer(
+    (state: LinkForm, patch: Partial<LinkForm>) => ({ ...state, ...patch }),
+    LINK_FORM_INITIAL
+  )
+  const { selectedOptionId, newOptionValue, newOptionColorHex, showNewOption } = linkForm
 
   const linkMutation = useMutation({
     mutationFn: () =>
@@ -114,12 +127,7 @@ export const VPValuesMatrix = ({ vp, projectId, isMobile, isTablet }: VPValuesMa
     }
   })
 
-  const resetLinkForm = () => {
-    setSelectedOptionId('')
-    setNewOptionValue('')
-    setNewOptionColorHex('')
-    setShowNewOption(false)
-  }
+  const resetLinkForm = () => patchLinkForm(LINK_FORM_INITIAL)
 
   if (vp.items.length === 0 || vp.spec_definitions.length === 0) {
     return (
@@ -280,7 +288,10 @@ export const VPValuesMatrix = ({ vp, projectId, isMobile, isTablet }: VPValuesMa
                 <>
                   <div className='flex flex-col gap-1.5'>
                     <Label>Select Option</Label>
-                    <Select value={selectedOptionId} onValueChange={setSelectedOptionId}>
+                    <Select
+                      value={selectedOptionId}
+                      onValueChange={selectedOptionId => patchLinkForm({ selectedOptionId })}
+                    >
                       <SelectTrigger>
                         <SelectValue placeholder='Choose an option' />
                       </SelectTrigger>
@@ -298,7 +309,7 @@ export const VPValuesMatrix = ({ vp, projectId, isMobile, isTablet }: VPValuesMa
                     variant='link'
                     size='sm'
                     className='self-start px-0 text-[12px]'
-                    onClick={() => setShowNewOption(true)}
+                    onClick={() => patchLinkForm({ showNewOption: true })}
                   >
                     <Plus className='size-3' />
                     Create new option
@@ -311,7 +322,7 @@ export const VPValuesMatrix = ({ vp, projectId, isMobile, isTablet }: VPValuesMa
                     <Input
                       id='new-opt-value'
                       value={newOptionValue}
-                      onChange={e => setNewOptionValue(e.target.value)}
+                      onChange={e => patchLinkForm({ newOptionValue: e.target.value })}
                       placeholder='e.g. Red, Large'
                       required
                       autoFocus
@@ -324,7 +335,7 @@ export const VPValuesMatrix = ({ vp, projectId, isMobile, isTablet }: VPValuesMa
                         <Input
                           id='new-opt-color'
                           value={newOptionColorHex}
-                          onChange={e => setNewOptionColorHex(e.target.value)}
+                          onChange={e => patchLinkForm({ newOptionColorHex: e.target.value })}
                           placeholder='#FF0000'
                         />
                         {newOptionColorHex && (
@@ -341,7 +352,7 @@ export const VPValuesMatrix = ({ vp, projectId, isMobile, isTablet }: VPValuesMa
                     variant='link'
                     size='sm'
                     className='self-start px-0 text-[12px]'
-                    onClick={() => setShowNewOption(false)}
+                    onClick={() => patchLinkForm({ showNewOption: false })}
                   >
                     Pick existing option instead
                   </Button>

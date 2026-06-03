@@ -1,7 +1,7 @@
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { Calendar, ChevronDown, Plus } from 'lucide-react'
 import { addDays, format, nextFriday, nextMonday } from 'date-fns'
-import { useRef, useState } from 'react'
+import { useReducer, useRef, useState } from 'react'
 
 import { TaskCustomerCombobox } from './customer-combobox'
 import { OrderCombobox } from './order-combobox'
@@ -131,23 +131,42 @@ function CommandBarCreateInner({
   const { user } = useAuth()
   const userIsSuperAdmin = !!user?.role && isSuperAdmin(user.role)
   const [projectId] = useProjectId()
-  const [title, setTitle] = useState('')
-  const [description, setDescription] = useState('')
-  const [selectedStatus, setSelectedStatus] = useState<TaskStatus | null>(
-    () => statuses.find(s => s.is_default) ?? statuses[0] ?? null
+  interface TaskDraft {
+    title: string
+    description: string
+    selectedStatus: TaskStatus | null
+    selectedPriority: TaskPriority
+    selectedAssignee: number | null
+    selectedDueDate: string | null
+    selectedOrder: string | null
+    selectedProposal: string | null
+    selectedCustomer: string | null
+  }
+  const [draft, patchDraft] = useReducer(
+    (state: TaskDraft, patch: Partial<TaskDraft>) => ({ ...state, ...patch }),
+    {
+      title: '',
+      description: '',
+      selectedStatus: statuses.find(s => s.is_default) ?? statuses[0] ?? null,
+      selectedPriority: TASK_PRIORITY.medium,
+      selectedAssignee: null,
+      selectedDueDate: null,
+      selectedOrder: defaultLinkedOrderAutoid ?? null,
+      selectedProposal: defaultLinkedProposalAutoid ?? null,
+      selectedCustomer: defaultLinkedCustomerAutoid ?? null
+    }
   )
-  const [selectedPriority, setSelectedPriority] = useState<TaskPriority>(TASK_PRIORITY.medium)
-  const [selectedAssignee, setSelectedAssignee] = useState<number | null>(null)
-  const [selectedDueDate, setSelectedDueDate] = useState<string | null>(null)
-  const [selectedOrder, setSelectedOrder] = useState<string | null>(
-    defaultLinkedOrderAutoid ?? null
-  )
-  const [selectedProposal, setSelectedProposal] = useState<string | null>(
-    defaultLinkedProposalAutoid ?? null
-  )
-  const [selectedCustomer, setSelectedCustomer] = useState<string | null>(
-    defaultLinkedCustomerAutoid ?? null
-  )
+  const {
+    title,
+    description,
+    selectedStatus,
+    selectedPriority,
+    selectedAssignee,
+    selectedDueDate,
+    selectedOrder,
+    selectedProposal,
+    selectedCustomer
+  } = draft
   const [statusOpen, setStatusOpen] = useState(false)
   const [priorityOpen, setPriorityOpen] = useState(false)
   const [dateOpen, setDateOpen] = useState(false)
@@ -212,7 +231,7 @@ function CommandBarCreateInner({
                 ref={titleRef}
                 autoFocus
                 value={title}
-                onChange={e => setTitle(e.target.value)}
+                onChange={e => patchDraft({ title: e.target.value })}
                 placeholder='What needs to be done?'
                 className='flex-1 text-[15px] font-medium text-foreground outline-none placeholder:text-text-tertiary'
                 onKeyDown={e => {
@@ -226,7 +245,7 @@ function CommandBarCreateInner({
             </div>
             <textarea
               value={description}
-              onChange={e => setDescription(e.target.value)}
+              onChange={e => patchDraft({ description: e.target.value })}
               placeholder='Add description...'
               rows={2}
               className='mt-2 ml-8 w-[calc(100%-2rem)] resize-none bg-transparent text-[13px] text-text-secondary outline-none placeholder:text-text-tertiary'
@@ -269,7 +288,7 @@ function CommandBarCreateInner({
                       selectedStatus?.id === s.id ? 'bg-accent-bg' : 'hover:bg-bg-hover'
                     )}
                     onClick={() => {
-                      setSelectedStatus(s)
+                      patchDraft({ selectedStatus: s })
                       setStatusOpen(false)
                     }}
                   >
@@ -310,7 +329,7 @@ function CommandBarCreateInner({
                       selectedPriority === key ? 'bg-accent-bg' : 'hover:bg-bg-hover'
                     )}
                     onClick={() => {
-                      setSelectedPriority(key as TaskPriority)
+                      patchDraft({ selectedPriority: key as TaskPriority })
                       setPriorityOpen(false)
                     }}
                   >
@@ -327,7 +346,7 @@ function CommandBarCreateInner({
 
             <UserCombobox
               value={selectedAssignee}
-              onChange={setSelectedAssignee}
+              onChange={selectedAssignee => patchDraft({ selectedAssignee })}
               placeholder='Assignee'
               excludeRoles={[USER_ROLES.superadmin]}
               triggerClassName='inline-flex items-center gap-1.5 rounded-[6px] bg-bg-secondary px-2.5 py-1.5 text-[13px] font-medium text-text-tertiary transition-colors duration-[80ms] hover:bg-bg-hover cursor-pointer'
@@ -356,7 +375,7 @@ function CommandBarCreateInner({
                         type='button'
                         className='flex w-full items-center justify-between rounded-[5px] px-2.5 py-1 text-[13px] font-medium transition-colors duration-80 hover:bg-bg-hover'
                         onClick={() => {
-                          setSelectedDueDate(format(resolved, 'yyyy-MM-dd'))
+                          patchDraft({ selectedDueDate: format(resolved, 'yyyy-MM-dd') })
                           setDateOpen(false)
                         }}
                       >
@@ -372,7 +391,7 @@ function CommandBarCreateInner({
                       type='button'
                       className='flex w-full items-center rounded-[5px] px-2.5 py-1 text-[13px] font-medium text-destructive transition-colors duration-80 hover:bg-bg-hover'
                       onClick={() => {
-                        setSelectedDueDate(null)
+                        patchDraft({ selectedDueDate: null })
                         setDateOpen(false)
                       }}
                     >
@@ -384,7 +403,7 @@ function CommandBarCreateInner({
                   mode='single'
                   selected={selectedDueDate ? new Date(selectedDueDate) : undefined}
                   onSelect={date => {
-                    setSelectedDueDate(date ? format(date, 'yyyy-MM-dd') : null)
+                    patchDraft({ selectedDueDate: date ? format(date, 'yyyy-MM-dd') : null })
                     setDateOpen(false)
                   }}
                   className='p-2'
@@ -404,7 +423,7 @@ function CommandBarCreateInner({
                 </span>
                 <OrderCombobox
                   value={selectedOrder}
-                  onChange={setSelectedOrder}
+                  onChange={selectedOrder => patchDraft({ selectedOrder })}
                   projectId={projectId}
                   placeholder='None'
                   triggerClassName={cn(
@@ -419,7 +438,7 @@ function CommandBarCreateInner({
                 </span>
                 <ProposalCombobox
                   value={selectedProposal}
-                  onChange={setSelectedProposal}
+                  onChange={selectedProposal => patchDraft({ selectedProposal })}
                   projectId={projectId}
                   placeholder='None'
                   triggerClassName={cn(
@@ -439,7 +458,7 @@ function CommandBarCreateInner({
                 ) : (
                   <TaskCustomerCombobox
                     value={selectedCustomer}
-                    onChange={setSelectedCustomer}
+                    onChange={selectedCustomer => patchDraft({ selectedCustomer })}
                     projectId={projectId}
                     placeholder='None'
                     triggerClassName={cn(
