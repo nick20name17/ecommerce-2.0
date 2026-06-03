@@ -50,6 +50,12 @@ interface StartPickingDialogProps {
 
 type Step = 'select-orders' | 'set-quantities' | 'saving'
 
+const formatQty = (raw: string) => {
+  const n = parseFloat(raw)
+  if (isNaN(n)) return '0'
+  return n % 1 === 0 ? n.toFixed(0) : String(parseFloat(n.toFixed(4)))
+}
+
 export function StartPickingDialog({
   open,
   onOpenChange,
@@ -136,12 +142,6 @@ export function StartPickingDialog({
 
   const selectAll = () => {
     setSelectedOrderIds(new Set(orders.map(o => o.autoid)))
-  }
-
-  const formatQty = (raw: string) => {
-    const n = parseFloat(raw)
-    if (isNaN(n)) return '0'
-    return n % 1 === 0 ? n.toFixed(0) : String(parseFloat(n.toFixed(4)))
   }
 
   const goToQuantities = () => {

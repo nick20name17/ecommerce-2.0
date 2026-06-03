@@ -74,6 +74,13 @@ const TOOLS: { type: ElementType; label: string; icon: React.FC<{ className?: st
 
 // ── Component ───────────────────────────────────────────────
 
+const handleCanvasDragOver = (e: React.DragEvent) => {
+  if (e.dataTransfer.types.includes('application/x-doc-element')) {
+    e.preventDefault()
+    e.dataTransfer.dropEffect = 'copy'
+  }
+}
+
 export function DesignerCanvas({
   layout,
   onChange,
@@ -326,13 +333,6 @@ export function DesignerCanvas({
   )
 
   // --- canvas drop target -------------------------------------------------
-
-  const handleCanvasDragOver = (e: React.DragEvent) => {
-    if (e.dataTransfer.types.includes('application/x-doc-element')) {
-      e.preventDefault()
-      e.dataTransfer.dropEffect = 'copy'
-    }
-  }
 
   const handleCanvasDrop = (e: React.DragEvent) => {
     const type = e.dataTransfer.getData('application/x-doc-element') as ElementType
@@ -1408,6 +1408,45 @@ function ToggleRow<T extends string>({
 
 // ── Layers panel ────────────────────────────────────────────
 
+const labelFor = (el: LayoutElement): string => {
+  const p = el.props ?? {}
+  if (el.type === 'text') {
+    const txt = String(p.text ?? '').trim()
+    return txt || 'Text'
+  }
+  if (el.type === 'field') {
+    const key = String(p.fieldKey ?? '').trim()
+    return key ? `{${key}}` : 'Field'
+  }
+  if (el.type === 'image') return 'Image'
+  if (el.type === 'table') {
+    const cols = (p.columns as { fieldKey?: string }[] | undefined) ?? []
+    return `Table (${cols.length} col${cols.length === 1 ? '' : 's'})`
+  }
+  if (el.type === 'line') return 'Line'
+  if (el.type === 'rect') return 'Rectangle'
+  return el.type
+}
+
+const iconFor = (el: LayoutElement) => {
+  switch (el.type) {
+    case 'text':
+      return <Type className='size-3' />
+    case 'field':
+      return <Square className='size-3' />
+    case 'image':
+      return <ImageIcon className='size-3' />
+    case 'table':
+      return <TableIcon className='size-3' />
+    case 'line':
+      return <Minus className='size-3' />
+    case 'rect':
+      return <Square className='size-3' />
+    default:
+      return <Square className='size-3' />
+  }
+}
+
 function LayersList({
   elements,
   selectedId,
@@ -1420,45 +1459,6 @@ function LayersList({
   // Render front-to-back so the visually top-most element appears first in
   // the list (matches user mental model — "this is on top").
   const ordered = [...elements].reverse()
-
-  const labelFor = (el: LayoutElement): string => {
-    const p = el.props ?? {}
-    if (el.type === 'text') {
-      const txt = String(p.text ?? '').trim()
-      return txt || 'Text'
-    }
-    if (el.type === 'field') {
-      const key = String(p.fieldKey ?? '').trim()
-      return key ? `{${key}}` : 'Field'
-    }
-    if (el.type === 'image') return 'Image'
-    if (el.type === 'table') {
-      const cols = (p.columns as { fieldKey?: string }[] | undefined) ?? []
-      return `Table (${cols.length} col${cols.length === 1 ? '' : 's'})`
-    }
-    if (el.type === 'line') return 'Line'
-    if (el.type === 'rect') return 'Rectangle'
-    return el.type
-  }
-
-  const iconFor = (el: LayoutElement) => {
-    switch (el.type) {
-      case 'text':
-        return <Type className='size-3' />
-      case 'field':
-        return <Square className='size-3' />
-      case 'image':
-        return <ImageIcon className='size-3' />
-      case 'table':
-        return <TableIcon className='size-3' />
-      case 'line':
-        return <Minus className='size-3' />
-      case 'rect':
-        return <Square className='size-3' />
-      default:
-        return <Square className='size-3' />
-    }
-  }
 
   return (
     <div className='shrink-0 border-b border-border'>

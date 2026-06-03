@@ -4,6 +4,21 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 
 import type { ShipToAddress } from './shipping-rates-dialog'
 
+const formatPhoneInput = (value: string) => {
+  const digits = value.replace(/\D/g, '')
+  if (digits.length <= 3) return digits
+  if (digits.length <= 6) return `(${digits.slice(0, 3)}) ${digits.slice(3)}`
+  return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6, 10)}`
+}
+
+const formatZipInput = (value: string) => {
+  // Allow alphanumeric + spaces for Canadian/international postal codes
+  return value
+    .toUpperCase()
+    .replace(/[^A-Z0-9 -]/g, '')
+    .slice(0, 10)
+}
+
 export function ShipToEditDialog({
   open,
   onOpenChange,
@@ -28,23 +43,8 @@ export function ShipToEditDialog({
     setDraft(d => ({ ...d, [field]: value }))
   }
 
-  const formatPhoneInput = (value: string) => {
-    const digits = value.replace(/\D/g, '')
-    if (digits.length <= 3) return digits
-    if (digits.length <= 6) return `(${digits.slice(0, 3)}) ${digits.slice(3)}`
-    return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6, 10)}`
-  }
-
   const handlePhoneChange = (value: string) => {
     update('c_phone', formatPhoneInput(value))
-  }
-
-  const formatZipInput = (value: string) => {
-    // Allow alphanumeric + spaces for Canadian/international postal codes
-    return value
-      .toUpperCase()
-      .replace(/[^A-Z0-9 -]/g, '')
-      .slice(0, 10)
   }
 
   const handleZipChange = (value: string) => {

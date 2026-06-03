@@ -36,6 +36,15 @@ interface VPValuesMatrixProps {
   isTablet?: boolean
 }
 
+// Build the matrix: rows = items, columns = spec_definitions
+// Each item has specs: Record<string, { option_id, value }>
+const getValueForCell = (
+  item: VariableProductItem,
+  spec: GlobalSpecDefinition
+): { option_id: string; value: string } | undefined => {
+  return item.specs[spec.slug]
+}
+
 export const VPValuesMatrix = ({ vp, projectId, isMobile, isTablet }: VPValuesMatrixProps) => {
   const [linkDialog, setLinkDialog] = useState<{
     spec: GlobalSpecDefinition
@@ -145,15 +154,6 @@ export const VPValuesMatrix = ({ vp, projectId, isMobile, isTablet }: VPValuesMa
         </div>
       </div>
     )
-  }
-
-  // Build the matrix: rows = items, columns = spec_definitions
-  // Each item has specs: Record<string, { option_id, value }>
-  const getValueForCell = (
-    item: VariableProductItem,
-    spec: GlobalSpecDefinition
-  ): { option_id: string; value: string } | undefined => {
-    return item.specs[spec.slug]
   }
 
   return (

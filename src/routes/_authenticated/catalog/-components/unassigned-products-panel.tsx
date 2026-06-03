@@ -27,6 +27,15 @@ interface UnassignedProductsPanelProps {
   isMobile?: boolean
 }
 
+const handleDragStart = (
+  e: React.DragEvent,
+  product: { autoid: string; id: string; descr_1: string; wtree_id: string }
+) => {
+  e.dataTransfer.setData('application/product-autoid', product.autoid)
+  e.dataTransfer.setData('text/plain', product.id)
+  e.dataTransfer.effectAllowed = 'copy'
+}
+
 export const UnassignedProductsPanel = ({ projectId, isMobile }: UnassignedProductsPanelProps) => {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
@@ -98,12 +107,6 @@ export const UnassignedProductsPanel = ({ projectId, isMobile }: UnassignedProdu
       navigate({ to: `/catalog/vp/${vp.id}` })
     }
   })
-
-  const handleDragStart = (e: React.DragEvent, product: (typeof products)[0]) => {
-    e.dataTransfer.setData('application/product-autoid', product.autoid)
-    e.dataTransfer.setData('text/plain', product.id)
-    e.dataTransfer.effectAllowed = 'copy'
-  }
 
   return (
     <div className='flex h-full flex-col'>

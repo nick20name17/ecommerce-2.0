@@ -52,6 +52,25 @@ export type FileUploadActions = {
   }
 }
 
+const createPreview = (file: File | FileMetadata): string | undefined => {
+  if (file instanceof File) {
+    return URL.createObjectURL(file)
+  }
+  return file.url
+}
+
+const generateUniqueId = (file: File | FileMetadata): string => {
+  if (file instanceof File) {
+    return `${file.name}-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`
+  }
+  return file.id
+}
+
+const handleDragOver = (e: DragEvent<HTMLElement>) => {
+  e.preventDefault()
+  e.stopPropagation()
+}
+
 export const useFileUpload = (
   options: FileUploadOptions = {}
 ): [FileUploadState, FileUploadActions] => {
@@ -111,20 +130,6 @@ export const useFileUpload = (
     }
 
     return null
-  }
-
-  const createPreview = (file: File | FileMetadata): string | undefined => {
-    if (file instanceof File) {
-      return URL.createObjectURL(file)
-    }
-    return file.url
-  }
-
-  const generateUniqueId = (file: File | FileMetadata): string => {
-    if (file instanceof File) {
-      return `${file.name}-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`
-    }
-    return file.id
   }
 
   const clearFiles = () => {
@@ -274,11 +279,6 @@ export const useFileUpload = (
     }
 
     setState(prev => ({ ...prev, isDragging: false }))
-  }
-
-  const handleDragOver = (e: DragEvent<HTMLElement>) => {
-    e.preventDefault()
-    e.stopPropagation()
   }
 
   const handleDrop = (e: DragEvent<HTMLElement>) => {

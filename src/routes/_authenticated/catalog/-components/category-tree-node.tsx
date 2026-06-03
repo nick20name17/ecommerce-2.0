@@ -39,6 +39,14 @@ function getDepthStyle(depth: number) {
   return DEPTH_STYLES[Math.min(depth, DEPTH_STYLES.length - 1)]
 }
 
+const handleDragOver = (e: React.DragEvent) => {
+  e.preventDefault()
+  e.stopPropagation()
+  e.dataTransfer.dropEffect = e.dataTransfer.types.includes('application/product-autoid')
+    ? 'copy'
+    : 'move'
+}
+
 export const CategoryTreeNode = ({
   category,
   depth,
@@ -63,14 +71,6 @@ export const CategoryTreeNode = ({
     e.stopPropagation()
     e.dataTransfer.setData('text/plain', category.id)
     e.dataTransfer.effectAllowed = 'move'
-  }
-
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-    e.dataTransfer.dropEffect = e.dataTransfer.types.includes('application/product-autoid')
-      ? 'copy'
-      : 'move'
   }
 
   const handleDragEnter = (e: React.DragEvent) => {

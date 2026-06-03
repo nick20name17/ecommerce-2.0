@@ -30,6 +30,12 @@ interface Props {
 
 type Step = 'select-orders' | 'set-quantities'
 
+const formatQty = (raw: string) => {
+  const n = parseFloat(raw)
+  if (isNaN(n)) return '0'
+  return n % 1 === 0 ? n.toFixed(0) : String(parseFloat(n.toFixed(4)))
+}
+
 export function AddItemsModal({
   pickListId,
   customerId,
@@ -83,12 +89,6 @@ export function AddItemsModal({
 
   const selectAll = () => {
     setSelectedOrderIds(new Set(orders.map(o => o.autoid)))
-  }
-
-  const formatQty = (raw: string) => {
-    const n = parseFloat(raw)
-    if (isNaN(n)) return '0'
-    return n % 1 === 0 ? n.toFixed(0) : String(parseFloat(n.toFixed(4)))
   }
 
   const goToQuantities = () => {
