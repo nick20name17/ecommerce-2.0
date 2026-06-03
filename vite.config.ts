@@ -6,9 +6,6 @@ import path from 'path'
 import { defineConfig } from 'vite'
 
 export default defineConfig({
-  optimizeDeps: {
-    include: ['lucide-react']
-  },
   plugins: [
     tanstackRouter({
       target: 'react',
@@ -25,9 +22,6 @@ export default defineConfig({
     alias: {
       '@': path.resolve(__dirname, './src')
     }
-  },
-  build: {
-    sourcemap: 'hidden'
   },
   test: {
     globals: true,
