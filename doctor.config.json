@@ -1,6 +1,7 @@
 {
   "ignore": {
     "files": [
+      "src/routes/_authenticated/documents/**",
       "src/routes/_authenticated/orders/-components/orders-data-table.tsx",
       "src/routes/_authenticated/users/-components/users-data-table.tsx",
       "src/routes/_authenticated/customers/-components/customers-data-table.tsx",
