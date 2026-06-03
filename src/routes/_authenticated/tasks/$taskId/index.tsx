@@ -2,38 +2,38 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { createFileRoute, useRouter } from '@tanstack/react-router'
 import { addDays, format, nextFriday, nextMonday } from 'date-fns'
 import { CalendarDays, ChevronDown, ChevronLeft, Paperclip, Trash2 } from 'lucide-react'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import {
-  TASK_QUERY_KEYS,
   getTaskDetailQuery,
   getTaskNotesQuery,
-  getTaskStatusesQuery
+  getTaskStatusesQuery,
+  TASK_QUERY_KEYS
 } from '@/api/task/query'
 import type { Task, TaskNote } from '@/api/task/schema'
 import { taskService } from '@/api/task/service'
-import { TaskAttachments } from '@/components/tasks/task-attachments'
+import { UserCombobox } from '@/components/common/user-combobox/user-combobox'
+import { InitialsAvatar, StatusIcon } from '@/components/ds'
 import { TaskCustomerCombobox } from '@/components/tasks/customer-combobox'
 import { OrderCombobox } from '@/components/tasks/order-combobox'
 import { ProposalCombobox } from '@/components/tasks/proposal-combobox'
-import { UserCombobox } from '@/components/common/user-combobox/user-combobox'
-import { InitialsAvatar, StatusIcon } from '@/components/ds'
+import { TaskAttachments } from '@/components/tasks/task-attachments'
+import { Calendar } from '@/components/ui/calendar'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
-import { Calendar } from '@/components/ui/calendar'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { SidebarTrigger } from '@/components/ui/sidebar'
 import { Skeleton } from '@/components/ui/skeleton'
-import { TASK_PRIORITY_COLORS, TASK_PRIORITY_LABELS } from '@/constants/task'
 import type { TaskPriority } from '@/constants/task'
+import { TASK_PRIORITY_COLORS, TASK_PRIORITY_LABELS } from '@/constants/task'
+import { isAdmin, isSuperAdmin, USER_ROLES } from '@/constants/user'
+import { formatDateMedium, getUserDisplayName } from '@/helpers/formatters'
 import { useBreakpoint } from '@/hooks/use-breakpoint'
 import { useProjectId } from '@/hooks/use-project-id'
-import { formatDateMedium, getUserDisplayName } from '@/helpers/formatters'
-import { isAdmin, isSuperAdmin, USER_ROLES } from '@/constants/user'
 import { cn } from '@/lib/utils'
 import { useAuth } from '@/providers/auth'
 
@@ -129,15 +129,6 @@ function TaskDetailPage() {
   const [activeTab, setActiveTab] = useState<'details' | 'attachments'>('details')
   const [panelTab, setPanelTab] = useState<'properties' | 'activity'>('properties')
   const [noteText, setNoteText] = useState('')
-  const titleRef = useRef<HTMLTextAreaElement>(null)
-
-  const autoResizeTitle = () => {
-    const el = titleRef.current
-    if (el) {
-      el.style.height = 'auto'
-      el.style.height = `${el.scrollHeight}px`
-    }
-  }
 
   // Fetch task
   const { data: task, isLoading } = useQuery({
@@ -212,12 +203,8 @@ function TaskDetailPage() {
   const [description, setDescription] = useState(task?.description ?? '')
 
   useEffect(() => {
-    if (task?.title) {
-      setTitle(task.title)
-      // defer resize so DOM has updated
-      queueMicrotask(autoResizeTitle)
-    }
-  }, [task?.title, autoResizeTitle])
+    if (task?.title) setTitle(task.title)
+  }, [task?.title])
 
   useEffect(() => {
     setDescription(task?.description ?? '')
@@ -437,14 +424,12 @@ function TaskDetailPage() {
             <div className='mx-auto max-w-160 pb-16'>
               {activeTab === 'details' ? (
                 <>
-                  {/* Title — editable, auto-resizing */}
+                  {/* Title auto-grows via CSS `field-sizing-content` (no JS resize).
+                      Newish CSS — Chromium 123+, FF 137+, Safari 18.4+. If the title
+                      height misbehaves on an older browser, this is the likely cause. */}
                   <textarea
-                    ref={titleRef}
                     value={title}
-                    onChange={e => {
-                      setTitle(e.target.value)
-                      autoResizeTitle()
-                    }}
+                    onChange={e => setTitle(e.target.value)}
                     onBlur={handleTitleBlur}
                     onKeyDown={e => {
                       if (e.key === 'Enter') {
@@ -454,7 +439,7 @@ function TaskDetailPage() {
                     }}
                     rows={1}
                     className={cn(
-                      'mb-6 w-full resize-none overflow-hidden bg-transparent leading-[1.3] font-semibold tracking-[-0.02em] outline-none',
+                      'mb-6 field-sizing-content w-full resize-none overflow-hidden bg-transparent leading-[1.3] font-semibold tracking-[-0.02em] outline-none',
                       'placeholder:text-text-tertiary',
                       isMobile ? 'text-xl' : 'text-[24px]'
                     )}
