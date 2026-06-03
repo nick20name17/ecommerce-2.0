@@ -1,5 +1,10 @@
 # Project: ecommerce-2.0
 
+## Tests
+
+- Do not add tests which simply restate the implementation. These provide zero confidence.
+
+
 ## Git
 
 - **Repo**: `nick20name17/ecommerce-2.0`

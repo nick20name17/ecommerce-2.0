@@ -3,14 +3,14 @@ import { ArrowDownRight, ArrowUpRight, Minus } from 'lucide-react'
 
 import { getDashboardQuery } from '@/api/dashboard/query'
 import type { DashboardMetrics } from '@/api/dashboard/schema'
+import { Skeleton } from '@/components/ui/skeleton'
+import { getErrorMessage } from '@/helpers/error'
+import { formatCurrency } from '@/helpers/formatters'
+import { cn } from '@/lib/utils'
 import {
   DashboardOrdersChart,
   OrdersChangeBadge
 } from '@/routes/_authenticated/-components/dashboard-orders-chart'
-import { getErrorMessage } from '@/helpers/error'
-import { formatCurrency } from '@/helpers/formatters'
-import { Skeleton } from '@/components/ui/skeleton'
-import { cn } from '@/lib/utils'
 
 interface CustomerDashboardTabProps {
   customerId: string

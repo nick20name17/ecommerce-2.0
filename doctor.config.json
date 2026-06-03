@@ -1,4 +1,5 @@
 {
+  "$schema": "https://react.doctor/schema/config.json",
   "ignore": {
     "files": [
       "src/routes/_authenticated/documents/**",
@@ -12,5 +13,8 @@
       "src/routes/_authenticated/customers/$customerId/-components/customer-orders-tab.tsx",
       "src/routes/_authenticated/settings/-components/fields-data-table.tsx"
     ]
+  },
+  "rules": {
+    "react-doctor/design-no-em-dash-in-jsx-text": "off"
   }
 }
