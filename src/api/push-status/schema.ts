@@ -3,6 +3,14 @@ import type { PaginationParams } from '@/api/schema'
 // Live push state of one storefront's approved, not-finished orders, joined
 // with PayloadLog history. Backed by GET /api/data/proposals/push-status/.
 
+export interface PushStatusLine {
+  name: string | null
+  sn: string | null
+  qty: number | null
+  unit: string | null
+  pushed: boolean
+}
+
 export interface PushStatusItem {
   // Live storefront state (GET /api/crm/proposal)
   proposal_id: number
@@ -16,6 +24,7 @@ export interface PushStatusItem {
   total: number | null
   items_total: number | null
   items_pushed: number | null
+  lines: PushStatusLine[]
   is_approved: boolean
   created_at: string | null
   updated_at: string | null
