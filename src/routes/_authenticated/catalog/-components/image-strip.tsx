@@ -51,7 +51,7 @@ export const ImageStrip = ({
     <>
       <div
         className={cn(
-          'flex items-center gap-2 overflow-x-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden',
+          'flex [scrollbar-width:none] items-center gap-2 overflow-x-auto [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden',
           className
         )}
       >

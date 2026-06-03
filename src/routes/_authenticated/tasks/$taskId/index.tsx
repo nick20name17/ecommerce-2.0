@@ -531,7 +531,7 @@ function TaskDetailPage() {
 
           {/* Panel content */}
           {panelTab === 'properties' ? (
-            <div className='flex-1 overflow-y-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden'>
+            <div className='flex-1 [scrollbar-width:none] overflow-y-auto [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden'>
               <div className={cn(isMobile ? 'px-4 py-4' : 'p-5')}>
                 {/* Status */}
                 <PropertyRow label='Status'>
@@ -723,7 +723,7 @@ function TaskDetailPage() {
           ) : (
             <>
               {/* Activity notes list */}
-              <div className='min-h-0 flex-1 overflow-y-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden'>
+              <div className='min-h-0 flex-1 [scrollbar-width:none] overflow-y-auto [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden'>
                 {notesLoading ? (
                   <div className='flex flex-col'>
                     {[1, 2, 3].map(k => (

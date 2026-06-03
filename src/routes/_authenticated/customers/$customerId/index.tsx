@@ -363,7 +363,7 @@ function CustomerDetailPage() {
           </div>
 
           {/* Panel content */}
-          <div className='flex-1 overflow-y-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden'>
+          <div className='flex-1 [scrollbar-width:none] overflow-y-auto [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden'>
             {panelTab === 'general' ? (
               <CustomerInfoPanel
                 customer={customer}

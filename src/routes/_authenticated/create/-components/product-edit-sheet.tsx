@@ -219,7 +219,7 @@ export const ProductEditSheet = ({
             /* Full two-panel layout for products with configurations */
             <div className='flex min-h-0 flex-1'>
               {/* Left panel: image + info */}
-              <div className='flex w-[380px] shrink-0 flex-col overflow-y-auto border-r border-border bg-bg-secondary/30 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden'>
+              <div className='flex w-[380px] shrink-0 [scrollbar-width:none] flex-col overflow-y-auto border-r border-border bg-bg-secondary/30 [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden'>
                 <div className='p-4'>
                   <ProductImageGallery
                     photos={photos}
