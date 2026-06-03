@@ -1,5 +1,5 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
-import { AlertCircle, ChevronRight, Inbox, Search, Send } from 'lucide-react'
+import { AlertCircle, Check, ChevronRight, Inbox, Search, Send, X } from 'lucide-react'
 import { useState } from 'react'
 import { useDebouncedCallback } from 'use-debounce'
 
@@ -77,7 +77,7 @@ export function PushStatusSection({ projectId }: { projectId: number }) {
   const [limit] = useLimitParam(PUSH_STATUS_DEFAULT_LIMIT)
 
   // Drill-down: click a row -> log trail for that proposal; click a trail row -> detail.
-  const [drillId, setDrillId] = useState<number | null>(null)
+  const [drillRow, setDrillRow] = useState<PushStatusItem | null>(null)
   const [selectedLog, setSelectedLog] = useState<PayloadLog | null>(null)
 
   const { data, isLoading, isPlaceholderData, error } = useQuery({
@@ -216,7 +216,7 @@ export function PushStatusSection({ projectId }: { projectId: number }) {
                     row={row}
                     bp={bp}
                     isMobile={isMobile}
-                    onClick={() => setDrillId(row.proposal_id)}
+                    onClick={() => setDrillRow(row)}
                   />
                 ))}
               </div>
@@ -239,8 +239,8 @@ export function PushStatusSection({ projectId }: { projectId: number }) {
       {/* Per-order push-log trail (PayloadLog enrich for this entity) */}
       <OrderLogTrailSheet
         projectId={projectId}
-        proposalId={drillId}
-        onClose={() => setDrillId(null)}
+        row={drillRow}
+        onClose={() => setDrillRow(null)}
         onSelectLog={setSelectedLog}
       />
       <PayloadLogDetailDialog
@@ -263,16 +263,17 @@ const METHOD_COLORS: Record<string, string> = {
 
 function OrderLogTrailSheet({
   projectId,
-  proposalId,
+  row,
   onClose,
   onSelectLog,
 }: {
   projectId: number
-  proposalId: number | null
+  row: PushStatusItem | null
   onClose: () => void
   onSelectLog: (log: PayloadLog) => void
 }) {
-  const open = proposalId != null
+  const open = row != null
+  const proposalId = row?.proposal_id ?? null
 
   const { data, isLoading } = useQuery({
     ...getPayloadLogsQuery({
@@ -286,19 +287,55 @@ function OrderLogTrailSheet({
   })
 
   const logs = data?.results ?? []
+  const lines = row?.lines ?? []
 
   return (
     <Sheet open={open} onOpenChange={(o) => !o && onClose()}>
       <SheetContent className='flex w-full flex-col gap-0 p-0 sm:max-w-xl'>
         <SheetHeader className='border-b border-border px-5 py-4'>
-          <SheetTitle>Order #{proposalId} — push log</SheetTitle>
+          <SheetTitle>Order #{proposalId}</SheetTitle>
           <SheetDescription>
-            Every EBMS push attempt for this order, newest first. Click a row for
-            payload / response.
+            Line items and EBMS push attempts for this order.
           </SheetDescription>
         </SheetHeader>
 
         <ScrollArea className='min-h-0 flex-1'>
+          {/* Items — which lines pushed (sendedEbms) vs not */}
+          <div className='flex items-center justify-between border-b border-border bg-bg-secondary px-5 py-1.5 text-[12px] font-medium text-text-tertiary'>
+            <span>Items</span>
+            <span className='tabular-nums'>
+              {row?.items_pushed ?? 0}/{row?.items_total ?? 0} pushed
+            </span>
+          </div>
+          {lines.length === 0 ? (
+            <div className='border-b border-border-light px-5 py-3 text-[12px] text-text-tertiary'>
+              No line items.
+            </div>
+          ) : (
+            <div className='divide-y divide-border-light border-b border-border'>
+              {lines.map((ln, i) => (
+                <div key={i} className='flex items-center gap-2.5 px-5 py-2'>
+                  {ln.pushed ? (
+                    <Check className='size-3.5 shrink-0 text-emerald-600 dark:text-emerald-400' />
+                  ) : (
+                    <X className='size-3.5 shrink-0 text-red-500' />
+                  )}
+                  <span className='min-w-0 flex-1 truncate text-[13px] text-foreground'>
+                    {ln.name || ln.sn || '—'}
+                  </span>
+                  <span className='shrink-0 text-[12px] tabular-nums text-text-tertiary'>
+                    {ln.qty ?? '—'}
+                    {ln.unit ? ` ${ln.unit}` : ''}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Push log */}
+          <div className='border-b border-border bg-bg-secondary px-5 py-1.5 text-[12px] font-medium text-text-tertiary'>
+            Push log
+          </div>
           {isLoading ? (
             <div className='flex flex-col gap-2 p-4'>
               {Array.from({ length: 6 }).map((_, i) => (
