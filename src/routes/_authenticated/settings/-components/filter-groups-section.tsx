@@ -12,7 +12,7 @@ import {
   Users,
   X
 } from 'lucide-react'
-import { useState } from 'react'
+import { useReducer, useState } from 'react'
 
 import { FILTER_PRESET_QUERY_KEYS, getFilterPresetsQuery } from '@/api/filter-preset/query'
 import type {
@@ -472,13 +472,24 @@ function FilterPresetDialog({
 }) {
   const isNew = !preset
 
-  const [name, setName] = useState(preset?.name ?? '')
-  const [entityType, setEntityType] = useState<FilterPresetEntityType>(
-    preset?.entity_type ?? 'order'
+  interface PresetForm {
+    name: string
+    entityType: FilterPresetEntityType
+    shared: boolean
+    visibleToRoles: string[]
+    visibleToUsers: number[]
+  }
+  const [form, patchForm] = useReducer(
+    (state: PresetForm, patch: Partial<PresetForm>) => ({ ...state, ...patch }),
+    {
+      name: preset?.name ?? '',
+      entityType: preset?.entity_type ?? 'order',
+      shared: preset?.shared ?? false,
+      visibleToRoles: preset?.visible_to_roles ?? [],
+      visibleToUsers: preset?.visible_to_users ?? []
+    }
   )
-  const [shared, setShared] = useState(preset?.shared ?? false)
-  const [visibleToRoles, setVisibleToRoles] = useState<string[]>(preset?.visible_to_roles ?? [])
-  const [visibleToUsers, setVisibleToUsers] = useState<number[]>(preset?.visible_to_users ?? [])
+  const { name, entityType, shared, visibleToRoles, visibleToUsers } = form
 
   const { data: usersData } = useQuery(
     getUsersQuery({ limit: 500, project: projectId ?? undefined })
@@ -619,7 +630,7 @@ function FilterPresetDialog({
               </label>
               <Input
                 value={name}
-                onChange={e => setName(e.target.value)}
+                onChange={e => patchForm({ name: e.target.value })}
                 placeholder='e.g. Open Orders (AARON)'
               />
             </div>
@@ -645,7 +656,7 @@ function FilterPresetDialog({
                         )}
                         onClick={() => {
                           if (e !== entityType) {
-                            setEntityType(e)
+                            patchForm({ entityType: e })
                             if (isNew) setRows([])
                           }
                         }}
@@ -874,7 +885,7 @@ function FilterPresetDialog({
                       'relative inline-flex h-4.5 w-7.5 shrink-0 items-center rounded-full transition-colors duration-150',
                       shared ? 'bg-primary' : 'bg-foreground/15'
                     )}
-                    onClick={() => setShared(v => !v)}
+                    onClick={() => patchForm({ shared: !shared })}
                   >
                     <span
                       className={cn(
@@ -905,9 +916,11 @@ function FilterPresetDialog({
                                   : 'border-border bg-background text-text-tertiary hover:text-text-secondary'
                               )}
                               onClick={() => {
-                                setVisibleToRoles(prev =>
-                                  selected ? prev.filter(r => r !== role) : [...prev, role]
-                                )
+                                patchForm({
+                                  visibleToRoles: selected
+                                    ? visibleToRoles.filter(r => r !== role)
+                                    : [...visibleToRoles, role]
+                                })
                               }}
                             >
                               {label}
@@ -940,9 +953,11 @@ function FilterPresetDialog({
                                 : 'border-border bg-background text-text-tertiary hover:text-text-secondary'
                             )}
                             onClick={() => {
-                              setVisibleToUsers(prev =>
-                                selected ? prev.filter(id => id !== u.id) : [...prev, u.id]
-                              )
+                              patchForm({
+                                visibleToUsers: selected
+                                  ? visibleToUsers.filter(id => id !== u.id)
+                                  : [...visibleToUsers, u.id]
+                              })
                             }}
                           >
                             {displayName}
