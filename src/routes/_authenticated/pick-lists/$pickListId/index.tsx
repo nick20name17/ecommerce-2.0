@@ -380,6 +380,7 @@ const PickListDetailPage = () => {
                               <input
                                 value={editQty}
                                 onChange={e => setEditQty(e.target.value)}
+                                aria-label='Quantity'
                                 className='h-6 w-15 rounded border border-border bg-background px-1.5 text-right text-[12px] tabular-nums outline-none focus:border-primary'
                                 onKeyDown={e => {
                                   if (e.key === 'Enter')

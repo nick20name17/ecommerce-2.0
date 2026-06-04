@@ -165,6 +165,7 @@ export const GlobalSearch = () => {
                 <Search className='size-4 shrink-0 text-text-tertiary' />
                 <input
                   ref={inputRef}
+                  aria-label='Search orders, customers'
                   value={query}
                   onChange={e => setQuery(e.target.value)}
                   onKeyDown={handleKeyDown}

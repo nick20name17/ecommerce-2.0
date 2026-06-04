@@ -179,6 +179,7 @@ export function MultiAssignDialog({
               )}
               <input
                 ref={inputRef}
+                aria-label='Search users to add'
                 placeholder='Search users to add...'
                 value={search}
                 onChange={e => handleSearchChange(e.target.value)}

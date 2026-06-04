@@ -120,6 +120,7 @@ export const ProposalCombobox = ({
           )}
           <input
             ref={inputRef}
+            aria-label='Search proposals'
             placeholder='Search by quote or name...'
             value={search}
             onChange={e => handleSearchChange(e.target.value)}

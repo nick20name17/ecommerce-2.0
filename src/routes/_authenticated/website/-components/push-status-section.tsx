@@ -112,6 +112,7 @@ export function PushStatusSection({ projectId }: { projectId: number }) {
           <div className='hidden h-7 w-full max-w-65 items-center gap-1.5 rounded-[5px] border border-border bg-background px-2 transition-[border-color,box-shadow] focus-within:border-ring focus-within:ring-2 focus-within:ring-ring/50 sm:flex'>
             <Search className='size-3 shrink-0 text-text-tertiary' />
             <input
+              aria-label='Search by proposal id or autoid'
               defaultValue={search}
               onChange={e => handleSearch(e.target.value)}
               placeholder='Proposal id or autoid...'

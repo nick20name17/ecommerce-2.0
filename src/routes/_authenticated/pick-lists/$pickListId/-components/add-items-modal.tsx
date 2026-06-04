@@ -579,6 +579,7 @@ function PickItemRow({
           onChange={e => updatePickQty(item.autoid, e.target.value, qty)}
           min='0'
           step='any'
+          aria-label='Pick quantity'
           className={cn(
             'h-7 w-full rounded-[5px] border bg-background text-center text-[13px] text-foreground tabular-nums outline-none focus:border-primary focus:ring-1 focus:ring-primary/20',
             isPartial ? 'border-amber-400' : 'border-border'
@@ -631,6 +632,7 @@ function PickItemRow({
           onChange={e => updatePickQty(item.autoid, e.target.value, qty)}
           min='0'
           step='any'
+          aria-label='Pick quantity'
           className={cn(
             'h-7 w-full rounded-[5px] border bg-background text-center text-[13px] text-foreground tabular-nums outline-none focus:border-primary focus:ring-1 focus:ring-primary/20',
             isPartial ? 'border-amber-400' : 'border-border'
@@ -676,6 +678,7 @@ function PickItemRow({
         onChange={e => updatePickQty(item.autoid, e.target.value, qty)}
         min='0'
         step='any'
+        aria-label='Pick quantity'
         className={cn(
           'h-7 w-full rounded-[5px] border bg-background text-center text-[13px] text-foreground tabular-nums outline-none focus:border-primary focus:ring-1 focus:ring-primary/20',
           isPartial ? 'border-amber-400' : 'border-border'

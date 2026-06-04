@@ -153,6 +153,7 @@ function FieldRow({
       <input
         value={value}
         onChange={e => onChange(e.target.value)}
+        aria-label={label}
         className='placeholder:text-text-quaternary w-full rounded-[5px] border border-border bg-background px-2.5 py-1.5 text-[13px] font-medium text-foreground transition-[border-color,box-shadow] duration-75 outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20'
         placeholder={`Enter ${label.toLowerCase()}`}
       />

@@ -757,6 +757,7 @@ function FilterPresetDialog({
                         ) : fType === 'boolean' ? (
                           <button
                             type='button'
+                            aria-label='Toggle value'
                             className={cn(
                               'relative inline-flex h-7 w-13 shrink-0 items-center rounded-full border transition-colors duration-200',
                               row.value === 'true'
@@ -881,6 +882,7 @@ function FilterPresetDialog({
                   <span className='text-[13px] text-text-secondary'>Shared with everyone</span>
                   <button
                     type='button'
+                    aria-label='Shared with everyone'
                     className={cn(
                       'relative inline-flex h-4.5 w-7.5 shrink-0 items-center rounded-full transition-colors duration-150',
                       shared ? 'bg-primary' : 'bg-foreground/15'

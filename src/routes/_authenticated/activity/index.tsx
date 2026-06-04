@@ -129,6 +129,7 @@ const ActivityPage = () => {
           <Search className='size-3.5 shrink-0 text-text-tertiary' />
           <input
             value={search}
+            aria-label='Search activity'
             onChange={e => {
               setSearch(e.target.value)
               setOffset(null)

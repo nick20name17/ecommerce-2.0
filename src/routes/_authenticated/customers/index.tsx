@@ -189,6 +189,7 @@ function CustomersPage() {
             value={search}
             onChange={e => setSearch(e.target.value)}
             placeholder='Search by name, email, or phone...'
+            aria-label='Search customers'
             className='flex-1 bg-transparent text-[13px] outline-none placeholder:text-text-tertiary'
           />
         </div>

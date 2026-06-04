@@ -775,6 +775,7 @@ function PickItemRow({
         <span className='text-center text-[11px] font-medium text-text-tertiary'>{unitLabel}</span>
         <input
           type='number'
+          aria-label='Pick quantity'
           value={pickVal}
           onChange={e => updatePickQty(item.autoid, e.target.value, qty)}
           min='0'
@@ -832,6 +833,7 @@ function PickItemRow({
         <span className='text-center text-[11px] font-medium text-text-tertiary'>{unitLabel}</span>
         <input
           type='number'
+          aria-label='Pick quantity'
           value={pickVal}
           onChange={e => updatePickQty(item.autoid, e.target.value, qty)}
           min='0'

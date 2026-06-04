@@ -96,6 +96,7 @@ const PickListsPage = () => {
               setOffset(null)
             }}
             placeholder='Search pick lists...'
+            aria-label='Search pick lists'
             className='w-35 bg-transparent text-[13px] outline-none placeholder:text-text-tertiary sm:w-50'
           />
         </div>

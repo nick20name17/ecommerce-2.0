@@ -95,6 +95,7 @@ export const CatalogProductGrid = ({
           )}
           <input
             value={query}
+            aria-label='Search products'
             onChange={e => handleInput(e.target.value)}
             placeholder='Search by ID, UPC, description…'
             className='flex-1 bg-transparent text-[13px] outline-none placeholder:text-text-tertiary'

@@ -143,6 +143,7 @@ export function UserCombobox({
           )}
           <input
             ref={inputRef}
+            aria-label='Search users'
             placeholder='Search by name or email...'
             value={search}
             onChange={e => handleSearchChange(e.target.value)}

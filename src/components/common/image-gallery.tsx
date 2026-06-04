@@ -195,6 +195,7 @@ export const ImageGallery = ({ entityType, entityId, projectId }: ImageGalleryPr
         </Button>
         <input
           ref={fileInputRef}
+          aria-label='Upload images'
           type='file'
           accept='image/jpeg,image/png,image/webp'
           multiple

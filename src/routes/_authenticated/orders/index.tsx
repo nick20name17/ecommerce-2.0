@@ -215,6 +215,7 @@ const OrdersPage = () => {
               setOffset(null)
             }}
             placeholder='Search by invoice number...'
+            aria-label='Search orders'
             className='flex-1 bg-transparent text-[13px] outline-none placeholder:text-text-tertiary'
           />
         </div>

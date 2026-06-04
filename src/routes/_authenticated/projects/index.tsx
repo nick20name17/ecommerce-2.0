@@ -127,6 +127,7 @@ const ProjectsPage = () => {
             defaultValue={search}
             onChange={e => handleSearch(e.target.value)}
             placeholder='Search projects...'
+            aria-label='Search projects'
             className='flex-1 bg-transparent text-[13px] outline-none placeholder:text-text-tertiary'
           />
         </div>

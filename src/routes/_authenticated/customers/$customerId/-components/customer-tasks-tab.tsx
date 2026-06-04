@@ -131,6 +131,7 @@ export const CustomerTasksTab = ({ customerId, customerName }: CustomerTasksTabP
             value={search}
             onChange={e => setSearch(e.target.value)}
             placeholder="Search to-do's..."
+            aria-label='Search to-dos'
             className='flex-1 bg-transparent text-[13px] outline-none placeholder:text-text-tertiary'
           />
         </div>

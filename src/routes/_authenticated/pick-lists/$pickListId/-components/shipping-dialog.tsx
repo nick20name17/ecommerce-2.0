@@ -542,6 +542,7 @@ function AddrField({
         value={value}
         onChange={e => onChange(e.target.value)}
         placeholder={label}
+        aria-label={label}
         className='placeholder:text-text-quaternary h-8 w-full rounded-md border border-border bg-background px-2.5 text-[13px] text-foreground transition-colors outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20'
       />
     </div>

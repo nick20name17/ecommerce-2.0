@@ -428,6 +428,7 @@ function TaskDetailPage() {
                       Newish CSS — Chromium 123+, FF 137+, Safari 18.4+. If the title
                       height misbehaves on an older browser, this is the likely cause. */}
                   <textarea
+                    aria-label='Task title'
                     value={title}
                     onChange={e => setTitle(e.target.value)}
                     onBlur={handleTitleBlur}
@@ -451,6 +452,7 @@ function TaskDetailPage() {
                       Description
                     </div>
                     <textarea
+                      aria-label='Description'
                       value={description}
                       onChange={e => setDescription(e.target.value)}
                       onBlur={handleDescriptionBlur}
@@ -785,6 +787,7 @@ function TaskDetailPage() {
                 }}
               >
                 <textarea
+                  aria-label='Write a comment'
                   value={noteText}
                   onChange={e => setNoteText(e.target.value.slice(0, 500))}
                   onKeyDown={e => {

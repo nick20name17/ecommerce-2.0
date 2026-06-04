@@ -605,6 +605,7 @@ function AddressDialogField({
       <label className='mb-1 block text-[12px] font-medium text-text-tertiary'>{label}</label>
       <input
         value={value}
+        aria-label={label}
         onChange={e => onChange(e.target.value)}
         placeholder={label}
         autoFocus={autoFocus}

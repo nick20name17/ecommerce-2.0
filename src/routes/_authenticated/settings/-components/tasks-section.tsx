@@ -96,6 +96,7 @@ const SortableStatusRow = ({
             if (e.key === 'Enter') handleSave()
             if (e.key === 'Escape') setEditing(false)
           }}
+          aria-label='Status name'
           className='h-7 min-w-0 flex-1 rounded-md border border-border bg-background px-2.5 text-[13px] font-medium transition-[border-color,box-shadow] outline-none focus:border-primary focus:ring-2 focus:ring-primary/20'
           autoFocus
         />
@@ -317,6 +318,7 @@ export const TasksSection = ({ projectId }: { projectId: number }) => {
                   onChange={e => setNewName(e.target.value)}
                   onKeyDown={e => e.key === 'Enter' && handleAddStatus()}
                   placeholder='Add a status...'
+                  aria-label='Add a status'
                   className='placeholder:text-text-quaternary h-7 min-w-0 flex-1 bg-transparent text-[13px] font-medium outline-none'
                 />
                 {newName.trim() && (

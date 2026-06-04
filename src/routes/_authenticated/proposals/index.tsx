@@ -255,6 +255,7 @@ const ProposalsPage = () => {
               setOffset(null)
             }}
             placeholder='Search by quote number...'
+            aria-label='Search by quote number'
             className='flex-1 bg-transparent text-[13px] outline-none placeholder:text-text-tertiary'
           />
         </div>

@@ -265,6 +265,7 @@ export const EntityNotesSheet = ({
           <div className='relative'>
             <textarea
               ref={textareaRef}
+              aria-label='Note text'
               value={text}
               onChange={e => setText(e.target.value.slice(0, NOTE_TEXT_MAX))}
               onKeyDown={handleKeyDown}

@@ -59,6 +59,7 @@ export const CustomerProposalsTab = ({ customerId }: CustomerProposalsTabProps) 
             value={search}
             onChange={e => setSearch(e.target.value)}
             placeholder='Search proposals...'
+            aria-label='Search proposals'
             className='flex-1 bg-transparent text-[13px] outline-none placeholder:text-text-tertiary'
           />
         </div>

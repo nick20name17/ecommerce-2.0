@@ -109,6 +109,7 @@ export const ShippingSection = ({ projectId }: { projectId: number }) => {
               </div>
               <button
                 type='button'
+                aria-label='Enable Shipping'
                 disabled={updateProjectMutation.isPending}
                 className={cn(
                   'relative inline-flex h-5 w-9 shrink-0 cursor-pointer items-center rounded-full transition-colors duration-200',
@@ -150,6 +151,7 @@ export const ShippingSection = ({ projectId }: { projectId: number }) => {
                       updateProjectMutation.mutate({ shipengine_test_api_key: shipengineKey })
                   }}
                   placeholder='TEST_...'
+                  aria-label='ShipEngine Test API Key'
                   disabled={updateProjectMutation.isPending}
                   className='placeholder:text-text-quaternary h-8 w-full rounded-md border border-border bg-background px-2.5 font-mono text-[13px] outline-none focus:border-primary'
                 />

@@ -115,6 +115,7 @@ export function CustomerCombobox({
           )}
           <input
             ref={inputRef}
+            aria-label='Search customers'
             placeholder='Search by name or ID...'
             value={search}
             onChange={e => handleSearchChange(e.target.value)}

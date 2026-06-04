@@ -419,6 +419,7 @@ function EditablePanelRow({
           <span className='shrink-0 text-[12px] font-medium text-text-tertiary'>{label}</span>
           <input
             value={draft}
+            aria-label={label}
             onChange={e => {
               setDraft(mask ? mask(e.target.value) : e.target.value)
               if (error) setError(null)

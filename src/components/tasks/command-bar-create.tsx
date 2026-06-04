@@ -229,6 +229,7 @@ function CommandBarCreateInner({
               <Plus className='size-5 shrink-0 text-primary' />
               <input
                 ref={titleRef}
+                aria-label='Task title'
                 autoFocus
                 value={title}
                 onChange={e => patchDraft({ title: e.target.value })}
@@ -244,6 +245,7 @@ function CommandBarCreateInner({
               />
             </div>
             <textarea
+              aria-label='Task description'
               value={description}
               onChange={e => patchDraft({ description: e.target.value })}
               placeholder='Add description...'

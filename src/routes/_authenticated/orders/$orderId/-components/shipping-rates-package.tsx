@@ -100,6 +100,7 @@ export function PackageCard({
                   step={0.01}
                   value={pkg[field] || ''}
                   onChange={e => onUpdateDimension(field, Number(e.target.value) || 0)}
+                  aria-label={label}
                   className='h-full min-w-0 flex-1 bg-background px-1.5 text-[12px] text-foreground tabular-nums outline-none'
                   placeholder='0'
                 />
@@ -126,6 +127,7 @@ export function PackageCard({
               onChange={e =>
                 onUpdateDimension('weight', Math.round((Number(e.target.value) || 0) * 100) / 100)
               }
+              aria-label='Weight'
               className='h-full min-w-0 flex-1 bg-background px-2 text-[12px] text-foreground tabular-nums outline-none'
               placeholder='0'
             />

@@ -179,6 +179,7 @@ export function PropertyField({
           onKeyDown={e => {
             if (e.key === 'Escape') cancel()
           }}
+          aria-label={label}
           autoFocus
           rows={3}
           className='w-full resize-none rounded border border-border bg-background px-2 py-1 text-[13px] text-foreground shadow-sm outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20'
@@ -202,6 +203,7 @@ export function PropertyField({
             if (e.key === 'Enter') commit()
             if (e.key === 'Escape') cancel()
           }}
+          aria-label={label}
           autoFocus
           className='min-w-0 flex-1 rounded border border-border bg-background px-2 py-0.5 text-right text-[13px] text-foreground shadow-sm outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20'
         />

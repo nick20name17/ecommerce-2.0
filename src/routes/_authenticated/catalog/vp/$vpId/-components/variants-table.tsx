@@ -617,6 +617,7 @@ function OptionPicker({
           <div className='border-b border-border px-2.5 py-1.5'>
             <input
               value={search}
+              aria-label='Search options'
               onChange={e => setSearch(e.target.value)}
               placeholder='Search...'
               className='placeholder:text-text-quaternary w-full bg-transparent text-[12px] outline-none'

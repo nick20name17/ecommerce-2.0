@@ -317,6 +317,7 @@ export function CartEditableTable({
                   <input
                     ref={inputRef}
                     type='text'
+                    aria-label='Product ID'
                     value={inputValue}
                     onChange={e => {
                       setInputValue(e.target.value.toUpperCase())

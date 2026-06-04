@@ -127,6 +127,7 @@ export function ShipToField({
         value={value}
         onChange={e => onChange(e.target.value)}
         placeholder={label}
+        aria-label={label}
         inputMode={inputMode}
         className='placeholder:text-text-quaternary h-8 w-full rounded-md border border-border bg-background px-2.5 text-[13px] text-foreground transition-colors duration-80 outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20'
       />

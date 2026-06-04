@@ -157,6 +157,7 @@ const ShippingPage = () => {
         <div className='flex items-center gap-1.5 rounded-md border border-border bg-background px-2.5 py-1.5'>
           <Search className='size-3.5 shrink-0 text-text-tertiary' />
           <input
+            aria-label='Search shipments'
             value={search}
             onChange={e => {
               setSearch(e.target.value)

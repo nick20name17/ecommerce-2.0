@@ -197,6 +197,7 @@ function KanbanColumn({
           <div className='rounded-lg border border-primary/40 bg-background p-2.5'>
             <input
               ref={inputRef}
+              aria-label='Task title'
               type='text'
               value={newTitle}
               onChange={e => setNewTitle(e.target.value)}

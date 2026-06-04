@@ -122,6 +122,7 @@ export const OrderCombobox = ({
           )}
           <input
             ref={inputRef}
+            aria-label='Search orders'
             placeholder='Search by invoice or name...'
             value={search}
             onChange={e => handleSearchChange(e.target.value)}
