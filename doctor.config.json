@@ -2,6 +2,7 @@
   "$schema": "https://react.doctor/schema/config.json",
   "ignore": {
     "files": [
+      "src/components/ui/**",
       "src/routes/_authenticated/documents/**",
       "src/routes/_authenticated/orders/-components/orders-data-table.tsx",
       "src/routes/_authenticated/users/-components/users-data-table.tsx",
