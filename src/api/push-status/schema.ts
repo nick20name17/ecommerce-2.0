@@ -52,6 +52,8 @@ export interface PushStatusParams extends PaginationParams {
   search?: string
   ordering?: string
   project_id?: number
+  // Push-state scope: undefined/inflight (default) | error | in_process | finished | all
+  status?: string
 }
 
 // Cross-project admin overview. Backed by

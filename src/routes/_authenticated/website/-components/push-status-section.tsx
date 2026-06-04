@@ -27,6 +27,24 @@ import { PayloadLogDetailDialog } from '@/routes/_authenticated/profile/-compone
 
 const PUSH_STATUS_DEFAULT_LIMIT = 20
 
+type PushStatusFilter = 'inflight' | 'error' | 'in_process' | 'finished' | 'all'
+
+const STATUS_TABS: { value: PushStatusFilter; label: string }[] = [
+  { value: 'inflight', label: 'In-flight' },
+  { value: 'error', label: 'Errors' },
+  { value: 'in_process', label: 'In process' },
+  { value: 'finished', label: 'Finished' },
+  { value: 'all', label: 'All' }
+]
+
+const COUNT_NOUN: Record<PushStatusFilter, string> = {
+  inflight: 'in flight',
+  error: 'errors',
+  in_process: 'in process',
+  finished: 'finished',
+  all: 'orders'
+}
+
 function money(n: number | null | undefined) {
   if (n == null) return '—'
   return `$${n.toFixed(2)}`
@@ -66,8 +84,15 @@ export function PushStatusSection({ projectId }: { projectId: number }) {
 
   const [search, setSearch] = useSearchParam()
   const handleSearch = useDebouncedCallback((value: string) => setSearch(value || null), 300)
-  const [offset] = useOffsetParam()
+  const [offset, setOffset] = useOffsetParam()
   const [limit] = useLimitParam(PUSH_STATUS_DEFAULT_LIMIT)
+
+  // Push-state scope filter (inflight = default gate). Switching resets to page 1.
+  const [statusFilter, setStatusFilter] = useState<PushStatusFilter>('inflight')
+  const changeStatus = (value: PushStatusFilter) => {
+    setStatusFilter(value)
+    setOffset(null)
+  }
 
   // Drill-down: click a row -> log trail for that proposal; click a trail row -> detail.
   const [drillId, setDrillId] = useState<number | null>(null)
@@ -78,6 +103,7 @@ export function PushStatusSection({ projectId }: { projectId: number }) {
       search: search || undefined,
       project_id: projectId,
       ordering: '-created_at',
+      status: statusFilter === 'inflight' ? undefined : statusFilter,
       offset,
       limit
     }),
@@ -101,13 +127,33 @@ export function PushStatusSection({ projectId }: { projectId: number }) {
           isMobile ? 'px-3.5' : 'px-6'
         )}
       >
-        <div className='text-[13px] font-medium text-text-tertiary'>
-          {supported &&
-            totalCount > 0 &&
-            `${totalCount} order${totalCount === 1 ? '' : 's'} in flight`}
+        {supported && (
+          <div className='flex min-w-0 items-center gap-0.5 overflow-x-auto'>
+            {STATUS_TABS.map(t => {
+              const active = statusFilter === t.value
+              return (
+                <button
+                  key={t.value}
+                  type='button'
+                  onClick={() => changeStatus(t.value)}
+                  className={cn(
+                    'h-7 shrink-0 rounded-md px-2.5 text-[12px] font-medium whitespace-nowrap transition-colors duration-80',
+                    active
+                      ? 'bg-bg-active text-foreground'
+                      : 'text-text-tertiary hover:bg-bg-hover hover:text-foreground'
+                  )}
+                >
+                  {t.label}
+                </button>
+              )
+            })}
+          </div>
+        )}
+        <div className='flex-1' />
+        <div className='shrink-0 text-[13px] font-medium text-text-tertiary'>
+          {supported && totalCount > 0 && `${totalCount} ${COUNT_NOUN[statusFilter]}`}
           {isPlaceholderData && <Spinner className='ml-2 inline size-3 text-text-tertiary' />}
         </div>
-        <div className='flex-1' />
         {supported && (
           <div className='hidden h-7 w-full max-w-65 items-center gap-1.5 rounded-[5px] border border-border bg-background px-2 transition-[border-color,box-shadow] focus-within:border-ring focus-within:ring-2 focus-within:ring-ring/50 sm:flex'>
             <Search className='size-3 shrink-0 text-text-tertiary' />
@@ -181,11 +227,17 @@ export function PushStatusSection({ projectId }: { projectId: number }) {
             ) : results.length === 0 ? (
               <PageEmpty
                 icon={Send}
-                title='Nothing in flight'
+                title={
+                  statusFilter === 'inflight'
+                    ? 'Nothing in flight'
+                    : `No ${COUNT_NOUN[statusFilter]}`
+                }
                 description={
                   search
                     ? 'No orders match your search.'
-                    : 'No approved orders are pending, stuck, or failed — everything has pushed to EBMS.'
+                    : statusFilter === 'inflight'
+                      ? 'No approved orders are pending, stuck, or failed — everything has pushed to EBMS.'
+                      : 'No orders in this view.'
                 }
               />
             ) : (
