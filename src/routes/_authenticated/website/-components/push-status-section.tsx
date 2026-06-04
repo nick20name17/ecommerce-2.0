@@ -103,7 +103,10 @@ export function PushStatusSection({ projectId }: { projectId: number }) {
       search: search || undefined,
       project_id: projectId,
       ordering: '-created_at',
-      status: statusFilter === 'inflight' ? undefined : statusFilter,
+      // Search widens scope: when looking up a specific id/autoid, match across
+      // all statuses (status=all) regardless of the active tab, so the order is
+      // always found. Otherwise honour the selected filter.
+      status: search ? 'all' : statusFilter === 'inflight' ? undefined : statusFilter,
       offset,
       limit
     }),
@@ -128,7 +131,13 @@ export function PushStatusSection({ projectId }: { projectId: number }) {
         )}
       >
         {supported && (
-          <div className='flex min-w-0 items-center gap-0.5 overflow-x-auto'>
+          <div
+            className={cn(
+              'flex min-w-0 items-center gap-0.5 overflow-x-auto',
+              // While searching, scope is forced to all -> tabs are inert.
+              search && 'pointer-events-none opacity-40'
+            )}
+          >
             {STATUS_TABS.map(t => {
               const active = statusFilter === t.value
               return (
@@ -151,7 +160,9 @@ export function PushStatusSection({ projectId }: { projectId: number }) {
         )}
         <div className='flex-1' />
         <div className='shrink-0 text-[13px] font-medium text-text-tertiary'>
-          {supported && totalCount > 0 && `${totalCount} ${COUNT_NOUN[statusFilter]}`}
+          {supported &&
+            totalCount > 0 &&
+            `${totalCount} ${search ? 'matching' : COUNT_NOUN[statusFilter]}`}
           {isPlaceholderData && <Spinner className='ml-2 inline size-3 text-text-tertiary' />}
         </div>
         {supported && (
