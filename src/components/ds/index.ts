@@ -1,8 +1,6 @@
-export { FieldTrigger } from './field-trigger'
 export { FilterChip, FilterPopover } from './filter-controls'
 export { InitialsAvatar } from './initials-avatar'
 export * from './nav-icons'
 export { PageHeaderIcon, PAGE_COLORS } from './page-header'
-export { SearchInput } from './search-input'
 export { StatusIcon } from './status-icon'
 export { ViewToggle, type ViewOption } from './view-toggle'
