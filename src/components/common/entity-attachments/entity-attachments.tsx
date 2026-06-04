@@ -13,7 +13,7 @@ import {
   UploadIcon,
   VideoIcon
 } from 'lucide-react'
-import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react'
+import { useEffect, useImperativeHandle, useRef, useState } from 'react'
 
 import { ORDER_QUERY_KEYS } from '@/api/order/query'
 import { orderService } from '@/api/order/service'
@@ -35,6 +35,7 @@ interface EntityAttachmentsProps {
   mode?: 'immediate' | 'deferred'
   isLoading?: boolean
   onPendingFilesChange?: (hasPending: boolean) => void
+  ref?: React.Ref<EntityAttachmentsRef>
 }
 
 export interface EntityAttachmentsRef {
@@ -103,266 +104,346 @@ const deleteAttachmentFn =
     return proposalService.deleteAttachment(autoid, attachmentId, projectId)
   }
 
-export const EntityAttachments = forwardRef<EntityAttachmentsRef, EntityAttachmentsProps>(
-  function EntityAttachments(
-    {
-      entityType,
-      entityId,
-      projectId,
-      attachments = [],
-      mode = 'immediate',
-      isLoading = false,
-      onPendingFilesChange
+export const EntityAttachments = function EntityAttachments({
+  entityType,
+  entityId,
+  projectId,
+  attachments = [],
+  mode = 'immediate',
+  isLoading = false,
+  onPendingFilesChange,
+  ref
+}: EntityAttachmentsProps) {
+  const queryClient = useQueryClient()
+  const [uploadingFiles, setUploadingFiles] = useState<UploadingFile[]>([])
+  const [recentlyUploaded, setRecentlyUploaded] = useState<EntityAttachment[]>([])
+  const [deletingIds, setDeletingIds] = useState<Set<number>>(new Set())
+
+  const existingIds = new Set(attachments.map(a => a.id))
+  const optimisticAttachments = recentlyUploaded.filter(a => !existingIds.has(a.id))
+  const allAttachments = [...attachments, ...optimisticAttachments]
+
+  const listQueryKey =
+    entityType === 'order' ? ORDER_QUERY_KEYS.lists() : PROPOSAL_QUERY_KEYS.lists()
+  const attachmentsQueryKey =
+    entityType === 'order' && entityId
+      ? ORDER_QUERY_KEYS.attachments(entityId)
+      : entityType === 'proposal' && entityId
+        ? PROPOSAL_QUERY_KEYS.attachments(entityId)
+        : null
+
+  const uploadMutation = useMutation({
+    mutationFn: async ({
+      file,
+      tempId,
+      autoid,
+      type
+    }: {
+      file: File
+      tempId: string
+      autoid: string
+      type: EntityAttachmentType
+    }) => {
+      const result = await uploadAttachment(type)(autoid, file, projectId)
+      return { result, tempId }
     },
-    ref
-  ) {
-    const queryClient = useQueryClient()
-    const [uploadingFiles, setUploadingFiles] = useState<UploadingFile[]>([])
-    const [recentlyUploaded, setRecentlyUploaded] = useState<EntityAttachment[]>([])
-    const [deletingIds, setDeletingIds] = useState<Set<number>>(new Set())
-
-    const existingIds = new Set(attachments.map(a => a.id))
-    const optimisticAttachments = recentlyUploaded.filter(a => !existingIds.has(a.id))
-    const allAttachments = [...attachments, ...optimisticAttachments]
-
-    const listQueryKey =
-      entityType === 'order' ? ORDER_QUERY_KEYS.lists() : PROPOSAL_QUERY_KEYS.lists()
-    const attachmentsQueryKey =
-      entityType === 'order' && entityId
-        ? ORDER_QUERY_KEYS.attachments(entityId)
-        : entityType === 'proposal' && entityId
-          ? PROPOSAL_QUERY_KEYS.attachments(entityId)
-          : null
-
-    const uploadMutation = useMutation({
-      mutationFn: async ({
-        file,
-        tempId,
-        autoid,
-        type
-      }: {
-        file: File
-        tempId: string
-        autoid: string
-        type: EntityAttachmentType
-      }) => {
-        const result = await uploadAttachment(type)(autoid, file, projectId)
-        return { result, tempId }
-      },
-      onMutate: ({ file, tempId }) => {
-        setUploadingFiles(prev => [
-          ...prev,
-          { id: tempId, name: file.name, type: file.type, size: file.size }
-        ])
-      },
-      onSuccess: ({ result, tempId }) => {
-        setUploadingFiles(prev => prev.filter(f => f.id !== tempId))
-        setRecentlyUploaded(prev => [...prev, result])
-        queryClient.invalidateQueries({ queryKey: listQueryKey })
-        if (attachmentsQueryKey) {
-          queryClient.invalidateQueries({ queryKey: attachmentsQueryKey })
-        }
-      },
-      onError: (_, { tempId }) => {
-        setUploadingFiles(prev => prev.filter(f => f.id !== tempId))
-      },
-      meta: {
-        successMessage: 'Attachment uploaded successfully'
+    onMutate: ({ file, tempId }) => {
+      setUploadingFiles(prev => [
+        ...prev,
+        { id: tempId, name: file.name, type: file.type, size: file.size }
+      ])
+    },
+    onSuccess: ({ result, tempId }) => {
+      setUploadingFiles(prev => prev.filter(f => f.id !== tempId))
+      setRecentlyUploaded(prev => [...prev, result])
+      queryClient.invalidateQueries({ queryKey: listQueryKey })
+      if (attachmentsQueryKey) {
+        queryClient.invalidateQueries({ queryKey: attachmentsQueryKey })
       }
-    })
+    },
+    onError: (_, { tempId }) => {
+      setUploadingFiles(prev => prev.filter(f => f.id !== tempId))
+    },
+    meta: {
+      successMessage: 'Attachment uploaded successfully'
+    }
+  })
 
-    const deleteMutation = useMutation({
-      mutationFn: async ({
-        attachmentId,
-        autoid,
-        type
-      }: {
-        attachmentId: number
-        autoid: string
-        type: EntityAttachmentType
-      }) => {
-        await deleteAttachmentFn(type)(autoid, attachmentId, projectId)
-        return attachmentId
-      },
-      onMutate: ({ attachmentId }) => {
-        setDeletingIds(prev => new Set(prev).add(attachmentId))
-      },
-      onSettled: (_, __, { attachmentId }) => {
-        setDeletingIds(prev => {
-          const next = new Set(prev)
-          next.delete(attachmentId)
-          return next
-        })
-      },
-      onSuccess: (_, { autoid }) => {
+  const deleteMutation = useMutation({
+    mutationFn: async ({
+      attachmentId,
+      autoid,
+      type
+    }: {
+      attachmentId: number
+      autoid: string
+      type: EntityAttachmentType
+    }) => {
+      await deleteAttachmentFn(type)(autoid, attachmentId, projectId)
+      return attachmentId
+    },
+    onMutate: ({ attachmentId }) => {
+      setDeletingIds(prev => new Set(prev).add(attachmentId))
+    },
+    onSettled: (_, __, { attachmentId }) => {
+      setDeletingIds(prev => {
+        const next = new Set(prev)
+        next.delete(attachmentId)
+        return next
+      })
+    },
+    onSuccess: (_, { autoid }) => {
+      queryClient.invalidateQueries({ queryKey: listQueryKey })
+      if (entityType === 'order') {
+        queryClient.invalidateQueries({ queryKey: ORDER_QUERY_KEYS.attachments(autoid) })
+      } else {
+        queryClient.invalidateQueries({ queryKey: PROPOSAL_QUERY_KEYS.attachments(autoid) })
+      }
+    },
+    meta: {
+      successMessage: 'Attachment deleted successfully'
+    }
+  })
+
+  const filesToUploadRef = useRef<Array<{ file: File; tempId: string }>>([])
+
+  const [
+    { files: pendingFiles, isDragging, errors },
+    {
+      handleDragEnter,
+      handleDragLeave,
+      handleDragOver,
+      handleDrop,
+      openFileDialog,
+      getInputProps,
+      clearErrors,
+      removeFile,
+      clearFiles
+    }
+  ] = useFileUpload({
+    maxSize: 10 * 1024 * 1024,
+    multiple: true,
+    onFilesAdded: addedFiles => {
+      if (mode === 'immediate' && entityId) {
+        for (const fileWithPreview of addedFiles) {
+          if (fileWithPreview.file instanceof File) {
+            filesToUploadRef.current.push({
+              file: fileWithPreview.file,
+              tempId: fileWithPreview.id
+            })
+          }
+        }
+      }
+    },
+    onFilesChange: () => {
+      if (mode === 'immediate' && entityId && filesToUploadRef.current.length > 0) {
+        const files = filesToUploadRef.current
+        filesToUploadRef.current = []
+        for (const { file, tempId } of files) {
+          uploadMutation.mutate({ file, tempId, autoid: entityId, type: entityType })
+        }
+        setTimeout(() => clearFiles(), 0)
+      }
+    }
+  })
+
+  const prevPendingCountRef = useRef(pendingFiles.length)
+  useEffect(() => {
+    const hasPending = pendingFiles.length > 0
+    const hadPending = prevPendingCountRef.current > 0
+    if (hasPending !== hadPending) {
+      onPendingFilesChange?.(hasPending)
+    }
+    prevPendingCountRef.current = pendingFiles.length
+  }, [pendingFiles.length, onPendingFilesChange])
+
+  useImperativeHandle(ref, () => ({
+    uploadPendingFiles: async (autoid: string, type: EntityAttachmentType) => {
+      const filesToUpload = pendingFiles.filter(
+        (f): f is FileWithPreview & { file: File } => f.file instanceof File
+      )
+      const upload = uploadAttachment(type)
+      for (const fileWithPreview of filesToUpload) {
+        await upload(autoid, fileWithPreview.file, projectId)
+      }
+      if (filesToUpload.length > 0) {
         queryClient.invalidateQueries({ queryKey: listQueryKey })
-        if (entityType === 'order') {
+        if (type === 'order') {
           queryClient.invalidateQueries({ queryKey: ORDER_QUERY_KEYS.attachments(autoid) })
         } else {
           queryClient.invalidateQueries({ queryKey: PROPOSAL_QUERY_KEYS.attachments(autoid) })
         }
-      },
-      meta: {
-        successMessage: 'Attachment deleted successfully'
       }
-    })
+      clearFiles()
+    },
+    hasPendingFiles: () => pendingFiles.length > 0,
+    getPendingFiles: () =>
+      pendingFiles
+        .filter((f): f is FileWithPreview & { file: File } => f.file instanceof File)
+        .map(f => f.file)
+  }))
 
-    const filesToUploadRef = useRef<Array<{ file: File; tempId: string }>>([])
+  const showPendingFiles = mode === 'deferred' && pendingFiles.length > 0
 
-    const [
-      { files: pendingFiles, isDragging, errors },
-      {
-        handleDragEnter,
-        handleDragLeave,
-        handleDragOver,
-        handleDrop,
-        openFileDialog,
-        getInputProps,
-        clearErrors,
-        removeFile,
-        clearFiles
-      }
-    ] = useFileUpload({
-      maxSize: 10 * 1024 * 1024,
-      multiple: true,
-      onFilesAdded: addedFiles => {
-        if (mode === 'immediate' && entityId) {
-          for (const fileWithPreview of addedFiles) {
-            if (fileWithPreview.file instanceof File) {
-              filesToUploadRef.current.push({
-                file: fileWithPreview.file,
-                tempId: fileWithPreview.id
-              })
-            }
-          }
-        }
-      },
-      onFilesChange: () => {
-        if (mode === 'immediate' && entityId && filesToUploadRef.current.length > 0) {
-          const files = filesToUploadRef.current
-          filesToUploadRef.current = []
-          for (const { file, tempId } of files) {
-            uploadMutation.mutate({ file, tempId, autoid: entityId, type: entityType })
-          }
-          setTimeout(() => clearFiles(), 0)
-        }
-      }
-    })
+  return (
+    <div>
+      <div
+        className={cn(
+          'flex items-center justify-center gap-2 border-b px-5 py-3 transition-colors',
+          isDragging ? 'border-primary bg-primary/5' : 'border-border'
+        )}
+        onDragEnter={handleDragEnter}
+        onDragLeave={handleDragLeave}
+        onDragOver={handleDragOver}
+        onDrop={handleDrop}
+      >
+        <input {...getInputProps()} className='sr-only' />
+        <UploadIcon className='size-3.5 text-text-tertiary' />
+        <span className='text-[13px] text-text-secondary'>
+          Drop files here or{' '}
+          <button
+            type='button'
+            onClick={openFileDialog}
+            className='font-medium text-primary hover:underline'
+          >
+            browse
+          </button>
+        </span>
+        <span className='text-text-quaternary text-[11px]'>Max 10MB</span>
+      </div>
 
-    const prevPendingCountRef = useRef(pendingFiles.length)
-    useEffect(() => {
-      const hasPending = pendingFiles.length > 0
-      const hadPending = prevPendingCountRef.current > 0
-      if (hasPending !== hadPending) {
-        onPendingFilesChange?.(hasPending)
-      }
-      prevPendingCountRef.current = pendingFiles.length
-    }, [pendingFiles.length, onPendingFilesChange])
-
-    useImperativeHandle(ref, () => ({
-      uploadPendingFiles: async (autoid: string, type: EntityAttachmentType) => {
-        const filesToUpload = pendingFiles.filter(
-          (f): f is FileWithPreview & { file: File } => f.file instanceof File
-        )
-        const upload = uploadAttachment(type)
-        for (const fileWithPreview of filesToUpload) {
-          await upload(autoid, fileWithPreview.file, projectId)
-        }
-        if (filesToUpload.length > 0) {
-          queryClient.invalidateQueries({ queryKey: listQueryKey })
-          if (type === 'order') {
-            queryClient.invalidateQueries({ queryKey: ORDER_QUERY_KEYS.attachments(autoid) })
-          } else {
-            queryClient.invalidateQueries({ queryKey: PROPOSAL_QUERY_KEYS.attachments(autoid) })
-          }
-        }
-        clearFiles()
-      },
-      hasPendingFiles: () => pendingFiles.length > 0,
-      getPendingFiles: () =>
-        pendingFiles
-          .filter((f): f is FileWithPreview & { file: File } => f.file instanceof File)
-          .map(f => f.file)
-    }))
-
-    const showPendingFiles = mode === 'deferred' && pendingFiles.length > 0
-
-    return (
-      <div>
-        <div
-          className={cn(
-            'flex items-center justify-center gap-2 border-b px-5 py-3 transition-colors',
-            isDragging ? 'border-primary bg-primary/5' : 'border-border'
-          )}
-          onDragEnter={handleDragEnter}
-          onDragLeave={handleDragLeave}
-          onDragOver={handleDragOver}
-          onDrop={handleDrop}
-        >
-          <input {...getInputProps()} className='sr-only' />
-          <UploadIcon className='size-3.5 text-text-tertiary' />
-          <span className='text-[13px] text-text-secondary'>
-            Drop files here or{' '}
+      {errors.length > 0 && (
+        <div className='flex items-start gap-2 border-b border-destructive/20 bg-destructive/5 px-5 py-2 text-[12px] text-destructive'>
+          <CircleAlertIcon className='mt-0.5 size-3.5 shrink-0' />
+          <div>
+            {errors.map(error => (
+              <p key={error}>{error}</p>
+            ))}
             <button
               type='button'
-              onClick={openFileDialog}
-              className='font-medium text-primary hover:underline'
+              onClick={clearErrors}
+              className='mt-0.5 text-destructive/80 underline hover:text-destructive'
             >
-              browse
+              Dismiss
             </button>
-          </span>
-          <span className='text-text-quaternary text-[11px]'>Max 10MB</span>
+          </div>
         </div>
+      )}
 
-        {errors.length > 0 && (
-          <div className='flex items-start gap-2 border-b border-destructive/20 bg-destructive/5 px-5 py-2 text-[12px] text-destructive'>
-            <CircleAlertIcon className='mt-0.5 size-3.5 shrink-0' />
-            <div>
-              {errors.map(error => (
-                <p key={error}>{error}</p>
-              ))}
-              <button
-                type='button'
-                onClick={clearErrors}
-                className='mt-0.5 text-destructive/80 underline hover:text-destructive'
+      <div>
+        {isLoading && (
+          <div>
+            {[1, 2].map(i => (
+              <div
+                key={i}
+                className='flex items-center gap-2.5 border-b border-border-light px-5 py-2'
               >
-                Dismiss
-              </button>
-            </div>
+                <Skeleton className='size-7 shrink-0 rounded-[5px]' />
+                <Skeleton className='h-3.5 w-36 flex-1' />
+                <Skeleton className='h-4 w-10 rounded-full' />
+                <Skeleton className='h-3 w-14' />
+              </div>
+            ))}
           </div>
         )}
 
-        <div>
-          {isLoading && (
-            <div>
-              {[1, 2].map(i => (
-                <div
-                  key={i}
-                  className='flex items-center gap-2.5 border-b border-border-light px-5 py-2'
-                >
-                  <Skeleton className='size-7 shrink-0 rounded-[5px]' />
-                  <Skeleton className='h-3.5 w-36 flex-1' />
-                  <Skeleton className='h-4 w-10 rounded-full' />
-                  <Skeleton className='h-3 w-14' />
-                </div>
-              ))}
+        {uploadingFiles.map(file => {
+          const typeInfo = getFileTypeInfo(file.type)
+          return (
+            <div
+              key={file.id}
+              className='flex items-center gap-2.5 border-b border-border-light px-5 py-2'
+            >
+              <div className='flex size-7 shrink-0 items-center justify-center rounded-[5px] bg-bg-secondary text-text-tertiary'>
+                {getFileIcon(file.type)}
+              </div>
+              <span className='min-w-0 flex-1 truncate text-[13px] font-medium text-text-secondary'>
+                {file.name}
+              </span>
+              <Loader2 className='size-3 shrink-0 animate-spin text-text-tertiary' />
+              <span
+                className={cn(
+                  'shrink-0 rounded-full border px-1.5 py-0.5 text-[10px] leading-none font-semibold',
+                  typeInfo.className
+                )}
+              >
+                {typeInfo.label}
+              </span>
+              <span className='text-text-quaternary shrink-0 text-[11px] tabular-nums'>
+                {formatBytes(file.size)}
+              </span>
             </div>
-          )}
+          )
+        })}
 
-          {uploadingFiles.map(file => {
-            const typeInfo = getFileTypeInfo(file.type)
+        {/* Pending files (deferred mode) */}
+        {showPendingFiles &&
+          pendingFiles.map(fileItem => {
+            const file = fileItem.file
+            const fileName = file instanceof File ? file.name : file.name
+            const fileType = file instanceof File ? file.type : file.type
+            const fileSize = file instanceof File ? file.size : file.size
+            const typeInfo = getFileTypeInfo(fileType)
+
             return (
               <div
-                key={file.id}
-                className='flex items-center gap-2.5 border-b border-border-light px-5 py-2'
+                key={fileItem.id}
+                className='group/file flex items-center gap-2.5 border-b border-border-light px-5 py-2 transition-colors hover:bg-bg-hover/50'
               >
                 <div className='flex size-7 shrink-0 items-center justify-center rounded-[5px] bg-bg-secondary text-text-tertiary'>
-                  {getFileIcon(file.type)}
+                  {getFileIcon(fileType)}
                 </div>
-                <span className='min-w-0 flex-1 truncate text-[13px] font-medium text-text-secondary'>
-                  {file.name}
+                <span className='min-w-0 flex-1 truncate text-[13px] font-medium text-foreground'>
+                  {fileName}
                 </span>
-                <Loader2 className='size-3 shrink-0 animate-spin text-text-tertiary' />
+                <span
+                  className={cn(
+                    'shrink-0 rounded-full border px-1.5 py-0.5 text-[10px] leading-none font-semibold',
+                    typeInfo.className
+                  )}
+                >
+                  {typeInfo.label}
+                </span>
+                <span className='shrink-0 rounded-full border border-primary/30 bg-primary/5 px-1.5 py-0.5 text-[10px] leading-none font-semibold text-primary'>
+                  New
+                </span>
+                <span className='text-text-quaternary shrink-0 text-[11px] tabular-nums'>
+                  {formatBytes(fileSize)}
+                </span>
+                <button
+                  type='button'
+                  onClick={() => removeFile(fileItem.id)}
+                  className='text-text-quaternary shrink-0 rounded-sm p-1 opacity-0 transition-all duration-75 group-hover/file:opacity-100 hover:bg-bg-active hover:text-destructive'
+                >
+                  <Trash2Icon className='size-3' />
+                </button>
+              </div>
+            )
+          })}
+
+        {!isLoading &&
+          allAttachments.map(attachment => {
+            const isDeleting = deletingIds.has(attachment.id)
+            if (!entityId) return null
+            const typeInfo = getFileTypeInfo(attachment.file_type)
+
+            return (
+              <div
+                key={attachment.id}
+                className={cn(
+                  'group/file flex items-center gap-2.5 border-b border-border-light px-5 py-2 transition-colors hover:bg-bg-hover/50',
+                  isDeleting && 'pointer-events-none opacity-40'
+                )}
+              >
+                <div className='flex size-7 shrink-0 items-center justify-center rounded-[5px] bg-bg-secondary text-text-tertiary'>
+                  {getFileIcon(attachment.file_type)}
+                </div>
+                <span
+                  className='min-w-0 flex-1 truncate text-[13px] font-medium text-foreground'
+                  title={attachment.file_name}
+                >
+                  {attachment.file_name}
+                </span>
                 <span
                   className={cn(
                     'shrink-0 rounded-full border px-1.5 py-0.5 text-[10px] leading-none font-semibold',
@@ -372,135 +453,51 @@ export const EntityAttachments = forwardRef<EntityAttachmentsRef, EntityAttachme
                   {typeInfo.label}
                 </span>
                 <span className='text-text-quaternary shrink-0 text-[11px] tabular-nums'>
-                  {formatBytes(file.size)}
+                  {formatBytes(attachment.file_size)}
                 </span>
+                <div className='flex shrink-0 items-center gap-0.5 opacity-0 transition-opacity duration-75 group-hover/file:opacity-100'>
+                  <a
+                    href={attachment.download_url}
+                    download={attachment.file_name}
+                    target='_blank'
+                    rel='noopener noreferrer'
+                    className='text-text-quaternary inline-flex size-6 items-center justify-center rounded-sm transition-colors hover:bg-bg-active hover:text-foreground'
+                  >
+                    <DownloadIcon className='size-3' />
+                  </a>
+                  <button
+                    type='button'
+                    onClick={() =>
+                      deleteMutation.mutate({
+                        attachmentId: attachment.id,
+                        autoid: entityId,
+                        type: entityType
+                      })
+                    }
+                    disabled={isDeleting}
+                    className='text-text-quaternary inline-flex size-6 items-center justify-center rounded-sm transition-colors hover:bg-bg-active hover:text-destructive'
+                  >
+                    {isDeleting ? (
+                      <Loader2 className='size-3 animate-spin' />
+                    ) : (
+                      <Trash2Icon className='size-3' />
+                    )}
+                  </button>
+                </div>
               </div>
             )
           })}
 
-          {/* Pending files (deferred mode) */}
-          {showPendingFiles &&
-            pendingFiles.map(fileItem => {
-              const file = fileItem.file
-              const fileName = file instanceof File ? file.name : file.name
-              const fileType = file instanceof File ? file.type : file.type
-              const fileSize = file instanceof File ? file.size : file.size
-              const typeInfo = getFileTypeInfo(fileType)
-
-              return (
-                <div
-                  key={fileItem.id}
-                  className='group/file flex items-center gap-2.5 border-b border-border-light px-5 py-2 transition-colors hover:bg-bg-hover/50'
-                >
-                  <div className='flex size-7 shrink-0 items-center justify-center rounded-[5px] bg-bg-secondary text-text-tertiary'>
-                    {getFileIcon(fileType)}
-                  </div>
-                  <span className='min-w-0 flex-1 truncate text-[13px] font-medium text-foreground'>
-                    {fileName}
-                  </span>
-                  <span
-                    className={cn(
-                      'shrink-0 rounded-full border px-1.5 py-0.5 text-[10px] leading-none font-semibold',
-                      typeInfo.className
-                    )}
-                  >
-                    {typeInfo.label}
-                  </span>
-                  <span className='shrink-0 rounded-full border border-primary/30 bg-primary/5 px-1.5 py-0.5 text-[10px] leading-none font-semibold text-primary'>
-                    New
-                  </span>
-                  <span className='text-text-quaternary shrink-0 text-[11px] tabular-nums'>
-                    {formatBytes(fileSize)}
-                  </span>
-                  <button
-                    type='button'
-                    onClick={() => removeFile(fileItem.id)}
-                    className='text-text-quaternary shrink-0 rounded-sm p-1 opacity-0 transition-all duration-75 group-hover/file:opacity-100 hover:bg-bg-active hover:text-destructive'
-                  >
-                    <Trash2Icon className='size-3' />
-                  </button>
-                </div>
-              )
-            })}
-
-          {!isLoading &&
-            allAttachments.map(attachment => {
-              const isDeleting = deletingIds.has(attachment.id)
-              if (!entityId) return null
-              const typeInfo = getFileTypeInfo(attachment.file_type)
-
-              return (
-                <div
-                  key={attachment.id}
-                  className={cn(
-                    'group/file flex items-center gap-2.5 border-b border-border-light px-5 py-2 transition-colors hover:bg-bg-hover/50',
-                    isDeleting && 'pointer-events-none opacity-40'
-                  )}
-                >
-                  <div className='flex size-7 shrink-0 items-center justify-center rounded-[5px] bg-bg-secondary text-text-tertiary'>
-                    {getFileIcon(attachment.file_type)}
-                  </div>
-                  <span
-                    className='min-w-0 flex-1 truncate text-[13px] font-medium text-foreground'
-                    title={attachment.file_name}
-                  >
-                    {attachment.file_name}
-                  </span>
-                  <span
-                    className={cn(
-                      'shrink-0 rounded-full border px-1.5 py-0.5 text-[10px] leading-none font-semibold',
-                      typeInfo.className
-                    )}
-                  >
-                    {typeInfo.label}
-                  </span>
-                  <span className='text-text-quaternary shrink-0 text-[11px] tabular-nums'>
-                    {formatBytes(attachment.file_size)}
-                  </span>
-                  <div className='flex shrink-0 items-center gap-0.5 opacity-0 transition-opacity duration-75 group-hover/file:opacity-100'>
-                    <a
-                      href={attachment.download_url}
-                      download={attachment.file_name}
-                      target='_blank'
-                      rel='noopener noreferrer'
-                      className='text-text-quaternary inline-flex size-6 items-center justify-center rounded-sm transition-colors hover:bg-bg-active hover:text-foreground'
-                    >
-                      <DownloadIcon className='size-3' />
-                    </a>
-                    <button
-                      type='button'
-                      onClick={() =>
-                        deleteMutation.mutate({
-                          attachmentId: attachment.id,
-                          autoid: entityId,
-                          type: entityType
-                        })
-                      }
-                      disabled={isDeleting}
-                      className='text-text-quaternary inline-flex size-6 items-center justify-center rounded-sm transition-colors hover:bg-bg-active hover:text-destructive'
-                    >
-                      {isDeleting ? (
-                        <Loader2 className='size-3 animate-spin' />
-                      ) : (
-                        <Trash2Icon className='size-3' />
-                      )}
-                    </button>
-                  </div>
-                </div>
-              )
-            })}
-
-          {!isLoading &&
-            allAttachments.length === 0 &&
-            uploadingFiles.length === 0 &&
-            !showPendingFiles && (
-              <div className='flex flex-col items-center justify-center py-10 text-center'>
-                <Paperclip className='text-text-quaternary mb-2 size-5' />
-                <p className='text-[13px] text-text-tertiary'>No attachments yet</p>
-              </div>
-            )}
-        </div>
+        {!isLoading &&
+          allAttachments.length === 0 &&
+          uploadingFiles.length === 0 &&
+          !showPendingFiles && (
+            <div className='flex flex-col items-center justify-center py-10 text-center'>
+              <Paperclip className='text-text-quaternary mb-2 size-5' />
+              <p className='text-[13px] text-text-tertiary'>No attachments yet</p>
+            </div>
+          )}
       </div>
-    )
-  }
-)
+    </div>
+  )
+}

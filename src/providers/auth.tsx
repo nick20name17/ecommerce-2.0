@@ -6,7 +6,7 @@ import {
 } from '@tanstack/react-query'
 import { useNavigate, useRouter } from '@tanstack/react-router'
 import { parseAsString, useQueryState } from 'nuqs'
-import { type PropsWithChildren, createContext, useContext, useMemo } from 'react'
+import { type PropsWithChildren, createContext, use } from 'react'
 
 import type { SignInPayload, SignInResponse } from '@/api/auth/schema'
 import { authService } from '@/api/auth/service'
@@ -86,21 +86,18 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
     }
   })
 
-  const value = useMemo(
-    () => ({
-      user: user ?? null,
-      signInMutation,
-      logout,
-      isUserLoading
-    }),
-    [user, signInMutation, logout, isUserLoading]
-  )
+  const value = {
+    user: user ?? null,
+    signInMutation,
+    logout,
+    isUserLoading
+  }
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }
 
 export const useAuth = (): AuthContextValue => {
-  const context = useContext(AuthContext)
+  const context = use(AuthContext)
 
   if (!context) {
     throw new Error('useAuth must be used within AuthProvider')

@@ -31,24 +31,6 @@ export const formatCurrency = (
   }
 }
 
-export const formatQuantity = (
-  quantity: string | number | null | undefined,
-  decimals: number = 2,
-  fallback: string = '—'
-): string => {
-  if (!quantity && quantity !== 0) return fallback
-  const num = typeof quantity === 'string' ? parseFloat(quantity) : quantity
-  if (isNaN(num)) return fallback
-  try {
-    return new Intl.NumberFormat(LOCALE_DEFAULT, {
-      minimumFractionDigits: 0,
-      maximumFractionDigits: decimals
-    }).format(num)
-  } catch {
-    return fallback
-  }
-}
-
 export const formatDate = (
   value: Date | string | null | undefined,
   formatKey: keyof typeof DATE_FORMATS = 'display'
