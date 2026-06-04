@@ -67,7 +67,7 @@ function NotificationItem({
   const eventColor = EVENT_COLORS[notification.eventType] ?? 'text-text-tertiary'
   const link = getNotificationLink(notification)
 
-  const handleClick = () => {
+  const handleNavigate = () => {
     if (link) {
       navigate({ to: link })
       onNavigate?.()
@@ -81,7 +81,7 @@ function NotificationItem({
         !notification.read && 'bg-primary/[0.03]',
         link && 'cursor-pointer hover:bg-black/3 dark:hover:bg-white/3'
       )}
-      onClick={handleClick}
+      onClick={handleNavigate}
       role={link ? 'button' : undefined}
     >
       <div
