@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Check, ChevronDown, MapPin, Pencil, Truck } from 'lucide-react'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
 import { PICK_LIST_QUERY_KEYS } from '@/api/pick-list/query'
@@ -72,9 +72,11 @@ export function ShippingDialog({ pickList, open, onOpenChange }: ShippingDialogP
     enabled: open && shippingQuery.enabled !== false
   })
 
-  const addressList = Array.isArray(addresses)
-    ? addresses
-    : ((addresses as unknown as ShippingAddress[]) ?? [])
+  const addressList = useMemo<ShippingAddress[]>(
+    () =>
+      Array.isArray(addresses) ? addresses : ((addresses as unknown as ShippingAddress[]) ?? []),
+    [addresses]
+  )
 
   // Auto-select default address
   useEffect(() => {
@@ -96,11 +98,13 @@ export function ShippingDialog({ pickList, open, onOpenChange }: ShippingDialogP
     return Math.max(Math.round(total * 100) / 100, 0.01)
   })()
 
-  // Set auto weight on first open
+  // Set auto weight on first open. `weight` is intentionally omitted so clearing/editing
+  // the field doesn't snap it back to the auto value.
   useEffect(() => {
     if (open && !weight) {
       setWeight(String(autoWeight))
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, autoWeight])
 
   const ratesMutation = useMutation({

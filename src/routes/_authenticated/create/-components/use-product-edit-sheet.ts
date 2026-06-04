@@ -425,6 +425,9 @@ export const useProductEditSheet = (
     if (userInteractionTick > 0 && wasTracked && isDone && !wasDone) {
       dispatch({ type: 'SET_ACTIVE_TAB', value: configs[activeStepIndex + 1].name })
     }
+    // isStepFullyDone is recreated each render by design — the effect must run on every
+    // render to capture async-settled doneness into prevDonenessRef (see comment above).
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [configs, wizardMode, activeStepIndex, isStepFullyDone, userInteractionTick])
 
   const hasChanges = (() => {

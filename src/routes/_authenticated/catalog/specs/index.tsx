@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { createFileRoute, useRouter } from '@tanstack/react-router'
 import { ArrowLeft, Layers, Merge, Pencil, Plus, Search, Trash2 } from 'lucide-react'
-import { useEffect, useDeferredValue, useState } from 'react'
+import { useEffect, useDeferredValue, useMemo, useState } from 'react'
 
 import { getSpecsQuery, VP_QUERY_KEYS } from '@/api/variable-product/query'
 import type { GlobalSpecDefinition, SpecDisplayType } from '@/api/variable-product/schema'
@@ -56,11 +56,15 @@ const SpecsManagerPage = () => {
   const [formSortOrder, setFormSortOrder] = useState(0)
 
   const { data: rawData, isLoading } = useQuery(getSpecsQuery(params))
-  const specs: GlobalSpecDefinition[] = Array.isArray(rawData)
-    ? rawData
-    : Array.isArray((rawData as unknown as { results?: unknown[] })?.results)
-      ? (rawData as unknown as { results: GlobalSpecDefinition[] }).results
-      : []
+  const specs = useMemo<GlobalSpecDefinition[]>(
+    () =>
+      Array.isArray(rawData)
+        ? rawData
+        : Array.isArray((rawData as unknown as { results?: unknown[] })?.results)
+          ? (rawData as unknown as { results: GlobalSpecDefinition[] }).results
+          : [],
+    [rawData]
+  )
 
   // Auto-select first spec when data loads
   useEffect(() => {

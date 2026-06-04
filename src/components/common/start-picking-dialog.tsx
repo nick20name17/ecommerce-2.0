@@ -114,7 +114,7 @@ export function StartPickingDialog({
       autoSelectedRef.current = true
       setSelectedOrderIds(new Set([orderAutoid]))
     }
-  }, [open, orderAutoid, orders])
+  }, [open, orderAutoid, orders.length])
 
   const selectedOrders = orders.filter(o => selectedOrderIds.has(o.autoid))
 

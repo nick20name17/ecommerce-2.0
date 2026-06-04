@@ -198,7 +198,7 @@ export function CanvasElement({
         onChange({ ...el, ...next })
       }
     },
-    [onChange, pageW, pageH]
+    [onChange, pageW, pageH, siblings, onGuidesChange]
   )
 
   const endDrag = useCallback(
