@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { createFileRoute, useRouter } from '@tanstack/react-router'
 import { addDays, format, nextFriday, nextMonday } from 'date-fns'
 import { CalendarDays, ChevronDown, ChevronLeft, Paperclip, Trash2 } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
 import {
   getTaskDetailQuery,
@@ -111,6 +111,77 @@ function PriorityIcon({
   )
 }
 
+function TaskTitleDescription({
+  task,
+  isMobile,
+  onSave
+}: {
+  task: Task
+  isMobile: boolean
+  onSave: (payload: Parameters<typeof taskService.update>[1]) => void
+}) {
+  const [title, setTitle] = useState(task.title)
+  const [description, setDescription] = useState(task.description ?? '')
+
+  const handleTitleBlur = () => {
+    const trimmed = title.trim()
+    if (trimmed && trimmed !== task.title) onSave({ title: trimmed })
+    else if (!trimmed) setTitle(task.title)
+  }
+
+  const handleDescriptionBlur = () => {
+    const trimmed = description.trim()
+    if (trimmed !== (task.description ?? '').trim()) onSave({ description: trimmed || null })
+  }
+
+  return (
+    <>
+      {/* Title auto-grows via CSS `field-sizing-content` (no JS resize).
+          Newish CSS — Chromium 123+, FF 137+, Safari 18.4+. If the title
+          height misbehaves on an older browser, this is the likely cause. */}
+      <textarea
+        aria-label='Task title'
+        value={title}
+        onChange={e => setTitle(e.target.value)}
+        onBlur={handleTitleBlur}
+        onKeyDown={e => {
+          if (e.key === 'Enter') {
+            e.preventDefault()
+            e.currentTarget.blur()
+          }
+        }}
+        rows={1}
+        className={cn(
+          'mb-6 field-sizing-content w-full resize-none overflow-hidden bg-transparent leading-[1.3] font-semibold tracking-[-0.02em] outline-none',
+          'placeholder:text-text-tertiary',
+          isMobile ? 'text-xl' : 'text-[24px]'
+        )}
+        placeholder='Task title'
+      />
+
+      <div className='mb-8'>
+        <div className='mb-3 text-[13px] font-semibold tracking-[0.06em] text-text-tertiary uppercase'>
+          Description
+        </div>
+        <textarea
+          aria-label='Description'
+          value={description}
+          onChange={e => setDescription(e.target.value)}
+          onBlur={handleDescriptionBlur}
+          placeholder='Add a description...'
+          rows={5}
+          className='w-full resize-none rounded-md border border-border bg-transparent px-3 py-2.5 text-sm leading-relaxed text-text-secondary placeholder:text-text-tertiary focus:border-primary focus:outline-none'
+        />
+        {task.updated_at && (
+          <p className='mt-2 text-[13px] text-text-tertiary'>
+            Last updated {formatDateTime(task.updated_at)}
+          </p>
+        )}
+      </div>
+    </>
+  )
+}
+
 // ── Page Component ───────────────────────────────────────────
 
 function TaskDetailPage() {
@@ -198,18 +269,6 @@ function TaskDetailPage() {
   const canDeleteNote = (note: TaskNote) =>
     !!user && (isAdmin(user.role) || note.author === user.id)
 
-  // Local state for editable fields
-  const [title, setTitle] = useState(task?.title ?? '')
-  const [description, setDescription] = useState(task?.description ?? '')
-
-  useEffect(() => {
-    if (task?.title) setTitle(task.title)
-  }, [task?.title])
-
-  useEffect(() => {
-    setDescription(task?.description ?? '')
-  }, [task?.description])
-
   // Update mutation with optimistic updates
   const updateMutation = useMutation({
     mutationFn: (payload: Parameters<typeof taskService.update>[1]) =>
@@ -265,24 +324,6 @@ function TaskDetailPage() {
       router.history.back()
     }
   })
-
-  const handleTitleBlur = () => {
-    if (!task) return
-    const trimmed = title.trim()
-    if (trimmed && trimmed !== task.title) {
-      updateMutation.mutate({ title: trimmed })
-    } else if (!trimmed) {
-      setTitle(task.title)
-    }
-  }
-
-  const handleDescriptionBlur = () => {
-    if (!task) return
-    const trimmed = description.trim()
-    if (trimmed !== (task.description ?? '').trim()) {
-      updateMutation.mutate({ description: trimmed || null })
-    }
-  }
 
   // Invalid ID
   if (Number.isNaN(id)) {
@@ -423,50 +464,12 @@ function TaskDetailPage() {
           <div className={cn('flex-1 overflow-y-auto', isMobile ? 'px-4 pt-5' : 'px-4 pt-6')}>
             <div className='mx-auto max-w-160 pb-16'>
               {activeTab === 'details' ? (
-                <>
-                  {/* Title auto-grows via CSS `field-sizing-content` (no JS resize).
-                      Newish CSS — Chromium 123+, FF 137+, Safari 18.4+. If the title
-                      height misbehaves on an older browser, this is the likely cause. */}
-                  <textarea
-                    aria-label='Task title'
-                    value={title}
-                    onChange={e => setTitle(e.target.value)}
-                    onBlur={handleTitleBlur}
-                    onKeyDown={e => {
-                      if (e.key === 'Enter') {
-                        e.preventDefault()
-                        e.currentTarget.blur()
-                      }
-                    }}
-                    rows={1}
-                    className={cn(
-                      'mb-6 field-sizing-content w-full resize-none overflow-hidden bg-transparent leading-[1.3] font-semibold tracking-[-0.02em] outline-none',
-                      'placeholder:text-text-tertiary',
-                      isMobile ? 'text-xl' : 'text-[24px]'
-                    )}
-                    placeholder='Task title'
-                  />
-
-                  <div className='mb-8'>
-                    <div className='mb-3 text-[13px] font-semibold tracking-[0.06em] text-text-tertiary uppercase'>
-                      Description
-                    </div>
-                    <textarea
-                      aria-label='Description'
-                      value={description}
-                      onChange={e => setDescription(e.target.value)}
-                      onBlur={handleDescriptionBlur}
-                      placeholder='Add a description...'
-                      rows={5}
-                      className='w-full resize-none rounded-md border border-border bg-transparent px-3 py-2.5 text-sm leading-relaxed text-text-secondary placeholder:text-text-tertiary focus:border-primary focus:outline-none'
-                    />
-                    {task.updated_at && (
-                      <p className='mt-2 text-[13px] text-text-tertiary'>
-                        Last updated {formatDateTime(task.updated_at)}
-                      </p>
-                    )}
-                  </div>
-                </>
+                <TaskTitleDescription
+                  key={task.id}
+                  task={task}
+                  isMobile={isMobile}
+                  onSave={updateMutation.mutate}
+                />
               ) : (
                 <TaskAttachments
                   taskId={task.id}
