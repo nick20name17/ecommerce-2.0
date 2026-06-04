@@ -1,6 +1,5 @@
-import memoize from 'memoize'
-
 import { authService } from '@/api/auth/service'
+import { singleFlight } from '@/api/single-flight'
 import { clearSession, getSession, updateTokens } from '@/helpers/auth'
 
 const refreshToken = async () => {
@@ -30,6 +29,4 @@ const refreshToken = async () => {
   }
 }
 
-export const memoizedRefreshToken = memoize(refreshToken, {
-  maxAge: 10000
-})
+export const refreshAccessToken = singleFlight(refreshToken)

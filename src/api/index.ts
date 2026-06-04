@@ -2,7 +2,7 @@ import { type InternalAxiosRequestConfig } from 'axios'
 
 import { api } from './client'
 import { AUTH_REDIRECTS } from './constants'
-import { memoizedRefreshToken } from './helpers'
+import { refreshAccessToken } from './helpers'
 import { clearSession, getSession } from '@/helpers/auth'
 
 export { api }
@@ -46,7 +46,7 @@ api.interceptors.response.use(
     config._retry = true
 
     try {
-      const { access } = await memoizedRefreshToken()
+      const { access } = await refreshAccessToken()
       config.headers.Authorization = `Bearer ${access}`
 
       return api(config)
