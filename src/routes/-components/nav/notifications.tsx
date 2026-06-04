@@ -135,8 +135,9 @@ export const NotificationBell = () => {
       <PopoverContent
         className='w-85 overflow-hidden rounded-[10px] border-border p-0'
         side='right'
-        align='end'
+        align='start'
         sideOffset={6}
+        collisionPadding={8}
         style={{ boxShadow: 'var(--dropdown-shadow)' }}
       >
         <div className='flex items-center justify-between border-b border-border px-3 py-2'>
