@@ -14,5 +14,9 @@ export const getPushStatusQuery = (params: PushStatusParams = {}) =>
     queryKey: PUSH_STATUS_QUERY_KEYS.list(params),
     queryFn: () => pushStatusService.get(params),
     staleTime: 0,
-    refetchInterval: 10_000
+    // Real-time updates arrive via the notifications WebSocket
+    // (storefront_push_logged -> invalidate). This poll is a fallback that
+    // also surfaces brand-new before-process orders that haven't logged a
+    // push yet, so it can be relaxed from the old 10s now that WS is primary.
+    refetchInterval: 30_000
   })

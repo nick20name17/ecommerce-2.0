@@ -77,7 +77,7 @@ export function PushStatusSection({ projectId }: { projectId: number }) {
     ...getPushStatusQuery({
       search: search || undefined,
       project_id: projectId,
-      ordering: '-updated_at',
+      ordering: '-created_at',
       offset,
       limit
     }),
