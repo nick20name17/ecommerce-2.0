@@ -5,7 +5,6 @@ import type {
   EntityNoteList,
   EntityNoteRequest,
   EntityNoteType,
-  NotesListParams,
   PaginatedEntityNoteListList
 } from './schema'
 
@@ -39,13 +38,6 @@ export const noteService = {
       entityType === 'order' ? 'orders' : entityType === 'proposal' ? 'proposals' : 'customers'
     const { data } = await api.post<EntityNote>(`/data/${entityPath}/${autoid}/notes/`, payload, {
       params: projectParam(projectId)
-    })
-    return data
-  },
-
-  listNotes: async (params: NotesListParams): Promise<PaginatedEntityNoteListList> => {
-    const { data } = await api.get<PaginatedEntityNoteListList>('/notes/', {
-      params: params.project_id != null ? { ...params, project_id: params.project_id } : params
     })
     return data
   },

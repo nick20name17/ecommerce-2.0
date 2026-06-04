@@ -36,11 +36,3 @@ export interface PaginatedEntityNoteListList {
   previous: string | null
   results: EntityNoteList[]
 }
-
-export interface NotesListParams {
-  entity_type?: EntityNoteType
-  entity_autoid?: string
-  ordering?: string
-  page?: number
-  project_id?: number | null
-}

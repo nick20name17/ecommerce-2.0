@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Send, StickyNote, Trash2 } from 'lucide-react'
-import { useRef, useState } from 'react'
+import { useState } from 'react'
 
 import { CUSTOMER_QUERY_KEYS } from '@/api/customer/query'
 import { NOTE_QUERY_KEYS, getEntityNotesQuery } from '@/api/note/query'
@@ -72,7 +72,6 @@ export const EntityNotesSheet = ({
   const { user } = useAuth()
   const [text, setText] = useState('')
   const [noteToDelete, setNoteToDelete] = useState<EntityNoteList | null>(null)
-  const textareaRef = useRef<HTMLTextAreaElement>(null)
 
   const { data: notes = [], isLoading } = useQuery({
     ...getEntityNotesQuery(entityType, autoid, projectId),
@@ -264,7 +263,6 @@ export const EntityNotesSheet = ({
         <form className='shrink-0 border-t border-border px-4 py-3' onSubmit={handleSubmit}>
           <div className='relative'>
             <textarea
-              ref={textareaRef}
               aria-label='Note text'
               value={text}
               onChange={e => setText(e.target.value.slice(0, NOTE_TEXT_MAX))}
