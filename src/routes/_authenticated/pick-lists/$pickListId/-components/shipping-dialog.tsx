@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Check, ChevronDown, MapPin, Pencil, Truck } from 'lucide-react'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
 import { PICK_LIST_QUERY_KEYS } from '@/api/pick-list/query'
@@ -72,18 +72,18 @@ export function ShippingDialog({ pickList, open, onOpenChange }: ShippingDialogP
     enabled: open && shippingQuery.enabled !== false
   })
 
-  const addressList = useMemo<ShippingAddress[]>(
-    () =>
-      Array.isArray(addresses) ? addresses : ((addresses as unknown as ShippingAddress[]) ?? []),
-    [addresses]
-  )
+  const addressList: ShippingAddress[] = Array.isArray(addresses)
+    ? addresses
+    : ((addresses as unknown as ShippingAddress[]) ?? [])
 
-  // Auto-select default address
+  // Auto-select default address. addressList is recreated each render, but the React
+  // Compiler memoizes it and the addressId guard keeps this idempotent.
   useEffect(() => {
     if (open && addressId === null && addressList.length > 0) {
       const def = addressList.find(a => a.is_default) ?? addressList[0]
       if (def) setAddressId(def.id)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, addressId, addressList])
 
   const selectedAddress = addressList.find(a => a.id === addressId)

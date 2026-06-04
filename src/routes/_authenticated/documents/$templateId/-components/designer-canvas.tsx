@@ -13,7 +13,7 @@ import {
   Type,
   X
 } from 'lucide-react'
-import { useCallback, useEffect, useEffectEvent, useRef, useState } from 'react'
+import { useEffect, useEffectEvent, useRef, useState } from 'react'
 
 import { documentTemplateService } from '@/api/document-template/service'
 import type { FieldConfigEntry } from '@/api/field-config/schema'
@@ -110,109 +110,88 @@ export function DesignerCanvas({
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [activeGuides, setActiveGuides] = useState<AlignmentGuide[]>([])
 
-  const updatePage = useCallback(
-    (next: LayoutElement[]) => {
-      const nextPages = [...pages]
-      nextPages[currentPageIndex] = {
-        ...(nextPages[currentPageIndex] ?? { elements: [] }),
-        elements: next
-      }
-      onChange({ pages: nextPages })
-    },
-    [pages, currentPageIndex, onChange]
-  )
+  const updatePage = (next: LayoutElement[]) => {
+    const nextPages = [...pages]
+    nextPages[currentPageIndex] = {
+      ...(nextPages[currentPageIndex] ?? { elements: [] }),
+      elements: next
+    }
+    onChange({ pages: nextPages })
+  }
 
-  const addPage = useCallback(() => {
+  const addPage = () => {
     onChange({ pages: [...pages, { elements: [] }] })
     setCurrentPageIndex(pages.length)
     setSelectedId(null)
-  }, [pages, onChange])
+  }
 
-  const removePage = useCallback(
-    (idx: number) => {
-      if (pages.length <= 1) return
-      const nextPages = pages.filter((_, i) => i !== idx)
-      const nextIdx = Math.max(0, Math.min(currentPageIndex, nextPages.length - 1))
-      onChange({ pages: nextPages })
-      setCurrentPageIndex(nextIdx)
-      setSelectedId(null)
-    },
-    [pages, currentPageIndex, onChange]
-  )
+  const removePage = (idx: number) => {
+    if (pages.length <= 1) return
+    const nextPages = pages.filter((_, i) => i !== idx)
+    const nextIdx = Math.max(0, Math.min(currentPageIndex, nextPages.length - 1))
+    onChange({ pages: nextPages })
+    setCurrentPageIndex(nextIdx)
+    setSelectedId(null)
+  }
 
-  const updateElement = useCallback(
-    (id: string, patch: Partial<LayoutElement>) => {
-      updatePage(elements.map(el => (el.id === id ? { ...el, ...patch } : el)))
-    },
-    [elements, updatePage]
-  )
+  const updateElement = (id: string, patch: Partial<LayoutElement>) => {
+    updatePage(elements.map(el => (el.id === id ? { ...el, ...patch } : el)))
+  }
 
-  const replaceElement = useCallback(
-    (next: LayoutElement) => {
-      updatePage(elements.map(el => (el.id === next.id ? next : el)))
-    },
-    [elements, updatePage]
-  )
+  const replaceElement = (next: LayoutElement) => {
+    updatePage(elements.map(el => (el.id === next.id ? next : el)))
+  }
 
-  const deleteElement = useCallback(
-    (id: string) => {
-      updatePage(elements.filter(el => el.id !== id))
-      if (selectedId === id) setSelectedId(null)
-    },
-    [elements, updatePage, selectedId]
-  )
+  const deleteElement = (id: string) => {
+    updatePage(elements.filter(el => el.id !== id))
+    if (selectedId === id) setSelectedId(null)
+  }
 
-  const moveLayer = useCallback(
-    (id: string, direction: 'front' | 'forward' | 'backward' | 'back') => {
-      const idx = elements.findIndex(el => el.id === id)
-      if (idx < 0) return
-      const next = [...elements]
-      const [picked] = next.splice(idx, 1)
-      switch (direction) {
-        case 'back':
-          next.unshift(picked)
-          break
-        case 'backward':
-          next.splice(Math.max(0, idx - 1), 0, picked)
-          break
-        case 'forward':
-          next.splice(Math.min(next.length, idx + 1), 0, picked)
-          break
-        case 'front':
-        default:
-          next.push(picked)
-      }
-      updatePage(next)
-    },
-    [elements, updatePage]
-  )
+  const moveLayer = (id: string, direction: 'front' | 'forward' | 'backward' | 'back') => {
+    const idx = elements.findIndex(el => el.id === id)
+    if (idx < 0) return
+    const next = [...elements]
+    const [picked] = next.splice(idx, 1)
+    switch (direction) {
+      case 'back':
+        next.unshift(picked)
+        break
+      case 'backward':
+        next.splice(Math.max(0, idx - 1), 0, picked)
+        break
+      case 'forward':
+        next.splice(Math.min(next.length, idx + 1), 0, picked)
+        break
+      case 'front':
+      default:
+        next.push(picked)
+    }
+    updatePage(next)
+  }
 
-  const duplicateElement = useCallback(
-    (id: string) => {
-      const source = elements.find(el => el.id === id)
-      if (!source) return
-      const OFFSET = 0.25 // inches
-      const newX = snapInches(Math.min(dims.w - source.w, source.x + OFFSET))
-      const newY = snapInches(Math.min(dims.h - source.h, source.y + OFFSET))
-      const duplicated: LayoutElement = {
-        ...source,
-        id: newId(),
-        x: newX,
-        y: newY,
-        props: source.props ? { ...source.props } : undefined
-      }
-      updatePage([...elements, duplicated])
-      setSelectedId(duplicated.id)
-    },
-    [elements, updatePage, dims]
-  )
+  const duplicateElement = (id: string) => {
+    const source = elements.find(el => el.id === id)
+    if (!source) return
+    const OFFSET = 0.25 // inches
+    const newX = snapInches(Math.min(dims.w - source.w, source.x + OFFSET))
+    const newY = snapInches(Math.min(dims.h - source.h, source.y + OFFSET))
+    const duplicated: LayoutElement = {
+      ...source,
+      id: newId(),
+      x: newX,
+      y: newY,
+      props: source.props ? { ...source.props } : undefined
+    }
+    updatePage([...elements, duplicated])
+    setSelectedId(duplicated.id)
+  }
 
   // ── Clipboard for copy/paste ─────────────────────────────
   // Held in a ref so paste survives between focus changes without depending
   // on React state.
   const clipboardRef = useRef<LayoutElement | null>(null)
 
-  const pasteFromClipboard = useCallback(() => {
+  const pasteFromClipboard = () => {
     const source = clipboardRef.current
     if (!source) return
     const OFFSET = 0.25
@@ -230,21 +209,18 @@ export function DesignerCanvas({
     // Update the clipboard's reference position so a second Cmd+V offsets
     // again instead of stacking on top of the previous paste.
     clipboardRef.current = pasted
-  }, [dims, elements, updatePage])
+  }
 
   // Arrow keys nudge the selected element; Shift = larger step.
-  const nudgeSelected = useCallback(
-    (dx: number, dy: number) => {
-      if (!selectedId) return
-      const el = elements.find(x => x.id === selectedId)
-      if (!el) return
-      const nextX = snapInches(Math.max(0, Math.min(dims.w - el.w, el.x + dx)))
-      const nextY = snapInches(Math.max(0, Math.min(dims.h - el.h, el.y + dy)))
-      if (nextX === el.x && nextY === el.y) return
-      replaceElement({ ...el, x: nextX, y: nextY })
-    },
-    [selectedId, elements, dims, replaceElement]
-  )
+  const nudgeSelected = (dx: number, dy: number) => {
+    if (!selectedId) return
+    const el = elements.find(x => x.id === selectedId)
+    if (!el) return
+    const nextX = snapInches(Math.max(0, Math.min(dims.w - el.w, el.x + dx)))
+    const nextY = snapInches(Math.max(0, Math.min(dims.h - el.h, el.y + dy)))
+    if (nextX === el.x && nextY === el.y) return
+    replaceElement({ ...el, x: nextX, y: nextY })
+  }
 
   // Cmd/Ctrl+D duplicates, Cmd+C copies, Cmd+V pastes;
   // bare arrow keys nudge the selected element.
@@ -307,30 +283,23 @@ export function DesignerCanvas({
     return () => window.removeEventListener('keydown', handler)
   }, [])
 
-  const addElement = useCallback(
-    (type: ElementType, dropX: number, dropY: number) => {
-      const defaults = ELEMENT_DEFAULTS[type]
-      const id = newId()
-      const xClamped = snapInches(
-        Math.max(0, Math.min(dims.w - defaults.w, dropX - defaults.w / 2))
-      )
-      const yClamped = snapInches(
-        Math.max(0, Math.min(dims.h - defaults.h, dropY - defaults.h / 2))
-      )
-      const newElement: LayoutElement = {
-        id,
-        type,
-        x: xClamped,
-        y: yClamped,
-        w: defaults.w,
-        h: defaults.h,
-        props: { ...defaults.props }
-      }
-      updatePage([...elements, newElement])
-      setSelectedId(id)
-    },
-    [dims, elements, updatePage]
-  )
+  const addElement = (type: ElementType, dropX: number, dropY: number) => {
+    const defaults = ELEMENT_DEFAULTS[type]
+    const id = newId()
+    const xClamped = snapInches(Math.max(0, Math.min(dims.w - defaults.w, dropX - defaults.w / 2)))
+    const yClamped = snapInches(Math.max(0, Math.min(dims.h - defaults.h, dropY - defaults.h / 2)))
+    const newElement: LayoutElement = {
+      id,
+      type,
+      x: xClamped,
+      y: yClamped,
+      w: defaults.w,
+      h: defaults.h,
+      props: { ...defaults.props }
+    }
+    updatePage([...elements, newElement])
+    setSelectedId(id)
+  }
 
   // --- canvas drop target -------------------------------------------------
 

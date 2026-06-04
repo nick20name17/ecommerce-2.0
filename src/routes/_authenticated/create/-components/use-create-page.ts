@@ -1,6 +1,6 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
-import { useCallback, useEffect, useReducer, useRef, useState } from 'react'
+import { useEffect, useReducer, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useEditSheetData } from './use-edit-sheet-data'
@@ -190,25 +190,19 @@ export function useCreatePage() {
   const isBusy = busy.cartUpdating || cartLoading || busy.creatingProposal || busy.creatingOrder
 
   // Set cart data directly from API response (avoids redundant GET refetch)
-  const setCart = useCallback(
-    (data: Cart) => {
-      if (customer?.id != null) {
-        queryClient.setQueryData(CART_QUERY_KEYS.detail(customer.id, projectId), data)
-      }
-    },
-    [customer?.id, projectId, queryClient]
-  )
+  const setCart = (data: Cart) => {
+    if (customer?.id != null) {
+      queryClient.setQueryData(CART_QUERY_KEYS.detail(customer.id, projectId), data)
+    }
+  }
 
-  const updateCartOptimistic = useCallback(
-    (updater: (prev: Cart) => Cart) => {
-      if (customer?.id != null) {
-        queryClient.setQueryData<Cart>(CART_QUERY_KEYS.detail(customer.id, projectId), prev =>
-          prev ? updater(prev) : prev
-        )
-      }
-    },
-    [customer?.id, projectId, queryClient]
-  )
+  const updateCartOptimistic = (updater: (prev: Cart) => Cart) => {
+    if (customer?.id != null) {
+      queryClient.setQueryData<Cart>(CART_QUERY_KEYS.detail(customer.id, projectId), prev =>
+        prev ? updater(prev) : prev
+      )
+    }
+  }
 
   const invalidateCart = () => {
     if (customer?.id != null) {
@@ -307,58 +301,55 @@ export function useCreatePage() {
   const qtyTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const qtyAbortRef = useRef<AbortController | null>(null)
 
-  const handleQuantityChange = useCallback(
-    (itemId: number, quantity: number) => {
-      if (!customer) return
+  const handleQuantityChange = (itemId: number, quantity: number) => {
+    if (!customer) return
 
-      // Optimistically update the cart items in cache
-      const cartKey = CART_QUERY_KEYS.detail(customer.id, projectId)
-      const currentCart = queryClient.getQueryData<Cart>(cartKey)
-      if (currentCart?.items) {
-        const item = currentCart.items.find(i => i.id === itemId)
-        if (item) {
-          queryClient.setQueryData(cartKey, {
-            ...currentCart,
-            items: currentCart.items.map(i => (i.id === itemId ? { ...i, quantity } : i))
-          })
+    // Optimistically update the cart items in cache
+    const cartKey = CART_QUERY_KEYS.detail(customer.id, projectId)
+    const currentCart = queryClient.getQueryData<Cart>(cartKey)
+    if (currentCart?.items) {
+      const item = currentCart.items.find(i => i.id === itemId)
+      if (item) {
+        queryClient.setQueryData(cartKey, {
+          ...currentCart,
+          items: currentCart.items.map(i => (i.id === itemId ? { ...i, quantity } : i))
+        })
+      }
+    }
+
+    setUpdatingQuantityItemId(itemId)
+    busyDispatch({ type: 'CART_UPDATING', value: true })
+
+    // Cancel pending debounce
+    if (qtyTimerRef.current) clearTimeout(qtyTimerRef.current)
+    if (qtyAbortRef.current) qtyAbortRef.current.abort()
+
+    qtyTimerRef.current = setTimeout(async () => {
+      const controller = new AbortController()
+      qtyAbortRef.current = controller
+      try {
+        const updatedCart = await cartService.updateItem(
+          itemId,
+          { quantity },
+          customer.id,
+          projectId
+        )
+        if (!controller.signal.aborted) {
+          setCart(updatedCart)
+        }
+      } catch (error) {
+        if (!controller.signal.aborted) {
+          toast.error(getErrorMessage(error))
+          invalidateCart() // Refetch on error to restore correct state
+        }
+      } finally {
+        if (!controller.signal.aborted) {
+          busyDispatch({ type: 'CART_UPDATING', value: false })
+          setUpdatingQuantityItemId(null)
         }
       }
-
-      setUpdatingQuantityItemId(itemId)
-      busyDispatch({ type: 'CART_UPDATING', value: true })
-
-      // Cancel pending debounce
-      if (qtyTimerRef.current) clearTimeout(qtyTimerRef.current)
-      if (qtyAbortRef.current) qtyAbortRef.current.abort()
-
-      qtyTimerRef.current = setTimeout(async () => {
-        const controller = new AbortController()
-        qtyAbortRef.current = controller
-        try {
-          const updatedCart = await cartService.updateItem(
-            itemId,
-            { quantity },
-            customer.id,
-            projectId
-          )
-          if (!controller.signal.aborted) {
-            setCart(updatedCart)
-          }
-        } catch (error) {
-          if (!controller.signal.aborted) {
-            toast.error(getErrorMessage(error))
-            invalidateCart() // Refetch on error to restore correct state
-          }
-        } finally {
-          if (!controller.signal.aborted) {
-            busyDispatch({ type: 'CART_UPDATING', value: false })
-            setUpdatingQuantityItemId(null)
-          }
-        }
-      }, 400)
-    },
-    [customer, projectId, queryClient, setCart, invalidateCart]
-  )
+    }, 400)
+  }
 
   const handleClearAll = () => {
     if (!customer || cartItems.length === 0) return

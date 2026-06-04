@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { createFileRoute, useRouter } from '@tanstack/react-router'
 import { ArrowLeft, Layers, Merge, Pencil, Plus, Search, Trash2 } from 'lucide-react'
-import { useEffect, useDeferredValue, useMemo, useState } from 'react'
+import { useEffect, useDeferredValue, useState } from 'react'
 
 import { getSpecsQuery, VP_QUERY_KEYS } from '@/api/variable-product/query'
 import type { GlobalSpecDefinition, SpecDisplayType } from '@/api/variable-product/schema'
@@ -56,21 +56,19 @@ const SpecsManagerPage = () => {
   const [formSortOrder, setFormSortOrder] = useState(0)
 
   const { data: rawData, isLoading } = useQuery(getSpecsQuery(params))
-  const specs = useMemo<GlobalSpecDefinition[]>(
-    () =>
-      Array.isArray(rawData)
-        ? rawData
-        : Array.isArray((rawData as unknown as { results?: unknown[] })?.results)
-          ? (rawData as unknown as { results: GlobalSpecDefinition[] }).results
-          : [],
-    [rawData]
-  )
+  const specs: GlobalSpecDefinition[] = Array.isArray(rawData)
+    ? rawData
+    : Array.isArray((rawData as unknown as { results?: unknown[] })?.results)
+      ? (rawData as unknown as { results: GlobalSpecDefinition[] }).results
+      : []
 
-  // Auto-select first spec when data loads
+  // Auto-select first spec when data loads. specs is recreated each render, but the React
+  // Compiler memoizes it and the selectedSpec guard keeps this idempotent.
   useEffect(() => {
     if (specs.length > 0 && !selectedSpec) {
       setSelectedSpec(specs[0])
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [specs, selectedSpec])
 
   const filteredSpecs = deferredSearch

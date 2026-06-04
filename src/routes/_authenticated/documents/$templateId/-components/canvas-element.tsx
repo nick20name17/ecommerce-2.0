@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useEffectEvent, useRef } from 'react'
+import { useEffect, useEffectEvent, useRef } from 'react'
 
 import type { LayoutElement, TableColumn } from '@/api/document-template/schema'
 import { cn } from '@/lib/utils'
@@ -78,142 +78,130 @@ export function CanvasElement({
 
   // --- pointer handlers ----------------------------------------------------
 
-  const beginMove = useCallback(
-    (e: React.PointerEvent) => {
-      // Don't start a move from a resize handle click
-      if ((e.target as HTMLElement).dataset.handle) return
-      onSelect()
-      e.stopPropagation()
-      ;(e.currentTarget as HTMLElement).setPointerCapture(e.pointerId)
-      dragRef.current = {
-        kind: 'move',
-        startX: e.clientX,
-        startY: e.clientY,
-        origX: latestRef.current.x,
-        origY: latestRef.current.y
+  const beginMove = (e: React.PointerEvent) => {
+    // Don't start a move from a resize handle click
+    if ((e.target as HTMLElement).dataset.handle) return
+    onSelect()
+    e.stopPropagation()
+    ;(e.currentTarget as HTMLElement).setPointerCapture(e.pointerId)
+    dragRef.current = {
+      kind: 'move',
+      startX: e.clientX,
+      startY: e.clientY,
+      origX: latestRef.current.x,
+      origY: latestRef.current.y
+    }
+  }
+
+  const beginResize = (handle: ResizeHandle) => (e: React.PointerEvent) => {
+    e.stopPropagation()
+    onSelect()
+    ;(e.currentTarget as HTMLElement).setPointerCapture(e.pointerId)
+    const el = latestRef.current
+    dragRef.current = {
+      kind: 'resize',
+      handle,
+      startX: e.clientX,
+      startY: e.clientY,
+      orig: { x: el.x, y: el.y, w: el.w, h: el.h }
+    }
+  }
+
+  const handleMove = (e: React.PointerEvent) => {
+    const drag = dragRef.current
+    if (!drag) return
+
+    const dxIn = (e.clientX - drag.startX) / PX_PER_INCH
+    const dyIn = (e.clientY - drag.startY) / PX_PER_INCH
+    const el = latestRef.current
+
+    // Hold Alt/Option to bypass grid + alignment snap for pixel-precise control.
+    const bypassSnap = e.altKey
+
+    if (drag.kind === 'move') {
+      let nextX = Math.max(0, Math.min(pageW - el.w, drag.origX + dxIn))
+      let nextY = Math.max(0, Math.min(pageH - el.h, drag.origY + dyIn))
+
+      // Alignment guides — snap to sibling edges/centers before the grid snap.
+      if (!bypassSnap && siblings && siblings.length > 0) {
+        const result = computeAlignment(
+          { x: nextX, y: nextY, w: el.w, h: el.h },
+          siblings.filter(s => s.id !== el.id)
+        )
+        nextX = result.x
+        nextY = result.y
+        onGuidesChange?.(result.guides)
+      } else {
+        onGuidesChange?.([])
       }
-    },
-    [onSelect]
-  )
 
-  const beginResize = useCallback(
-    (handle: ResizeHandle) => (e: React.PointerEvent) => {
-      e.stopPropagation()
-      onSelect()
-      ;(e.currentTarget as HTMLElement).setPointerCapture(e.pointerId)
-      const el = latestRef.current
-      dragRef.current = {
-        kind: 'resize',
-        handle,
-        startX: e.clientX,
-        startY: e.clientY,
-        orig: { x: el.x, y: el.y, w: el.w, h: el.h }
+      if (!bypassSnap) {
+        nextX = snapInches(Math.max(0, Math.min(pageW - el.w, nextX)))
+        nextY = snapInches(Math.max(0, Math.min(pageH - el.h, nextY)))
+      } else {
+        // Clamp without grid snap, but round to 3 decimals to avoid float drift.
+        nextX = Math.round(Math.max(0, Math.min(pageW - el.w, nextX)) * 1000) / 1000
+        nextY = Math.round(Math.max(0, Math.min(pageH - el.h, nextY)) * 1000) / 1000
       }
-    },
-    [onSelect]
-  )
 
-  const handleMove = useCallback(
-    (e: React.PointerEvent) => {
-      const drag = dragRef.current
-      if (!drag) return
+      if (nextX !== el.x || nextY !== el.y) {
+        onChange({ ...el, x: nextX, y: nextY })
+      }
+      return
+    }
 
-      const dxIn = (e.clientX - drag.startX) / PX_PER_INCH
-      const dyIn = (e.clientY - drag.startY) / PX_PER_INCH
-      const el = latestRef.current
+    // resize
+    let { x, y, w, h } = drag.orig
+    const h_ = drag.handle
+    if (h_.includes('e')) w = drag.orig.w + dxIn
+    if (h_.includes('s')) h = drag.orig.h + dyIn
+    if (h_.includes('w')) {
+      w = drag.orig.w - dxIn
+      x = drag.orig.x + dxIn
+    }
+    if (h_.includes('n')) {
+      h = drag.orig.h - dyIn
+      y = drag.orig.y + dyIn
+    }
 
-      // Hold Alt/Option to bypass grid + alignment snap for pixel-precise control.
-      const bypassSnap = e.altKey
+    w = Math.max(MIN_W, w)
+    h = Math.max(MIN_H, h)
+    // keep inside the page
+    if (x < 0) {
+      w += x
+      x = 0
+    }
+    if (y < 0) {
+      h += y
+      y = 0
+    }
+    if (x + w > pageW) w = pageW - x
+    if (y + h > pageH) h = pageH - y
 
-      if (drag.kind === 'move') {
-        let nextX = Math.max(0, Math.min(pageW - el.w, drag.origX + dxIn))
-        let nextY = Math.max(0, Math.min(pageH - el.h, drag.origY + dyIn))
-
-        // Alignment guides — snap to sibling edges/centers before the grid snap.
-        if (!bypassSnap && siblings && siblings.length > 0) {
-          const result = computeAlignment(
-            { x: nextX, y: nextY, w: el.w, h: el.h },
-            siblings.filter(s => s.id !== el.id)
-          )
-          nextX = result.x
-          nextY = result.y
-          onGuidesChange?.(result.guides)
-        } else {
-          onGuidesChange?.([])
+    const round3 = (v: number) => Math.round(v * 1000) / 1000
+    const next = bypassSnap
+      ? { x: round3(x), y: round3(y), w: round3(w), h: round3(h) }
+      : {
+          x: snapInches(x),
+          y: snapInches(y),
+          w: snapInches(w),
+          h: snapInches(h)
         }
+    if (next.x !== el.x || next.y !== el.y || next.w !== el.w || next.h !== el.h) {
+      onChange({ ...el, ...next })
+    }
+  }
 
-        if (!bypassSnap) {
-          nextX = snapInches(Math.max(0, Math.min(pageW - el.w, nextX)))
-          nextY = snapInches(Math.max(0, Math.min(pageH - el.h, nextY)))
-        } else {
-          // Clamp without grid snap, but round to 3 decimals to avoid float drift.
-          nextX = Math.round(Math.max(0, Math.min(pageW - el.w, nextX)) * 1000) / 1000
-          nextY = Math.round(Math.max(0, Math.min(pageH - el.h, nextY)) * 1000) / 1000
-        }
-
-        if (nextX !== el.x || nextY !== el.y) {
-          onChange({ ...el, x: nextX, y: nextY })
-        }
-        return
-      }
-
-      // resize
-      let { x, y, w, h } = drag.orig
-      const h_ = drag.handle
-      if (h_.includes('e')) w = drag.orig.w + dxIn
-      if (h_.includes('s')) h = drag.orig.h + dyIn
-      if (h_.includes('w')) {
-        w = drag.orig.w - dxIn
-        x = drag.orig.x + dxIn
-      }
-      if (h_.includes('n')) {
-        h = drag.orig.h - dyIn
-        y = drag.orig.y + dyIn
-      }
-
-      w = Math.max(MIN_W, w)
-      h = Math.max(MIN_H, h)
-      // keep inside the page
-      if (x < 0) {
-        w += x
-        x = 0
-      }
-      if (y < 0) {
-        h += y
-        y = 0
-      }
-      if (x + w > pageW) w = pageW - x
-      if (y + h > pageH) h = pageH - y
-
-      const round3 = (v: number) => Math.round(v * 1000) / 1000
-      const next = bypassSnap
-        ? { x: round3(x), y: round3(y), w: round3(w), h: round3(h) }
-        : {
-            x: snapInches(x),
-            y: snapInches(y),
-            w: snapInches(w),
-            h: snapInches(h)
-          }
-      if (next.x !== el.x || next.y !== el.y || next.w !== el.w || next.h !== el.h) {
-        onChange({ ...el, ...next })
-      }
-    },
-    [onChange, pageW, pageH, siblings, onGuidesChange]
-  )
-
-  const endDrag = useCallback(
-    (e: React.PointerEvent) => {
-      if (!dragRef.current) return
-      dragRef.current = null
-      onGuidesChange?.([])
-      try {
-        ;(e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId)
-      } catch {
-        // pointer might already be released
-      }
-    },
-    [onGuidesChange]
-  )
+  const endDrag = (e: React.PointerEvent) => {
+    if (!dragRef.current) return
+    dragRef.current = null
+    onGuidesChange?.([])
+    try {
+      ;(e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId)
+    } catch {
+      // pointer might already be released
+    }
+  }
 
   // Delete with keyboard when selected
   const onDeleteKey = useEffectEvent(() => onDelete())
