@@ -11,6 +11,12 @@ import type {
 const projectParam = (projectId?: number | null) =>
   projectId != null ? { project_id: projectId } : {}
 
+const ENTITY_PATHS: Record<EntityNoteType, string> = {
+  order: 'orders',
+  proposal: 'proposals',
+  customer: 'customers'
+}
+
 export const noteService = {
   listEntityNotes: async (
     entityType: EntityNoteType,
@@ -34,11 +40,11 @@ export const noteService = {
     payload: EntityNoteRequest,
     projectId?: number | null
   ): Promise<EntityNote> => {
-    const entityPath =
-      entityType === 'order' ? 'orders' : entityType === 'proposal' ? 'proposals' : 'customers'
-    const { data } = await api.post<EntityNote>(`/data/${entityPath}/${autoid}/notes/`, payload, {
-      params: projectParam(projectId)
-    })
+    const { data } = await api.post<EntityNote>(
+      `/data/${ENTITY_PATHS[entityType]}/${autoid}/notes/`,
+      payload,
+      { params: projectParam(projectId) }
+    )
     return data
   },
 
