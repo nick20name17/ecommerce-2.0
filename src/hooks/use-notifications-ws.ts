@@ -9,6 +9,7 @@ import { NOTE_QUERY_KEYS } from '@/api/note/query'
 import { ORDER_QUERY_KEYS } from '@/api/order/query'
 import { PICK_LIST_QUERY_KEYS } from '@/api/pick-list/query'
 import { PROPOSAL_QUERY_KEYS } from '@/api/proposal/query'
+import { PUSH_STATUS_QUERY_KEYS } from '@/api/push-status/query'
 import { SHIPMENT_QUERY_KEYS } from '@/api/shipment/query'
 import { TASK_QUERY_KEYS } from '@/api/task/query'
 import { isSuperAdmin } from '@/constants/user'
@@ -130,6 +131,19 @@ const isTaskNotification = (msg: unknown): msg is TaskNotificationPayload => {
   )
 }
 
+// Storefront push-status events: emitted by the backend on every storefront
+// EBMS log ingest (a push attempt just happened, so the proposal's push state
+// likely changed). Matches on `type` OR `event_type` to be agnostic to the
+// payload key. Drives the Website -> Push Status dashboard in real time.
+const PUSH_STATUS_EVENT = 'storefront_push_logged'
+const PUSH_STATUS_DEBOUNCE_MS = 1200
+
+const isPushStatusEvent = (msg: unknown): boolean => {
+  if (typeof msg !== 'object' || msg === null) return false
+  const m = msg as Record<string, unknown>
+  return m.type === PUSH_STATUS_EVENT || m.event_type === PUSH_STATUS_EVENT
+}
+
 export const useNotificationsWebSocket = ({
   projectId,
   enabled = true,
@@ -138,6 +152,7 @@ export const useNotificationsWebSocket = ({
   const queryClient = useQueryClient()
   const rwsRef = useRef<ReconnectingWebSocket | null>(null)
   const pingIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  const pushStatusTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const mountedRef = useRef(true)
 
   useEffect(() => {
@@ -175,6 +190,18 @@ export const useNotificationsWebSocket = ({
         (msg as { type: string }).type === 'pong'
       )
         return
+
+      if (isPushStatusEvent(msg)) {
+        // A push can emit many per-item logs in a burst — coalesce into one
+        // refetch of the push-status dashboard.
+        if (pushStatusTimerRef.current) clearTimeout(pushStatusTimerRef.current)
+        pushStatusTimerRef.current = setTimeout(() => {
+          queryClient.invalidateQueries({
+            queryKey: PUSH_STATUS_QUERY_KEYS.all()
+          })
+        }, PUSH_STATUS_DEBOUNCE_MS)
+        return
+      }
 
       if (isTaskNotification(msg)) {
         // Personal task notification — invalidate tasks and show notification
@@ -249,6 +276,10 @@ export const useNotificationsWebSocket = ({
       if (pingIntervalRef.current) {
         clearInterval(pingIntervalRef.current)
         pingIntervalRef.current = null
+      }
+      if (pushStatusTimerRef.current) {
+        clearTimeout(pushStatusTimerRef.current)
+        pushStatusTimerRef.current = null
       }
       rws.close()
       rwsRef.current = null

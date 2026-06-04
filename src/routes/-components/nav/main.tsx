@@ -153,6 +153,7 @@ const WORKSPACE_ITEMS: NavItem[] = [
 ]
 
 const BOTTOM_ITEMS: NavItem[] = [
+  { title: 'Push Status', url: '/push-status', icon: IStorefront, superAdminOnly: true },
   { title: 'Projects', url: '/projects', icon: IProjects, superAdminOnly: true }
 ]
 

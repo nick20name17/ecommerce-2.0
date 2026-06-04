@@ -52,4 +52,27 @@ export interface PushStatusParams extends PaginationParams {
   search?: string
   ordering?: string
   project_id?: number
+  // Push-state scope: undefined/inflight (default) | error | in_process | finished | all
+  status?: string
+}
+
+// Cross-project admin overview. Backed by
+// GET /api/data/proposals/push-status/overview/ (superadmin).
+
+export type PushStatusLiveState = 'ok' | 'unreachable' | 'unsupported' | 'not_configured' | 'error'
+
+export interface PushStatusOverviewRow {
+  project_id: number
+  project_name: string
+  // Live in-flight count (gated pending set); null unless live_state === 'ok'.
+  in_flight: number | null
+  live_state: PushStatusLiveState
+  // Storefront push errors in the last 7 days (from PayloadLog).
+  errors_recent: number
+  last_attempt_at: string | null
+}
+
+export interface PushStatusOverviewResponse {
+  count: number
+  results: PushStatusOverviewRow[]
 }
