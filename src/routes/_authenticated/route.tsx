@@ -10,6 +10,7 @@ import { getFieldConfigQuery } from '@/api/field-config/query'
 import { getPriceLevelsQuery } from '@/api/price-level/query'
 import { getSalespersonsQuery } from '@/api/salesperson/query'
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar'
+import { isAdmin } from '@/constants/user'
 import { getSession } from '@/helpers/auth'
 import { useProjectId } from '@/hooks/use-project-id'
 import { NotificationsWsManager } from './-components/notifications-ws-manager'
@@ -20,7 +21,10 @@ const AuthenticatedLayout = () => {
 
   useEffect(() => {
     if (!projectId) return
-    queryClient.prefetchQuery(getFieldConfigQuery(projectId))
+    const session = getSession()
+    if (!!session?.user?.role && isAdmin(session.user.role)) {
+      queryClient.prefetchQuery(getFieldConfigQuery(projectId))
+    }
     queryClient.prefetchQuery(getEditableFieldsQuery(projectId))
     queryClient.prefetchQuery(getPriceLevelsQuery(projectId))
     queryClient.prefetchQuery(getSalespersonsQuery(projectId))

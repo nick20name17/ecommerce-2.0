@@ -13,6 +13,7 @@ import {
 import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
+import { ORDER_QUERY_KEYS } from '@/api/order/query'
 import type {
   Order,
   OrderItem,
@@ -22,7 +23,6 @@ import type {
   ShippingRatesResponse,
   ShippingSelectionRequest
 } from '@/api/order/schema'
-import { ORDER_QUERY_KEYS } from '@/api/order/query'
 import { orderService } from '@/api/order/service'
 import { getShippingAddressesQuery } from '@/api/shipping-address/query'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
@@ -31,9 +31,9 @@ import { getErrorMessage } from '@/helpers/error'
 import { useProjectId } from '@/hooks/use-project-id'
 import { cn } from '@/lib/utils'
 
+import { ShipToEditDialog } from './shipping-rates-edit'
 import { PackageCard } from './shipping-rates-package'
 import { RatesResultStep } from './shipping-rates-results'
-import { ShipToEditDialog } from './shipping-rates-edit'
 
 type Step = 'configure' | 'rates'
 
@@ -98,11 +98,13 @@ export function ShippingRatesDialog({
   const [selectedAddressId, setSelectedAddressId] = useState<number | null>(null)
   const [addressPopoverOpen, setAddressPopoverOpen] = useState(false)
 
-  const { data: shippingAddresses = [] } = useQuery(getShippingAddressesQuery(projectId))
+  const { data: shippingAddresses = [] } = useQuery({
+    ...getShippingAddressesQuery(projectId),
+    enabled: open && projectId != null
+  })
 
   const selectedAddress = shippingAddresses.find(a => a.id === selectedAddressId) ?? null
 
-  // Initialize when dialog opens
   const prevOpenRef = useRef(false)
   useEffect(() => {
     if (open && !prevOpenRef.current) {
