@@ -15,11 +15,12 @@ export const getPushStatusQuery = (params: PushStatusParams = {}) =>
     queryKey: PUSH_STATUS_QUERY_KEYS.list(params),
     queryFn: () => pushStatusService.get(params),
     staleTime: 0,
-    // Real-time updates arrive via the notifications WebSocket
-    // (storefront_push_logged -> invalidate). This poll is a fallback that
-    // also surfaces brand-new before-process orders that haven't logged a
-    // push yet, so it can be relaxed from the old 10s now that WS is primary.
-    refetchInterval: 30_000
+    // WS (storefront_push_logged) already makes push activity instant; this
+    // poll's job is to surface brand-new before-process orders that haven't
+    // logged a push yet (no log -> no WS event). 10s so a freshly-approved or
+    // worker-stuck order shows quickly. TanStack pauses refetchInterval while
+    // the tab is unfocused, so the live-proxy load is bounded to active triage.
+    refetchInterval: 10_000
   })
 
 // Cross-project admin overview. The notifications WS is per-project, so this
