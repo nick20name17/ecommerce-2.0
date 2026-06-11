@@ -32,7 +32,13 @@ export default defineConfig({
   server: {
     port: 3000,
     watch: {
-      ignored: ['**/.claude/**', '**/.tanstack/**']
+      // Anchor to this project's own dot-dirs. A bare '**/.claude/**' also
+      // matches when the checkout itself lives under .claude/worktrees/
+      // (Claude Code worktrees), which silently kills HMR for the whole app.
+      ignored: [
+        `${path.resolve(__dirname, '.claude')}/**`,
+        `${path.resolve(__dirname, '.tanstack')}/**`
+      ]
     },
     // Same-origin dev mode: set VITE_API_URL= (empty) in .env.local and the
     // app calls /api + /ws on the Vite origin; these proxies forward to the
