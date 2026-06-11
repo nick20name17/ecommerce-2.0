@@ -4,49 +4,68 @@ import {
   buildMonthWeeks,
   buildWeekBars,
   isSameDay,
+  nameInitials,
   toISODate,
   type CalendarEvent
 } from './calendar-lib'
 
+import { InitialsAvatar } from '@/components/ds/initials-avatar'
 import { cn } from '@/lib/utils'
 
 const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 
 /** px from week-cell top reserved for the day numbers */
-const BARS_TOP = 28
+const BARS_TOP = 30
 /** px per bar track (bar height + gap) */
-const TRACK_HEIGHT = 26
+const TRACK_HEIGHT = 28
 
 interface MonthGridProps {
   month: Date
   events: CalendarEvent[]
+  /** Date-less events shown in the Unscheduled tray below the grid */
+  trayEvents?: CalendarEvent[]
   onEventClick?: (event: CalendarEvent) => void
-  /** Called when a bar is dropped on a day. New start date in ISO. */
+  /** Called when a bar or tray chip is dropped on a day. New start date in ISO. */
   onEventDrop?: (event: CalendarEvent, newStart: string) => void
 }
 
-export function MonthGrid({ month, events, onEventClick, onEventDrop }: MonthGridProps) {
+export function MonthGrid({
+  month,
+  events,
+  trayEvents = [],
+  onEventClick,
+  onEventDrop
+}: MonthGridProps) {
   const weeks = buildMonthWeeks(month)
   const today = new Date()
   const dragEvent = useRef<CalendarEvent | null>(null)
   const [dropWeek, setDropWeek] = useState<string | null>(null)
 
+  const startDrag = (event: CalendarEvent) => (e: React.DragEvent) => {
+    dragEvent.current = event
+    e.dataTransfer.effectAllowed = 'move'
+  }
+  const endDrag = () => {
+    dragEvent.current = null
+    setDropWeek(null)
+  }
+
   return (
-    <div className='flex h-full min-h-0 flex-col'>
+    <div className='flex h-full min-h-0 flex-col overflow-y-auto bg-bg-secondary/40 px-3.5 pb-4 sm:px-6'>
       {/* Weekday header */}
-      <div className='grid shrink-0 grid-cols-7 border-b border-border'>
+      <div className='grid shrink-0 grid-cols-7 py-1.5'>
         {WEEKDAYS.map(d => (
           <div
             key={d}
-            className='py-1.5 text-center text-[11px] font-semibold tracking-[0.06em] text-text-tertiary uppercase'
+            className='text-center text-[11px] font-semibold tracking-[0.06em] text-text-tertiary uppercase'
           >
             {d}
           </div>
         ))}
       </div>
 
-      {/* Weeks */}
-      <div className='flex flex-1 flex-col overflow-y-auto'>
+      {/* Month card */}
+      <div className='flex min-h-[60vh] flex-col overflow-hidden rounded-[10px] border border-border bg-background shadow-[var(--surface-shadow)]'>
         {weeks.map(week => {
           const weekKey = toISODate(week[0])
           const bars = buildWeekBars(events, week)
@@ -112,32 +131,33 @@ export function MonthGrid({ month, events, onEventClick, onEventDrop }: MonthGri
                     key={`${bar.event.source}:${bar.event.id}`}
                     type='button'
                     draggable={!!onEventDrop}
-                    onDragStart={e => {
-                      dragEvent.current = bar.event
-                      e.dataTransfer.effectAllowed = 'move'
-                    }}
-                    onDragEnd={() => {
-                      dragEvent.current = null
-                      setDropWeek(null)
-                    }}
+                    onDragStart={startDrag(bar.event)}
+                    onDragEnd={endDrag}
                     onClick={() => onEventClick?.(bar.event)}
                     className={cn(
-                      'pointer-events-auto absolute flex h-[22px] cursor-grab items-center gap-1.5 overflow-hidden rounded-[5px] px-1.5 text-left text-[12px] font-medium text-white shadow-[0_1px_2px_rgba(0,0,0,0.08)] transition-opacity duration-[80ms] hover:opacity-90 active:cursor-grabbing',
+                      'pointer-events-auto absolute flex h-[24px] cursor-grab items-center gap-1.5 overflow-hidden rounded-[6px] px-1.5 text-left text-[12px] font-semibold text-white shadow-[0_1px_2px_rgba(0,0,0,0.08)] transition-opacity duration-[80ms] hover:opacity-90 active:cursor-grabbing',
                       bar.clipLeft && 'rounded-l-none',
                       bar.clipRight && 'rounded-r-none'
                     )}
                     style={{
-                      left: `calc(${(bar.startCol / 7) * 100}% + 3px)`,
-                      width: `calc(${(bar.span / 7) * 100}% - 6px)`,
+                      left: `calc(${(bar.startCol / 7) * 100}% + 4px)`,
+                      width: `calc(${(bar.span / 7) * 100}% - 8px)`,
                       top: BARS_TOP + bar.track * TRACK_HEIGHT,
                       backgroundColor: bar.event.color
                     }}
                   >
-                    <span className='truncate'>{bar.event.title}</span>
-                    {bar.event.meta && (
-                      <span className='ml-auto shrink-0 text-[10px] text-white/75 tabular-nums'>
-                        {bar.event.meta}
+                    {bar.event.code && (
+                      <span className='shrink-0 rounded-[4px] bg-white/25 px-1 text-[10px] font-bold tracking-[0.02em]'>
+                        {bar.event.code}
                       </span>
+                    )}
+                    <span className='flex-1 truncate font-medium'>{bar.event.title}</span>
+                    {bar.event.meta && (
+                      <InitialsAvatar
+                        initials={nameInitials(bar.event.meta)}
+                        size={16}
+                        className='shrink-0 ring-[1.5px] ring-white/70'
+                      />
                     )}
                   </button>
                 ))}
@@ -145,6 +165,53 @@ export function MonthGrid({ month, events, onEventClick, onEventDrop }: MonthGri
             </div>
           )
         })}
+      </div>
+
+      {/* Unscheduled tray */}
+      <div
+        className={cn(
+          'mt-3 shrink-0 rounded-[10px] border border-dashed border-border bg-background px-3.5 py-3',
+          trayEvents.length === 0 && 'opacity-70'
+        )}
+      >
+        <div className='mb-2 text-[11px] font-semibold tracking-[0.06em] text-text-tertiary uppercase'>
+          Unscheduled
+          {trayEvents.length > 0 ? ` — drag onto a day to set a date (${trayEvents.length})` : ''}
+        </div>
+        {trayEvents.length === 0 ? (
+          <div className='text-[12px] text-text-tertiary'>
+            Nothing waiting. Items without a date land here until you drag them onto a day.
+          </div>
+        ) : (
+          <div className='flex flex-wrap gap-2'>
+            {trayEvents.map(event => (
+              <button
+                key={`${event.source}:${event.id}`}
+                type='button'
+                draggable={!!onEventDrop}
+                onDragStart={startDrag(event)}
+                onDragEnd={endDrag}
+                onClick={() => onEventClick?.(event)}
+                className='flex cursor-grab items-center gap-1.5 rounded-[6px] px-2 py-1 text-[12px] font-medium text-white shadow-[0_1px_2px_rgba(0,0,0,0.08)] transition-opacity duration-[80ms] hover:opacity-90 active:cursor-grabbing'
+                style={{ backgroundColor: event.color }}
+              >
+                {event.code && (
+                  <span className='rounded-[4px] bg-white/25 px-1 text-[10px] font-bold'>
+                    {event.code}
+                  </span>
+                )}
+                {event.title}
+                {event.meta && (
+                  <InitialsAvatar
+                    initials={nameInitials(event.meta)}
+                    size={16}
+                    className='ring-[1.5px] ring-white/70'
+                  />
+                )}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   )

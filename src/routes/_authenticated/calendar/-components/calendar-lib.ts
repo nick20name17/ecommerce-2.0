@@ -6,19 +6,41 @@
  * proposals, jobs…) can plug in beside native tasks later.
  */
 
+import type { CalendarWriteMode } from '@/api/calendar/schema'
+
 export interface CalendarEvent {
   /** Source key from the backend registry ('task', 'job', …) */
   source: string
   /** Source-scoped id (task pk, EBMS autoid…) */
   id: string
   title: string
+  /** ISO yyyy-mm-dd (inclusive); missing = unscheduled (tray) */
+  start?: string | null
   /** ISO yyyy-mm-dd (inclusive) */
-  start: string
-  /** ISO yyyy-mm-dd (inclusive) */
-  end: string
+  end?: string | null
   /** Resolved display color (hex or CSS color) */
   color: string
+  /** Short id chip shown on the bar (e.g. "#42", "J-2041") */
+  code?: string
   meta?: string
+  writeMode?: CalendarWriteMode
+  nativeStart?: string | null
+  nativeEnd?: string | null
+  overridden?: boolean
+}
+
+/** Initials for an avatar from a display name ("Jane Doe" → "JD"). */
+export function nameInitials(name: string): string {
+  const parts = name.trim().split(/\s+/)
+  return ((parts[0]?.[0] ?? '') + (parts[1]?.[0] ?? parts[0]?.[1] ?? '')).toUpperCase()
+}
+
+/** Toast subtitle describing what a reschedule actually did. */
+export const WRITE_MODE_TOAST: Record<CalendarWriteMode, string> = {
+  web: 'app event moved',
+  overlay: 'overlay only · EBMS unchanged',
+  ebms: 'written back to EBMS',
+  config: 'overlay (write-back configurable)'
 }
 
 // ── Date helpers (local-time, ISO date strings) ──────────────
@@ -86,20 +108,21 @@ export function buildWeekBars(events: CalendarEvent[], week: Date[]): WeekBar[] 
 
   const inWeek = events
     .filter(e => {
+      if (!e.start) return false
       const s = fromISODate(e.start)
-      const end = fromISODate(e.end)
+      const end = fromISODate(e.end || e.start)
       return s <= weekEnd && end >= weekStart
     })
     .sort(
       (a, b) =>
-        fromISODate(a.start).getTime() - fromISODate(b.start).getTime() ||
+        fromISODate(a.start!).getTime() - fromISODate(b.start!).getTime() ||
         a.title.localeCompare(b.title)
     )
 
   const trackEnds: number[] = []
   return inWeek.map(event => {
-    const s = fromISODate(event.start)
-    const e = fromISODate(event.end)
+    const s = fromISODate(event.start!)
+    const e = fromISODate(event.end || event.start!)
     const clipLeft = s < weekStart
     const clipRight = e > weekEnd
     const startCol = clipLeft ? 0 : s.getDay()
