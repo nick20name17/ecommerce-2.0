@@ -4,6 +4,7 @@
  */
 
 import {
+  CalendarDays,
   CheckCircle2,
   ClipboardList,
   FileSpreadsheet,
@@ -40,3 +41,4 @@ export const IActivity: IC = ({ className }) => <ListChecks className={className
 export const ICatalog: IC = ({ className }) => <FolderTree className={className} />
 export const IStorefront: IC = ({ className }) => <LayoutTemplate className={className} />
 export const IDocuments: IC = ({ className }) => <FileSpreadsheet className={className} />
+export const ICalendar: IC = ({ className }) => <CalendarDays className={className} />

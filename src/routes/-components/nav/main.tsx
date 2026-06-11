@@ -4,6 +4,7 @@ import { Link } from '@tanstack/react-router'
 import { getTasksQuery, getTaskStatusesQuery } from '@/api/task/query'
 import {
   IActivity,
+  ICalendar,
   ICatalog,
   ICustomers,
   IDashboard,
@@ -101,6 +102,13 @@ const WORKSPACE_ITEMS: NavItem[] = [
     url: '/tasks',
     icon: ITodos,
     iconBg: 'bg-violet-500',
+    iconColor: 'text-white'
+  },
+  {
+    title: 'Calendar',
+    url: '/calendar',
+    icon: ICalendar,
+    iconBg: 'bg-red-500',
     iconColor: 'text-white'
   },
   {

@@ -22,7 +22,15 @@ const RECONNECT_MAX_MS = 30000
 const RECONNECT_GROW_FACTOR = 2
 const PING_INTERVAL_MS = 30000
 
-const getWsOrigin = (): string => API_ORIGIN.replace(/^http/, 'ws')
+const getWsOrigin = (): string => {
+  // Same-origin mode (empty API_ORIGIN): derive ws origin from the page,
+  // letting the Vite dev proxy forward /ws to the backend.
+  if (!API_ORIGIN) {
+    const { protocol, host } = window.location
+    return `${protocol === 'https:' ? 'wss' : 'ws'}://${host}`
+  }
+  return API_ORIGIN.replace(/^http/, 'ws')
+}
 
 export interface WSNotificationPayload {
   event_type: string

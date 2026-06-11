@@ -33,6 +33,20 @@ export default defineConfig({
     port: 3000,
     watch: {
       ignored: ['**/.claude/**', '**/.tanstack/**']
+    },
+    // Same-origin dev mode: set VITE_API_URL= (empty) in .env.local and the
+    // app calls /api + /ws on the Vite origin; these proxies forward to the
+    // real backend server-side, so no CORS and no fixed port required.
+    proxy: {
+      '/api': {
+        target: 'https://api.ebms.app',
+        changeOrigin: true
+      },
+      '/ws': {
+        target: 'https://api.ebms.app',
+        changeOrigin: true,
+        ws: true
+      }
     }
   }
 })

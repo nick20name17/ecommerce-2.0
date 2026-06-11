@@ -30,6 +30,7 @@ import { Route as AuthenticatedDevIndexRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedCustomersIndexRouteImport } from './routes/_authenticated/customers/index'
 import { Route as AuthenticatedCreateIndexRouteImport } from './routes/_authenticated/create/index'
 import { Route as AuthenticatedCatalogIndexRouteImport } from './routes/_authenticated/catalog/index'
+import { Route as AuthenticatedCalendarIndexRouteImport } from './routes/_authenticated/calendar/index'
 import { Route as AuthenticatedActivityIndexRouteImport } from './routes/_authenticated/activity/index'
 import { Route as AuthSignInIndexRouteImport } from './routes/_auth/sign-in/index'
 import { Route as AuthenticatedDocumentsNewRouteImport } from './routes/_authenticated/documents/new'
@@ -160,6 +161,12 @@ const AuthenticatedCatalogIndexRoute =
     path: '/catalog/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedCalendarIndexRoute =
+  AuthenticatedCalendarIndexRouteImport.update({
+    id: '/calendar/',
+    path: '/calendar/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedActivityIndexRoute =
   AuthenticatedActivityIndexRouteImport.update({
     id: '/activity/',
@@ -231,6 +238,7 @@ export interface FileRoutesByFullPath {
   '/documents/new': typeof AuthenticatedDocumentsNewRoute
   '/sign-in/': typeof AuthSignInIndexRoute
   '/activity/': typeof AuthenticatedActivityIndexRoute
+  '/calendar/': typeof AuthenticatedCalendarIndexRoute
   '/catalog/': typeof AuthenticatedCatalogIndexRoute
   '/create/': typeof AuthenticatedCreateIndexRoute
   '/customers/': typeof AuthenticatedCustomersIndexRoute
@@ -263,6 +271,7 @@ export interface FileRoutesByTo {
   '/documents/new': typeof AuthenticatedDocumentsNewRoute
   '/sign-in': typeof AuthSignInIndexRoute
   '/activity': typeof AuthenticatedActivityIndexRoute
+  '/calendar': typeof AuthenticatedCalendarIndexRoute
   '/catalog': typeof AuthenticatedCatalogIndexRoute
   '/create': typeof AuthenticatedCreateIndexRoute
   '/customers': typeof AuthenticatedCustomersIndexRoute
@@ -298,6 +307,7 @@ export interface FileRoutesById {
   '/_authenticated/documents/new': typeof AuthenticatedDocumentsNewRoute
   '/_auth/sign-in/': typeof AuthSignInIndexRoute
   '/_authenticated/activity/': typeof AuthenticatedActivityIndexRoute
+  '/_authenticated/calendar/': typeof AuthenticatedCalendarIndexRoute
   '/_authenticated/catalog/': typeof AuthenticatedCatalogIndexRoute
   '/_authenticated/create/': typeof AuthenticatedCreateIndexRoute
   '/_authenticated/customers/': typeof AuthenticatedCustomersIndexRoute
@@ -332,6 +342,7 @@ export interface FileRouteTypes {
     | '/documents/new'
     | '/sign-in/'
     | '/activity/'
+    | '/calendar/'
     | '/catalog/'
     | '/create/'
     | '/customers/'
@@ -364,6 +375,7 @@ export interface FileRouteTypes {
     | '/documents/new'
     | '/sign-in'
     | '/activity'
+    | '/calendar'
     | '/catalog'
     | '/create'
     | '/customers'
@@ -398,6 +410,7 @@ export interface FileRouteTypes {
     | '/_authenticated/documents/new'
     | '/_auth/sign-in/'
     | '/_authenticated/activity/'
+    | '/_authenticated/calendar/'
     | '/_authenticated/catalog/'
     | '/_authenticated/create/'
     | '/_authenticated/customers/'
@@ -580,6 +593,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCatalogIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/calendar/': {
+      id: '/_authenticated/calendar/'
+      path: '/calendar'
+      fullPath: '/calendar/'
+      preLoaderRoute: typeof AuthenticatedCalendarIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/activity/': {
       id: '/_authenticated/activity/'
       path: '/activity'
@@ -676,6 +696,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
   AuthenticatedDocumentsNewRoute: typeof AuthenticatedDocumentsNewRoute
   AuthenticatedActivityIndexRoute: typeof AuthenticatedActivityIndexRoute
+  AuthenticatedCalendarIndexRoute: typeof AuthenticatedCalendarIndexRoute
   AuthenticatedCatalogIndexRoute: typeof AuthenticatedCatalogIndexRoute
   AuthenticatedCreateIndexRoute: typeof AuthenticatedCreateIndexRoute
   AuthenticatedCustomersIndexRoute: typeof AuthenticatedCustomersIndexRoute
@@ -708,6 +729,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
   AuthenticatedDocumentsNewRoute: AuthenticatedDocumentsNewRoute,
   AuthenticatedActivityIndexRoute: AuthenticatedActivityIndexRoute,
+  AuthenticatedCalendarIndexRoute: AuthenticatedCalendarIndexRoute,
   AuthenticatedCatalogIndexRoute: AuthenticatedCatalogIndexRoute,
   AuthenticatedCreateIndexRoute: AuthenticatedCreateIndexRoute,
   AuthenticatedCustomersIndexRoute: AuthenticatedCustomersIndexRoute,
