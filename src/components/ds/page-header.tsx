@@ -24,6 +24,7 @@ export const PAGE_COLORS = {
   shipping: 'bg-cyan-500',
   customers: 'bg-blue-500',
   orders: 'bg-amber-500',
+  draftOrders: 'bg-amber-600',
   proposals: 'bg-rose-500',
   todos: 'bg-violet-500',
   projects: 'bg-slate-500',

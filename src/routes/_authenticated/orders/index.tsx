@@ -1,6 +1,6 @@
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
-import { Package, Plus, Search, UserRound } from 'lucide-react'
+import { Package, Plus, ScanText, Search, UserRound } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 
 import { OrderAssignDialog } from './-components/order-assign-dialog'
@@ -278,6 +278,16 @@ const OrdersPage = () => {
           >
             <UserRound className='size-3' />
             Assigned to me
+          </button>
+
+          <button
+            type='button'
+            title='Upload order doc'
+            className='hidden h-7 items-center gap-1 rounded-[5px] border border-border bg-background px-2 text-[13px] font-medium text-text-secondary transition-colors duration-80 hover:bg-bg-hover lg:inline-flex'
+            onClick={() => navigate({ to: '/orders/drafts' })}
+          >
+            <ScanText className='size-3' />
+            Upload doc
           </button>
 
           <button
