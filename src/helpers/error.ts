@@ -8,6 +8,9 @@ export const getErrorMessage = (error: unknown): string => {
 
     if (typeof data?.detail === 'string') return data.detail
 
+    // Hand-rolled backend views (draft orders, uploads, ...) use {"error": "..."}.
+    if (typeof data?.error === 'string') return data.error
+
     if (typeof data?.message === 'string') return data.message
 
     if (Array.isArray(data?.non_field_errors)) {

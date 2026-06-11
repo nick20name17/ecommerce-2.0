@@ -9,6 +9,7 @@ import {
   IDashboard,
   IDev,
   IDocuments,
+  IDraftOrders,
   IOrderDesk,
   IOrders,
   IPickLists,
@@ -87,6 +88,13 @@ const WORKSPACE_ITEMS: NavItem[] = [
     url: '/orders',
     icon: IOrders,
     iconBg: 'bg-amber-500',
+    iconColor: 'text-white'
+  },
+  {
+    title: 'Draft Orders',
+    url: '/orders/drafts',
+    icon: IDraftOrders,
+    iconBg: 'bg-amber-600',
     iconColor: 'text-white'
   },
   {

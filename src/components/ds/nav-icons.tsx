@@ -14,6 +14,7 @@ import {
   ListChecks,
   Package,
   Rocket,
+  ScanText,
   Settings,
   SquarePlus,
   FileText,
@@ -29,6 +30,7 @@ export const IProjects: IC = ({ className }) => <LayoutList className={className
 export const ICustomers: IC = ({ className }) => <Users className={className} />
 export const IUser: IC = ({ className }) => <UserCircle2 className={className} />
 export const IOrders: IC = ({ className }) => <Package className={className} />
+export const IDraftOrders: IC = ({ className }) => <ScanText className={className} />
 export const IProposals: IC = ({ className }) => <FileText className={className} />
 export const ITodos: IC = ({ className }) => <CheckCircle2 className={className} />
 export const IOrderDesk: IC = ({ className }) => <SquarePlus className={className} />
